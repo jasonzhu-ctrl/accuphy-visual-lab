@@ -157,13 +157,24 @@ export const sonarFragment = /* glsl */ `
         spk = max(spk, pulse * structure);          // a solid face is bright whether it fills one row or all 24 (app piling)
       }
       acc = acc / 16.0 + 0.7 * peak + 0.9 * spk;  // bottom: hot dense band; structure: solid bright column (Jason: 实心结构亮的清晰的)
-      if (uFlat > 0.5) acc = flatHit * (0.45 + 0.3 * mottle + 0.12 * streak) * (1.0 - 0.3 * smoothstep(0.0, 0.15 * uRange, 0.15 * uRange - r)) + 0.9 * spk; // pano: even bottom texture with shadows, dark near the apex // first return makes the leading edge hot even where the bottom slopes across the beam; the integrated part gives the orange body (balance loop, §6.11)
+      if (uFlat > 0.5) {
+        // Panoramic (app lake frames, §7.12): the fan is a continuous dark-red grainy field of bottom
+        // texture; shadows behind humps are darker red, never black; hard bottom / structure facing the
+        // transducer is brighter; fish are small bright dashes on top. Per-pixel grain + radial beam streaks.
+        float cover = smoothstep(0.0, 0.5, flatHit);
+        float fine = hash(gl_FragCoord.xy * 0.71 + t * 0.3);
+        // calibrated to the app's lake frame (index histogram: 70 % of the fan in the 0.1–0.2 bin, mean 0.18)
+        // app lake frame: a smooth, even crimson field with soft low-frequency mottle and faint beam
+        // streaks — NOT per-pixel grain; brightness barely falls off with range
+        float field = 0.072 + 0.012 * fine + 0.02 * streak + 0.04 * mottle + 0.015 * rays;
+        acc = field * (0.78 + 0.22 * cover) + 0.06 * peak * cover + 0.9 * spk; // open water and shadows are the same dark-red floor, bottom a shade brighter
+      }
       // fish (sonar-style.md §6.8): the mask already carries the fish's own angular extent
       // (near: body length + heading). Blur it by a CONSTANT beam angle along the arc —
       // so far fish become tangential dashes the width of the beam — and use the average
       // fill rather than the max, so a head-on fish (narrow in angle) comes out dimmer
       // than a broadside one at the same range.
-      float beamHalf = max(0.014, 0.07 / r);    // ≈ 0.8° beam half-width, never under ≈ 7 cm: the near-field rim (app: a few cm gradient)
+      float beamHalf = max(uFlat > 0.5 ? 0.028 : 0.014, 0.07 / r); // beam half-width (panoramic marks are wider tangential dashes, app lake frames §7.12)
       float fishSum = 0.0, wSum = 0.0, fishMax = 0.0;
       for (int i = -3; i <= 3; i++) {
         float f = float(i) / 3.0;
@@ -197,10 +208,11 @@ export const sonarFragment = /* glsl */ `
       // no beam comb on fish: the app's fish are solid oblongs with a soft rim in every view (§7.2, §7.9);
       // the comb belongs to structure faces only. A gentle per-fish brightness variation instead.
       fishHit *= 0.85 + 0.3 * vnoise(vec2(a * 60.0, r * 0.7));
-      float atten = 1.0 - 0.4 * clamp(r / uRange, 0.0, 1.0);
+      float atten = 1.0 - (uFlat > 0.5 ? 0.12 : 0.4) * clamp(r / uRange, 0.0, 1.0);
       float gain = 1.0;
       float fishEcho = fishHit;                            // fish rims are smooth gradients in the app, not speckle
-      echo = max(echo, max(acc * atten * tex * gain, fishEcho));
+      float texUse = uFlat > 0.5 ? 0.85 + 0.3 * streak : tex; // panoramic: gentle texture (the field is even)
+      echo = max(echo, max(acc * atten * texUse * gain, fishEcho));
     }
     // clutter near the transducer: bright rays fanning out from the apex — a FIXED ≈ 2.4 m
     // in metres (sonar-style.md §6.9), so they look big at short range and small at long range

@@ -547,3 +547,27 @@ school now stands in for the app's reference scene so the comparison is like
 for like. Remaining gaps after this round: the bait school reads much weaker
 than the app's (small fish at true size are near the pixel limit at 18 m
 range), and the app's fill texture is finer-grained than the engine's lumps.
+
+### 7.12 Panoramic — the real lake look (2026-09-24, Jason: "差距也太大了, 特别是 panoramic")
+The pool frame on the tablet was a special case. The lake recordings
+(`reference/app-study/panoramic-lake/`, PL 14–28 m gain 77 %, PLM Live
+Panoramic 14–20 m) show what Panoramic actually looks like on the water:
+- **The whole fan is a continuous, even crimson field** — index ≈ 0.1–0.25,
+  70 % of the fan in the 0.1–0.2 bin, mean 0.18, **0 % black inside the fan**.
+  Brightness barely falls off with range. The texture is a soft low-frequency
+  mottle with faint radial beam streaks, not per-pixel grain.
+- **Bottom is found from the apex outward**, not only beyond depth/sin 25°:
+  the nominal 5°–25° slab does not explain it, so the thickness sidelobes must
+  reach the bottom at steep angles. Engine: the panoramic depth pass now
+  samples 5°–65° below the surface.
+- **Shadows** behind humps and channels are a darker crimson, never black;
+  open water is the same floor.
+- **Fish are the picture:** dozens of short bright yellow dashes with an
+  orange halo, 0.3–0.8 m, mostly tangential (across the ray), scattered over
+  the field. Engine: wider tangential beam blur in Panoramic (≈ 1.6°).
+- PLM Live Panoramic draws the fan from a **left apex opening right** (like
+  Forward), with the same crimson field, dark shadow holes and bright dashes.
+Engine calibration (shelf scene, 50 ft): index histogram now 0.09 / 0.28 /
+0.36 / 0.21 in the first four bins vs the app's 0.01 / 0.70 / 0.24 / 0.04 —
+same shape, one bin brighter; black inside the fan 0. Shelf bait schools were
+added to the lake so the Panoramic step shows dashes.

@@ -156,15 +156,21 @@ export default function SonarScreen({ state, rect, lakeMats }) {
     lakeMats.forEach((m) => { m.userData.uniforms.uSonarPass.value = 1 })
     specs.forEach((sp, k) => {
       const cam = res.cams[k]
-      const half = (sp.a1 - sp.a0) / 2, thickHalf = Math.abs(sp.s1 - sp.s0) === 2 ? sp.theta : sp.theta / 2
+      const half = (sp.a1 - sp.a0) / 2
+      let thickHalf = Math.abs(sp.s1 - sp.s0) === 2 ? sp.theta : sp.theta / 2
+      const c = sp.frame.c.clone()
+      if (sp.s0 === 0) {
+        // Panoramic: the nominal slab is 5°–25° below the surface, but the real picture is bottom-
+        // filled from the apex outward (the app's lake and pool frames, sonar-style.md §7.12) — the
+        // thickness sidelobes reach the bottom at steep angles. Sample 5°–65° so near bottom is found.
+        thickHalf = THREE.MathUtils.degToRad(30)
+        c.multiplyScalar(Math.cos(thickHalf)).addScaledVector(sp.frame.n, Math.sin(thickHalf)).normalize()
+      }
       const tanH = Math.tan(half), tanV = Math.tan(thickHalf)
       cam.fov = THREE.MathUtils.radToDeg(thickHalf) * 2
       cam.aspect = tanH / tanV
       cam.updateProjectionMatrix()
       cam.position.copy(s.apex)
-      // for one-sided thickness (panoramic: s0=0, s1=1) aim the camera at the middle of the slab
-      const c = sp.frame.c.clone()
-      if (sp.s0 === 0) c.addScaledVector(sp.frame.n, Math.tan(sp.theta) * 0.5).normalize()
       tmpUp.copy(sp.frame.n).negate() // so NDC +x = +wide angle (see docs)
       cam.up.copy(tmpUp)
       cam.lookAt(s.apex.x + c.x, s.apex.y + c.y, s.apex.z + c.z)

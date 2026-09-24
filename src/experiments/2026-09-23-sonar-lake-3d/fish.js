@@ -47,6 +47,10 @@ export function makePopulation(bedY) {
   // crappie: two loose schools suspended near timber
   add('crappie', -15, -2, 4.0, 14, 5)
   add('crappie', -20, 12, 3.5, 12, 5)
+  // shelf bait for the Panoramic step (the app's lake frames are full of small dashes in 1–6 m of water)
+  add('smelt', -46, 12, 2.5, 40, 7)
+  add('crappie', -54, 4, 2.0, 8, 5)
+  add('smelt', -58, 14, 2.0, 25, 6)
   // smelt: two tight bait balls in open water
   add('smelt', 10, -6, 7.0, 60, 4)
   add('smelt', 20, 26, 6.0, 50, 4)
