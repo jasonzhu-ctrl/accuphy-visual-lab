@@ -67,17 +67,17 @@ export const sonarFragment = /* glsl */ `
     if (abs(a) > uFan[k].y || r > uRange) return 0.0;
     float u = 0.5 + 0.5 * tan(a) / uFan[k].z;
     float best = 0.0;
-    for (int j = 0; j < 12; j++) {
-      float v = (float(j) + 0.5) / 12.0;         // fixed rows: no per-pixel jitter → a solid mark, not salt-and-pepper
+    for (int j = 0; j < 24; j++) {
+      float v = (float(j) + 0.5) / 24.0;         // fixed rows: no per-pixel jitter → a solid mark, not salt-and-pepper
       float ty = (v * 2.0 - 1.0) * uFan[k].w;
-      float m = sampleFish(k, vec2(u, v));
-      if (m < 0.62) continue;                    // alpha 1 = fish (0.5 = structure); linear-filtered edges still count
+      float m = smoothstep(0.55, 0.95, sampleFish(k, vec2(u, v))); // linear-filtered alpha = coverage; weight by it instead of a hard cut (no checkerboard on small fish)
+      if (m < 0.02) continue;
       float hit = sampleDist(k, vec2(u, v), length(vec3(tan(a), ty, 1.0)));
       float dr = r - hit;
       float sr = (0.12 + 0.004 * r) * srScale;  // pulse length: thin in range, barely grows
       float core = exp(-dr * dr / (sr * sr));
       float tail = dr > 0.0 ? 0.35 * exp(-dr / (0.08 + 0.004 * r)) : 0.0; // short smear (app marks ≈ 0.07–0.2 m along the ray, §7.8)
-      best = max(best, core + tail);
+      best = max(best, m * (core + tail));
     }
     return best;
   }
@@ -149,7 +149,7 @@ export const sonarFragment = /* glsl */ `
         float second = 0.10 * exp(-(r - 2.0 * hit) * (r - 2.0 * hit) / (4.0 * sigma * sigma)); // faint second echo
         // panoramic: the fan grazes the bottom, so every screen point where SOME thickness row lands near
         // this range is bottom texture (a wide match), and where no row lands it is acoustic shadow (§3b)
-        float sf = 1.2 + 0.05 * r;
+        float sf = 2.2 + 0.08 * r;               // wide: the grazing fan paints the bottom densely; only true shadows stay dark
         flatHit = max(flatHit, exp(-dr * dr / (sf * sf)) * (1.0 - fish));
         float wgt = 0.55 + 0.9 * (1.0 - abs(v * 2.0 - 1.0));
         acc += (1.2 * pulse + tail + second) * wgt * (1.0 - fish);
@@ -157,7 +157,7 @@ export const sonarFragment = /* glsl */ `
         spk = max(spk, pulse * structure);          // a solid face is bright whether it fills one row or all 24 (app piling)
       }
       acc = acc / 16.0 + 0.7 * peak + 0.9 * spk;  // bottom: hot dense band; structure: solid bright column (Jason: 实心结构亮的清晰的)
-      if (uFlat > 0.5) acc = flatHit * (0.3 + 0.38 * mottle + 0.2 * streak) * (1.0 - 0.3 * smoothstep(0.0, 0.15 * uRange, 0.15 * uRange - r)) + 0.9 * spk; // pano: even bottom texture with shadows, dark near the apex // first return makes the leading edge hot even where the bottom slopes across the beam; the integrated part gives the orange body (balance loop, §6.11)
+      if (uFlat > 0.5) acc = flatHit * (0.45 + 0.3 * mottle + 0.12 * streak) * (1.0 - 0.3 * smoothstep(0.0, 0.15 * uRange, 0.15 * uRange - r)) + 0.9 * spk; // pano: even bottom texture with shadows, dark near the apex // first return makes the leading edge hot even where the bottom slopes across the beam; the integrated part gives the orange body (balance loop, §6.11)
       // fish (sonar-style.md §6.8): the mask already carries the fish's own angular extent
       // (near: body length + heading). Blur it by a CONSTANT beam angle along the arc —
       // so far fish become tangential dashes the width of the beam — and use the average
