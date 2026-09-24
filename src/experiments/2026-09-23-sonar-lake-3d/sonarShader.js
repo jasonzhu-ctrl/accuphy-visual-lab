@@ -122,6 +122,8 @@ export const sonarFragment = /* glsl */ `
     float idx = clamp((v - lo) / (hi - lo), 0.0, 1.0);
     if (echo <= 0.0005) idx = 0.0;
     vec3 col = texture2D(uLUT, vec2(idx * (255.0 / 256.0) + 0.5 / 256.0, 0.5)).rgb;
+    // like the app: the LUT's first colour fills the beam area (navy in jet), black outside it
+    col *= inAny;
     gl_FragColor = vec4(col, 1.0);
   }
 `
