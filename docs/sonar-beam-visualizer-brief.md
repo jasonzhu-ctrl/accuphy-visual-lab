@@ -85,8 +85,6 @@ In the Mini Combo View clip the downward-pointing blue triangle is the Down View
   the lake/river, so the visualiser gets a display-range control (like the
   app's −/+), with the max clamped per device. Store these as data, not
   constants in shaders.
-- `reference/recordings/unsorted/` has two RPReplay clips whose device/mode
-  is not yet identified — classify during Phase 1.
 
 ## How it maps onto this lab
 

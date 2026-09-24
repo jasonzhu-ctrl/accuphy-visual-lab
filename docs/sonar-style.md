@@ -41,8 +41,9 @@ Ramp: `#000000 → #300000 → #801000 → #c05000 → #e09000 → #f0c000 → #
   tinted, only returns are drawn.
 - **Mini Combo View:** Down triangle at the left + Forward wedge on the right,
   with a black gap between them; **depth is shared** on the vertical axis.
-- **Split Down + Forward (RPReplay clips):** two panels separated by a thin
-  grey diagonal line, each with its own range scale.
+- **PLM split Down + Forward in yellow mode (RPReplay clips):** two panels
+  separated by a thin grey diagonal line, each with its own range scale —
+  the yellow-mode rendering of the same Down + Forward pairing.
 - ⚠️ **The app stretches the picture**: horizontal px/m ≠ vertical px/m
   (e.g. Mini Down View 864×544 clip: ~68 px/m horizontal vs ~41 px/m vertical).
   Measured half-angle after correcting for the stretch ≈ 18–19°, i.e. the
@@ -77,6 +78,6 @@ ACCUPHY logo top-right, `1440p (QHD)` tag. Not needed for the marketing
 visualiser — the "sonar flashlight" only needs the picture inside the beam.
 
 ## 5. Open questions for Jason
-1. Which device made the two RPReplay split-view clips (range 40/60 ft)?
+1. ~~Which device made the two RPReplay split-view clips?~~ PLM (answered).
 2. For the website piece: one palette only, or a blue/red ↔ yellow toggle?
 3. Max range per device and mode (needed for fan length).

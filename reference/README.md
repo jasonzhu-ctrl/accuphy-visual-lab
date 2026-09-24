@@ -12,8 +12,7 @@ Copied 2026-09-23. To re-copy, see the source paths below.
 | Local folder | Source (Shared drives/…) | Files |
 |---|---|---|
 | `recordings/pinglive/` | `CA Authorized Dealers/Dealer Digital Assests/Master Version/PingLive Screen Recordings/` | 3257, 4479_raw, 6041_raw, 6089, 86789ab9…, b5690b3e…, ScreenRecording_09-23-2026 19-42-23, …19-45-33 |
-| `recordings/pinglive-mini/` | `…/Master Version/PingLive Mini Screen Recordings/` + `Distributors/Prime Sports/09.23.2026 Graphics/` | Mini Combo View-04-30, Mini Down View, ScreenRecording_09-23-2026 19-49-57, Mini Down View_1 (1), PLM big fish |
-| `recordings/unsorted/` | `Distributors/Prime Sports/09.23.2026 Graphics/` | RPReplay_Final1787183497, RPReplay_Final1787255969 — device/mode not yet identified |
+| `recordings/pinglive-mini/` | `…/Master Version/PingLive Mini Screen Recordings/` + `Distributors/Prime Sports/09.23.2026 Graphics/` | Mini Combo View-04-30, Mini Down View, ScreenRecording_09-23-2026 19-49-57, Mini Down View_1 (1), PLM big fish, RPReplay_Final1787183497 + …255969 (PLM, yellow, split view, 40/60 ft) |
 
 Skipped: `mini Panoramic View.MP4` (218 MB, Panoramic is out of scope for v1).
 
