@@ -25,7 +25,7 @@ it is done. ✅ done · 🔧 in progress · ⬜ open.
 ## Content
 - ✅ Second, ~20 m, more complete wreck on the deep slope up-and-right
 - ✅ Salmon / lake trout also up-and-right in the deep water
-- ⬜ New APK for the emulator study — Jason said it is "here" but no file/link received yet (2026-09-24)
+- ⬜ New APK for the emulator study: `AccuphySonar_20260901_2.0.0_beta_14.apk` — Dropbox link from Jason 2026-09-24 (see `reference/README.md`); download when the emulator is set up
 
 ## Brand / UI
 - ✅ Control panel in Accuphy brand (white wordmark, Instrument Sans, Eurostile Heavy headline, brand blue #0d8fdb)

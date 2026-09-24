@@ -32,10 +32,15 @@ export function makeLakeMaterial({ fish = false } = {}) {
       #ifdef FISH
         attribute float aPattern; attribute vec3 aBelly; attribute vec3 aSide;
         varying float vPattern; varying vec3 vBelly; varying vec3 vSide; varying vec3 vLocal;
+        uniform float uSonarPass;
       #endif
       void main() {
+        vec3 pos = position;
       #ifdef FISH
         vPattern = aPattern; vBelly = aBelly; vSide = aSide; vLocal = position;
+        // sonar pass: a fish echoes from a small part of its body at a time — compress the
+        // body along its axis so the mark is narrow in angle and the pulse shapes its length
+        if (uSonarPass > 0.5) pos.x *= 0.35;
       #endif
         vec3 c = vec3(1.0);
         #ifdef USE_COLOR
@@ -49,7 +54,7 @@ export function makeLakeMaterial({ fish = false } = {}) {
         #ifdef USE_INSTANCING
           m = modelMatrix * instanceMatrix;
         #endif
-        vec4 wp = m * vec4(position, 1.0);
+        vec4 wp = m * vec4(pos, 1.0);
         vWorld = wp.xyz;
         vNormal = normalize(mat3(m) * normal);
         gl_Position = projectionMatrix * viewMatrix * wp;

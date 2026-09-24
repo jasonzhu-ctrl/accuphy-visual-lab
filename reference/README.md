@@ -39,3 +39,9 @@ Two small `PingBeam_Combo View_20260910_*.sonar` files from
 `…/09.23.2026 Graphics/BEST RECENT 2.0 IMAGE DATA/` (proprietary format,
 kept for possible later analysis). The 229 MB `PingLive Mini_动态下扫` file
 was not copied.
+
+## Accuphy Sonar App — latest APK (for the emulator study)
+
+`AccuphySonar_20260901_2.0.0_beta_14.apk` (v2.0.0 beta 14), Jason 2026-09-24:
+https://www.dropbox.com/scl/fi/kus9fnv0kv6y044q89tcr/AccuphySonar_20260901_2.0.0_beta_14.apk?rlkey=u8qk1vg6mm79d69taktytxn8k&st=x00fkdjx&dl=0
+Not downloaded yet. Older dev build: `ACCUPHY/IT/Accuhy Sonar App APK versions/June18,2026/AccuphySonar_0615_dev.apk`.

@@ -85,16 +85,12 @@ export const sonarFragment = /* glsl */ `
         float tail = (dr > 0.0) ? 0.35 * exp(-dr / 1.6) : 0.0;
         float wgt = 0.55 + 0.9 * (1.0 - abs(v * 2.0 - 1.0));
         acc += (pulse + tail) * wgt * (1.0 - fish);
-        // fish: a compact blob at the hit range — bright core, soft edge, NO smear behind it
+        // fish: the app draws a mark elongated ALONG THE BEAM (radially), with a bright
+        // core and a soft rim — short toward the transducer, longer away from it
         if (fish > 0.5) {
-          float blob = exp(-dr * dr / (0.55 * 0.55));
+          float sr = dr < 0.0 ? 0.35 : 0.75 + 0.01 * r;
+          float blob = exp(-dr * dr / (sr * sr));
           fishHit = max(fishHit, blob);
-        }
-        // widen the blob slightly across the angle so it reads as a rounded dash, like the app
-        for (int o = -1; o <= 1; o += 2) {
-          vec2 uv2 = vec2(u + float(o) * du, v);
-          float f2 = (k == 0) ? texture2D(uColor0, uv2).a : texture2D(uColor1, uv2).a;
-          if (f2 > 0.5) { float h2 = sampleDist(k, uv2, rayLen); float d2 = r - h2; fishHit = max(fishHit, 0.85 * exp(-d2 * d2 / (0.55 * 0.55))); }
         }
       }
       acc /= 9.0;
