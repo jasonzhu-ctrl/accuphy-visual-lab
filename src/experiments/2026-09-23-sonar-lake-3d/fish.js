@@ -64,16 +64,17 @@ export function makePopulation(bedY) {
   ;[[10, -36, 18], [22, -40, 24], [-4, -40, 15], [30, -34, 20], [6, -50, 26], [18, -52, 14], [-14, -46, 21], [38, -28, 16], [48, -38, 22], [56, -30, 12], [42, -46, 26]]
     .forEach(([x, z, off]) => addOne('salmon', x, z, off, 0.7 + rnd() * 0.3))
   // dev: ?fishtest — fixed fish at known spots so the sonar marks can be compared with the app's
-  // frames (docs/sonar-style.md §7.2). Boat at ?boat=28,11 → Down view; boat at ?boat=16,11 → PLM Forward.
+  // frames (docs/sonar-style.md §7.2). The transducer sits ≈ (+3.0, −0.9, +0.5) from the ?boat point.
+  // ?boat=28,11 → apex ≈ (31, −0.9, 11.5): Down view.  ?boat=16,11 → apex ≈ (19, −0.9, 11.5): PLM Forward.
   if (typeof window !== 'undefined' && /fishtest/.test(window.location.search)) {
     const T = (species, len, x, y, z, heading) => ({ species, len, home: [x, y, z], phase: 0, radius: 0, speed: 0, heading })
     fish.push(
-      T('largemouth', 0.5, 28, -3, 11, 0),            // 3 m under the boat, broadside to the Down plane
-      T('largemouth', 0.5, 29.5, -5, 11, Math.PI / 2), // head-on to the plane (only the cross-section)
-      T('musky', 1.1, 26, -4.2, 11, 0),                // big fish, broadside
-      T('largemouth', 0.5, 28, -6.5, 11, 0),           // 12 m ahead of (16,11) at 6.5 m: inside PLM Forward
-      T('largemouth', 0.5, 25, -5, 11, Math.PI / 2),   // 9 m ahead, head-on
-      T('musky', 1.1, 30, -4, 11, 0),                  // 14 m ahead, broadside
+      T('largemouth', 0.5, 31, -3, 11.5, 0),            // Down: 2 m under the transducer, broadside to the plane
+      T('largemouth', 0.5, 32.2, -5, 11.5, Math.PI / 2), // Down: head-on to the plane (only the cross-section)
+      T('musky', 1.1, 29.6, -4.2, 11.5, 0),              // Down: big fish, broadside
+      T('largemouth', 0.5, 31, -6.5, 11.5, 0),           // Forward: 12 m ahead of the (16,11) apex at 6.5 m
+      T('largemouth', 0.5, 28, -5, 11.5, Math.PI / 2),   // Forward: 9 m ahead, head-on
+      T('musky', 1.1, 33, -4, 11.5, 0),                  // Forward: 14 m ahead, broadside
     )
   }
   return fish

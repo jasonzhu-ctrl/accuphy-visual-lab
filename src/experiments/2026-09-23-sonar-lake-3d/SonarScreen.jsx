@@ -39,7 +39,7 @@ const STRIP_W = 1024, STRIP_H = 32
 
 export default function SonarScreen({ state, rect, lakeMats }) {
   const { gl, scene, camera, size } = useThree()
-  if (import.meta.env.DEV) window.__sonarGL = gl
+  if (import.meta.env.DEV) { window.__sonarGL = gl; window.__sonarState = state.current }
   const res = useMemo(() => {
     const targets = [0, 1].map(() => {
       const rt = new THREE.WebGLRenderTarget(STRIP_W, STRIP_H, { depthBuffer: true })

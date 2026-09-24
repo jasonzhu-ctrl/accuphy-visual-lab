@@ -67,8 +67,8 @@ export const sonarFragment = /* glsl */ `
     if (abs(a) > uFan[k].y || r > uRange) return 0.0;
     float u = 0.5 + 0.5 * tan(a) / uFan[k].z;
     float best = 0.0;
-    for (int j = 0; j < 8; j++) {
-      float v = (float(j) + jit) / 8.0;
+    for (int j = 0; j < 12; j++) {
+      float v = (float(j) + 0.5) / 12.0;         // fixed rows: no per-pixel jitter → a solid mark, not salt-and-pepper
       float ty = (v * 2.0 - 1.0) * uFan[k].w;
       float m = sampleFish(k, vec2(u, v));
       if (m < 0.75) continue;                    // alpha 1 = fish (0.5 = structure)
@@ -147,7 +147,7 @@ export const sonarFragment = /* glsl */ `
       // so far fish become tangential dashes the width of the beam — and use the average
       // fill rather than the max, so a head-on fish (narrow in angle) comes out dimmer
       // than a broadside one at the same range.
-      float beamHalf = 0.014;                   // ≈ 0.8° half-width of the formed beam
+      float beamHalf = max(0.014, 0.07 / r);    // ≈ 0.8° beam half-width, never under ≈ 7 cm: the near-field rim (app: a few cm gradient)
       float fishSum = 0.0, wSum = 0.0;
       for (int i = -3; i <= 3; i++) {
         float f = float(i) / 3.0;
@@ -155,9 +155,11 @@ export const sonarFragment = /* glsl */ `
         fishSum += w * fishAt(k, a + f * beamHalf, r, jit); wSum += w;
       }
       float fishHit = min(1.15, 1.7 * fishSum / wSum);        // soft rim: the average fill tapers at the edges (§7.4); head-on ≈ dim, broadside ≈ full
+      // lumpy body (the app's near blobs are uneven: flexing body, ping-to-ping change), never speckle
+      fishHit *= 0.78 + 0.34 * vnoise(p * 5.0 + vec2(0.0, uTime * 0.15));
       float atten = 1.0 - 0.4 * clamp(r / uRange, 0.0, 1.0);
       float gain = uFlat > 0.5 ? 3.0 : 1.0;
-      float fishEcho = fishHit * (1.05 + 0.35 * streak);
+      float fishEcho = fishHit * (1.0 + 0.12 * streak);   // fish rims are smooth gradients in the app, not speckle
       echo = max(echo, max(acc * atten * tex * gain, fishEcho));
     }
     // clutter near the transducer: bright rays fanning out from the apex — a FIXED ≈ 2.4 m

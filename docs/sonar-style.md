@@ -404,3 +404,20 @@ the cut fills × how hard the surface faces the transducer.
    calibrate it against the reference frames with the §6.11 histogram.
 4. PLM Forward depth rule (nothing nearer than 1.26·d) already follows from
    the wedge geometry; make sure the guide copy explains it.
+
+### 7.5 First engine check against the near-field frames (2026-09-24, `?fishtest`)
+Fixed test fish (`fish.js`, `?fishtest`): a broadside bass, a head-on bass and a
+broadside musky placed relative to the transducer (which sits ≈ 3 m ahead of
+the `?boat` point, 0.9 m under the surface — a placement mistake at first put
+the "fish under the boat" outside the fan). Result (`reference/engine-compare/
+compare-down-fish-app-vs-engine.png`, app jet-mode blob left, engine right):
+- **Shapes agree with the model:** the broadside musky is a body-long blob with
+  a white core, the head-on bass is a small soft dot. The physics of §7 holds.
+- **What differed:** the engine blob was a hard rectangle filled with
+  salt-and-pepper (per-pixel row jitter through a binary mask) where the app
+  shows a solid lumpy core with a smooth few-cm rim. Fixed by sampling the fish
+  mask on fixed rows, a minimum 7 cm angular blur for the near field, a
+  low-frequency lumpiness along the body, and no streak modulation on fish.
+- **Colour:** `accuphy_red` (black → deep red → red → orange → yellow → white)
+  reads far closer to the app/LiveScope look than `Moreland_Black_Body`, which
+  goes orange too early. Not yet calibrated with the §6.11 histogram.

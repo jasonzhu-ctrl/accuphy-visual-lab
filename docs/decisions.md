@@ -333,3 +333,23 @@ Numbered log. Newest at the bottom.
     reports the same statistic via `window.__sonarHist()` and exports its
     picture via `window.__sonarSnap()`. A tone gamma `uGamma = 0.8` on the LUT
     index closes most of the gap (the engine was too dark-red in the mids).
+
+32. **2026-09-24** — **The photograph model** (Jason: 探头发射波束的方向对应物体
+    形状的关系，像拍照片; 不同 view 下不同深度对应的角度关系). Written up as
+    `docs/sonar-style.md` §7: the beam plane is the film; a mark is the target's
+    silhouette cut by the 18–20° slab, projected into the plane's polar
+    coordinates, blurred tangentially by the beam angle and radially by the
+    pulse; per view the plane, the angle range and the depth↔angle rule differ
+    (PLM Forward sees nothing nearer than 1.26 × depth; Panoramic grazes the
+    bottom). Verified against Jason's Down-view near-field recording (`PLM big
+    fish.mp4`, crops in `reference/app-study/fish-down-near/`): a broadside
+    fish is a body-long lumpy blob with a soft rim, a head-on fish a dot.
+    Engine changes: the sonar pass renders fish at **true size** (the ×2.6
+    display scale no longer leaks into the screen), fish marks are solid,
+    lumpy and soft-rimmed (fixed-row mask sampling, ≥ 7 cm near-field blur,
+    no speckle), thin structure renders as grain instead of a block mosaic
+    (per-pixel row jitter, 24 rows), and a new `accuphy_red` colour map
+    (deep red → orange → white, after the LiveScope look — Jason: 现在的
+    orange 不够红) is the inset's candidate default, pending his verdict.
+    `?fishtest` places fixed test fish relative to the transducer for
+    side-by-side checks (`reference/engine-compare/compare-down-fish-*.png`).
