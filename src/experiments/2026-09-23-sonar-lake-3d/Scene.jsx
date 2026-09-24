@@ -78,22 +78,32 @@ function Structures({ mat }) {
 
 function Wreck({ mat }) {
   const geo = useMemo(() => {
-    // 7.5 m wooden boat hull on its side in the basin
+    // ~10 m wooden workboat (Jason 2026-09-24: +30 %, shaped after the PL wreck imaging):
+    // hull with a raised bow, a boxy cabin with window openings, a short mast; lying tilted on the bottom
+    const L = 9.8
     const shape = new THREE.Shape()
-    shape.moveTo(-3.75, 0); shape.quadraticCurveTo(-3.6, 1.1, -2.2, 1.15); shape.lineTo(3.0, 1.0)
-    shape.quadraticCurveTo(3.7, 0.6, 3.75, 0); shape.quadraticCurveTo(3.7, -0.6, 3.0, -1.0); shape.lineTo(-2.2, -1.15)
-    shape.quadraticCurveTo(-3.6, -1.1, -3.75, 0)
-    const hull = new THREE.ExtrudeGeometry(shape, { depth: 1.3, bevelEnabled: true, bevelSize: 0.15, bevelThickness: 0.15, bevelSegments: 2 })
+    shape.moveTo(-L / 2, 0); shape.quadraticCurveTo(-L * 0.48, 1.5, -L * 0.3, 1.55); shape.lineTo(L * 0.36, 1.35)
+    shape.quadraticCurveTo(L * 0.5, 0.8, L / 2, 0); shape.quadraticCurveTo(L * 0.5, -0.8, L * 0.36, -1.35); shape.lineTo(-L * 0.3, -1.55)
+    shape.quadraticCurveTo(-L * 0.48, -1.5, -L / 2, 0)
+    const hull = new THREE.ExtrudeGeometry(shape, { depth: 1.7, bevelEnabled: true, bevelSize: 0.2, bevelThickness: 0.2, bevelSegments: 2 })
     hull.rotateX(-Math.PI / 2)
-    const cabin = new THREE.BoxGeometry(2.2, 1.1, 1.6); cabin.translate(-0.5, 1.6, 0)
-    const g = mergeGeometries([hull, cabin])
+    const bow = new THREE.BoxGeometry(2.2, 0.5, 2.4); bow.translate(L * 0.34, 1.9, 0) // raised foredeck
+    const cabin = new THREE.BoxGeometry(3.6, 1.6, 2.2); cabin.translate(-0.6, 2.5, 0)
+    const roof = new THREE.BoxGeometry(4.0, 0.15, 2.5); roof.translate(-0.6, 3.35, 0)
+    const parts = [hull, bow, cabin, roof]
+    for (let i = 0; i < 3; i++) { // window openings read as dark gaps in the sonar picture
+      const w = new THREE.BoxGeometry(0.7, 0.6, 2.3); w.translate(-1.7 + i * 1.1, 2.7, 0); parts.push(w)
+    }
+    const mast = new THREE.CylinderGeometry(0.06, 0.09, 4.5, 6); mast.translate(0.9, 4.5, 0)
+    parts.push(mast)
+    const g = mergeGeometries(parts)
     const col = new Float32Array(g.attributes.position.count * 3)
-    for (let i = 0; i < col.length; i += 3) { col[i] = 0.36; col[i + 1] = 0.3; col[i + 2] = 0.22 }
+    for (let i = 0; i < col.length; i += 3) { const k = 0.9 + Math.random() * 0.2; col[i] = 0.34 * k; col[i + 1] = 0.28 * k; col[i + 2] = 0.2 * k }
     g.setAttribute('color', new THREE.BufferAttribute(col, 3))
     return g
   }, [])
   const x = 16, z = -26
-  return <mesh geometry={geo} material={mat} position={[x, bedY(x, z) - 0.3, z]} rotation={[0.35, 0.6, 0.1]} />
+  return <mesh geometry={geo} material={mat} position={[x, bedY(x, z) - 0.2, z]} rotation={[0.42, 0.6, 0.12]} />
 }
 
 // ---------- fish ----------

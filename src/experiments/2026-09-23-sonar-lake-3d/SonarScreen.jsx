@@ -91,6 +91,8 @@ export default function SonarScreen({ state, rect }) {
       xmin = Math.min(xmin, R * Math.sin(Math.max(lo, -Math.PI / 2))); xmax = Math.max(xmax, R * Math.sin(Math.min(hi, Math.PI / 2)))
       ymax = Math.max(ymax, lo <= 0 && hi >= 0 ? R : R * Math.cos(Math.min(Math.abs(lo), Math.abs(hi))))
     }
+    // Forward-only views: the app keeps the apex ~20 % in from the left edge
+    if (xmin > -R * 0.05 && !flat) xmin = -R * 0.25
     const m = R * 0.04
     let bx = xmin - m, by = -m, bw = xmax - xmin + 2 * m, bh = ymax + 2 * m
     const want = w / h

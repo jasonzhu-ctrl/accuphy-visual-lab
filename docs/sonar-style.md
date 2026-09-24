@@ -71,6 +71,18 @@ Ramp: `#000000 → #300000 → #801000 → #c05000 → #e09000 → #f0c000 → #
 | **Surface clutter** | red/yellow streak hugging the top edge of the Forward wedge near the apex | dim speckle near the apex |
 | **Noise** | sparse cyan/blue speckle inside the beam; grid lines visible | fine dark-red speckle everywhere returns are weak; horizontal smearing from the stretch |
 
+## 3b. Panoramic View (PL) — from the three clips Jason sent 2026-09-24
+- **Layout:** apex at the **bottom centre**, the 135° fan opens **upward**; black
+  outside the fan; faint white grid with range numbers on both side axes and
+  cross-range numbers along the top.
+- **Look:** because the fan looks down at the bottom, the whole fan is filled
+  with bottom texture (dark-red grain in yellow/red mode); brighter patches =
+  hard bottom / structure, **black patches = acoustic shadows**; fish are
+  bright **elongated streaks** (they cross the thin beam); **radial streaks**
+  along the beam directions are a natural artefact.
+- **Blue mode** exists too (navy → blue → cyan → white), seen at 62 m range
+  with a ~35 m shipwreck.
+
 ## 4. UI chrome (only if we mimic the app frame)
 Depth readout top-left (e.g. `13.4 m`), water temp, battery voltage, range −/+
 control (`8m`…`22m`), gain % control, pause button centre-bottom, `…` menu,

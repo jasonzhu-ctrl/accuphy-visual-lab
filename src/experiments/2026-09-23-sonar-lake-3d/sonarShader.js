@@ -52,7 +52,10 @@ export const sonarFragment = /* glsl */ `
 
   void main() {
     // screen metres: x from -w/2..w/2, y = 0 at the apex (top) growing downward
-    vec2 p = uScreenMin + vec2(vUv.x, 1.0 - vUv.y) * uScreenSize;
+    // side views: apex at the top, depth grows downward. Panoramic (uFlat): apex at
+    // the bottom centre and the fan opens upward, like the app's top-down picture.
+    float vy = uFlat > 0.5 ? vUv.y : 1.0 - vUv.y;
+    vec2 p = uScreenMin + vec2(vUv.x, vy) * uScreenSize;
     float r = length(p);
     float aWorld = atan(p.x, p.y); // angle from straight-down, +right
     float echo = 0.0;
