@@ -31,3 +31,14 @@ Numbered log. Newest at the bottom.
    palettes apply to both devices; (b) the app draws with non-uniform px/m
    (horizontal stretch) — engine works in metres, never copies screen angles;
    (c) yellow mode does not tint the beam area, blue/red mode fills it navy.
+
+5. **2026-09-23** — Jason: (a) **yellow colour mode first**; more app palettes
+   later. (b) Abbreviations **PL = PingLive, PLM = PingLive Mini**. (c) Max
+   *range* (horizontal) and *depth range* (vertical): PL 240 ft / 240 ft,
+   PLM 200 ft — user-adjustable in the app, so the visualiser exposes a
+   display-range control clamped per device. (d) After research
+   (`docs/research.md`): render with **three.js + React Three Fiber + custom
+   GLSL** using a polar shadow-map + shade pass; water-surface / drag feel via
+   **three-fluid-fx** (or the inspiration site's tiny CPU flow-field trick);
+   host the built page on Cloudflare Pages/Vercel and embed in Shopify via a
+   Custom Liquid iframe section.

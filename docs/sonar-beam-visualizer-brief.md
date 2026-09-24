@@ -42,6 +42,9 @@ Hybrid: procedural real-time rendering, styled to match the real app.
 
 ## App color modes (from reference recordings in `reference/recordings/`)
 
+> **Decision 2026-09-23:** build **yellow mode first**. The app offers many more
+> colour modes; add them one by one later as extra colour ramps.
+
 > **Correction 2026-09-23:** palette is an app-wide setting, not per device — the
 > Mini forward-view weeds clip is in yellow mode. Measured palettes and
 > per-element looks are in `docs/sonar-style.md`; clip catalog in
@@ -76,8 +79,12 @@ In the Mini Combo View clip the downward-pointing blue triangle is the Down View
   3/4 front view bundled with Router One; the PingLive one is a photo on its
   shaft mount. A clean side-view cutout of each device (or a decision to just
   use a stylised silhouette) is still needed for the cursor.
-- **Max depth / range per device and mode: still missing.** Use placeholder
-  values marked TODO until Jason confirms.
+- **Max range / depth: answered 2026-09-23.** *Range* = horizontal distance,
+  *depth range* = vertical. **PL (PingLive): 240 ft range and 240 ft depth.**
+  **PLM (PingLive Mini): 200 ft.** Both are user-adjustable in the app to suit
+  the lake/river, so the visualiser gets a display-range control (like the
+  app's −/+), with the max clamped per device. Store these as data, not
+  constants in shaders.
 - `reference/recordings/unsorted/` has two RPReplay clips whose device/mode
   is not yet identified — classify during Phase 1.
 
