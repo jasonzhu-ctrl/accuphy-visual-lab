@@ -190,7 +190,8 @@ export const sonarFragment = /* glsl */ `
       // lumpy body (the app's near blobs are uneven: flexing body, ping-to-ping change), never speckle
       // lumpy body: two noise scales, deep enough to cut holes and bites into the silhouette (app: irregular blobs)
       float lump = vnoise(p * 4.0 + vec2(0.0, uTime * 0.12)) * 0.6 + vnoise(p * 11.0 - vec2(uTime * 0.07, 0.0)) * 0.55;
-      float rim = (1.0 - smoothstep(0.3, 0.9, fishSum / wSum)) * smoothstep(0.35, 0.75, haloSum / hSum); // edge of a BIG blob only; small fish (low halo) keep their whole dash
+      // rim bites only on near-field blobs (Jason's Down data, < ~6 m): beyond that a fish is a solid oblong
+      float rim = (1.0 - smoothstep(0.3, 0.9, fishSum / wSum)) * smoothstep(0.35, 0.75, haloSum / hSum) * (1.0 - smoothstep(4.0, 8.0, r));
       fishHit *= mix(1.0, smoothstep(0.15, 0.75, lump) * 1.15, rim);      // bites only at the rim; the core stays solid
       // beam filaments: at close range the beam footprint is smaller than a pixel, so the app's near blobs
       // are solid with a ragged rim; the comb only shows from mid range out (Jason: 近处的团要实)
