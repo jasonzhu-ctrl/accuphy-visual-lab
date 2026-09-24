@@ -7,7 +7,7 @@ import * as THREE from 'three'
 //   inside ⇔ r=|(u,v)| < R, atan(v,u) ∈ [a0,a1], w ∈ [s0,s1]·u·tan(theta)
 export const MAX_BEAMS = 2
 
-export function makeLakeMaterial({ fish = false } = {}) {
+export function makeLakeMaterial({ fish = false, structure = false } = {}) {
   const uniforms = {
     uSun: { value: new THREE.Vector3(0.4, 0.8, 0.3).normalize() },
     uFogColor: { value: new THREE.Color('#17545f') },
@@ -26,7 +26,7 @@ export function makeLakeMaterial({ fish = false } = {}) {
   const mat = new THREE.ShaderMaterial({
     uniforms,
     vertexColors: true,
-    defines: fish ? { FISH: 1 } : {},
+    defines: fish ? { FISH: 1 } : structure ? { STRUCTURE: 1 } : {},
     vertexShader: /* glsl */ `
       varying vec3 vWorld; varying vec3 vNormal; varying vec3 vColor;
       #ifdef FISH
@@ -156,7 +156,11 @@ export function makeLakeMaterial({ fish = false } = {}) {
         float fog = 1.0 - exp(-dist * uFogDensity);
         fog *= 1.0 - 0.7 * beam; // the beam also cuts through the murk
         vec3 col = mix(lit, uFogColor, clamp(fog, 0.0, 0.92));
+        // sonar pass alpha: 1 = fish, 0.5 = structure (timber, rocks, wrecks), 0 = bottom
         float isFish = 0.0;
+      #ifdef STRUCTURE
+        isFish = 0.5;
+      #endif
       #ifdef FISH
         isFish = 1.0;
         // rim light on fish caught in the beam — a bright edge, like a spotlight from behind

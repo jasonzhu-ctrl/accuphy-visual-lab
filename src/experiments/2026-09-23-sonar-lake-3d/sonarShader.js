@@ -70,7 +70,7 @@ export const sonarFragment = /* glsl */ `
       float v = (float(j) + jit) / 6.0;
       float ty = (v * 2.0 - 1.0) * uFan[k].w;
       float m = sampleFish(k, vec2(u, v));
-      if (m < 0.3) continue;
+      if (m < 0.75) continue;                    // alpha 1 = fish (0.5 = structure)
       float hit = sampleDist(k, vec2(u, v), length(vec3(tan(a), ty, 1.0)));
       float dr = r - hit;
       float sr = 0.12 + 0.004 * r;              // pulse length: thin in range, barely grows
@@ -130,8 +130,10 @@ export const sonarFragment = /* glsl */ `
         float rayLen = length(vec3(tan(a), ty, 1.0));
         float hit = sampleDist(k, vec2(u, v), rayLen);
         float dr = r - hit;
-        float fish = sampleFish(k, vec2(u, v));
-        float pulse = exp(-dr * dr / (sigma * sigma));
+        float tag = sampleFish(k, vec2(u, v));   // 1 fish · 0.5 structure · 0 bottom
+        float fish = step(0.75, tag);
+        float structure = step(0.25, tag) * (1.0 - fish);
+        float pulse = exp(-dr * dr / (sigma * sigma)) * (1.0 - 0.2 * structure); // Jason: wrecks a touch less hot (§6.10)
         float tail = dr > 0.0 ? 0.55 * exp(-dr / tailLen) : 0.0;
         float second = 0.10 * exp(-(r - 2.0 * hit) * (r - 2.0 * hit) / (4.0 * sigma * sigma)); // faint second echo
         float wgt = 0.55 + 0.9 * (1.0 - abs(v * 2.0 - 1.0));
@@ -156,8 +158,9 @@ export const sonarFragment = /* glsl */ `
       float fishEcho = fishHit * (1.05 + 0.35 * streak);
       echo = max(echo, max(acc * atten * tex * gain, fishEcho));
     }
-    // clutter near the transducer: bright rays fanning out from the apex
-    float near = 1.0 - smoothstep(0.0, 0.18 * uRange, r);
+    // clutter near the transducer: bright rays fanning out from the apex — a FIXED ≈ 2.4 m
+    // in metres (sonar-style.md §6.9), so they look big at short range and small at long range
+    float near = 1.0 - smoothstep(0.0, 2.4, r);
     echo = max(echo, inAny * near * near * (0.25 + 0.6 * rays) * tex * 0.5);
     echo = max(echo, inAny * floorTex * 0.7); // ≈ LUT index 0.15–0.25 at gain 57 %, contrast 0 (the app's factory look)
 

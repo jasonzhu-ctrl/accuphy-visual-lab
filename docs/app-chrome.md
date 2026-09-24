@@ -17,7 +17,7 @@ transfer to the iPhone frame.
 | Gain −/+ | bottom-right of centre | ⊖ `57%` ⊕ — 1 % per tap |
 | Back | bottom-left corner | ↶ bent-arrow icon |
 | ⋯ menu | bottom-right corner | three dots |
-| Depth range −/+ | right edge, mid-height (Forward View only) | ⊖ / `16m` / ⊕ stacked vertically — **vertical range** (depth) |
+| Depth range −/+ | right edge, mid-height (PL Forward View only) | ⊖ / `12m` / ⊕ stacked vertically — **vertical range** (depth); steps 8·9·10·12·14·16·18 m. Range steps 6…22 m by 2 m. Each control scales ONE axis only (`sonar-style.md` §6.9) |
 | Rulers | top edge and both side edges | thin white italic numbers, no lines; **no grid** in orange mode |
 
 Everything is white text on the picture, no boxes; the picture runs edge to

@@ -259,3 +259,29 @@ beam angle (not screen metres) added to the fish mask's own angular extent;
 radial thickness = constant pulse; brightness = angular fill of the beam
 (broadside fills it, head-on does not) → near fish show body length and
 heading, far fish become uniform tangential dashes that vary in brightness.
+
+### 6.9 What the two range controls do to the picture (measured, PL Forward, 2026-09-24)
+Frames in `reference/app-study/range-controls/` (wreck recording, gain 50 ·
+contrast 35 · noise 30). Two independent controls, two independent axes:
+
+| Control | Where | Steps seen | What changes | What does NOT change |
+|---|---|---|---|---|
+| **Range** ⊖ `14m` ⊕ | bottom-left | 6 · 8 · 10 · 12 · 14 · 16 · 18 · 20 · 22 m (2 m steps) | only the **horizontal** scale: the top ruler re-numbers, the apex stays at x ≈ 20 %; targets get **wider** (short range) or **narrower** (long range) | their depth position, their height, the side rulers, the depth readout |
+| **Depth range** ⊖ `12m` ⊕ (PL Forward only) | right edge | 8 · 9 · 10 · 12 · 14 · 16 · 18 m (1 m steps below 10, 2 m above) | only the **vertical** scale: side rulers re-number, apex stays at the top; targets get **taller** (small depth range) or **flatter** (large); the bottom drops off the screen when the depth range is less than the water depth | the top ruler, target x positions |
+
+So "nearer / farther" never happens — a target keeps its (x, depth) in
+metres; only the metres-per-pixel of each axis change. Everything stretches
+with the axes, including the near-field rays under the apex (they stay ≈ 2–2.5 m
+in metres, so they look big at 6 m range and small at 22 m) and the fish
+dashes (their tangential length is metres, so they look longer at short range).
+Neither control follows the other: 6 m range with 12 m depth is allowed and
+looks 2× stretched horizontally.
+
+Engine: `screenLayout` takes range and depth range separately for PL Forward;
+the near-field rays and every mark are sized in metres, never in fractions of
+the range. Defaults after Reset: range 14 m · depth 12 m (PL Forward), i.e.
+depth ≈ 0.85 × range.
+
+### 6.10 Case 2 verdict (Jason): wreck slightly less bright — the orange-red look
+is preferred in the inset; near-field rays stay. → engine: structure echoes
+(wreck, timber, rocks) ×0.8 versus bottom and fish.

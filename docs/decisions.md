@@ -310,3 +310,17 @@ Numbered log. Newest at the bottom.
     (`sonarShader.js` fishAt + beam-angle blur, average fill instead of max;
     `lakeMaterial.js` sonar-pass body no longer compressed to 0.6). Write-up in
     `docs/sonar-style.md` §6.8.
+
+30. **2026-09-24** — **Range controls understood and mirrored** (Jason asked
+    how targets change when range is adjusted). Measured on PL Forward: the
+    bottom-left Range ⊖⊕ scales only the horizontal axis (apex stays at 20 %),
+    the right-edge Depth-range ⊖⊕ scales only the vertical axis; a target
+    keeps its (x, depth) in metres and only gets wider/narrower or
+    taller/flatter — never nearer or farther. Everything scales with the axes,
+    including the near-field rays (≈ 2–2.5 m fixed). Steps: range 6–22 m by 2,
+    depth 8·9·10·12·14·16·18. Engine: PL Forward gets a Depth slider
+    (`screenLayout` box height = depth range), near rays are 2.4 m in metres
+    instead of 18 % of range, and structure echoes are tagged in the sonar pass
+    (alpha 0.5) and drawn ×0.8 — Jason's case-2 verdict: wreck a touch less
+    hot, orange-red preferred; rays stay. Frames in
+    `reference/app-study/range-controls/`; write-up `sonar-style.md` §6.9–6.10.

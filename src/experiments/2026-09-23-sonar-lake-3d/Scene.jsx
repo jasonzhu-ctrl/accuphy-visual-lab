@@ -344,7 +344,7 @@ export default function LakeScene({ state, sonarRect }) {
     fish.userData.uniforms.uHighlight.value.set('#ffe9a0') // fish light up warm, like a sonar return
     fish.userData.uniforms.uFogDensity.value = 0.006
     fish.side = THREE.DoubleSide // flat fins
-    return { bed: makeLakeMaterial(), inst: makeLakeMaterial(), fish }
+    return { bed: makeLakeMaterial(), inst: makeLakeMaterial({ structure: true }), fish }
   }, [])
   const beamMats = useMemo(() => [mats.bed, mats.inst, mats.fish], [mats])
   return (

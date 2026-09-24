@@ -18,10 +18,11 @@ function ticks(from, to, step) {
   return out
 }
 
-export default function SonarChrome({ layout, deviceId, mode, rangeFt, imperial, gain, depthRef }) {
+export default function SonarChrome({ layout, deviceId, mode, rangeFt, depthFt, imperial, gain, depthRef }) {
   const unit = imperial ? FT : 1 // metres per display unit
   const box = layout.box0
   const rangeLabel = imperial ? `${Math.round(rangeFt)}ft` : `${Math.round(rangeFt * FT)}m`
+  const depthLabel = imperial ? `${Math.round(depthFt ?? rangeFt)}ft` : `${Math.round((depthFt ?? rangeFt) * FT)}m`
   const flat = mode === 'panoramic'
   const split = layout.split
   // rulers (display units)
@@ -64,7 +65,7 @@ export default function SonarChrome({ layout, deviceId, mode, rangeFt, imperial,
       {showDepthRange && (
         <div style={{ position: 'absolute', right: '5.5%', top: '50%', transform: 'translateY(-50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2cqh' }}>
           <Ring>−</Ring>
-          <span className={num} style={{ fontSize: '4.6cqh', fontWeight: 500 }}>{rangeLabel}</span>
+          <span className={num} style={{ fontSize: '4.6cqh', fontWeight: 500 }}>{depthLabel}</span>
           <Ring>+</Ring>
         </div>
       )}

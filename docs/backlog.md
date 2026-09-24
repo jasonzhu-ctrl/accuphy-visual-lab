@@ -4,6 +4,7 @@ Jason 2026-09-24: "别把之前说过的任务丢了" — every promised task li
 it is done. ✅ done · 🔧 in progress · ⬜ open.
 
 ## Sonar screen (Phase 4)
+- ✅ Range vs depth-range behaviour measured on the app (§6.9) and mirrored: PL Forward has its own Depth slider (vertical scale only), near-field rays sized in metres, structure echoes ×0.8 (case-2 verdict)
 - ✅ Contrast + Noise Reject controls (Tune row) mapped to the app's tone curve per Jason's tuning strategy (`sonar-style.md` §6.5); defaults gain 57 / contrast 40 / noise 30 after the confirmed ideal picture (decision #28)
 - ⬜ Side-by-side check of the engine's PLM Forward against the confirmed frame (`ideal-picture/5-FINAL-*.jpg`): bottom band ✓, black background ✓; still to compare fish-dash size/brightness and how standing timber reads next to the piling reference
 - ⬜ TVG control (range-dependent gain) — Jason: higher = crisper far targets, a little more noise

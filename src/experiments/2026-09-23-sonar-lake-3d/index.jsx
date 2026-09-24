@@ -20,6 +20,7 @@ export default function SonarLake3D() {
   const [deviceId, setDeviceId] = useState('PL')
   const [mode, setMode] = useState('forward')
   const [rangeFt, setRangeFt] = useState(80)
+  const [depthFt, setDepthFt] = useState(70) // PL Forward depth range (app: 12 m at 14 m range)
   const [imperial, setImperial] = useState(true)
   const [colormap, setColormap] = useState('amber')
   const [gain, setGain] = useState(0.57)
@@ -37,7 +38,7 @@ export default function SonarLake3D() {
 
   const specs = useMemo(() => wedgeSpecs(device, mode, rangeFt * FT), [device, mode, rangeFt])
   const specKey = `${deviceId}-${mode}-${rangeFt}`
-  const layout = useMemo(() => screenLayout(deviceId, mode, rangeFt * FT, 2.08, specs), [deviceId, mode, rangeFt, specs]) // display aspect = phone frame aspect
+  const layout = useMemo(() => screenLayout(deviceId, mode, rangeFt * FT, 2.08, specs, depthFt * FT), [deviceId, mode, rangeFt, depthFt, specs]) // display aspect = phone frame aspect
 
   const b0 = (/boat=(-?[\d.]+),(-?[\d.]+)/.exec(window.location.search) || []).slice(1).map(Number) // dev: ?boat=x,z
   const state = useRef({
@@ -50,6 +51,7 @@ export default function SonarLake3D() {
   state.current.specs = specs
   state.current.specKey = specKey
   state.current.rangeM = rangeFt * FT
+  state.current.depthM = depthFt * FT
   state.current.imperial = imperial
   state.current.colormap = colormap
   state.current.gain = gain
@@ -103,6 +105,13 @@ export default function SonarLake3D() {
           <button className="ac-value" onClick={() => setImperial((v) => !v)} title="ft / m">{fmt(rangeFt)}</button>
           <span className="text-[10.5px] text-[#8b9199]">max {fmt(maxFt)}</span>
         </Row>
+        {deviceId === 'PL' && mode === 'forward' && (
+          <Row label="Depth">
+            <input type="range" min={20} max={device.maxDepthFt} step={5} value={depthFt} onChange={(e) => setDepthFt(+e.target.value)} className="ac-range w-36" style={{ '--fill': `${((depthFt - 20) / (device.maxDepthFt - 20)) * 100}%` }} />
+            <span className="ac-value">{fmt(depthFt)}</span>
+            <span className="text-[10.5px] text-[#8b9199]">depth axis</span>
+          </Row>
+        )}
         <Row label="Screen">
           <select value={colormap} onChange={(e) => setColormap(e.target.value)} className="rounded-[3px] border border-white/15 bg-transparent px-2 py-1 text-[11.5px] text-white/85">
             {COLORMAP_NAMES.map((n) => <option key={n} value={n} className="bg-[#0f1216]">{n}</option>)}
@@ -145,7 +154,7 @@ export default function SonarLake3D() {
           <div className="ph-band" style={{ ...ring('1.35%'), borderRadius: '6.6% / 13.8%', boxShadow: '16px 26px 44px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.45), inset 0 0 0 2px rgba(0,0,0,0.12)' }} />
           <div style={{ ...ring('1.25%'), inset: '1.35%', borderRadius: '6.1% / 12.7%', background: '#040404' }} />
           <div ref={(el) => { sonarRect.current.el = el }} style={{ position: 'absolute', inset: '2.6%', borderRadius: '5.4% / 11.3%', containerType: 'size', overflow: 'hidden' }}>
-            <SonarChrome layout={layout} deviceId={deviceId} mode={mode} rangeFt={rangeFt} imperial={imperial} gain={gain} depthRef={(el) => { state.current.depthEl = el }} />
+            <SonarChrome layout={layout} deviceId={deviceId} mode={mode} rangeFt={rangeFt} depthFt={depthFt} imperial={imperial} gain={gain} depthRef={(el) => { state.current.depthEl = el }} />
             <div className="ph-glass" />
           </div>
           {/* Dynamic Island: vertical pill on the left in landscape */}

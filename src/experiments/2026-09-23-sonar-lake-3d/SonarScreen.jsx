@@ -11,12 +11,13 @@ export const PHONE_POSE = { perspective: 1400, rotY: -16, rotX: 6 }
 // How the app frames each view (measured on the tablet 2026-09-24, docs/app-chrome.md §2/§6).
 // A box is {x0, y0, w, h} in metres with the apex at (0,0) and y growing with depth;
 // the quad maps it onto the whole display, so each axis is stretched independently.
-export function screenLayout(deviceId, mode, R, aspect, specs) {
+export function screenLayout(deviceId, mode, R, aspect, specs, depthM) {
   const half = specs[0] ? (specs[0].a1 - specs[0].a0) / 2 : 0.6
   const mini = deviceId === 'PLM'
   if (mode === 'forward') {
     if (mini) return { box0: { x0: 0, y0: 0, w: R, h: R / aspect }, apexU: 0, split: false }            // apex top-left, 1:1
-    return { box0: { x0: -0.25 * R, y0: 0, w: 1.25 * R, h: R }, apexU: 0.2, split: false }               // apex 20 % in, depth range = range
+    const D = depthM ?? 0.85 * R // PL Forward has its own depth-range control (sonar-style.md §6.9); app default 12 m at 14 m
+    return { box0: { x0: -0.25 * R, y0: 0, w: 1.25 * R, h: D }, apexU: 0.2, split: false }               // apex 20 % in; axes independent
   }
   if (mode === 'down') {
     if (mini) { const hw = R * Math.tan(half) * 1.12; return { box0: { x0: -hw, y0: 0, w: 2 * hw, h: R }, apexU: 0.5, split: false, mottle: true } } // fan corners on the screen corners
@@ -94,7 +95,7 @@ export default function SonarScreen({ state, rect, lakeMats }) {
     {
       const el0 = rect.current.el
       const aspect = el0 && el0.offsetHeight > 0 ? el0.offsetWidth / el0.offsetHeight : 2
-      const lay = screenLayout(s.deviceId, s.mode, s.rangeM, aspect, specs)
+      const lay = screenLayout(s.deviceId, s.mode, s.rangeM, aspect, specs, s.depthM)
       u.uBox0.value.set(lay.box0.x0, lay.box0.y0, lay.box0.w, lay.box0.h)
       const b1 = lay.box1 ?? lay.box0
       u.uBox1.value.set(b1.x0, b1.y0, b1.w, b1.h)
