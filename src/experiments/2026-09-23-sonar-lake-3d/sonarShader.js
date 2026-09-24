@@ -141,7 +141,10 @@ export const sonarFragment = /* glsl */ `
         float tag = sampleFish(k, vec2(u, v));   // 1 fish · 0.5 structure · 0 bottom
         float fish = step(0.75, tag);
         float structure = step(0.25, tag) * (1.0 - fish);
-        float pulse = exp(-dr * dr / (sigma * sigma)) * (1.0 - 0.22 * structure) * mix(1.0, 0.85 + 0.25 * filament, structure); // structure facing the transducer: solid and bright, only a touch under the bottom band (Jason 2026-09-24)
+        // structure faces are sharp: their pulse is the real one (≈ 0.1 m), not the bottom band's wide one —
+        // the app's piling is a crisp 0.15 m column at 15 m, ours was smeared 0.7 m wide by the bottom sigma
+        float sg = mix(sigma, 0.08 + 0.004 * r, structure);
+        float pulse = exp(-dr * dr / (sg * sg)) * (1.0 - 0.22 * structure) * mix(1.0, 0.85 + 0.25 * filament, structure); // structure facing the transducer: solid and bright, only a touch under the bottom band (Jason 2026-09-24)
         float tail = dr > 0.0 ? 0.6 * exp(-dr / tailLen) : 0.0;   // body of the band sits in the orange mid-tones
         float second = 0.10 * exp(-(r - 2.0 * hit) * (r - 2.0 * hit) / (4.0 * sigma * sigma)); // faint second echo
         float wgt = 0.55 + 0.9 * (1.0 - abs(v * 2.0 - 1.0));
