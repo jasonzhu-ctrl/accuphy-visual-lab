@@ -451,3 +451,42 @@ Jason: Garmin's is **amber**; learn from clear LVS34 videos rather than from
 Garmin's marketing stills (those use the purple/green/blue palettes).
 Frames pulled with yt-dlp are kept out of the repo (scratchpad only); notes
 go here as they are studied.
+
+**Measured 2026-09-24** from Garmin's own LiveScope settings video (LVS34, amber,
+8 frames in `reference/app-study/livescope-lvs34/`, texture crops at 3×):
+
+| Share of lit pixels | dark red (R<120) | red | orange | yellow | white |
+|---|---|---|---|---|---|
+| bottom arc + fish (f003) | 0.50 | 0.34 | 0.09 | 0.03 | 0.03 |
+| brush pile 45 ft (f011) | 0.61 | 0.30 | 0.02 | 0.01 | 0.06 |
+| tree + bottom (f021) | 0.42 | 0.31 | 0.17 | 0.06 | 0.04 |
+
+Ramp by luminance (mean RGB): (71,14,6) → (98,20,10) → (128,30,17) →
+(170,56,27) → (194,81,27) → (227,129,19) → (242,219,128). So the LiveScope
+amber spends **half the picture in blood red**, a third in red, and reaches
+orange only in the top ~15 %; yellow-white is the tip of the bottom band and
+the core of a big fish. That is the "红" Jason means. Engine: new map
+`garmin_amber` with these stops (now the default); `accuphy_red` kept but
+demoted. Texture notes from the same frames: fish = short oblongs along the
+ray (1–3 filaments wide, 3–6 long), sharp with a 1–2 px edge gradient; a
+dark-red radial haze fills the fan with visible beam rays; the bottom band is
+fibrous — filaments across it, a white tip only where it faces the transducer.
+
+Engine check with the same metric (colour shares of lit pixels, `garmin_amber`,
+gain 57 / contrast 40 / noise 30), 2026-09-24:
+
+| Scene | dark red | red | orange | yellow | white |
+|---|---|---|---|---|---|
+| LiveScope reference (3 frames avg) | 0.50 | 0.32 | 0.10 | 0.03 | 0.04 |
+| Engine PLM Forward, timber + 3 test fish, 60 ft | 0.55 | 0.29 | 0.11 | 0.02 | 0.02 |
+| Engine PLM Down, near-field test fish, 25 ft | 0.30 | 0.31 | 0.24 | 0.06 | 0.09 |
+
+The forward scene now sits on the LiveScope balance; the near-field Down scene
+is still hotter (big fish 2–4 m away fill the beam), which is also what the
+app's own near-field frames do (jet mode saturates red there).
+
+Garmin colour schemes seen in the settings videos (for reference only):
+Rusted Steel, Lava, Caribbean, Floodlight, Ice Blue, Aqua, Moss, Amber,
+Copper, Black Emerald, Midnight Blue, Orange Crawfish, Red Shad, Blue.
+Garmin's "Color Gain" (default 70–75 %) is their contrast; "Noise Reject"
+Medium and "TVG" Off are the factory positions in the support video.

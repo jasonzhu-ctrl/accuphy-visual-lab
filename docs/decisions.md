@@ -353,3 +353,18 @@ Numbered log. Newest at the bottom.
     orange 不够红) is the inset's candidate default, pending his verdict.
     `?fishtest` places fixed test fish relative to the transducer for
     side-by-side checks (`reference/engine-compare/compare-down-fish-*.png`).
+
+33. **2026-09-24** — **Texture and palette from real LVS34 footage.** Jason's
+    round-2 verdict: fish too bright and too smooth (取两者中间), `accuphy_red`
+    wrong (纹理完全不是一回事, 太模糊), learn Garmin amber from clear LVS34
+    videos. Done: yt-dlp pulled Garmin's own LiveScope settings video; 8 amber
+    frames + 3× texture crops in `reference/app-study/livescope-lvs34/`;
+    palette measured (half the lit picture is blood red, orange only in the
+    top ~15 %) → new default map `garmin_amber`; texture = per-beam filaments
+    along the ray with ragged edges, fish = short oblongs 1–3 filaments wide,
+    bottom = fibrous band with a white tip only where it faces the transducer
+    (`sonar-style.md` §7.6–7.7). Engine: filament texture on fish and
+    structure, radial smear behind fish, two-scale lumpiness cutting holes,
+    fish cap 0.78; the PLM Forward scene now matches LiveScope's colour shares
+    within a few percent. Composites: `reference/engine-compare/
+    compare-livescope-vs-engine-forward.png`, `compare-down-fish-*.png`.
