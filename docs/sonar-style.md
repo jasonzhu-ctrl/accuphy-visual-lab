@@ -221,3 +221,41 @@ TVG 25 (a step higher than PLM's 20/20/20). Frames in
 Compared with case 1 the PL view needs less contrast (35 vs 40) because it
 starts cleaner; gain stays at the factory 50 — structure blows out faster than
 fish. Near-field rays fanning from the apex are normal (see §6.2), kept.
+
+### 6.8 Fish marks near vs far — the physics behind the look (Jason's question, 2026-09-24)
+Crops in `reference/app-study/fish-near-vs-far/` (PLM Forward, apex top-left,
+89 px/m: near = 3–8 m, far = 11–17 m, same frames as the ideal picture).
+
+**What the crops show**
+- Near (3–8 m): marks are small compact dots / short dashes ≈ 0.1–0.2 m,
+  oriented every which way; a few are clearly longer than others.
+- Far (11–17 m): marks are ≈ 0.3–0.5 m long, all elongated the same way —
+  **along the arc, perpendicular to the ray from the transducer** (tangential),
+  thin in the range direction; brightness varies a lot from mark to mark.
+
+**Why (two resolutions, two regimes)**
+1. *Range (radial) resolution* comes from the pulse length and is the same at
+   every distance: a fish is always thin in the range direction (~0.1 m).
+2. *Angular (tangential) resolution* is a fixed angle (the beam-formed width,
+   ~1–2°), so its footprint grows with range: ≈ 0.05–0.1 m at 3 m, ≈ 0.3–0.5 m
+   at 15 m.
+3. **Near regime** (footprint smaller than the fish): the mark shows the fish's
+   *own* length and heading. A fish broadside to the beam draws a dash the
+   length of its body, along its body; a fish facing the transducer draws a dot
+   (only the head/shoulder cross-section is in the beam).
+4. **Far regime** (footprint larger than the fish): every fish is smeared to
+   the footprint — a tangential dash of the *beam's* width, whatever the fish's
+   heading. Heading now only changes **brightness and stability**: broadside
+   presents the swim bladder and flank (strong, steady echo, bright core toward
+   the transducer, faint tail behind it), head-on presents a small cross-section
+   (weak, flickers between pings as the fish turns).
+5. In Forward view the "horizontal dash" seen earlier is therefore the special
+   case of a fish at mid-range on a ray that points mostly forward (tangential
+   ≈ vertical-ish in screen terms only near the top edge; horizontal along the
+   fan centre). Rule for the engine: **dash along the arc, never along screen x.**
+
+**Engine mapping** (`sonarShader.js` fishAt/dash): angular blur = constant
+beam angle (not screen metres) added to the fish mask's own angular extent;
+radial thickness = constant pulse; brightness = angular fill of the beam
+(broadside fills it, head-on does not) → near fish show body length and
+heading, far fish become uniform tangential dashes that vary in brightness.

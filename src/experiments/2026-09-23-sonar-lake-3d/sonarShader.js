@@ -60,10 +60,9 @@ export const sonarFragment = /* glsl */ `
   }
   float sampleFish(int k, vec2 uv) { return (k == 0) ? texture2D(uColor0, uv).a : texture2D(uColor1, uv).a; }
 
-  // fish mask hit near screen point p for fan k: a few thickness rows, tight radial window
-  float fishAt(int k, vec2 p, float jit) {
-    float r = length(p);
-    float a = atan(p.x, p.y) - uFan[k].x;
+  // fish mask hit at fan angle a / range r for fan k: a few thickness rows, tight radial
+  // window (the pulse length — constant with range, sonar-style.md §6.8)
+  float fishAt(int k, float a, float r, float jit) {
     if (abs(a) > uFan[k].y || r > uRange) return 0.0;
     float u = 0.5 + 0.5 * tan(a) / uFan[k].z;
     float best = 0.0;
@@ -74,7 +73,7 @@ export const sonarFragment = /* glsl */ `
       if (m < 0.3) continue;
       float hit = sampleDist(k, vec2(u, v), length(vec3(tan(a), ty, 1.0)));
       float dr = r - hit;
-      float sr = 0.22 + 0.006 * r;              // thin across the beam direction
+      float sr = 0.12 + 0.004 * r;              // pulse length: thin in range, barely grows
       best = max(best, exp(-dr * dr / (sr * sr)));
     }
     return best;
@@ -139,15 +138,19 @@ export const sonarFragment = /* glsl */ `
         acc += (pulse + tail + second) * wgt * (1.0 - fish);
       }
       acc /= 9.0;
-      // fish: a horizontal dash — sample the mask at a few horizontal offsets in
-      // SCREEN metres, brightest in the middle, soft ends (sonar-style.md §6.3)
-      float dashHalf = 0.16 + 0.012 * r;        // ≈ 0.4–0.6 m wide at 8–18 m
-      float fishHit = 0.0;
-      for (int i = -2; i <= 2; i++) {
-        float f = float(i) / 2.0;
-        float w = 1.0 - 0.55 * f * f;           // 1, 0.86, 0.45 → bright core, feathered ends
-        fishHit = max(fishHit, w * fishAt(k, p - vec2(f * dashHalf, 0.0), jit));
+      // fish (sonar-style.md §6.8): the mask already carries the fish's own angular extent
+      // (near: body length + heading). Blur it by a CONSTANT beam angle along the arc —
+      // so far fish become tangential dashes the width of the beam — and use the average
+      // fill rather than the max, so a head-on fish (narrow in angle) comes out dimmer
+      // than a broadside one at the same range.
+      float beamHalf = 0.014;                   // ≈ 0.8° half-width of the formed beam
+      float fishSum = 0.0, wSum = 0.0;
+      for (int i = -3; i <= 3; i++) {
+        float f = float(i) / 3.0;
+        float w = 1.0 - 0.6 * f * f;            // soft ends
+        fishSum += w * fishAt(k, a + f * beamHalf, r, jit); wSum += w;
       }
+      float fishHit = smoothstep(0.08, 0.7, fishSum / wSum) * 1.1; // head-on ≈ dim fleck, broadside ≈ full
       float atten = 1.0 - 0.4 * clamp(r / uRange, 0.0, 1.0);
       float gain = uFlat > 0.5 ? 3.0 : 1.0;
       float fishEcho = fishHit * (1.05 + 0.35 * streak);

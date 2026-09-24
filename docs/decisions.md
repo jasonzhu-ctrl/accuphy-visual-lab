@@ -298,3 +298,15 @@ Numbered log. Newest at the bottom.
     ignore) are in `docs/sonar-style.md` §6.6. Rule for the inset: cleaner than
     real use — small speckle next to structure must not be mistaken for fish.
     Engine defaults set to gain 57 · contrast 40 · noise 30 to match.
+
+29. **2026-09-24** — **Fish mark model from first principles** (Jason asked to
+    compare near vs far fish in Forward view). Range resolution is the pulse
+    (constant); angular resolution is a constant beam angle whose footprint
+    grows with range. So near fish show their own body length and heading
+    (broadside = dash along the body, head-on = dot); far fish are all smeared
+    to a tangential dash the width of the beam, and heading only changes
+    brightness/stability. Verified on the tablet crops
+    (`reference/app-study/fish-near-vs-far/`). Engine changed accordingly
+    (`sonarShader.js` fishAt + beam-angle blur, average fill instead of max;
+    `lakeMaterial.js` sonar-pass body no longer compressed to 0.6). Write-up in
+    `docs/sonar-style.md` §6.8.
