@@ -41,7 +41,16 @@ export function makeLakeMaterial({ fish = false, structure = false } = {}) {
         vPattern = aPattern; vBelly = aBelly; vSide = aSide; vLocal = position;
         // sonar pass: a fish echoes from a small part of its body at a time — compress the
         // body along its axis so the mark is narrow in angle and the pulse shapes its length
-        if (uSonarPass > 0.5) pos *= uFishSonarScale; // true size in the sonar; the body keeps its length + heading (§6.8, §7.4)
+        if (uSonarPass > 0.5) {
+          pos *= uFishSonarScale; // true size in the sonar; the body keeps its length + heading (§6.8, §7.4)
+          // a fish thinner than the beam's thickness resolution still echoes as a point target: give
+          // small fish a minimum apparent height/width (≈ 0.12 m) so bait does not vanish between rows
+          #ifdef USE_INSTANCING
+          float trueLen = length(instanceMatrix[0].xyz) * uFishSonarScale;
+          float grow = max(1.0, 0.12 / max(trueLen * 0.25, 0.01));
+          pos.y *= grow; pos.z *= grow;
+          #endif
+        }
       #endif
         vec3 c = vec3(1.0);
         #ifdef USE_COLOR

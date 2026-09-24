@@ -71,7 +71,7 @@ export const sonarFragment = /* glsl */ `
       float v = (float(j) + 0.5) / 12.0;         // fixed rows: no per-pixel jitter → a solid mark, not salt-and-pepper
       float ty = (v * 2.0 - 1.0) * uFan[k].w;
       float m = sampleFish(k, vec2(u, v));
-      if (m < 0.75) continue;                    // alpha 1 = fish (0.5 = structure)
+      if (m < 0.62) continue;                    // alpha 1 = fish (0.5 = structure); linear-filtered edges still count
       float hit = sampleDist(k, vec2(u, v), length(vec3(tan(a), ty, 1.0)));
       float dr = r - hit;
       float sr = (0.12 + 0.004 * r) * srScale;  // pulse length: thin in range, barely grows
