@@ -75,6 +75,9 @@ export default function SonarLake3D() {
         </div>
       </motion.div>
 
+      {import.meta.env.DEV && window.location.search.includes('debug') && (
+        <pre ref={(el) => { state.current.debugEl = el }} className="pointer-events-none absolute left-2 top-1/2 rounded bg-black/60 p-1 text-[10px] text-lime-300" />
+      )}
       {/* frame + labels for the sonar screen (the picture itself is drawn by SonarScreen inside the canvas) */}
       <div className="pointer-events-none absolute" style={{ right: 16, bottom: 16, width: '34%', aspectRatio: `1 / ${deviceId === 'PL' ? 0.6 : 0.78}` }}>
         <div className="absolute inset-0 rounded-md ring-1 ring-white/30" />

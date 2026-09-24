@@ -26,6 +26,7 @@ export const sonarFragment = /* glsl */ `
   uniform float uTime;
   uniform float uUnitM;       // grid spacing in metres (1 ft or 1 m based)
   uniform float uFlat;        // 1 = panoramic (top-down), 0 = side view
+  uniform float uDebug;       // 1 = show the raw depth strip (dev)
 
   float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
   float linearize(float d) { // three.js perspective depth → view-space distance along -z
@@ -83,7 +84,9 @@ export const sonarFragment = /* glsl */ `
       // range attenuation + speckle
       float atten = 1.0 - 0.45 * clamp(r / uRange, 0.0, 1.0);
       float sp = 0.75 + 0.5 * hash(floor(p * 7.0) + floor(uTime * 12.0));
-      echo = max(echo, acc * atten * sp);
+      // grazing-angle bottom returns are weak; the app's Panoramic runs at ~70 % gain
+      float gain = uFlat > 0.5 ? 2.4 : 1.0;
+      echo = max(echo, acc * atten * sp * gain);
     }
     // black water, echoes only — no invented rings/grid (Jason 2026-09-24);
     // the real app chrome is learned later from the app's playback mode

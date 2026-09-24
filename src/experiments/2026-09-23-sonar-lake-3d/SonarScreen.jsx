@@ -25,7 +25,7 @@ export default function SonarScreen({ state, rect }) {
         uDepth0: { value: targets[0].depthTexture }, uDepth1: { value: targets[1].depthTexture },
         uFanCount: { value: 0 }, uFan: { value: [new THREE.Vector4(), new THREE.Vector4()] },
         uNearFar: { value: new THREE.Vector2(0.3, 150) }, uRange: { value: 20 },
-        uScreenMin: { value: new THREE.Vector2(-20, 0) }, uScreenSize: { value: new THREE.Vector2(40, 30) }, uTime: { value: 0 }, uUnitM: { value: 0.3048 }, uFlat: { value: 0 },
+        uScreenMin: { value: new THREE.Vector2(-20, 0) }, uScreenSize: { value: new THREE.Vector2(40, 30) }, uTime: { value: 0 }, uUnitM: { value: 0.3048 }, uFlat: { value: 0 }, uDebug: { value: window.location.search.includes('sonardebug') ? 1 : 0 },
       },
     })
     const overlay = new THREE.Scene()
@@ -33,6 +33,7 @@ export default function SonarScreen({ state, rect }) {
     quad.frustumCulled = false
     overlay.add(quad)
     const ortho = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1)
+    if (import.meta.env.DEV) window.__sonar = { targets, cams, mat }
     return { targets, cams, mat, overlay, quad, ortho }
   }, [])
   useEffect(() => { camera.layers.enable(SONAR_HIDE_LAYER) }, [camera])
@@ -73,6 +74,7 @@ export default function SonarScreen({ state, rect }) {
       u.uFan.value[k].set(centreAngle, half, tanH, tanV)
     })
     gl.setRenderTarget(null)
+    if (s.debugEl) s.debugEl.textContent = `sonar fans ${specs.length} flat ${flat ? 1 : 0} fan0 ${u.uFan.value[0].toArray().map((v) => v.toFixed(2)).join(',')} apex ${s.apex.toArray().map((v) => v.toFixed(1)).join(',')}`
 
     // 2) main view
     gl.autoClear = true

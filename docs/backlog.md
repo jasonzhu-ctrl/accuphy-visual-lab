@@ -29,5 +29,5 @@ it is done. ✅ done · 🔧 in progress · ⬜ open.
 
 ## Engineering
 - ⬜ Mobile performance pass (target 60 fps mid iPhone); dpr cap, instancing check
-- ⬜ React 19 + R3F `refCleanup` console error on unmount (benign) — pin versions or fix
+- 🔧 React 19 + R3F `refCleanup` console error on unmount (benign) — StrictMode removed 2026-09-24 (its double mount duplicated GL resources); watch whether the error persists
 - ⬜ Single-file build + Cloudflare Pages/Vercel hosting + Shopify Custom Liquid iframe

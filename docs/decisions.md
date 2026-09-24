@@ -172,3 +172,11 @@ Numbered log. Newest at the bottom.
     species profiles (`fishGeometry.js`): smooth tube nose→peduncle with
     per-type height/width curves, forked or rounded caudal fin, dorsal, anal
     and pectoral fins — no more abrupt body/tail step.
+
+19. **2026-09-24** — Panoramic sonar screen verified: black at short range in
+    deep water is **physics** (5–25° fan reaches only range·sin 25° deep); at
+    240 ft it images the rock hump with the app's dark-red bottom fill, bright
+    structure and radial streaks. Panoramic gain ×2.4 to match the app's ~70 %
+    gain look. Dev aids: `?debug` (live sonar numbers), `?sonardebug` (raw
+    depth strip). React StrictMode removed from `main.jsx` — its dev double
+    mount created duplicate render targets / frame loops.
