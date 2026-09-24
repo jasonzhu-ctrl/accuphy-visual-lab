@@ -108,3 +108,13 @@ Numbered log. Newest at the bottom.
     timber / stumps, a small wreck, rock piles; everything scaled to a real
     bass boat and real distances; and always feasible on the web (mobile).
     Sizes used are recorded in `src/experiments/2026-09-23-sonar-lake-3d/fish.js`.
+
+13. **2026-09-24** — Jason's direction for the 3D lake, applied: deep-water
+    share +10 % (`terrain.js`); natural structure via clumped rejection
+    sampling (`vegetation.js`): 4 tall drowned-tree variants along the
+    drop-off, 5 fine multi-fork submerged bush-tree variants on the shelf and
+    hump flanks, stumps in loose groups, fallen logs, weed beds on the shallow
+    shelf, rock pile with size gradient + scattered boulders; boat = 20 ft+
+    **Ranger-style** bass boat (6.3 m × 2.4 m) with a **Mercury V8 Pro XS**
+    style outboard and bow trolling motor carrying the transducer (`boat.js`).
+    Beam contrast raised (outside 0.72×, inside up to 3×).

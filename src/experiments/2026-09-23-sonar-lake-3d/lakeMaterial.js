@@ -82,11 +82,12 @@ export function makeLakeMaterial({ instanced = false } = {}) {
         float beam = 0.0;
         for (int k = 0; k < ${MAX_BEAMS}; k++) { if (k < uBeamCount) beam = max(beam, insideBeam(k, vWorld)); }
         beam *= uReveal;
-        vec3 lit = base * (1.0 + 1.6 * beam) + uHighlight * 0.18 * beam;
+        // outside the beam things stay murky; inside they pop (Garmin look)
+        vec3 lit = base * (0.72 + 2.3 * beam) + uHighlight * 0.22 * beam;
         // underwater fog by distance from camera
         float dist = length(vWorld - cameraPosition);
         float fog = 1.0 - exp(-dist * uFogDensity);
-        fog *= 1.0 - 0.55 * beam; // the beam also cuts through the murk
+        fog *= 1.0 - 0.7 * beam; // the beam also cuts through the murk
         vec3 col = mix(lit, uFogColor, clamp(fog, 0.0, 0.92));
         gl_FragColor = vec4(col, 1.0);
       }

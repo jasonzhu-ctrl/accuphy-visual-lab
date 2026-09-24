@@ -8,6 +8,8 @@ import { HALF, SEG, bedY, fbm } from './terrain'
 import { SPECIES, makePopulation, fishPose, rnd } from './fish'
 import { makeLakeMaterial, setBeamUniforms } from './lakeMaterial'
 import { wedgeGeometry } from '../2026-09-23-beam-shapes-3d/wedge'
+import { makeTallTree, makeBushTree, makeStump, makeLog, makeWeedTuft, makeRock, placeAll } from './vegetation'
+import { makeRangerBoat, TRANSDUCER_OFFSET } from './boat'
 
 // ---------- lakebed ----------
 function Lakebed({ mat }) {
@@ -36,84 +38,40 @@ function Lakebed({ mat }) {
 }
 
 // ---------- structures ----------
-function makeTreeGeometry() {
-  const parts = []
-  const trunk = new THREE.CylinderGeometry(0.12, 0.28, 1, 7)
-  trunk.translate(0, 0.5, 0)
-  parts.push(trunk)
-  for (let i = 0; i < 3; i++) {
-    const b = new THREE.CylinderGeometry(0.03, 0.07, 0.45, 5)
-    b.translate(0, 0.225, 0)
-    b.rotateZ(0.9 + rnd() * 0.5)
-    b.rotateY(i * 2.1 + rnd())
-    b.translate(0, 0.45 + i * 0.18, 0)
-    parts.push(b)
-  }
-  const g = mergeGeometries(parts)
-  const col = new Float32Array(g.attributes.position.count * 3).fill(0)
-  for (let i = 0; i < col.length; i += 3) { col[i] = 0.26; col[i + 1] = 0.2; col[i + 2] = 0.14 }
-  g.setAttribute('color', new THREE.BufferAttribute(col, 3))
-  return g
-}
-function Timber({ mat }) {
-  const geo = useMemo(makeTreeGeometry, [])
-  const ref = useRef()
-  const items = useMemo(() => {
-    const out = []
-    for (let i = 0; i < 34; i++) {
-      // standing dead timber on the shelf edge and one cluster in the deep
-      const cluster = i < 24 ? [-18, 6] : [12, -14]
-      const x = cluster[0] + (rnd() - 0.5) * 22, z = cluster[1] + (rnd() - 0.5) * 22
-      const h = 3 + rnd() * 6 // 3–9 m tall drowned trees
-      out.push({ x, z, y: bedY(x, z) - 0.2, h, rot: rnd() * 6.28, tilt: (rnd() - 0.5) * 0.15 })
-    }
-    for (let i = 0; i < 20; i++) { // stumps
-      const x = -20 + (rnd() - 0.5) * 30, z = (rnd() - 0.5) * 40
-      out.push({ x, z, y: bedY(x, z) - 0.1, h: 0.5 + rnd() * 0.8, rot: rnd() * 6.28, tilt: 0 })
-    }
-    return out
-  }, [])
+// One InstancedMesh per geometry variant; items are dealt round-robin across variants.
+function Instanced({ mat, geos, items }) {
+  const refs = useRef([])
+  const buckets = useMemo(() => geos.map((_, k) => items.filter((_, i) => i % geos.length === k)), [geos, items])
   useEffect(() => {
-    const m = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler()
-    items.forEach((it, i) => {
-      e.set(it.tilt, it.rot, 0); q.setFromEuler(e)
-      m.compose(new THREE.Vector3(it.x, it.y, it.z), q, new THREE.Vector3(1 + it.h * 0.08, it.h, 1 + it.h * 0.08))
-      ref.current.setMatrixAt(i, m)
+    const m = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler(), p = new THREE.Vector3(), sc = new THREE.Vector3()
+    buckets.forEach((list, k) => {
+      const mesh = refs.current[k]; if (!mesh) return
+      list.forEach((it, i) => {
+        e.set(it.tilt || 0, it.rot || 0, (it.tilt || 0) * 0.5); q.setFromEuler(e)
+        p.set(it.x, it.y, it.z); sc.set(it.s * (it.sx ?? 1), it.s * (it.sy ?? 1), it.s * (it.sz ?? 1))
+        m.compose(p, q, sc); mesh.setMatrixAt(i, m)
+      })
+      mesh.instanceMatrix.needsUpdate = true
     })
-    ref.current.instanceMatrix.needsUpdate = true
-  }, [items])
-  return <instancedMesh ref={ref} args={[geo, mat, items.length]} />
+  }, [buckets])
+  return geos.map((g, k) => <instancedMesh key={k} ref={(el) => (refs.current[k] = el)} args={[g, mat, Math.max(1, buckets[k].length)]} frustumCulled={false} />)
 }
-
-function Rocks({ mat }) {
-  const geo = useMemo(() => {
-    const g = new THREE.DodecahedronGeometry(0.6, 0)
-    const col = new Float32Array(g.attributes.position.count * 3)
-    for (let i = 0; i < col.length; i += 3) { col[i] = 0.45; col[i + 1] = 0.44; col[i + 2] = 0.4 }
-    g.setAttribute('color', new THREE.BufferAttribute(col, 3))
-    return g
-  }, [])
-  const ref = useRef()
-  const items = useMemo(() => {
-    const out = []
-    for (let i = 0; i < 60; i++) { // rock pile on the hump at (30,12)
-      const a = rnd() * 6.28, r = rnd() * 9
-      const x = 30 + Math.cos(a) * r, z = 12 + Math.sin(a) * r * 0.7
-      const s = 0.5 + rnd() * 1.6 // 0.3–1.3 m boulders
-      out.push({ x, z, y: bedY(x, z) + s * 0.25, s, rot: rnd() * 6.28 })
-    }
-    return out
-  }, [])
-  useEffect(() => {
-    const m = new THREE.Matrix4(), q = new THREE.Quaternion()
-    items.forEach((it, i) => {
-      q.setFromEuler(new THREE.Euler(it.rot, it.rot * 1.7, 0))
-      m.compose(new THREE.Vector3(it.x, it.y, it.z), q, new THREE.Vector3(it.s, it.s * 0.7, it.s))
-      ref.current.setMatrixAt(i, m)
-    })
-    ref.current.instanceMatrix.needsUpdate = true
-  }, [items])
-  return <instancedMesh ref={ref} args={[geo, mat, items.length]} />
+function Structures({ mat }) {
+  const geos = useMemo(() => ({
+    tall: [0, 1, 2, 3].map(makeTallTree), bush: [0, 1, 2, 3, 4].map(makeBushTree), stump: [makeStump()], log: [makeLog()],
+    weed: [makeWeedTuft()], rock: [0, 1, 2].map(makeRock),
+  }), [])
+  const items = useMemo(placeAll, [])
+  return (
+    <group>
+      <Instanced mat={mat} geos={geos.tall} items={items.tall} />
+      <Instanced mat={mat} geos={geos.bush} items={items.bush} />
+      <Instanced mat={mat} geos={geos.stump} items={items.stump} />
+      <Instanced mat={mat} geos={geos.log} items={items.log.map((it) => ({ ...it, sx: 1, sy: 0.12, sz: 0.12 }))} />
+      <Instanced mat={mat} geos={geos.weed} items={items.weed.map((it) => ({ ...it, sx: 0.8, sz: 0.8 }))} />
+      <Instanced mat={mat} geos={geos.rock} items={items.rock} />
+    </group>
+  )
 }
 
 function Wreck({ mat }) {
@@ -211,35 +169,18 @@ function Water() {
 }
 
 // ---------- boat + device + beams ----------
-function makeBoatGeometry() {
-  // 5.6 m bass boat: hull outline extruded, plus deck/console
-  const s = new THREE.Shape()
-  s.moveTo(2.8, 0); s.quadraticCurveTo(2.5, 0.9, 1.2, 1.05); s.lineTo(-2.5, 1.05); s.quadraticCurveTo(-2.8, 1.0, -2.8, 0.7)
-  s.lineTo(-2.8, -0.7); s.quadraticCurveTo(-2.8, -1.0, -2.5, -1.05); s.lineTo(1.2, -1.05); s.quadraticCurveTo(2.5, -0.9, 2.8, 0)
-  const hull = new THREE.ExtrudeGeometry(s, { depth: 0.75, bevelEnabled: false }); hull.rotateX(-Math.PI / 2); hull.translate(0, -0.45, 0)
-  const console_ = new THREE.BoxGeometry(0.8, 0.6, 0.9); console_.translate(-0.2, 0.55, 0)
-  const motor = new THREE.BoxGeometry(0.5, 0.7, 0.4); motor.translate(-2.9, 0.15, 0)
-  return mergeGeometries([hull, console_, motor])
-}
 function Boat({ state, beamMats }) {
-  const geo = useMemo(makeBoatGeometry, [])
+  const boat = useMemo(makeRangerBoat, [])
   const group = useRef()
   useFrame((_, dt) => {
     const s = state.current
-    // ease toward the target, keep inside the lake
     s.boat.x += (s.target.x - s.boat.x) * Math.min(1, dt * 4)
     s.boat.z += (s.target.z - s.boat.z) * Math.min(1, dt * 4)
-    group.current.position.set(s.boat.x, 0.05, s.boat.z)
-    // device under the bow
-    s.apex.set(s.boat.x + 2.3, -0.35, s.boat.z)
+    group.current.position.set(s.boat.x, 0.02, s.boat.z)
+    s.apex.copy(TRANSDUCER_OFFSET).add(group.current.position)
     setBeamUniforms(beamMats, s.specs, s.apex)
   })
-  return (
-    <group ref={group}>
-      <mesh geometry={geo}><meshStandardMaterial color="#d9dde2" roughness={0.6} /></mesh>
-      <mesh position={[2.3, -0.35, 0]}><boxGeometry args={[0.35, 0.25, 0.22]} /><meshStandardMaterial color="#111" /></mesh>
-    </group>
-  )
+  return <group ref={group}><primitive object={boat} /></group>
 }
 function Beams({ state }) {
   const group = useRef()
@@ -270,8 +211,9 @@ function Rig({ state }) {
     const s = state.current
     // fixed 3/4 aerial view like the PL animations; slight parallax from the pointer
     const px = s.parallax.x, py = s.parallax.y
-    camera.position.set(-26 + px * 4, 54 + py * 2, 46 + px * 2)
-    camera.lookAt(10 + px * 2, -8, -2)
+    // view from the south: drop-off timber on the left, rock hump on the right
+    camera.position.set(-14 + px * 4, 52 + py * 2, 66 + px * 2)
+    camera.lookAt(3 + px * 2, -9, 0)
   })
   return null
 }
@@ -303,8 +245,7 @@ export default function LakeScene({ state }) {
       <directionalLight position={[40, 80, 30]} intensity={1.4} />
       <Lakebed mat={mats.bed} />
       <mesh rotation-x={-Math.PI / 2} position-y={-26}><planeGeometry args={[900, 900]} /><meshBasicMaterial color="#17545f" /></mesh>
-      <Timber mat={mats.inst} />
-      <Rocks mat={mats.inst} />
+      <Structures mat={mats.inst} />
       <Wreck mat={mats.inst} />
       <Fish mat={mats.inst} />
       <Water />
