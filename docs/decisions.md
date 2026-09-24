@@ -386,5 +386,9 @@ Numbered log. Newest at the bottom.
     Panoramic screen rebuilt: even bottom texture with acoustic shadows, dark
     near the apex, the old near-field burnout removed. Step-2 preset moved to
     the timber flat so "this is what your phone shows" shows timber and fish.
-    Antenna lines on the phone band. Still open: school stacking, finer fill
-    texture inside solid structure, bottom white tip width.
+    Antenna lines on the phone band. Later the same day: bait fish get a
+    minimum apparent size in the sonar pass (point-target PSF) and the mask is
+    sampled as coverage, so bait no longer dots or checkers; the beam comb is
+    removed from fish altogether (the app's fish are solid oblongs with a soft
+    rim — the comb belongs to structure faces). Still open: school stacking,
+    finer fill texture inside solid structure, bottom white tip width.
