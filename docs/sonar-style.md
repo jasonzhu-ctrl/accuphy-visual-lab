@@ -174,3 +174,22 @@ Engine mapping: gain = window offset (already), contrast = raise the window's
 low end (cuts the floor before targets), noise reject = suppress isolated
 speckle in the floor texture (never the bottom band or fish). Defaults for the
 website follow step 6, not the app's factory values.
+
+### 6.6 Candidate "ideal picture" (2026-09-24, awaiting Jason's feedback)
+Made on the tablet from Reset Defaults, PLM Live Forward, the 2026-08-16
+piling + fish-school recording, range 18 m (frames in
+`reference/app-study/ideal-picture/`):
+
+| Step | Setting | What changed |
+|---|---|---|
+| 0 | gain 50 · contrast 20 · noise 20 · TVG 20 (defaults) | dark-red floor everywhere, fish dim |
+| 1 | gain 58 | fish bright but the piling and bottom band go white → too hot |
+| 2 | gain 55 | bright, still readable |
+| 3 | + contrast 40 | ~80 % of the floor gone, targets unchanged in size |
+| 4 | + noise reject 30 | remaining speckle gone; a few flecks stay near the cable |
+| **5** | **gain 52 · contrast 40 · noise 30 · TVG 20** | piling/bottom back off white, fish dashes crisp, black background with a trace of noise — my pick |
+| 6 | gain 50 (same rest) | a touch dim on the small fish |
+
+Left on the tablet at step 5 for Jason to look at. Once confirmed, this becomes the
+target the engine's defaults are matched against (currently gain 57 / contrast 40 /
+noise 20 in engine units — to be re-matched to this frame).
