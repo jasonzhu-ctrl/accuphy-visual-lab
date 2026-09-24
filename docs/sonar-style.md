@@ -513,3 +513,23 @@ tail 0.35 m + 0.015·r, filament period ≈ 0.1 m, streak period ≈ 0.2 m.
 Fish cores stay solid (the rim-only bites replace the earlier holes — Jason:
 中间空了); the filament comb fades out under ≈ 5 m where the beam footprint
 is smaller than a pixel.
+
+### 7.9 Near-field fish: brightness rises toward the centre (verified 2026-09-24)
+Jason's principle "越靠近中心越亮, 有逐步亮的过程" checked on the Down-view
+big-fish recording (jet map → LUT index, distance measured inward from the
+blob edge at index 0.45):
+
+| distance inside the edge | 0–1 cm | 1–3 cm | 3–4 cm | 4–6 cm | 6–8 cm | 8–10 cm |
+|---|---|---|---|---|---|---|
+| t = 2 s (1.5 m) | 0.81 | 0.90 | 0.94 | 0.97 | 0.98 | 0.99 |
+| t = 8 s (2 m) | 0.88 | 0.94 | 0.98 | 1.00 | 1.00 | 1.00 |
+| t = 14 s (3 m, two fish) | 0.78 | 0.83 | 0.88 | 0.91 | 0.92 | 0.93 |
+
+Confirmed: monotonic climb over ≈ 5–8 cm from the rim to a saturated core,
+preceded outside the edge by the cyan/green halo (index 0.2–0.45) a few cm
+wide. Engine: fish brightness = 0.8·fill^1.4 (fill = beam-blurred silhouette
+coverage, so it ramps over the blur width) + a faint outer halo from a 2.5×
+wider blur. Structure (piling, trunk, wreck face) is drawn **solid and bright**
+again, a touch under the bottom band, with only a light filament modulation —
+Jason: the app's big piling is solid, bright and sharp, and that is the
+better look.

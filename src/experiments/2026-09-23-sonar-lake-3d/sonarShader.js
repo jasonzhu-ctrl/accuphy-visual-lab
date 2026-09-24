@@ -63,7 +63,7 @@ export const sonarFragment = /* glsl */ `
 
   // fish mask hit at fan angle a / range r for fan k: a few thickness rows, tight radial
   // window (the pulse length — constant with range, sonar-style.md §6.8)
-  float fishAt(int k, float a, float r, float jit) {
+  float fishAt(int k, float a, float r, float jit, float srScale) {
     if (abs(a) > uFan[k].y || r > uRange) return 0.0;
     float u = 0.5 + 0.5 * tan(a) / uFan[k].z;
     float best = 0.0;
@@ -74,7 +74,7 @@ export const sonarFragment = /* glsl */ `
       if (m < 0.75) continue;                    // alpha 1 = fish (0.5 = structure)
       float hit = sampleDist(k, vec2(u, v), length(vec3(tan(a), ty, 1.0)));
       float dr = r - hit;
-      float sr = 0.12 + 0.004 * r;              // pulse length: thin in range, barely grows
+      float sr = (0.12 + 0.004 * r) * srScale;  // pulse length: thin in range, barely grows
       float core = exp(-dr * dr / (sr * sr));
       float tail = dr > 0.0 ? 0.35 * exp(-dr / (0.08 + 0.004 * r)) : 0.0; // short smear (app marks ≈ 0.07–0.2 m along the ray, §7.8)
       best = max(best, core + tail);
@@ -141,12 +141,12 @@ export const sonarFragment = /* glsl */ `
         float tag = sampleFish(k, vec2(u, v));   // 1 fish · 0.5 structure · 0 bottom
         float fish = step(0.75, tag);
         float structure = step(0.25, tag) * (1.0 - fish);
-        float pulse = exp(-dr * dr / (sigma * sigma)) * (1.0 - 0.45 * structure) * mix(1.0, 0.5 + 0.8 * filament, structure); // structure: dimmer and streaky (§6.10, §7.6)
+        float pulse = exp(-dr * dr / (sigma * sigma)) * (1.0 - 0.12 * structure) * mix(1.0, 0.85 + 0.25 * filament, structure); // structure facing the transducer: solid and bright, only a touch under the bottom band (Jason 2026-09-24)
         float tail = dr > 0.0 ? 0.6 * exp(-dr / tailLen) : 0.0;   // body of the band sits in the orange mid-tones
         float second = 0.10 * exp(-(r - 2.0 * hit) * (r - 2.0 * hit) / (4.0 * sigma * sigma)); // faint second echo
         float wgt = 0.55 + 0.9 * (1.0 - abs(v * 2.0 - 1.0));
         acc += (1.2 * pulse + tail + second) * wgt * (1.0 - fish);
-        peak = max(peak, pulse * (1.0 - fish) * (1.0 - 0.5 * structure));
+        peak = max(peak, pulse * (1.0 - fish) * (1.0 - 0.15 * structure));
       }
       acc = acc / 21.0 + 0.5 * peak;  // 24 rows now (was 16 → /14) // first return makes the leading edge hot even where the bottom slopes across the beam; the integrated part gives the orange body (balance loop, §6.11)
       // fish (sonar-style.md §6.8): the mask already carries the fish's own angular extent
@@ -159,9 +159,18 @@ export const sonarFragment = /* glsl */ `
       for (int i = -3; i <= 3; i++) {
         float f = float(i) / 3.0;
         float w = 1.0 - 0.6 * f * f;            // soft ends
-        fishSum += w * fishAt(k, a + f * beamHalf, r, jit); wSum += w;
+        fishSum += w * fishAt(k, a + f * beamHalf, r, jit, 1.0); wSum += w;
       }
-      float fishHit = min(0.78, 1.3 * fishSum / wSum);        // soft rim from the angular average (§7.4); capped under white (Jason: 太亮)
+      // outer halo: the same mask seen through a 2.5× wider blur (measured §7.9: brightness climbs
+      // gradually from a faint halo, through the rim, to a saturated core ≈ 5–8 cm inside the edge)
+      float haloSum = 0.0, hSum = 0.0;
+      for (int i = -3; i <= 3; i++) {
+        float f = float(i) / 3.0;
+        float w = 1.0 - 0.6 * f * f;
+        haloSum += w * fishAt(k, a + f * beamHalf * 2.5, r, jit, 2.5); hSum += w;
+      }
+      float fill = fishSum / wSum, halo = haloSum / hSum;
+      float fishHit = 0.8 * pow(smoothstep(0.0, 1.0, fill), 1.4) + 0.22 * halo * (1.0 - fill); // gradual rise rim → core, faint halo outside (§7.9)
       // lumpy body (the app's near blobs are uneven: flexing body, ping-to-ping change), never speckle
       // lumpy body: two noise scales, deep enough to cut holes and bites into the silhouette (app: irregular blobs)
       float lump = vnoise(p * 4.0 + vec2(0.0, uTime * 0.12)) * 0.6 + vnoise(p * 11.0 - vec2(uTime * 0.07, 0.0)) * 0.55;
