@@ -99,7 +99,7 @@ export default function SonarLake3D() {
       </div>
 
       {/* ---- iPhone Pro Max, landscape, slightly turned in 3D (same pose as the GL picture) ---- */}
-      <div ref={(el) => { sonarRect.current.frame = el }} className="pointer-events-none absolute right-[4vw] bottom-[200px] w-[92vw] sm:right-[28px] sm:bottom-[24px] sm:w-[min(38vw,560px)]" style={{ aspectRatio: '19.5 / 9' }}>
+      <div ref={(el) => { sonarRect.current.frame = el }} className="pointer-events-none absolute right-[4vw] bottom-[240px] w-[88vw] sm:right-[28px] sm:bottom-[24px] sm:w-[min(38vw,560px)]" style={{ aspectRatio: '19.5 / 9' }}>
         <div style={{ position: 'relative', width: '100%', height: '100%', transform: `perspective(${PHONE_POSE.perspective}px) rotateY(${PHONE_POSE.rotY}deg) rotateX(${PHONE_POSE.rotX}deg)` }}>
           {/* titanium band with a faint edge highlight, then the black inner bezel ring, then the display hole */}
           <div style={{ ...ring('1.6%'), borderRadius: '10.5% / 22%',
