@@ -10,6 +10,9 @@ import SonarChrome from './SonarChrome'
 import { screenLayout } from './SonarScreen'
 // dev: ?bigphone makes the phone huge so the sonar picture can be inspected in screenshots
 const BIG_PHONE = import.meta.env.DEV && window.location.search.includes('bigphone')
+// The page is for people who have never used live sonar (Jason 2026-09-24): only Device / View / Range are
+// public. Colour map, gain, contrast, noise reject and the depth-range axis are calibration tools — dev only (?dev).
+const DEV_TOOLS = import.meta.env.DEV && window.location.search.includes('dev')
 
 export const meta = {
   title: 'Sonar lake 3D — Phase 3/4',
@@ -105,13 +108,14 @@ export default function SonarLake3D() {
           <button className="ac-value" onClick={() => setImperial((v) => !v)} title="ft / m">{fmt(rangeFt)}</button>
           <span className="text-[10.5px] text-[#8b9199]">max {fmt(maxFt)}</span>
         </Row>
-        {deviceId === 'PL' && mode === 'forward' && (
+        {DEV_TOOLS && deviceId === 'PL' && mode === 'forward' && (
           <Row label="Depth">
             <input type="range" min={20} max={device.maxDepthFt} step={5} value={depthFt} onChange={(e) => setDepthFt(+e.target.value)} className="ac-range w-36" style={{ '--fill': `${((depthFt - 20) / (device.maxDepthFt - 20)) * 100}%` }} />
             <span className="ac-value">{fmt(depthFt)}</span>
             <span className="text-[10.5px] text-[#8b9199]">depth axis</span>
           </Row>
         )}
+        {DEV_TOOLS && (<>
         <Row label="Screen">
           <select value={colormap} onChange={(e) => setColormap(e.target.value)} className="rounded-[3px] border border-white/15 bg-transparent px-2 py-1 text-[11.5px] text-white/85">
             {COLORMAP_NAMES.map((n) => <option key={n} value={n} className="bg-[#0f1216]">{n}</option>)}
@@ -128,6 +132,7 @@ export default function SonarLake3D() {
           <input type="range" min={0} max={1} step={0.05} value={noise} onChange={(e) => setNoise(+e.target.value)} className="ac-range w-20" style={{ '--fill': `${noise * 100}%` }} />
           <span className="ac-value text-[13px]">{Math.round(noise * 100)}%</span>
         </Row>
+        </>)}
         <div className="hidden text-[11px] leading-snug text-[#8b9199] sm:block">
           {device.name} · {device.beamDeg}° × {device.thickDeg}° beam. Drag the boat — whatever the beam touches lights up.
         </div>

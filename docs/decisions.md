@@ -368,3 +368,12 @@ Numbered log. Newest at the bottom.
     fish cap 0.78; the PLM Forward scene now matches LiveScope's colour shares
     within a few percent. Composites: `reference/engine-compare/
     compare-livescope-vs-engine-forward.png`, `compare-down-fish-*.png`.
+
+34. **2026-09-24** — **Keep the page simple.** Jason: TVG / contrast / noise
+    reject etc. were for my understanding of the app, not features for the
+    page — the page exists so people who have never used live sonar can start
+    quickly, no complex testing or tuning. Public controls are Device, View
+    and Range only. Colour map, gain, contrast, noise reject and the PL
+    Forward depth-range slider stay in the code as calibration tools behind
+    `?dev` (DEV builds only). The engine's defaults (gain 57 / contrast 40 /
+    noise 30 / garmin_amber) are the picture everyone sees.
