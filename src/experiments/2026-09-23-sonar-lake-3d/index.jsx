@@ -22,7 +22,7 @@ export default function SonarLake3D() {
   const [rangeFt, setRangeFt] = useState(80)
   const [depthFt, setDepthFt] = useState(70) // PL Forward depth range (app: 12 m at 14 m range)
   const [imperial, setImperial] = useState(true)
-  const [colormap, setColormap] = useState('amber')
+  const [colormap, setColormap] = useState('Moreland_Black_Body') // = the app's "orange" map (measured: error 0.03 vs 0.12 for amber)
   const [gain, setGain] = useState(0.57)
   const [contrast, setContrast] = useState(0.4)    // demo look (sonar-style.md §6.5): floor mostly gone, a trace of noise stays
   const [noise, setNoise] = useState(0.3)          // noise reject (inset cleaner than real use, decision #28): the smaller of the two, used last

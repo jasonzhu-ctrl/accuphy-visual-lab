@@ -44,6 +44,7 @@ export const sonarFragment = /* glsl */ `
   uniform float uDynRange;    // 0..1 window width (app: fDynaRange / fMaxDynaRangeDB)
   uniform float uContrast;    // 0..1 like the app's Contrast: raises the window's low end (cuts the floor), steepens it
   uniform float uNoise;       // 0..1 like the app's Noise Reject: thins the floor speckle, never the targets
+  uniform float uGamma;       // tone shaping of the LUT index (1 = linear); calibrated against the reference frames
 
   float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
   float vnoise(vec2 q) { vec2 i = floor(q), f = fract(q); f = f * f * (3.0 - 2.0 * f);
@@ -175,7 +176,7 @@ export const sonarFragment = /* glsl */ `
     float lo = (1.0 - width) * 0.5 + width * (uGain - 0.5) + 0.5 * width * uContrast; // 40 % ≈ the app at Contrast 40 (floor ~gone)
     float hi = lo + width * (1.0 - 0.45 * uContrast);
     float idx = echo > 0.0005 ? clamp((lv - lo) / (hi - lo), 0.0, 1.0) : 0.0;
-    idx *= inAny;
+    idx = pow(idx, uGamma) * inAny;
     vec3 col = texture2D(uLUT, vec2(idx * (255.0 / 256.0) + 0.5 / 256.0, 0.5)).rgb;
     col *= inAny; // black outside the fan
     gl_FragColor = vec4(col, 1.0);

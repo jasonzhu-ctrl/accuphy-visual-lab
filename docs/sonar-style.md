@@ -285,3 +285,50 @@ depth ≈ 0.85 × range.
 ### 6.10 Case 2 verdict (Jason): wreck slightly less bright — the orange-red look
 is preferred in the inset; near-field rays stay. → engine: structure echoes
 (wreck, timber, rocks) ×0.8 versus bottom and fish.
+
+### 6.11 Brightness ↔ orange balance, made measurable (2026-09-24 — Jason: "找这个亮度和桔红色的平衡是核心能力")
+Method: take the app's 256-entry colour maps (`colormaps.js`), map every lit
+pixel of a frame to its nearest LUT entry, and histogram that **LUT index**
+(10 bins from dark red to white) plus the black fraction. The same statistic is
+computed inside the engine by `window.__sonarHist()` (DEV; renders the sonar
+picture flat to an offscreen target), and `window.__sonarSnap()` returns that
+render as a PNG for side-by-side files. Reference script: the raw-RGB +
+numpy analysis in the session notes (ffmpeg → rgb24, nearest-LUT search).
+
+**Finding 1 — the app's "orange" map is `Moreland_Black_Body`, not `amber`.**
+Nearest-LUT error on the confirmed frames: Black Body 0.03, amber 0.12–0.17,
+gist_heat 0.15. Black Body runs black → dark red → orange → yellow → **white**,
+which is why the hottest returns go white on the tablet. Engine default switched.
+
+**Finding 2 — target distributions (lit pixels, Black Body index bins 0.0–1.0):**
+
+| Frame | black | 0–.1 | .1–.2 | .2–.3 | .3–.4 | .4–.5 | .5–.6 | .6–.7 | .7–.8 | .8–.9 | .9–1 |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| Case 1 PLM fish + piling (gain 52/c40/n30) | 0.79 | .116 | .138 | .146 | .130 | .125 | .104 | .076 | .055 | .054 | .066 |
+| Case 2 PL wreck (gain 50/c35/n30), 2 frames avg | 0.80–0.83 | .057 | .061 | .075 | .074 | .104 | .112 | .129 | .133 | .118 | .140 |
+
+Reading: ~80 % of the picture is black; of the rest, a fish/bottom scene is
+weighted to the dark-red/orange half with a 6–7 % white tip; a structure scene
+is weighted to the yellow/white half (13–14 % white). Both have a real
+dark-red foot (5–12 % in the lowest bin) — the soft edges.
+
+**Finding 3 — engine before/after.** At the same settings the engine was too
+dark-red: PLM scene 58 % of lit pixels in the lowest three bins vs 40 % in the
+reference. A tone gamma on the LUT index (`uGamma`) fixes the balance without
+touching black or white: γ = 0.7 matched the PLM scene best (L1 0.19), γ = 1.0
+the wreck scene (L1 0.25); **γ = 0.8** is the compromise now baked in. Keep
+this check in the loop whenever gain/contrast/pulse/tail constants change:
+run `__sonarHist(10)` on the two standard scenes (`?boat=-40,-5` PLM Forward
+60 ft; `?boat=4,-26` PL Forward 120/100 ft) and compare with the table.
+
+Engine at γ 0.8 (Black Body, gain 57 / contrast 40 / noise 30), 2026-09-24:
+
+| Scene | black | 0–.1 | .1–.2 | .2–.3 | .3–.4 | .4–.5 | .5–.6 | .6–.7 | .7–.8 | .8–.9 | .9–1 |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| PLM Forward 60 ft (bottom + timber) | 0.78 | .110 | .167 | .198 | .154 | .129 | .076 | .054 | .032 | .021 | .060 |
+| PL Forward 120/100 ft (bottom band, wreck out of the fan) | 0.84 | .025 | .022 | .041 | .067 | .111 | .139 | .173 | .160 | .154 | .107 |
+
+Side-by-side files: `reference/engine-compare/compare-*-app-vs-engine.png`
+(left = app reference frame, right = engine, same colour map). Snapshots are
+saved from the browser through the dev-only `POST /__snap` endpoint in
+`vite.config.js`.

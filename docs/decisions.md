@@ -324,3 +324,12 @@ Numbered log. Newest at the bottom.
     (alpha 0.5) and drawn ×0.8 — Jason's case-2 verdict: wreck a touch less
     hot, orange-red preferred; rays stay. Frames in
     `reference/app-study/range-controls/`; write-up `sonar-style.md` §6.9–6.10.
+
+31. **2026-09-24** — **The brightness/orange balance is measured, not
+    eyeballed** (Jason: 找这个亮度和桔红色的平衡是核心能力). The app's "orange"
+    colour map turned out to be `Moreland_Black_Body` (nearest-LUT error 0.03
+    vs 0.12 for amber) — engine default switched. The LUT-index histogram of
+    the two confirmed frames is the target (`sonar-style.md` §6.11); the engine
+    reports the same statistic via `window.__sonarHist()` and exports its
+    picture via `window.__sonarSnap()`. A tone gamma `uGamma = 0.8` on the LUT
+    index closes most of the gap (the engine was too dark-red in the mids).

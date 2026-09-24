@@ -39,6 +39,7 @@ const STRIP_W = 1024, STRIP_H = 32
 
 export default function SonarScreen({ state, rect, lakeMats }) {
   const { gl, scene, camera, size } = useThree()
+  if (import.meta.env.DEV) window.__sonarGL = gl
   const res = useMemo(() => {
     const targets = [0, 1].map(() => {
       const rt = new THREE.WebGLRenderTarget(STRIP_W, STRIP_H, { depthBuffer: true })
@@ -56,7 +57,7 @@ export default function SonarScreen({ state, rect, lakeMats }) {
         uNearFar: { value: new THREE.Vector2(0.3, 150) }, uRange: { value: 20 },
         uBox0: { value: new THREE.Vector4(-20, 0, 40, 30) }, uBox1: { value: new THREE.Vector4(-20, 0, 40, 30) }, uSplit: { value: 0 }, uApexU: { value: 0.5 },
         uTime: { value: 0 }, uFlat: { value: 0 }, uStreak: { value: 1 }, uDebug: { value: window.location.search.includes('sonardebug') ? 1 : 0 },
-        uLUT: { value: colormapTexture('amber') }, uGain: { value: 0.57 }, uDynRange: { value: 0.85 }, uContrast: { value: 0.4 }, uNoise: { value: 0.3 },
+        uLUT: { value: colormapTexture('Moreland_Black_Body') }, uGain: { value: 0.57 }, uDynRange: { value: 0.85 }, uContrast: { value: 0.4 }, uNoise: { value: 0.3 }, uGamma: { value: 0.8 }, // calibrated 2026-09-24 against the two confirmed frames (sonar-style.md §6.11)
       },
     })
     const overlay = new THREE.Scene()
@@ -72,6 +73,50 @@ export default function SonarScreen({ state, rect, lakeMats }) {
     overlay.add(quad)
     const ortho = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1)
     if (import.meta.env.DEV) window.__sonar = { targets, cams, mat }
+    // dev: window.__sonarHist(bins) — render the sonar picture flat into an offscreen target and
+    // return the histogram of LUT index (nearest LUT entry per pixel) so the engine's brightness
+    // distribution can be compared number-for-number with the app's reference frames
+    if (import.meta.env.DEV) {
+      const histRT = new THREE.WebGLRenderTarget(768, 384)
+      window.__sonarHist = (bins = 10) => {
+        const pos = quad.geometry.attributes.position, aW = quad.geometry.attributes.aW
+        const savedP = pos.array.slice(), savedW = aW.array.slice()
+        const corners = [[-1, 1], [1, 1], [-1, -1], [1, -1]]
+        corners.forEach(([x, y], i) => { pos.setXYZ(i, x, y, 0); aW.setX(i, 1) })
+        pos.needsUpdate = true; aW.needsUpdate = true
+        const gl = window.__sonarGL
+        gl.setRenderTarget(histRT); gl.render(overlay, ortho); gl.setRenderTarget(null)
+        const px = new Uint8Array(768 * 384 * 4); gl.readRenderTargetPixels(histRT, 0, 0, 768, 384, px)
+        pos.array.set(savedP); aW.array.set(savedW); pos.needsUpdate = true; aW.needsUpdate = true
+        const lut = mat.uniforms.uLUT.value.image.data // 256×4 (rgba bytes)
+        const hist = new Array(bins).fill(0); let black = 0, lit = 0
+        for (let i = 0; i < px.length; i += 16) { // every 4th pixel
+          const r = px[i], g = px[i + 1], b = px[i + 2]
+          if (r + g + b < 24) { black++; continue }
+          let best = 0, bd = 1e9
+          for (let k = 0; k < 256; k++) { const dr = r - 255 * lut[k * 4], dg = g - 255 * lut[k * 4 + 1], db = b - 255 * lut[k * 4 + 2]; const d = dr * dr + dg * dg + db * db; if (d < bd) { bd = d; best = k } }
+          hist[Math.min(bins - 1, Math.floor((best / 255) * bins))]++; lit++
+        }
+        return { black: black / (black + lit), lit, hist: hist.map((h) => +(h / lit).toFixed(3)) }
+      }
+      // dev: window.__sonarSnap() — the same flat render as a PNG data URL (for side-by-side files)
+      window.__sonarSnap = () => {
+        const pos = quad.geometry.attributes.position, aW = quad.geometry.attributes.aW
+        const savedP = pos.array.slice(), savedW = aW.array.slice()
+        ;[[-1, 1], [1, 1], [-1, -1], [1, -1]].forEach(([x, y], i) => { pos.setXYZ(i, x, y, 0); aW.setX(i, 1) })
+        pos.needsUpdate = true; aW.needsUpdate = true
+        const gl = window.__sonarGL
+        gl.setRenderTarget(histRT); gl.render(overlay, ortho); gl.setRenderTarget(null)
+        const px = new Uint8Array(768 * 384 * 4); gl.readRenderTargetPixels(histRT, 0, 0, 768, 384, px)
+        pos.array.set(savedP); aW.array.set(savedW); pos.needsUpdate = true; aW.needsUpdate = true
+        const c = document.createElement('canvas'); c.width = 768; c.height = 384
+        const ctx = c.getContext('2d'); const img = ctx.createImageData(768, 384)
+        for (let y = 0; y < 384; y++) img.data.set(px.subarray((383 - y) * 768 * 4, (384 - y) * 768 * 4), y * 768 * 4) // GL rows are bottom-up
+        for (let i = 3; i < img.data.length; i += 4) img.data[i] = 255
+        ctx.putImageData(img, 0, 0)
+        return c.toDataURL('image/png')
+      }
+    }
     return { targets, cams, mat, overlay, quad, ortho }
   }, [])
   useEffect(() => { camera.layers.enable(SONAR_HIDE_LAYER) }, [camera])
