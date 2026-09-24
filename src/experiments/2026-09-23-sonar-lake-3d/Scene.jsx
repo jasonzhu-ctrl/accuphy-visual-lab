@@ -286,9 +286,17 @@ function Beams({ state }) {
 
 // ---------- camera + picking ----------
 function Rig({ state }) {
-  const { camera } = useThree()
+  const { camera, size } = useThree()
+  const tmp = useMemo(() => new THREE.Vector3(), [])
   useFrame(() => {
     const s = state.current
+    // drag hint follows the boat until the first drag
+    if (s.hintEl) {
+      tmp.set(s.boat.x, 0.6, s.boat.z).project(camera)
+      const px = ((tmp.x + 1) / 2) * size.width, py = ((1 - tmp.y) / 2) * size.height
+      s.hintEl.style.transform = `translate(${px.toFixed(1)}px, ${(py - 46).toFixed(1)}px) translate(-50%, -100%)`
+      s.hintEl.style.opacity = s.hasDragged ? '0' : '1'
+    }
     // fixed 3/4 aerial view like the PL animations; slight parallax from the pointer
     const px = s.parallax.x, py = s.parallax.y
     if (s.fishCam && s.pop) { // dev aid ?cam=fish:<species> — follow the first fish of that species
@@ -314,7 +322,7 @@ function Rig({ state }) {
   return null
 }
 function PickPlane({ state }) {
-  const onDown = (e) => { e.stopPropagation(); state.current.dragging = true; e.target.setPointerCapture?.(e.pointerId); move(e) }
+  const onDown = (e) => { e.stopPropagation(); state.current.dragging = true; state.current.hasDragged = true; e.target.setPointerCapture?.(e.pointerId); move(e) }
   const move = (e) => {
     const s = state.current
     if (!s.dragging) return

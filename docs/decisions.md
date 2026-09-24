@@ -202,3 +202,14 @@ Numbered log. Newest at the bottom.
     mobile portrait layout (phone above the panel); dpr capped at 1.5;
     production build verified (`npm run build` ok). Fish cam accepts an index:
     `?cam=fish:musky:1`.
+
+22. **2026-09-24** — Jason: (a) tilt the phone so it reads as an iPhone → CSS
+    `perspective(1400px) rotateY(-16°) rotateX(6°)` on the frame; the sonar
+    quad is placed in clip space with the same rotateX→rotateY→perspective
+    maths and per-vertex w (`SonarScreen.jsx` `PHONE_POSE`), so the picture
+    is perspective-correct inside the display; (b) the control panel looked
+    "very AI" → restyled after **shop.accuphy.com** (measured: Eurostile 800
+    uppercase headings, Roboto/Instrument body, square corners, blue
+    `#028cdf` 1 px outline buttons that fill blue when active, white cards);
+    (c) animated **Drag the boat** hint following the boat until the first
+    drag. Brand blue corrected to `#028cdf` (site value).

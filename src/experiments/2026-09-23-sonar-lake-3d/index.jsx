@@ -4,6 +4,7 @@ import * as THREE from 'three'
 import LakeScene from './Scene'
 import { DEVICES, FT, MODE_LABELS } from '../2026-09-23-sonar-beam/devices'
 import { wedgeSpecs } from '../2026-09-23-beam-shapes-3d/wedge'
+import { PHONE_POSE } from './SonarScreen'
 
 export const meta = {
   title: 'Sonar lake 3D — Phase 3/4',
@@ -41,7 +42,7 @@ export default function SonarLake3D() {
   state.current.rangeM = rangeFt * FT
   state.current.imperial = imperial
   // the sonar picture is drawn by the GL canvas into the phone's screen element
-  const sonarRect = useRef({ el: null })
+  const sonarRect = useRef({ el: null, frame: null })
 
   const onMove = (e) => {
     const s = state.current
@@ -68,39 +69,43 @@ export default function SonarLake3D() {
         <LakeScene state={state} sonarRect={sonarRect} />
       </div>
 
-      {/* ---- control panel, Accuphy brand ---- */}
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-        className="pointer-events-auto absolute inset-x-3 bottom-3 flex flex-col gap-2 rounded-2xl bg-[#0f1216]/80 p-3 text-sm shadow-xl ring-1 ring-white/10 backdrop-blur-md sm:inset-x-auto sm:bottom-auto sm:left-4 sm:top-4 sm:w-[420px] sm:gap-3 sm:p-4">
+      {/* ---- control panel — styled after shop.accuphy.com (Eurostile uppercase, square blue outline buttons) ---- */}
+      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+        className="ac-panel pointer-events-auto absolute inset-x-3 bottom-3 flex flex-col gap-3 p-3 sm:inset-x-auto sm:bottom-auto sm:left-4 sm:top-11 sm:w-[400px] sm:p-4">
         <div className="flex items-center justify-between">
-          <img src="/brand/logo/White Accuphy Logo.png" alt="Accuphy" className="h-5 w-auto" draggable={false} />
-          <span className="font-brand-head text-[11px] uppercase tracking-[0.18em] text-[#0d8fdb]">Live sonar · beam explorer</span>
+          <img src="/brand/logo/logo_OG.png" alt="Accuphy" className="h-5 w-auto" draggable={false} />
+          <span className="ac-label">Live sonar · beam explorer</span>
         </div>
         <Row label="Device">
-          {Object.values(DEVICES).map((d) => <Btn key={d.id} active={deviceId === d.id} onClick={() => setDeviceId(d.id)}>{d.name}</Btn>)}
+          <div className="ac-seg">{Object.values(DEVICES).map((d) => <button key={d.id} className={`ac-btn ${deviceId === d.id ? 'is-active' : ''}`} onClick={() => setDeviceId(d.id)}>{d.name}</button>)}</div>
         </Row>
         <Row label="View">
-          {device.modes.map((m) => <Btn key={m} active={mode === m} onClick={() => setMode(m)}>{MODE_LABELS[m]}</Btn>)}
+          <div className="ac-seg flex-wrap">{device.modes.map((m) => <button key={m} className={`ac-btn ${mode === m ? 'is-active' : ''}`} onClick={() => setMode(m)}>{MODE_LABELS[m]}</button>)}</div>
         </Row>
         <Row label="Range">
-          <input type="range" min={20} max={maxFt} step={5} value={rangeFt} onChange={(e) => setRangeFt(+e.target.value)} className="w-40 accent-[#0d8fdb]" />
-          <button className="tabular-nums font-semibold text-[#5fc3ff]" onClick={() => setImperial((v) => !v)} title="ft / m">{fmt(rangeFt)}</button>
-          <span className="text-neutral-500">max {fmt(maxFt)}</span>
+          <input type="range" min={20} max={maxFt} step={5} value={rangeFt} onChange={(e) => setRangeFt(+e.target.value)} className="ac-range w-36" />
+          <button className="font-brand-head text-[15px] text-[#028cdf]" onClick={() => setImperial((v) => !v)} title="ft / m">{fmt(rangeFt)}</button>
+          <span className="text-[11px] text-neutral-500">max {fmt(maxFt)}</span>
         </Row>
-        <div className="hidden text-[11px] leading-snug text-neutral-400 sm:block">
-          {device.name} · {device.beamDeg}° × {device.thickDeg}° beam · drag the boat, the beam reveals what is under it
+        <div className="hidden text-[11px] leading-snug text-neutral-600 sm:block">
+          {device.name} · {device.beamDeg}° × {device.thickDeg}° beam. Drag the boat — whatever the beam touches lights up.
         </div>
       </motion.div>
 
-      {/* ---- iPhone Pro Max (landscape, natural titanium) showing the Accuphy Sonar App.
-           The bezels are RINGS (CSS mask with a hole) so the GL canvas underneath shows
-           through the display area, where SonarScreen draws the picture. ---- */}
-      <div className="pointer-events-none absolute right-[4vw] bottom-[200px] w-[92vw] sm:right-[18px] sm:bottom-[18px] sm:w-[min(38vw,560px)]">
-        <div style={{ position: 'relative', aspectRatio: '19.5 / 9' }}>
+      {/* ---- drag hint: follows the boat until the first drag (position set by the render loop) ---- */}
+      <div ref={(el) => { state.current.hintEl = el }} className="ac-hint pointer-events-none absolute left-0 top-0 flex items-center gap-2 px-3 py-1.5" style={{ opacity: 0 }}>
+        <svg className="hand" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#028cdf" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12h18M7 8l-4 4 4 4M17 8l4 4-4 4"/></svg>
+        <span className="font-brand-head text-[11px] uppercase tracking-wider">Drag the boat</span>
+      </div>
+
+      {/* ---- iPhone Pro Max, landscape, slightly turned in 3D (same pose as the GL picture) ---- */}
+      <div ref={(el) => { sonarRect.current.frame = el }} className="pointer-events-none absolute right-[4vw] bottom-[200px] w-[92vw] sm:right-[28px] sm:bottom-[24px] sm:w-[min(38vw,560px)]" style={{ aspectRatio: '19.5 / 9' }}>
+        <div style={{ position: 'relative', width: '100%', height: '100%', transform: `perspective(${PHONE_POSE.perspective}px) rotateY(${PHONE_POSE.rotY}deg) rotateX(${PHONE_POSE.rotX}deg)` }}>
+          {/* titanium band with a faint edge highlight, then the black inner bezel ring, then the display hole */}
           <div style={{ ...ring('1.6%'), borderRadius: '10.5% / 22%',
             background: 'linear-gradient(135deg, #f4f4f2 0%, #c6c6c3 18%, #ebebe8 40%, #9a9a96 62%, #e0dedb 82%, #b4b3af 100%)',
-            boxShadow: '0 18px 40px rgba(0,0,0,0.45)' }} />
+            boxShadow: '14px 22px 40px rgba(0,0,0,0.5), -2px -2px 3px rgba(255,255,255,0.5) inset' }} />
           <div style={{ ...ring('1.7%'), inset: '1.6%', borderRadius: '9.5% / 20%', background: '#060606' }} />
-          {/* the display hole: SonarScreen renders the sonar picture exactly here */}
           <div ref={(el) => { sonarRect.current.el = el }} style={{ position: 'absolute', inset: '3.3%', borderRadius: '8% / 17%' }}>
             <div className="absolute left-[8%] top-[5%] flex items-center gap-2">
               <img src="/brand/logo/White Accuphy Logo.png" alt="" className="h-[11px] w-auto opacity-90" draggable={false} />
@@ -108,18 +113,17 @@ export default function SonarLake3D() {
             </div>
             <div className="absolute right-[4%] top-[5%] text-[10px] tabular-nums text-white/80">{fmt(rangeFt)}</div>
           </div>
-          {/* dynamic island (landscape: on the left) */}
           <div style={{ position: 'absolute', left: '4.6%', top: '50%', width: '2.2%', height: '22%', transform: 'translateY(-50%)', borderRadius: 999, background: '#000', boxShadow: '0 0 0 1px #111' }} />
         </div>
       </div>
-      {/* ---- guide strip ---- */}
-      <div className="pointer-events-auto absolute right-[18px] top-4 hidden w-[min(600px,42vw)] items-stretch gap-2 md:flex">
+
+      {/* ---- guide strip (website card style) ---- */}
+      <div className="pointer-events-auto absolute right-[28px] top-4 hidden w-[min(600px,42vw)] items-stretch gap-2 md:flex">
         {STEPS.map((st, i) => (
-          <button key={st.n} onClick={() => goStep(i)}
-            className={`flex-1 rounded-xl px-3 py-2 text-left ring-1 backdrop-blur-md transition ${step === i ? 'bg-[#0d8fdb]/85 text-white ring-white/30' : 'bg-[#0f1216]/70 text-white/85 ring-white/10 hover:bg-[#0f1216]/85'}`}>
-            <div className="font-brand-head text-[11px] uppercase tracking-wider opacity-80">Step {st.n}</div>
+          <button key={st.n} onClick={() => goStep(i)} className={`ac-card flex-1 px-3 py-2 text-left transition ${step === i ? 'is-active' : ''}`}>
+            <div className="ac-label" style={{ color: step === i ? '#fff' : undefined }}>Step {st.n}</div>
             <div className="text-[13px] font-semibold leading-tight">{st.title}</div>
-            {step === i && <div className="mt-1 text-[11px] leading-snug text-white/85">{st.text}</div>}
+            {step === i && <div className="mt-1 text-[11px] leading-snug opacity-90">{st.text}</div>}
           </button>
         ))}
       </div>
@@ -136,8 +140,8 @@ function ring(pad) {
 }
 function Row({ label, children }) {
   return (
-    <div className="flex flex-wrap items-center gap-2">
-      <span className="w-14 text-xs uppercase tracking-wider text-neutral-400">{label}</span>
+    <div className="flex flex-wrap items-center gap-3">
+      <span className="ac-label w-14">{label}</span>
       {children}
     </div>
   )

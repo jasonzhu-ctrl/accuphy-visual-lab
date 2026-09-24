@@ -3,6 +3,9 @@ import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { MAX_FANS, sonarVertex, sonarFragment } from './sonarShader'
 
+// CSS 3D pose of the phone (index.jsx applies the same transform to the DOM frame)
+export const PHONE_POSE = { perspective: 1400, rotY: -16, rotX: 6 }
+
 // Takes over the frame loop (priority 1): renders a depth strip per fan from the
 // transducer, then the main view, then the sonar screen as an overlay quad.
 // Objects on layer 1 (water, beams, boat) are invisible to the sonar cameras.
@@ -30,7 +33,14 @@ export default function SonarScreen({ state, rect, lakeMats }) {
       },
     })
     const overlay = new THREE.Scene()
-    const quad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), mat)
+    // a 4-vertex quad whose corners are set every frame in CLIP space (x*w, y*w) with w per vertex,
+    // so the picture gets the same perspective as the CSS-transformed phone and stays perspective-correct
+    const geo = new THREE.BufferGeometry()
+    geo.setAttribute('position', new THREE.Float32BufferAttribute(new Float32Array(12), 3))
+    geo.setAttribute('uv', new THREE.Float32BufferAttribute(new Float32Array([0, 1, 1, 1, 0, 0, 1, 0]), 2))
+    geo.setAttribute('aW', new THREE.Float32BufferAttribute(new Float32Array([1, 1, 1, 1]), 1))
+    geo.setIndex([0, 2, 1, 1, 2, 3])
+    const quad = new THREE.Mesh(geo, mat)
     quad.frustumCulled = false
     overlay.add(quad)
     const ortho = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1)
@@ -84,36 +94,36 @@ export default function SonarScreen({ state, rect, lakeMats }) {
     gl.render(scene, camera)
 
     // 3) sonar screen overlay in the bottom-right corner
-    // the screen area is a DOM element (the phone's display); map it to GL pixels
-    const el = rect.current.el
-    if (!el) return
-    const cr = gl.domElement.getBoundingClientRect(), er = el.getBoundingClientRect()
-    const w = Math.round(er.width), h = Math.round(er.height)
-    const x = Math.round(er.left - cr.left), y = Math.round(cr.bottom - er.bottom)
+    // the screen area is a DOM element inside the CSS-3D-transformed phone. Take its
+    // LAYOUT rect (offset*, unaffected by transforms) relative to the phone's centre,
+    // apply the same rotateX → rotateY → perspective maths as the CSS, and place the
+    // quad corners in clip space with per-vertex w for perspective-correct sampling.
+    const el = rect.current.el, frame = rect.current.frame
+    if (!el || !frame) return
+    const cr = gl.domElement.getBoundingClientRect(), fr = frame.getBoundingClientRect()
+    if (fr.width < 8) return
+    const cx = fr.left + fr.width / 2, cy = fr.top + fr.height / 2
+    const { perspective: P, rotY, rotX } = PHONE_POSE
+    const ay = (rotY * Math.PI) / 180, ax = (rotX * Math.PI) / 180
+    const corners = [[el.offsetLeft, el.offsetTop], [el.offsetLeft + el.offsetWidth, el.offsetTop], [el.offsetLeft, el.offsetTop + el.offsetHeight], [el.offsetLeft + el.offsetWidth, el.offsetTop + el.offsetHeight]]
+    const pos = res.quad.geometry.attributes.position, aW = res.quad.geometry.attributes.aW
+    corners.forEach(([lx, ly], i) => {
+      let x = lx - fr.width / 2, y = ly - fr.height / 2, z = 0
+      // rotateX (CSS y down, z toward the viewer)
+      let y1 = y * Math.cos(ax) - z * Math.sin(ax), z1 = y * Math.sin(ax) + z * Math.cos(ax)
+      // rotateY
+      let x2 = x * Math.cos(ay) + z1 * Math.sin(ay), z2 = -x * Math.sin(ay) + z1 * Math.cos(ay)
+      const w = (P - z2) / P
+      const sx = cx + x2 / w, sy = cy + y1 / w // projected screen position (CSS px)
+      const nx = ((sx - cr.left) / cr.width) * 2 - 1, ny = 1 - ((sy - cr.top) / cr.height) * 2
+      pos.setXYZ(i, nx * w, ny * w, 0); aW.setX(i, w)
+    })
+    pos.needsUpdate = true; aW.needsUpdate = true
+    const w = Math.round(el.offsetWidth), h = Math.round(el.offsetHeight)
     if (w < 8 || h < 8) return
-    const R = s.rangeM
-    // fit the fans like the app does: apex at the top, forward wedges start at the left
-    let xmin = 0, xmax = 0, ymax = 0
-    for (let k = 0; k < specs.length; k++) {
-      const f = u.uFan.value[k]
-      const lo = f.x - f.y, hi = f.x + f.y
-      xmin = Math.min(xmin, R * Math.sin(Math.max(lo, -Math.PI / 2))); xmax = Math.max(xmax, R * Math.sin(Math.min(hi, Math.PI / 2)))
-      ymax = Math.max(ymax, lo <= 0 && hi >= 0 ? R : R * Math.cos(Math.min(Math.abs(lo), Math.abs(hi))))
-    }
-    // Forward-only views: the app keeps the apex ~20 % in from the left edge
-    if (xmin > -R * 0.05 && !flat) xmin = -R * 0.25
-    const m = R * 0.04
-    let bx = xmin - m, by = -m, bw = xmax - xmin + 2 * m, bh = ymax + 2 * m
-    const want = w / h
-    if (bw / bh < want) { const nw = bh * want; bx -= (nw - bw) / 2; bw = nw } else { bh = bw / want }
-    u.uScreenMin.value.set(bx, by); u.uScreenSize.value.set(bw, bh)
     gl.autoClear = false
-    gl.setViewport(x, y, w, h)
-    gl.setScissor(x, y, w, h)
-    gl.setScissorTest(true)
-    gl.render(res.overlay, res.ortho)
-    gl.setScissorTest(false)
     gl.setViewport(0, 0, size.width, size.height)
+    gl.render(res.overlay, res.ortho)
     gl.autoClear = true
   }, 1)
   return null

@@ -7,8 +7,9 @@
 export const MAX_FANS = 2
 
 export const sonarVertex = /* glsl */ `
+  attribute float aW; // per-vertex clip w: corners are given as (x*w, y*w) for the phone's perspective
   varying vec2 vUv;
-  void main() { vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }
+  void main() { vUv = uv; gl_Position = vec4(position.xy, 0.0, aW); }
 `
 
 export const sonarFragment = /* glsl */ `

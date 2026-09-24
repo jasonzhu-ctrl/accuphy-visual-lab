@@ -8,3 +8,19 @@
 :root { --accuphy-blue: #0d8fdb; --accuphy-ink: #111214; }
 .font-brand { font-family: 'Instrument Sans', system-ui, sans-serif; }
 .font-brand-head { font-family: 'Eurostile Heavy', 'Instrument Sans', system-ui, sans-serif; letter-spacing: 0.02em; }
+
+/* --- website-matched UI (shop.accuphy.com: Eurostile 800 uppercase headings, square corners, blue #028cdf outline buttons) --- */
+:root { --accuphy-blue: #028cdf; }
+.ac-panel { background: rgba(255, 255, 255, 0.94); color: #111; border-top: 3px solid var(--accuphy-blue); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35); }
+.ac-label { font-family: 'Eurostile Heavy', 'Instrument Sans', sans-serif; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #333; }
+.ac-btn { font-family: 'Instrument Sans', sans-serif; font-weight: 700; font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase; padding: 6px 10px; border: 1px solid var(--accuphy-blue); color: var(--accuphy-blue); background: #fff; line-height: 1.1; transition: background .15s, color .15s; }
+.ac-btn:hover { background: #e8f4fd; }
+.ac-btn.is-active { background: var(--accuphy-blue); color: #fff; }
+.ac-seg { display: flex; }
+.ac-seg .ac-btn + .ac-btn { margin-left: -1px; }
+.ac-range { accent-color: var(--accuphy-blue); }
+.ac-card { background: rgba(255, 255, 255, 0.94); color: #111; border-left: 3px solid var(--accuphy-blue); box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25); }
+.ac-card.is-active { background: var(--accuphy-blue); color: #fff; border-left-color: #fff; }
+.ac-hint { background: #fff; color: #111; border: 1px solid var(--accuphy-blue); box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3); transition: opacity .6s; }
+@keyframes ac-drag { 0% { transform: translateX(-14px); } 50% { transform: translateX(14px); } 100% { transform: translateX(-14px); } }
+.ac-hint .hand { animation: ac-drag 1.6s ease-in-out infinite; }

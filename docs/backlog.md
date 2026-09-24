@@ -28,6 +28,9 @@ it is done. ✅ done · 🔧 in progress · ⬜ open.
 - ⬜ New APK for the emulator study: `AccuphySonar_20260901_2.0.0_beta_14.apk` — Dropbox link from Jason 2026-09-24 (see `reference/README.md`); download when the emulator is set up
 
 ## Brand / UI
+- ✅ Control panel + guide cards restyled after shop.accuphy.com (white cards, Eurostile uppercase labels, square #028cdf outline/filled buttons) — Jason: the earlier pills looked "very AI"
+- ✅ Animated "Drag the boat" hint that follows the boat until the first drag
+- ✅ Phone frame turned in 3D (perspective + rotateY/rotateX); the GL picture uses the same maths with per-vertex w, so it stays perspective-correct inside the display
 - ✅ Control panel in Accuphy brand (white wordmark, Instrument Sans, Eurostile Heavy headline, brand blue #0d8fdb)
 - ✅ Sonar screen inside an iPhone Pro Max frame (landscape, natural-titanium ring, dynamic island); the GL picture is drawn into the DOM display hole
 - ⬜ The sonar picture's own chrome (scales, numbers) — untouched until the app playback study
