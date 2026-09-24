@@ -54,7 +54,7 @@ function Instanced({ mat, geos, items }) {
       mesh.instanceMatrix.needsUpdate = true
     })
   }, [buckets])
-  return geos.map((g, k) => <instancedMesh key={k} ref={(el) => (refs.current[k] = el)} args={[g, mat, Math.max(1, buckets[k].length)]} frustumCulled={false} />)
+  return geos.map((g, k) => <instancedMesh key={k} ref={(el) => { refs.current[k] = el }} args={[g, mat, Math.max(1, buckets[k].length)]} frustumCulled={false} />)
 }
 function Structures({ mat }) {
   const geos = useMemo(() => ({
@@ -144,16 +144,26 @@ function Water() {
       }
     `,
     fragmentShader: /* glsl */ `
-      precision highp float; varying vec3 vW; varying vec3 vN; uniform vec3 uSun; uniform vec3 uSky;
+      precision highp float; varying vec3 vW; varying vec3 vN; uniform vec3 uSun; uniform vec3 uSky; uniform float uTime;
+      float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+      float vnoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
+        return mix(mix(hash(i), hash(i + vec2(1, 0)), f.x), mix(hash(i + vec2(0, 1)), hash(i + vec2(1, 1)), f.x), f.y); }
       void main() {
+        // fine ripple detail on top of the big waves
+        float t = uTime;
+        float n1 = vnoise(vW.xz * 0.9 + vec2(t * 0.25, -t * 0.2));
+        float n2 = vnoise(vW.xz * 2.7 - vec2(t * 0.4, t * 0.3));
+        vec3 N = normalize(vN + vec3((n1 - 0.5) * 0.35 + (n2 - 0.5) * 0.18, 0.0, (n2 - 0.5) * 0.35 + (n1 - 0.5) * 0.18));
         vec3 v = normalize(cameraPosition - vW);
-        float fres = pow(1.0 - max(dot(v, vN), 0.0), 3.0);
+        float fres = pow(1.0 - max(dot(v, N), 0.0), 3.0);
         vec3 deep = vec3(0.14, 0.47, 0.56), sky = vec3(0.66, 0.80, 0.88);
         vec3 h = normalize(uSun + v);
-        float spec = pow(max(dot(vN, h), 0.0), 180.0);
-        vec3 col = mix(deep, sky, fres * 0.8) + spec * 0.6;
-        float alpha = 0.46 + 0.4 * fres;
-        // blend into the sky toward the horizon so the far edge never shows
+        float spec = pow(max(dot(N, h), 0.0), 90.0);
+        float glitter = smoothstep(0.55, 0.95, vnoise(vW.xz * 6.0 + vec2(t * 0.6, t * 0.5)));
+        vec3 col = mix(deep, sky, fres * 0.8) + spec * (0.35 + 0.9 * glitter);
+        // a touch of surface texture so it reads as a surface from above
+        col += (n2 - 0.5) * 0.05;
+        float alpha = 0.5 + 0.4 * fres;
         float dist = length(vW - cameraPosition);
         float fog = smoothstep(120.0, 420.0, dist);
         gl_FragColor = vec4(mix(col, uSky, fog), mix(alpha, 1.0, fog));
