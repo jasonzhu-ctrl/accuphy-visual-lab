@@ -69,25 +69,25 @@ export default function SonarLake3D() {
         <LakeScene state={state} sonarRect={sonarRect} />
       </div>
 
-      {/* ---- control panel — styled after shop.accuphy.com (Eurostile uppercase, square blue outline buttons) ---- */}
+      {/* ---- control panel — dark, precise, one accent (DJI / Insta360 / Anker feel) ---- */}
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
         className="ac-panel pointer-events-auto absolute inset-x-3 bottom-3 flex flex-col gap-3 p-3 sm:inset-x-auto sm:bottom-auto sm:left-4 sm:top-11 sm:w-[400px] sm:p-4">
-        <div className="flex items-center justify-between">
-          <img src="/brand/logo/logo_OG.png" alt="Accuphy" className="h-5 w-auto" draggable={false} />
-          <span className="ac-label">Live sonar · beam explorer</span>
+        <div className="flex items-center justify-between border-b border-white/10 pb-3">
+          <img src="/brand/logo/White Accuphy Logo.png" alt="Accuphy" className="h-[18px] w-auto" draggable={false} />
+          <span className="ac-title">Beam explorer</span>
         </div>
         <Row label="Device">
           <div className="ac-seg">{Object.values(DEVICES).map((d) => <button key={d.id} className={`ac-btn ${deviceId === d.id ? 'is-active' : ''}`} onClick={() => setDeviceId(d.id)}>{d.name}</button>)}</div>
         </Row>
         <Row label="View">
-          <div className="ac-seg flex-wrap">{device.modes.map((m) => <button key={m} className={`ac-btn ${mode === m ? 'is-active' : ''}`} onClick={() => setMode(m)}>{MODE_LABELS[m]}</button>)}</div>
+          <div className="ac-seg">{device.modes.map((m) => <button key={m} className={`ac-btn ${mode === m ? 'is-active' : ''}`} onClick={() => setMode(m)}>{MODE_LABELS[m].replace(' View', '')}</button>)}</div>
         </Row>
         <Row label="Range">
-          <input type="range" min={20} max={maxFt} step={5} value={rangeFt} onChange={(e) => setRangeFt(+e.target.value)} className="ac-range w-36" />
-          <button className="font-brand-head text-[15px] text-[#028cdf]" onClick={() => setImperial((v) => !v)} title="ft / m">{fmt(rangeFt)}</button>
-          <span className="text-[11px] text-neutral-500">max {fmt(maxFt)}</span>
+          <input type="range" min={20} max={maxFt} step={5} value={rangeFt} onChange={(e) => setRangeFt(+e.target.value)} className="ac-range w-36" style={{ '--fill': `${((rangeFt - 20) / (maxFt - 20)) * 100}%` }} />
+          <button className="ac-value" onClick={() => setImperial((v) => !v)} title="ft / m">{fmt(rangeFt)}</button>
+          <span className="text-[10.5px] text-[#8b9199]">max {fmt(maxFt)}</span>
         </Row>
-        <div className="hidden text-[11px] leading-snug text-neutral-600 sm:block">
+        <div className="hidden text-[11px] leading-snug text-[#8b9199] sm:block">
           {device.name} · {device.beamDeg}° × {device.thickDeg}° beam. Drag the boat — whatever the beam touches lights up.
         </div>
       </motion.div>
@@ -98,32 +98,40 @@ export default function SonarLake3D() {
         <span className="font-brand-head text-[11px] uppercase tracking-wider">Drag the boat</span>
       </div>
 
-      {/* ---- iPhone Pro Max, landscape, slightly turned in 3D (same pose as the GL picture) ---- */}
-      <div ref={(el) => { sonarRect.current.frame = el }} className="pointer-events-none absolute right-[4vw] bottom-[240px] w-[88vw] sm:right-[28px] sm:bottom-[24px] sm:w-[min(38vw,560px)]" style={{ aspectRatio: '19.5 / 9' }}>
+      {/* ---- iPhone Pro Max, landscape, turned slightly in 3D (same pose as the GL picture).
+           Proportions from the 15/16 Pro Max: body 2.08:1, corner radius ≈ 14 % of the short side,
+           thin uniform bezel, Dynamic Island on the left in landscape, volume/action buttons on top,
+           power button below; brushed titanium band; faint glass reflection over the display. ---- */}
+      <div ref={(el) => { sonarRect.current.frame = el }} className="pointer-events-none absolute right-[4vw] bottom-[240px] w-[88vw] sm:right-[28px] sm:bottom-[24px] sm:w-[min(38vw,560px)]" style={{ aspectRatio: '2.08 / 1' }}>
         <div style={{ position: 'relative', width: '100%', height: '100%', transform: `perspective(${PHONE_POSE.perspective}px) rotateY(${PHONE_POSE.rotY}deg) rotateX(${PHONE_POSE.rotX}deg)` }}>
-          {/* titanium band with a faint edge highlight, then the black inner bezel ring, then the display hole */}
-          <div style={{ ...ring('1.6%'), borderRadius: '10.5% / 22%',
-            background: 'linear-gradient(135deg, #f4f4f2 0%, #c6c6c3 18%, #ebebe8 40%, #9a9a96 62%, #e0dedb 82%, #b4b3af 100%)',
-            boxShadow: '14px 22px 40px rgba(0,0,0,0.5), -2px -2px 3px rgba(255,255,255,0.5) inset' }} />
-          <div style={{ ...ring('1.7%'), inset: '1.6%', borderRadius: '9.5% / 20%', background: '#060606' }} />
-          <div ref={(el) => { sonarRect.current.el = el }} style={{ position: 'absolute', inset: '3.3%', borderRadius: '8% / 17%' }}>
-            <div className="absolute left-[8%] top-[5%] flex items-center gap-2">
+          {/* side buttons (on the top edge in landscape: action + volume; power on the bottom edge) */}
+          <div className="ph-btn" style={{ left: '14%', top: '-1.2%', width: '2.2%', height: '1.6%' }} />
+          <div className="ph-btn" style={{ left: '19.5%', top: '-1.2%', width: '4.6%', height: '1.6%' }} />
+          <div className="ph-btn" style={{ left: '25.5%', top: '-1.2%', width: '4.6%', height: '1.6%' }} />
+          <div className="ph-btn" style={{ left: '22%', bottom: '-1.2%', width: '7%', height: '1.6%' }} />
+          {/* titanium band (ring), inner black bezel (ring), display hole */}
+          <div className="ph-band" style={{ ...ring('1.35%'), borderRadius: '6.6% / 13.8%', boxShadow: '16px 26px 44px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.45), inset 0 0 0 2px rgba(0,0,0,0.12)' }} />
+          <div style={{ ...ring('1.25%'), inset: '1.35%', borderRadius: '6.1% / 12.7%', background: '#040404' }} />
+          <div ref={(el) => { sonarRect.current.el = el }} style={{ position: 'absolute', inset: '2.6%', borderRadius: '5.4% / 11.3%' }}>
+            <div className="absolute left-[7%] top-[5%] flex items-center gap-2">
               <img src="/brand/logo/White Accuphy Logo.png" alt="" className="h-[11px] w-auto opacity-90" draggable={false} />
               <span className="text-[10px] text-white/80">{device.name} · {MODE_LABELS[mode]}</span>
             </div>
             <div className="absolute right-[4%] top-[5%] text-[10px] tabular-nums text-white/80">{fmt(rangeFt)}</div>
+            <div className="ph-glass" />
           </div>
-          <div style={{ position: 'absolute', left: '4.6%', top: '50%', width: '2.2%', height: '22%', transform: 'translateY(-50%)', borderRadius: 999, background: '#000', boxShadow: '0 0 0 1px #111' }} />
+          {/* Dynamic Island: vertical pill on the left in landscape */}
+          <div style={{ position: 'absolute', left: '4.1%', top: '50%', width: '2.4%', height: '20%', transform: 'translateY(-50%)', borderRadius: 999, background: '#000', boxShadow: '0 0 0 1px #0a0a0a' }} />
         </div>
       </div>
 
-      {/* ---- guide strip (website card style) ---- */}
+      {/* ---- guide strip ---- */}
       <div className="pointer-events-auto absolute right-[28px] top-4 hidden w-[min(600px,42vw)] items-stretch gap-2 md:flex">
         {STEPS.map((st, i) => (
-          <button key={st.n} onClick={() => goStep(i)} className={`ac-card flex-1 px-3 py-2 text-left transition ${step === i ? 'is-active' : ''}`}>
-            <div className="ac-label" style={{ color: step === i ? '#fff' : undefined }}>Step {st.n}</div>
-            <div className="text-[13px] font-semibold leading-tight">{st.title}</div>
-            {step === i && <div className="mt-1 text-[11px] leading-snug opacity-90">{st.text}</div>}
+          <button key={st.n} onClick={() => goStep(i)} className={`ac-card flex-1 px-3 py-2.5 text-left transition ${step === i ? 'is-active' : ''}`}>
+            <div className="flex items-baseline gap-2"><span className="ac-num">0{st.n}</span><span className="ac-label">Step</span></div>
+            <div className="mt-1 text-[13px] font-semibold leading-tight">{st.title}</div>
+            {step === i && <div className="mt-1 text-[11px] leading-snug text-[#b7bcc3]">{st.text}</div>}
           </button>
         ))}
       </div>

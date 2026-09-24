@@ -26,11 +26,13 @@ it is done. ✅ done · 🔧 in progress · ⬜ open.
 - ✅ Second, ~20 m, more complete wreck on the deep slope up-and-right
 - ✅ Salmon / lake trout also up-and-right in the deep water
 - ⬜ New APK for the emulator study: `AccuphySonar_20260901_2.0.0_beta_14.apk` — Dropbox link from Jason 2026-09-24 (see `reference/README.md`); download when the emulator is set up
+- ⬜ App playback procedure (Jason 2026-09-24): after installing the APK, copy the `.sonar` files from `reference/sonar-data/` into the device's `Files/Accuphy Sonar App/Sonar Data`, open **Playback** in the app, then in a view use the **⋯ settings** to find the data and change settings while watching how the picture reacts
 
 ## Brand / UI
-- ✅ Control panel + guide cards restyled after shop.accuphy.com (white cards, Eurostile uppercase labels, square #028cdf outline/filled buttons) — Jason: the earlier pills looked "very AI"
+- ✅ Control panel + guide cards: dark premium tech style (DJI / Insta360 / Anker reference) — near-black glass, hairline borders, grey caps labels, one blue accent, sliding segmented control (Jason 2026-09-24: white did not fit, pills looked "AI")
 - ✅ Animated "Drag the boat" hint that follows the boat until the first drag
 - ✅ Phone frame turned in 3D (perspective + rotateY/rotateX); the GL picture uses the same maths with per-vertex w, so it stays perspective-correct inside the display
+- 🔧 Phone realism (Jason: keep improving): now true Pro Max proportions, thin uniform bezel, brushed titanium band, side/action/power buttons, glass reflection, Dynamic Island — next: antenna lines, camera-side depth, screen-off reflections
 - ✅ Control panel in Accuphy brand (white wordmark, Instrument Sans, Eurostile Heavy headline, brand blue #0d8fdb)
 - ✅ Sonar screen inside an iPhone Pro Max frame (landscape, natural-titanium ring, dynamic island); the GL picture is drawn into the DOM display hole
 - ⬜ The sonar picture's own chrome (scales, numbers) — untouched until the app playback study
@@ -43,4 +45,4 @@ it is done. ✅ done · 🔧 in progress · ⬜ open.
 ## Engineering
 - 🔧 Mobile performance: dpr capped at 1.5, high-performance GL context; real-device fps check still to do
 - ✅ React 19 + R3F `refCleanup` console error — gone since StrictMode was removed (no new occurrences in this session's checks)
-- ⬜ Single-file build + Cloudflare Pages/Vercel hosting + Shopify Custom Liquid iframe
+- ⬜ **Local only** (Jason 2026-09-24): `npm run build` + `npm run preview` on this Mac; no public hosting / Shopify embed until Jason says so

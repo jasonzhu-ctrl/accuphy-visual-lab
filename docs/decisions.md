@@ -213,3 +213,11 @@ Numbered log. Newest at the bottom.
     `#028cdf` 1 px outline buttons that fill blue when active, white cards);
     (c) animated **Drag the boat** hint following the boat until the first
     drag. Brand blue corrected to `#028cdf` (site value).
+
+23. **2026-09-24** — Jason: (a) UI must feel like premium consumer tech
+    (DJI / Insta360 / Anker), not a white card → dark glass panel, hairline
+    borders, one accent; (b) keep making the iPhone frame more real (now true
+    Pro Max proportions, buttons, brushed band, glass reflection); (c) the
+    app study procedure: install APK → copy `.sonar` files to
+    `Files/Accuphy Sonar App/Sonar Data` → Playback → per-view ⋯ settings;
+    (d) **deployment is local only for now** — no public hosting.

@@ -9,18 +9,27 @@
 .font-brand { font-family: 'Instrument Sans', system-ui, sans-serif; }
 .font-brand-head { font-family: 'Eurostile Heavy', 'Instrument Sans', system-ui, sans-serif; letter-spacing: 0.02em; }
 
-/* --- website-matched UI (shop.accuphy.com: Eurostile 800 uppercase headings, square corners, blue #028cdf outline buttons) --- */
-:root { --accuphy-blue: #028cdf; }
-.ac-panel { background: rgba(255, 255, 255, 0.94); color: #111; border-top: 3px solid var(--accuphy-blue); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35); }
-.ac-label { font-family: 'Eurostile Heavy', 'Instrument Sans', sans-serif; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #333; }
-.ac-btn { font-family: 'Instrument Sans', sans-serif; font-weight: 700; font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase; padding: 6px 10px; border: 1px solid var(--accuphy-blue); color: var(--accuphy-blue); background: #fff; line-height: 1.1; transition: background .15s, color .15s; }
-.ac-btn:hover { background: #e8f4fd; }
-.ac-btn.is-active { background: var(--accuphy-blue); color: #fff; }
-.ac-seg { display: flex; }
-.ac-seg .ac-btn + .ac-btn { margin-left: -1px; }
-.ac-range { accent-color: var(--accuphy-blue); }
-.ac-card { background: rgba(255, 255, 255, 0.94); color: #111; border-left: 3px solid var(--accuphy-blue); box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25); }
-.ac-card.is-active { background: var(--accuphy-blue); color: #fff; border-left-color: #fff; }
-.ac-hint { background: #fff; color: #111; border: 1px solid var(--accuphy-blue); box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3); transition: opacity .6s; }
-@keyframes ac-drag { 0% { transform: translateX(-14px); } 50% { transform: translateX(14px); } 100% { transform: translateX(-14px); } }
+/* --- premium dark tech UI (reference: DJI / Insta360 / Anker product pages): near-black glass,
+   hairline borders, quiet grey caps labels, one accent (brand blue #028cdf), sliding segmented control --- */
+:root { --accuphy-blue: #028cdf; --ink: #0a0c0f; --hair: rgba(255,255,255,0.10); --hair2: rgba(255,255,255,0.18); --mute: #8b9199; }
+.ac-panel { background: linear-gradient(180deg, rgba(14,16,20,0.86), rgba(8,9,12,0.86)); color: #e8eaed; border: 1px solid var(--hair); backdrop-filter: blur(18px) saturate(140%); -webkit-backdrop-filter: blur(18px) saturate(140%); box-shadow: 0 24px 60px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.06); border-radius: 6px; }
+.ac-label { font-family: 'Instrument Sans', sans-serif; font-weight: 600; font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--mute); }
+.ac-title { font-family: 'Eurostile Heavy', 'Instrument Sans', sans-serif; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #cfd3d8; }
+.ac-seg { display: inline-flex; padding: 3px; border: 1px solid var(--hair2); border-radius: 4px; background: rgba(255,255,255,0.03); gap: 2px; }
+.ac-btn { font-family: 'Instrument Sans', sans-serif; font-weight: 600; font-size: 11.5px; letter-spacing: 0.04em; padding: 5px 11px; border-radius: 3px; color: #b7bcc3; background: transparent; line-height: 1.1; transition: background .18s, color .18s; white-space: nowrap; }
+.ac-btn:hover { color: #fff; background: rgba(255,255,255,0.06); }
+.ac-btn.is-active { color: #fff; background: var(--accuphy-blue); box-shadow: 0 0 0 1px rgba(2,140,223,0.35), 0 4px 14px rgba(2,140,223,0.35); }
+.ac-range { -webkit-appearance: none; appearance: none; height: 2px; background: linear-gradient(90deg, var(--accuphy-blue) var(--fill, 30%), rgba(255,255,255,0.18) var(--fill, 30%)); border-radius: 2px; outline: none; }
+.ac-range::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: #fff; border: 2px solid var(--accuphy-blue); box-shadow: 0 2px 8px rgba(0,0,0,0.5); }
+.ac-value { font-family: 'Eurostile Heavy', 'Instrument Sans', sans-serif; font-size: 15px; color: #fff; letter-spacing: 0.02em; }
+.ac-card { background: linear-gradient(180deg, rgba(14,16,20,0.86), rgba(8,9,12,0.86)); color: #d7dbe0; border: 1px solid var(--hair); border-radius: 6px; backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); box-shadow: 0 12px 30px rgba(0,0,0,0.35); }
+.ac-card.is-active { border-color: rgba(2,140,223,0.7); box-shadow: 0 0 0 1px rgba(2,140,223,0.35), 0 12px 30px rgba(0,0,0,0.35); color: #fff; }
+.ac-card .ac-num { font-family: 'Eurostile Heavy', sans-serif; font-size: 18px; color: var(--accuphy-blue); line-height: 1; }
+.ac-hint { background: rgba(10,12,15,0.85); color: #fff; border: 1px solid rgba(2,140,223,0.6); border-radius: 4px; box-shadow: 0 8px 22px rgba(0,0,0,0.45); backdrop-filter: blur(10px); transition: opacity .6s; }
+@keyframes ac-drag { 0% { transform: translateX(-12px); } 50% { transform: translateX(12px); } 100% { transform: translateX(-12px); } }
 .ac-hint .hand { animation: ac-drag 1.6s ease-in-out infinite; }
+
+/* --- iPhone frame details --- */
+.ph-band { background: linear-gradient(160deg, #f1f0ec 0%, #d9d8d3 14%, #bfbdb7 30%, #e6e4df 48%, #a8a6a1 66%, #d2d0cb 84%, #bcbab5 100%); }
+.ph-btn { position: absolute; background: linear-gradient(90deg, #cfcdc8, #8e8c87); border-radius: 2px; box-shadow: 0 0 0 1px rgba(0,0,0,0.25); }
+.ph-glass { position: absolute; inset: 0; border-radius: inherit; pointer-events: none; background: linear-gradient(115deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.03) 28%, rgba(255,255,255,0) 45%, rgba(255,255,255,0) 70%, rgba(255,255,255,0.05) 100%); }
