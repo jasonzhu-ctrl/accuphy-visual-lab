@@ -4,7 +4,7 @@ Jason 2026-09-24: "别把之前说过的任务丢了" — every promised task li
 it is done. ✅ done · 🔧 in progress · ⬜ open.
 
 ## Sonar screen (Phase 4)
-- 🔧 Fish echoes as compact bright blobs (fish mask from the sonar pass) — tune against the recordings / LiveScope clips (Jason: fish are the most important thing)
+- 🔧 Fish echoes: now marks elongated ALONG the beam with a bright core (from the PLM Combo clip); fish compressed along their body in the sonar pass so marks are narrow in angle. Still to tune against the recordings / good LiveScope clips (Jason: fish are the most important thing)
 - ✅ Surface clutter streak under the transducer (side views)
 - ⬜ Combo (PLM): currently both fans share one apex in one frame (matches the blue/red Combo clip); the split two-panel layout of the yellow-mode clips can come with the app-chrome study
 - ✅ Forward View screen: apex ~20 % from the left, like the recordings

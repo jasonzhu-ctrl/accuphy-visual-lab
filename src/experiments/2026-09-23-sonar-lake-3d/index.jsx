@@ -28,8 +28,9 @@ export default function SonarLake3D() {
   const specs = useMemo(() => wedgeSpecs(device, mode, rangeFt * FT), [device, mode, rangeFt])
   const specKey = `${deviceId}-${mode}-${rangeFt}`
 
+  const b0 = (/boat=(-?[\d.]+),(-?[\d.]+)/.exec(window.location.search) || []).slice(1).map(Number) // dev: ?boat=x,z
   const state = useRef({
-    boat: { x: -6, z: 4 }, target: { x: -6, z: 4 }, apex: new THREE.Vector3(), dragging: false,
+    boat: { x: b0[0] ?? -6, z: b0[1] ?? 4 }, target: { x: b0[0] ?? -6, z: b0[1] ?? 4 }, apex: new THREE.Vector3(), dragging: false,
     parallax: { x: 0, y: 0 }, specs, specKey,
     closeCam: window.location.search.includes('cam=boat'),
     fishCam: (/cam=fish:(\w+)/.exec(window.location.search) || [])[1],

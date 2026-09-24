@@ -87,7 +87,7 @@ export const sonarFragment = /* glsl */ `
         acc += (pulse + tail) * wgt * (1.0 - fish);
         // fish: the app draws a mark elongated ALONG THE BEAM (radially), with a bright
         // core and a soft rim — short toward the transducer, longer away from it
-        if (fish > 0.5) {
+        if (fish > 0.3) {
           float sr = dr < 0.0 ? 0.35 : 0.75 + 0.01 * r;
           float blob = exp(-dr * dr / (sr * sr));
           fishHit = max(fishHit, blob);

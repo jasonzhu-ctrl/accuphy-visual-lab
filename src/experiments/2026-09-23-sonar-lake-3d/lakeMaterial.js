@@ -40,7 +40,7 @@ export function makeLakeMaterial({ fish = false } = {}) {
         vPattern = aPattern; vBelly = aBelly; vSide = aSide; vLocal = position;
         // sonar pass: a fish echoes from a small part of its body at a time — compress the
         // body along its axis so the mark is narrow in angle and the pulse shapes its length
-        if (uSonarPass > 0.5) pos.x *= 0.35;
+        if (uSonarPass > 0.5) pos.x *= 0.6;
       #endif
         vec3 c = vec3(1.0);
         #ifdef USE_COLOR
