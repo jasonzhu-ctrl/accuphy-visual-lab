@@ -104,7 +104,7 @@ export const sonarFragment = /* glsl */ `
       float atten = 1.0 - 0.45 * clamp(r / uRange, 0.0, 1.0);
       float sp = 0.75 + 0.5 * hash(floor(p * 7.0) + floor(uTime * 12.0));
       // grazing-angle bottom returns are weak; the app's Panoramic runs at ~70 % gain
-      float gain = uFlat > 0.5 ? 2.4 : 1.0;
+      float gain = uFlat > 0.5 ? 3.0 : 1.0;
       echo = max(echo, max(acc * atten * sp * gain, fishEcho * (0.8 + 0.2 * atten)));
     }
     // black water, echoes only — no invented rings/grid (Jason 2026-09-24);
