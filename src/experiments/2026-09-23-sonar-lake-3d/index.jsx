@@ -1,0 +1,86 @@
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { motion } from 'framer-motion'
+import * as THREE from 'three'
+import LakeScene from './Scene'
+import { DEVICES, FT, MODE_LABELS } from '../2026-09-23-sonar-beam/devices'
+import { wedgeSpecs } from '../2026-09-23-beam-shapes-3d/wedge'
+import { SPECIES } from './fish'
+
+export const meta = {
+  title: 'Sonar lake 3D — Phase 3',
+  description: '3D lake with real-scale timber, rocks, wreck and NA fish; PL/PLM beam volumes reveal the bottom. Drag the boat.',
+}
+
+export default function SonarLake3D() {
+  const [deviceId, setDeviceId] = useState('PL')
+  const [mode, setMode] = useState('forward')
+  const [rangeFt, setRangeFt] = useState(80)
+  const [imperial, setImperial] = useState(true)
+  const [, tick] = useState(0)
+  useEffect(() => { const id = requestAnimationFrame(() => tick(1)); return () => cancelAnimationFrame(id) }, [])
+
+  const device = DEVICES[deviceId]
+  const maxFt = device.maxRangeFt
+  useEffect(() => {
+    if (!device.modes.includes(mode)) setMode('down')
+    if (rangeFt > maxFt) setRangeFt(maxFt)
+  }, [deviceId]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const specs = useMemo(() => wedgeSpecs(device, mode, rangeFt * FT), [device, mode, rangeFt])
+  const specKey = `${deviceId}-${mode}-${rangeFt}`
+
+  const state = useRef({
+    boat: { x: -6, z: 4 }, target: { x: -6, z: 4 }, apex: new THREE.Vector3(), dragging: false,
+    parallax: { x: 0, y: 0 }, specs, specKey,
+  })
+  state.current.specs = specs
+  state.current.specKey = specKey
+
+  const onMove = (e) => {
+    const s = state.current
+    s.parallax.x = (e.clientX / window.innerWidth - 0.5) * 2
+    s.parallax.y = (e.clientY / window.innerHeight - 0.5) * 2
+  }
+  const fmt = (ft) => (imperial ? `${Math.round(ft)} ft` : `${(ft * FT).toFixed(1)} m`)
+
+  return (
+    <main className="fixed inset-0 select-none overflow-hidden bg-[#9cc1cf] text-white" onPointerMove={onMove}>
+      <div className="absolute inset-0 touch-none">
+        <LakeScene state={state} />
+      </div>
+
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+        className="pointer-events-auto absolute inset-x-3 bottom-12 flex flex-col gap-2 rounded-2xl bg-black/55 p-3 text-sm backdrop-blur sm:inset-x-auto sm:bottom-auto sm:left-4 sm:top-4 sm:gap-3 sm:p-4">
+        <div className="flex items-center gap-2">
+          <span className="w-16 text-neutral-400">Device</span>
+          {Object.values(DEVICES).map((d) => <Btn key={d.id} active={deviceId === d.id} onClick={() => setDeviceId(d.id)}>{d.name}</Btn>)}
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="w-16 text-neutral-400">View</span>
+          {device.modes.map((m) => <Btn key={m} active={mode === m} onClick={() => setMode(m)}>{MODE_LABELS[m]}</Btn>)}
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="w-16 text-neutral-400">Range</span>
+          <input type="range" min={20} max={maxFt} step={5} value={rangeFt} onChange={(e) => setRangeFt(+e.target.value)} className="w-40 accent-amber-400" />
+          <button className="tabular-nums text-amber-300" onClick={() => setImperial((v) => !v)}>{fmt(rangeFt)}</button>
+          <span className="text-neutral-500">max {fmt(maxFt)}</span>
+        </div>
+        <div className="hidden text-xs text-neutral-500 sm:block">
+          {device.name} {device.beamDeg}°×{device.thickDeg}° · fish: {Object.values(SPECIES).map((s) => s.name).join(', ')}
+        </div>
+      </motion.div>
+
+      <div className="pointer-events-none absolute bottom-3 left-1/2 w-max max-w-[90vw] -translate-x-1/2 rounded-full bg-black/50 px-3 py-1 text-xs text-neutral-200 backdrop-blur">
+        Drag the boat on the water · the beam reveals what is under it
+      </div>
+    </main>
+  )
+}
+
+function Btn({ active, children, ...rest }) {
+  return (
+    <button {...rest} className={`rounded-full px-3 py-1 transition ${active ? 'bg-amber-400 text-black' : 'bg-white/10 text-white hover:bg-white/20'}`}>
+      {children}
+    </button>
+  )
+}

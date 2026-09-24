@@ -99,3 +99,12 @@ Numbered log. Newest at the bottom.
     instead of the true 39° for visual effect (`displayBeamDeg`; Combo is
     therefore drawn as 2 × 43°). True values stay in `beamDeg`. PLM Forward =
     39° and Combo = 78° reconfirmed.
+
+12. **2026-09-23** — Jason approved Phase 3 (3D lake) with two content
+    standards: (1) underwater look = Garmin LVS34 video as the reference,
+    improved with Claude's judgement; (2) **real, in-proportion content**:
+    fish = North American largemouth & smallmouth bass, walleye, smelt,
+    crappie (true sizes, schooling where real); structures = standing dead
+    timber / stumps, a small wreck, rock piles; everything scaled to a real
+    bass boat and real distances; and always feasible on the web (mobile).
+    Sizes used are recorded in `src/experiments/2026-09-23-sonar-lake-3d/fish.js`.
