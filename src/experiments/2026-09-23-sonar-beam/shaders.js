@@ -16,6 +16,7 @@ export const fragmentShader = /* glsl */ `
   precision highp float;
   varying vec2 vUv;
 
+  uniform vec2  uResolution;  // drawing-buffer size in pixels
   uniform vec2  uSceneSize;   // metres (width, height) of the visible scene
   uniform float uSurfaceY;    // metres from top
   uniform float uDeviceX;     // metres from left
@@ -129,7 +130,10 @@ export const fragmentShader = /* glsl */ `
   }
 
   void main() {
-    vec2 p = vec2(vUv.x, 1.0 - vUv.y) * uSceneSize;   // metres, y down
+    // use the real pixel position, not the interpolated uv: independent of
+    // camera / viewport state, so it cannot drift when the canvas is resized
+    vec2 uv = gl_FragCoord.xy / uResolution;
+    vec2 p = vec2(uv.x, 1.0 - uv.y) * uSceneSize;     // metres, y down
     vec2 apex = vec2(uDeviceX, uSurfaceY);
     vec2 rel = p - apex;                               // y down = +depth
     rel.y = max(rel.y, 0.0);

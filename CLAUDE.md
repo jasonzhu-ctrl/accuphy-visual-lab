@@ -48,5 +48,12 @@ no TypeScript. No backend, no database — front-end only.
 - One experiment = one folder; don't edit an old experiment to make a new
   idea — copy it into a new dated folder.
 - Keep each experiment self-contained (its own components/assets in its folder).
+- **R3F gotcha (learned 2026-09-23):** React Three Fiber copies plain-object
+  `uniforms` when applying the prop, so scalar `{ value }` entries in your own
+  memoised object are not the material's. Update uniforms through the material
+  ref (`mat.current.uniforms.x.value = …`), never through the memo. Symptom:
+  vector uniforms update, scalars silently stay at their initial value.
+- Dev aids on the sonar experiment: `?frame=375x812` renders it in a fake
+  phone box; `?debug` shows live uniform values.
 - Jason is not comfortable with git/terminal: Claude drives git (commit, push),
   starts the dev server, and explains in plain language.

@@ -8,7 +8,7 @@ export const meta = {
   description: 'Fans, PL/PLM switch, cursor = device on the surface, touch drag. Placeholder art.',
 }
 
-const SCENE_WIDTH_M = 60 // visible lake width (metres) — placeholder choice
+const SCENE_HEIGHT_M = 45 // visible scene height (metres): 15 m sky + 30 m water — placeholder choice
 
 export default function SonarBeam() {
   const [deviceId, setDeviceId] = useState('PLM')
@@ -18,6 +18,15 @@ export default function SonarBeam() {
   const [showScene, setShowScene] = useState(true)
   const [tiltOverride, setTiltOverride] = useState(null) // debug slider, null = rule
   const [pos, setPos] = useState(0.5) // device x, 0..1 of scene width (for the DOM cursor)
+
+  // R3F mounts the scene only once it has measured the container; in some
+  // embeds the first measurement is 0×0 and nothing renders until the next
+  // React render. One forced re-render after mount makes it robust.
+  const [, tick] = useState(0)
+  useEffect(() => {
+    const id = requestAnimationFrame(() => tick(1))
+    return () => cancelAnimationFrame(id)
+  }, [])
 
   const device = DEVICES[deviceId]
   const maxFt = device.maxRangeFt
@@ -29,7 +38,7 @@ export default function SonarBeam() {
   const fans = useMemo(() => fanSpans(device, mode, tiltOverride ?? undefined), [device, mode, tiltOverride])
 
   // Mutable state read by the render loop every frame (no React re-render on drag).
-  const state = useRef({ deviceX01: 0.5, sceneWidthM: SCENE_WIDTH_M, fans, rangeM: rangeFt * FT, showScene })
+  const state = useRef({ deviceX01: 0.5, sceneHeightM: SCENE_HEIGHT_M, fans, rangeM: rangeFt * FT, showScene })
   state.current.fans = fans
   state.current.rangeM = rangeFt * FT
   state.current.showScene = showScene
@@ -55,8 +64,16 @@ export default function SonarBeam() {
   const surfaceTop = '33.333%' // matches uSurfaceY = h/3
   const fmt = (ft) => (imperial ? `${Math.round(ft)} ft` : `${(ft * FT).toFixed(1)} m`)
 
+  // Dev aid: `?frame=375x812` renders the experiment inside a centred box of
+  // that size (a fake phone) instead of full-viewport, so odd aspect ratios can
+  // be checked in a desktop browser without device emulation.
+  const frame = /frame=(\d+)x(\d+)/.exec(window.location.search)
+  const frameStyle = frame
+    ? { position: 'fixed', left: '50%', top: '50%', transform: 'translate(-50%,-50%)', width: `min(${frame[1]}px, 100vw)`, height: `min(${frame[2]}px, 100vh)`, boxShadow: '0 0 0 2px #444' }
+    : undefined
+
   return (
-    <main className="fixed inset-0 select-none overflow-hidden bg-black text-white">
+    <main className={`${frame ? '' : 'fixed inset-0'} select-none overflow-hidden bg-black text-white`} style={frameStyle}>
       <div
         ref={wrapRef}
         className="absolute inset-0 touch-none cursor-none"
@@ -82,7 +99,7 @@ export default function SonarBeam() {
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="pointer-events-auto absolute left-4 top-4 flex flex-col gap-3 rounded-2xl bg-black/55 p-4 text-sm backdrop-blur"
+        className="pointer-events-auto absolute inset-x-3 bottom-12 flex flex-col gap-2 rounded-2xl bg-black/55 p-3 text-sm backdrop-blur sm:inset-x-auto sm:bottom-auto sm:left-4 sm:top-4 sm:gap-3 sm:p-4"
       >
         <div className="flex items-center gap-2">
           <span className="w-16 text-neutral-400">Device</span>
@@ -123,13 +140,16 @@ export default function SonarBeam() {
             {tiltOverride !== null && <button className="underline" onClick={() => setTiltOverride(null)}>rule</button>}
           </label>
         </div>
-        <div className="text-xs text-neutral-500">
+        <div className="hidden text-xs text-neutral-500 sm:block">
           {device.name}: {device.beamDeg}° beam · fans {fans.map((f) => `[${f[0].toFixed(1)}°, ${f[1].toFixed(1)}°]`).join(' + ')} from straight-down
         </div>
       </motion.div>
 
-      <div className="pointer-events-none absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-black/50 px-3 py-1 text-xs text-neutral-300 backdrop-blur">
-        Move the mouse / drag on touch to slide the device along the surface
+      {import.meta.env.DEV && window.location.search.includes('debug') && (
+        <pre ref={(el) => { state.current.debugEl = el }} className="pointer-events-none absolute right-2 top-2 max-w-[60vw] whitespace-pre-wrap rounded bg-black/60 p-1 text-[10px] text-lime-300" />
+      )}
+      <div className="pointer-events-none absolute bottom-3 left-1/2 w-max max-w-[90vw] -translate-x-1/2 rounded-full bg-black/50 px-3 py-1 text-xs text-neutral-300 backdrop-blur">
+        Move the mouse or drag to slide the device along the surface
       </div>
     </main>
   )
