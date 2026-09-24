@@ -23,7 +23,8 @@ const extrude = (l, w, depth, y, bevel = 0) => {
 
 export function makeRangerBoat() {
   const g = new THREE.Group()
-  const hullMat = new THREE.MeshStandardMaterial({ color: '#1c1f24', metalness: 0.75, roughness: 0.28 }) // charcoal metal flake
+  // charcoal metal-flake gelcoat: metallic base under a glossy clearcoat
+  const hullMat = new THREE.MeshPhysicalMaterial({ color: '#1c1f24', metalness: 0.7, roughness: 0.32, clearcoat: 1.0, clearcoatRoughness: 0.08 })
   const stripeMat = new THREE.MeshStandardMaterial({ color: '#c8102e', metalness: 0.4, roughness: 0.35 })
   const silverMat = new THREE.MeshStandardMaterial({ color: '#cfd4da', metalness: 0.85, roughness: 0.25 })
   const carpetMat = new THREE.MeshStandardMaterial({ color: '#6f7479', roughness: 1 })
