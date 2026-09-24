@@ -50,7 +50,7 @@ export default function App() {
     <>
       <a
         href="#"
-        className="fixed left-4 top-4 z-50 rounded-full bg-black/70 px-3 py-1 text-xs text-white backdrop-blur hover:bg-black"
+        className="ac-back fixed left-4 top-4 z-50 px-3.5 py-1.5 text-xs font-semibold text-white"
       >
         ← Lab
       </a>

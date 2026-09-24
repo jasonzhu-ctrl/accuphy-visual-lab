@@ -90,13 +90,14 @@ export default function SonarLake3D() {
         <LakeScene state={state} sonarRect={sonarRect} />
       </div>
 
-      {/* ---- control panel — dark, precise, one accent (DJI / Insta360 / Anker feel) ---- */}
+      {/* ---- control panel — Apple-style frosted glass over the lake (Jason 2026-09-24) ---- */}
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-        className="ac-panel pointer-events-auto absolute inset-x-3 bottom-3 flex flex-col gap-3 p-3 sm:inset-x-auto sm:bottom-auto sm:left-4 sm:top-11 sm:w-[400px] sm:p-4">
-        <div className="flex items-center justify-between border-b border-white/10 pb-3">
-          <img src="/brand/logo/White Accuphy Logo.png" alt="Accuphy" className="h-[18px] w-auto" draggable={false} />
+        className="ac-panel pointer-events-auto absolute inset-x-3 bottom-3 flex flex-col gap-3 p-3.5 sm:inset-x-auto sm:bottom-auto sm:left-4 sm:top-14 sm:w-[400px] sm:p-4">
+        <div className="flex items-center justify-between px-1 pt-0.5">
+          <img src="/brand/logo/White Accuphy Logo.png" alt="Accuphy" className="h-[18px] w-auto drop-shadow-[0_1px_2px_rgba(0,20,30,0.25)]" draggable={false} />
           <span className="ac-title">Beam explorer</span>
         </div>
+        <div className="ac-divider" />
         <Row label="Device">
           <div className="ac-seg">{Object.values(DEVICES).map((d) => <button key={d.id} className={`ac-btn ${deviceId === d.id ? 'is-active' : ''}`} onClick={() => setDeviceId(d.id)}>{d.name}</button>)}</div>
         </Row>
@@ -106,18 +107,18 @@ export default function SonarLake3D() {
         <Row label="Range">
           <input type="range" min={20} max={maxFt} step={5} value={rangeFt} onChange={(e) => setRangeFt(+e.target.value)} className="ac-range w-36" style={{ '--fill': `${((rangeFt - 20) / (maxFt - 20)) * 100}%` }} />
           <button className="ac-value" onClick={() => setImperial((v) => !v)} title="ft / m">{fmt(rangeFt)}</button>
-          <span className="text-[10.5px] text-[#8b9199]">max {fmt(maxFt)}</span>
+          <span className="ac-soft text-[11px]">max {fmt(maxFt)}</span>
         </Row>
         {DEV_TOOLS && deviceId === 'PL' && mode === 'forward' && (
           <Row label="Depth">
             <input type="range" min={20} max={device.maxDepthFt} step={5} value={depthFt} onChange={(e) => setDepthFt(+e.target.value)} className="ac-range w-36" style={{ '--fill': `${((depthFt - 20) / (device.maxDepthFt - 20)) * 100}%` }} />
             <span className="ac-value">{fmt(depthFt)}</span>
-            <span className="text-[10.5px] text-[#8b9199]">depth axis</span>
+            <span className="ac-soft text-[11px]">depth axis</span>
           </Row>
         )}
         {DEV_TOOLS && (<>
         <Row label="Screen">
-          <select value={colormap} onChange={(e) => setColormap(e.target.value)} className="rounded-[3px] border border-white/15 bg-transparent px-2 py-1 text-[11.5px] text-white/85">
+          <select value={colormap} onChange={(e) => setColormap(e.target.value)} className="rounded-full border border-white/25 bg-white/10 px-3 py-1 text-[11.5px] text-white/90">
             {COLORMAP_NAMES.map((n) => <option key={n} value={n} className="bg-[#0f1216]">{n}</option>)}
           </select>
           <span className="ac-label">gain</span>
@@ -133,13 +134,13 @@ export default function SonarLake3D() {
           <span className="ac-value text-[13px]">{Math.round(noise * 100)}%</span>
         </Row>
         </>)}
-        <div className="hidden text-[11px] leading-snug text-[#8b9199] sm:block">
+        <div className="ac-soft hidden px-1 text-[11.5px] leading-snug sm:block">
           {device.name} · {device.beamDeg}° × {device.thickDeg}° beam. Drag the boat — whatever the beam touches lights up.
         </div>
       </motion.div>
 
       {/* ---- drag hint: follows the boat until the first drag (position set by the render loop) ---- */}
-      <div ref={(el) => { state.current.hintEl = el }} className="ac-hint pointer-events-none absolute left-0 top-0 flex items-center gap-2 px-3 py-1.5" style={{ opacity: 0 }}>
+      <div ref={(el) => { state.current.hintEl = el }} className="ac-hint pointer-events-none absolute left-0 top-0 flex items-center gap-2 px-3.5 py-2" style={{ opacity: 0 }}>
         <svg className="hand" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#028cdf" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12h18M7 8l-4 4 4 4M17 8l4 4-4 4"/></svg>
         <span className="font-brand-head text-[11px] uppercase tracking-wider">Drag the boat</span>
       </div>
@@ -172,12 +173,12 @@ export default function SonarLake3D() {
       </div>
 
       {/* ---- guide strip ---- */}
-      <div className="pointer-events-auto absolute right-[28px] top-4 hidden w-[min(600px,42vw)] items-stretch gap-2 md:flex">
+      <div className="pointer-events-auto absolute right-[28px] top-4 hidden w-[min(620px,44vw)] items-stretch gap-2.5 md:flex">
         {STEPS.map((st, i) => (
-          <button key={st.n} onClick={() => goStep(i)} className={`ac-card flex-1 px-3 py-2.5 text-left transition ${step === i ? 'is-active' : ''}`}>
-            <div className="flex items-baseline gap-2"><span className="ac-num">0{st.n}</span><span className="ac-label">Step</span></div>
-            <div className="mt-1 text-[13px] font-semibold leading-tight">{st.title}</div>
-            {step === i && <div className="mt-1 text-[11px] leading-snug text-[#b7bcc3]">{st.text}</div>}
+          <button key={st.n} onClick={() => goStep(i)} className={`ac-card flex-1 px-3.5 py-3 text-left ${step === i ? 'is-active' : ''}`}>
+            <div className="flex items-center gap-2"><span className="ac-num">0{st.n}</span><span className="ac-label">Step</span></div>
+            <div className="mt-1.5 text-[13.5px] font-semibold leading-tight">{st.title}</div>
+            {step === i && <div className="ac-body mt-1.5 text-[11.5px] leading-snug">{st.text}</div>}
           </button>
         ))}
       </div>

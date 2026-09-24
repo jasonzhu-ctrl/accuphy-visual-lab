@@ -403,3 +403,16 @@ Numbered log. Newest at the bottom.
     fish also casts a shadow blotch on the bottom in Panoramic. Schools swim
     together. Panoramic framing matches the app (1:1, apex below the bottom
     edge, no range arc). Details `sonar-style.md` §7.13.
+
+37. **2026-09-24** — **UI in Apple-style frosted glass** (Jason: 控制 panel 和右上角
+    三个卡片按苹果的磨砂玻璃风格做, 背景太黑, 需要透明度, 保持高级感). Replaces the
+    near-black DJI-style panels of decision #23: translucent white glass over a
+    faint cool tint, 28 px backdrop blur + 175 % saturation, a gradient hairline
+    edge (bright top-left, faint bottom-right), inner top highlight, long soft
+    shadow, 18–22 px corner radii. iOS controls: pill segmented control with a
+    white thumb, 4 px slider with brand-blue fill and a white thumb,
+    sentence-case labels. Step numbers are round badges, the active one brand
+    blue with a glow ring. The drag hint and the "← Lab" link are glass pills.
+    Styles in `src/index.css` (`.ac-panel`, `.ac-card`, `.ac-seg`, `.ac-btn`,
+    `.ac-range`, `.ac-hint`, `.ac-back`, `.glass`). Note: that CSS is unlayered,
+    so it must not set `position` (it would beat Tailwind's absolute/fixed).

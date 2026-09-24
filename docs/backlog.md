@@ -47,7 +47,7 @@ it is done. ✅ done · 🔧 in progress · ⬜ open.
 - ⬜ App study leftovers: every colour map on one frame, range stepping, imperial units (tablet route, cheap)
 
 ## Brand / UI
-- ✅ Control panel + guide cards: dark premium tech style (DJI / Insta360 / Anker reference) — near-black glass, hairline borders, grey caps labels, one blue accent, sliding segmented control (Jason 2026-09-24: white did not fit, pills looked "AI")
+- ✅ Control panel + guide cards: Apple-style frosted glass (decision #37) — replaced the earlier near-black DJI-style panels
 - ✅ Animated "Drag the boat" hint that follows the boat until the first drag
 - ✅ Phone frame turned in 3D (perspective + rotateY/rotateX); the GL picture uses the same maths with per-vertex w, so it stays perspective-correct inside the display
 - 🔧 Phone realism (Jason: keep improving): Pro Max proportions, bezel, titanium band, buttons, glass reflection, Dynamic Island, antenna lines — next: camera-side depth, screen-off reflections
