@@ -134,12 +134,12 @@ export const sonarFragment = /* glsl */ `
         float tag = sampleFish(k, vec2(u, v));   // 1 fish · 0.5 structure · 0 bottom
         float fish = step(0.75, tag);
         float structure = step(0.25, tag) * (1.0 - fish);
-        float pulse = exp(-dr * dr / (sigma * sigma)) * (1.0 - 0.2 * structure); // Jason: wrecks a touch less hot (§6.10)
+        float pulse = exp(-dr * dr / (sigma * sigma)) * (1.0 - 0.45 * structure); // structure (timber, wreck) well under the bottom band (§6.10; the app's piling is orange, not white)
         float tail = dr > 0.0 ? 0.5 * exp(-dr / tailLen) : 0.0;   // body of the band sits in the orange mid-tones
         float second = 0.10 * exp(-(r - 2.0 * hit) * (r - 2.0 * hit) / (4.0 * sigma * sigma)); // faint second echo
         float wgt = 0.55 + 0.9 * (1.0 - abs(v * 2.0 - 1.0));
         acc += (1.2 * pulse + tail + second) * wgt * (1.0 - fish);
-        peak = max(peak, pulse * (1.0 - fish) * (1.0 - 0.2 * structure));
+        peak = max(peak, pulse * (1.0 - fish) * (1.0 - 0.5 * structure));
       }
       acc = acc / 21.0 + 0.5 * peak;  // 24 rows now (was 16 → /14) // first return makes the leading edge hot even where the bottom slopes across the beam; the integrated part gives the orange body (balance loop, §6.11)
       // fish (sonar-style.md §6.8): the mask already carries the fish's own angular extent
@@ -154,9 +154,9 @@ export const sonarFragment = /* glsl */ `
         float w = 1.0 - 0.6 * f * f;            // soft ends
         fishSum += w * fishAt(k, a + f * beamHalf, r, jit); wSum += w;
       }
-      float fishHit = min(1.15, 1.7 * fishSum / wSum);        // soft rim: the average fill tapers at the edges (§7.4); head-on ≈ dim, broadside ≈ full
+      float fishHit = min(0.92, 1.5 * fishSum / wSum);        // soft rim: the average fill tapers at the edges (§7.4); capped under white — the app's fish are orange with a yellow-white core, not a white slab
       // lumpy body (the app's near blobs are uneven: flexing body, ping-to-ping change), never speckle
-      fishHit *= 0.78 + 0.34 * vnoise(p * 5.0 + vec2(0.0, uTime * 0.15));
+      fishHit *= 0.7 + 0.45 * vnoise(p * 5.0 + vec2(0.0, uTime * 0.15));
       float atten = 1.0 - 0.4 * clamp(r / uRange, 0.0, 1.0);
       float gain = uFlat > 0.5 ? 3.0 : 1.0;
       float fishEcho = fishHit * (1.0 + 0.12 * streak);   // fish rims are smooth gradients in the app, not speckle
