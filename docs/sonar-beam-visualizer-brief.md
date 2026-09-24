@@ -59,7 +59,7 @@ small marks = fish and floating debris.
 
 In the Mini Combo View clip the downward-pointing blue triangle is the Down View portion.
 
-## Phases (status 2026-09-23: 1 done, 2 done, 3 in progress — `src/experiments/2026-09-23-sonar-lake-3d/`)
+## Phases (status 2026-09-24: 1–2 done, 3 = 3D lake in polish, 4 = sonar-screen inset MVP live — all in `src/experiments/2026-09-23-sonar-lake-3d/`)
 
 > **Direction change under discussion (2026-09-23):** after studying Accuphy's
 > PingLive mode animations and Garmin's LVS34 video, Jason wants a **3D**

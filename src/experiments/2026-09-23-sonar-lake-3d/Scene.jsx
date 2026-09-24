@@ -10,6 +10,7 @@ import { makeLakeMaterial, setBeamUniforms } from './lakeMaterial'
 import { wedgeGeometry } from '../2026-09-23-beam-shapes-3d/wedge'
 import { makeTallTree, makeBushTree, makeStump, makeLog, makeWeedTuft, makeRock, placeAll } from './vegetation'
 import { makeRangerBoat, TRANSDUCER_OFFSET } from './boat'
+import SonarScreen, { SONAR_HIDE_LAYER } from './SonarScreen'
 
 // ---------- lakebed ----------
 function Lakebed({ mat }) {
@@ -200,7 +201,7 @@ function Water() {
   }), [])
   useFrame(({ clock }) => { mat.uniforms.uTime.value = clock.elapsedTime })
   return (
-    <mesh rotation-x={-Math.PI / 2} material={mat}>
+    <mesh rotation-x={-Math.PI / 2} material={mat} onUpdate={(o) => o.layers.set(SONAR_HIDE_LAYER)}>
       <planeGeometry args={[900, 900, 90, 90]} />
     </mesh>
   )
@@ -218,7 +219,7 @@ function Boat({ state, beamMats }) {
     s.apex.copy(TRANSDUCER_OFFSET).add(group.current.position)
     setBeamUniforms(beamMats, s.specs, s.apex)
   })
-  return <group ref={group}><primitive object={boat} /></group>
+  return <group ref={group} onUpdate={(g) => g.traverse((o) => o.layers.set(SONAR_HIDE_LAYER))}><primitive object={boat} /></group>
 }
 function Beams({ state }) {
   const group = useRef()
@@ -229,7 +230,7 @@ function Beams({ state }) {
   }), [specs])
   useFrame(() => { group.current.position.copy(state.current.apex) })
   return (
-    <group ref={group}>
+    <group ref={group} onUpdate={(g) => g.traverse((o) => o.layers.set(SONAR_HIDE_LAYER))}>
       {meshes.map((m, i) => (
         <group key={i}>
           <mesh geometry={m.g}>
@@ -287,7 +288,7 @@ function PickPlane({ state }) {
   )
 }
 
-export default function LakeScene({ state }) {
+export default function LakeScene({ state, sonarRect }) {
   const mats = useMemo(() => {
     const fish = makeLakeMaterial({ fish: true })
     fish.userData.uniforms.uHighlight.value.set('#ffe9a0') // fish light up warm, like a sonar return
@@ -302,7 +303,7 @@ export default function LakeScene({ state }) {
       <hemisphereLight args={['#dbe9f0', '#2a3a2a', 0.9]} />
       <directionalLight position={[40, 80, 30]} intensity={1.4} />
       <Lakebed mat={mats.bed} />
-      <mesh rotation-x={-Math.PI / 2} position-y={-47}><planeGeometry args={[900, 900]} /><meshBasicMaterial color="#17545f" /></mesh>
+      <mesh rotation-x={-Math.PI / 2} position-y={-47} onUpdate={(o) => o.layers.set(SONAR_HIDE_LAYER)}><planeGeometry args={[900, 900]} /><meshBasicMaterial color="#17545f" /></mesh>
       <Structures mat={mats.inst} />
       <Wreck mat={mats.inst} />
       <Fish mat={mats.fish} state={state} />
@@ -311,6 +312,7 @@ export default function LakeScene({ state }) {
       <Beams key={state.current.specKey} state={state} />
       <PickPlane state={state} />
       <Rig state={state} />
+      <SonarScreen state={state} rect={sonarRect} />
     </Canvas>
   )
 }

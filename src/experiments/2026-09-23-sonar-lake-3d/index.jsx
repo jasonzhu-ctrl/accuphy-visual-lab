@@ -35,6 +35,11 @@ export default function SonarLake3D() {
   })
   state.current.specs = specs
   state.current.specKey = specKey
+  state.current.rangeM = rangeFt * FT
+  state.current.imperial = imperial
+  // sonar-screen inset: bottom-right, 34 % of the width, wider for PL's 135° fan
+  const sonarRect = useRef({ w: 0.34, aspect: 0.6, margin: 16 })
+  sonarRect.current.aspect = deviceId === 'PL' ? 0.6 : 0.78
 
   const onMove = (e) => {
     const s = state.current
@@ -46,7 +51,7 @@ export default function SonarLake3D() {
   return (
     <main className="fixed inset-0 select-none overflow-hidden bg-[#9cc1cf] text-white" onPointerMove={onMove}>
       <div className="absolute inset-0 touch-none">
-        <LakeScene state={state} />
+        <LakeScene state={state} sonarRect={sonarRect} />
       </div>
 
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
@@ -70,8 +75,14 @@ export default function SonarLake3D() {
         </div>
       </motion.div>
 
-      <div className="pointer-events-none absolute bottom-3 left-1/2 w-max max-w-[90vw] -translate-x-1/2 rounded-full bg-black/50 px-3 py-1 text-xs text-neutral-200 backdrop-blur">
-        Drag the boat on the water · the beam reveals what is under it
+      {/* frame + labels for the sonar screen (the picture itself is drawn by SonarScreen inside the canvas) */}
+      <div className="pointer-events-none absolute" style={{ right: 16, bottom: 16, width: '34%', aspectRatio: `1 / ${deviceId === 'PL' ? 0.6 : 0.78}` }}>
+        <div className="absolute inset-0 rounded-md ring-1 ring-white/30" />
+        <div className="absolute left-2 top-1 text-[11px] font-medium text-amber-200/90">{device.name} · {MODE_LABELS[mode]} · what the app shows</div>
+        <div className="absolute right-2 top-1 text-[11px] tabular-nums text-neutral-300">{fmt(rangeFt)}</div>
+      </div>
+      <div className="pointer-events-none absolute bottom-3 left-3 w-max max-w-[60vw] rounded-full bg-black/50 px-3 py-1 text-xs text-neutral-200 backdrop-blur sm:left-1/2 sm:-translate-x-1/2">
+        Drag the boat · the beam reveals what is under it · the small screen is what the app would show
       </div>
     </main>
   )

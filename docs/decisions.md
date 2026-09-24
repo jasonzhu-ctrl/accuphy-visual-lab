@@ -148,3 +148,17 @@ Numbered log. Newest at the bottom.
     pale green-silver + dark bars; lake trout dark grey-green + light spots;
     chinook steel-blue back, silver sides, black spots on the upper half.
     Shader now blends back → side → belly. Dev aid `?cam=fish:<species>`.
+
+17. **2026-09-24** — **Phase 4 MVP shipped: the sonar-screen inset is computed
+    from the 3D scene, not faked.** For each fan a "sonar camera" sits at the
+    transducer, looks along the fan centre with FOV = beam × thickness and
+    renders a 1024×32 **depth strip** (water, beams and boat are on a hidden
+    layer). The screen shader converts every screen pixel (angle, range) into
+    "how many thickness rows hit at that range" → echo strength → the yellow
+    ramp from `docs/sonar-style.md`, plus range attenuation, speckle, a short
+    echo tail and faint range rings. Screen box is fitted like the app (apex at
+    top, Forward wedge from the left). Files: `SonarScreen.jsx`,
+    `sonarShader.js`. Known: Panoramic shows little in deep water because the
+    flat fan (0–20° below horizontal) only reaches the bottom within
+    range·sin(20°) — physically right, but the real tilt of Panoramic mode
+    needs Jason's confirmation.
