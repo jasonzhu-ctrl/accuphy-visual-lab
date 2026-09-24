@@ -4,8 +4,12 @@ Jason 2026-09-24: "别把之前说过的任务丢了" — every promised task li
 it is done. ✅ done · 🔧 in progress · ⬜ open.
 
 ## Sonar screen (Phase 4)
+- ✅ AUTO depth on PL Forward: bottom kept at ~80 % of the screen in deep water; sound reaches the whole picture box; the 3D curtain = that box (decision #38)
+- ⬜ Down View in water deeper than the range: the bottom is out of range (the app behaves the same). Option for Jason: auto range in Down View too (the Range slider would move by itself) — not done without his call
+- ⬜ Down / PLM views: the app also draws echoes out to the screen corners beyond the range (PL Down 12 m frame, `reference/app-study/pl-down-menu.jpg`); the engine still cuts at the range arc there. Apply the box rule + box-shaped curtain to those views after checking the 3D look with Jason
+- ⬜ Deep water: the bottom band gets thick where the lake floor slopes sideways (the 20° slab is ≈ 11 m wide at 31 m). Physically right, but check against a deep app recording (all current app frames are ≈ 10 m)
 - ✅ Panoramic rebuilt as a plan-view photograph; fish = analytic persistence streaks with shadows in all views (decision #36)
-- ⬜ Panoramic wreck: the app's 35 m wreck shows dark hatches and bright crossbars — our 10 m wreck reads as a bright hull; a bigger, shallower wreck would make the Panoramic step stronger (ask Jason before moving/adding)
+- ✅ Panoramic wreck: the 40 m cargo ship (decision #38) now shows hatches, masts and deck gear from above like the app's 35 m wreck. It lies at ~36 m; moving it shallower stays Jason's call
 - ⬜ Small far fish still show a faint dot grid inside the blob: the 24 sampled thickness rows miss a 4-row-tall bait fish depending on where it sits → fix with a column-reduction pre-pass (per angle column: fish coverage + nearest fish depth over all 128 rows), then one fetch per tap
 - ✅ Public UI trimmed to Device / View / Range; colour map, gain, contrast, noise, depth axis are `?dev` only (decision #34). No TVG, no tuning controls on the page
 - ✅ Brightness/orange balance calibration: LUT-index histogram of the confirmed frames vs the engine (`__sonarHist`), default map = Moreland_Black_Body, uGamma 0.8 (§6.11)
@@ -24,7 +28,10 @@ it is done. ✅ done · 🔧 in progress · ⬜ open.
 - ✅ Surface clutter streak under the transducer (side views)
 - ✅ Combo (PLM): two-panel layout — Down panel lower-left (R/3, stretched ×2), Forward upper-right, shared apex at x≈20 %, grey double diagonal to x≈0.8 at the bottom
 - ✅ Forward View screen: apex ~20 % from the left, like the recordings
-- ✅ App chrome on the phone inset (`SonarChrome.jsx`, 2026-09-24): italic rulers on three edges from the live screen box, live depth readout (water depth under the transducer), temp/voltage, wordmark + `1440p (QHD)` tag, range −/+, pause, gain −/+, back, ⋯, PL-Forward depth-range control, Combo variant. Decorative buttons (the left panel is the control) — making them work is a later nicety
+- ✅ App chrome on the phone inset (`SonarChrome.jsx`, 2026-09-24): italic rulers on three edges from the live screen box, live depth readout (water depth under the transducer), temp/voltage, wordmark + `1440p (QHD)` tag, range −/+, pause, gain −/+, back, ⋯, PL-Forward depth-range control, Combo variant
+- ✅ App buttons on the phone are display-only (42 % opacity); a tap opens the sign-up gate, the picture freezes until sign-up (decision #38)
+- ⬜ Klaviyo: Jason creates the list "Website — Sonar Beam Explorer", picks single/double opt-in, sends the public key + list ID → paste into `signup.js` (`docs/signup-klaviyo-plan.md`)
+- ⬜ Before public launch: decide on a quiet "No thanks, just exploring" link under the sign-up button (GDPR consent-wall risk, plan §4)
 - ✅ App tone curve adopted (log compression + gain/dynamic-range window → LUT)
 - ✅ All 11 app colour maps available on the phone screen (amber default); gain slider
 
@@ -42,6 +49,8 @@ it is done. ✅ done · 🔧 in progress · ⬜ open.
 
 ## Content
 - ✅ Second, ~20 m, more complete wreck on the deep slope up-and-right
+- ✅ That wreck doubled to a 40 m cargo ship with holds, hatches, masts, derricks, crane, stern house, railings, lifeboats and debris (decision #38)
+- ✅ Bass / musky / salmon spread through the water column (bass 2–17 m, musky 5–13 m, salmon 4–33 m)
 - ✅ Salmon / lake trout also up-and-right in the deep water
 - ✅ App playback study done on the real V10 tablet (emulator route stays blocked by GLES 3.2): all PL and PLM views captured, findings in `sonar-style.md` §6 + `app-chrome.md`
 - ⬜ App study leftovers: every colour map on one frame, range stepping, imperial units (tablet route, cheap)

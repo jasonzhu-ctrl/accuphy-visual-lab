@@ -76,3 +76,10 @@ Combo's ⋯ menu has three tabs: 🐟→ Live Forward settings, 🐟↓ Live Dow
 settings (Contrast / Noise Reject / TVG at 20 %, Color Map, Image
 Stabilization, Interference Rejection), ⟲ Demo Record. The two panels are the
 full Forward and Down pictures, each clipped by the diagonal.
+
+## On the Beam Explorer page (decision #38)
+The chrome's buttons (back, range −/+, pause, gain −/+, ⋯, depth −/+) are
+**display-only** on the page: drawn at 42 % opacity like a disabled iOS
+control, with the values between them at full white. A tap opens the sign-up
+gate (`docs/signup-klaviyo-plan.md`). The PL Forward depth control shows a small
+blue **AUTO** above its value, because the page runs the depth range on auto.

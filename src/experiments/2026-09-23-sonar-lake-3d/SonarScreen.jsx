@@ -17,8 +17,10 @@ export function screenLayout(deviceId, mode, R, aspect, specs, depthM) {
   const mini = deviceId === 'PLM'
   if (mode === 'forward') {
     if (mini) return { box0: { x0: 0, y0: 0, w: R, h: R / aspect }, apexU: 0, split: false }            // apex top-left, 1:1
-    const D = depthM ?? 0.85 * R // PL Forward has its own depth-range control (sonar-style.md §6.9); app default 12 m at 14 m
-    return { box0: { x0: -0.25 * R, y0: 0, w: 1.25 * R, h: D }, apexU: 0.2, split: false }               // apex 20 % in; axes independent
+    const D = depthM ?? 0.85 * R // PL Forward has its own depth-range axis (sonar-style.md §6.9) — AUTO on the page (index.jsx)
+    // the app draws echoes over the whole box, also below the range (8 m range shows the bottom at 10.5 m, §6.9),
+    // so the sound reaches the far corner of the box
+    return { box0: { x0: -0.25 * R, y0: 0, w: 1.25 * R, h: D }, apexU: 0.2, split: false, reach: Math.hypot(R, D) } // apex 20 % in; axes independent
   }
   if (mode === 'down') {
     if (mini) { const hw = R * Math.tan(half) * 1.12; return { box0: { x0: -hw, y0: 0, w: 2 * hw, h: R }, apexU: 0.5, split: false, mottle: true } } // fan corners on the screen corners
@@ -72,7 +74,7 @@ export default function SonarScreen({ state, rect, lakeMats }) {
         uDepth0: { value: targets[0].depthTexture }, uDepth1: { value: targets[1].depthTexture },
         uColor0: { value: targets[0].texture }, uColor1: { value: targets[1].texture },
         uFanCount: { value: 0 }, uFan: { value: [new THREE.Vector4(), new THREE.Vector4()] },
-        uNearFar: { value: new THREE.Vector2(0.3, 150) }, uRange: { value: 20 },
+        uNearFar: { value: new THREE.Vector2(0.3, 150) }, uRange: { value: 20 }, uReach: { value: 20 },
         uBox0: { value: new THREE.Vector4(-20, 0, 40, 30) }, uBox1: { value: new THREE.Vector4(-20, 0, 40, 30) }, uSplit: { value: 0 }, uApexU: { value: 0.5 },
         uTime: { value: 0 }, uFlat: { value: 0 }, uStreak: { value: 1 }, uDebug: { value: window.location.search.includes('sonardebug') ? 1 : 0 },
         uMarks: { value: marks.tex }, uMarkCount: { value: 0 }, uPulse: { value: 0.05 }, uBeamHalf: { value: 0.012 },
@@ -169,6 +171,7 @@ export default function SonarScreen({ state, rect, lakeMats }) {
       u.uSplit.value = lay.split ? 1 : 0
       u.uApexU.value = lay.apexU
       u.uStreak.value = lay.mottle ? 0 : 1
+      u.uReach.value = lay.reach ?? s.rangeM
       s.layout = lay // for the DOM chrome (rulers)
     }
 
@@ -215,7 +218,7 @@ export default function SonarScreen({ state, rect, lakeMats }) {
     lakeMats.forEach((m) => { m.userData.uniforms.uSonarPass.value = 0 })
     u.uApexXZ.value.set(s.apex.x, s.apex.z); u.uApexDepth.value = -s.apex.y
     // fish marks: every fish in the beam, projected into the view (sonarMarks.js)
-    u.uMarkCount.value = computeMarks({ pop: s.pop, t: root.clock.elapsedTime, specs, apex: s.apex, flat, bake: res.bake, rangeM: s.rangeM }, res.marks)
+    u.uMarkCount.value = computeMarks({ pop: s.pop, t: root.clock.elapsedTime, specs, apex: s.apex, flat, bake: res.bake, rangeM: flat ? s.rangeM : u.uReach.value }, res.marks)
     // the app's depth readout: water depth under the transducer, in the user's unit
     if (s.depthEl) {
       const d = depthAt(s.apex.x, s.apex.z)

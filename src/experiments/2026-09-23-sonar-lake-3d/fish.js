@@ -76,6 +76,26 @@ export function makePopulation(bedY) {
   addOne('salmon', 2, -22, 9.0, 0.82); addOne('salmon', 14, -24, 12.0, 0.9); addOne('salmon', -8, -26, 10.0, 0.76)
   ;[[10, -36, 18], [22, -40, 24], [-4, -40, 15], [30, -34, 20], [6, -50, 26], [18, -52, 14], [-14, -46, 21], [38, -28, 16], [48, -38, 22], [56, -30, 12], [42, -46, 26]]
     .forEach(([x, z, off]) => addOne('salmon', x, z, off, 0.7 + rnd() * 0.3))
+  // Spread bass, musky and salmon through the water column — some deep, some shallow (Jason 2026-09-24:
+  // 水层分散一点 有深有浅). Only the depth changes (x/z stay), from a per-fish hash so no rnd() calls shift.
+  fish.forEach((f, i) => {
+    const sp = f.species
+    if (!['largemouth', 'smallmouth', 'musky', 'salmon'].includes(sp)) return
+    const D = -bedY(f.home[0], f.home[2])
+    const u = Math.abs(Math.sin(i * 12.9898 + f.home[0] * 3.1 + f.home[2] * 1.7) * 43758.5453) % 1
+    const v = Math.abs(Math.sin(i * 78.233 + f.home[2] * 2.3) * 12345.678) % 1
+    let depth
+    if (sp === 'largemouth' || sp === 'smallmouth') {
+      if (u < 0.4) return                                   // 40 % stay near the bottom / on the structure
+      depth = u < 0.75 ? D * (0.35 + 0.3 * v) : 1.2 + 2.0 * v // 35 % suspended mid-water, 25 % shallow
+    } else if (sp === 'musky') {
+      depth = 1.5 + u * Math.max(0.5, D - 2.5)               // cruising anywhere from just under the surface down
+    } else {
+      depth = 4 + u * Math.max(0.5, D - 5)                    // chinook suspended across the whole column
+    }
+    depth = Math.min(Math.max(depth, 0.9), D - 0.4)
+    f.home[1] = -depth
+  })
   // dev: ?fishtest — fixed fish at known spots so the sonar marks can be compared with the app's
   // frames (docs/sonar-style.md §7.2). The transducer sits ≈ (+3.0, −0.9, +0.5) from the ?boat point.
   // ?boat=28,11 → apex ≈ (31, −0.9, 11.5): Down view.  ?boat=16,11 → apex ≈ (19, −0.9, 11.5): PLM Forward.

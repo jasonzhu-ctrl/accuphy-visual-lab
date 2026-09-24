@@ -65,6 +65,17 @@
 @keyframes ac-drag { 0% { transform: translateX(-12px); } 50% { transform: translateX(12px); } 100% { transform: translateX(-12px); } }
 .ac-hint .hand { animation: ac-drag 1.6s ease-in-out infinite; }
 
+/* sign-up gate: dimmed, lightly blurred page behind a glass card */
+.ac-gate { background: rgba(3,18,26,0.30); -webkit-backdrop-filter: blur(6px) saturate(115%); backdrop-filter: blur(6px) saturate(115%); }
+.ac-input { height: 44px; padding: 0 14px; border-radius: 12px; font-size: 15px; color: #fff; background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.34); outline: none; transition: background .2s, border-color .2s, box-shadow .2s; }
+.ac-input::placeholder { color: rgba(255,255,255,0.55); }
+.ac-input:focus { background: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.6); box-shadow: 0 0 0 3px rgba(2,140,223,0.45); }
+.ac-input[aria-invalid="true"] { border-color: rgba(255,150,150,0.8); }
+.ac-primary { height: 46px; border-radius: 999px; font-family: 'Instrument Sans', sans-serif; font-weight: 650; font-size: 15px; color: #fff; background: var(--accuphy-blue); box-shadow: 0 10px 24px rgba(2,140,223,0.38), inset 0 1px 0 rgba(255,255,255,0.3); transition: filter .2s, transform .1s; }
+.ac-primary:hover { filter: brightness(1.08); } .ac-primary:active { transform: scale(0.99); } .ac-primary:disabled { opacity: 0.7; }
+/* display-only app controls on the phone inset: dimmed like a disabled iOS control, no hover state */
+.ph-ctl { pointer-events: auto; cursor: default; opacity: 0.42; display: inline-flex; align-items: center; justify-content: center; -webkit-tap-highlight-color: transparent; }
+
 /* --- iPhone frame details --- */
 .ph-band { background: linear-gradient(160deg, #f1f0ec 0%, #d9d8d3 14%, #bfbdb7 30%, #e6e4df 48%, #a8a6a1 66%, #d2d0cb 84%, #bcbab5 100%); }
 .ph-btn { position: absolute; background: linear-gradient(90deg, #cfcdc8, #8e8c87); border-radius: 2px; box-shadow: 0 0 0 1px rgba(0,0,0,0.25); }

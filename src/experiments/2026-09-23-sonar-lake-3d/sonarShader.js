@@ -31,6 +31,7 @@ export const sonarFragment = /* glsl */ `
   uniform vec4 uFan[${MAX_FANS}];
   uniform vec2 uNearFar;
   uniform float uRange;       // display range (metres)
+  uniform float uReach;       // how far the sound reaches in the side views: the range, or (PL Forward) the far corner of the range × depth-range box
   uniform vec4 uBox0;         // panel 0 screen box in metres: x0, y0, w, h (apex at 0,0)
   uniform vec4 uBox1;         // panel 1 box (Combo's Down panel)
   uniform float uSplit;       // 1 = Combo two-panel layout: fan 1 (forward) in panel 0, fan 0 (down) in panel 1
@@ -208,13 +209,13 @@ export const sonarFragment = /* glsl */ `
       float fil2 = vnoise(vec2(aWorld * 900.0 + 7.0, r * 18.0 - t * 0.1));
       float filament = 0.35 + 0.75 * fil + 0.35 * fil2 * fil;
       float floorTex = uStreak > 0.5 ? 0.10 + 0.08 * rays + 0.05 * streak : 0.06 + 0.16 * mottle;
-      floorTex = max(0.0, floorTex - 0.22 * uNoise) * (1.0 - 0.35 * r / uRange);
+      floorTex = max(0.0, floorTex - 0.22 * uNoise) * (1.0 - 0.35 * min(r / uRange, 1.0));
       int kFrom = 0, kTo = uFanCount;
       if (uSplit > 0.5) { kFrom = panel == 0 ? 1 : 0; kTo = kFrom + 1; }
       for (int k = 0; k < ${MAX_FANS}; k++) {
         if (k < kFrom || k >= kTo) continue;
         float a = aWorld - uFan[k].x;
-        if (abs(a) > uFan[k].y || r > uRange) continue;
+        if (abs(a) > uFan[k].y || r > uReach) continue;
         inAny = 1.0;
         float u = 0.5 + 0.5 * tan(a) / uFan[k].z;
         float acc = 0.0, peak = 0.0, spk = 0.0;

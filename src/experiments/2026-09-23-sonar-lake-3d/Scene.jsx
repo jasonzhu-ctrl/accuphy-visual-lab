@@ -11,6 +11,7 @@ import { wedgeGeometry } from '../2026-09-23-beam-shapes-3d/wedge'
 import { makeTallTree, makeBushTree, makeStump, makeLog, makeWeedTuft, makeRock, placeAll } from './vegetation'
 import { makeRangerBoat, TRANSDUCER_OFFSET } from './boat'
 import { makeFishGeometry } from './fishGeometry'
+import { makeCargoWreck, makeWreckDebris, WRECK_L } from './wreck'
 import SonarScreen, { SONAR_HIDE_LAYER, LAKEBED_LAYER, FISH_LAYER } from './SonarScreen'
 
 // ---------- lakebed ----------
@@ -120,36 +121,33 @@ function TestPiling({ mat }) {
   return <mesh geometry={geo} material={mat} position={[x, bedY(x, z) + 5.5, z]} />
 }
 
-// A ~20 m steel workboat, fairly complete, listing on the deep slope up-and-right
-// (Jason 2026-09-24: "右上部分再放一艘大一倍的稍微完整一点的沉船").
+// The big wreck: a ~40 m steel cargo ship (twice the old workboat, Jason 2026-09-24), listing on the deep
+// slope up-and-right, pitched to follow the bottom and settled ~1 m into the mud, with debris around it.
 function BigWreck({ mat }) {
-  const geo = useMemo(() => {
-    const L = 20
-    const sh = new THREE.Shape()
-    sh.moveTo(-L / 2, 0); sh.quadraticCurveTo(-L * 0.49, 2.6, -L * 0.3, 2.7); sh.lineTo(L * 0.3, 2.5)
-    sh.quadraticCurveTo(L * 0.47, 1.6, L / 2, 0); sh.quadraticCurveTo(L * 0.47, -1.6, L * 0.3, -2.5); sh.lineTo(-L * 0.3, -2.7)
-    sh.quadraticCurveTo(-L * 0.49, -2.6, -L / 2, 0)
-    const hull = new THREE.ExtrudeGeometry(sh, { depth: 3.2, bevelEnabled: true, bevelSize: 0.25, bevelThickness: 0.25, bevelSegments: 2 }); hull.rotateX(-Math.PI / 2)
-    const parts = [hull]
-    const bulwark = (z) => { const b = new THREE.BoxGeometry(L * 0.9, 0.7, 0.15); b.translate(0, 3.5, z); parts.push(b) }
-    bulwark(2.35); bulwark(-2.35)
-    const house = new THREE.BoxGeometry(6, 2.4, 4.4); house.translate(-2.5, 4.4, 0); parts.push(house)
-    const bridge = new THREE.BoxGeometry(4, 2.0, 3.6); bridge.translate(-2.2, 6.6, 0); parts.push(bridge)
-    for (let i = 0; i < 4; i++) { const w = new THREE.BoxGeometry(0.7, 0.8, 3.7); w.translate(-3.6 + i * 0.95, 6.8, 0); parts.push(w) }
-    const stack = new THREE.CylinderGeometry(0.5, 0.6, 3.2, 10); stack.translate(-5.5, 6.2, 0); parts.push(stack)
-    const mast = new THREE.CylinderGeometry(0.08, 0.14, 7, 6); mast.translate(0.6, 9, 0); parts.push(mast)
-    const yard = new THREE.CylinderGeometry(0.06, 0.06, 4, 5); yard.rotateX(Math.PI / 2); yard.translate(0.6, 10.5, 0); parts.push(yard)
-    const hatch = new THREE.BoxGeometry(3.2, 0.5, 2.6); hatch.translate(4.5, 3.4, 0); parts.push(hatch)
-    const winch = new THREE.CylinderGeometry(0.5, 0.5, 1.6, 8); winch.rotateZ(Math.PI / 2); winch.translate(7.2, 3.6, 0); parts.push(winch)
-    for (const z of [2.0, -2.0]) for (let i = 0; i < 6; i++) { const st = new THREE.CylinderGeometry(0.04, 0.04, 1.0, 4); st.translate(-7 + i * 2.6, 3.9, z); parts.push(st) }
-    const g = mergeGeometries(parts)
-    const col = new Float32Array(g.attributes.position.count * 3)
-    for (let i = 0; i < col.length; i += 3) { const k = 0.85 + Math.random() * 0.3; col[i] = 0.3 * k; col[i + 1] = 0.27 * k; col[i + 2] = 0.24 * k }
-    g.setAttribute('color', new THREE.BufferAttribute(col, 3))
-    return g
+  const { geo, debris } = useMemo(() => {
+    const geo = makeCargoWreck()
+    const d = makeWreckDebris()
+    return { geo, debris: d.items }
   }, [])
-  const x = 44, z = -30
-  return <mesh geometry={geo} material={mat} position={[x, bedY(x, z) + 0.2, z]} rotation={[0.5, -0.9, -0.08]} />
+  const x = 44, z = -30, yaw = -0.9
+  // follow the slope: bottom height under the bow and the stern
+  const ax = Math.cos(yaw), az = -Math.sin(yaw)
+  const yBow = bedY(x + ax * WRECK_L * 0.45, z + az * WRECK_L * 0.45), yStern = bedY(x - ax * WRECK_L * 0.45, z - az * WRECK_L * 0.45)
+  const pitch = Math.atan2(yBow - yStern, WRECK_L * 0.9)
+  const y = (yBow + yStern) / 2 - 1.1
+  return (
+    <group>
+      <group position={[x, y, z]} rotation-y={yaw}>
+        <group rotation-z={pitch}>
+          <mesh geometry={geo} material={mat} rotation-x={0.3} />
+        </group>
+      </group>
+      {debris.map((it, i) => {
+        const dx = x + it.dx, dz = z + it.dz
+        return <mesh key={i} geometry={it.g} material={mat} position={[dx, bedY(dx, dz) + it.lift, dz]} />
+      })}
+    </group>
+  )
 }
 
 // ---------- fish ----------
@@ -284,6 +282,7 @@ function Beams({ state }) {
     const g = wedgeGeometry(spec)
     return { g, e: new THREE.EdgesGeometry(g, 25) }
   }), [specs])
+  useEffect(() => () => meshes.forEach((m) => { m.g.dispose(); m.e.dispose() }), [meshes]) // AUTO depth rebuilds the PL Forward curtain
   useFrame(() => { group.current.position.copy(state.current.apex) })
   return (
     <group ref={group} onUpdate={(g) => g.traverse((o) => o.layers.set(SONAR_HIDE_LAYER))}>
@@ -325,6 +324,12 @@ function Rig({ state }) {
         return
       }
     }
+    if (s.wreckCam) { // dev aid ?cam=wreck — inspect the big wreck
+      const a = performance.now() / 9000
+      camera.position.set(44 + Math.cos(a) * 42, -4, -30 + Math.sin(a) * 42)
+      camera.lookAt(44, -30, -30)
+      return
+    }
     if (s.closeCam) { // dev aid ?cam=boat — inspect the boat / fish up close
       camera.position.set(s.boat.x - 6 + px, 3.5 + py * 0.5, s.boat.z + 9)
       camera.lookAt(s.boat.x + 1, -0.6, s.boat.z)
@@ -353,7 +358,8 @@ function PickPlane({ state }) {
   )
 }
 
-export default function LakeScene({ state, sonarRect }) {
+// paused: the sign-up gate is open — stop the render loop so the lake and the sonar picture freeze
+export default function LakeScene({ state, sonarRect, paused = false }) {
   const mats = useMemo(() => {
     const fish = makeLakeMaterial({ fish: true })
     fish.userData.uniforms.uHighlight.value.set('#ffe9a0') // fish light up warm, like a sonar return
@@ -363,7 +369,7 @@ export default function LakeScene({ state, sonarRect }) {
   }, [])
   const beamMats = useMemo(() => [mats.bed, mats.inst, mats.fish], [mats])
   return (
-    <Canvas dpr={[1, 1.5]} camera={{ fov: 38, near: 0.5, far: 400, position: [-38, 34, 54] }} gl={{ antialias: true, powerPreference: 'high-performance' }}>
+    <Canvas frameloop={paused ? 'never' : 'always'} dpr={[1, 1.5]} camera={{ fov: 38, near: 0.5, far: 400, position: [-38, 34, 54] }} gl={{ antialias: true, powerPreference: 'high-performance' }}>
       <color attach="background" args={['#9cc1cf']} />
       <fog attach="fog" args={['#9cc1cf', 160, 420]} />
       <hemisphereLight args={['#dbe9f0', '#2a3a2a', 0.9]} />

@@ -1,7 +1,8 @@
 // The real app's screen chrome, drawn over the GL picture inside the phone display
 // (measured on the tablet 2026-09-24 — docs/app-chrome.md). All sizes are in
 // container-query units of the display, so it scales with the phone frame.
-// Decorative: the buttons do not work (the panel on the left is the control).
+// The app's buttons are display-only here: dimmed like a disabled iOS control (values stay bright) and a tap
+// opens the sign-up gate (onLocked) — Jason 2026-09-24. The depth axis runs on AUTO.
 import { FT } from '../2026-09-23-sonar-beam/devices'
 
 const num = 'font-brand-body tabular-nums'
@@ -18,7 +19,16 @@ function ticks(from, to, step) {
   return out
 }
 
-export default function SonarChrome({ layout, deviceId, mode, rangeFt, depthFt, imperial, gain, depthRef }) {
+// a display-only app control: dimmed like a disabled iOS control, no hover state, a tap opens the sign-up gate.
+// Module-level so a re-render between pointer-down and click never swaps the element under the finger.
+function LockedCtl({ onLocked, children, style }) {
+  return (
+    <span className="ph-ctl" role="button" aria-disabled="true" tabIndex={-1} title="App control — shown for reference"
+      onPointerDown={(e) => e.stopPropagation()} onClick={(e) => { e.stopPropagation(); onLocked?.() }} style={style}>{children}</span>
+  )
+}
+
+export default function SonarChrome({ layout, deviceId, mode, rangeFt, depthFt, imperial, gain, depthRef, onLocked, autoDepth = true }) {
   const unit = imperial ? FT : 1 // metres per display unit
   const box = layout.box0
   const rangeLabel = imperial ? `${Math.round(rangeFt)}ft` : `${Math.round(rangeFt * FT)}m`
@@ -64,27 +74,30 @@ export default function SonarChrome({ layout, deviceId, mode, rangeFt, depthFt, 
       {/* depth-range control on the right edge (PL Forward only) */}
       {showDepthRange && (
         <div style={{ position: 'absolute', right: '5.5%', top: '50%', transform: 'translateY(-50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2cqh' }}>
-          <Ring>−</Ring>
-          <span className={num} style={{ fontSize: '4.6cqh', fontWeight: 500 }}>{depthLabel}</span>
-          <Ring>+</Ring>
+          <LockedCtl onLocked={onLocked}><Ring>−</Ring></LockedCtl>
+          <span style={{ textAlign: 'center', lineHeight: 1.05 }}>
+            {autoDepth && <span className={num} style={{ display: 'block', fontSize: '2.6cqh', fontWeight: 700, letterSpacing: '0.12em', color: '#7fcfff' }}>AUTO</span>}
+            <span className={num} style={{ fontSize: '4.6cqh', fontWeight: 500 }}>{depthLabel}</span>
+          </span>
+          <LockedCtl onLocked={onLocked}><Ring>+</Ring></LockedCtl>
         </div>
       )}
 
       {/* bottom bar: back · range −/+ · pause · gain −/+ · ⋯ */}
       <div style={{ position: 'absolute', left: 0, right: 0, bottom: '2.5cqh', height: '9cqh' }}>
-        <span style={{ position: 'absolute', left: '2.5%', top: '50%', transform: 'translateY(-50%)', fontSize: '7cqh', lineHeight: 1 }}>↶</span>
+        <LockedCtl onLocked={onLocked} style={{ position: 'absolute', left: '2.5%', top: '50%', transform: 'translateY(-50%)', fontSize: '7cqh', lineHeight: 1 }}>↶</LockedCtl>
         {!split && (
           <div style={{ position: 'absolute', left: '19%', top: '50%', transform: 'translate(-50%, -50%)', display: 'flex', alignItems: 'center', gap: '2.2cqh' }}>
-            <Ring>−</Ring><span className={num} style={{ fontSize: '4.8cqh', fontWeight: 500 }}>{rangeLabel}</span><Ring>+</Ring>
+            <LockedCtl onLocked={onLocked}><Ring>−</Ring></LockedCtl><span className={num} style={{ fontSize: '4.8cqh', fontWeight: 500 }}>{rangeLabel}</span><LockedCtl onLocked={onLocked}><Ring>+</Ring></LockedCtl>
           </div>
         )}
-        <span style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}><Ring style={{ width: '9cqh', height: '9cqh', gap: '0.9cqh' }}><i style={{ display: 'block', width: '0.9cqh', height: '3.6cqh', background: '#fff', borderRadius: '0.3cqh' }} /><i style={{ display: 'block', width: '0.9cqh', height: '3.6cqh', background: '#fff', borderRadius: '0.3cqh' }} /></Ring></span>
+        <LockedCtl onLocked={onLocked} style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}><Ring style={{ width: '9cqh', height: '9cqh', gap: '0.9cqh' }}><i style={{ display: 'block', width: '0.9cqh', height: '3.6cqh', background: '#fff', borderRadius: '0.3cqh' }} /><i style={{ display: 'block', width: '0.9cqh', height: '3.6cqh', background: '#fff', borderRadius: '0.3cqh' }} /></Ring></LockedCtl>
         {!split && (
           <div style={{ position: 'absolute', left: '75%', top: '50%', transform: 'translate(-50%, -50%)', display: 'flex', alignItems: 'center', gap: '2.2cqh' }}>
-            <Ring>−</Ring><span className={num} style={{ fontSize: '4.8cqh', fontWeight: 500 }}>{Math.round(gain * 100)}%</span><Ring>+</Ring>
+            <LockedCtl onLocked={onLocked}><Ring>−</Ring></LockedCtl><span className={num} style={{ fontSize: '4.8cqh', fontWeight: 500 }}>{Math.round(gain * 100)}%</span><LockedCtl onLocked={onLocked}><Ring>+</Ring></LockedCtl>
           </div>
         )}
-        <span style={{ position: 'absolute', right: '2.5%', top: '50%', transform: 'translateY(-50%)', fontSize: '7cqh', lineHeight: 0.6, letterSpacing: '-0.05em' }}>•••</span>
+        <LockedCtl onLocked={onLocked} style={{ position: 'absolute', right: '2.5%', top: '50%', transform: 'translateY(-50%)', fontSize: '7cqh', lineHeight: 0.6, letterSpacing: '-0.05em' }}>•••</LockedCtl>
       </div>
     </div>
   )

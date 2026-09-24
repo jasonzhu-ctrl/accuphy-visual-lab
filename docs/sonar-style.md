@@ -277,6 +277,15 @@ dashes (their tangential length is metres, so they look longer at short range).
 Neither control follows the other: 6 m range with 12 m depth is allowed and
 looks 2× stretched horizontally.
 
+**The sound covers the whole picture box, not just the range.** The app draws
+echoes below and beyond the range: 8 m range with 12 m depth range shows the
+bottom at 10.5 m across the full width (slant ≈ 13.6 m), and 18 m / 16 m fills
+the lower-right corner (slant ≈ 21 m). PL Down at 12 m also fills its lower
+corners. Engine (PL Forward, decision #38): the cutoff is the box's far corner
+`hypot(range, depth range)` (`uReach`), and the page runs the depth range on
+**AUTO**: the deepest bottom inside the picture lands at ~80 % of the height,
+in the app's steps, deeper at once and shallower only after 1.5 s.
+
 Engine: `screenLayout` takes range and depth range separately for PL Forward;
 the near-field rays and every mark are sized in metres, never in fractions of
 the range. Defaults after Reset: range 14 m · depth 12 m (PL Forward), i.e.

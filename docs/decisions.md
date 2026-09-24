@@ -416,3 +416,41 @@ Numbered log. Newest at the bottom.
     Styles in `src/index.css` (`.ac-panel`, `.ac-card`, `.ac-seg`, `.ac-btn`,
     `.ac-range`, `.ac-hint`, `.ac-back`, `.glass`). Note: that CSS is unlayered,
     so it must not set `position` (it would beat Tailwind's absolute/fixed).
+
+38. **2026-09-24** — **AUTO depth, display-only app buttons with a sign-up
+    gate, a 40 m wreck, fish spread through the water column** (Jason: 实际app
+    里是有auto depth功能的 … 到深水了底部还能看得见; 小窗里的功能应该不能点击 …
+    弹出 sign up form … 不sign up不能关掉 … 画面卡住不动; 大的沉船再大一倍;
+    鲈鱼 musky 三文鱼水层分散一点).
+    - **AUTO depth (PL Forward):** the depth axis follows the deepest bottom
+      inside the picture and puts it at ~80 % of the screen height, in the
+      app's depth-range steps (ft: 20…240; m: 6…70). It deepens at once and
+      shrinks only after 1.5 s, so it does not pump over uneven bottom. The
+      depth control on the phone shows a small blue **AUTO** over the value.
+      The dev Depth slider (`?dev`) turns AUTO off; its `auto` pill turns it
+      back on.
+    - **The sound reaches the whole picture box** (measured on the app: an 8 m
+      range shows the bottom at 10.5 m; 18 m range / 16 m depth fills the
+      lower-right corner). The PL Forward cutoff is now the box's far corner
+      (hypot(range, depth range)) instead of the range. The 3D curtain and the
+      lit lakebed use the same box, so the curtain is a slab reaching ahead and
+      down to the bottom (like Accuphy's own Forward animation) and touches
+      exactly what the phone shows. Down / PLM keep the range as their cutoff
+      for now (backlog).
+    - **App buttons on the phone are display-only:** 42 % opacity, no hover,
+      default cursor (the iOS "disabled" treatment); values stay bright. A tap
+      opens a frosted-glass sign-up card that cannot be dismissed (no close
+      button, Escape and outside clicks do nothing, page `inert`) while the
+      render loop is stopped (`frameloop="never"`). After sign-up the browser
+      remembers it; later taps show a short hint instead. Klaviyo is wired but
+      off until the public key + list ID are filled in; plan, copy and the
+      CASL/GDPR note in `docs/signup-klaviyo-plan.md`.
+    - **Big wreck:** a 40 m cargo ship (`wreck.js`) replaces the old big hull:
+      three holds (one hatch shut, one open, one knocked off), forecastle and
+      poop deck, bulwarks with a torn stretch, railings, a three-level stern
+      house with bridge wings and funnel, masts with derricks, crane, winches,
+      windlass and anchor, davits and lifeboats, rudder and propeller, exposed
+      ribs, and 16 pieces of debris around it. It lies in ~36 m of water, so
+      Down View needs ≥ 130 ft range to show the hull.
+    - **Fish depths:** bass 2–17 m (40 % stay near the bottom, the rest
+      suspend mid-water or shallow), musky 5–13 m, salmon 4–33 m.

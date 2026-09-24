@@ -7,16 +7,37 @@ import * as THREE from 'three'
 //   point(a, s) = R·(cos a·c + sin a·h) + s·R·cos a·tan(theta)·n
 // so on a flat bottom the footprint's long sides are straight, and the far
 // boundary is the arc of radius R in the fan plane.
-export function wedgeGeometry({ a0, a1, s0, s1, R, frame, theta, na = 48, ns = 6 }) {
+// Optional `box` {xMin, xMax, yMax} (metres from the apex: world x forward, y = depth below it) clips the
+// fan to the phone's screen box — PL Forward, where the picture is range-ahead × depth-range-down and the
+// sound reaches the whole box (sonar-style.md §6.9); the curtain then shows exactly what the phone shows.
+export function wedgeGeometry({ a0, a1, s0, s1, R, frame, theta, box, na = 48, ns = 6 }) {
   const { c, h, n } = frame
   const pos = []
   const push = (v) => pos.push(v.x, v.y, v.z)
+  const rad = (a) => {
+    if (!box) return R
+    const fx = c.x * Math.cos(a) + h.x * Math.sin(a), fy = c.y * Math.cos(a) + h.y * Math.sin(a) // forward, up
+    let r = R
+    if (fx > 1e-6) r = Math.min(r, box.xMax / fx)
+    if (fx < -1e-6) r = Math.min(r, box.xMin / fx)
+    if (fy < -1e-6) r = Math.min(r, box.yMax / -fy)
+    return r
+  }
   const P = (a, s) => {
-    const v = new THREE.Vector3().addScaledVector(c, R * Math.cos(a)).addScaledVector(h, R * Math.sin(a))
-    return v.addScaledVector(n, s * R * Math.cos(a) * Math.tan(theta))
+    const r = rad(a)
+    const v = new THREE.Vector3().addScaledVector(c, r * Math.cos(a)).addScaledVector(h, r * Math.sin(a))
+    return v.addScaledVector(n, s * r * Math.cos(a) * Math.tan(theta))
   }
   const apex = new THREE.Vector3()
-  const A = (i) => a0 + ((a1 - a0) * i) / na
+  // angle samples: uniform, plus the exact directions of the box corners so the clipped outline stays crisp
+  const angs = Array.from({ length: na + 1 }, (_, i) => a0 + ((a1 - a0) * i) / na)
+  if (box) {
+    const t = Math.atan2(c.x, -c.y) // tilt of the fan centre from straight down (vertical frames)
+    for (const X of [box.xMin, box.xMax]) { const a = Math.atan2(X, box.yMax) - t; if (a > a0 && a < a1) angs.push(a) }
+    angs.sort((p, q) => p - q)
+  }
+  na = angs.length - 1
+  const A = (i) => angs[i]
   const S = (j) => s0 + ((s1 - s0) * j) / ns
   for (let i = 0; i < na; i++) for (let j = 0; j < ns; j++) {
     const p00 = P(A(i), S(j)), p10 = P(A(i + 1), S(j)), p01 = P(A(i), S(j + 1)), p11 = P(A(i + 1), S(j + 1))
