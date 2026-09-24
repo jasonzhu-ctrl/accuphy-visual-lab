@@ -194,7 +194,8 @@ export const sonarFragment = /* glsl */ `
       fishHit *= mix(1.0, smoothstep(0.15, 0.75, lump) * 1.15, rim);      // bites only at the rim; the core stays solid
       // beam filaments: at close range the beam footprint is smaller than a pixel, so the app's near blobs
       // are solid with a ragged rim; the comb only shows from mid range out (Jason: 近处的团要实)
-      fishHit *= mix(1.0, 0.6 + 0.6 * filament, smoothstep(3.0, 10.0, r));
+      // only BIG marks (high halo coverage) show the beam comb; small bait dashes are solid oblongs in the app
+      fishHit *= mix(1.0, 0.6 + 0.6 * filament, smoothstep(3.0, 10.0, r) * smoothstep(0.4, 0.9, haloSum / hSum));
       float atten = 1.0 - 0.4 * clamp(r / uRange, 0.0, 1.0);
       float gain = 1.0;
       float fishEcho = fishHit * (1.0 + 0.12 * streak);   // fish rims are smooth gradients in the app, not speckle
