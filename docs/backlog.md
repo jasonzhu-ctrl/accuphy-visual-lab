@@ -4,7 +4,7 @@ Jason 2026-09-24: "别把之前说过的任务丢了" — every promised task li
 it is done. ✅ done · 🔧 in progress · ⬜ open.
 
 ## Sonar screen (Phase 4)
-- ⬜ Fish echoes should look like the app: arcs / bright blobs, not dots
+- 🔧 Fish echoes as compact bright blobs (fish mask from the sonar pass) — tune against the recordings / LiveScope clips (Jason: fish are the most important thing)
 - ⬜ Surface clutter streak near the apex (see `docs/sonar-style.md`)
 - ⬜ Combo (PLM) as two panels like the app
 - ✅ Forward View screen: apex ~20 % from the left, like the recordings
@@ -14,13 +14,23 @@ it is done. ✅ done · 🔧 in progress · ⬜ open.
 
 ## 3D lake (Phase 3 polish)
 - ⬜ Tree bark / timber texture quality (currently flat vertex colour + speckle)
-- ⬜ Boat hull / deck material quality (metal flake, carpet), outboard decals
+- 🔧 Boat restyled to Ranger Z521R proportions (charcoal metal flake, red waterline stripe, rub rail, wraparound windshield, Power-Poles, jack plate) — next: metal-flake sparkle, decals
 - ✅ Beam footprint rim on the bottom
 - ✅ Wreck +30 % (≈10 m) with cabin/windows/mast after the app imaging
 - ✅ PL Panoramic clips studied (`sonar-style.md` §3b); screen now opens upward from a bottom apex
 - ⬜ Panoramic screen: bottom texture fill, radial streaks, elongated fish streaks
 - ⬜ Water: wake / ripple from the dragged boat (fluid trick from `docs/research.md`)
-- ⬜ Fish glow inside the beam: tune so "fish enters beam → lights up" is obvious
+- ✅ Fish rim glow inside the beam (bright edge)
+
+## Content
+- ✅ Second, ~20 m, more complete wreck on the deep slope up-and-right
+- ✅ Salmon / lake trout also up-and-right in the deep water
+- ⬜ New APK for the emulator study — Jason said it is "here" but no file/link received yet (2026-09-24)
+
+## Brand / UI
+- ✅ Control panel in Accuphy brand (white wordmark, Instrument Sans, Eurostile Heavy headline, brand blue #0d8fdb)
+- ✅ Sonar screen inside an iPhone Pro Max frame (landscape, natural-titanium ring, dynamic island); the GL picture is drawn into the DOM display hole
+- ⬜ The sonar picture's own chrome (scales, numbers) — untouched until the app playback study
 
 ## Experience (the three-step guide)
 - ⬜ Step 1 "this is the beam" / Step 2 "this is the screen" / Step 3 "which mode when"

@@ -9,7 +9,7 @@ import { MAX_FANS, sonarVertex, sonarFragment } from './sonarShader'
 export const SONAR_HIDE_LAYER = 1
 const STRIP_W = 1024, STRIP_H = 32
 
-export default function SonarScreen({ state, rect }) {
+export default function SonarScreen({ state, rect, lakeMats }) {
   const { gl, scene, camera, size } = useThree()
   const res = useMemo(() => {
     const targets = [0, 1].map(() => {
@@ -23,6 +23,7 @@ export default function SonarScreen({ state, rect }) {
       vertexShader: sonarVertex, fragmentShader: sonarFragment, depthTest: false, depthWrite: false,
       uniforms: {
         uDepth0: { value: targets[0].depthTexture }, uDepth1: { value: targets[1].depthTexture },
+        uColor0: { value: targets[0].texture }, uColor1: { value: targets[1].texture },
         uFanCount: { value: 0 }, uFan: { value: [new THREE.Vector4(), new THREE.Vector4()] },
         uNearFar: { value: new THREE.Vector2(0.3, 150) }, uRange: { value: 20 },
         uScreenMin: { value: new THREE.Vector2(-20, 0) }, uScreenSize: { value: new THREE.Vector2(40, 30) }, uTime: { value: 0 }, uUnitM: { value: 0.3048 }, uFlat: { value: 0 }, uDebug: { value: window.location.search.includes('sonardebug') ? 1 : 0 },
@@ -51,7 +52,8 @@ export default function SonarScreen({ state, rect }) {
     const flat = specs[0] && specs[0].frame.n.y !== 0 // panoramic: thickness normal is vertical
     u.uFlat.value = flat ? 1 : 0
 
-    // 1) depth strips from the transducer
+    // 1) depth strips from the transducer (materials flag the pass so alpha = fish mask)
+    lakeMats.forEach((m) => { m.userData.uniforms.uSonarPass.value = 1 })
     specs.forEach((sp, k) => {
       const cam = res.cams[k]
       const half = (sp.a1 - sp.a0) / 2, thickHalf = Math.abs(sp.s1 - sp.s0) === 2 ? sp.theta : sp.theta / 2
@@ -74,6 +76,7 @@ export default function SonarScreen({ state, rect }) {
       u.uFan.value[k].set(centreAngle, half, tanH, tanV)
     })
     gl.setRenderTarget(null)
+    lakeMats.forEach((m) => { m.userData.uniforms.uSonarPass.value = 0 })
     if (s.debugEl) s.debugEl.textContent = `sonar fans ${specs.length} flat ${flat ? 1 : 0} fan0 ${u.uFan.value[0].toArray().map((v) => v.toFixed(2)).join(',')} apex ${s.apex.toArray().map((v) => v.toFixed(1)).join(',')}`
 
     // 2) main view
@@ -81,9 +84,13 @@ export default function SonarScreen({ state, rect }) {
     gl.render(scene, camera)
 
     // 3) sonar screen overlay in the bottom-right corner
-    const r = rect.current
-    const w = Math.round(size.width * r.w), h = Math.round(w * r.aspect)
-    const x = Math.round(size.width - w - r.margin), y = Math.round(r.margin)
+    // the screen area is a DOM element (the phone's display); map it to GL pixels
+    const el = rect.current.el
+    if (!el) return
+    const cr = gl.domElement.getBoundingClientRect(), er = el.getBoundingClientRect()
+    const w = Math.round(er.width), h = Math.round(er.height)
+    const x = Math.round(er.left - cr.left), y = Math.round(cr.bottom - er.bottom)
+    if (w < 8 || h < 8) return
     const R = s.rangeM
     // fit the fans like the app does: apex at the top, forward wedges start at the left
     let xmin = 0, xmax = 0, ymax = 0

@@ -180,3 +180,16 @@ Numbered log. Newest at the bottom.
     gain look. Dev aids: `?debug` (live sonar numbers), `?sonardebug` (raw
     depth strip). React StrictMode removed from `main.jsx` — its dev double
     mount created duplicate render targets / frame loops.
+
+20. **2026-09-24** — Jason's 8-point review applied: second ~20 m wreck on
+    the deep slope; fish echoes on the sonar screen rebuilt as **compact bright
+    blobs** using a fish mask (materials write alpha = fish during the sonar
+    pass; the screen shader takes max over rows, no smear, slight angular
+    widening) — Jason: *fish are the most important element*; sonar bottom
+    bands smoothed with 16 jittered rows and range-dependent pulse width;
+    salmon/lake trout also up-and-right; fish get a **rim glow** when inside
+    the beam; boat restyled to **Ranger Z521R** (21'9" × 96") with Mercury
+    250 Pro XS; UI in **Accuphy brand** (fonts + white wordmark from
+    `WORK/ACCUPHY/branding`, copied to `public/brand/`); the sonar screen now
+    sits inside an **iPhone Pro Max** landscape frame. The sonar picture's own
+    chrome is left for the app-playback study.

@@ -20,6 +20,7 @@ export function makeLakeMaterial({ fish = false } = {}) {
     uAng: { value: [new THREE.Vector4(), new THREE.Vector4()] }, // a0, a1, s0, s1
     uRT: { value: [new THREE.Vector2(), new THREE.Vector2()] },  // R, tan(theta)
     uReveal: { value: 1.0 },
+    uSonarPass: { value: 0.0 }, // 1 while rendering the sonar depth strips: alpha = fish mask
     uHighlight: { value: new THREE.Color('#7fe6ff') },
   }
   const mat = new THREE.ShaderMaterial({
@@ -61,7 +62,7 @@ export function makeLakeMaterial({ fish = false } = {}) {
       uniform int uBeamCount;
       uniform vec3 uApex[${MAX_BEAMS}]; uniform vec3 uC[${MAX_BEAMS}]; uniform vec3 uH[${MAX_BEAMS}]; uniform vec3 uN[${MAX_BEAMS}];
       uniform vec4 uAng[${MAX_BEAMS}]; uniform vec2 uRT[${MAX_BEAMS}];
-      uniform float uReveal; uniform vec3 uHighlight;
+      uniform float uReveal; uniform vec3 uHighlight; uniform float uSonarPass;
       #ifdef FISH
         varying float vPattern; varying vec3 vBelly; varying vec3 vSide; varying vec3 vLocal;
         float hash3(vec3 p) { return fract(sin(dot(p, vec3(127.1, 311.7, 74.7))) * 43758.5453); }
@@ -138,7 +139,16 @@ export function makeLakeMaterial({ fish = false } = {}) {
         float fog = 1.0 - exp(-dist * uFogDensity);
         fog *= 1.0 - 0.7 * beam; // the beam also cuts through the murk
         vec3 col = mix(lit, uFogColor, clamp(fog, 0.0, 0.92));
-        gl_FragColor = vec4(col, 1.0);
+        float isFish = 0.0;
+      #ifdef FISH
+        isFish = 1.0;
+        // rim light on fish caught in the beam — a bright edge, like a spotlight from behind
+        vec3 V = normalize(cameraPosition - vWorld);
+        float rim = pow(1.0 - max(dot(n, V), 0.0), 2.2);
+        col += uHighlight * rim * beam * 1.6 + vec3(1.0, 0.98, 0.9) * pow(rim, 6.0) * beam * 1.2;
+      #endif
+        // sonar pass: alpha carries "is this a fish" so the screen can draw fish brighter
+        gl_FragColor = vec4(col, uSonarPass > 0.5 ? isFish : 1.0);
       }
     `,
   })

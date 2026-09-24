@@ -57,10 +57,11 @@ export function makePopulation(bedY) {
   // deep water (>25 m): lake trout tight to the bottom, chinook suspended
   // lake trout: low in the deep water, tight to the bottom (Jason 2026-09-24)
   add('laketrout', 4, -48, 1.2, 5, 16)
+  add('laketrout', 46, -36, 1.2, 4, 16) // up-and-right deep slope too (Jason 2026-09-24)
   // chinook: 10 in the deep water at mixed depths — 3 a little closer/shallower
   // to the drop-off, the rest spread naturally over the 30–40 m basin
   addOne('salmon', 2, -22, 9.0, 0.82); addOne('salmon', 14, -24, 12.0, 0.9); addOne('salmon', -8, -26, 10.0, 0.76)
-  ;[[10, -36, 18], [22, -40, 24], [-4, -40, 15], [30, -34, 20], [6, -50, 26], [18, -52, 14], [-14, -46, 21]]
+  ;[[10, -36, 18], [22, -40, 24], [-4, -40, 15], [30, -34, 20], [6, -50, 26], [18, -52, 14], [-14, -46, 21], [38, -28, 16], [48, -38, 22], [56, -30, 12], [42, -46, 26]]
     .forEach(([x, z, off]) => addOne('salmon', x, z, off, 0.7 + rnd() * 0.3))
   return fish
 }

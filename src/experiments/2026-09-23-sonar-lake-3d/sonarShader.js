@@ -15,6 +15,7 @@ export const sonarFragment = /* glsl */ `
   precision highp float;
   varying vec2 vUv;
   uniform sampler2D uDepth0; uniform sampler2D uDepth1;
+  uniform sampler2D uColor0; uniform sampler2D uColor1; // .a = fish mask
   uniform int uFanCount;
   // per fan: x = centre angle from straight-down in the SCREEN plane (rad, +right),
   //          y = half wide angle (rad), z = tanH = tan(half wide), w = tanV = tan(half thick)
@@ -67,26 +68,44 @@ export const sonarFragment = /* glsl */ `
       if (abs(a) > uFan[k].y || r > uRange) continue;
       inAny = 1.0;
       float u = 0.5 + 0.5 * tan(a) / uFan[k].z; // depth-strip column for this angle
-      // integrate across the fan thickness (rows of the strip)
-      float acc = 0.0;
-      for (int j = 0; j < 9; j++) {
-        float v = (float(j) + 0.5) / 9.0;
+      // integrate across the fan thickness: many jittered rows so a sloping
+      // bottom becomes one soft band, not a stack of stripes (Jason 2026-09-24)
+      float acc = 0.0, fishHit = 0.0;
+      float jit = hash(floor(p * 13.0) + 0.37);
+      float sigma = 0.35 + 0.012 * r; // bottom pulse widens with range like a real beam
+      float du = 1.5 / 1024.0;         // angular softness for fish: look one column either side
+      for (int j = 0; j < 16; j++) {
+        float v = (float(j) + jit) / 16.0;
         float ty = (v * 2.0 - 1.0) * uFan[k].w;
         float rayLen = length(vec3(tan(a), ty, 1.0));
         float hit = sampleDist(k, vec2(u, v), rayLen);
         float dr = (r - hit);
-        // echo peaks at the hit range, with a short tail behind it (multiple bounces)
-        float pulse = exp(-dr * dr / (0.35 * 0.35));
+        float fish = (k == 0) ? texture2D(uColor0, vec2(u, v)).a : texture2D(uColor1, vec2(u, v)).a;
+        float pulse = exp(-dr * dr / (sigma * sigma));
         float tail = (dr > 0.0) ? 0.35 * exp(-dr / 1.6) : 0.0;
-        acc += (pulse + tail) * (0.6 + 0.8 * (1.0 - abs(v * 2.0 - 1.0))); // centre rows count more
+        float wgt = 0.55 + 0.9 * (1.0 - abs(v * 2.0 - 1.0));
+        acc += (pulse + tail) * wgt * (1.0 - fish);
+        // fish: a compact blob at the hit range — bright core, soft edge, NO smear behind it
+        if (fish > 0.5) {
+          float blob = exp(-dr * dr / (0.55 * 0.55));
+          fishHit = max(fishHit, blob);
+        }
+        // widen the blob slightly across the angle so it reads as a rounded dash, like the app
+        for (int o = -1; o <= 1; o += 2) {
+          vec2 uv2 = vec2(u + float(o) * du, v);
+          float f2 = (k == 0) ? texture2D(uColor0, uv2).a : texture2D(uColor1, uv2).a;
+          if (f2 > 0.5) { float h2 = sampleDist(k, uv2, rayLen); float d2 = r - h2; fishHit = max(fishHit, 0.85 * exp(-d2 * d2 / (0.55 * 0.55))); }
+        }
       }
-      acc /= 5.0;
+      acc /= 9.0;
+      // fish go near-white at the core (ramp top), with a touch of speckle texture
+      float fishEcho = fishHit * (1.15 + 0.25 * hash(floor(p * 9.0) + 1.7));
       // range attenuation + speckle
       float atten = 1.0 - 0.45 * clamp(r / uRange, 0.0, 1.0);
       float sp = 0.75 + 0.5 * hash(floor(p * 7.0) + floor(uTime * 12.0));
       // grazing-angle bottom returns are weak; the app's Panoramic runs at ~70 % gain
       float gain = uFlat > 0.5 ? 2.4 : 1.0;
-      echo = max(echo, acc * atten * sp * gain);
+      echo = max(echo, max(acc * atten * sp * gain, fishEcho * (0.8 + 0.2 * atten)));
     }
     // black water, echoes only — no invented rings/grid (Jason 2026-09-24);
     // the real app chrome is learned later from the app's playback mode

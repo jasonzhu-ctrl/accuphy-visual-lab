@@ -106,6 +106,38 @@ function Wreck({ mat }) {
   return <mesh geometry={geo} material={mat} position={[x, bedY(x, z) - 0.2, z]} rotation={[0.42, 0.6, 0.12]} />
 }
 
+// A ~20 m steel workboat, fairly complete, listing on the deep slope up-and-right
+// (Jason 2026-09-24: "右上部分再放一艘大一倍的稍微完整一点的沉船").
+function BigWreck({ mat }) {
+  const geo = useMemo(() => {
+    const L = 20
+    const sh = new THREE.Shape()
+    sh.moveTo(-L / 2, 0); sh.quadraticCurveTo(-L * 0.49, 2.6, -L * 0.3, 2.7); sh.lineTo(L * 0.3, 2.5)
+    sh.quadraticCurveTo(L * 0.47, 1.6, L / 2, 0); sh.quadraticCurveTo(L * 0.47, -1.6, L * 0.3, -2.5); sh.lineTo(-L * 0.3, -2.7)
+    sh.quadraticCurveTo(-L * 0.49, -2.6, -L / 2, 0)
+    const hull = new THREE.ExtrudeGeometry(sh, { depth: 3.2, bevelEnabled: true, bevelSize: 0.25, bevelThickness: 0.25, bevelSegments: 2 }); hull.rotateX(-Math.PI / 2)
+    const parts = [hull]
+    const bulwark = (z) => { const b = new THREE.BoxGeometry(L * 0.9, 0.7, 0.15); b.translate(0, 3.5, z); parts.push(b) }
+    bulwark(2.35); bulwark(-2.35)
+    const house = new THREE.BoxGeometry(6, 2.4, 4.4); house.translate(-2.5, 4.4, 0); parts.push(house)
+    const bridge = new THREE.BoxGeometry(4, 2.0, 3.6); bridge.translate(-2.2, 6.6, 0); parts.push(bridge)
+    for (let i = 0; i < 4; i++) { const w = new THREE.BoxGeometry(0.7, 0.8, 3.7); w.translate(-3.6 + i * 0.95, 6.8, 0); parts.push(w) }
+    const stack = new THREE.CylinderGeometry(0.5, 0.6, 3.2, 10); stack.translate(-5.5, 6.2, 0); parts.push(stack)
+    const mast = new THREE.CylinderGeometry(0.08, 0.14, 7, 6); mast.translate(0.6, 9, 0); parts.push(mast)
+    const yard = new THREE.CylinderGeometry(0.06, 0.06, 4, 5); yard.rotateX(Math.PI / 2); yard.translate(0.6, 10.5, 0); parts.push(yard)
+    const hatch = new THREE.BoxGeometry(3.2, 0.5, 2.6); hatch.translate(4.5, 3.4, 0); parts.push(hatch)
+    const winch = new THREE.CylinderGeometry(0.5, 0.5, 1.6, 8); winch.rotateZ(Math.PI / 2); winch.translate(7.2, 3.6, 0); parts.push(winch)
+    for (const z of [2.0, -2.0]) for (let i = 0; i < 6; i++) { const st = new THREE.CylinderGeometry(0.04, 0.04, 1.0, 4); st.translate(-7 + i * 2.6, 3.9, z); parts.push(st) }
+    const g = mergeGeometries(parts)
+    const col = new Float32Array(g.attributes.position.count * 3)
+    for (let i = 0; i < col.length; i += 3) { const k = 0.85 + Math.random() * 0.3; col[i] = 0.3 * k; col[i + 1] = 0.27 * k; col[i + 2] = 0.24 * k }
+    g.setAttribute('color', new THREE.BufferAttribute(col, 3))
+    return g
+  }, [])
+  const x = 44, z = -30
+  return <mesh geometry={geo} material={mat} position={[x, bedY(x, z) + 0.2, z]} rotation={[0.5, -0.9, -0.08]} />
+}
+
 // ---------- fish ----------
 // Realistic bodies per type — see fishGeometry.js
 function FishGroup({ mat, body, fish }) {
@@ -307,13 +339,14 @@ export default function LakeScene({ state, sonarRect }) {
       <mesh rotation-x={-Math.PI / 2} position-y={-47} onUpdate={(o) => o.layers.set(SONAR_HIDE_LAYER)}><planeGeometry args={[900, 900]} /><meshBasicMaterial color="#17545f" /></mesh>
       <Structures mat={mats.inst} />
       <Wreck mat={mats.inst} />
+      <BigWreck mat={mats.inst} />
       <Fish mat={mats.fish} state={state} />
       <Water />
       <Boat state={state} beamMats={beamMats} />
       <Beams key={state.current.specKey} state={state} />
       <PickPlane state={state} />
       <Rig state={state} />
-      <SonarScreen state={state} rect={sonarRect} />
+      <SonarScreen state={state} rect={sonarRect} lakeMats={beamMats} />
     </Canvas>
   )
 }
