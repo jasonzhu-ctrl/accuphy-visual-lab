@@ -76,6 +76,8 @@ export function makePopulation(bedY) {
       T('largemouth', 0.5, 28, -5, 11.5, Math.PI / 2),   // Forward: 9 m ahead, head-on
       T('musky', 1.1, 33, -4, 11.5, 0),                  // Forward: 14 m ahead, broadside
     )
+    // bait school around the test piling (app frame: dozens of small dashes crowding the piling)
+    for (let i = 0; i < 40; i++) fish.push({ species: 'smelt', len: 0.16 + rnd() * 0.08, home: [31 + (rnd() - 0.5) * 4, -2.5 - rnd() * 4, 11.5 + (rnd() - 0.5) * 1.2], phase: rnd() * 6.28, radius: 0.3 + rnd() * 0.5, speed: 0.3 + rnd() * 0.3 })
   }
   return fish
 }

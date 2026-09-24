@@ -533,3 +533,17 @@ wider blur. Structure (piling, trunk, wreck face) is drawn **solid and bright**
 again, a touch under the bottom band, with only a light filament modulation —
 Jason: the app's big piling is solid, bright and sharp, and that is the
 better look.
+
+### 7.10 Round 6 — "差的也太远了" (Jason, 2026-09-24)
+Jason's side-by-side of the app's piling frame vs the engine: the engine was
+thin, dim and sparse where the app is thick, hot and dense. Two causes:
+(1) the engine averaged echoes over the 24 thickness rows, so a solid face
+that fills few rows came out grey — the app draws a solid face at full
+brightness no matter how much of the slab it fills → structure now uses its
+own peak term (`spk`, weight 0.9) instead of the row average; (2) the bottom
+band's first-return weight was 0.5 → 0.7 for a hot dense band. A `?fishtest`
+dock piling (0.35 m, bottom to surface, 12 m ahead) with a 40-smelt bait
+school now stands in for the app's reference scene so the comparison is like
+for like. Remaining gaps after this round: the bait school reads much weaker
+than the app's (small fish at true size are near the pixel limit at 18 m
+range), and the app's fill texture is finer-grained than the engine's lumps.

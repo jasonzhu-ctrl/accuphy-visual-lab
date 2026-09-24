@@ -106,6 +106,20 @@ function Wreck({ mat }) {
   return <mesh geometry={geo} material={mat} position={[x, bedY(x, z) - 0.2, z]} rotation={[0.42, 0.6, 0.12]} />
 }
 
+// dev (?fishtest): a dock piling 12 m ahead of the ?boat=16,11 apex — the app's reference frame
+// (PLM Forward, piling + bait school) so structure brightness/sharpness can be compared like for like
+function TestPiling({ mat }) {
+  const geo = useMemo(() => {
+    const g = new THREE.CylinderGeometry(0.16, 0.18, 12, 12)
+    const col = new Float32Array(g.attributes.position.count * 3)
+    for (let i = 0; i < col.length; i += 3) { col[i] = 0.32; col[i + 1] = 0.26; col[i + 2] = 0.18 }
+    g.setAttribute('color', new THREE.BufferAttribute(col, 3))
+    return g
+  }, [])
+  const x = 31, z = 11.5
+  return <mesh geometry={geo} material={mat} position={[x, bedY(x, z) + 5.5, z]} />
+}
+
 // A ~20 m steel workboat, fairly complete, listing on the deep slope up-and-right
 // (Jason 2026-09-24: "右上部分再放一艘大一倍的稍微完整一点的沉船").
 function BigWreck({ mat }) {
@@ -359,6 +373,7 @@ export default function LakeScene({ state, sonarRect }) {
       <Structures mat={mats.inst} />
       <Wreck mat={mats.inst} />
       <BigWreck mat={mats.inst} />
+      {import.meta.env.DEV && /fishtest/.test(window.location.search) && <TestPiling mat={mats.inst} />}
       <Fish mat={mats.fish} state={state} />
       <Water state={state} />
       <Boat state={state} beamMats={beamMats} />

@@ -128,7 +128,7 @@ export const sonarFragment = /* glsl */ `
       if (abs(a) > uFan[k].y || r > uRange) continue;
       inAny = 1.0;
       float u = 0.5 + 0.5 * tan(a) / uFan[k].z;
-      float acc = 0.0, peak = 0.0;              // acc = integrated band, peak = first return (hot leading edge)
+      float acc = 0.0, peak = 0.0, spk = 0.0;   // acc = integrated band, peak = first return (hot leading edge), spk = structure peak
       float jit = hash(gl_FragCoord.xy * 0.37 + 0.11); // per-pixel row jitter: thin branches become grain, not blocks
       float sigma = 0.22 + 0.010 * r;           // bottom pulse: thin leading edge (app band ≈ 0.3 m), widens a little with range
       float tailLen = 0.35 + 0.015 * r;         // short orange tail under the bottom (§7.8)
@@ -149,9 +149,10 @@ export const sonarFragment = /* glsl */ `
         float second = 0.10 * exp(-(r - 2.0 * hit) * (r - 2.0 * hit) / (4.0 * sigma * sigma)); // faint second echo
         float wgt = 0.55 + 0.9 * (1.0 - abs(v * 2.0 - 1.0));
         acc += (1.2 * pulse + tail + second) * wgt * (1.0 - fish);
-        peak = max(peak, pulse * (1.0 - fish) * (1.0 - 0.3 * structure)); // structure tops out yellow-orange, not white (app piling)
+        peak = max(peak, pulse * (1.0 - fish) * (1.0 - structure));
+        spk = max(spk, pulse * structure);          // a solid face is bright whether it fills one row or all 24 (app piling)
       }
-      acc = acc / 21.0 + 0.5 * peak;  // 24 rows now (was 16 → /14) // first return makes the leading edge hot even where the bottom slopes across the beam; the integrated part gives the orange body (balance loop, §6.11)
+      acc = acc / 16.0 + 0.7 * peak + 0.9 * spk;  // bottom: hot dense band; structure: solid bright column (Jason: 实心结构亮的清晰的) // first return makes the leading edge hot even where the bottom slopes across the beam; the integrated part gives the orange body (balance loop, §6.11)
       // fish (sonar-style.md §6.8): the mask already carries the fish's own angular extent
       // (near: body length + heading). Blur it by a CONSTANT beam angle along the arc —
       // so far fish become tangential dashes the width of the beam — and use the average
