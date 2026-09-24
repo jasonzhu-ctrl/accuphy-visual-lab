@@ -186,7 +186,7 @@ export const sonarFragment = /* glsl */ `
       float fishHit = 0.85 * max(smoothstep(0.0, 0.9, fill), 1.15 * fishMax) + 0.22 * halo * (1.0 - fill); // small fish read bright yellow, like the app's bait dashes
       // head-on / narrow fish flicker ping to ping (app: they wink in and out)
       float narrow = 1.0 - smoothstep(0.35, 0.8, fill);
-      fishHit *= mix(1.0, 0.7 + 0.5 * hash(vec2(floor(uTime * 6.0), floor(a * 40.0))), narrow);
+      fishHit *= mix(1.0, 0.7 + 0.5 * vnoise(vec2(a * 10.0, uTime * 5.0)), narrow); // smooth across a blob (a per-angle-bin hash striped small fish)
       // lumpy body (the app's near blobs are uneven: flexing body, ping-to-ping change), never speckle
       // lumpy body: two noise scales, deep enough to cut holes and bites into the silhouette (app: irregular blobs)
       float lump = vnoise(p * 4.0 + vec2(0.0, uTime * 0.12)) * 0.6 + vnoise(p * 11.0 - vec2(uTime * 0.07, 0.0)) * 0.55;
