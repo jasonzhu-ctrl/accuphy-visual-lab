@@ -29,6 +29,9 @@ export const sonarFragment = /* glsl */ `
   uniform float uUnitM;       // grid spacing in metres (1 ft or 1 m based)
   uniform float uFlat;        // 1 = panoramic (top-down), 0 = side view
   uniform float uDebug;       // 1 = show the raw depth strip (dev)
+  uniform sampler2D uLUT;     // 256-entry colour map of the real app (colormaps.js)
+  uniform float uGain;        // 0..1 like the app's gain %, default 0.7
+  uniform float uDynRange;    // 0..1 window width (app: fDynaRange / fMaxDynaRangeDB)
 
   float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
   float linearize(float d) { // three.js perspective depth → view-space distance along -z
@@ -108,7 +111,17 @@ export const sonarFragment = /* glsl */ `
     // the real app chrome is learned later from the app's playback mode
     // surface clutter: a short noisy streak right under the transducer (see sonar-style.md)
     if (uFlat < 0.5 && inAny > 0.5 && r < 2.4) echo = max(echo, (1.0 - r / 2.4) * (0.25 + 0.45 * hash(floor(p * 15.0) + floor(uTime * 10.0))));
-    vec3 col = ramp(echo);
+    // the app's tone curve (assets/aio_shader.glsl): log compression of the raw
+    // return, then a gain / dynamic-range window, then a 256-entry colour LUT
+    float raw = echo * 65535.0;
+    float bs = 4000.0;
+    float v = log(1.0 + raw / bs) / log(1.0 + 65535.0 / bs);      // 0..1 compressed
+    float width = clamp(uDynRange, 0.05, 1.0);
+    float offset = width * (uGain - 0.5);
+    float lo = (1.0 - width) * 0.5 + offset, hi = lo + width;
+    float idx = clamp((v - lo) / (hi - lo), 0.0, 1.0);
+    if (echo <= 0.0005) idx = 0.0;
+    vec3 col = texture2D(uLUT, vec2(idx * (255.0 / 256.0) + 0.5 / 256.0, 0.5)).rgb;
     gl_FragColor = vec4(col, 1.0);
   }
 `

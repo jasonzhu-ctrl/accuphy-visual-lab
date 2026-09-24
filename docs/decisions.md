@@ -221,3 +221,15 @@ Numbered log. Newest at the bottom.
     app study procedure: install APK → copy `.sonar` files to
     `Files/Accuphy Sonar App/Sonar Data` → Playback → per-view ⋯ settings;
     (d) **deployment is local only for now** — no public hosting.
+
+24. **2026-09-24 (overnight)** — Emulator study: SDK + Pixel 6 AVD + APK
+    installed; app launches, Playback found (Setting → Playback, data folder
+    `/Download/Accuphy Sonar/Sonar Data`), but **every sonar view crashes on
+    the macOS emulator** (`#version 320 es` shaders vs. emulator max GLES 3.1).
+    Not worked around by re-signing a patched APK. Needs a `310 es` dev build
+    from the app team or a real Android device over USB. Meanwhile the APK's
+    own assets gave the two things that matter most: **the 11 real colour
+    maps** (`assets/colormap/*.csv` → `colormaps.js`; amber = yellow mode,
+    jet = blue/red, ice = blue) and **the tone curve** (`aio_shader.glsl`: log
+    compression → gain/dynamic-range window → 256-entry LUT). The phone screen
+    now uses both, with a colour-map selector and a gain slider (default 70 %).

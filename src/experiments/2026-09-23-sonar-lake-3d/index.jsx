@@ -5,6 +5,7 @@ import LakeScene from './Scene'
 import { DEVICES, FT, MODE_LABELS } from '../2026-09-23-sonar-beam/devices'
 import { wedgeSpecs } from '../2026-09-23-beam-shapes-3d/wedge'
 import { PHONE_POSE } from './SonarScreen'
+import { COLORMAP_NAMES } from './colormaps'
 
 export const meta = {
   title: 'Sonar lake 3D — Phase 3/4',
@@ -16,6 +17,8 @@ export default function SonarLake3D() {
   const [mode, setMode] = useState('forward')
   const [rangeFt, setRangeFt] = useState(80)
   const [imperial, setImperial] = useState(true)
+  const [colormap, setColormap] = useState('amber')
+  const [gain, setGain] = useState(0.7)
   const [, tick] = useState(0)
   useEffect(() => { const id = requestAnimationFrame(() => tick(1)); return () => cancelAnimationFrame(id) }, [])
 
@@ -41,6 +44,8 @@ export default function SonarLake3D() {
   state.current.specKey = specKey
   state.current.rangeM = rangeFt * FT
   state.current.imperial = imperial
+  state.current.colormap = colormap
+  state.current.gain = gain
   // the sonar picture is drawn by the GL canvas into the phone's screen element
   const sonarRect = useRef({ el: null, frame: null })
 
@@ -86,6 +91,14 @@ export default function SonarLake3D() {
           <input type="range" min={20} max={maxFt} step={5} value={rangeFt} onChange={(e) => setRangeFt(+e.target.value)} className="ac-range w-36" style={{ '--fill': `${((rangeFt - 20) / (maxFt - 20)) * 100}%` }} />
           <button className="ac-value" onClick={() => setImperial((v) => !v)} title="ft / m">{fmt(rangeFt)}</button>
           <span className="text-[10.5px] text-[#8b9199]">max {fmt(maxFt)}</span>
+        </Row>
+        <Row label="Screen">
+          <select value={colormap} onChange={(e) => setColormap(e.target.value)} className="rounded-[3px] border border-white/15 bg-transparent px-2 py-1 text-[11.5px] text-white/85">
+            {COLORMAP_NAMES.map((n) => <option key={n} value={n} className="bg-[#0f1216]">{n}</option>)}
+          </select>
+          <span className="ac-label">gain</span>
+          <input type="range" min={0.3} max={1} step={0.05} value={gain} onChange={(e) => setGain(+e.target.value)} className="ac-range w-20" style={{ '--fill': `${((gain - 0.3) / 0.7) * 100}%` }} />
+          <span className="ac-value text-[13px]">{Math.round(gain * 100)}%</span>
         </Row>
         <div className="hidden text-[11px] leading-snug text-[#8b9199] sm:block">
           {device.name} · {device.beamDeg}° × {device.thickDeg}° beam. Drag the boat — whatever the beam touches lights up.

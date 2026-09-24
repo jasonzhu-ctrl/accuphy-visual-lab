@@ -9,8 +9,8 @@ it is done. ✅ done · 🔧 in progress · ⬜ open.
 - ⬜ Combo (PLM): currently both fans share one apex in one frame (matches the blue/red Combo clip); the split two-panel layout of the yellow-mode clips can come with the app-chrome study
 - ✅ Forward View screen: apex ~20 % from the left, like the recordings
 - ⬜ Range/depth scale numbers and the rest of the app chrome — after the app can be run (see emulator note)
-- ⬜ Adopt the app's tone curve in our sonar shader: log compression + gain/dynamic-range window → 256-entry LUT (from `aio_shader.glsl`)
-- ⬜ More colour modes (blue/red first)
+- ✅ App tone curve adopted (log compression + gain/dynamic-range window → LUT)
+- ✅ All 11 app colour maps available on the phone screen (amber default); gain slider
 
 ## 3D lake (Phase 3 polish)
 - ✅ Bark striations on timber (procedural, in the lake shader)

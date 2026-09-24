@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { MAX_FANS, sonarVertex, sonarFragment } from './sonarShader'
+import { colormapTexture } from './colormaps'
 
 // CSS 3D pose of the phone (index.jsx applies the same transform to the DOM frame)
 export const PHONE_POSE = { perspective: 1400, rotY: -16, rotX: 6 }
@@ -30,6 +31,7 @@ export default function SonarScreen({ state, rect, lakeMats }) {
         uFanCount: { value: 0 }, uFan: { value: [new THREE.Vector4(), new THREE.Vector4()] },
         uNearFar: { value: new THREE.Vector2(0.3, 150) }, uRange: { value: 20 },
         uScreenMin: { value: new THREE.Vector2(-20, 0) }, uScreenSize: { value: new THREE.Vector2(40, 30) }, uTime: { value: 0 }, uUnitM: { value: 0.3048 }, uFlat: { value: 0 }, uDebug: { value: window.location.search.includes('sonardebug') ? 1 : 0 },
+        uLUT: { value: colormapTexture('amber') }, uGain: { value: 0.7 }, uDynRange: { value: 0.85 },
       },
     })
     const overlay = new THREE.Scene()
@@ -58,6 +60,8 @@ export default function SonarScreen({ state, rect, lakeMats }) {
     u.uTime.value += dt
     u.uRange.value = s.rangeM
     u.uUnitM.value = s.imperial ? 0.3048 : 1
+    if (s.colormap !== u.uLUT.name) { u.uLUT.value.dispose?.(); u.uLUT.value = colormapTexture(s.colormap); u.uLUT.name = s.colormap }
+    u.uGain.value = s.gain ?? 0.7
     u.uFanCount.value = specs.length
     const flat = specs[0] && specs[0].frame.n.y !== 0 // panoramic: thickness normal is vertical
     u.uFlat.value = flat ? 1 : 0
