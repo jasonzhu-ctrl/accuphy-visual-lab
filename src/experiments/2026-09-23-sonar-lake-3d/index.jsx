@@ -23,6 +23,8 @@ export default function SonarLake3D() {
   const [imperial, setImperial] = useState(true)
   const [colormap, setColormap] = useState('amber')
   const [gain, setGain] = useState(0.57)
+  const [contrast, setContrast] = useState(0.4)    // demo look (sonar-style.md §6.5): floor mostly gone, a trace of noise stays
+  const [noise, setNoise] = useState(0.2)          // noise reject: the smaller of the two, used last
   const [, tick] = useState(0)
   useEffect(() => { const id = requestAnimationFrame(() => tick(1)); return () => cancelAnimationFrame(id) }, [])
 
@@ -51,6 +53,8 @@ export default function SonarLake3D() {
   state.current.imperial = imperial
   state.current.colormap = colormap
   state.current.gain = gain
+  state.current.contrast = contrast
+  state.current.noise = noise
   state.current.mode = mode
   state.current.deviceId = deviceId
   // the sonar picture is drawn by the GL canvas into the phone's screen element
@@ -106,6 +110,14 @@ export default function SonarLake3D() {
           <span className="ac-label">gain</span>
           <input type="range" min={0.3} max={1} step={0.05} value={gain} onChange={(e) => setGain(+e.target.value)} className="ac-range w-20" style={{ '--fill': `${((gain - 0.3) / 0.7) * 100}%` }} />
           <span className="ac-value text-[13px]">{Math.round(gain * 100)}%</span>
+        </Row>
+        <Row label="Tune">
+          <span className="ac-label">contrast</span>
+          <input type="range" min={0} max={1} step={0.05} value={contrast} onChange={(e) => setContrast(+e.target.value)} className="ac-range w-20" style={{ '--fill': `${contrast * 100}%` }} />
+          <span className="ac-value text-[13px]">{Math.round(contrast * 100)}%</span>
+          <span className="ac-label">noise</span>
+          <input type="range" min={0} max={1} step={0.05} value={noise} onChange={(e) => setNoise(+e.target.value)} className="ac-range w-20" style={{ '--fill': `${noise * 100}%` }} />
+          <span className="ac-value text-[13px]">{Math.round(noise * 100)}%</span>
         </Row>
         <div className="hidden text-[11px] leading-snug text-[#8b9199] sm:block">
           {device.name} · {device.beamDeg}° × {device.thickDeg}° beam. Drag the boat — whatever the beam touches lights up.

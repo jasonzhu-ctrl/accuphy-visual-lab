@@ -272,3 +272,20 @@ Numbered log. Newest at the bottom.
     units (rulers, live depth readout via `depthAt`, temp/voltage, wordmark +
     resolution tag, range/gain/pause/back/⋯, PL-Forward depth-range control).
     Buttons are decorative for now. (d) Dev helper `?bigphone`.
+
+27. **2026-09-24** — **Jason's tuning strategy adopted as the engine's model
+    and defaults** (voice note, written up in `docs/sonar-style.md` §6.5):
+    gain first until targets are bright but not blown out; then **Contrast**
+    up until 70–90 % of the noise is gone (it never shrinks targets); then a
+    little **Noise Reject** for the rest (used too hard it eats target edges,
+    so always the smaller of the two); if contrast starts to over-expose, drop
+    the gain a step; for the website aim for 90–95 % of the noise removed with
+    a trace left for authenticity. Verified on the tablet (PLM Forward
+    recording: factory 20/20 → 28/20 → 40/30, frames in
+    `reference/app-study/plm-forward-tune-*.jpg`) — Contrast 40 + Noise 30
+    leaves a nearly black floor with the fish, cable and piling intact.
+    Engine: the noise floor is now a weak raw echo (so gain/contrast act on it
+    like on targets), Contrast raises the tone window's low end and steepens
+    it, Noise Reject thins the floor speckle only. New Tune row in the panel;
+    defaults gain 57 % / contrast 40 % / noise 20 %. The tablet's view
+    settings were put back to 20/20 afterwards.

@@ -154,3 +154,23 @@ apex position) and let the quad stretch; do not preserve aspect.
   two-panel Down + Forward layout (see `docs/app-chrome.md`).
 - A recording keeps its own range / gain; the depth readout, water temp and
   voltage are live from the file.
+
+### 6.5 Jason's tuning strategy (2026-09-24, voice note) — how a clean demo picture is made
+1. **Gain first** (the ⊖ % ⊕ on the screen; 50–70 % defaults): raise it until
+   the targets are clearly bright, but never over-exposed — think of a camera
+   that is blown out.
+2. **Contrast** (⋯ → ☰): raise it until 70–90 % of the channel noise is gone.
+   Contrast is the main tool: it does **not** shrink targets.
+3. **Noise Reject** last, only for what is left. Used too hard it eats the
+   edges of targets, so it is always the smaller of the two.
+4. **TVG**: higher = a little more noise but crisper distant targets.
+5. If a high contrast starts to look over-exposed (same feeling as too much
+   gain), go back and lower the gain a step.
+6. Target for the marketing piece: **90–95 % of the noise removed** — a clean
+   picture with just a trace of noise left for authenticity. On the water a
+   fisherman keeps more noise; for display, cleaner is better.
+
+Engine mapping: gain = window offset (already), contrast = raise the window's
+low end (cuts the floor before targets), noise reject = suppress isolated
+speckle in the floor texture (never the bottom band or fish). Defaults for the
+website follow step 6, not the app's factory values.

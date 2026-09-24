@@ -42,6 +42,8 @@ export const sonarFragment = /* glsl */ `
   uniform sampler2D uLUT;     // 256-entry colour map of the real app (colormaps.js)
   uniform float uGain;        // 0..1 like the app's gain %, default 0.57
   uniform float uDynRange;    // 0..1 window width (app: fDynaRange / fMaxDynaRangeDB)
+  uniform float uContrast;    // 0..1 like the app's Contrast: raises the window's low end (cuts the floor), steepens it
+  uniform float uNoise;       // 0..1 like the app's Noise Reject: thins the floor speckle, never the targets
 
   float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
   float vnoise(vec2 q) { vec2 i = floor(q), f = fract(q); f = f * f * (3.0 - 2.0 * f);
@@ -107,7 +109,10 @@ export const sonarFragment = /* glsl */ `
     float rays = vnoise(vec2(aWorld * 22.0 + 3.1, 0.5));          // beam-to-beam gain variation
     float grain = hash(floor(vec2(aWorld * 600.0, r * 6.0)) + t);
     float tex = uStreak > 0.5 ? 0.45 + 0.75 * streak + 0.25 * grain : 0.35 + 0.9 * mottle + 0.2 * grain;
+    // noise floor as a weak raw echo, so gain / contrast act on it exactly like on targets;
+    // Noise Reject thins it out (isolated speckle goes first)
     float floorTex = uStreak > 0.5 ? 0.10 + 0.08 * rays + 0.05 * streak : 0.06 + 0.16 * mottle;
+    floorTex = max(0.0, floorTex - 0.22 * uNoise) * (1.0 - 0.35 * r / uRange);
     int kFrom = 0, kTo = uFanCount;
     if (uSplit > 0.5) { kFrom = panel == 0 ? 1 : 0; kTo = kFrom + 1; }
     for (int k = 0; k < ${MAX_FANS}; k++) {
@@ -151,6 +156,7 @@ export const sonarFragment = /* glsl */ `
     // clutter near the transducer: bright rays fanning out from the apex
     float near = 1.0 - smoothstep(0.0, 0.18 * uRange, r);
     echo = max(echo, inAny * near * near * (0.25 + 0.6 * rays) * tex * 0.5);
+    echo = max(echo, inAny * floorTex * 0.7); // ≈ LUT index 0.15–0.25 at gain 57 %, contrast 0 (the app's factory look)
 
     if (uDebug > 0.5) { float d = texture2D(uDepth0, vUv).r; gl_FragColor = vec4(vec3(d >= 0.9999 ? 0.0 : 1.0 - linearize(d) / 60.0), 1.0); return; }
     // the app's tone curve (assets/aio_shader.glsl): log compression → gain/dynamic-range window → LUT
@@ -158,11 +164,12 @@ export const sonarFragment = /* glsl */ `
     float bs = 4000.0;
     float lv = log(1.0 + raw / bs) / log(1.0 + 65535.0 / bs);
     float width = clamp(uDynRange, 0.05, 1.0);
-    float lo = (1.0 - width) * 0.5 + width * (uGain - 0.5), hi = lo + width;
+    // Contrast: raise the low end (floor disappears first) and narrow the window (steeper ramp);
+    // pushed far it over-exposes like too much gain — Jason's tuning note, sonar-style.md §6.5
+    float lo = (1.0 - width) * 0.5 + width * (uGain - 0.5) + 0.5 * width * uContrast; // 40 % ≈ the app at Contrast 40 (floor ~gone)
+    float hi = lo + width * (1.0 - 0.45 * uContrast);
     float idx = echo > 0.0005 ? clamp((lv - lo) / (hi - lo), 0.0, 1.0) : 0.0;
-    // noise floor inside the fan: dark-red haze, fading a little with range, scaled by gain
-    float floorIdx = floorTex * (1.0 - 0.35 * r / uRange) * (0.5 + 0.9 * uGain);
-    idx = max(idx, floorIdx) * inAny;
+    idx *= inAny;
     vec3 col = texture2D(uLUT, vec2(idx * (255.0 / 256.0) + 0.5 / 256.0, 0.5)).rgb;
     col *= inAny; // black outside the fan
     gl_FragColor = vec4(col, 1.0);

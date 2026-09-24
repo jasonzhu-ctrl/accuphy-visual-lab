@@ -60,7 +60,7 @@ Tablet screenshots taken over adb during the 2026-09-24 study: settings and
 menus (`settings-*`, `menu-*`, `home*`), one set per view
 (`pl-forward-*`, `pl-down-*`, `pl-pano-*`, `plm-forward-*`, `plm-down-*`,
 `plm-combo-*`) and full-resolution PNG **crops of fish marks**
-(`*-fish-crop-*.png`). Findings: `docs/sonar-style.md` §6, `docs/app-chrome.md`.
+(`*-fish-crop-*.png`), and the tuning sequence `plm-forward-tune-*.jpg` (factory → contrast up → clean). Findings: `docs/sonar-style.md` §6, `docs/app-chrome.md`.
 
 ## Accuphy Sonar App — latest APK (for the emulator study)
 
