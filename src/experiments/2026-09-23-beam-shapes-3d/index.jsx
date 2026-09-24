@@ -134,7 +134,7 @@ export default function BeamShapes3D() {
           <Btn active={showAll} onClick={() => setShowAll((v) => !v)}>all at once</Btn>
         </div>
         <div className="text-xs text-neutral-400">
-          {device.name}: <b className="text-white">{device.beamDeg}° × {device.thickDeg}°</b> · shown at 100 ft range, lakebed at 60 ft · drag to orbit
+          {device.name}: <b className="text-white">{device.beamDeg}° × {device.thickDeg}°</b>{device.displayBeamDeg ? ` (drawn at ${device.displayBeamDeg}°)` : ''} · shown at 100 ft range, lakebed at 60 ft · drag to orbit
         </div>
       </div>
     </main>

@@ -15,7 +15,8 @@ export const DEVICES = {
   PLM: {
     id: 'PLM',
     name: 'PingLive Mini',
-    beamDeg: 39,       // 78° in Combo (two fans)
+    beamDeg: 39,       // 78° in Combo (two fans) — the true value
+    displayBeamDeg: 43, // drawn a little wider for visual effect (Jason 2026-09-23)
     thickDeg: 18,      // "18° 左右" (Jason 2026-09-23)
     maxRangeFt: 200,
     maxDepthFt: 200,
@@ -36,14 +37,14 @@ export const MODE_LABELS = {
 // upper edge is horizontal and it extends downward by one beam width.
 //   PLM 39°  → tilt 70.5° → [51.5°, 90°]  (gap of 32° to the down fan)
 //   PL  135° → tilt 22.5° → [−45°, 90°]
-export function forwardTiltDeg(beamDeg) {
+export function forwardTiltDeg(beamDeg) { // pass the display angle where one exists
   return 90 - beamDeg / 2
 }
 
 // Angular spans, in degrees measured from straight-down, positive = forward
 // (to the right). Returns a list of [start, end] pairs.
 export function fanSpans(device, mode, tiltOverrideDeg) {
-  const half = device.beamDeg / 2
+  const half = (device.displayBeamDeg ?? device.beamDeg) / 2
   const tilt = tiltOverrideDeg ?? forwardTiltDeg(device.beamDeg)
   const down = [-half, half]
   const forward = [-half + tilt, half + tilt]

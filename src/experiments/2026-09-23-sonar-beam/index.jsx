@@ -134,11 +134,11 @@ export default function SonarBeam() {
             fwd tilt
             <input
               type="range" min={0} max={90} step={1}
-              value={tiltOverride ?? forwardTiltDeg(device.beamDeg)}
+              value={tiltOverride ?? forwardTiltDeg(device.displayBeamDeg ?? device.beamDeg)}
               onChange={(e) => setTiltOverride(+e.target.value)}
               className="w-24 accent-neutral-400"
             />
-            <span className="tabular-nums">{Math.round(tiltOverride ?? forwardTiltDeg(device.beamDeg))}°</span>
+            <span className="tabular-nums">{Math.round(tiltOverride ?? forwardTiltDeg(device.displayBeamDeg ?? device.beamDeg))}°</span>
             {tiltOverride !== null && <button className="underline" onClick={() => setTiltOverride(null)}>rule</button>}
           </label>
         </div>

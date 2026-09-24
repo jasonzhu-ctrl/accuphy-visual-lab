@@ -91,3 +91,11 @@ Numbered log. Newest at the bottom.
     reference for the 2D engine. iOS Simulator would need a simulator build
     from the dev team (App Store apps cannot be installed in it). Not started
     yet — the 3D stage does not need it.
+
+11. **2026-09-23** — Jason reviewed the 3D beam shapes: correct except (a)
+    Panoramic's lower face must be **flat**, (b) Down View's footprint edges
+    must be **straight** from above → wedges now use flat thickness planes
+    hinged at the apex (`wedge.js`), not a cone; (c) **PLM drawn at 43°**
+    instead of the true 39° for visual effect (`displayBeamDeg`; Combo is
+    therefore drawn as 2 × 43°). True values stay in `beamDeg`. PLM Forward =
+    39° and Combo = 78° reconfirmed.
