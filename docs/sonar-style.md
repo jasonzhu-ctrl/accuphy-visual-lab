@@ -421,3 +421,33 @@ compare-down-fish-app-vs-engine.png`, app jet-mode blob left, engine right):
 - **Colour:** `accuphy_red` (black → deep red → red → orange → yellow → white)
   reads far closer to the app/LiveScope look than `Moreland_Black_Body`, which
   goes orange too early. Not yet calibrated with the §6.11 histogram.
+
+### 7.6 Texture, not just hue (Jason 2026-09-24: "你的太模糊了", "和我们的纹理完全不是一回事")
+Pixel-level crops of the confirmed frames (`reference/app-study/texture/`, 3×
+nearest-neighbour) show what "the app's texture" actually is:
+- **Every echo is a bundle of thin filaments along the ray.** The formed beams
+  are ~1° apart and each has its own gain and noise, so a piling, a wreck face
+  or a fish body breaks into streaks 1–2 px wide running from the apex outward,
+  with ragged, bitten edges across the beam direction. Nothing is a smooth
+  blob or a smooth band.
+- **Fish:** a cluster of 3–8 such filaments, orange body, a yellow core
+  toward the transducer, no white; near-field blobs (Down view) are irregular
+  with holes and bites, and change shape every ping.
+- **Bottom:** a white-yellow leading edge that is itself broken into short
+  dashes, then an orange body made of the same filaments, then a red tail.
+- **The look is sharp, not soft:** the "softness" is only the 2–3 px colour
+  gradient at each filament's edge; the overall silhouette is crisp.
+
+Engine (`sonarShader.js`): a per-beam filament texture (`filament`, high
+angular frequency × low radial frequency, slowly drifting) multiplies fish and
+structure echoes; the fish silhouette gets two-scale lumpiness that cuts real
+holes; the fish cap sits at 0.78 (no white); a short radial smear trails each
+fish away from the transducer. Jason's verdict on the first round: brightness
+and smoothness should land **between** the old smooth blob and the app's
+raggedness — the current build is that middle.
+
+### 7.7 Garmin LiveScope Plus (LVS34) as the palette reference
+Jason: Garmin's is **amber**; learn from clear LVS34 videos rather than from
+Garmin's marketing stills (those use the purple/green/blue palettes).
+Frames pulled with yt-dlp are kept out of the repo (scratchpad only); notes
+go here as they are studied.
