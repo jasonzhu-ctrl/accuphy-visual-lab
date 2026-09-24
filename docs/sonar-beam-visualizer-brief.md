@@ -42,6 +42,11 @@ Hybrid: procedural real-time rendering, styled to match the real app.
 
 ## App color modes (from reference recordings in `reference/recordings/`)
 
+> **Correction 2026-09-23:** palette is an app-wide setting, not per device — the
+> Mini forward-view weeds clip is in yellow mode. Measured palettes and
+> per-element looks are in `docs/sonar-style.md`; clip catalog in
+> `reference/clips.md`.
+
 **Blue/red mode** (PingLive Mini clips): blue = water background; flat red band near the
 bottom = lakebed; small red granules = fish and bait; very large red blob = big fish at
 close range; tall vertical strands = weeds.

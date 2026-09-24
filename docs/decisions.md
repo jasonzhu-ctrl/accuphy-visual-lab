@@ -23,3 +23,11 @@ Numbered log. Newest at the bottom.
    acoustic shadows, WebGL (PixiJS or three.js — pick at Phase 2/3), single
    embeddable HTML output, desktop + touch. Reference recordings and product
    images go under `reference/` (gitignored if large).
+
+4. **2026-09-23** — Phase 1 started: reference clips catalogued with Jason's
+   annotations (`reference/clips.md`), frames extracted with a project-local
+   `ffmpeg-static` (no system ffmpeg on the Mac), first draft of
+   `docs/sonar-style.md`. Findings: (a) colour mode is app-wide, both
+   palettes apply to both devices; (b) the app draws with non-uniform px/m
+   (horizontal stretch) — engine works in metres, never copies screen angles;
+   (c) yellow mode does not tint the beam area, blue/red mode fills it navy.
