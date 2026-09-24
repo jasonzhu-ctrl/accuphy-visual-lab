@@ -45,8 +45,10 @@ function verticalFrame(tiltDeg) {
   const t = d2r(tiltDeg)
   return { c: V(Math.sin(t), -Math.cos(t), 0), h: V(Math.cos(t), Math.sin(t), 0), n: V(0, 0, 1) }
 }
-// Flat fan (Panoramic): fan plane horizontal, centred on +x; thickness downward.
-const flatFrame = { c: V(1, 0, 0), h: V(0, 0, 1), n: V(0, -1, 0) }
+// Flat fan (Panoramic): installed 5° below horizontal (Jason 2026-09-24), the
+// 20° thickness then sweeps further down (5° → 25° below the surface).
+const PANO_TILT = d2r(5)
+const flatFrame = { c: V(Math.cos(PANO_TILT), -Math.sin(PANO_TILT), 0), h: V(0, 0, 1), n: V(-Math.sin(PANO_TILT), -Math.cos(PANO_TILT), 0) }
 
 // One wedge spec per (device, mode). Uses the *display* beam angle if the
 // device defines one (PLM is drawn at 43° instead of 39° — Jason's call).

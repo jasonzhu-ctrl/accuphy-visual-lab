@@ -82,12 +82,9 @@ export const sonarFragment = /* glsl */ `
       float sp = 0.75 + 0.5 * hash(floor(p * 7.0) + floor(uTime * 12.0));
       echo = max(echo, acc * atten * sp);
     }
-    // faint water noise inside the fan, black outside
-    float noiseFloor = inAny * 0.05 * hash(floor(p * 5.0) + floor(uTime * 8.0) * 3.1);
-    vec3 col = ramp(echo + noiseFloor);
-    // grid: range rings every 5 units and a centre line, very faint
-    float ring = 1.0 - smoothstep(0.0, 0.08, abs(fract(r / (5.0 * uUnitM) + 0.5) - 0.5) * (5.0 * uUnitM));
-    col += vec3(0.18, 0.18, 0.2) * ring * 0.35 * inAny;
+    // black water, echoes only — no invented rings/grid (Jason 2026-09-24);
+    // the real app chrome is learned later from the app's playback mode
+    vec3 col = ramp(echo);
     gl_FragColor = vec4(col, 1.0);
   }
 `

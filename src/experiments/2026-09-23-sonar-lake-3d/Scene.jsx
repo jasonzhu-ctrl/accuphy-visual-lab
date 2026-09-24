@@ -10,6 +10,7 @@ import { makeLakeMaterial, setBeamUniforms } from './lakeMaterial'
 import { wedgeGeometry } from '../2026-09-23-beam-shapes-3d/wedge'
 import { makeTallTree, makeBushTree, makeStump, makeLog, makeWeedTuft, makeRock, placeAll } from './vegetation'
 import { makeRangerBoat, TRANSDUCER_OFFSET } from './boat'
+import { makeFishGeometry } from './fishGeometry'
 import SonarScreen, { SONAR_HIDE_LAYER } from './SonarScreen'
 
 // ---------- lakebed ----------
@@ -96,18 +97,7 @@ function Wreck({ mat }) {
 }
 
 // ---------- fish ----------
-// One unit long, nose at +x. Body types give recognisable silhouettes.
-function makeFishGeometry(body) {
-  const P = { bass: [1, 0.36, 0.17], salmonid: [1, 0.26, 0.15], pike: [1, 0.2, 0.15], panfish: [1, 0.46, 0.13], bait: [1, 0.2, 0.11] }[body]
-  const b = new THREE.SphereGeometry(0.5, 12, 8); b.scale(P[0], P[1], P[2])
-  if (body === 'pike') b.translate(0.05, 0, 0)
-  const forked = body === 'salmonid' || body === 'bait' || body === 'pike'
-  const tail = new THREE.ConeGeometry(forked ? 0.2 : 0.16, 0.3, 4); tail.rotateZ(Math.PI / 2); tail.scale(1, 1, 0.22); tail.translate(-0.56, 0, 0)
-  const dorsal = new THREE.ConeGeometry(body === 'panfish' ? 0.14 : 0.09, body === 'pike' ? 0.14 : 0.24, 3); dorsal.scale(1, 1, 0.18); dorsal.translate(body === 'pike' ? -0.28 : 0.02, P[1] * 0.5 + 0.06, 0)
-  const pecL = new THREE.ConeGeometry(0.05, 0.16, 3); pecL.rotateX(Math.PI / 2); pecL.scale(1, 0.2, 1); pecL.translate(0.12, -0.04, P[2] * 0.5 + 0.06)
-  const pecR = pecL.clone(); pecR.translate(0, 0, -P[2] - 0.12)
-  return mergeGeometries([b, tail, dorsal, pecL, pecR])
-}
+// Realistic bodies per type — see fishGeometry.js
 function FishGroup({ mat, body, fish }) {
   const geo = useMemo(() => {
     const g = makeFishGeometry(body)
@@ -293,6 +283,7 @@ export default function LakeScene({ state, sonarRect }) {
     const fish = makeLakeMaterial({ fish: true })
     fish.userData.uniforms.uHighlight.value.set('#ffe9a0') // fish light up warm, like a sonar return
     fish.userData.uniforms.uFogDensity.value = 0.006
+    fish.side = THREE.DoubleSide // flat fins
     return { bed: makeLakeMaterial(), inst: makeLakeMaterial(), fish }
   }, [])
   const beamMats = useMemo(() => [mats.bed, mats.inst, mats.fish], [mats])

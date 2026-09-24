@@ -52,6 +52,6 @@ export function fanSpans(device, mode, tiltOverrideDeg) {
   if (mode === 'forward') return [forward]
   // Panoramic (PL only): the fan lies flat just under the surface, so from the
   // side you only see its thickness — a thin wedge skimming down from horizontal.
-  if (mode === 'panoramic') return [[90 - (device.thickDeg ?? 20), 90]]
+  if (mode === 'panoramic') return [[85 - (device.thickDeg ?? 20), 85]] // installed 5° down, then the thickness
   return [down, forward] // combo
 }

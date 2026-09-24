@@ -162,3 +162,13 @@ Numbered log. Newest at the bottom.
     flat fan (0–20° below horizontal) only reaches the bottom within
     range·sin(20°) — physically right, but the real tilt of Panoramic mode
     needs Jason's confirmation.
+
+18. **2026-09-24** — Jason: (a) **Panoramic is installed 5° below horizontal**,
+    the 20° thickness then sweeps down to 25° — applied in `wedge.js`
+    (`PANO_TILT`) and the 2D experiment; (b) **no invented range rings /
+    noise floor on the sonar screen** — black water and echoes only; the real
+    app chrome will be learned from the app's playback mode later, the
+    reference recordings remain the baseline; (c) fish bodies rebuilt from
+    species profiles (`fishGeometry.js`): smooth tube nose→peduncle with
+    per-type height/width curves, forked or rounded caudal fin, dorsal, anal
+    and pectoral fins — no more abrupt body/tail step.
