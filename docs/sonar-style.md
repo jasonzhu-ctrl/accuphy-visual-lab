@@ -175,7 +175,7 @@ low end (cuts the floor before targets), noise reject = suppress isolated
 speckle in the floor texture (never the bottom band or fish). Defaults for the
 website follow step 6, not the app's factory values.
 
-### 6.6 Candidate "ideal picture" (2026-09-24, awaiting Jason's feedback)
+### 6.6 The ideal picture — CONFIRMED by Jason 2026-09-24
 Made on the tablet from Reset Defaults, PLM Live Forward, the 2026-08-16
 piling + fish-school recording, range 18 m (frames in
 `reference/app-study/ideal-picture/`):
@@ -190,6 +190,16 @@ piling + fish-school recording, range 18 m (frames in
 | **5** | **gain 52 · contrast 40 · noise 30 · TVG 20** | piling/bottom back off white, fish dashes crisp, black background with a trace of noise — my pick |
 | 6 | gain 50 (same rest) | a touch dim on the small fish |
 
-Left on the tablet at step 5 for Jason to look at. Once confirmed, this becomes the
-target the engine's defaults are matched against (currently gain 57 / contrast 40 /
-noise 20 in engine units — to be re-matched to this frame).
+Jason's verdict on step 5: **"剩余部分的话我觉得可以了"** — this frame
+(`5-FINAL-gain52-contrast40-noise30.jpg`) is the standard the engine is matched to.
+His notes on what in it is signal and what is not:
+- The thick diagonal line from the top-left is a **mounting artefact** of that
+  recording (transducer not installed well) — ignore, never reproduce.
+- The ripple that sweeps left→right under the piling now and then is
+  **interference from another sonar** — ignore, never reproduce.
+- The piling's brightness (near white) is **reasonable** for structure.
+- Small speckle right next to a vertical structure must stay distinguishable
+  from fish; on the water some speckle is fine, but **the website inset should be
+  cleaner than real use** — so the engine's noise reject sits a step above the
+  app's (engine defaults: gain 57 · contrast 40 · noise 30).
+- TVG stays at 20 (not discussed further).

@@ -4,7 +4,8 @@ Jason 2026-09-24: "别把之前说过的任务丢了" — every promised task li
 it is done. ✅ done · 🔧 in progress · ⬜ open.
 
 ## Sonar screen (Phase 4)
-- ✅ Contrast + Noise Reject controls (Tune row) mapped to the app's tone curve per Jason's tuning strategy (`sonar-style.md` §6.5); demo defaults gain 57 / contrast 40 / noise 20
+- ✅ Contrast + Noise Reject controls (Tune row) mapped to the app's tone curve per Jason's tuning strategy (`sonar-style.md` §6.5); defaults gain 57 / contrast 40 / noise 30 after the confirmed ideal picture (decision #28)
+- ⬜ Side-by-side check of the engine's PLM Forward against the confirmed frame (`ideal-picture/5-FINAL-*.jpg`): bottom band ✓, black background ✓; still to compare fish-dash size/brightness and how standing timber reads next to the piling reference
 - ⬜ TVG control (range-dependent gain) — Jason: higher = crisper far targets, a little more noise
 - ✅ **Sonar screen rework** (2026-09-24, after the tablet study): screen box per view fills the display with independent axes (`screenLayout` in `SonarScreen.jsx`), dark-red noise floor with radial streaks (mottled for PLM Down), thick bottom band with tail + faint second echo, near-apex rays, PLM Forward apex top-left, PLM Down stretched to the screen corners, Combo two-panel with the grey diagonal. Root cause of the old "small fan in black" picture: the screen-box code had been dropped by mistake in commit 4952966 (phone restyle)
 - 🔧 Fish echoes: now drawn as **horizontal dashes** (5 horizontal taps of the fish mask in screen metres, bright centre, feathered ends, thin across the beam) per `sonar-style.md` §6.3. Next: compare side by side with `reference/app-study/plm-forward-fish-crop-*.png` and tune size/brightness; school stacking

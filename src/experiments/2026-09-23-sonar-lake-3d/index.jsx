@@ -24,7 +24,7 @@ export default function SonarLake3D() {
   const [colormap, setColormap] = useState('amber')
   const [gain, setGain] = useState(0.57)
   const [contrast, setContrast] = useState(0.4)    // demo look (sonar-style.md §6.5): floor mostly gone, a trace of noise stays
-  const [noise, setNoise] = useState(0.2)          // noise reject: the smaller of the two, used last
+  const [noise, setNoise] = useState(0.3)          // noise reject (inset cleaner than real use, decision #28): the smaller of the two, used last
   const [, tick] = useState(0)
   useEffect(() => { const id = requestAnimationFrame(() => tick(1)); return () => cancelAnimationFrame(id) }, [])
 

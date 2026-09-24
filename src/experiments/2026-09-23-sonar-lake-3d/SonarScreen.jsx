@@ -55,7 +55,7 @@ export default function SonarScreen({ state, rect, lakeMats }) {
         uNearFar: { value: new THREE.Vector2(0.3, 150) }, uRange: { value: 20 },
         uBox0: { value: new THREE.Vector4(-20, 0, 40, 30) }, uBox1: { value: new THREE.Vector4(-20, 0, 40, 30) }, uSplit: { value: 0 }, uApexU: { value: 0.5 },
         uTime: { value: 0 }, uFlat: { value: 0 }, uStreak: { value: 1 }, uDebug: { value: window.location.search.includes('sonardebug') ? 1 : 0 },
-        uLUT: { value: colormapTexture('amber') }, uGain: { value: 0.57 }, uDynRange: { value: 0.85 }, uContrast: { value: 0.4 }, uNoise: { value: 0.2 },
+        uLUT: { value: colormapTexture('amber') }, uGain: { value: 0.57 }, uDynRange: { value: 0.85 }, uContrast: { value: 0.4 }, uNoise: { value: 0.3 },
       },
     })
     const overlay = new THREE.Scene()
@@ -86,7 +86,7 @@ export default function SonarScreen({ state, rect, lakeMats }) {
     if (s.colormap !== u.uLUT.name) { u.uLUT.value.dispose?.(); u.uLUT.value = colormapTexture(s.colormap); u.uLUT.name = s.colormap }
     u.uGain.value = s.gain ?? 0.57
     u.uContrast.value = s.contrast ?? 0.4
-    u.uNoise.value = s.noise ?? 0.2
+    u.uNoise.value = s.noise ?? 0.3
     u.uFanCount.value = specs.length
     const flat = specs[0] && specs[0].frame.n.y !== 0 // panoramic: thickness normal is vertical
     u.uFlat.value = flat ? 1 : 0

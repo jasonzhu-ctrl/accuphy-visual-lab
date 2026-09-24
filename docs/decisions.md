@@ -289,3 +289,12 @@ Numbered log. Newest at the bottom.
     it, Noise Reject thins the floor speckle only. New Tune row in the panel;
     defaults gain 57 % / contrast 40 % / noise 20 %. The tablet's view
     settings were put back to 20/20 afterwards.
+
+28. **2026-09-24** — **Ideal sonar picture confirmed.** From Reset Defaults on
+    the tablet (PLM Live Forward, 2026-08-16 piling + fish recording, 18 m):
+    gain 52 · contrast 40 · noise reject 30 · TVG 20 — Jason: "剩余部分的话我觉得
+    可以了". Frame `reference/app-study/ideal-picture/5-FINAL-*.jpg`; the
+    sequence and his notes on artefacts (mounting line, other-sonar ripple:
+    ignore) are in `docs/sonar-style.md` §6.6. Rule for the inset: cleaner than
+    real use — small speckle next to structure must not be mistaken for fish.
+    Engine defaults set to gain 57 · contrast 40 · noise 30 to match.
