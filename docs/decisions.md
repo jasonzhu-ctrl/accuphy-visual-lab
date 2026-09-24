@@ -138,3 +138,13 @@ Numbered log. Newest at the bottom.
     **3 small rock humps** (with 1.5 m terrain mounds) added; outboard
     restyled to **Mercury 250 Pro XS** proportions (tall boxy cowl, forward-
     sloping top, front hood intake, graphite side panels, white/red band).
+
+16. **2026-09-24** — Jason: deep share trimmed ~10 % (drop-off edge moved
+    6 m north, basin narrowed); lake trout / chinook moved to the 38–40 m
+    water. Fish colours **researched per species** so none repeat
+    (`fish.js`): largemouth green + black lateral band; smallmouth bronze-
+    brown + vertical bars; walleye golden-brass + dark saddles; crappie
+    silver + dark mottling; smelt olive back + silver lateral stripe; musky
+    pale green-silver + dark bars; lake trout dark grey-green + light spots;
+    chinook steel-blue back, silver sides, black spots on the upper half.
+    Shader now blends back → side → belly. Dev aid `?cam=fish:<species>`.

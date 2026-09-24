@@ -31,12 +31,13 @@ export function depthAt(x, z) {
   d = d + (7 - d) * (1 - smooth(6, 16, hr)) * 0.9
   // deep basin around (15, -28)
   const br = Math.hypot(x - 15, z + 28)
-  d = d + (24 - d) * (1 - smooth(10, 30, br)) * 0.85
+  d = d + (24 - d) * (1 - smooth(9, 26, br)) * 0.85
   // Jason 2026-09-24: the drop-off to 40 m runs across the middle of the screen
   // (camera looks from +z toward -z, so "up" on screen = -z). The edge sits
   // around z ≈ -4 at screen centre, slightly angled, with a noisy outline.
-  const along = (-z - 4) * 0.92 + (x - 3) * 0.22 + 7 * (fbm(x * 0.05 + 11, z * 0.05 + 3) - 0.5)
-  d = d + (40 - d) * smooth(2, 38, along)
+  // (2026-09-24 second pass: deep share trimmed ~10 % — edge moved 6 m north)
+  const along = (-z - 10) * 0.92 + (x - 3) * 0.22 + 7 * (fbm(x * 0.05 + 11, z * 0.05 + 3) - 0.5)
+  d = d + (40 - d) * smooth(3, 40, along)
   // small rock humps (Jason): gentle 1.5 m mounds the rocks sit on
   for (const [hx, hz, hr] of ROCK_HUMPS) { const q = Math.hypot(x - hx, z - hz); d -= 1.5 * (1 - smooth(hr * 0.4, hr, q)) }
   // beyond the play area the bed sinks smoothly into the deep so no edge shows

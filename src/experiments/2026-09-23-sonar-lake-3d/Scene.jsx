@@ -110,11 +110,16 @@ function makeFishGeometry(body) {
 function FishGroup({ mat, body, fish }) {
   const geo = useMemo(() => {
     const g = makeFishGeometry(body)
-    const pat = new Float32Array(fish.length), belly = new Float32Array(fish.length * 3)
+    const pat = new Float32Array(fish.length), belly = new Float32Array(fish.length * 3), side = new Float32Array(fish.length * 3)
     const c = new THREE.Color()
-    fish.forEach((f, i) => { const sp = SPECIES[f.species]; pat[i] = sp.pattern; c.set(sp.belly); belly[i * 3] = c.r; belly[i * 3 + 1] = c.g; belly[i * 3 + 2] = c.b })
+    fish.forEach((f, i) => {
+      const sp = SPECIES[f.species]; pat[i] = sp.pattern
+      c.set(sp.belly); belly[i * 3] = c.r; belly[i * 3 + 1] = c.g; belly[i * 3 + 2] = c.b
+      c.set(sp.side); side[i * 3] = c.r; side[i * 3 + 1] = c.g; side[i * 3 + 2] = c.b
+    })
     g.setAttribute('aPattern', new THREE.InstancedBufferAttribute(pat, 1))
     g.setAttribute('aBelly', new THREE.InstancedBufferAttribute(belly, 3))
+    g.setAttribute('aSide', new THREE.InstancedBufferAttribute(side, 3))
     return g
   }, [body, fish])
   const ref = useRef()
@@ -137,8 +142,9 @@ function FishGroup({ mat, body, fish }) {
   })
   return <instancedMesh ref={ref} args={[geo, mat, fish.length]} frustumCulled={false} />
 }
-function Fish({ mat }) {
+function Fish({ mat, state }) {
   const pop = useMemo(() => makePopulation(bedY), [])
+  state.current.pop = pop
   const groups = useMemo(() => {
     const by = {}
     pop.forEach((f) => { const b = SPECIES[f.species].body; (by[b] ||= []).push(f) })
@@ -243,6 +249,16 @@ function Rig({ state }) {
     const s = state.current
     // fixed 3/4 aerial view like the PL animations; slight parallax from the pointer
     const px = s.parallax.x, py = s.parallax.y
+    if (s.fishCam && s.pop) { // dev aid ?cam=fish:<species> — follow the first fish of that species
+      const f = s.pop.find((x) => x.species === s.fishCam)
+      if (f) {
+        const o = fishPose(f, performance.now() / 1000, {})
+        const L = f.len * FISH_DISPLAY_SCALE
+        camera.position.set(o.x + L * 0.3, o.y + L * 0.35, o.z + L * 2.4)
+        camera.lookAt(o.x, o.y, o.z)
+        return
+      }
+    }
     if (s.closeCam) { // dev aid ?cam=boat — inspect the boat / fish up close
       camera.position.set(s.boat.x - 6 + px, 3.5 + py * 0.5, s.boat.z + 9)
       camera.lookAt(s.boat.x + 1, -0.6, s.boat.z)
@@ -289,7 +305,7 @@ export default function LakeScene({ state }) {
       <mesh rotation-x={-Math.PI / 2} position-y={-47}><planeGeometry args={[900, 900]} /><meshBasicMaterial color="#17545f" /></mesh>
       <Structures mat={mats.inst} />
       <Wreck mat={mats.inst} />
-      <Fish mat={mats.fish} />
+      <Fish mat={mats.fish} state={state} />
       <Water />
       <Boat state={state} beamMats={beamMats} />
       <Beams key={state.current.specKey} state={state} />

@@ -29,12 +29,12 @@ export function makeLakeMaterial({ fish = false } = {}) {
     vertexShader: /* glsl */ `
       varying vec3 vWorld; varying vec3 vNormal; varying vec3 vColor;
       #ifdef FISH
-        attribute float aPattern; attribute vec3 aBelly;
-        varying float vPattern; varying vec3 vBelly; varying vec3 vLocal;
+        attribute float aPattern; attribute vec3 aBelly; attribute vec3 aSide;
+        varying float vPattern; varying vec3 vBelly; varying vec3 vSide; varying vec3 vLocal;
       #endif
       void main() {
       #ifdef FISH
-        vPattern = aPattern; vBelly = aBelly; vLocal = position;
+        vPattern = aPattern; vBelly = aBelly; vSide = aSide; vLocal = position;
       #endif
         vec3 c = vec3(1.0);
         #ifdef USE_COLOR
@@ -63,7 +63,7 @@ export function makeLakeMaterial({ fish = false } = {}) {
       uniform vec4 uAng[${MAX_BEAMS}]; uniform vec2 uRT[${MAX_BEAMS}];
       uniform float uReveal; uniform vec3 uHighlight;
       #ifdef FISH
-        varying float vPattern; varying vec3 vBelly; varying vec3 vLocal;
+        varying float vPattern; varying vec3 vBelly; varying vec3 vSide; varying vec3 vLocal;
         float hash3(vec3 p) { return fract(sin(dot(p, vec3(127.1, 311.7, 74.7))) * 43758.5453); }
       #endif
 
@@ -91,14 +91,36 @@ export function makeLakeMaterial({ fish = false } = {}) {
         float hemi = 0.5 + 0.5 * n.y;
         vec3 albedo = vColor;
       #ifdef FISH
-        // back → belly gradient by local height (fish geometry is 1 unit long, y in [-0.18, 0.18])
-        float t = smoothstep(0.08, -0.14, vLocal.y);
-        albedo = mix(vColor, vBelly, t);
-        // markings: 1 vertical bars, 2 light spots, 3 dark spots, 4 dark lateral stripe
-        if (vPattern > 0.5 && vPattern < 1.5) { float bar = smoothstep(0.35, 0.5, abs(fract(vLocal.x * 9.0) - 0.5) * 2.0); albedo *= mix(0.55, 1.0, bar) * (1.0 - 0.6 * t) + 0.6 * t; }
-        if (vPattern > 1.5 && vPattern < 2.5) { float sp = step(0.86, hash3(floor(vLocal * 22.0))); albedo = mix(albedo, albedo * 1.7 + 0.15, sp * (1.0 - t)); }
-        if (vPattern > 2.5 && vPattern < 3.5) { float sp = step(0.88, hash3(floor(vLocal * 26.0))); albedo = mix(albedo, albedo * 0.35, sp * (1.0 - t * 0.8)); }
-        if (vPattern > 3.5) { float st = 1.0 - smoothstep(0.02, 0.05, abs(vLocal.y + 0.01)); float br = step(0.5, hash3(floor(vLocal * vec3(10.0, 1.0, 1.0)))); albedo = mix(albedo, albedo * 0.35, st * br); }
+        // back → side → belly gradient by local height (geometry is 1 unit long, |y| ≲ 0.23)
+        float hgt = vLocal.y;
+        float tb = smoothstep(0.12, -0.02, hgt);   // back → side
+        float ts = smoothstep(-0.03, -0.13, hgt);  // side → belly
+        albedo = mix(mix(vColor, vSide, tb), vBelly, ts);
+        float upper = 1.0 - ts; // 1 on back/sides, 0 on belly
+        int pat = int(vPattern + 0.5);
+        if (pat == 1) { // dark vertical bars, strongest on the sides, fade on the belly
+          float bar = smoothstep(0.3, 0.55, abs(fract(vLocal.x * 8.0 + 0.25) - 0.5) * 2.0);
+          albedo *= mix(0.5, 1.0, bar) * upper + (1.0 - upper);
+        } else if (pat == 2) { // light spots
+          float sp = step(0.84, hash3(floor(vLocal * 24.0)));
+          albedo = mix(albedo, albedo * 1.9 + 0.2, sp * upper);
+        } else if (pat == 3) { // dark speckle / mottling
+          float sp = step(0.8, hash3(floor(vLocal * 26.0)));
+          albedo = mix(albedo, albedo * 0.4, sp * (0.3 + 0.7 * upper));
+        } else if (pat == 4) { // dark lateral band of blotches (largemouth)
+          float st = 1.0 - smoothstep(0.02, 0.05, abs(hgt + 0.02));
+          float br = step(0.35, hash3(floor(vLocal * vec3(9.0, 1.0, 1.0))));
+          albedo = mix(albedo, albedo * 0.3, st * br);
+        } else if (pat == 5) { // dark saddles across the back (walleye)
+          float sad = step(0.45, hash3(floor(vLocal * vec3(6.0, 1.0, 1.0)))) * smoothstep(-0.02, 0.1, hgt);
+          albedo = mix(albedo, albedo * 0.55, sad);
+        } else if (pat == 6) { // small black spots on the upper half (chinook)
+          float sp = step(0.9, hash3(floor(vLocal * 30.0))) * smoothstep(-0.04, 0.06, hgt);
+          albedo = mix(albedo, vec3(0.05), sp);
+        } else if (pat == 7) { // bright silver lateral stripe (smelt)
+          float st = 1.0 - smoothstep(0.015, 0.04, abs(hgt + 0.015));
+          albedo = mix(albedo, vec3(0.95, 0.97, 1.0), st * 0.8);
+        }
       #endif
         vec3 base = albedo * (0.28 + 0.42 * hemi + 0.6 * lambert);
         // dim everything under water a little; the beam brings it back
