@@ -1,11 +1,35 @@
 # reference/
 
-Input material for experiments — not code.
+Input material for experiments — not code. **Everything here except this
+README is gitignored** (videos and large PNGs); the originals live in Jason's
+Google Drive and are copied in from the local Drive sync folder
+`~/Library/CloudStorage/GoogleDrive-jason.zhu@accuphy.ca/Shared drives/`.
 
-- `recordings/` — screen recordings of the real PingLive / PingLive Mini app
-  (source of truth for sonar colours, noise, fish/bottom/structure look).
-- `product-images/` — side-view transparent PNGs of PingLive and PingLive Mini
-  (used as the on-water cursor).
+Copied 2026-09-23. To re-copy, see the source paths below.
 
-Large video files are gitignored; keep the originals here locally and note in
-`docs/sonar-style.md` which frames were used.
+## recordings/ — real app screen recordings (sonar look source of truth)
+
+| Local folder | Source (Shared drives/…) | Files |
+|---|---|---|
+| `recordings/pinglive/` | `CA Authorized Dealers/Dealer Digital Assests/Master Version/PingLive Screen Recordings/` | 3257, 4479_raw, 6041_raw, 6089, 86789ab9…, b5690b3e…, ScreenRecording_09-23-2026 19-42-23, …19-45-33 |
+| `recordings/pinglive-mini/` | `…/Master Version/PingLive Mini Screen Recordings/` + `Distributors/Prime Sports/09.23.2026 Graphics/` | Mini Combo View-04-30, Mini Down View, ScreenRecording_09-23-2026 19-49-57, Mini Down View_1 (1), PLM big fish |
+| `recordings/unsorted/` | `Distributors/Prime Sports/09.23.2026 Graphics/` | RPReplay_Final1787183497, RPReplay_Final1787255969 — device/mode not yet identified |
+
+Skipped: `mini Panoramic View.MP4` (218 MB, Panoramic is out of scope for v1).
+
+## product-images/ — device art for the on-water cursor
+
+From `Distributors/Prime Sports/Product Digitals/{PingLive, PingLive Mini}/`
+and `…/09.23.2026 Graphics/`:
+`Transparent PingLive Shaft Mount.png`, `Transparent PingLive Mini.png`,
+`PingLive Mini (1).png`, `PingLive Mini (2).png`, `PingLive Mini Views.png`,
+`PingLive Product Page Image.png`, `PingLive Mini Product Page.png`,
+`3tablets mock.png`, plus beam-illustration GIFs `Down View / Forward View /
+Panoramic View PingLive.gif`.
+
+## sonar-data/ — raw `.sonar` app exports
+
+Two small `PingBeam_Combo View_20260910_*.sonar` files from
+`…/09.23.2026 Graphics/BEST RECENT 2.0 IMAGE DATA/` (proprietary format,
+kept for possible later analysis). The 229 MB `PingLive Mini_动态下扫` file
+was not copied.

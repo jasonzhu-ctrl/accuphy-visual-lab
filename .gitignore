@@ -2,7 +2,5 @@
 node_modules/
 dist/
 .env*
-reference/recordings/*.mp4
-reference/recordings/*.mov
-reference/recordings/*.MOV
-reference/recordings/*.MP4
+reference/**
+!reference/README.md
