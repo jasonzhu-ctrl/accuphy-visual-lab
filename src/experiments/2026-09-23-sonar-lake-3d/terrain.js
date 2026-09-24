@@ -1,4 +1,6 @@
 // Lakebed heightfield in METRES. y = -depth. Lake spans x,z in [-HALF, HALF].
+// centres + radius of the small rock humps (shared with vegetation.js)
+export const ROCK_HUMPS = [[-8, 22, 6], [42, -6, 7], [-38, -18, 6]]
 export const HALF = 160 // modelled lakebed half-size; detail lives within ±70 m
 export const SEG = 160  // 2 m spacing
 
@@ -30,10 +32,13 @@ export function depthAt(x, z) {
   // deep basin around (15, -28)
   const br = Math.hypot(x - 15, z + 28)
   d = d + (24 - d) * (1 - smooth(10, 30, br)) * 0.85
-  // Jason 2026-09-24: a natural slope dropping to 40 m up-and-right of the boat
-  // (world +x / -z). Distance along that direction from (8,-8), with noisy edge.
-  const along = (x - 8) * 0.6 + (-z - 8) * 0.8 + 6 * (fbm(x * 0.05 + 11, z * 0.05 + 3) - 0.5)
-  d = d + (40 - d) * smooth(4, 42, along)
+  // Jason 2026-09-24: the drop-off to 40 m runs across the middle of the screen
+  // (camera looks from +z toward -z, so "up" on screen = -z). The edge sits
+  // around z ≈ -4 at screen centre, slightly angled, with a noisy outline.
+  const along = (-z - 4) * 0.92 + (x - 3) * 0.22 + 7 * (fbm(x * 0.05 + 11, z * 0.05 + 3) - 0.5)
+  d = d + (40 - d) * smooth(2, 38, along)
+  // small rock humps (Jason): gentle 1.5 m mounds the rocks sit on
+  for (const [hx, hz, hr] of ROCK_HUMPS) { const q = Math.hypot(x - hx, z - hz); d -= 1.5 * (1 - smooth(hr * 0.4, hr, q)) }
   // beyond the play area the bed sinks smoothly into the deep so no edge shows
   const rim = Math.max(Math.abs(x), Math.abs(z))
   d = d + (42 - d) * smooth(70, 130, rim)

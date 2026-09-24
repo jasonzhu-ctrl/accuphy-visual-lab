@@ -3,7 +3,7 @@
 // "树桩排列自然一些, 形状不同更细的有很多分叉的水底小树, 石头大小分布随机自然".
 import * as THREE from 'three'
 import { mergeGeometries as _merge } from 'three/addons/utils/BufferGeometryUtils.js'
-import { bedY, depthAt, fbm } from './terrain'
+import { bedY, depthAt, fbm, ROCK_HUMPS } from './terrain'
 
 const merge = (parts) => _merge(parts.map((g) => (g.index ? g.toNonIndexed() : g)))
 let seed = 5
@@ -135,6 +135,17 @@ export function placeAll() {
     const x = 30 + Math.cos(a) * r, z = 12 + Math.sin(a) * r * 0.75
     const s = 0.35 + (1 - r / 11) * 1.4 * rnd() + rnd() * 0.5
     items.rock.push({ x, z, y: bedY(x, z) + s * 0.22, s, rot: rnd() * 6.28, tilt: rnd() * 0.6 })
+  }
+  // 3–5 big boulders (2–4 m) anywhere in the play area, and 2–3 small rock humps
+  scatter(4, (x, z) => (d(x, z) > 5 && d(x, z) < 30 && Math.hypot(x - 30, z - 12) > 14 ? 0.6 : 0))
+    .forEach(([x, z]) => { const s = 2 + rnd() * 2; items.rock.push({ x, z, y: bedY(x, z) + s * 0.25, s, rot: rnd() * 6.28, tilt: rnd() * 0.3 }) })
+  for (const [hx, hz, hr] of ROCK_HUMPS) {
+    for (let i = 0; i < 22; i++) {
+      const a = rnd() * 6.28, r = Math.pow(rnd(), 0.7) * hr
+      const x = hx + Math.cos(a) * r, z = hz + Math.sin(a) * r
+      const s = 0.3 + (1 - r / hr) * 0.9 * rnd() + rnd() * 0.3
+      items.rock.push({ x, z, y: bedY(x, z) + s * 0.22, s, rot: rnd() * 6.28, tilt: rnd() * 0.6 })
+    }
   }
   scatter(45, (x, z) => (Math.hypot(x - 30, z - 12) < 22 ? 0.3 : 0.0) + (d(x, z) > 8 && d(x, z) < 13 ? 0.15 : 0))
     .forEach(([x, z]) => { const s = 0.3 + rnd() * 1.1; items.rock.push({ x, z, y: bedY(x, z) + s * 0.2, s, rot: rnd() * 6.28, tilt: rnd() * 0.6 }) })

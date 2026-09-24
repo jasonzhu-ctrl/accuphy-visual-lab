@@ -95,25 +95,38 @@ function Wreck({ mat }) {
 }
 
 // ---------- fish ----------
-function makeFishGeometry() {
-  const body = new THREE.SphereGeometry(0.5, 10, 8); body.scale(1, 0.32, 0.16)
-  const tail = new THREE.ConeGeometry(0.16, 0.3, 4); tail.rotateZ(Math.PI / 2); tail.scale(1, 1, 0.25); tail.translate(-0.55, 0, 0)
-  const fin = new THREE.ConeGeometry(0.1, 0.22, 3); fin.scale(1, 1, 0.2); fin.translate(0.05, 0.22, 0)
-  return mergeGeometries([body, tail, fin])
+// One unit long, nose at +x. Body types give recognisable silhouettes.
+function makeFishGeometry(body) {
+  const P = { bass: [1, 0.36, 0.17], salmonid: [1, 0.26, 0.15], pike: [1, 0.2, 0.15], panfish: [1, 0.46, 0.13], bait: [1, 0.2, 0.11] }[body]
+  const b = new THREE.SphereGeometry(0.5, 12, 8); b.scale(P[0], P[1], P[2])
+  if (body === 'pike') b.translate(0.05, 0, 0)
+  const forked = body === 'salmonid' || body === 'bait' || body === 'pike'
+  const tail = new THREE.ConeGeometry(forked ? 0.2 : 0.16, 0.3, 4); tail.rotateZ(Math.PI / 2); tail.scale(1, 1, 0.22); tail.translate(-0.56, 0, 0)
+  const dorsal = new THREE.ConeGeometry(body === 'panfish' ? 0.14 : 0.09, body === 'pike' ? 0.14 : 0.24, 3); dorsal.scale(1, 1, 0.18); dorsal.translate(body === 'pike' ? -0.28 : 0.02, P[1] * 0.5 + 0.06, 0)
+  const pecL = new THREE.ConeGeometry(0.05, 0.16, 3); pecL.rotateX(Math.PI / 2); pecL.scale(1, 0.2, 1); pecL.translate(0.12, -0.04, P[2] * 0.5 + 0.06)
+  const pecR = pecL.clone(); pecR.translate(0, 0, -P[2] - 0.12)
+  return mergeGeometries([b, tail, dorsal, pecL, pecR])
 }
-function Fish({ mat, revealRef }) {
-  const geo = useMemo(makeFishGeometry, [])
-  const pop = useMemo(() => makePopulation(bedY), [])
+function FishGroup({ mat, body, fish }) {
+  const geo = useMemo(() => {
+    const g = makeFishGeometry(body)
+    const pat = new Float32Array(fish.length), belly = new Float32Array(fish.length * 3)
+    const c = new THREE.Color()
+    fish.forEach((f, i) => { const sp = SPECIES[f.species]; pat[i] = sp.pattern; c.set(sp.belly); belly[i * 3] = c.r; belly[i * 3 + 1] = c.g; belly[i * 3 + 2] = c.b })
+    g.setAttribute('aPattern', new THREE.InstancedBufferAttribute(pat, 1))
+    g.setAttribute('aBelly', new THREE.InstancedBufferAttribute(belly, 3))
+    return g
+  }, [body, fish])
   const ref = useRef()
   useEffect(() => {
     const c = new THREE.Color()
-    pop.forEach((f, i) => { c.set(SPECIES[f.species].color); ref.current.setColorAt(i, c) })
+    fish.forEach((f, i) => { c.set(SPECIES[f.species].back); ref.current.setColorAt(i, c) })
     ref.current.instanceColor.needsUpdate = true
-  }, [pop])
+  }, [fish])
   const tmp = useMemo(() => ({ m: new THREE.Matrix4(), q: new THREE.Quaternion(), e: new THREE.Euler(), p: new THREE.Vector3(), s: new THREE.Vector3(), pose: {} }), [])
   useFrame(({ clock }) => {
     const t = clock.elapsedTime
-    pop.forEach((f, i) => {
+    fish.forEach((f, i) => {
       const o = fishPose(f, t, tmp.pose)
       tmp.e.set(0, o.heading, Math.sin(t * 6 + f.phase) * 0.08); tmp.q.setFromEuler(tmp.e)
       tmp.p.set(o.x, o.y, o.z); const L = f.len * FISH_DISPLAY_SCALE; tmp.s.set(L, L, L)
@@ -122,7 +135,16 @@ function Fish({ mat, revealRef }) {
     })
     ref.current.instanceMatrix.needsUpdate = true
   })
-  return <instancedMesh ref={ref} args={[geo, mat, pop.length]} frustumCulled={false} />
+  return <instancedMesh ref={ref} args={[geo, mat, fish.length]} frustumCulled={false} />
+}
+function Fish({ mat }) {
+  const pop = useMemo(() => makePopulation(bedY), [])
+  const groups = useMemo(() => {
+    const by = {}
+    pop.forEach((f) => { const b = SPECIES[f.species].body; (by[b] ||= []).push(f) })
+    return Object.entries(by)
+  }, [pop])
+  return groups.map(([body, fish]) => <FishGroup key={body} mat={mat} body={body} fish={fish} />)
 }
 
 // ---------- water surface ----------
@@ -251,7 +273,7 @@ function PickPlane({ state }) {
 
 export default function LakeScene({ state }) {
   const mats = useMemo(() => {
-    const fish = makeLakeMaterial()
+    const fish = makeLakeMaterial({ fish: true })
     fish.userData.uniforms.uHighlight.value.set('#ffe9a0') // fish light up warm, like a sonar return
     fish.userData.uniforms.uFogDensity.value = 0.006
     return { bed: makeLakeMaterial(), inst: makeLakeMaterial(), fish }
@@ -264,7 +286,7 @@ export default function LakeScene({ state }) {
       <hemisphereLight args={['#dbe9f0', '#2a3a2a', 0.9]} />
       <directionalLight position={[40, 80, 30]} intensity={1.4} />
       <Lakebed mat={mats.bed} />
-      <mesh rotation-x={-Math.PI / 2} position-y={-42}><planeGeometry args={[900, 900]} /><meshBasicMaterial color="#17545f" /></mesh>
+      <mesh rotation-x={-Math.PI / 2} position-y={-47}><planeGeometry args={[900, 900]} /><meshBasicMaterial color="#17545f" /></mesh>
       <Structures mat={mats.inst} />
       <Wreck mat={mats.inst} />
       <Fish mat={mats.fish} />

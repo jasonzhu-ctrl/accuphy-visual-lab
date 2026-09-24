@@ -126,3 +126,15 @@ Numbered log. Newest at the bottom.
     stay in `fish.js`; (c) outboard restyled to the **current-generation
     Mercury V8 Pro XS** look (rounded sculpted cowl, side vents, white/red
     band). Water made clearer (alpha 0.36 + fresnel). Dev aid `?cam=boat`.
+
+15. **2026-09-24** — Jason's second review of the 3D lake, applied: drop-off
+    to 40 m now runs across the **middle of the screen** (edge near z ≈ −4);
+    periphery flicker was z-fighting between the sunk lakebed rim and the
+    backstop floor → floor lowered; **3 musky** (0.78 / 1.02 / 1.28 m) cruise
+    the weed/timber edges; **lake trout ×4 and chinook salmon ×4** live in the
+    deep water; fish now have body types (bass / salmonid / pike / panfish /
+    bait), back→belly colour gradient and species markings (bars, spots,
+    lateral stripe) in the fish shader; **3–5 big boulders (2–4 m)** and
+    **3 small rock humps** (with 1.5 m terrain mounds) added; outboard
+    restyled to **Mercury 250 Pro XS** proportions (tall boxy cowl, forward-
+    sloping top, front hood intake, graphite side panels, white/red band).

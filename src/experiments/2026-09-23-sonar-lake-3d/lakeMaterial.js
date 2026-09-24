@@ -7,7 +7,7 @@ import * as THREE from 'three'
 //   inside ⇔ r=|(u,v)| < R, atan(v,u) ∈ [a0,a1], w ∈ [s0,s1]·u·tan(theta)
 export const MAX_BEAMS = 2
 
-export function makeLakeMaterial({ instanced = false } = {}) {
+export function makeLakeMaterial({ fish = false } = {}) {
   const uniforms = {
     uSun: { value: new THREE.Vector3(0.4, 0.8, 0.3).normalize() },
     uFogColor: { value: new THREE.Color('#17545f') },
@@ -25,9 +25,17 @@ export function makeLakeMaterial({ instanced = false } = {}) {
   const mat = new THREE.ShaderMaterial({
     uniforms,
     vertexColors: true,
+    defines: fish ? { FISH: 1 } : {},
     vertexShader: /* glsl */ `
       varying vec3 vWorld; varying vec3 vNormal; varying vec3 vColor;
+      #ifdef FISH
+        attribute float aPattern; attribute vec3 aBelly;
+        varying float vPattern; varying vec3 vBelly; varying vec3 vLocal;
+      #endif
       void main() {
+      #ifdef FISH
+        vPattern = aPattern; vBelly = aBelly; vLocal = position;
+      #endif
         vec3 c = vec3(1.0);
         #ifdef USE_COLOR
           c = color;
@@ -54,6 +62,10 @@ export function makeLakeMaterial({ instanced = false } = {}) {
       uniform vec3 uApex[${MAX_BEAMS}]; uniform vec3 uC[${MAX_BEAMS}]; uniform vec3 uH[${MAX_BEAMS}]; uniform vec3 uN[${MAX_BEAMS}];
       uniform vec4 uAng[${MAX_BEAMS}]; uniform vec2 uRT[${MAX_BEAMS}];
       uniform float uReveal; uniform vec3 uHighlight;
+      #ifdef FISH
+        varying float vPattern; varying vec3 vBelly; varying vec3 vLocal;
+        float hash3(vec3 p) { return fract(sin(dot(p, vec3(127.1, 311.7, 74.7))) * 43758.5453); }
+      #endif
 
       float insideBeam(int k, vec3 p) {
         vec3 d = p - uApex[k];
@@ -77,7 +89,18 @@ export function makeLakeMaterial({ instanced = false } = {}) {
         if (!gl_FrontFacing) n = -n;
         float lambert = max(dot(n, uSun), 0.0);
         float hemi = 0.5 + 0.5 * n.y;
-        vec3 base = vColor * (0.28 + 0.42 * hemi + 0.6 * lambert);
+        vec3 albedo = vColor;
+      #ifdef FISH
+        // back → belly gradient by local height (fish geometry is 1 unit long, y in [-0.18, 0.18])
+        float t = smoothstep(0.08, -0.14, vLocal.y);
+        albedo = mix(vColor, vBelly, t);
+        // markings: 1 vertical bars, 2 light spots, 3 dark spots, 4 dark lateral stripe
+        if (vPattern > 0.5 && vPattern < 1.5) { float bar = smoothstep(0.35, 0.5, abs(fract(vLocal.x * 9.0) - 0.5) * 2.0); albedo *= mix(0.55, 1.0, bar) * (1.0 - 0.6 * t) + 0.6 * t; }
+        if (vPattern > 1.5 && vPattern < 2.5) { float sp = step(0.86, hash3(floor(vLocal * 22.0))); albedo = mix(albedo, albedo * 1.7 + 0.15, sp * (1.0 - t)); }
+        if (vPattern > 2.5 && vPattern < 3.5) { float sp = step(0.88, hash3(floor(vLocal * 26.0))); albedo = mix(albedo, albedo * 0.35, sp * (1.0 - t * 0.8)); }
+        if (vPattern > 3.5) { float st = 1.0 - smoothstep(0.02, 0.05, abs(vLocal.y + 0.01)); float br = step(0.5, hash3(floor(vLocal * vec3(10.0, 1.0, 1.0)))); albedo = mix(albedo, albedo * 0.35, st * br); }
+      #endif
+        vec3 base = albedo * (0.28 + 0.42 * hemi + 0.6 * lambert);
         // dim everything under water a little; the beam brings it back
         float beam = 0.0;
         for (int k = 0; k < ${MAX_BEAMS}; k++) { if (k < uBeamCount) beam = max(beam, insideBeam(k, vWorld)); }
