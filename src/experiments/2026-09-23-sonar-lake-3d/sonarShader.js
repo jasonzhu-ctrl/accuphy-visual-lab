@@ -161,10 +161,12 @@ export const sonarFragment = /* glsl */ `
         float w = 1.0 - 0.6 * f * f;            // soft ends
         fishSum += w * fishAt(k, a + f * beamHalf, r, jit); wSum += w;
       }
-      float fishHit = min(0.82, 1.35 * fishSum / wSum);       // soft rim from the angular average (§7.4); capped well under white (Jason: 太亮)
+      float fishHit = min(0.78, 1.3 * fishSum / wSum);        // soft rim from the angular average (§7.4); capped under white (Jason: 太亮)
       // lumpy body (the app's near blobs are uneven: flexing body, ping-to-ping change), never speckle
-      fishHit *= 0.7 + 0.45 * vnoise(p * 5.0 + vec2(0.0, uTime * 0.15)); // lumpy body
-      fishHit *= 0.55 + 0.75 * filament;                                   // beam filaments: ragged, streaky (Jason: 太光滑/太模糊)
+      // lumpy body: two noise scales, deep enough to cut holes and bites into the silhouette (app: irregular blobs)
+      float lump = vnoise(p * 4.0 + vec2(0.0, uTime * 0.12)) * 0.6 + vnoise(p * 11.0 - vec2(uTime * 0.07, 0.0)) * 0.55;
+      fishHit *= smoothstep(0.15, 0.75, lump) * 1.15;
+      fishHit *= 0.6 + 0.6 * filament;                                     // beam filaments, moderate (Jason: 取两者中间)
       float atten = 1.0 - 0.4 * clamp(r / uRange, 0.0, 1.0);
       float gain = uFlat > 0.5 ? 3.0 : 1.0;
       float fishEcho = fishHit * (1.0 + 0.12 * streak);   // fish rims are smooth gradients in the app, not speckle
