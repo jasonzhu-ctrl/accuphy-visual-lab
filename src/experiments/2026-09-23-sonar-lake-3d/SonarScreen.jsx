@@ -42,7 +42,9 @@ export default function SonarScreen({ state, rect, lakeMats }) {
   if (import.meta.env.DEV) { window.__sonarGL = gl; window.__sonarState = state.current }
   const res = useMemo(() => {
     const targets = [0, 1].map(() => {
-      const rt = new THREE.WebGLRenderTarget(STRIP_W, STRIP_H, { depthBuffer: true })
+      // NEAREST: the colour target's alpha is a TAG (1 fish, 0.5 structure, 0 bottom); linear filtering
+      // blended fish edges into 'structure' values and speckled every small fish (2026-09-24)
+      const rt = new THREE.WebGLRenderTarget(STRIP_W, STRIP_H, { depthBuffer: true, minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter })
       rt.depthTexture = new THREE.DepthTexture(STRIP_W, STRIP_H, THREE.UnsignedIntType)
       return rt
     })

@@ -70,8 +70,8 @@ export const sonarFragment = /* glsl */ `
     for (int j = 0; j < 24; j++) {
       float v = (float(j) + 0.5) / 24.0;         // fixed rows: no per-pixel jitter → a solid mark, not salt-and-pepper
       float ty = (v * 2.0 - 1.0) * uFan[k].w;
-      float m = smoothstep(0.55, 0.95, sampleFish(k, vec2(u, v))); // linear-filtered alpha = coverage; weight by it instead of a hard cut (no checkerboard on small fish)
-      if (m < 0.02) continue;
+      float m = step(0.75, sampleFish(k, vec2(u, v)));  // tag 1 = fish (nearest-filtered, exact)
+      if (m < 0.5) continue;
       float hit = sampleDist(k, vec2(u, v), length(vec3(tan(a), ty, 1.0)));
       float dr = r - hit;
       float sr = (0.12 + 0.004 * r) * srScale;  // pulse length: thin in range, barely grows
