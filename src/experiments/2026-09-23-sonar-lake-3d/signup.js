@@ -7,7 +7,7 @@
 // API (public site key — safe to ship in the page; no private key ever goes into this code).
 export const KLAVIYO = {
   publicKey: null,  // Klaviyo "Public API key / Site ID" (6 characters), e.g. 'AbC123'
-  listId: null,     // the list id for "Website — Sonar Beam Explorer"
+  listId: null,     // the list id for "Sonar Beam Explorer sign-ups"
   revision: '2026-07-15', // Klaviyo API revision (each is supported ~2 years; bump when Klaviyo retires it)
 }
 

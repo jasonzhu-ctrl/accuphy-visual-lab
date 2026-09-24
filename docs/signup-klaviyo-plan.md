@@ -24,7 +24,7 @@ Copy on the card (English source, `SignupGate.jsx`):
 
 ## 2. Turning Klaviyo on (Jason, ~15 minutes, when the page goes public)
 
-1. **Create the list** in Klaviyo: *Audience → Lists & segments → Create → List*, name **"Website — Sonar Beam Explorer"**.
+1. **Create the list** in Klaviyo: *Audience → Lists & segments → Create → List*, name **"Sonar Beam Explorer sign-ups"**.
 2. **Choose the opt-in** in the list's settings. **Double opt-in** is recommended (Klaviyo emails a confirm link; best proof of consent for CASL/GDPR). Klaviyo applies the list's setting to this form automatically.
 3. **Copy two values**:
    - the **public API key / Site ID** (6 characters): *Settings → Account → API keys → Public API key*. It is safe in a web page.
