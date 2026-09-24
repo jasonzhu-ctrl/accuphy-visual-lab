@@ -1,13 +1,18 @@
 # Accuphy Visual Lab
 
-Design experiments for the accuphy.ca website. Each idea lives in its own
-folder under `experiments/`, written in plain HTML/CSS/JS with no build step,
-so anything here can be opened, compared and thrown away cheaply. This is a
-separate project from the Accuphy Partner Portal / RMA portal.
+Design and interaction experiments for the accuphy.ca website. Each idea lives
+in its own folder under `src/experiments/`, built with Vite + React + Tailwind
++ Framer Motion, so ideas can be tried, compared and thrown away cheaply. This
+is a separate project from the Accuphy Partner Portal / RMA portal.
 
-## Opening an experiment
+## Running it
 
-Open `experiments/<date>-<slug>/index.html` in any browser (double-click the
-file in Finder). No install, no server needed.
+```bash
+npm install
+npm run dev
+```
+
+Then open http://localhost:5173 — the gallery lists every experiment; click
+one to open it.
 
 See `CLAUDE.md` for project rules and `docs/decisions.md` for the decision log.
