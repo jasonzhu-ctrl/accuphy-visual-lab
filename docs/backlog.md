@@ -4,12 +4,12 @@ Jason 2026-09-24: "别把之前说过的任务丢了" — every promised task li
 it is done. ✅ done · 🔧 in progress · ⬜ open.
 
 ## Sonar screen (Phase 4)
-- 🔧 **Sonar screen rework** (queued by Jason 2026-09-24 until the data was chosen; parked patch `docs/wip/sonar-screen-rework.patch`): fill the screen per axis (range × depth range, apex position per view), dark-red noise floor inside the fan, radial streaks, thick bottom band with tail, near-apex rays — all per `sonar-style.md` §6
-- 🔧 Fish echoes: measured on the real app 2026-09-24 (`sonar-style.md` §6.3): a fish is a **horizontal dash** 3–5× wider than tall, orange with a yellow-white core at the transducer-facing end, soft edges; schools stack into bright bars. Next: rebuild the mark this way (Jason: fish are the most important thing)
+- ✅ **Sonar screen rework** (2026-09-24, after the tablet study): screen box per view fills the display with independent axes (`screenLayout` in `SonarScreen.jsx`), dark-red noise floor with radial streaks (mottled for PLM Down), thick bottom band with tail + faint second echo, near-apex rays, PLM Forward apex top-left, PLM Down stretched to the screen corners, Combo two-panel with the grey diagonal. Root cause of the old "small fan in black" picture: the screen-box code had been dropped by mistake in commit 4952966 (phone restyle)
+- 🔧 Fish echoes: now drawn as **horizontal dashes** (5 horizontal taps of the fish mask in screen metres, bright centre, feathered ends, thin across the beam) per `sonar-style.md` §6.3. Next: compare side by side with `reference/app-study/plm-forward-fish-crop-*.png` and tune size/brightness; school stacking
 - ✅ Surface clutter streak under the transducer (side views)
-- ⬜ Combo (PLM): rebuild as the app's two-panel layout — Down panel lower-left, Forward upper-right, shared apex at x≈20 %, grey double diagonal (`app-chrome.md` §6)
+- ✅ Combo (PLM): two-panel layout — Down panel lower-left (R/3, stretched ×2), Forward upper-right, shared apex at x≈20 %, grey double diagonal to x≈0.8 at the bottom
 - ✅ Forward View screen: apex ~20 % from the left, like the recordings
-- ⬜ Range/depth scale numbers and the rest of the app chrome — spec now complete in `app-chrome.md`; build it on the phone inset
+- ✅ App chrome on the phone inset (`SonarChrome.jsx`, 2026-09-24): italic rulers on three edges from the live screen box, live depth readout (water depth under the transducer), temp/voltage, wordmark + `1440p (QHD)` tag, range −/+, pause, gain −/+, back, ⋯, PL-Forward depth-range control, Combo variant. Decorative buttons (the left panel is the control) — making them work is a later nicety
 - ✅ App tone curve adopted (log compression + gain/dynamic-range window → LUT)
 - ✅ All 11 app colour maps available on the phone screen (amber default); gain slider
 
@@ -36,7 +36,7 @@ it is done. ✅ done · 🔧 in progress · ⬜ open.
 - 🔧 Phone realism (Jason: keep improving): now true Pro Max proportions, thin uniform bezel, brushed titanium band, side/action/power buttons, glass reflection, Dynamic Island — next: antenna lines, camera-side depth, screen-off reflections
 - ✅ Control panel in Accuphy brand (white wordmark, Instrument Sans, Eurostile Heavy headline, brand blue #0d8fdb)
 - ✅ Sonar screen inside an iPhone Pro Max frame (landscape, natural-titanium ring, dynamic island); the GL picture is drawn into the DOM display hole
-- ⬜ The sonar picture's own chrome (scales, numbers, depth readout, buttons) — build from `app-chrome.md`
+- ✅ The sonar picture's own chrome — done (see Sonar screen section)
 
 ## Experience (the three-step guide)
 - ✅ Three-step guide strip with presets (device/mode/range/boat position) — copy is a first draft for Jason to edit
@@ -44,6 +44,7 @@ it is done. ✅ done · 🔧 in progress · ⬜ open.
 - ⬜ Device side-view cutouts (or stylised silhouettes) — still owed by Jason
 
 ## Engineering
+- ✅ Dev helper `?bigphone` (DEV only): the phone frame fills the viewport so the sonar picture can be inspected in screenshots
 - 🔧 Mobile performance: dpr capped at 1.5, high-performance GL context; real-device fps check still to do
 - ✅ React 19 + R3F `refCleanup` console error — gone since StrictMode was removed (no new occurrences in this session's checks)
 - ⬜ **Local for now** (Jason 2026-09-24): `npm run build` + `npm run preview` on this Mac. Public hosting + Shopify embed stay in the plan for later, unchanged

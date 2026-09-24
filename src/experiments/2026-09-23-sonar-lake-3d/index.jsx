@@ -6,6 +6,10 @@ import { DEVICES, FT, MODE_LABELS } from '../2026-09-23-sonar-beam/devices'
 import { wedgeSpecs } from '../2026-09-23-beam-shapes-3d/wedge'
 import { PHONE_POSE } from './SonarScreen'
 import { COLORMAP_NAMES } from './colormaps'
+import SonarChrome from './SonarChrome'
+import { screenLayout } from './SonarScreen'
+// dev: ?bigphone makes the phone huge so the sonar picture can be inspected in screenshots
+const BIG_PHONE = import.meta.env.DEV && window.location.search.includes('bigphone')
 
 export const meta = {
   title: 'Sonar lake 3D — Phase 3/4',
@@ -18,7 +22,7 @@ export default function SonarLake3D() {
   const [rangeFt, setRangeFt] = useState(80)
   const [imperial, setImperial] = useState(true)
   const [colormap, setColormap] = useState('amber')
-  const [gain, setGain] = useState(0.7)
+  const [gain, setGain] = useState(0.57)
   const [, tick] = useState(0)
   useEffect(() => { const id = requestAnimationFrame(() => tick(1)); return () => cancelAnimationFrame(id) }, [])
 
@@ -31,6 +35,7 @@ export default function SonarLake3D() {
 
   const specs = useMemo(() => wedgeSpecs(device, mode, rangeFt * FT), [device, mode, rangeFt])
   const specKey = `${deviceId}-${mode}-${rangeFt}`
+  const layout = useMemo(() => screenLayout(deviceId, mode, rangeFt * FT, 2.08, specs), [deviceId, mode, rangeFt, specs]) // display aspect = phone frame aspect
 
   const b0 = (/boat=(-?[\d.]+),(-?[\d.]+)/.exec(window.location.search) || []).slice(1).map(Number) // dev: ?boat=x,z
   const state = useRef({
@@ -46,6 +51,8 @@ export default function SonarLake3D() {
   state.current.imperial = imperial
   state.current.colormap = colormap
   state.current.gain = gain
+  state.current.mode = mode
+  state.current.deviceId = deviceId
   // the sonar picture is drawn by the GL canvas into the phone's screen element
   const sonarRect = useRef({ el: null, frame: null })
 
@@ -115,7 +122,7 @@ export default function SonarLake3D() {
            Proportions from the 15/16 Pro Max: body 2.08:1, corner radius ≈ 14 % of the short side,
            thin uniform bezel, Dynamic Island on the left in landscape, volume/action buttons on top,
            power button below; brushed titanium band; faint glass reflection over the display. ---- */}
-      <div ref={(el) => { sonarRect.current.frame = el }} className="pointer-events-none absolute right-[4vw] bottom-[240px] w-[88vw] sm:right-[28px] sm:bottom-[24px] sm:w-[min(38vw,560px)]" style={{ aspectRatio: '2.08 / 1' }}>
+      <div ref={(el) => { sonarRect.current.frame = el }} className={`pointer-events-none absolute right-[4vw] bottom-[240px] w-[88vw] sm:right-[28px] sm:bottom-[24px] ${BIG_PHONE ? 'sm:w-[min(88vw,1400px)]' : 'sm:w-[min(38vw,560px)]'}`} style={{ aspectRatio: '2.08 / 1' }}>
         <div style={{ position: 'relative', width: '100%', height: '100%', transform: `perspective(${PHONE_POSE.perspective}px) rotateY(${PHONE_POSE.rotY}deg) rotateX(${PHONE_POSE.rotX}deg)` }}>
           {/* side buttons (on the top edge in landscape: action + volume; power on the bottom edge) */}
           <div className="ph-btn" style={{ left: '14%', top: '-1.2%', width: '2.2%', height: '1.6%' }} />
@@ -125,12 +132,8 @@ export default function SonarLake3D() {
           {/* titanium band (ring), inner black bezel (ring), display hole */}
           <div className="ph-band" style={{ ...ring('1.35%'), borderRadius: '6.6% / 13.8%', boxShadow: '16px 26px 44px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.45), inset 0 0 0 2px rgba(0,0,0,0.12)' }} />
           <div style={{ ...ring('1.25%'), inset: '1.35%', borderRadius: '6.1% / 12.7%', background: '#040404' }} />
-          <div ref={(el) => { sonarRect.current.el = el }} style={{ position: 'absolute', inset: '2.6%', borderRadius: '5.4% / 11.3%' }}>
-            <div className="absolute left-[7%] top-[5%] flex items-center gap-2">
-              <img src="/brand/logo/White Accuphy Logo.png" alt="" className="h-[11px] w-auto opacity-90" draggable={false} />
-              <span className="text-[10px] text-white/80">{device.name} · {MODE_LABELS[mode]}</span>
-            </div>
-            <div className="absolute right-[4%] top-[5%] text-[10px] tabular-nums text-white/80">{fmt(rangeFt)}</div>
+          <div ref={(el) => { sonarRect.current.el = el }} style={{ position: 'absolute', inset: '2.6%', borderRadius: '5.4% / 11.3%', containerType: 'size', overflow: 'hidden' }}>
+            <SonarChrome layout={layout} deviceId={deviceId} mode={mode} rangeFt={rangeFt} imperial={imperial} gain={gain} depthRef={(el) => { state.current.depthEl = el }} />
             <div className="ph-glass" />
           </div>
           {/* Dynamic Island: vertical pill on the left in landscape */}

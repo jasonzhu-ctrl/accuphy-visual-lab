@@ -3,9 +3,32 @@ import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { MAX_FANS, sonarVertex, sonarFragment } from './sonarShader'
 import { colormapTexture } from './colormaps'
+import { depthAt } from './terrain'
 
 // CSS 3D pose of the phone (index.jsx applies the same transform to the DOM frame)
 export const PHONE_POSE = { perspective: 1400, rotY: -16, rotX: 6 }
+
+// How the app frames each view (measured on the tablet 2026-09-24, docs/app-chrome.md §2/§6).
+// A box is {x0, y0, w, h} in metres with the apex at (0,0) and y growing with depth;
+// the quad maps it onto the whole display, so each axis is stretched independently.
+export function screenLayout(deviceId, mode, R, aspect, specs) {
+  const half = specs[0] ? (specs[0].a1 - specs[0].a0) / 2 : 0.6
+  const mini = deviceId === 'PLM'
+  if (mode === 'forward') {
+    if (mini) return { box0: { x0: 0, y0: 0, w: R, h: R / aspect }, apexU: 0, split: false }            // apex top-left, 1:1
+    return { box0: { x0: -0.25 * R, y0: 0, w: 1.25 * R, h: R }, apexU: 0.2, split: false }               // apex 20 % in, depth range = range
+  }
+  if (mode === 'down') {
+    if (mini) { const hw = R * Math.tan(half) * 1.12; return { box0: { x0: -hw, y0: 0, w: 2 * hw, h: R }, apexU: 0.5, split: false, mottle: true } } // fan corners on the screen corners
+    const w = R * aspect; return { box0: { x0: -w / 2, y0: 0, w, h: R }, apexU: 0.5, split: false }      // 1:1, the 135° fan runs off the sides
+  }
+  if (mode === 'panoramic') { const w = R * aspect; return { box0: { x0: -w / 2, y0: 0, w, h: R }, apexU: 0.5, split: false } }
+  // Combo (PLM): Forward panel upper-right (fan 1), Down panel lower-left (fan 0), shared apex at 20 %
+  const fwd = { x0: -0.25 * R, y0: 0, w: 1.25 * R, h: 0.7 * R }
+  const Rd = R / 3, wd = (Rd * aspect) / 2 // the Down panel is zoomed in and stretched ×2 like Live Down
+  const down = { x0: -0.2 * wd, y0: 0, w: wd, h: Rd }
+  return { box0: fwd, box1: down, apexU: 0.2, split: true, mottle: false }
+}
 
 // Takes over the frame loop (priority 1): renders a depth strip per fan from the
 // transducer, then the main view, then the sonar screen as an overlay quad.
@@ -30,8 +53,9 @@ export default function SonarScreen({ state, rect, lakeMats }) {
         uColor0: { value: targets[0].texture }, uColor1: { value: targets[1].texture },
         uFanCount: { value: 0 }, uFan: { value: [new THREE.Vector4(), new THREE.Vector4()] },
         uNearFar: { value: new THREE.Vector2(0.3, 150) }, uRange: { value: 20 },
-        uScreenMin: { value: new THREE.Vector2(-20, 0) }, uScreenSize: { value: new THREE.Vector2(40, 30) }, uTime: { value: 0 }, uUnitM: { value: 0.3048 }, uFlat: { value: 0 }, uDebug: { value: window.location.search.includes('sonardebug') ? 1 : 0 },
-        uLUT: { value: colormapTexture('amber') }, uGain: { value: 0.7 }, uDynRange: { value: 0.85 },
+        uBox0: { value: new THREE.Vector4(-20, 0, 40, 30) }, uBox1: { value: new THREE.Vector4(-20, 0, 40, 30) }, uSplit: { value: 0 }, uApexU: { value: 0.5 },
+        uTime: { value: 0 }, uFlat: { value: 0 }, uStreak: { value: 1 }, uDebug: { value: window.location.search.includes('sonardebug') ? 1 : 0 },
+        uLUT: { value: colormapTexture('amber') }, uGain: { value: 0.57 }, uDynRange: { value: 0.85 },
       },
     })
     const overlay = new THREE.Scene()
@@ -59,12 +83,24 @@ export default function SonarScreen({ state, rect, lakeMats }) {
     const u = res.mat.uniforms
     u.uTime.value += dt
     u.uRange.value = s.rangeM
-    u.uUnitM.value = s.imperial ? 0.3048 : 1
     if (s.colormap !== u.uLUT.name) { u.uLUT.value.dispose?.(); u.uLUT.value = colormapTexture(s.colormap); u.uLUT.name = s.colormap }
-    u.uGain.value = s.gain ?? 0.7
+    u.uGain.value = s.gain ?? 0.57
     u.uFanCount.value = specs.length
     const flat = specs[0] && specs[0].frame.n.y !== 0 // panoramic: thickness normal is vertical
     u.uFlat.value = flat ? 1 : 0
+    // screen box(es) in metres — the app fills the screen and scales each axis on its own
+    {
+      const el0 = rect.current.el
+      const aspect = el0 && el0.offsetHeight > 0 ? el0.offsetWidth / el0.offsetHeight : 2
+      const lay = screenLayout(s.deviceId, s.mode, s.rangeM, aspect, specs)
+      u.uBox0.value.set(lay.box0.x0, lay.box0.y0, lay.box0.w, lay.box0.h)
+      const b1 = lay.box1 ?? lay.box0
+      u.uBox1.value.set(b1.x0, b1.y0, b1.w, b1.h)
+      u.uSplit.value = lay.split ? 1 : 0
+      u.uApexU.value = lay.apexU
+      u.uStreak.value = lay.mottle ? 0 : 1
+      s.layout = lay // for the DOM chrome (rulers)
+    }
 
     // 1) depth strips from the transducer (materials flag the pass so alpha = fish mask)
     lakeMats.forEach((m) => { m.userData.uniforms.uSonarPass.value = 1 })
@@ -91,6 +127,12 @@ export default function SonarScreen({ state, rect, lakeMats }) {
     })
     gl.setRenderTarget(null)
     lakeMats.forEach((m) => { m.userData.uniforms.uSonarPass.value = 0 })
+    // the app's depth readout: water depth under the transducer, in the user's unit
+    if (s.depthEl) {
+      const d = depthAt(s.apex.x, s.apex.z)
+      const txt = s.imperial ? `${(d / 0.3048).toFixed(1)} ft` : `${d.toFixed(1)} m`
+      if (s.depthEl.textContent !== txt) s.depthEl.textContent = txt
+    }
     if (s.debugEl) s.debugEl.textContent = `sonar fans ${specs.length} flat ${flat ? 1 : 0} fan0 ${u.uFan.value[0].toArray().map((v) => v.toFixed(2)).join(',')} apex ${s.apex.toArray().map((v) => v.toFixed(1)).join(',')}`
 
     // 2) main view

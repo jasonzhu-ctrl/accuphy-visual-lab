@@ -253,3 +253,22 @@ Numbered log. Newest at the bottom.
     `docs/wip/sonar-screen-rework.patch` and is the next task. Screenshots are
     committed under `reference/app-study/` (JPEG, ≈ 17 MB) as the design
     reference; the `.sonar` files stay on the tablet / Drive.
+
+26. **2026-09-24** — **Sonar screen rebuilt from the tablet measurements**
+    (decision #25). (a) The old inset showed a small fan in a black box because
+    the fan-fitting screen-box code had been dropped by accident in commit
+    `4952966` (the phone restyle) — `uScreenMin/uScreenSize` were never set
+    again. Replaced by `screenLayout()` in `SonarScreen.jsx`: a screen box in
+    metres per (device, view) that fills the display with independent axis
+    scales, exactly like the app (PL Forward apex 20 %, depth range = range;
+    PLM Forward apex top-left 1:1; PL Down 1:1; PLM Down stretched so the fan
+    corners meet the screen corners; Panoramic apex bottom-centre; Combo =
+    Forward panel upper-right + Down panel lower-left (R/3) split by the grey
+    diagonal). (b) Shader look: dark-red noise floor inside the fan (radial
+    streaks; mottled speckle for PLM Down), thick bottom band with tail and a
+    faint second echo, near-apex rays, **fish as horizontal dashes** with a
+    bright core. Default gain 57 % (Jason's screenshots). (c) New
+    `SonarChrome.jsx`: the app's chrome over the picture in container-query
+    units (rulers, live depth readout via `depthAt`, temp/voltage, wordmark +
+    resolution tag, range/gain/pause/back/⋯, PL-Forward depth-range control).
+    Buttons are decorative for now. (d) Dev helper `?bigphone`.
