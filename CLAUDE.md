@@ -39,6 +39,9 @@ no TypeScript. No backend, no database — front-end only.
 
 - **PL** = PingLive, **PLM** = PingLive Mini (Jason's shorthand).
 - *Range* = horizontal distance, *depth range* = vertical (as in the app).
+- **Units:** the Accuphy app can be metric or imperial. Only trust a unit that
+  is printed on screen (`13.4 m`); bare axis numbers carry no unit. Engine
+  works in metres internally, displays in the user's unit.
 
 ## Rules
 

@@ -31,6 +31,8 @@ Numbered log. Newest at the bottom.
    palettes apply to both devices; (b) the app draws with non-uniform px/m
    (horizontal stretch) — engine works in metres, never copies screen angles;
    (c) yellow mode does not tint the beam area, blue/red mode fills it navy.
+   *Correction (Jason, same day):* the RPReplay clips' 40/60 axis numbers are
+   **feet** — the app was in imperial; only a printed unit counts.
 
 5. **2026-09-23** — Jason: (a) **yellow colour mode first**; more app palettes
    later. (b) Abbreviations **PL = PingLive, PLM = PingLive Mini**. (c) Max

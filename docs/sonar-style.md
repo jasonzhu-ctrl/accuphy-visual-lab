@@ -48,9 +48,14 @@ Ramp: `#000000 → #300000 → #801000 → #c05000 → #e09000 → #f0c000 → #
   Measured half-angle after correcting for the stretch ≈ 18–19°, i.e. the
   39° Mini beam. Our engine should work in metres and let the view choose
   aspect — do **not** copy pixel angles from the screen.
-- Ranges seen in the clips: Mini 8 m / 14 m / 16 m; PingLive 16–22 m; the
-  RPReplay split view goes to 40–60 m forward. **Max range per device/mode is
-  still a TODO from Jason** — do not hard-code these.
+- Display ranges seen in the clips (clips whose depth readout shows `m`):
+  PLM 8 / 14 / 16 m; PL 16–22 m. The two RPReplay split-view clips show bare
+  numbers → the app was in **imperial**: 40 ft and 60 ft forward range.
+  Max range/depth per device: **PL 240 ft, PLM 200 ft** (decision #5), user
+  adjustable — keep as data, never hard-code.
+- ⚠️ **Units:** the app switches metric/imperial in settings. Only trust a
+  unit that is printed on screen; a bare number on an axis has no unit. The
+  engine works in metres internally and formats to the user's unit on top.
 
 ## 3. How each thing looks
 
@@ -72,6 +77,6 @@ ACCUPHY logo top-right, `1440p (QHD)` tag. Not needed for the marketing
 visualiser — the "sonar flashlight" only needs the picture inside the beam.
 
 ## 5. Open questions for Jason
-1. Which device made the two RPReplay split-view clips (range 40/60 m)?
+1. Which device made the two RPReplay split-view clips (range 40/60 ft)?
 2. For the website piece: one palette only, or a blue/red ↔ yellow toggle?
 3. Max range per device and mode (needed for fan length).
