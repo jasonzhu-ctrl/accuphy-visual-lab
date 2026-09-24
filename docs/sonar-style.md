@@ -321,12 +321,21 @@ this check in the loop whenever gain/contrast/pulse/tail constants change:
 run `__sonarHist(10)` on the two standard scenes (`?boat=-40,-5` PLM Forward
 60 ft; `?boat=4,-26` PL Forward 120/100 ft) and compare with the table.
 
-Engine at γ 0.8 (Black Body, gain 57 / contrast 40 / noise 30), 2026-09-24:
+Engine after the balance loop (Black Body, gain 57 / contrast 40 / noise 30,
+γ 0.75, bottom = 1.2·pulse integrated + 0.5·first-return peak, tail 0.5 over
+1.2 m + 0.04·r), 2026-09-24:
 
 | Scene | black | 0–.1 | .1–.2 | .2–.3 | .3–.4 | .4–.5 | .5–.6 | .6–.7 | .7–.8 | .8–.9 | .9–1 |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| PLM Forward 60 ft (bottom + timber) | 0.78 | .110 | .167 | .198 | .154 | .129 | .076 | .054 | .032 | .021 | .060 |
-| PL Forward 120/100 ft (bottom band, wreck out of the fan) | 0.84 | .025 | .022 | .041 | .067 | .111 | .139 | .173 | .160 | .154 | .107 |
+| PLM Forward 60 ft (bottom + timber) | 0.90 | .081 | .114 | .125 | .144 | .170 | .154 | .098 | .037 | .016 | .060 |
+| PL Forward 120/100 ft (bottom band, wreck out of the fan) | 0.85 | .038 | .034 | .034 | .032 | .044 | .097 | .222 | .261 | .187 | .050 |
+
+What the loop taught: (1) the bottom band must be a thin hot leading edge
+(first return) over an orange body (integrated thickness) — a wide white slab
+was the biggest mismatch; (2) the app's band tops at white only where the
+bottom is flat across the beam, so the peak term is weighted 0.5, not 1;
+(3) the black fraction is scene-dependent and not a target — compare the
+lit-pixel histogram shape and the side-by-side, not the black %.
 
 Side-by-side files: `reference/engine-compare/compare-*-app-vs-engine.png`
 (left = app reference frame, right = engine, same colour map). Snapshots are
