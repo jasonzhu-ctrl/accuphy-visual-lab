@@ -141,12 +141,12 @@ export const sonarFragment = /* glsl */ `
         float tag = sampleFish(k, vec2(u, v));   // 1 fish · 0.5 structure · 0 bottom
         float fish = step(0.75, tag);
         float structure = step(0.25, tag) * (1.0 - fish);
-        float pulse = exp(-dr * dr / (sigma * sigma)) * (1.0 - 0.12 * structure) * mix(1.0, 0.85 + 0.25 * filament, structure); // structure facing the transducer: solid and bright, only a touch under the bottom band (Jason 2026-09-24)
+        float pulse = exp(-dr * dr / (sigma * sigma)) * (1.0 - 0.22 * structure) * mix(1.0, 0.85 + 0.25 * filament, structure); // structure facing the transducer: solid and bright, only a touch under the bottom band (Jason 2026-09-24)
         float tail = dr > 0.0 ? 0.6 * exp(-dr / tailLen) : 0.0;   // body of the band sits in the orange mid-tones
         float second = 0.10 * exp(-(r - 2.0 * hit) * (r - 2.0 * hit) / (4.0 * sigma * sigma)); // faint second echo
         float wgt = 0.55 + 0.9 * (1.0 - abs(v * 2.0 - 1.0));
         acc += (1.2 * pulse + tail + second) * wgt * (1.0 - fish);
-        peak = max(peak, pulse * (1.0 - fish) * (1.0 - 0.15 * structure));
+        peak = max(peak, pulse * (1.0 - fish) * (1.0 - 0.3 * structure)); // structure tops out yellow-orange, not white (app piling)
       }
       acc = acc / 21.0 + 0.5 * peak;  // 24 rows now (was 16 → /14) // first return makes the leading edge hot even where the bottom slopes across the beam; the integrated part gives the orange body (balance loop, §6.11)
       // fish (sonar-style.md §6.8): the mask already carries the fish's own angular extent
@@ -170,7 +170,7 @@ export const sonarFragment = /* glsl */ `
         haloSum += w * fishAt(k, a + f * beamHalf * 2.5, r, jit, 2.5); hSum += w;
       }
       float fill = fishSum / wSum, halo = haloSum / hSum;
-      float fishHit = 0.8 * pow(smoothstep(0.0, 1.0, fill), 1.4) + 0.22 * halo * (1.0 - fill); // gradual rise rim → core, faint halo outside (§7.9)
+      float fishHit = 0.85 * smoothstep(0.0, 0.9, fill) + 0.22 * halo * (1.0 - fill); // gradual rise rim → core, faint halo outside (§7.9); mid-range dashes stay bright
       // lumpy body (the app's near blobs are uneven: flexing body, ping-to-ping change), never speckle
       // lumpy body: two noise scales, deep enough to cut holes and bites into the silhouette (app: irregular blobs)
       float lump = vnoise(p * 4.0 + vec2(0.0, uTime * 0.12)) * 0.6 + vnoise(p * 11.0 - vec2(uTime * 0.07, 0.0)) * 0.55;
