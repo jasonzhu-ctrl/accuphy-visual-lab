@@ -341,3 +341,66 @@ Side-by-side files: `reference/engine-compare/compare-*-app-vs-engine.png`
 (left = app reference frame, right = engine, same colour map). Snapshots are
 saved from the browser through the dev-only `POST /__snap` endpoint in
 `vite.config.js`.
+
+## 7. The photograph model (Jason's framing, 2026-09-24) — what each view "sees"
+
+> Jason: 探头发射波束的方向对应模型湖里物体形状的关系，有一点像拍照片；不同 view
+> 下不同深度对应的角度关系也很重要。
+
+Treat the transducer as a **camera whose film is the beam plane**. The fan is a
+thin slab (PL 20°, PLM 18° thick); only what cuts through that slab is imaged,
+and it is imaged in **polar coordinates of the plane**: direction inside the
+plane (angle) × distance from the transducer (range). Nothing outside the
+slab exists; nothing behind an occluder exists (acoustic shadow).
+
+**A target's mark = its silhouette cut by the plane, projected onto the plane,
+then blurred:** tangentially by the beam angle (footprint grows with range —
+§6.8) and radially by the pulse (constant). Brightness = how much of the beam
+the cut fills × how hard the surface faces the transducer.
+
+### 7.1 Per view: which plane, which angles, which depths
+| View | Plane | Angles covered (from straight down) | Depth ↔ angle rule |
+|---|---|---|---|
+| **Down** (both) | vertical, across the screen; apex top-centre | PL ±67.5°, PLM ±19.5° (drawn ±21.5°) | a target at depth d, offset s sideways is at angle atan(s/d); at 8 m depth PLM sees ±2.8 m of bottom, PL sees ±19 m |
+| **Forward** | vertical, fore-aft; apex left (PL 20 %, PLM corner) | PL −45°…90° (sees straight down and ahead), PLM 51.5°…90° (a wedge from 1.26·d ahead to the surface) | PLM Forward **cannot see anything closer than 1.26× its depth** — deep fish only appear far out; the bottom enters the fan at x = 1.26·depth and rises toward the right |
+| **Panoramic** (PL) | tilted 5° down, 20° thick → 5°–25° below the surface | 135° wide in the horizontal | the fan **grazes** the bottom: at range r it touches depth r·sin(5°…25°) = 0.09r…0.42r, so the whole picture is bottom texture with shadows; mid-water fish are only caught in that thin depth band |
+
+### 7.2 Fish, per view (from the recordings)
+- **Down, near (1–3 m, `reference/app-study/fish-down-near/`):** a big fish
+  swimming *along* the plane is drawn as its **whole body outline**, 0.6–0.8 m
+  long, lumpy, red core with yellow → green → cyan soft rim (jet map);
+  swimming *across* the plane it is a short cross-section blob that pops in
+  and out as it passes the 18° slab. Two fish crossing at an angle → two
+  diagonal streaks. Small fish at 4–5 m: dots ≈ 0.15 m with a cyan halo.
+- **Forward, mid/far (§6.3, §6.8):** the level fish's body projected into the
+  fore-aft plane → a horizontal dash, bright toward the transducer, feathered
+  ends; at far range every fish is smeared to the beam footprint (tangential).
+- **Panoramic:** fish are streaks along the plane where they cut the thin
+  depth band; the bottom is a textured field with black shadows behind humps.
+
+### 7.3 Bottom and structure, per view
+- Down: bottom is a **flat-ish thick band** (the plane cuts it along a line);
+  slope shows as tilt; the band has a hard top edge and a long speckled tail
+  (multiple reflections), brightest where the bottom faces the transducer
+  (directly below).
+- Forward: the bottom is the line where the plane meets the bed, drawn as a
+  band that **rises with range** in PLM (can only be seen ahead of 1.26·d);
+  structure (piling, tree, wreck) shows the side facing the transducer, with
+  a black shadow behind it and the bottom line continuing after it.
+- Panoramic: bottom texture everywhere, structure = bright face + shadow tail.
+
+### 7.4 Engine consequences (what still has to change)
+1. The sonar pass must give the screen the **fish silhouette as cut by the
+   slab**, at true scale — done (fish rendered into the depth strip, alpha
+   mask); the display scale of fish in the 3D lake (×2.6) must **not** leak
+   into the sonar pass (fish look 2.6× too big on the screen) → render the
+   sonar pass at true fish size.
+2. Mark rendering = silhouette ⊗ (tangential beam blur, radial pulse) with a
+   **soft rim** (tone falloff), not a hard-edged dash: the app's fish have a
+   bright core and a 2–3 pixel gradient edge in every view.
+3. Colour: the inset's orange reads too yellow; the app's real look (and
+   LiveScope's) spends more of the ramp in deep red. Build an "Accuphy red"
+   map for the inset (black → deep red → red → orange → yellow → white) and
+   calibrate it against the reference frames with the §6.11 histogram.
+4. PLM Forward depth rule (nothing nearer than 1.26·d) already follows from
+   the wedge geometry; make sure the guide copy explains it.

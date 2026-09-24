@@ -63,6 +63,19 @@ export function makePopulation(bedY) {
   addOne('salmon', 2, -22, 9.0, 0.82); addOne('salmon', 14, -24, 12.0, 0.9); addOne('salmon', -8, -26, 10.0, 0.76)
   ;[[10, -36, 18], [22, -40, 24], [-4, -40, 15], [30, -34, 20], [6, -50, 26], [18, -52, 14], [-14, -46, 21], [38, -28, 16], [48, -38, 22], [56, -30, 12], [42, -46, 26]]
     .forEach(([x, z, off]) => addOne('salmon', x, z, off, 0.7 + rnd() * 0.3))
+  // dev: ?fishtest — fixed fish at known spots so the sonar marks can be compared with the app's
+  // frames (docs/sonar-style.md §7.2). Boat at ?boat=28,11 → Down view; boat at ?boat=16,11 → PLM Forward.
+  if (typeof window !== 'undefined' && /fishtest/.test(window.location.search)) {
+    const T = (species, len, x, y, z, heading) => ({ species, len, home: [x, y, z], phase: 0, radius: 0, speed: 0, heading })
+    fish.push(
+      T('largemouth', 0.5, 28, -3, 11, 0),            // 3 m under the boat, broadside to the Down plane
+      T('largemouth', 0.5, 29.5, -5, 11, Math.PI / 2), // head-on to the plane (only the cross-section)
+      T('musky', 1.1, 26, -4.2, 11, 0),                // big fish, broadside
+      T('largemouth', 0.5, 28, -6.5, 11, 0),           // 12 m ahead of (16,11) at 6.5 m: inside PLM Forward
+      T('largemouth', 0.5, 25, -5, 11, Math.PI / 2),   // 9 m ahead, head-on
+      T('musky', 1.1, 30, -4, 11, 0),                  // 14 m ahead, broadside
+    )
+  }
   return fish
 }
 
@@ -76,6 +89,6 @@ export function fishPose(f, t, out) {
   // heading = derivative of the path
   const dx = -Math.sin(a) * f.radius * w
   const dz = Math.cos(a * 0.7) * f.radius * 0.6 * 0.7 * w
-  out.x = x; out.y = y; out.z = z; out.heading = Math.atan2(-dz, dx)
+  out.x = x; out.y = y; out.z = z; out.heading = f.heading != null ? f.heading : Math.atan2(-dz, dx)
   return out
 }

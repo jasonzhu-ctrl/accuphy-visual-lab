@@ -21,6 +21,7 @@ export function makeLakeMaterial({ fish = false, structure = false } = {}) {
     uRT: { value: [new THREE.Vector2(), new THREE.Vector2()] },  // R, tan(theta)
     uReveal: { value: 1.0 },
     uSonarPass: { value: 0.0 }, // 1 while rendering the sonar depth strips: alpha = fish mask
+    uFishSonarScale: { value: 1.0 / 2.6 }, // fish are DRAWN ×2.6 in the lake (fish.js); the sonar sees them at true size (§7.4)
     uHighlight: { value: new THREE.Color('#7fe6ff') },
   }
   const mat = new THREE.ShaderMaterial({
@@ -32,7 +33,7 @@ export function makeLakeMaterial({ fish = false, structure = false } = {}) {
       #ifdef FISH
         attribute float aPattern; attribute vec3 aBelly; attribute vec3 aSide;
         varying float vPattern; varying vec3 vBelly; varying vec3 vSide; varying vec3 vLocal;
-        uniform float uSonarPass;
+        uniform float uSonarPass; uniform float uFishSonarScale;
       #endif
       void main() {
         vec3 pos = position;
@@ -40,7 +41,7 @@ export function makeLakeMaterial({ fish = false, structure = false } = {}) {
         vPattern = aPattern; vBelly = aBelly; vSide = aSide; vLocal = position;
         // sonar pass: a fish echoes from a small part of its body at a time — compress the
         // body along its axis so the mark is narrow in angle and the pulse shapes its length
-        if (uSonarPass > 0.5) pos.x *= 0.9; // keep the real body: near fish show their own length + heading (sonar-style.md §6.8)
+        if (uSonarPass > 0.5) pos *= uFishSonarScale; // true size in the sonar; the body keeps its length + heading (§6.8, §7.4)
       #endif
         vec3 c = vec3(1.0);
         #ifdef USE_COLOR

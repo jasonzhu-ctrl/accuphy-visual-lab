@@ -177,6 +177,7 @@ function FishGroup({ mat, body, fish }) {
 }
 function Fish({ mat, state }) {
   const pop = useMemo(() => makePopulation(bedY), [])
+  if (import.meta.env.DEV) window.__fish = pop // dev: fish population for scene lookups
   state.current.pop = pop
   const groups = useMemo(() => {
     const by = {}

@@ -67,14 +67,14 @@ export const sonarFragment = /* glsl */ `
     if (abs(a) > uFan[k].y || r > uRange) return 0.0;
     float u = 0.5 + 0.5 * tan(a) / uFan[k].z;
     float best = 0.0;
-    for (int j = 0; j < 6; j++) {
-      float v = (float(j) + jit) / 6.0;
+    for (int j = 0; j < 8; j++) {
+      float v = (float(j) + jit) / 8.0;
       float ty = (v * 2.0 - 1.0) * uFan[k].w;
       float m = sampleFish(k, vec2(u, v));
       if (m < 0.75) continue;                    // alpha 1 = fish (0.5 = structure)
       float hit = sampleDist(k, vec2(u, v), length(vec3(tan(a), ty, 1.0)));
       float dr = r - hit;
-      float sr = 0.12 + 0.004 * r;              // pulse length: thin in range, barely grows
+      float sr = 0.16 + 0.005 * r;              // pulse length: thin in range, barely grows; gives the radial soft edge
       best = max(best, exp(-dr * dr / (sr * sr)));
     }
     return best;
@@ -122,11 +122,11 @@ export const sonarFragment = /* glsl */ `
       inAny = 1.0;
       float u = 0.5 + 0.5 * tan(a) / uFan[k].z;
       float acc = 0.0, peak = 0.0;              // acc = integrated band, peak = first return (hot leading edge)
-      float jit = hash(floor(p * 13.0) + 0.37);
+      float jit = hash(gl_FragCoord.xy * 0.37 + 0.11); // per-pixel row jitter: thin branches become grain, not blocks
       float sigma = 0.22 + 0.010 * r;           // bottom pulse: thin leading edge (app band ≈ 0.3 m), widens a little with range
       float tailLen = 1.2 + 0.04 * r;           // orange tail under the bottom
-      for (int j = 0; j < 16; j++) {
-        float v = (float(j) + jit) / 16.0;
+      for (int j = 0; j < 24; j++) {
+        float v = (float(j) + jit) / 24.0;
         float ty = (v * 2.0 - 1.0) * uFan[k].w;
         float rayLen = length(vec3(tan(a), ty, 1.0));
         float hit = sampleDist(k, vec2(u, v), rayLen);
@@ -141,7 +141,7 @@ export const sonarFragment = /* glsl */ `
         acc += (1.2 * pulse + tail + second) * wgt * (1.0 - fish);
         peak = max(peak, pulse * (1.0 - fish) * (1.0 - 0.2 * structure));
       }
-      acc = acc / 14.0 + 0.5 * peak; // first return makes the leading edge hot even where the bottom slopes across the beam; the integrated part gives the orange body (balance loop, §6.11)
+      acc = acc / 21.0 + 0.5 * peak;  // 24 rows now (was 16 → /14) // first return makes the leading edge hot even where the bottom slopes across the beam; the integrated part gives the orange body (balance loop, §6.11)
       // fish (sonar-style.md §6.8): the mask already carries the fish's own angular extent
       // (near: body length + heading). Blur it by a CONSTANT beam angle along the arc —
       // so far fish become tangential dashes the width of the beam — and use the average
@@ -154,7 +154,7 @@ export const sonarFragment = /* glsl */ `
         float w = 1.0 - 0.6 * f * f;            // soft ends
         fishSum += w * fishAt(k, a + f * beamHalf, r, jit); wSum += w;
       }
-      float fishHit = smoothstep(0.08, 0.7, fishSum / wSum) * 1.1; // head-on ≈ dim fleck, broadside ≈ full
+      float fishHit = min(1.15, 1.7 * fishSum / wSum);        // soft rim: the average fill tapers at the edges (§7.4); head-on ≈ dim, broadside ≈ full
       float atten = 1.0 - 0.4 * clamp(r / uRange, 0.0, 1.0);
       float gain = uFlat > 0.5 ? 3.0 : 1.0;
       float fishEcho = fishHit * (1.05 + 0.35 * streak);
