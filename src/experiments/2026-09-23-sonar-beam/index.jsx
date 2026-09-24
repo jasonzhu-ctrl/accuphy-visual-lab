@@ -8,12 +8,14 @@ export const meta = {
   description: 'Fans, PL/PLM switch, cursor = device on the surface, touch drag. Placeholder art.',
 }
 
-const SCENE_HEIGHT_M = 45 // visible scene height (metres): 15 m sky + 30 m water — placeholder choice
+const SKY_M = 15   // visible height above the surface (metres)
+const WATER_M = 50 // visible water depth (metres) — Jason 2026-09-23: "到 50 米水"
+const SCENE_HEIGHT_M = SKY_M + WATER_M
 
 export default function SonarBeam() {
   const [deviceId, setDeviceId] = useState('PLM')
   const [mode, setMode] = useState('down')
-  const [rangeFt, setRangeFt] = useState(60)
+  const [rangeFt, setRangeFt] = useState(85)
   const [imperial, setImperial] = useState(true)
   const [showScene, setShowScene] = useState(true)
   const [tiltOverride, setTiltOverride] = useState(null) // debug slider, null = rule
@@ -38,7 +40,7 @@ export default function SonarBeam() {
   const fans = useMemo(() => fanSpans(device, mode, tiltOverride ?? undefined), [device, mode, tiltOverride])
 
   // Mutable state read by the render loop every frame (no React re-render on drag).
-  const state = useRef({ deviceX01: 0.5, sceneHeightM: SCENE_HEIGHT_M, fans, rangeM: rangeFt * FT, showScene })
+  const state = useRef({ deviceX01: 0.5, sceneHeightM: SCENE_HEIGHT_M, surfaceM: SKY_M, fans, rangeM: rangeFt * FT, showScene })
   state.current.fans = fans
   state.current.rangeM = rangeFt * FT
   state.current.showScene = showScene
@@ -61,7 +63,7 @@ export default function SonarBeam() {
   }
   const onUp = () => { dragging.current = false }
 
-  const surfaceTop = '33.333%' // matches uSurfaceY = h/3
+  const surfaceTop = `${(100 * SKY_M) / SCENE_HEIGHT_M}%` // matches uSurfaceY
   const fmt = (ft) => (imperial ? `${Math.round(ft)} ft` : `${(ft * FT).toFixed(1)} m`)
 
   // Dev aid: `?frame=375x812` renders the experiment inside a centred box of

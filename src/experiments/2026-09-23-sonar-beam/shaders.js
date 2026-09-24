@@ -43,7 +43,7 @@ export const fragmentShader = /* glsl */ `
   float bedDepth(float x) {
     float w = uSceneSize.x;
     float t = x / w;
-    float base = 14.0 + 6.0 * sin(t * 3.1) + 3.0 * sin(t * 9.7 + 1.3) + 1.5 * noise(vec2(x * 0.25, 0.0));
+    float base = 30.0 + 11.0 * sin(t * 3.1) + 5.0 * sin(t * 9.7 + 1.3) + 2.0 * noise(vec2(x * 0.25, 0.0));
     // shallow shore on the left
     base = mix(2.0, base, smoothstep(0.0, 0.22, t));
     return base;
@@ -53,14 +53,14 @@ export const fragmentShader = /* glsl */ `
   float wreckMask(vec2 p) {
     float cx = uSceneSize.x * 0.62;
     float bed = uSurfaceY + bedDepth(cx);
-    vec2 d = abs(p - vec2(cx, bed - 2.2)) - vec2(5.0, 2.2);
+    vec2 d = abs(p - vec2(cx, bed - 3.0)) - vec2(7.0, 3.0);
     return 1.0 - smoothstep(0.0, 0.3, max(d.x, d.y));
   }
   // rock pile around x = 35%
   float rockMask(vec2 p) {
     float cx = uSceneSize.x * 0.35;
     float bed = uSurfaceY + bedDepth(cx);
-    float r = length((p - vec2(cx, bed - 1.0)) * vec2(0.6, 1.0)) - 2.4;
+    float r = length((p - vec2(cx, bed - 1.5)) * vec2(0.6, 1.0)) - 3.5;
     return 1.0 - smoothstep(0.0, 0.3, r);
   }
   // weed strands between 45% and 55%
@@ -68,7 +68,7 @@ export const fragmentShader = /* glsl */ `
     float t = p.x / uSceneSize.x;
     if (t < 0.44 || t > 0.56) return 0.0;
     float bed = uSurfaceY + bedDepth(p.x);
-    float h = 3.0 + 2.0 * noise(vec2(p.x * 0.8, 2.0));
+    float h = 4.0 + 3.0 * noise(vec2(p.x * 0.8, 2.0));
     float strand = smoothstep(0.35, 0.0, abs(fract(p.x * 1.6) - 0.5)); // thin columns
     float sway = 0.15 * sin(uTime * 1.5 + p.x * 2.0) * (bed - p.y);
     float inside = step(bed - h, p.y + sway) * step(p.y, bed + 0.2);
@@ -85,7 +85,7 @@ export const fragmentShader = /* glsl */ `
       return mix(sky, land, step(hills, p.y));
     }
     float depth = p.y - uSurfaceY;
-    vec3 water = mix(vec3(0.10, 0.45, 0.60), vec3(0.02, 0.08, 0.16), clamp(depth / 25.0, 0.0, 1.0));
+    vec3 water = mix(vec3(0.10, 0.45, 0.60), vec3(0.02, 0.08, 0.16), clamp(depth / 45.0, 0.0, 1.0));
     vec3 sand = vec3(0.45, 0.40, 0.28) * (0.8 + 0.2 * noise(p * 1.5));
     vec3 c = mix(water, sand, step(bed, p.y));
     c = mix(c, vec3(0.35, 0.25, 0.15), wreckMask(p));

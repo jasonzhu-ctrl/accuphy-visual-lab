@@ -42,7 +42,7 @@ function Quad({ state }) {
     const h = s.sceneHeightM
     const w = h * aspect
     u.uSceneSize.value.set(w, h)
-    u.uSurfaceY.value = h / 3 // 1/3 sky, 2/3 water (brief)
+    u.uSurfaceY.value = s.surfaceM
     u.uDeviceX.value = s.deviceX01 * w
     u.uTime.value = time.current
     u.uFanA.value.set(s.fans[0][0], s.fans[0][1])

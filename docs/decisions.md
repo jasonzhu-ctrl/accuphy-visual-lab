@@ -57,3 +57,12 @@ Numbered log. Newest at the bottom.
    device max from decision #5; engine uses metres. (d) Mouse hover moves the
    device; touch requires a drag. Device cursor is a placeholder shape until
    side-view PNGs exist.
+
+7. **2026-09-23** — Jason confirmed on the prototype: (a) **PLM Combo looks
+   right with the forward fan tilted 71°**, i.e. the forward fan's leading edge
+   lies on the water surface. Rule adopted for both devices: forward fan =
+   [90° − beam, 90°] from straight-down (PLM [51.5°, 90°], PL [−45°, 90°]);
+   supersedes the "contiguous 78°" assumption in #6. (b) **Visible water depth
+   50 m** (sky 15 m above). (c) Before Phase 3, Jason will supply a PingLive
+   three-viewing-mode animation and Garmin LVS34 real footage to study how
+   each mode images the bottom; he wants the final piece to feel **3D**.
