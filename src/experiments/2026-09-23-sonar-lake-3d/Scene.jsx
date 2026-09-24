@@ -11,7 +11,7 @@ import { wedgeGeometry } from '../2026-09-23-beam-shapes-3d/wedge'
 import { makeTallTree, makeBushTree, makeStump, makeLog, makeWeedTuft, makeRock, placeAll } from './vegetation'
 import { makeRangerBoat, TRANSDUCER_OFFSET } from './boat'
 import { makeFishGeometry } from './fishGeometry'
-import SonarScreen, { SONAR_HIDE_LAYER } from './SonarScreen'
+import SonarScreen, { SONAR_HIDE_LAYER, LAKEBED_LAYER, FISH_LAYER } from './SonarScreen'
 
 // ---------- lakebed ----------
 function Lakebed({ mat }) {
@@ -36,7 +36,7 @@ function Lakebed({ mat }) {
     g.computeVertexNormals()
     return g
   }, [])
-  return <mesh geometry={geo} material={mat} />
+  return <mesh geometry={geo} material={mat} onUpdate={(o) => o.layers.set(LAKEBED_LAYER)} />
 }
 
 // ---------- structures ----------
@@ -187,7 +187,7 @@ function FishGroup({ mat, body, fish }) {
     })
     ref.current.instanceMatrix.needsUpdate = true
   })
-  return <instancedMesh ref={ref} args={[geo, mat, fish.length]} frustumCulled={false} />
+  return <instancedMesh ref={ref} args={[geo, mat, fish.length]} frustumCulled={false} onUpdate={(o) => o.layers.set(FISH_LAYER)} />
 }
 function Fish({ mat, state }) {
   const pop = useMemo(() => makePopulation(bedY), [])

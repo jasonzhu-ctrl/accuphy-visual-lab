@@ -392,3 +392,14 @@ Numbered log. Newest at the bottom.
     removed from fish altogether (the app's fish are solid oblongs with a soft
     rim — the comb belongs to structure faces). Still open: school stacking,
     finer fill texture inside solid structure, bottom white tip width.
+
+36. **2026-09-24** — **Panoramic is a plan-view photograph; fish are persistence
+    streaks** (Jason: 鱼和结构的形状 … 完全不是一回事). Panoramic rebuilt from a
+    top-down model (baked terrain + per-frame structure height map + acoustic
+    shadow marching) instead of side-view depth strips. Fish in every view are
+    drawn analytically from their real pose and the last 0.7 s of their path —
+    the app's ping persistence — which explains the app's 0.4–1 m parallel
+    fish streaks in Panoramic and the horizontal dashes in Forward/Down; each
+    fish also casts a shadow blotch on the bottom in Panoramic. Schools swim
+    together. Panoramic framing matches the app (1:1, apex below the bottom
+    edge, no range arc). Details `sonar-style.md` §7.13.

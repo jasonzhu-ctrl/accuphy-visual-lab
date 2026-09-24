@@ -30,10 +30,10 @@ export default function SonarChrome({ layout, deviceId, mode, rangeFt, depthFt, 
   const hStep = niceStep(Math.abs(hx1 - hx0))
   const top = ticks(hx0, hx1, hStep).filter((v) => v !== 0 || true)
   const vStep = niceStep(box.h / unit)
-  const side = ticks(0, box.h / unit, vStep).filter((v) => v > 0)
+  const side = ticks(box.y0 / unit, (box.y0 + box.h) / unit, vStep).filter((v) => v > 0)
   const leftBox = split ? layout.box1 : box
   const lStep = niceStep(leftBox.h / unit)
-  const left = ticks(0, leftBox.h / unit, lStep).filter((v) => v > 0)
+  const left = ticks(leftBox.y0 / unit, (leftBox.y0 + leftBox.h) / unit, lStep).filter((v) => v > 0)
   const mini = deviceId === 'PLM'
   const showDepthRange = !mini && mode === 'forward'
   const label = (v) => `${Math.abs(Math.round(v * 100) / 100)}`
@@ -44,8 +44,8 @@ export default function SonarChrome({ layout, deviceId, mode, rangeFt, depthFt, 
     <div className="absolute inset-0 select-none text-white" style={{ fontFamily: 'var(--font-body, "Instrument Sans", system-ui, sans-serif)' }}>
       {/* rulers: italic numbers, no lines (orange mode has no grid) */}
       {top.map((v) => { const x = ((v - hx0) / (hx1 - hx0)) * 100; if (x < 1.5 || x > 98.5) return null; return <span key={`t${v}`} className={num} style={{ position: 'absolute', top: '1.5cqh', left: `${x}%`, transform: 'translateX(-50%)', fontSize: '3.2cqh', fontStyle: 'italic', opacity: 0.9 }}>{label(v)}</span> })}
-      {side.map((v) => { const y = (v * unit / box.h) * 100; const yy = flat ? 100 - y : y; if (yy < 4 || yy > 96) return null; return <span key={`r${v}`} className={num} style={{ position: 'absolute', right: '0.6%', top: `${yy}%`, transform: 'translateY(-50%)', fontSize: '3.2cqh', opacity: 0.9 }}>{label(v)}</span> })}
-      {left.map((v) => { const y = (v * unit / leftBox.h) * 100; const yy = flat ? 100 - y : y; if (yy < 4 || yy > 96) return null; return <span key={`l${v}`} className={num} style={{ position: 'absolute', left: '0.6%', top: `${yy}%`, transform: 'translateY(-50%)', fontSize: '3.2cqh', opacity: 0.9 }}>{label(v)}</span> })}
+      {side.map((v) => { const y = ((v * unit - box.y0) / box.h) * 100; const yy = flat ? 100 - y : y; if (yy < 4 || yy > 96) return null; return <span key={`r${v}`} className={num} style={{ position: 'absolute', right: '0.6%', top: `${yy}%`, transform: 'translateY(-50%)', fontSize: '3.2cqh', opacity: 0.9 }}>{label(v)}</span> })}
+      {left.map((v) => { const y = ((v * unit - leftBox.y0) / leftBox.h) * 100; const yy = flat ? 100 - y : y; if (yy < 4 || yy > 96) return null; return <span key={`l${v}`} className={num} style={{ position: 'absolute', left: '0.6%', top: `${yy}%`, transform: 'translateY(-50%)', fontSize: '3.2cqh', opacity: 0.9 }}>{label(v)}</span> })}
 
       {/* depth readout + water temp + voltage (top-left; Combo: top-right) */}
       <div style={{ position: 'absolute', top: '11cqh', ...(split ? { right: '5%', textAlign: 'left' } : { left: '4%' }) }}>

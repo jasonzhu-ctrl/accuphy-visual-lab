@@ -30,12 +30,18 @@ export function makePopulation(bedY) {
     for (let i = 0; i < n; i++) {
       const px = x + (rnd() - 0.5) * spread, pz = z + (rnd() - 0.5) * spread
       const y = bedY(px, pz) + offBottom + (rnd() - 0.5) * Math.min(spread, 3) * 0.5
-      fish.push({ species, len: range(SPECIES[species].len), home: [px, y, pz], phase: rnd() * Math.PI * 2, radius: 1.5 + rnd() * 3, speed: 0.15 + rnd() * 0.2 })
+      // schools move together: a shared swim direction and phase per school (derived from the school's
+      // position, so no extra rnd() calls and every fish keeps its place) — the app shows a school as
+      // parallel streaks (sonar-style.md §7.13)
+      const sh = Math.abs(Math.sin(x * 12.9898 + z * 78.233) * 43758.5453) % 1
+      const ph0 = rnd() * Math.PI * 2
+      fish.push({ species, len: range(SPECIES[species].len), home: [px, y, pz], phase: sh * 40 + (ph0 - Math.PI) * 0.13, rot: sh * Math.PI * 2 + ((ph0 * 7.1) % 1 - 0.5) * 0.5, radius: 1.5 + rnd() * 3, speed: 0.15 + rnd() * 0.2 })
     }
   }
   const addOne = (species, x, z, offBottom, len) => {
     const y = bedY(x, z) + offBottom
-    fish.push({ species, len, home: [x, y, z], phase: rnd() * Math.PI * 2, radius: 4 + rnd() * 4, speed: 0.08 + rnd() * 0.06 })
+    const ph = rnd() * Math.PI * 2
+    fish.push({ species, len, home: [x, y, z], phase: ph, rot: (ph * 3.7) % (Math.PI * 2), radius: 4 + rnd() * 4, speed: 0.08 + rnd() * 0.06 })
   }
   // bass hold on timber (shelf edge x≈-18) and the rock hump (30,12)
   add('largemouth', -16, 4, 1.2, 4, 10)
@@ -51,6 +57,9 @@ export function makePopulation(bedY) {
   add('smelt', -46, 12, 2.5, 40, 7)
   add('crappie', -54, 4, 2.0, 8, 5)
   add('smelt', -58, 14, 2.0, 25, 6)
+  add('smelt', -38, 2, 3.0, 30, 6)
+  add('crappie', -40, 16, 1.5, 12, 6)
+  add('largemouth', -35, 9, 1.0, 4, 6)
   // smelt: two tight bait balls in open water
   add('smelt', 10, -6, 7.0, 60, 4)
   add('smelt', 20, 26, 6.0, 50, 4)
@@ -90,12 +99,14 @@ export function makePopulation(bedY) {
 export function fishPose(f, t, out) {
   const w = f.speed
   const a = f.phase + t * w
-  const x = f.home[0] + Math.cos(a) * f.radius
-  const z = f.home[2] + Math.sin(a * 0.7) * f.radius * 0.6
+  // an orbit in the fish's own frame, rotated by f.rot (schools share it)
+  const ox = Math.cos(a) * f.radius, oz = Math.sin(a * 0.7) * f.radius * 0.6
+  const vx = -Math.sin(a) * f.radius * w, vz = Math.cos(a * 0.7) * f.radius * 0.6 * 0.7 * w // derivative of the path
+  const c = Math.cos(f.rot || 0), s = Math.sin(f.rot || 0)
+  const x = f.home[0] + ox * c - oz * s
+  const z = f.home[2] + ox * s + oz * c
   const y = f.home[1] + Math.sin(a * 1.3 + f.phase) * 0.3
-  // heading = derivative of the path
-  const dx = -Math.sin(a) * f.radius * w
-  const dz = Math.cos(a * 0.7) * f.radius * 0.6 * 0.7 * w
+  const dx = vx * c - vz * s, dz = vx * s + vz * c
   out.x = x; out.y = y; out.z = z; out.heading = f.heading != null ? f.heading : Math.atan2(-dz, dx)
   return out
 }

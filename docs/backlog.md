@@ -4,6 +4,8 @@ Jason 2026-09-24: "别把之前说过的任务丢了" — every promised task li
 it is done. ✅ done · 🔧 in progress · ⬜ open.
 
 ## Sonar screen (Phase 4)
+- ✅ Panoramic rebuilt as a plan-view photograph; fish = analytic persistence streaks with shadows in all views (decision #36)
+- ⬜ Panoramic wreck: the app's 35 m wreck shows dark hatches and bright crossbars — our 10 m wreck reads as a bright hull; a bigger, shallower wreck would make the Panoramic step stronger (ask Jason before moving/adding)
 - ⬜ Small far fish still show a faint dot grid inside the blob: the 24 sampled thickness rows miss a 4-row-tall bait fish depending on where it sits → fix with a column-reduction pre-pass (per angle column: fish coverage + nearest fish depth over all 128 rows), then one fetch per tap
 - ✅ Public UI trimmed to Device / View / Range; colour map, gain, contrast, noise, depth axis are `?dev` only (decision #34). No TVG, no tuning controls on the page
 - ✅ Brightness/orange balance calibration: LUT-index histogram of the confirmed frames vs the engine (`__sonarHist`), default map = Moreland_Black_Body, uGamma 0.8 (§6.11)

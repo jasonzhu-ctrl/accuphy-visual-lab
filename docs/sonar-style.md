@@ -571,3 +571,48 @@ Engine calibration (shelf scene, 50 ft): index histogram now 0.09 / 0.28 /
 0.36 / 0.21 in the first four bins vs the app's 0.01 / 0.70 / 0.24 / 0.04 —
 same shape, one bin brighter; black inside the fan 0. Shelf bait schools were
 added to the lake so the Panoramic step shows dashes.
+
+### 7.13 Panoramic rebuilt as a plan-view photograph (2026-09-24, Jason: "鱼和结构的形状包括沉船的 pano 和你做的完全不是一回事")
+The earlier Panoramic was still built like a side view (depth strips along a
+slab), so it could never produce what the app shows. Studied frame by frame:
+`pinglive/6089.MP4` (lake, 14 m, 32 frames), `3257.MP4`, the sunk-boat clip
+(62 m, blue mode) → `reference/app-study/panoramic-wreck/`, 3× streak crop in
+`panoramic-lake/pl-panoramic-fish-streaks-3x.png`.
+
+**What Panoramic is:** a picture taken from above. The fan lies nearly flat and
+grazes the bottom, so every point of the lake floor in front of the boat is a
+pixel, lit if the sound reaches it and dark if something between it and the
+transducer blocks the ray.
+- **Fish are streaks, 0.4–1 m long, all parallel within a school.** A fish is
+  ~0.2–0.4 m, so the length is not the body: the app blends consecutive pings
+  (persistence ≈ 0.7 s) and a moving fish paints the path it swam. Bright
+  yellow-white middle, orange pointed ends. Hovering fish are short.
+- **Every fish has a black blotch further out along its ray** — its acoustic
+  shadow on the bottom (the ray through the fish continues down and hits the
+  bottom later). The app's "random dark patches" are these.
+- **Structure = its silhouette from above** with the edge facing the
+  transducer brightest, and **a long black shadow behind it** away from the
+  transducer (the wreck: bright hull, dark hatches, a shadow as long as the
+  hull is tall × range / depth).
+- The field is an even crimson with fine grain, soft patches and beam-to-beam
+  bands (stronger at long range); near the transducer it is darker with
+  clutter speckle and bright spokes along a few beams.
+- **Framing:** 1:1, top edge = range, the apex just below the bottom edge; the
+  data runs out to the screen corners — only the two straight fan edges are
+  drawn, no arc.
+
+**Engine (new, `sonarMarks.js` + Panoramic branch of `sonarShader.js`):**
+bottom from a baked terrain texture, structure from a top-down depth map of
+the scene rendered each frame (dilated to the beam footprint so thin branches
+read as clumps), acoustic shadows by marching each ray back to the transducer,
+field textures calibrated in echo units (field LUT index 0.1–0.3).
+**Fish in all views are now analytic marks** computed on the CPU from each
+fish's true position, heading and the last 0.7 s of its path (persistence),
+not sampled from depth strips: Panoramic = swept body from above + shadow
+blotch; Down/Forward = swept body projected into the vertical plane (fish swim
+level → horizontal dashes, body depth = mark thickness, finer vertical-fan
+beam), strength from the beam pattern across the slab and the aspect.
+Fish in a school now share swim direction and phase (parallel streaks), and
+the shelf got more bait for the Panoramic step (preset now 70 ft).
+Comparisons: `reference/engine-compare/compare-pl-panoramic-app-vs-engine.png`,
+`compare-pl-panoramic-wreck-app-vs-engine.png`.
