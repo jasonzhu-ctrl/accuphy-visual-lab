@@ -67,18 +67,18 @@ export function makeLakeMaterial({ fish = false } = {}) {
         float hash3(vec3 p) { return fract(sin(dot(p, vec3(127.1, 311.7, 74.7))) * 43758.5453); }
       #endif
 
-      float insideBeam(int k, vec3 p) {
+      float insideBeam(int k, vec3 p, float margin) {
         vec3 d = p - uApex[k];
         float u = dot(d, uC[k]), v = dot(d, uH[k]), w = dot(d, uN[k]);
         float r = length(vec2(u, v));
         float ang = atan(v, u);
-        float soft = 0.04; // radians of edge softness
-        float inA = smoothstep(uAng[k].x - soft, uAng[k].x + soft, ang) * (1.0 - smoothstep(uAng[k].y - soft, uAng[k].y + soft, ang));
+        float soft = 0.03; // radians of edge softness
+        float inA = smoothstep(uAng[k].x - margin - soft, uAng[k].x - margin + soft, ang) * (1.0 - smoothstep(uAng[k].y + margin - soft, uAng[k].y + margin + soft, ang));
         float lim = max(u, 0.0) * uRT[k].y;
-        float lo = uAng[k].z * lim, hi = uAng[k].w * lim;
-        float sw = max(0.15, 0.06 * lim);
+        float lo = uAng[k].z * lim - margin * 4.0 * lim, hi = uAng[k].w * lim + margin * 4.0 * lim;
+        float sw = max(0.12, 0.05 * lim);
         float inW = smoothstep(lo - sw, lo + sw, w) * (1.0 - smoothstep(hi - sw, hi + sw, w));
-        float inR = 1.0 - smoothstep(uRT[k].x - 1.0, uRT[k].x, r);
+        float inR = 1.0 - smoothstep(uRT[k].x - 0.6 + margin * 30.0, uRT[k].x + margin * 30.0, r);
         // fade with range like a real beam
         float atten = 1.0 - 0.6 * clamp(r / uRT[k].x, 0.0, 1.0);
         return inA * inW * inR * atten;
@@ -124,11 +124,15 @@ export function makeLakeMaterial({ fish = false } = {}) {
       #endif
         vec3 base = albedo * (0.28 + 0.42 * hemi + 0.6 * lambert);
         // dim everything under water a little; the beam brings it back
-        float beam = 0.0;
-        for (int k = 0; k < ${MAX_BEAMS}; k++) { if (k < uBeamCount) beam = max(beam, insideBeam(k, vWorld)); }
+        float beam = 0.0, wide = 0.0;
+        for (int k = 0; k < ${MAX_BEAMS}; k++) { if (k < uBeamCount) { beam = max(beam, insideBeam(k, vWorld, 0.0)); wide = max(wide, insideBeam(k, vWorld, 0.02)); } }
         beam *= uReveal;
+        float edge = clamp(wide - beam, 0.0, 1.0) * uReveal; // thin bright rim where the beam footprint ends
+        // procedural surface texture: fine speckle for sand/bark
+        float tex = 0.9 + 0.2 * fract(sin(dot(floor(vWorld * 9.0), vec3(12.9898, 78.233, 37.719))) * 43758.5453);
+        albedo *= tex;
         // outside the beam things stay murky; inside they pop (Garmin look)
-        vec3 lit = base * (0.72 + 2.3 * beam) + uHighlight * 0.3 * beam;
+        vec3 lit = base * (0.72 + 2.3 * beam) + uHighlight * 0.3 * beam + uHighlight * 0.9 * edge;
         // underwater fog by distance from camera
         float dist = length(vWorld - cameraPosition);
         float fog = 1.0 - exp(-dist * uFogDensity);
