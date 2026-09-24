@@ -57,3 +57,18 @@ Findings go into `docs/sonar-style.md`; UI copy into `docs/app-chrome.md`.
   across the pixel span. Our sonar shader should adopt this tone curve and
   sample the yellow LUT from the recordings.
 - Extracted APK contents live in `~/android-sdk/dl/apk_x` (not in the repo).
+
+## Result of the second attempt — real tablet (2026-09-24, done)
+Jason plugged in the **V10 tablet** (Android 13, GLES 3.2, 1920×1200). Over
+adb: APK v2.0.0_beta.14 installed, the six recordings above pushed to
+`/Download/Accuphy Sonar/Sonar Data`, **Setting → Playback → On**, then
+**Grant Data Access** (Android folder picker → Accuphy Sonar → Allow) — without
+that step externally copied files never appear in the ⟲ Demo Record list.
+Each view then auto-plays the newest matching recording in a loop.
+Captured: chrome + menus + colour-map list, PL Forward at 70 % and 57 % gain,
+PL Down, PL Panoramic, PLM Forward / Down / Combo (`reference/app-study/`).
+Findings written to `docs/sonar-style.md` §6 and `docs/app-chrome.md`.
+Not yet captured: every colour map on one frame, range stepping, imperial
+units (rows 2, 3, 6 of the table) — cheap to add later, the tablet route works.
+Gotchas: `input keyevent BACK` twice exits the app; close the ⋯ menu by
+tapping the picture; the Home list scrolls, so screenshot before tapping tiles.

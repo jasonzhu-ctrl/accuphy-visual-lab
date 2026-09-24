@@ -4,3 +4,5 @@ dist/
 .env*
 reference/**
 !reference/README.md
+!reference/app-study/
+!reference/app-study/**

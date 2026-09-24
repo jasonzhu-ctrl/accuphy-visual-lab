@@ -233,3 +233,23 @@ Numbered log. Newest at the bottom.
     jet = blue/red, ice = blue) and **the tone curve** (`aio_shader.glsl`: log
     compression → gain/dynamic-range window → 256-entry LUT). The phone screen
     now uses both, with a colour-map selector and a gain slider (default 70 %).
+
+25. **2026-09-24** — **App study done on Jason's real V10 tablet** (adb over
+    USB). Jason caught that my phone inset had "核心问题" against his two app
+    screenshots, then paused the rework until newer data was chosen; he
+    supplied `PingLive_Forward View_20260906_162600.sonar` and `2.0.13.zip`
+    (PL Down / Panoramic, Aug 3) from `~/Downloads`; PLM files came from
+    `My Drive/Maiky/` (Aug 16) and the Sept 23 down-scan. Measured rules now
+    in `docs/sonar-style.md` §6 and `docs/app-chrome.md`: (a) the picture
+    **fills the screen, each axis scaled independently** (horizontal = range,
+    vertical = depth range; PLM Down stretched ×2); apex Forward x≈20 % (PL) /
+    top-left corner (PLM), Down top-centre, Panoramic bottom-centre, Combo =
+    two panels with a grey diagonal; (b) the fan is never black inside: dark-red
+    noise floor with radial streaks (side views) or mottled speckle (PLM
+    Down); thick bottom band with a long tail; (c) **a fish is a horizontal
+    dash 3–5× wider than tall with a yellow-white core at the transducer end**;
+    (d) gain 1 %/tap, 57 % (Jason) / 50 % (PLM files) is the balanced look,
+    70 % blows out. The half-done shader rewrite is parked in
+    `docs/wip/sonar-screen-rework.patch` and is the next task. Screenshots are
+    committed under `reference/app-study/` (JPEG, ≈ 17 MB) as the design
+    reference; the `.sonar` files stay on the tablet / Drive.

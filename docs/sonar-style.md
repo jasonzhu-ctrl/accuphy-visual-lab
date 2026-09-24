@@ -93,3 +93,64 @@ visualiser — the "sonar flashlight" only needs the picture inside the beam.
 1. ~~Which device made the two RPReplay split-view clips?~~ PLM (answered).
 2. For the website piece: one palette only, or a blue/red ↔ yellow toggle?
 3. Max range per device and mode (needed for fan length).
+
+## 6. Measured on the real app (tablet playback, 2026-09-24) — overrides §1–§3 where they differ
+
+Source: app v2.0.0_beta.14 on the V10 tablet, orange colour map, recordings
+listed in `reference/README.md`; frames in `reference/app-study/`. Chrome and
+per-view layout are in `docs/app-chrome.md`.
+
+### 6.1 Layout rule (the one thing the phone inset got wrong)
+The picture **fills the screen**: the vertical axis is 0 → depth range, the
+horizontal axis is the range, and **each axis is scaled independently** —
+the fan is stretched, not kept 1:1. Measured px/m (tablet 1920×1200):
+
+| View | horizontal | vertical | apex | what the axes show |
+|---|---|---|---|---|
+| PL Forward, 18 m range, 16 m depth range | 71 px/m | 60 px/m | x ≈ 20 % | top ruler −4.5 … 18 m, sides 0 … 16 m |
+| PL Down, 12 m | 80 px/m | 80 px/m | top-centre | 1:1, the 135° fan runs off both sides |
+| PL Panoramic, 12 m | — | — | bottom-centre | sides 2 → 10 upward, black corners |
+| PLM Forward, 18 m range, 10 m depth | 89 px/m | 89 px/m | **top-left corner (x ≈ 0)** | upper beam edge ≈ 6° below horizontal, lower edge ≈ 32° |
+| PLM Down, 8 m | 240 px/m | 118 px/m (**stretched ×2**) | top-centre | the 39° fan's bottom corners land on the screen's bottom corners |
+| PLM Live Combo | — | — | one shared apex, top, x ≈ 20 % | Down panel lower-left, Forward panel upper-right, grey double diagonal between; each panel has its own scales |
+
+Jason's phone screenshots (2000×920): Forward 23 px/ft × 15 px/ft, Down 1:1.
+Rule for the engine: pick the screen box in metres from (range, depth range,
+apex position) and let the quad stretch; do not preserve aspect.
+
+### 6.2 What fills the fan
+- **Noise floor:** the whole fan carries a dark-red haze (LUT index ≈ 0.10–0.25
+  at 50–57 % gain); pure black only outside the fan. In the side views it is
+  drawn as **radial streaks** from the apex (beam-by-beam gain differences and
+  range smearing); in PLM Down it is a coarse **mottled speckle** (cells ≈
+  0.1 m) rather than streaks. The floor fades a little with range.
+- **Bottom:** a thick band — hard, white-yellow leading edge, then a long
+  orange → dark-red tail below it (≈ 1–2 m at 8–18 m range) with a faint
+  second echo further down. Never a thin line.
+- **Near the apex:** bright rays fan out for the first 10–20 % of the range
+  (surface / near-field clutter).
+- **Structure (wreck, piling):** white-hot on the facing side, dark interior
+  gaps, a black acoustic shadow behind it; the bottom line continues past it.
+- **Gain:** 1 % per tap; 70 % blows the picture out to white (the app's own
+  default for PL Forward), 57 % (Jason's reference) and 50 % (PLM recordings)
+  give the balanced look above. TVG 25 %, Contrast 25 % everywhere.
+
+### 6.3 Fish (the most important part — Jason)
+- A fish is a **horizontal dash**: 3–5× wider than tall, in every view
+  (Forward, Down). Size at 8–18 m range: ≈ 0.3–0.6 m wide, 0.1–0.15 m tall.
+- Body: orange with a **brighter yellow-white core** at one end (the end
+  facing the transducer), soft feathered edges, a faint darker tail behind.
+- Bait / small fish: same shape, smaller and dimmer (dark orange, no core).
+- Schools: dozens of dashes overlapping into a bright horizontal bar / cloud,
+  brightest where they stack (PLM Down: a white-yellow bar 1.5 m wide at 2 m).
+- Near a piling the dashes crowd around the structure (PLM Forward night
+  recording, `plm-forward-fish-*.jpg`, crops `plm-forward-fish-crop-*.png`).
+- No rim halo, no ring — just the dash with its soft edge.
+
+### 6.4 Other
+- Colour maps in the app list: classic, rainbow, coolwarm, red, orange,
+  yellow, … (orange = the amber look in all Jason's screenshots).
+- The app's PLM also offers **Live Panoramic** and **Live Combo**; Combo is a
+  two-panel Down + Forward layout (see `docs/app-chrome.md`).
+- A recording keeps its own range / gain; the depth readout, water temp and
+  voltage are live from the file.

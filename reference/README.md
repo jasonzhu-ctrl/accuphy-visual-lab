@@ -33,15 +33,37 @@ and `…/09.23.2026 Graphics/`:
 `PingLive Product Page Image.png`, `PingLive Mini Product Page.png`,
 `3tablets mock.png`.
 
-## sonar-data/ — raw `.sonar` app exports
+## sonar-data/ — raw `.sonar` app exports (gitignored, proprietary format)
 
 Two small `PingBeam_Combo View_20260910_*.sonar` files from
-`…/09.23.2026 Graphics/BEST RECENT 2.0 IMAGE DATA/` (proprietary format,
-kept for possible later analysis). The 229 MB `PingLive Mini_动态下扫` file
-was not copied.
+`…/09.23.2026 Graphics/BEST RECENT 2.0 IMAGE DATA/`.
+
+**Recordings used for the tablet study 2026-09-24** (chosen with Jason; the
+older files were too old — "这个 data 太老了"). They live on the V10 tablet in
+`/Download/Accuphy Sonar/Sonar Data`, not in this repo:
+
+| File | Device / view | Source |
+|---|---|---|
+| `PingLive_Forward View_20260906_162600.sonar` (804 MB) | PL Forward — a wreck at 8–10 m, 18 m range | Jason's `~/Downloads` |
+| `PingLive_Down View_20260803_191159_PL 2.0.13 down human 4.sonar` (978 MB) | PL Down — diver test, 12 m | `~/Downloads/2.0.13.zip` |
+| `PingLive_Panoramic View_20260803_185807_Pinglive2.0.13 pano human.sonar` (978 MB) | PL Panoramic — pool/diver test, 12 m | `~/Downloads/2.0.13.zip` |
+| `PingLive Mini_Live Forward_20260816_213926.sonar` (369 MB) | PLM Forward — night, piling + fish school, 18 m | `My Drive/Maiky/` |
+| `PingLive Mini_Live Combo_20260816_213259.sonar` (369 MB) | PLM Combo — dock with pilings | `My Drive/Maiky/` |
+| `PingLive Mini_动态下扫_20260923_145047.sonar` (229 MB) | PLM Down — fish school at 2 m, 8 m range | `…/BEST RECENT 2.0 IMAGE DATA/` |
+
+More PLM recordings (≈ 50, Jul 31 – Aug 16) are in `My Drive/Maiky/`; the
+only other PL file is `Distributors/OMAKEE/PingLive_Forward View_20260713_195155.sonar` (1.7 GB).
+
+## app-study/ — screenshots of the real app (committed, JPEG)
+
+Tablet screenshots taken over adb during the 2026-09-24 study: settings and
+menus (`settings-*`, `menu-*`, `home*`), one set per view
+(`pl-forward-*`, `pl-down-*`, `pl-pano-*`, `plm-forward-*`, `plm-down-*`,
+`plm-combo-*`) and full-resolution PNG **crops of fish marks**
+(`*-fish-crop-*.png`). Findings: `docs/sonar-style.md` §6, `docs/app-chrome.md`.
 
 ## Accuphy Sonar App — latest APK (for the emulator study)
 
 `AccuphySonar_20260901_2.0.0_beta_14.apk` (v2.0.0 beta 14), Jason 2026-09-24:
 https://www.dropbox.com/scl/fi/kus9fnv0kv6y044q89tcr/AccuphySonar_20260901_2.0.0_beta_14.apk?rlkey=u8qk1vg6mm79d69taktytxn8k&st=x00fkdjx&dl=0
-Not downloaded yet. Older dev build: `ACCUPHY/IT/Accuhy Sonar App APK versions/June18,2026/AccuphySonar_0615_dev.apk`.
+Downloaded to `~/Downloads/` and `~/android-sdk/dl/` (same SHA-256); installed on the V10 tablet 2026-09-24. Older dev build: `ACCUPHY/IT/Accuhy Sonar App APK versions/June18,2026/AccuphySonar_0615_dev.apk`.
