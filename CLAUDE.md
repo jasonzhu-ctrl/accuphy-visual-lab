@@ -28,6 +28,9 @@ no TypeScript. No backend, no database — front-end only.
 - `src/App.jsx` — gallery + hash router. `src/experiments.js` — discovery.
 - `docs/decisions.md` — numbered log of design/tooling decisions. Any decision
   made in any Claude session must be written back here.
+- `docs/sonar-beam-visualizer-brief.md` — brief for the first real experiment
+  (Sonar Beam Visualizer). **Read it before touching that experiment.**
+- `reference/` — recordings + product images used as design input (see its README).
 
 ## Rules
 
