@@ -32,7 +32,9 @@ it is done. ✅ done · 🔧 in progress · ⬜ open.
 - ✅ Beam footprint rim on the bottom
 - ✅ Wreck +30 % (≈10 m) with cabin/windows/mast after the app imaging
 - ✅ PL Panoramic clips studied (`sonar-style.md` §3b); screen now opens upward from a bottom apex
-- ✅ Panoramic screen: bottom texture fill with acoustic shadows, dark near the apex, no fake burnout (round 7)
+- ✅ Panoramic screen rebuilt from the lake recordings (§7.12): even crimson field from the apex, soft mottle, darker-red shadows, tangential dashes
+- ⬜ Panoramic colour: the app's lake recording reads pinker crimson than garmin_amber's brown-red — check which app map that recording used (likely 'red') and decide
+- ⬜ PLM Live Panoramic (left apex, opens right) is not a mode in the lab yet — add if Jason wants it in the page
 - ✅ Water: ripple rings spread from the boat while it moves (simple wake; the fluid-sim trick stays optional)
 - ✅ Fish rim glow inside the beam (bright edge)
 
