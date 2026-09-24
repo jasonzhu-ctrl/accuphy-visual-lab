@@ -188,11 +188,9 @@ export const sonarFragment = /* glsl */ `
       float narrow = 1.0 - smoothstep(0.35, 0.8, fill);
       fishHit *= mix(1.0, 0.7 + 0.5 * vnoise(vec2(a * 10.0, uTime * 5.0)), narrow); // smooth across a blob (a per-angle-bin hash striped small fish)
       // lumpy body (the app's near blobs are uneven: flexing body, ping-to-ping change), never speckle
-      // lumpy body: two noise scales, deep enough to cut holes and bites into the silhouette (app: irregular blobs)
-      float lump = vnoise(p * 4.0 + vec2(0.0, uTime * 0.12)) * 0.6 + vnoise(p * 11.0 - vec2(uTime * 0.07, 0.0)) * 0.55;
-      // rim bites only on near-field blobs (Jason's Down data, < ~6 m): beyond that a fish is a solid oblong
-      float rim = (1.0 - smoothstep(0.3, 0.9, fishSum / wSum)) * smoothstep(0.35, 0.75, haloSum / hSum) * (1.0 - smoothstep(4.0, 8.0, r));
-      fishHit *= mix(1.0, smoothstep(0.15, 0.75, lump) * 1.15, rim);      // bites only at the rim; the core stays solid
+      // no lattice-noise lumps on fish: value noise on a grid printed a regular dot pattern into every
+      // blob (2026-09-24). The rim-to-core ramp + halo give the soft edge; the silhouette itself (a real
+      // swimming body cut by the slab) supplies the irregularity.      // bites only at the rim; the core stays solid
       // beam filaments: at close range the beam footprint is smaller than a pixel, so the app's near blobs
       // are solid with a ragged rim; the comb only shows from mid range out (Jason: 近处的团要实)
       // only BIG marks (high halo coverage) show the beam comb; small bait dashes are solid oblongs in the app
@@ -201,7 +199,7 @@ export const sonarFragment = /* glsl */ `
       fishHit *= 0.85 + 0.3 * vnoise(vec2(a * 60.0, r * 0.7));
       float atten = 1.0 - 0.4 * clamp(r / uRange, 0.0, 1.0);
       float gain = 1.0;
-      float fishEcho = fishHit * (1.0 + 0.12 * streak);   // fish rims are smooth gradients in the app, not speckle
+      float fishEcho = fishHit;                            // fish rims are smooth gradients in the app, not speckle
       echo = max(echo, max(acc * atten * tex * gain, fishEcho));
     }
     // clutter near the transducer: bright rays fanning out from the apex — a FIXED ≈ 2.4 m
