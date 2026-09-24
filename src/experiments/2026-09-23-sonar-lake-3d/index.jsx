@@ -31,7 +31,7 @@ export default function SonarLake3D() {
 
   const state = useRef({
     boat: { x: -6, z: 4 }, target: { x: -6, z: 4 }, apex: new THREE.Vector3(), dragging: false,
-    parallax: { x: 0, y: 0 }, specs, specKey,
+    parallax: { x: 0, y: 0 }, specs, specKey, closeCam: window.location.search.includes('cam=boat'),
   })
   state.current.specs = specs
   state.current.specKey = specKey

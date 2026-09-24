@@ -83,7 +83,7 @@ export function makeLakeMaterial({ instanced = false } = {}) {
         for (int k = 0; k < ${MAX_BEAMS}; k++) { if (k < uBeamCount) beam = max(beam, insideBeam(k, vWorld)); }
         beam *= uReveal;
         // outside the beam things stay murky; inside they pop (Garmin look)
-        vec3 lit = base * (0.72 + 2.3 * beam) + uHighlight * 0.22 * beam;
+        vec3 lit = base * (0.72 + 2.3 * beam) + uHighlight * 0.3 * beam;
         // underwater fog by distance from camera
         float dist = length(vWorld - cameraPosition);
         float fog = 1.0 - exp(-dist * uFogDensity);

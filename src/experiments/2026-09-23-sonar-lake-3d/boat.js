@@ -46,16 +46,25 @@ export function makeRangerBoat() {
   // seats: two pedestal seats in the cockpit, one on the bow deck
   const seat = () => merge([new THREE.CylinderGeometry(0.04, 0.05, 0.35, 6).translate(0, 0.3, 0), new THREE.BoxGeometry(0.45, 0.12, 0.45).translate(0, 0.52, 0), new THREE.BoxGeometry(0.42, 0.4, 0.1).translate(-0.18, 0.75, 0)])
   for (const [x, z] of [[-0.9, -0.5], [-0.9, 0.5], [1.5, 0]]) { const m = new THREE.Mesh(seat(), blackMat); m.position.set(x, 0.1, z); group.add(m) }
-  // outboard: Mercury V8 Pro XS style — big cowl, midsection, lower unit + skeg + prop
-  const cowl = new THREE.BoxGeometry(0.62, 0.72, 0.5); cowl.translate(-L / 2 - 0.36, 0.55, 0)
-  const cowlTop = new THREE.BoxGeometry(0.5, 0.12, 0.42); cowlTop.translate(-L / 2 - 0.36, 0.97, 0)
-  const mid = new THREE.BoxGeometry(0.22, 0.6, 0.2); mid.translate(-L / 2 - 0.36, 0.0, 0)
-  const lower = new THREE.BoxGeometry(0.48, 0.32, 0.14); lower.translate(-L / 2 - 0.3, -0.45, 0)
-  const skeg = new THREE.BoxGeometry(0.2, 0.25, 0.04); skeg.translate(-L / 2 - 0.2, -0.7, 0)
-  const prop = new THREE.TorusGeometry(0.16, 0.035, 5, 8); prop.rotateY(Math.PI / 2); prop.translate(-L / 2 - 0.58, -0.45, 0)
-  group.add(new THREE.Mesh(merge([cowl, cowlTop, mid, lower, skeg, prop]), blackMat))
-  const stripe = new THREE.BoxGeometry(0.63, 0.06, 0.51); stripe.translate(-L / 2 - 0.36, 0.7, 0)
-  group.add(new THREE.Mesh(stripe, new THREE.MeshStandardMaterial({ color: '#c8102e' }))) // Mercury red band
+  // outboard: current-generation Mercury V8 Pro XS look — tall rounded cowl,
+  // sculpted top, side vents, black lower cowl, white/red Pro XS band (Jason 2026-09-24)
+  const cx = -L / 2 - 0.38
+  const cowlMat = new THREE.MeshStandardMaterial({ color: '#1f2226', metalness: 0.35, roughness: 0.4 })
+  const upper = new THREE.CapsuleGeometry(0.27, 0.42, 4, 10); upper.scale(1.15, 1, 0.95); upper.translate(cx, 0.72, 0)
+  const lowerCowl = new THREE.CylinderGeometry(0.3, 0.26, 0.32, 12); lowerCowl.scale(1.2, 1, 1); lowerCowl.translate(cx, 0.28, 0)
+  const vents = merge([0, 1, 2].map((i) => new THREE.BoxGeometry(0.05, 0.02, 0.34).translate(cx + 0.31, 0.78 + i * 0.06, 0)))
+  group.add(new THREE.Mesh(merge([upper, lowerCowl]), cowlMat))
+  group.add(new THREE.Mesh(vents, blackMat))
+  const band = new THREE.CylinderGeometry(0.315, 0.315, 0.07, 12); band.scale(1.2, 1, 1); band.translate(cx, 0.48, 0)
+  group.add(new THREE.Mesh(band, new THREE.MeshStandardMaterial({ color: '#f2f2f2' })))
+  const accent = new THREE.CylinderGeometry(0.317, 0.317, 0.025, 12); accent.scale(1.2, 1, 1); accent.translate(cx, 0.43, 0)
+  group.add(new THREE.Mesh(accent, new THREE.MeshStandardMaterial({ color: '#c8102e' })))
+  const mid = new THREE.BoxGeometry(0.2, 0.55, 0.18); mid.translate(cx, -0.15, 0)
+  const lower = new THREE.BoxGeometry(0.5, 0.3, 0.13); lower.translate(cx + 0.06, -0.55, 0)
+  const skeg = new THREE.BoxGeometry(0.22, 0.24, 0.04); skeg.translate(cx + 0.14, -0.8, 0)
+  const prop = new THREE.TorusGeometry(0.16, 0.035, 5, 8); prop.rotateY(Math.PI / 2); prop.translate(cx - 0.24, -0.55, 0)
+  const bracket = new THREE.BoxGeometry(0.16, 0.5, 0.36); bracket.translate(-L / 2 - 0.06, 0.05, 0)
+  group.add(new THREE.Mesh(merge([mid, lower, skeg, prop, bracket]), blackMat))
   // trolling motor at the bow with the PingLive on its shaft, head just under the surface
   const tmShaft = new THREE.CylinderGeometry(0.03, 0.03, 1.5, 6); tmShaft.translate(L / 2 - 0.25, -0.45, 0.35)
   const tmHead = new THREE.BoxGeometry(0.35, 0.2, 0.2); tmHead.translate(L / 2 - 0.25, 0.32, 0.35)

@@ -118,3 +118,11 @@ Numbered log. Newest at the bottom.
     **Ranger-style** bass boat (6.3 m × 2.4 m) with a **Mercury V8 Pro XS**
     style outboard and bow trolling motor carrying the transducer (`boat.js`).
     Beam contrast raised (outside 0.72×, inside up to 3×).
+
+14. **2026-09-24** — Jason: (a) a natural **slope down to 40 m** up-and-right
+    of the boat (world +x/−z) — added in `terrain.js`; (b) fish are
+    **drawn at 2.6× true length** (`FISH_DISPLAY_SCALE`) so they are visible at
+    the fixed camera distance, and they glow warm inside the beam; true sizes
+    stay in `fish.js`; (c) outboard restyled to the **current-generation
+    Mercury V8 Pro XS** look (rounded sculpted cowl, side vents, white/red
+    band). Water made clearer (alpha 0.36 + fresnel). Dev aid `?cam=boat`.

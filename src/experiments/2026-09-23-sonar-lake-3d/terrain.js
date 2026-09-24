@@ -30,9 +30,13 @@ export function depthAt(x, z) {
   // deep basin around (15, -28)
   const br = Math.hypot(x - 15, z + 28)
   d = d + (24 - d) * (1 - smooth(10, 30, br)) * 0.85
+  // Jason 2026-09-24: a natural slope dropping to 40 m up-and-right of the boat
+  // (world +x / -z). Distance along that direction from (8,-8), with noisy edge.
+  const along = (x - 8) * 0.6 + (-z - 8) * 0.8 + 6 * (fbm(x * 0.05 + 11, z * 0.05 + 3) - 0.5)
+  d = d + (40 - d) * smooth(4, 42, along)
   // beyond the play area the bed sinks smoothly into the deep so no edge shows
   const rim = Math.max(Math.abs(x), Math.abs(z))
-  d = d + (28 - d) * smooth(70, 130, rim)
+  d = d + (42 - d) * smooth(70, 130, rim)
   return d
 }
 export function bedY(x, z) { return -depthAt(x, z) }

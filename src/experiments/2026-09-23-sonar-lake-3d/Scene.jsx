@@ -5,7 +5,7 @@ import { mergeGeometries as _merge } from 'three/addons/utils/BufferGeometryUtil
 // Extrude geometries are non-indexed, primitives are indexed — normalise first.
 const mergeGeometries = (parts) => _merge(parts.map((g) => (g.index ? g.toNonIndexed() : g)))
 import { HALF, SEG, bedY, fbm } from './terrain'
-import { SPECIES, makePopulation, fishPose, rnd } from './fish'
+import { SPECIES, makePopulation, fishPose, rnd, FISH_DISPLAY_SCALE } from './fish'
 import { makeLakeMaterial, setBeamUniforms } from './lakeMaterial'
 import { wedgeGeometry } from '../2026-09-23-beam-shapes-3d/wedge'
 import { makeTallTree, makeBushTree, makeStump, makeLog, makeWeedTuft, makeRock, placeAll } from './vegetation'
@@ -116,7 +116,7 @@ function Fish({ mat, revealRef }) {
     pop.forEach((f, i) => {
       const o = fishPose(f, t, tmp.pose)
       tmp.e.set(0, o.heading, Math.sin(t * 6 + f.phase) * 0.08); tmp.q.setFromEuler(tmp.e)
-      tmp.p.set(o.x, o.y, o.z); tmp.s.set(f.len, f.len, f.len)
+      tmp.p.set(o.x, o.y, o.z); const L = f.len * FISH_DISPLAY_SCALE; tmp.s.set(L, L, L)
       tmp.m.compose(tmp.p, tmp.q, tmp.s)
       ref.current.setMatrixAt(i, tmp.m)
     })
@@ -163,7 +163,7 @@ function Water() {
         vec3 col = mix(deep, sky, fres * 0.8) + spec * (0.35 + 0.9 * glitter);
         // a touch of surface texture so it reads as a surface from above
         col += (n2 - 0.5) * 0.05;
-        float alpha = 0.5 + 0.4 * fres;
+        float alpha = 0.36 + 0.42 * fres;
         float dist = length(vW - cameraPosition);
         float fog = smoothstep(120.0, 420.0, dist);
         gl_FragColor = vec4(mix(col, uSky, fog), mix(alpha, 1.0, fog));
@@ -205,7 +205,7 @@ function Beams({ state }) {
       {meshes.map((m, i) => (
         <group key={i}>
           <mesh geometry={m.g}>
-            <meshPhysicalMaterial color="#5fd3ff" transparent opacity={0.16} side={THREE.DoubleSide} depthWrite={false} roughness={0.3} />
+            <meshPhysicalMaterial color="#5fd3ff" transparent opacity={0.11} side={THREE.DoubleSide} depthWrite={false} roughness={0.3} />
           </mesh>
           <lineSegments geometry={m.e}><lineBasicMaterial color="#dff7ff" transparent opacity={0.6} /></lineSegments>
         </group>
@@ -221,6 +221,11 @@ function Rig({ state }) {
     const s = state.current
     // fixed 3/4 aerial view like the PL animations; slight parallax from the pointer
     const px = s.parallax.x, py = s.parallax.y
+    if (s.closeCam) { // dev aid ?cam=boat — inspect the boat / fish up close
+      camera.position.set(s.boat.x - 6 + px, 3.5 + py * 0.5, s.boat.z + 9)
+      camera.lookAt(s.boat.x + 1, -0.6, s.boat.z)
+      return
+    }
     // view from the south: drop-off timber on the left, rock hump on the right
     camera.position.set(-14 + px * 4, 52 + py * 2, 66 + px * 2)
     camera.lookAt(3 + px * 2, -9, 0)
@@ -245,8 +250,13 @@ function PickPlane({ state }) {
 }
 
 export default function LakeScene({ state }) {
-  const mats = useMemo(() => ({ bed: makeLakeMaterial(), inst: makeLakeMaterial() }), [])
-  const beamMats = useMemo(() => [mats.bed, mats.inst], [mats])
+  const mats = useMemo(() => {
+    const fish = makeLakeMaterial()
+    fish.userData.uniforms.uHighlight.value.set('#ffe9a0') // fish light up warm, like a sonar return
+    fish.userData.uniforms.uFogDensity.value = 0.006
+    return { bed: makeLakeMaterial(), inst: makeLakeMaterial(), fish }
+  }, [])
+  const beamMats = useMemo(() => [mats.bed, mats.inst, mats.fish], [mats])
   return (
     <Canvas dpr={[1, 1.75]} camera={{ fov: 38, near: 0.5, far: 400, position: [-38, 34, 54] }} gl={{ antialias: true }}>
       <color attach="background" args={['#9cc1cf']} />
@@ -254,10 +264,10 @@ export default function LakeScene({ state }) {
       <hemisphereLight args={['#dbe9f0', '#2a3a2a', 0.9]} />
       <directionalLight position={[40, 80, 30]} intensity={1.4} />
       <Lakebed mat={mats.bed} />
-      <mesh rotation-x={-Math.PI / 2} position-y={-26}><planeGeometry args={[900, 900]} /><meshBasicMaterial color="#17545f" /></mesh>
+      <mesh rotation-x={-Math.PI / 2} position-y={-42}><planeGeometry args={[900, 900]} /><meshBasicMaterial color="#17545f" /></mesh>
       <Structures mat={mats.inst} />
       <Wreck mat={mats.inst} />
-      <Fish mat={mats.inst} />
+      <Fish mat={mats.fish} />
       <Water />
       <Boat state={state} beamMats={beamMats} />
       <Beams key={state.current.specKey} state={state} />

@@ -1,4 +1,7 @@
 // Fish species — real North American sizes (metres). Jason 2026-09-23.
+// Jason 2026-09-24: at this camera distance real sizes are invisible, so fish are
+// DRAWN at FISH_DISPLAY_SCALE × their true length. Data stays true.
+export const FISH_DISPLAY_SCALE = 2.6
 export const SPECIES = {
   largemouth: { name: 'Largemouth bass', len: [0.38, 0.55], color: '#5d7a3a', belly: '#c9d3a8', school: false },
   smallmouth: { name: 'Smallmouth bass', len: [0.33, 0.45], color: '#7a6a3a', belly: '#d8cfa8', school: false },
