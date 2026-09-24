@@ -8,15 +8,16 @@ it is done. ✅ done · 🔧 in progress · ⬜ open.
 - ⬜ Re-run the histogram check on a wreck-in-view scene (the wreck scene used had mostly bottom in the fan) and after any pulse/tail change
 - ✅ Range vs depth-range behaviour measured on the app (§6.9) and mirrored: PL Forward has its own Depth slider (vertical scale only), near-field rays sized in metres, structure echoes ×0.8 (case-2 verdict)
 - ✅ Contrast + Noise Reject controls (Tune row) mapped to the app's tone curve per Jason's tuning strategy (`sonar-style.md` §6.5); defaults gain 57 / contrast 40 / noise 30 after the confirmed ideal picture (decision #28)
-- ⬜ Side-by-side check of the engine's PLM Forward against the confirmed frame (`ideal-picture/5-FINAL-*.jpg`): bottom band ✓, black background ✓; still to compare fish-dash size/brightness and how standing timber reads next to the piling reference
+- ✅ Side-by-side checks vs the confirmed frames — running loop, composites in `reference/engine-compare/`
 - ⬜ TVG control (range-dependent gain) — Jason: higher = crisper far targets, a little more noise
 - ✅ **Sonar screen rework** (2026-09-24, after the tablet study): screen box per view fills the display with independent axes (`screenLayout` in `SonarScreen.jsx`), dark-red noise floor with radial streaks (mottled for PLM Down), thick bottom band with tail + faint second echo, near-apex rays, PLM Forward apex top-left, PLM Down stretched to the screen corners, Combo two-panel with the grey diagonal. Root cause of the old "small fan in black" picture: the screen-box code had been dropped by mistake in commit 4952966 (phone restyle)
 - ✅ Fish echoes v3 (photograph model §7, decision #32): true size in the sonar pass, silhouette ⊗ beam/pulse blur, solid lumpy soft-rimmed marks; verified vs the Down-view near-field recording with `?fishtest`
 - ✅ Colour: `garmin_amber` measured from LVS34 footage is the default (decision #33); `accuphy_red` demoted
-- ⬜ Jason to judge the round-3 fish texture (filaments + lumps, cap 0.78) against the app and LiveScope composites
+- ✅ Fish texture rounds 3–5 judged by Jason (solid core, rim bites, short marks, sharp structure)
 - ⬜ Head-on fish flicker between pings; school stacking
 - ⬜ More LVS34 study: near-field fish blobs in Garmin's Down mode, bottom-band fibre density, the dark-red haze rays (yt-dlp is installed: `~/Library/Python/3.13/bin/yt-dlp`)
-- 🔧 (old) Fish echoes: physics model per `sonar-style.md` §6.8 — constant beam-angle blur along the arc (far fish = tangential dash of beam width), constant pulse radially, brightness from angular fill (head-on dim, broadside full); near fish show their own length/heading (sonar-pass body kept at 0.9). Next: compare against `reference/app-study/fish-near-vs-far/`; flicker for head-on fish; school stacking
+- ⬜ Forward-view far fish: tangential elongation not strong enough yet (they read as round dots; app/LiveScope show short oblongs across the ray, §6.8) — next fish task
+- ⬜ Bottom band white tip a little too wide vs the app
 - ✅ Surface clutter streak under the transducer (side views)
 - ✅ Combo (PLM): two-panel layout — Down panel lower-left (R/3, stretched ×2), Forward upper-right, shared apex at x≈20 %, grey double diagonal to x≈0.8 at the bottom
 - ✅ Forward View screen: apex ~20 % from the left, like the recordings
