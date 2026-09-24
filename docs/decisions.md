@@ -82,3 +82,12 @@ Numbered log. Newest at the bottom.
    (Panoramic). Project goal restated by Jason: *let people who don't know
    live sonar understand what it is and how to use it, quickly, by playing
    with the piece.*
+
+10. **2026-09-23** — Jason: the Accuphy Sonar App is developed in-house and
+    using the **Android APK** (`ACCUPHY/IT/Accuhy Sonar App APK versions/`) is
+    fine. Plan for the sonar-screen inset phase: run the APK in an Android
+    emulator on this Mac, open the `.sonar` recordings in playback mode, and
+    capture every colour mode / range / unit setting frame-by-frame as the
+    reference for the 2D engine. iOS Simulator would need a simulator build
+    from the dev team (App Store apps cannot be installed in it). Not started
+    yet — the 3D stage does not need it.
