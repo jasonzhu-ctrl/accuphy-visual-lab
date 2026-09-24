@@ -6,15 +6,17 @@ export const DEVICES = {
   PL: {
     id: 'PL',
     name: 'PingLive',
-    beamDeg: 135,
+    beamDeg: 135,      // wide angle of the fan (in the viewing plane)
+    thickDeg: 20,      // thickness of the fan across the viewing plane (Jason 2026-09-23)
     maxRangeFt: 240,
     maxDepthFt: 240,
-    modes: ['down', 'forward'],
+    modes: ['down', 'forward', 'panoramic'],
   },
   PLM: {
     id: 'PLM',
     name: 'PingLive Mini',
-    beamDeg: 39,
+    beamDeg: 39,       // 78° in Combo (two fans)
+    thickDeg: 18,      // "18° 左右" (Jason 2026-09-23)
     maxRangeFt: 200,
     maxDepthFt: 200,
     modes: ['down', 'forward', 'combo'],
@@ -25,6 +27,7 @@ export const MODE_LABELS = {
   down: 'Down View',
   forward: 'Forward View',
   combo: 'Combo View',
+  panoramic: 'Panoramic View',
 }
 
 // Forward-view tilt rule — CONFIRMED by Jason 2026-09-23 on the PLM Combo View

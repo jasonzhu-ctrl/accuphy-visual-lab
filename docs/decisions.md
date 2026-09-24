@@ -73,3 +73,12 @@ Numbered log. Newest at the bottom.
    under an aerial view of the lake that reveals the bottom inside it**.
    Proposed (awaiting Jason): 3D lake + beam volumes as the main stage, 2D
    yellow-mode sonar picture as an app-style inset; phases 3–5 re-planned.
+
+9. **2026-09-23** — Jason: the beam is a **3D wedge, not a plane**: PL =
+   **135° × 20°**, PLM = **39° (78° Combo) × ~18°**. Stored as
+   `beamDeg` × `thickDeg` in `devices.js`. Consequence: the coverage is a
+   thin "curtain" (wide in the viewing plane, ~20° across), and the three
+   modes are the same curtain aimed three ways — down, forward, or laid flat
+   (Panoramic). Project goal restated by Jason: *let people who don't know
+   live sonar understand what it is and how to use it, quickly, by playing
+   with the piece.*
