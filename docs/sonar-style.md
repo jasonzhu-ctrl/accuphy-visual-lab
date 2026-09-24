@@ -490,3 +490,26 @@ Rusted Steel, Lava, Caribbean, Floodlight, Ice Blue, Aqua, Moss, Amber,
 Copper, Black Emerald, Midnight Blue, Orange Crawfish, Red Shad, Blue.
 Garmin's "Color Gain" (default 70–75 %) is their contrast; "Noise Reject"
 Medium and "TVG" Off are the factory positions in the support video.
+
+### 7.8 How long are the marks? (Jason 2026-09-24: "线条感太长了 … 规律是什么")
+Measured on the confirmed frames: walk rays from the apex and arcs around
+it, count runs of lit pixels (luminance > 60 of 255), convert to metres.
+
+| Frame | radial run length p50 / p75 / p90 / p97 (m) | tangential p50 / p75 / p90 / p97 (m) |
+|---|---|---|
+| PLM Forward, piling + fish, 18 m | 0.07 / 0.12 / 0.20 / 0.48 | 0.10 / 0.22 / 0.37 / 0.56 |
+| PL Forward, wreck, 14 m | 0.11 / 0.49 / 1.15 / 2.26 (the wreck's long faces) | 0.18 / 1.13 / 3.4 / 4.8 |
+| Engine PLM Forward before this fix | 0.02 / 0.10 / 0.46 / 1.52 | 0.05 / 0.20 / 0.62 / 0.75 |
+| Engine after | 0.05 / 0.14 / 0.33 / 0.57 | 0.05 / 0.09 / 0.29 / 0.51 |
+
+**The rule:** in the app a single echo along the ray is 7–20 cm long — about
+one pulse length — and only continuous surfaces (a wreck side, the bottom
+band) run longer. Marks are slightly longer across the beam than along it.
+There are no long radial streaks; what reads as "texture" is many short
+dashes stacked along the ray, each with its own gain. The engine had every
+radial texture and smear 3–10× too long (fish smear 0.3–0.4 m, bottom fibres
+1.5 m, streak noise period 1 m). Fixed: fish smear 0.08 m + 0.004·r, bottom
+tail 0.35 m + 0.015·r, filament period ≈ 0.1 m, streak period ≈ 0.2 m.
+Fish cores stay solid (the rim-only bites replace the earlier holes — Jason:
+中间空了); the filament comb fades out under ≈ 5 m where the beam footprint
+is smaller than a pixel.

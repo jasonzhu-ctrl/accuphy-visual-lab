@@ -76,7 +76,7 @@ export const sonarFragment = /* glsl */ `
       float dr = r - hit;
       float sr = 0.12 + 0.004 * r;              // pulse length: thin in range, barely grows
       float core = exp(-dr * dr / (sr * sr));
-      float tail = dr > 0.0 ? 0.55 * exp(-dr / (0.28 + 0.01 * r)) : 0.0; // smear away from the transducer
+      float tail = dr > 0.0 ? 0.35 * exp(-dr / (0.08 + 0.004 * r)) : 0.0; // short smear (app marks ≈ 0.07–0.2 m along the ray, §7.8)
       best = max(best, core + tail);
     }
     return best;
@@ -106,15 +106,15 @@ export const sonarFragment = /* glsl */ `
     // polar texture: fine across the angle, long along the range → radial streaks;
     // PLM Down uses a coarse mottled speckle instead (measured on the app)
     float t = floor(uTime * 8.0);
-    float streak = vnoise(vec2(aWorld * 140.0, r * 0.9 + t * 0.37));
+    float streak = vnoise(vec2(aWorld * 140.0, r * 5.0 + t * 0.37));     // radial period ≈ 0.2 m (measured, §7.8)
     float mottle = vnoise(p * 9.0 + t * 0.5) * 0.7 + vnoise(p * 23.0 - t * 0.3) * 0.5;
     float rays = vnoise(vec2(aWorld * 22.0 + 3.1, 0.5));          // beam-to-beam gain variation
     float grain = hash(floor(vec2(aWorld * 600.0, r * 6.0)) + t);
     float tex = uStreak > 0.5 ? 0.45 + 0.75 * streak + 0.25 * grain : 0.35 + 0.9 * mottle + 0.2 * grain;
     // per-beam filaments (app texture, sonar-style.md §7.6): each formed beam has its own gain and
     // noise, so every echo breaks into thin streaks ALONG the ray with ragged edges across it
-    float fil = vnoise(vec2(aWorld * 420.0, r * 1.6 + t * 0.13));
-    float fil2 = vnoise(vec2(aWorld * 900.0 + 7.0, r * 3.0 - t * 0.1));
+    float fil = vnoise(vec2(aWorld * 420.0, r * 9.0 + t * 0.13));     // filaments ≈ 0.1 m long, not 0.6 (§7.8)
+    float fil2 = vnoise(vec2(aWorld * 900.0 + 7.0, r * 18.0 - t * 0.1));
     float filament = 0.35 + 0.75 * fil + 0.35 * fil2 * fil;
     // noise floor as a weak raw echo, so gain / contrast act on it exactly like on targets;
     // Noise Reject thins it out (isolated speckle goes first)
@@ -131,7 +131,7 @@ export const sonarFragment = /* glsl */ `
       float acc = 0.0, peak = 0.0;              // acc = integrated band, peak = first return (hot leading edge)
       float jit = hash(gl_FragCoord.xy * 0.37 + 0.11); // per-pixel row jitter: thin branches become grain, not blocks
       float sigma = 0.22 + 0.010 * r;           // bottom pulse: thin leading edge (app band ≈ 0.3 m), widens a little with range
-      float tailLen = 1.2 + 0.04 * r;           // orange tail under the bottom
+      float tailLen = 0.35 + 0.015 * r;         // short orange tail under the bottom (§7.8)
       for (int j = 0; j < 24; j++) {
         float v = (float(j) + jit) / 24.0;
         float ty = (v * 2.0 - 1.0) * uFan[k].w;
@@ -142,7 +142,7 @@ export const sonarFragment = /* glsl */ `
         float fish = step(0.75, tag);
         float structure = step(0.25, tag) * (1.0 - fish);
         float pulse = exp(-dr * dr / (sigma * sigma)) * (1.0 - 0.45 * structure) * mix(1.0, 0.5 + 0.8 * filament, structure); // structure: dimmer and streaky (§6.10, §7.6)
-        float tail = dr > 0.0 ? 0.5 * exp(-dr / tailLen) : 0.0;   // body of the band sits in the orange mid-tones
+        float tail = dr > 0.0 ? 0.6 * exp(-dr / tailLen) : 0.0;   // body of the band sits in the orange mid-tones
         float second = 0.10 * exp(-(r - 2.0 * hit) * (r - 2.0 * hit) / (4.0 * sigma * sigma)); // faint second echo
         float wgt = 0.55 + 0.9 * (1.0 - abs(v * 2.0 - 1.0));
         acc += (1.2 * pulse + tail + second) * wgt * (1.0 - fish);
@@ -165,8 +165,11 @@ export const sonarFragment = /* glsl */ `
       // lumpy body (the app's near blobs are uneven: flexing body, ping-to-ping change), never speckle
       // lumpy body: two noise scales, deep enough to cut holes and bites into the silhouette (app: irregular blobs)
       float lump = vnoise(p * 4.0 + vec2(0.0, uTime * 0.12)) * 0.6 + vnoise(p * 11.0 - vec2(uTime * 0.07, 0.0)) * 0.55;
-      fishHit *= smoothstep(0.15, 0.75, lump) * 1.15;
-      fishHit *= 0.6 + 0.6 * filament;                                     // beam filaments, moderate (Jason: 取两者中间)
+      float rim = 1.0 - smoothstep(0.3, 0.9, fishSum / wSum);              // 1 at the silhouette edge, 0 in the core
+      fishHit *= mix(1.0, smoothstep(0.15, 0.75, lump) * 1.15, rim);      // bites only at the rim; the core stays solid
+      // beam filaments: at close range the beam footprint is smaller than a pixel, so the app's near blobs
+      // are solid with a ragged rim; the comb only shows from mid range out (Jason: 近处的团要实)
+      fishHit *= mix(1.0, 0.6 + 0.6 * filament, smoothstep(3.0, 10.0, r));
       float atten = 1.0 - 0.4 * clamp(r / uRange, 0.0, 1.0);
       float gain = uFlat > 0.5 ? 3.0 : 1.0;
       float fishEcho = fishHit * (1.0 + 0.12 * streak);   // fish rims are smooth gradients in the app, not speckle
