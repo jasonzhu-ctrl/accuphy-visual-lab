@@ -62,13 +62,19 @@ In the Mini Combo View clip the downward-pointing blue triangle is the Down View
    structure) plus matching reflectivity map.
 5. Performance, mobile, Shopify embed.
 
-## Still to provide
+## Still to provide (updated 2026-09-23)
 
-- Product images of both devices (side view, transparent PNG) for the cursor
-  → put in `reference/product-images/`.
-- Max depth / range per device and mode.
-- The reference recordings themselves → put in `reference/recordings/`
-  (not yet in this repo as of 2026-09-23).
+- **Recordings: DONE.** 15 clips copied from Jason's Drive into
+  `reference/recordings/` (see `reference/README.md` for the manifest).
+- **Product images: partial.** `reference/product-images/` has transparent
+  PNGs, but neither is a clean *side-view* cutout: the PingLive Mini one is a
+  3/4 front view bundled with Router One; the PingLive one is a photo on its
+  shaft mount. A clean side-view cutout of each device (or a decision to just
+  use a stylised silhouette) is still needed for the cursor.
+- **Max depth / range per device and mode: still missing.** Use placeholder
+  values marked TODO until Jason confirms.
+- `reference/recordings/unsorted/` has two RPReplay clips whose device/mode
+  is not yet identified — classify during Phase 1.
 
 ## How it maps onto this lab
 
