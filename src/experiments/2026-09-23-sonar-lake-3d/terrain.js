@@ -1,6 +1,6 @@
 // Lakebed heightfield in METRES. y = -depth. Lake spans x,z in [-HALF, HALF].
-export const HALF = 70
-export const SEG = 140 // vertices per side (1 m spacing)
+export const HALF = 160 // modelled lakebed half-size; detail lives within ±70 m
+export const SEG = 160  // 2 m spacing
 
 // small deterministic value-noise / fbm
 function hash(x, y) { const s = Math.sin(x * 127.1 + y * 311.7) * 43758.5453; return s - Math.floor(s) }
@@ -29,6 +29,9 @@ export function depthAt(x, z) {
   // deep basin around (15, -28)
   const br = Math.hypot(x - 15, z + 28)
   d = d + (22 - d) * (1 - smooth(8, 24, br)) * 0.8
+  // beyond the play area the bed sinks smoothly into the deep so no edge shows
+  const rim = Math.max(Math.abs(x), Math.abs(z))
+  d = d + (26 - d) * smooth(70, 130, rim)
   return d
 }
 export function bedY(x, z) { return -depthAt(x, z) }

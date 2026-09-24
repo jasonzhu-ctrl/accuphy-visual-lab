@@ -280,8 +280,8 @@ function PickPlane({ state }) {
   const move = (e) => {
     const s = state.current
     if (!s.dragging) return
-    s.target.x = THREE.MathUtils.clamp(e.point.x, -HALF + 12, HALF - 12)
-    s.target.z = THREE.MathUtils.clamp(e.point.z, -HALF + 12, HALF - 12)
+    s.target.x = THREE.MathUtils.clamp(e.point.x, -58, 58)
+    s.target.z = THREE.MathUtils.clamp(e.point.z, -58, 58)
   }
   const onUp = () => { state.current.dragging = false }
   return (
@@ -302,7 +302,7 @@ export default function LakeScene({ state }) {
       <hemisphereLight args={['#dbe9f0', '#2a3a2a', 0.9]} />
       <directionalLight position={[40, 80, 30]} intensity={1.4} />
       <Lakebed mat={mats.bed} />
-      <mesh rotation-x={-Math.PI / 2} position-y={-24}><planeGeometry args={[900, 900]} /><meshBasicMaterial color="#17545f" /></mesh>
+      <mesh rotation-x={-Math.PI / 2} position-y={-26}><planeGeometry args={[900, 900]} /><meshBasicMaterial color="#17545f" /></mesh>
       <Timber mat={mats.inst} />
       <Rocks mat={mats.inst} />
       <Wreck mat={mats.inst} />
