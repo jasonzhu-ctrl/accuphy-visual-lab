@@ -203,3 +203,21 @@ His notes on what in it is signal and what is not:
   cleaner than real use** — so the engine's noise reject sits a step above the
   app's (engine defaults: gain 57 · contrast 40 · noise 30).
 - TVG stays at 20 (not discussed further).
+
+### 6.7 Ideal picture, case 2 — PL Forward View, wreck (2026-09-24, awaiting Jason)
+Recording `PingLive_Forward View_20260906_162600.sonar`, range 14 m, depth
+range 12 m. Reset Defaults for this view = gain 50 · contrast 25 · noise 25 ·
+TVG 25 (a step higher than PLM's 20/20/20). Frames in
+`reference/app-study/ideal-picture-2-pl-forward-wreck/`.
+
+| Step | Setting | What changed |
+|---|---|---|
+| 0 | defaults | wreck already readable; faint haze in open water and near-field rays under the apex |
+| 1 | + contrast 35 | open water goes black, wreck edges sharper, size unchanged |
+| 2 | + noise reject 30 | remaining flecks gone; only near-field rays left |
+| 3 | gain 47 | wreck goes dull orange, the hull's detail flattens → too dim |
+| **4** | **gain 50 · contrast 35 · noise 30 · TVG 25** | hull, deck frames and shadow all readable; bottom band bright with tail; black water — my pick |
+
+Compared with case 1 the PL view needs less contrast (35 vs 40) because it
+starts cleaner; gain stays at the factory 50 — structure blows out faster than
+fish. Near-field rays fanning from the apex are normal (see §6.2), kept.
