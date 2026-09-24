@@ -8,8 +8,8 @@ it is done. ✅ done · 🔧 in progress · ⬜ open.
 - ✅ Surface clutter streak under the transducer (side views)
 - ⬜ Combo (PLM): currently both fans share one apex in one frame (matches the blue/red Combo clip); the split two-panel layout of the yellow-mode clips can come with the app-chrome study
 - ✅ Forward View screen: apex ~20 % from the left, like the recordings
-- ⬜ Range/depth scale numbers and the rest of the app chrome — after studying
-  the app's playback mode (Android APK in an emulator, decision #10)
+- ⬜ Range/depth scale numbers and the rest of the app chrome — after the app can be run (see emulator note)
+- ⬜ Adopt the app's tone curve in our sonar shader: log compression + gain/dynamic-range window → 256-entry LUT (from `aio_shader.glsl`)
 - ⬜ More colour modes (blue/red first)
 
 ## 3D lake (Phase 3 polish)
@@ -25,7 +25,7 @@ it is done. ✅ done · 🔧 in progress · ⬜ open.
 ## Content
 - ✅ Second, ~20 m, more complete wreck on the deep slope up-and-right
 - ✅ Salmon / lake trout also up-and-right in the deep water
-- 🔧 Emulator study: Jason OK'd the downloads 2026-09-24 — JDK 17 installed, APK downloaded (`~/android-sdk/dl/`), Android SDK + arm64 system image installing
+- ⛔ Emulator study blocked: app shaders need GLES 3.2, macOS emulator tops out at 3.1 (see `docs/app-study-plan.md`). Needs a `#version 310 es` dev build from the app team, or a real Android device over USB
 - ⬜ App playback procedure (Jason 2026-09-24): after installing the APK, copy the `.sonar` files from `reference/sonar-data/` into the device's `Files/Accuphy Sonar App/Sonar Data`, open **Playback** in the app, then in a view use the **⋯ settings** to find the data and change settings while watching how the picture reacts
 
 ## Brand / UI

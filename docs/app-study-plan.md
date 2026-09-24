@@ -29,3 +29,31 @@ behaviour, fish/bottom/structure looks per view. Jason 2026-09-24.
 | 7 | Frames with fish close & far | fish mark shape/size vs range |
 
 Findings go into `docs/sonar-style.md`; UI copy into `docs/app-chrome.md`.
+
+## Result of the first attempt (2026-09-24, overnight)
+- Emulator (Pixel 6 / Android 14 / arm64) runs; APK v2.0.0 beta 14 installs and
+  launches; Playback switch found under **Setting → Playback**; the app reads
+  `.sonar` files from **`/Download/Accuphy Sonar/Sonar Data`** (pushed the two
+  PingBeam Combo files + the 229 MB PingLive Mini file there). Home lists
+  PingBeam (Side / Down / Traditional), PingLive (Panoramic / Forward / Down)
+  and PingLive Mini (4 views); each view first downloads a **simulation data
+  pack** (PingLive Forward: 149 MB, done).
+- **Blocked:** every sonar view crashes on the emulator with
+  `Shader compile error: unsupported shader version` — the app's 19 shaders
+  declare `#version 320 es` (GLES 3.2). The macOS emulator offers GLES 3.0 on
+  the host GPU and 3.1 with SwiftShader-ANGLE; nothing offers 3.2. The shaders
+  use only 3.1 features (SSBO, compute, imageStore, texelFetch — no geometry /
+  tessellation), so a build declaring `#version 310 es` would run here. I did
+  NOT re-sign a patched APK (the auto-mode safety check refused, correctly).
+- **Two ways forward:** (a) ask the dev team for an emulator build with
+  `#version 310 es` (one line per shader), or (b) plug a real Android phone/
+  tablet into this Mac — `adb` can screenshot and drive it the same way.
+- **Learned from the app's own shader (`assets/aio_shader.glsl`):** raw sample →
+  `× rawDataScale`, cutoff `nCutoffValue`, then **log compression**
+  `255·log(1+x/bs)/log(1+65535/bs)`, then a **gain/dynamic-range window**
+  (`nWidth = dynaRange·255/maxDynaRangeDB`, offset from gain, floor/ceil) → a
+  0–255 **colour index into a 256-entry RGBA LUT** (`colors[]`, supplied by the
+  app per colour mode); consecutive scan lines are linearly interpolated
+  across the pixel span. Our sonar shader should adopt this tone curve and
+  sample the yellow LUT from the recordings.
+- Extracted APK contents live in `~/android-sdk/dl/apk_x` (not in the repo).
