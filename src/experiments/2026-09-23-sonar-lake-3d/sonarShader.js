@@ -128,7 +128,7 @@ export const sonarFragment = /* glsl */ `
       if (abs(a) > uFan[k].y || r > uRange) continue;
       inAny = 1.0;
       float u = 0.5 + 0.5 * tan(a) / uFan[k].z;
-      float acc = 0.0, peak = 0.0, spk = 0.0;   // acc = integrated band, peak = first return (hot leading edge), spk = structure peak
+      float acc = 0.0, peak = 0.0, spk = 0.0, flatHit = 0.0;   // acc = integrated band, peak = first return (hot leading edge), spk = structure peak, flatHit = panoramic bottom coverage
       float jit = hash(gl_FragCoord.xy * 0.37 + 0.11); // per-pixel row jitter: thin branches become grain, not blocks
       float sigma = 0.22 + 0.010 * r;           // bottom pulse: thin leading edge (app band ≈ 0.3 m), widens a little with range
       float tailLen = 0.35 + 0.015 * r;         // short orange tail under the bottom (§7.8)
@@ -147,23 +147,29 @@ export const sonarFragment = /* glsl */ `
         float pulse = exp(-dr * dr / (sg * sg)) * (1.0 - 0.22 * structure) * mix(1.0, 0.85 + 0.25 * filament, structure); // structure facing the transducer: solid and bright, only a touch under the bottom band (Jason 2026-09-24)
         float tail = dr > 0.0 ? 0.6 * exp(-dr / tailLen) : 0.0;   // body of the band sits in the orange mid-tones
         float second = 0.10 * exp(-(r - 2.0 * hit) * (r - 2.0 * hit) / (4.0 * sigma * sigma)); // faint second echo
+        // panoramic: the fan grazes the bottom, so every screen point where SOME thickness row lands near
+        // this range is bottom texture (a wide match), and where no row lands it is acoustic shadow (§3b)
+        float sf = 1.2 + 0.05 * r;
+        flatHit = max(flatHit, exp(-dr * dr / (sf * sf)) * (1.0 - fish));
         float wgt = 0.55 + 0.9 * (1.0 - abs(v * 2.0 - 1.0));
         acc += (1.2 * pulse + tail + second) * wgt * (1.0 - fish);
         peak = max(peak, pulse * (1.0 - fish) * (1.0 - structure));
         spk = max(spk, pulse * structure);          // a solid face is bright whether it fills one row or all 24 (app piling)
       }
-      acc = acc / 16.0 + 0.7 * peak + 0.9 * spk;  // bottom: hot dense band; structure: solid bright column (Jason: 实心结构亮的清晰的) // first return makes the leading edge hot even where the bottom slopes across the beam; the integrated part gives the orange body (balance loop, §6.11)
+      acc = acc / 16.0 + 0.7 * peak + 0.9 * spk;  // bottom: hot dense band; structure: solid bright column (Jason: 实心结构亮的清晰的)
+      if (uFlat > 0.5) acc = flatHit * (0.3 + 0.38 * mottle + 0.2 * streak) * (1.0 - 0.3 * smoothstep(0.0, 0.15 * uRange, 0.15 * uRange - r)) + 0.9 * spk; // pano: even bottom texture with shadows, dark near the apex // first return makes the leading edge hot even where the bottom slopes across the beam; the integrated part gives the orange body (balance loop, §6.11)
       // fish (sonar-style.md §6.8): the mask already carries the fish's own angular extent
       // (near: body length + heading). Blur it by a CONSTANT beam angle along the arc —
       // so far fish become tangential dashes the width of the beam — and use the average
       // fill rather than the max, so a head-on fish (narrow in angle) comes out dimmer
       // than a broadside one at the same range.
       float beamHalf = max(0.014, 0.07 / r);    // ≈ 0.8° beam half-width, never under ≈ 7 cm: the near-field rim (app: a few cm gradient)
-      float fishSum = 0.0, wSum = 0.0;
+      float fishSum = 0.0, wSum = 0.0, fishMax = 0.0;
       for (int i = -3; i <= 3; i++) {
         float f = float(i) / 3.0;
         float w = 1.0 - 0.6 * f * f;            // soft ends
-        fishSum += w * fishAt(k, a + f * beamHalf, r, jit, 1.0); wSum += w;
+        float v = fishAt(k, a + f * beamHalf, r, jit, 1.0);
+        fishSum += w * v; wSum += w; fishMax = max(fishMax, w * v);
       }
       // outer halo: the same mask seen through a 2.5× wider blur (measured §7.9: brightness climbs
       // gradually from a faint halo, through the rim, to a saturated core ≈ 5–8 cm inside the edge)
@@ -174,24 +180,30 @@ export const sonarFragment = /* glsl */ `
         haloSum += w * fishAt(k, a + f * beamHalf * 2.5, r, jit, 2.5); hSum += w;
       }
       float fill = fishSum / wSum, halo = haloSum / hSum;
-      float fishHit = 0.85 * smoothstep(0.0, 0.9, fill) + 0.22 * halo * (1.0 - fill); // gradual rise rim → core, faint halo outside (§7.9); mid-range dashes stay bright
+      // a fish smaller than the beam footprint still returns a strong echo: the image is the point-spread
+      // function, a bright dash the width of the beam (§7.11) — so brightness uses the MAX tap for small
+      // targets and the fill-based ramp (rim → core) for big near ones
+      float fishHit = 0.85 * max(smoothstep(0.0, 0.9, fill), 1.15 * fishMax) + 0.22 * halo * (1.0 - fill); // small fish read bright yellow, like the app's bait dashes
+      // head-on / narrow fish flicker ping to ping (app: they wink in and out)
+      float narrow = 1.0 - smoothstep(0.35, 0.8, fill);
+      fishHit *= mix(1.0, 0.7 + 0.5 * hash(vec2(floor(uTime * 6.0), floor(a * 40.0))), narrow);
       // lumpy body (the app's near blobs are uneven: flexing body, ping-to-ping change), never speckle
       // lumpy body: two noise scales, deep enough to cut holes and bites into the silhouette (app: irregular blobs)
       float lump = vnoise(p * 4.0 + vec2(0.0, uTime * 0.12)) * 0.6 + vnoise(p * 11.0 - vec2(uTime * 0.07, 0.0)) * 0.55;
-      float rim = 1.0 - smoothstep(0.3, 0.9, fishSum / wSum);              // 1 at the silhouette edge, 0 in the core
+      float rim = (1.0 - smoothstep(0.3, 0.9, fishSum / wSum)) * smoothstep(0.35, 0.75, haloSum / hSum); // edge of a BIG blob only; small fish (low halo) keep their whole dash
       fishHit *= mix(1.0, smoothstep(0.15, 0.75, lump) * 1.15, rim);      // bites only at the rim; the core stays solid
       // beam filaments: at close range the beam footprint is smaller than a pixel, so the app's near blobs
       // are solid with a ragged rim; the comb only shows from mid range out (Jason: 近处的团要实)
       fishHit *= mix(1.0, 0.6 + 0.6 * filament, smoothstep(3.0, 10.0, r));
       float atten = 1.0 - 0.4 * clamp(r / uRange, 0.0, 1.0);
-      float gain = uFlat > 0.5 ? 3.0 : 1.0;
+      float gain = 1.0;
       float fishEcho = fishHit * (1.0 + 0.12 * streak);   // fish rims are smooth gradients in the app, not speckle
       echo = max(echo, max(acc * atten * tex * gain, fishEcho));
     }
     // clutter near the transducer: bright rays fanning out from the apex — a FIXED ≈ 2.4 m
     // in metres (sonar-style.md §6.9), so they look big at short range and small at long range
     float near = 1.0 - smoothstep(0.0, 2.4, r);
-    echo = max(echo, inAny * near * near * (0.25 + 0.6 * rays) * tex * 0.5);
+    echo = max(echo, inAny * (1.0 - uFlat) * near * near * (0.25 + 0.6 * rays) * tex * 0.5);
     echo = max(echo, inAny * floorTex * 0.7); // ≈ LUT index 0.15–0.25 at gain 57 %, contrast 0 (the app's factory look)
 
     if (uDebug > 0.5) { float d = texture2D(uDepth0, vUv).r; gl_FragColor = vec4(vec3(d >= 0.9999 ? 0.0 : 1.0 - linearize(d) / 60.0), 1.0); return; }

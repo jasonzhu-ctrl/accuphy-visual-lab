@@ -14,9 +14,9 @@ it is done. ✅ done · 🔧 in progress · ⬜ open.
 - ✅ Fish echoes v3 (photograph model §7, decision #32): true size in the sonar pass, silhouette ⊗ beam/pulse blur, solid lumpy soft-rimmed marks; verified vs the Down-view near-field recording with `?fishtest`
 - ✅ Colour: `garmin_amber` measured from LVS34 footage is the default (decision #33); `accuphy_red` demoted
 - ✅ Fish texture rounds 3–5 judged by Jason (solid core, rim bites, short marks, sharp structure)
-- ⬜ Head-on fish flicker between pings; school stacking
+- ⬜ School stacking (overlapping dashes brighten) — still open
 - ⬜ More LVS34 study: near-field fish blobs in Garmin's Down mode, bottom-band fibre density, the dark-red haze rays (yt-dlp is installed: `~/Library/Python/3.13/bin/yt-dlp`)
-- ⬜ Forward-view far fish: tangential elongation not strong enough yet (they read as round dots; app/LiveScope show short oblongs across the ray, §6.8) — next fish task
+- ✅ Small/far fish: full-brightness beam-width dashes (max tap), 128-row depth strip so bait fish are not dotted; head-on fish flicker ping to ping
 - ⬜ Bottom band white tip a little too wide vs the app
 - ✅ Surface clutter streak under the transducer (side views)
 - ✅ Combo (PLM): two-panel layout — Down panel lower-left (R/3, stretched ×2), Forward upper-right, shared apex at x≈20 %, grey double diagonal to x≈0.8 at the bottom
@@ -31,7 +31,7 @@ it is done. ✅ done · 🔧 in progress · ⬜ open.
 - ✅ Beam footprint rim on the bottom
 - ✅ Wreck +30 % (≈10 m) with cabin/windows/mast after the app imaging
 - ✅ PL Panoramic clips studied (`sonar-style.md` §3b); screen now opens upward from a bottom apex
-- ⬜ Panoramic screen: bottom texture fill, radial streaks, elongated fish streaks
+- ✅ Panoramic screen: bottom texture fill with acoustic shadows, dark near the apex, no fake burnout (round 7)
 - ✅ Water: ripple rings spread from the boat while it moves (simple wake; the fluid-sim trick stays optional)
 - ✅ Fish rim glow inside the beam (bright edge)
 
@@ -45,13 +45,13 @@ it is done. ✅ done · 🔧 in progress · ⬜ open.
 - ✅ Control panel + guide cards: dark premium tech style (DJI / Insta360 / Anker reference) — near-black glass, hairline borders, grey caps labels, one blue accent, sliding segmented control (Jason 2026-09-24: white did not fit, pills looked "AI")
 - ✅ Animated "Drag the boat" hint that follows the boat until the first drag
 - ✅ Phone frame turned in 3D (perspective + rotateY/rotateX); the GL picture uses the same maths with per-vertex w, so it stays perspective-correct inside the display
-- 🔧 Phone realism (Jason: keep improving): now true Pro Max proportions, thin uniform bezel, brushed titanium band, side/action/power buttons, glass reflection, Dynamic Island — next: antenna lines, camera-side depth, screen-off reflections
+- 🔧 Phone realism (Jason: keep improving): Pro Max proportions, bezel, titanium band, buttons, glass reflection, Dynamic Island, antenna lines — next: camera-side depth, screen-off reflections
 - ✅ Control panel in Accuphy brand (white wordmark, Instrument Sans, Eurostile Heavy headline, brand blue #0d8fdb)
 - ✅ Sonar screen inside an iPhone Pro Max frame (landscape, natural-titanium ring, dynamic island); the GL picture is drawn into the DOM display hole
 - ✅ The sonar picture's own chrome — done (see Sonar screen section)
 
 ## Experience (the three-step guide)
-- ✅ Three-step guide strip with presets (device/mode/range/boat position) — copy is a first draft for Jason to edit
+- ✅ Three-step guide strip with presets — step 2 now lands on standing timber + bass (PL Forward 60 ft); copy is a first draft for Jason to edit
 - ✅ Mobile portrait layout: phone above the control panel, guide strip hidden; fixed camera kept
 - ⬜ Device side-view cutouts (or stylised silhouettes) — still owed by Jason
 

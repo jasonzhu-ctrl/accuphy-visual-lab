@@ -377,3 +377,14 @@ Numbered log. Newest at the bottom.
     Forward depth-range slider stay in the code as calibration tools behind
     `?dev` (DEV builds only). The engine's defaults (gain 57 / contrast 40 /
     noise 30 / garmin_amber) are the picture everyone sees.
+
+35. **2026-09-24** — Round 7 (Jason: 剩下没干的干了, 持续优化). Small and far
+    fish now render at full brightness as beam-width dashes (a point target
+    still returns a strong echo — the image is the point-spread function), and
+    the sonar depth strip went from 32 to 128 rows so a 5 cm bait fish lands
+    on a row instead of dotting; narrow/head-on fish flicker ping to ping.
+    Panoramic screen rebuilt: even bottom texture with acoustic shadows, dark
+    near the apex, the old near-field burnout removed. Step-2 preset moved to
+    the timber flat so "this is what your phone shows" shows timber and fish.
+    Antenna lines on the phone band. Still open: school stacking, finer fill
+    texture inside solid structure, bottom white tip width.

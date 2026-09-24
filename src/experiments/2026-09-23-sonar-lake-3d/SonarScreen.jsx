@@ -35,7 +35,7 @@ export function screenLayout(deviceId, mode, R, aspect, specs, depthM) {
 // transducer, then the main view, then the sonar screen as an overlay quad.
 // Objects on layer 1 (water, beams, boat) are invisible to the sonar cameras.
 export const SONAR_HIDE_LAYER = 1
-const STRIP_W = 1024, STRIP_H = 32
+const STRIP_W = 1024, STRIP_H = 128 // 128 rows across the 18–20° thickness ≈ 0.15°/row: a 5 cm bait fish at 12 m still lands on a row (was 32 → dotted small fish)
 
 export default function SonarScreen({ state, rect, lakeMats }) {
   const { gl, scene, camera, size } = useThree()

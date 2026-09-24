@@ -76,7 +76,7 @@ export default function SonarLake3D() {
   const [step, setStep] = useState(0)
   const STEPS = [
     { n: 1, title: 'This is the beam', text: 'A thin curtain of sound under the boat. Drag the boat — whatever the curtain touches lights up.', device: 'PL', mode: 'down', range: 80, boat: [-20, 6] },
-    { n: 2, title: 'This is what your phone shows', text: 'The screen is that curtain, seen edge-on: bottom, timber, fish. Forward View aims it ahead of the boat.', device: 'PL', mode: 'forward', range: 80, boat: [8, -18] },
+    { n: 2, title: 'This is what your phone shows', text: 'The screen is that curtain, seen edge-on: bottom, timber, fish. Forward View aims it ahead of the boat.', device: 'PL', mode: 'forward', range: 60, boat: [16, 11] }, // standing timber + bass 8–15 m ahead on the 7 m flat
     { n: 3, title: 'Which view, when', text: 'Panoramic scans wide to find fish and structure; Forward to cast at them; Down to fish straight below.', device: 'PL', mode: 'panoramic', range: 160, boat: [-50, 8] }, // on the 5 m shelf, scanning toward the drop-off: the flat fan paints the bottom
   ]
   const goStep = (i) => {
@@ -162,6 +162,10 @@ export default function SonarLake3D() {
             <SonarChrome layout={layout} deviceId={deviceId} mode={mode} rangeFt={rangeFt} depthFt={depthFt} imperial={imperial} gain={gain} depthRef={(el) => { state.current.depthEl = el }} />
             <div className="ph-glass" />
           </div>
+          {/* antenna lines in the titanium band (two per long edge, like the Pro Max) */}
+          {[['16%', 'top'], ['84%', 'top'], ['16%', 'bottom'], ['84%', 'bottom']].map(([l, side]) => (
+            <div key={l + side} style={{ position: 'absolute', left: l, [side]: 0, width: '0.35%', height: '1.35%', background: 'rgba(0,0,0,0.55)', boxShadow: '0 0 0 0.5px rgba(255,255,255,0.15)' }} />
+          ))}
           {/* Dynamic Island: vertical pill on the left in landscape */}
           <div style={{ position: 'absolute', left: '4.1%', top: '50%', width: '2.4%', height: '20%', transform: 'translateY(-50%)', borderRadius: 999, background: '#000', boxShadow: '0 0 0 1px #0a0a0a' }} />
         </div>
