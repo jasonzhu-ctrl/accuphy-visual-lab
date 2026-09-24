@@ -193,3 +193,12 @@ Numbered log. Newest at the bottom.
     `WORK/ACCUPHY/branding`, copied to `public/brand/`); the sonar screen now
     sits inside an **iPhone Pro Max** landscape frame. The sonar picture's own
     chrome is left for the app-playback study.
+
+21. **2026-09-24 (overnight, Jason asleep)** — Autonomous pass through the
+    backlog: musky recoloured (olive-brown back, silver-green/golden sides,
+    cream belly, broken dark bars — pattern 8); bark striations on timber;
+    water wake rings from the moving boat; surface-clutter streak on the sonar
+    screen; three-step guide strip with presets (top-right, desktop only);
+    mobile portrait layout (phone above the panel); dpr capped at 1.5;
+    production build verified (`npm run build` ok). Fish cam accepts an index:
+    `?cam=fish:musky:1`.

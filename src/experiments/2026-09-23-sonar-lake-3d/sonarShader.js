@@ -109,6 +109,8 @@ export const sonarFragment = /* glsl */ `
     }
     // black water, echoes only — no invented rings/grid (Jason 2026-09-24);
     // the real app chrome is learned later from the app's playback mode
+    // surface clutter: a short noisy streak right under the transducer (see sonar-style.md)
+    if (uFlat < 0.5 && inAny > 0.5 && r < 2.4) echo = max(echo, (1.0 - r / 2.4) * (0.25 + 0.45 * hash(floor(p * 15.0) + floor(uTime * 10.0))));
     vec3 col = ramp(echo);
     gl_FragColor = vec4(col, 1.0);
   }

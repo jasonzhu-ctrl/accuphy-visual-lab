@@ -187,15 +187,18 @@ function Fish({ mat, state }) {
 }
 
 // ---------- water surface ----------
-function Water() {
+function Water({ state }) {
   const mat = useMemo(() => new THREE.ShaderMaterial({
     transparent: true, depthWrite: false, side: THREE.DoubleSide,
-    uniforms: { uTime: { value: 0 }, uSun: { value: new THREE.Vector3(0.4, 0.8, 0.3).normalize() }, uSky: { value: new THREE.Color('#9cc1cf') } },
+    uniforms: { uTime: { value: 0 }, uSun: { value: new THREE.Vector3(0.4, 0.8, 0.3).normalize() }, uSky: { value: new THREE.Color('#9cc1cf') }, uBoat: { value: new THREE.Vector3(0, 0, 0) }, uWake: { value: 0 } },
     vertexShader: /* glsl */ `
-      uniform float uTime; varying vec3 vW; varying vec3 vN;
+      uniform float uTime; uniform vec3 uBoat; uniform float uWake; varying vec3 vW; varying vec3 vN;
       void main() {
         vec3 p = position;
         float w = 0.06 * sin(p.x * 0.6 + uTime * 0.9) + 0.05 * sin(p.z * 0.8 - uTime * 0.7) + 0.03 * sin((p.x + p.z) * 1.7 + uTime * 1.6);
+        // wake: rings spreading from the boat while it moves (plane is rotated: local x,y ↔ world x,-z)
+        float dB = length(vec2(p.x - uBoat.x, -p.y - uBoat.z));
+        w += uWake * 0.22 * sin(dB * 2.0 - uTime * 5.0) * exp(-dB / 6.0);
         p.y += w;
         float dx = 0.036 * cos(p.x * 0.6 + uTime * 0.9) + 0.051 * cos((p.x + p.z) * 1.7 + uTime * 1.6);
         float dz = 0.04 * cos(p.z * 0.8 - uTime * 0.7) + 0.051 * cos((p.x + p.z) * 1.7 + uTime * 1.6);
@@ -231,7 +234,13 @@ function Water() {
       }
     `,
   }), [])
-  useFrame(({ clock }) => { mat.uniforms.uTime.value = clock.elapsedTime })
+  useFrame(({ clock }, dt) => {
+    mat.uniforms.uTime.value = clock.elapsedTime
+    const s = state.current
+    const speed = Math.hypot(s.target.x - s.boat.x, s.target.z - s.boat.z)
+    mat.uniforms.uBoat.value.set(s.boat.x, 0, s.boat.z)
+    mat.uniforms.uWake.value += (Math.min(1, speed / 3) - mat.uniforms.uWake.value) * Math.min(1, dt * 3)
+  })
   return (
     <mesh rotation-x={-Math.PI / 2} material={mat} onUpdate={(o) => o.layers.set(SONAR_HIDE_LAYER)}>
       <planeGeometry args={[900, 900, 90, 90]} />
@@ -283,7 +292,8 @@ function Rig({ state }) {
     // fixed 3/4 aerial view like the PL animations; slight parallax from the pointer
     const px = s.parallax.x, py = s.parallax.y
     if (s.fishCam && s.pop) { // dev aid ?cam=fish:<species> — follow the first fish of that species
-      const f = s.pop.find((x) => x.species === s.fishCam)
+      const list = s.pop.filter((x) => x.species === s.fishCam)
+      const f = list[Math.min(list.length - 1, s.fishCamIndex || 0)]
       if (f) {
         const o = fishPose(f, performance.now() / 1000, {})
         const L = f.len * FISH_DISPLAY_SCALE
@@ -330,7 +340,7 @@ export default function LakeScene({ state, sonarRect }) {
   }, [])
   const beamMats = useMemo(() => [mats.bed, mats.inst, mats.fish], [mats])
   return (
-    <Canvas dpr={[1, 1.75]} camera={{ fov: 38, near: 0.5, far: 400, position: [-38, 34, 54] }} gl={{ antialias: true }}>
+    <Canvas dpr={[1, 1.5]} camera={{ fov: 38, near: 0.5, far: 400, position: [-38, 34, 54] }} gl={{ antialias: true, powerPreference: 'high-performance' }}>
       <color attach="background" args={['#9cc1cf']} />
       <fog attach="fog" args={['#9cc1cf', 160, 420]} />
       <hemisphereLight args={['#dbe9f0', '#2a3a2a', 0.9]} />
@@ -341,7 +351,7 @@ export default function LakeScene({ state, sonarRect }) {
       <Wreck mat={mats.inst} />
       <BigWreck mat={mats.inst} />
       <Fish mat={mats.fish} state={state} />
-      <Water />
+      <Water state={state} />
       <Boat state={state} beamMats={beamMats} />
       <Beams key={state.current.specKey} state={state} />
       <PickPlane state={state} />

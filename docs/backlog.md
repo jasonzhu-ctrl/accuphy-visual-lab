@@ -5,21 +5,21 @@ it is done. ✅ done · 🔧 in progress · ⬜ open.
 
 ## Sonar screen (Phase 4)
 - 🔧 Fish echoes as compact bright blobs (fish mask from the sonar pass) — tune against the recordings / LiveScope clips (Jason: fish are the most important thing)
-- ⬜ Surface clutter streak near the apex (see `docs/sonar-style.md`)
-- ⬜ Combo (PLM) as two panels like the app
+- ✅ Surface clutter streak under the transducer (side views)
+- ⬜ Combo (PLM): currently both fans share one apex in one frame (matches the blue/red Combo clip); the split two-panel layout of the yellow-mode clips can come with the app-chrome study
 - ✅ Forward View screen: apex ~20 % from the left, like the recordings
 - ⬜ Range/depth scale numbers and the rest of the app chrome — after studying
   the app's playback mode (Android APK in an emulator, decision #10)
 - ⬜ More colour modes (blue/red first)
 
 ## 3D lake (Phase 3 polish)
-- ⬜ Tree bark / timber texture quality (currently flat vertex colour + speckle)
+- ✅ Bark striations on timber (procedural, in the lake shader)
 - 🔧 Boat restyled to Ranger Z521R proportions (charcoal metal flake, red waterline stripe, rub rail, wraparound windshield, Power-Poles, jack plate) — next: metal-flake sparkle, decals
 - ✅ Beam footprint rim on the bottom
 - ✅ Wreck +30 % (≈10 m) with cabin/windows/mast after the app imaging
 - ✅ PL Panoramic clips studied (`sonar-style.md` §3b); screen now opens upward from a bottom apex
 - ⬜ Panoramic screen: bottom texture fill, radial streaks, elongated fish streaks
-- ⬜ Water: wake / ripple from the dragged boat (fluid trick from `docs/research.md`)
+- ✅ Water: ripple rings spread from the boat while it moves (simple wake; the fluid-sim trick stays optional)
 - ✅ Fish rim glow inside the beam (bright edge)
 
 ## Content
@@ -33,11 +33,11 @@ it is done. ✅ done · 🔧 in progress · ⬜ open.
 - ⬜ The sonar picture's own chrome (scales, numbers) — untouched until the app playback study
 
 ## Experience (the three-step guide)
-- ⬜ Step 1 "this is the beam" / Step 2 "this is the screen" / Step 3 "which mode when"
-- ⬜ Fixed-camera framing per mode; mobile portrait layout
+- ✅ Three-step guide strip with presets (device/mode/range/boat position) — copy is a first draft for Jason to edit
+- ✅ Mobile portrait layout: phone above the control panel, guide strip hidden; fixed camera kept
 - ⬜ Device side-view cutouts (or stylised silhouettes) — still owed by Jason
 
 ## Engineering
-- ⬜ Mobile performance pass (target 60 fps mid iPhone); dpr cap, instancing check
-- 🔧 React 19 + R3F `refCleanup` console error on unmount (benign) — StrictMode removed 2026-09-24 (its double mount duplicated GL resources); watch whether the error persists
+- 🔧 Mobile performance: dpr capped at 1.5, high-performance GL context; real-device fps check still to do
+- ✅ React 19 + R3F `refCleanup` console error — gone since StrictMode was removed (no new occurrences in this session's checks)
 - ⬜ Single-file build + Cloudflare Pages/Vercel hosting + Shopify Custom Liquid iframe

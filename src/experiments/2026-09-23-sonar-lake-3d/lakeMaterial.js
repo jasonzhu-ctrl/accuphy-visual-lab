@@ -118,6 +118,12 @@ export function makeLakeMaterial({ fish = false } = {}) {
         } else if (pat == 6) { // small black spots on the upper half (chinook)
           float sp = step(0.9, hash3(floor(vLocal * 30.0))) * smoothstep(-0.04, 0.06, hgt);
           albedo = mix(albedo, vec3(0.05), sp);
+        } else if (pat == 8) { // musky: dark olive-brown bars, broken into dashes, strongest mid-side
+          float bx = fract(vLocal.x * 7.0 + 0.3);
+          float bar = 1.0 - smoothstep(0.22, 0.34, abs(bx - 0.5) * 2.0);
+          float broken = step(0.3, hash3(floor(vLocal * vec3(7.0, 11.0, 1.0)) + 2.0)); // gaps in the bars
+          float band = smoothstep(-0.12, -0.04, hgt) * (1.0 - smoothstep(0.06, 0.13, hgt));
+          albedo = mix(albedo, vec3(0.16, 0.17, 0.09), bar * broken * band * 0.85);
         } else if (pat == 7) { // bright silver lateral stripe (smelt)
           float st = 1.0 - smoothstep(0.015, 0.04, abs(hgt + 0.015));
           albedo = mix(albedo, vec3(0.95, 0.97, 1.0), st * 0.8);
@@ -132,6 +138,12 @@ export function makeLakeMaterial({ fish = false } = {}) {
         // procedural surface texture: fine speckle for sand/bark
         float tex = 0.9 + 0.2 * fract(sin(dot(floor(vWorld * 9.0), vec3(12.9898, 78.233, 37.719))) * 43758.5453);
         albedo *= tex;
+      #ifndef FISH
+        // bark: vertical striations on brown (timber) surfaces — grooves follow the trunk
+        float brown = smoothstep(0.02, 0.08, vColor.r - vColor.b);
+        float groove = fract(sin(dot(floor(vec2(atan(vWorld.z, vWorld.x) * 40.0 + vWorld.x * 3.0, vWorld.y * 1.2)), vec2(12.9898, 78.233))) * 43758.5453);
+        albedo *= 1.0 - brown * 0.28 * groove;
+      #endif
         // outside the beam things stay murky; inside they pop (Garmin look)
         vec3 lit = base * (0.72 + 2.3 * beam) + uHighlight * 0.3 * beam + uHighlight * 0.9 * edge;
         // underwater fog by distance from camera

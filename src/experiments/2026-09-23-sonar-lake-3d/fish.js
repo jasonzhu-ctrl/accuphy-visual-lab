@@ -6,14 +6,14 @@ export const FISH_DISPLAY_SCALE = 2.6
 // back → side → belly gradient. pattern: 0 none · 1 dark vertical bars on the
 // sides · 2 light spots · 3 dark speckle all over · 4 dark lateral band of
 // blotches · 5 dark saddles on the back · 6 small black spots on the upper half
-// · 7 bright silver lateral stripe.
+// · 7 bright silver lateral stripe · 8 broken, irregular dark vertical bars (musky).
 export const SPECIES = {
   largemouth: { name: 'Largemouth bass', len: [0.38, 0.55], body: 'bass',     back: '#2f4a1f', side: '#6f8f3f', belly: '#e9e7cc', pattern: 4 }, // green, black lateral band
   smallmouth: { name: 'Smallmouth bass', len: [0.33, 0.45], body: 'bass',     back: '#4a3d1c', side: '#8a6d34', belly: '#dccfa5', pattern: 1 }, // bronze-brown, vertical bars
   walleye:    { name: 'Walleye',         len: [0.45, 0.70], body: 'salmonid', back: '#55582a', side: '#c49a3c', belly: '#f4efd8', pattern: 5 }, // golden-brass, dark saddles
   crappie:    { name: 'Crappie',         len: [0.25, 0.35], body: 'panfish',  back: '#4f5d5a', side: '#aab4b4', belly: '#f1f4f4', pattern: 3 }, // silver, dark mottling
   smelt:      { name: 'Smelt',           len: [0.12, 0.20], body: 'bait',     back: '#6a8a84', side: '#c7d6d8', belly: '#f4f8f8', pattern: 7 }, // translucent olive back, silver stripe
-  musky:      { name: 'Muskellunge',     len: [0.75, 1.30], body: 'pike',     back: '#6d7d55', side: '#b6bc94', belly: '#ecebd6', pattern: 1 }, // pale green-silver, dark bars
+  musky:      { name: 'Muskellunge',     len: [0.75, 1.30], body: 'pike',     back: '#3f4a2c', side: '#8f9f6e', belly: '#e9e4cf', pattern: 8 }, // olive-brown back, silver-green/golden sides, broken dark bars
   laketrout:  { name: 'Lake trout',      len: [0.60, 0.90], body: 'salmonid', back: '#2f3b37', side: '#5c6a63', belly: '#d9ddd4', pattern: 2 }, // dark grey-green, light spots
   salmon:     { name: 'Chinook salmon',  len: [0.70, 1.00], body: 'salmonid', back: '#34485a', side: '#b3c0c9', belly: '#f2f4f5', pattern: 6 }, // steel-blue back, silver, black spots
 }

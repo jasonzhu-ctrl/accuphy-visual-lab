@@ -33,6 +33,7 @@ export default function SonarLake3D() {
     parallax: { x: 0, y: 0 }, specs, specKey,
     closeCam: window.location.search.includes('cam=boat'),
     fishCam: (/cam=fish:(\w+)/.exec(window.location.search) || [])[1],
+    fishCamIndex: +((/cam=fish:\w+:(\d+)/.exec(window.location.search) || [])[1] || 0),
   })
   state.current.specs = specs
   state.current.specKey = specKey
@@ -47,6 +48,18 @@ export default function SonarLake3D() {
     s.parallax.y = (e.clientY / window.innerHeight - 0.5) * 2
   }
   const fmt = (ft) => (imperial ? `${Math.round(ft)} ft` : `${(ft * FT).toFixed(1)} m`)
+
+  // the three-step guide (docs/3d-beam-reference.md §3): each step is a preset
+  const [step, setStep] = useState(0)
+  const STEPS = [
+    { n: 1, title: 'This is the beam', text: 'A thin curtain of sound under the boat. Drag the boat — whatever the curtain touches lights up.', device: 'PL', mode: 'down', range: 80, boat: [-20, 6] },
+    { n: 2, title: 'This is what your phone shows', text: 'The screen is that curtain, seen edge-on: bottom, timber, fish. Forward View aims it ahead of the boat.', device: 'PL', mode: 'forward', range: 80, boat: [8, -18] },
+    { n: 3, title: 'Which view, when', text: 'Panoramic scans wide to find fish and structure; Forward to cast at them; Down to fish straight below.', device: 'PL', mode: 'panoramic', range: 240, boat: [20, 22] },
+  ]
+  const goStep = (i) => {
+    const st = STEPS[i]; setStep(i); setDeviceId(st.device); setMode(st.mode); setRangeFt(st.range)
+    state.current.target.x = st.boat[0]; state.current.target.z = st.boat[1]
+  }
 
   return (
     <main className="font-brand fixed inset-0 select-none overflow-hidden bg-[#9cc1cf] text-white" onPointerMove={onMove}>
@@ -80,7 +93,7 @@ export default function SonarLake3D() {
       {/* ---- iPhone Pro Max (landscape, natural titanium) showing the Accuphy Sonar App.
            The bezels are RINGS (CSS mask with a hole) so the GL canvas underneath shows
            through the display area, where SonarScreen draws the picture. ---- */}
-      <div className="pointer-events-none absolute" style={{ right: 18, bottom: 18, width: 'min(38vw, 560px)' }}>
+      <div className="pointer-events-none absolute right-[4vw] bottom-[200px] w-[92vw] sm:right-[18px] sm:bottom-[18px] sm:w-[min(38vw,560px)]">
         <div style={{ position: 'relative', aspectRatio: '19.5 / 9' }}>
           <div style={{ ...ring('1.6%'), borderRadius: '10.5% / 22%',
             background: 'linear-gradient(135deg, #f4f4f2 0%, #c6c6c3 18%, #ebebe8 40%, #9a9a96 62%, #e0dedb 82%, #b4b3af 100%)',
@@ -97,6 +110,17 @@ export default function SonarLake3D() {
           {/* dynamic island (landscape: on the left) */}
           <div style={{ position: 'absolute', left: '4.6%', top: '50%', width: '2.2%', height: '22%', transform: 'translateY(-50%)', borderRadius: 999, background: '#000', boxShadow: '0 0 0 1px #111' }} />
         </div>
+      </div>
+      {/* ---- guide strip ---- */}
+      <div className="pointer-events-auto absolute right-[18px] top-4 hidden w-[min(600px,42vw)] items-stretch gap-2 md:flex">
+        {STEPS.map((st, i) => (
+          <button key={st.n} onClick={() => goStep(i)}
+            className={`flex-1 rounded-xl px-3 py-2 text-left ring-1 backdrop-blur-md transition ${step === i ? 'bg-[#0d8fdb]/85 text-white ring-white/30' : 'bg-[#0f1216]/70 text-white/85 ring-white/10 hover:bg-[#0f1216]/85'}`}>
+            <div className="font-brand-head text-[11px] uppercase tracking-wider opacity-80">Step {st.n}</div>
+            <div className="text-[13px] font-semibold leading-tight">{st.title}</div>
+            {step === i && <div className="mt-1 text-[11px] leading-snug text-white/85">{st.text}</div>}
+          </button>
+        ))}
       </div>
       {import.meta.env.DEV && window.location.search.includes('debug') && (
         <pre ref={(el) => { state.current.debugEl = el }} className="pointer-events-none absolute left-2 top-1/2 rounded bg-black/60 p-1 text-[10px] text-lime-300" />
