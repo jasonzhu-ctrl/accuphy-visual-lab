@@ -59,7 +59,7 @@ small marks = fish and floating debris.
 
 In the Mini Combo View clip the downward-pointing blue triangle is the Down View portion.
 
-## Phases
+## Phases (status 2026-09-23: 1 done, 2 done as prototype, 3 next)
 
 1. Reference analysis: extract frames from recordings (ffmpeg), measure palettes, noise
    texture, how fish / bottom / structure / shadows look. Output: `docs/sonar-style.md`.

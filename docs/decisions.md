@@ -44,3 +44,16 @@ Numbered log. Newest at the bottom.
    **three-fluid-fx** (or the inspiration site's tiny CPU flow-field trick);
    host the built page on Cloudflare Pages/Vercel and embed in Shopify via a
    Custom Liquid iframe section.
+
+6. **2026-09-23** — Phase 2 geometry prototype shipped as
+   `src/experiments/2026-09-23-sonar-beam/` (three.js + R3F full-screen shader,
+   placeholder lake drawn procedurally). Working assumptions, all tunable in
+   the on-screen debug controls and **to be confirmed by Jason**:
+   (a) **Forward View = Down fan rotated forward by one full beam width**, so
+   Down + Forward are contiguous (PLM 39°+39° = 78° Combo, as in the clips);
+   clamped so the leading edge never rises above the surface (PL: 22.5° tilt →
+   leading edge horizontal). (b) Scene is a 60 m-wide side view, surface at
+   1/3 height. (c) Display range slider in ft (tap to toggle m), clamped to the
+   device max from decision #5; engine uses metres. (d) Mouse hover moves the
+   device; touch requires a drag. Device cursor is a placeholder shape until
+   side-view PNGs exist.
