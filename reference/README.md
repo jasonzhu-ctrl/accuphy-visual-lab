@@ -16,6 +16,14 @@ Copied 2026-09-23. To re-copy, see the source paths below.
 
 Skipped: `mini Panoramic View.MP4` (218 MB, Panoramic is out of scope for v1).
 
+## animations/ — Accuphy's PingLive mode animations (3D concept reference)
+
+`PL_down-view_anim_1Ftq5.gif`, `PL_forward-view_anim_1xS_K.gif`,
+`PL_panoramic-view_anim_1Z1uC.gif` — Jason's Drive links 2026-09-23 (same
+files as `Product Digitals/PingLive/{Down,Forward,Panoramic} View PingLive.gif`).
+Analysed in `docs/3d-beam-reference.md`. Garmin LVS34 reference is a YouTube
+video (NznEbu0V2Wc), not stored here.
+
 ## product-images/ — device art for the on-water cursor
 
 From `Distributors/Prime Sports/Product Digitals/{PingLive, PingLive Mini}/`
@@ -23,8 +31,7 @@ and `…/09.23.2026 Graphics/`:
 `Transparent PingLive Shaft Mount.png`, `Transparent PingLive Mini.png`,
 `PingLive Mini (1).png`, `PingLive Mini (2).png`, `PingLive Mini Views.png`,
 `PingLive Product Page Image.png`, `PingLive Mini Product Page.png`,
-`3tablets mock.png`, plus beam-illustration GIFs `Down View / Forward View /
-Panoramic View PingLive.gif`.
+`3tablets mock.png`.
 
 ## sonar-data/ — raw `.sonar` app exports
 

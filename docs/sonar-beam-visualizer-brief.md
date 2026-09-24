@@ -61,6 +61,12 @@ In the Mini Combo View clip the downward-pointing blue triangle is the Down View
 
 ## Phases (status 2026-09-23: 1 done, 2 done as prototype, 3 next)
 
+> **Direction change under discussion (2026-09-23):** after studying Accuphy's
+> PingLive mode animations and Garmin's LVS34 video, Jason wants a **3D**
+> feel. Proposal in `docs/3d-beam-reference.md` §3: 3D lake with translucent
+> beam volumes as the main stage, the 2D sonar picture as an app-style inset.
+> Phases 3–5 below are re-planned there once Jason approves.
+
 1. Reference analysis: extract frames from recordings (ffmpeg), measure palettes, noise
    texture, how fish / bottom / structure / shadows look. Output: `docs/sonar-style.md`.
 2. Geometry prototype with placeholder art: fans, device switching, cursor = device,

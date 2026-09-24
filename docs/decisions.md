@@ -66,3 +66,10 @@ Numbered log. Newest at the bottom.
    50 m** (sky 15 m above). (c) Before Phase 3, Jason will supply a PingLive
    three-viewing-mode animation and Garmin LVS34 real footage to study how
    each mode images the bottom; he wants the final piece to feel **3D**.
+
+8. **2026-09-23** — Reference study done (`docs/3d-beam-reference.md`):
+   Accuphy's own PingLive Down/Forward/Panoramic animations and Garmin's
+   LiveScope Plus video both present the beam as a **translucent 3D volume
+   under an aerial view of the lake that reveals the bottom inside it**.
+   Proposed (awaiting Jason): 3D lake + beam volumes as the main stage, 2D
+   yellow-mode sonar picture as an app-style inset; phases 3–5 re-planned.
