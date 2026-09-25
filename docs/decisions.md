@@ -720,3 +720,18 @@ Numbered log. Newest at the bottom.
     coverage, the rest stays as it was. Jason is open on tools and on how we
     collaborate; he has more reference videos to share from a web platform.
     Still planning only.
+
+56. **2026-09-25** — **Boat scene = a 16–18 ft aluminium deep-V; on phones the scene
+    choice adds no step** (Jason: "移动端会不会太重了还要选择 A我觉得不错").
+    - The Boat scene uses a 16–18 ft aluminium deep-V, the everyday walleye boat of
+      Canada and the Upper Midwest, instead of the Ranger tournament boat
+      (revises #20 for the Lab's scenes).
+    - Jason's worry was that a choice makes mobile too heavy. The answer is that the
+      choice is never a gate:
+      - the page opens straight into one scene: the ad's scene when a link carries
+        one, otherwise the season's default;
+      - switching is a small chip on phones (or sits in the "More" sheet), not a new
+        row of buttons;
+      - only the scene in use is loaded, and the others download when tapped;
+      - one scene renders at a time, so the per-frame cost does not grow.
+    Planning only: nothing is built until Jason says go.
