@@ -48,8 +48,8 @@ it is done. ✅ done · 🔧 in progress · ⬜ open.
 - ✅ Bottom toned down to orange with a thin hot edge; lockup moved into the boat's reach (decision #66)
 - ✅ Panoramic structure: bright near faces, dark shadows, no rock rings (decision #67)
 - ⬜ Panoramic shadow edges are still grainy (per-pixel march offsets); smoother ones need a better method than the two tried in #67
-- ⬜ Option for Jason: the wreck in ~10–12 m so it fills the phone like the tablet recording (`docs/deep-water-plan.md` §6)
-- ⬜ Option for Jason: PLM Down in deep water — the bottom band is thick and bright (noticed 2026-09-25)
+- ✖ The wreck in ~10–12 m so it fills the phone like the tablet recording — Jason 2026-09-25: 不用 (it stays on the 24 m floor)
+- ✅ PLM Down in deep water no longer burns white (~11 % white after decision #66)
 - ✅ Bark striations on timber (procedural, in the lake shader)
 - 🔧 Boat restyled to Ranger Z521R proportions (charcoal metal flake, red waterline stripe, rub rail, wraparound windshield, Power-Poles, jack plate) — next: metal-flake sparkle, decals
 - ✅ Beam footprint rim on the bottom
