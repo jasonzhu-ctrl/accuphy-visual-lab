@@ -106,6 +106,8 @@ the cheapest Android phone class). Phone size was emulated at 360×800.
   A web page cannot force landscape (iOS Safari has no orientation lock, and Instagram's iPhone app
   does not rotate). Proposal, waiting on Jason: keep portrait fully working, add a compact phone
   landscape layout and an optional dismissible "turn for a bigger view" hint. No rotate wall.
+- ⬜ **Before any US ad spend (decision #57):** walk the US store's checkout on a phone (view only, no
+  payment) and find where US buyers drop off; US ads lead with the PingLive Mini.
 - ⬜ **Before any ad spend:** public hosting; drop "← Lab" and the gallery from the public build;
   add a "Shop PingLive" button with UTM tags; add the Meta Pixel; wire Klaviyo (see above); remove
   the logo source files (.ai/.cdr/.zip/.DS_Store) from `public/`.
@@ -117,13 +119,13 @@ the cheapest Android phone class). Phone size was emulated at 360×800.
   LiveScope owners wanting a second unit, francophone and Chinese-speaking communities), not tournament
   bass pros. Proposals in its §7: lead with "live sonar on the phone you already own" (answers the
   pending "aha" question with A); a "How do you fish? Boat · Kayak · Ice" scene choice instead of the
-  tournament bass boat (**decided #53: Boat, Kayak, Ice**; the default and the boat type are still open) (status-ladder study in Drive: no single vehicle carries the brand; the
+  tournament bass boat (**decided #53/#56: Boat (an aluminium deep-V), Kayak, Ice; no gate on phones**; the seasonal default is a working assumption) (status-ladder study in Drive: no single vehicle carries the brand; the
   default follows the season: ice in winter, an aluminium deep-V in open water, the kayak never
   the default); target Canada before ice season, and the US only after its availability and
   checkout are fixed; the Lab as an onboarding tool (reading the picture) and a dealer demo; show
   multi-device sharing; UTM, Pixel and Klaviyo tags before any ad spend. Next data to get: the HelpScout
   queue (~4,200 conversations) and a 5-question owner survey.
-- ⬜ **Market research round 1 + continuous learning (2026-09-25, decision #54, proposals waiting on
+- ⬜ **Market research round 1 + continuous learning (2026-09-25, decision #60, proposals waiting on
   Jason):** `docs/market/` (start with `report-2026-09.md`; the loop is in `README.md`). Questions for
   Jason, in this order:
   1. **US store:** only the Mini is offered to US visitors, and duties are added at checkout (US
@@ -161,3 +163,4 @@ the cheapest Android phone class). Phone size was emulated at 360×800.
   lists the light, beam-volume, parallax, bloom, motion and glass-UI rules; phones get the same look with fewer samples.
   Jason reviews the prototype's look against the LVS34 frames, Accuphy's animations and the 3D Lab before packaging
 - ✅ Mood decided: dark cinematic water, the dusk palette of plan §3b (decision #51)
+- ✅ Look references: Jason picked groups A + B and gave the "dark lakebed lit up" lamp concept (decision #54, `docs/look-references.md`)

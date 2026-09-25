@@ -42,8 +42,10 @@ The "Principles for mobile" section below is the current thinking.
 7. **Landscape is "real device mode".** If the visitor rotates, the sonar fills the screen exactly
    like the real app, and the lake becomes a small inset (tap to enlarge). Portrait stays the
    default and complete; nothing ever asks the visitor to rotate.
-8. **Three ways to fish (decision #53).** "How do you fish? Boat · Kayak · Ice", on phone and
-   desktop alike. The default follows the season, and ads deep-link to the matching scene.
+8. **Three ways to fish (decisions #53, #56).** Boat (an aluminium deep-V), Kayak and Ice. On a
+   phone the choice is never a gate. The page opens straight into one scene: the ad's scene, or
+   the season's default. Switching is a small chip or sits in the "More" sheet. Only the scene in
+   use is loaded; the others download on tap.
 9. **Ask for the email after the "aha", never before.** Inline, dismissible, with "Shop PingLive"
    next to it (decision #45).
 
@@ -137,6 +139,13 @@ optimise for landing-page views or engagement; after that, optimise for Lead.
 - **Links:** give each ad variant its own scene preset link (the wreck, bass under timber, the
   hidden sign), so the page opens on what the ad showed.
 - **Budget:** start small, compare cost per engaged visitor and cost per lead, then scale.
+- **Meta feasibility (2026-09-25; the Drive study "Meta ads feasibility"):** Meta fits awareness,
+  leads and retargeting, not direct sales. The order is:
+  1. tracking first;
+  2. test on our own ~1,700 never-ordered subscribers, at no cost;
+  3. Canada before the ice season. The US leads with the PingLive Mini (decision #57); check the US
+     checkout before spending there;
+  4. the goal is an email lead, and Klaviyo does the selling.
 
 ## Order of work
 

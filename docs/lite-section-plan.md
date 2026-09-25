@@ -123,6 +123,18 @@ met by *computing* the picture, not by simplifying it: everything below is per-p
 maths and CSS and costs no download. Where the 3D Lab spends bytes and GPU on
 geometry, the section spends them on light.
 
+**The guiding image (Jason, decision #54): a dark lakebed lit up.** Like a swinging lamp
+in a black room (his reference: the HTML Light Demo, `docs/look-references.md`): the
+beam is the only light, whatever it sweeps over is revealed, the rest stays dark, and
+the light has physical weight — it lags, sways and settles when the boat is dragged.
+Taste confirmed on the reference sheets: groups A (dark cinematic product pages) and
+B (one light source revealing a dark world).
+
+Jason's three rules (decision #55): the lake stays a realistic lake picture, half-dark
+with a logic to its darkness; the cursor is a small but real image of the transducer;
+wherever it goes, everything its beam can reach lights up. (This refines §3: "the
+boat" becomes the device itself; the boat, if shown at all, is scenery.)
+
 **Where the feel comes from**
 
 1. **Light in the water** (mood decided: dark cinematic, decision #51). Lit from the
@@ -163,6 +175,11 @@ geometry, the section spends them on light.
    widgets, no white cards, no drop-shadow soup.
 8. **Finishing.** A subtle vignette and film grain, a slow colour drift in the
    water, cinematic 16:9 framing on desktop.
+9. **Learned from Lusion's About page** (`docs/look-references.md`, Lusion study):
+   a near-monochrome world with one light source; alive before touch (idle breathing),
+   pointer = parallax, drag = reveal; foreground debris parallax for depth; bloom on
+   bright points; (a huge product wordmark was tried and dropped, decision #59 — the section serves both devices);
+   upright + italic caption lines; corner marks and one tiny hint line.
 
 **Cost and the phone rule.** Desktop gets everything. Phones get the *same look* with
 fewer samples (light-shaft samples 24 → 8, bloom at 1/8 resolution, half the

@@ -691,7 +691,85 @@ Numbered log. Newest at the bottom.
 
     Planning only: nothing is built until Jason says go.
 
-54. **2026-09-25** — **Market learning gets a shared home: `docs/market/`** (Jason:
+54. **2026-09-25** — **Look picks: groups A and B; the guiding concept is "a dark
+    lakebed lit up", like a swinging lamp** (Jason: "A B 都喜欢的 我们不说技术因为技术和最后
+    的呈现效果最有关系 我继续给你我想说的暗色湖底被点亮的概念吧 有一个我的录屏参考概念 但不要被
+    限制了 继续学习"). From `docs/look-references.md`: he likes A (dark cinematic product
+    pages: DJI, Apple, Hasselblad, GoPro) and B (interactive WebGL: Hubtown's glowing
+    object over dark water, Iventions' spotlight atmosphere, IVRESS). His own reference
+    is the "HTML Light Demo" (github.com/jinruozai/HTML-Light-Demo, a recreation of
+    @kaolti's piece; live at jinruozai.github.io/HTML-Light-Demo): a near-black room, one
+    hanging lamp on a physical pendulum, and a warm soft-edged cone that is the only
+    light — whatever it sweeps over is revealed, the rest stays dark; the lamp has
+    weight (swing, inertia, settle). Mapping for the section: the beam is the lamp, the
+    lakebed and its timber, rocks and fish are the wall, the amber sonar picture is
+    what the light reveals, the water is the dark room; the beam should carry physical
+    weight when the boat is dragged (lag, sway, settle). He asked not to be limited by
+    the clip and to keep learning. Judge by the final look, not the technique.
+    Still planning only.
+
+55. **2026-09-25** — **The concept, in Jason's words** ("就是湖归湖的画面 他是半暗的或者是
+    有逻辑的暗和半暗 然后鼠标是声纳探头的缩小版本 但是真实图形 然后探头到了哪里 对应的声纳波束
+    能触达的地方就亮了"). Three rules for the lite section, replacing any looser reading
+    of #54: (1) **the lake stays a lake picture** — realistic, half-dark, with a logic
+    to what is dark and what is half-lit (surface light, depth), not a black void;
+    (2) **the cursor is the transducer itself** — a small but real image of the device
+    (PingLive / PingLive Mini), not a boat silhouette or an abstract marker; the
+    side-view device cutouts are therefore needed (backlog); (3) **wherever the device
+    goes, everything its beam can reach lights up** — the lit region is the beam's true
+    coverage, the rest stays as it was. Jason is open on tools and on how we
+    collaborate; he has more reference videos to share from a web platform.
+    Still planning only.
+
+56. **2026-09-25** — **Boat scene = a 16–18 ft aluminium deep-V; on phones the scene
+    choice adds no step** (Jason: "移动端会不会太重了还要选择 A我觉得不错").
+    - The Boat scene uses a 16–18 ft aluminium deep-V, the everyday walleye boat of
+      Canada and the Upper Midwest, instead of the Ranger tournament boat
+      (revises #20 for the Lab's scenes).
+    - Jason's worry was that a choice makes mobile too heavy. The answer is that the
+      choice is never a gate:
+      - the page opens straight into one scene: the ad's scene when a link carries
+        one, otherwise the season's default;
+      - switching is a small chip on phones (or sits in the "More" sheet), not a new
+        row of buttons;
+      - only the scene in use is loaded, and the others download when tapped;
+      - one scene renders at a time, so the per-frame cost does not grow.
+    Planning only: nothing is built until Jason says go.
+
+57. **2026-09-25** — **US = PingLive Mini (PLM) is fine for ads** (Jason: "我赞成 美国做PLM是可以的哦").
+    The US market does not wait for the full-size PingLive.
+    - US ads lead with the Mini at US$699. That is the strongest price story (against
+      the Lowrance Eagle Eye 9 at $999) and fits the kayak and ice scenes.
+    - A Lab link from a US ad opens with the Mini selected.
+    - The remaining US check before spending: the store's checkout completion. The
+      2026-09-24 data showed ~5% of US checkouts completing, possibly inflated by
+      express-pay buttons.
+
+    This revises condition 3 of the Meta feasibility note in Google Drive's
+    `Market Research`. The rest of the order stands: tracking first, then our own
+    list, then Canada before the ice season.
+    Planning only.
+
+58. **2026-09-25** — **Wordmark look mock made — a still, not the build** (Jason, on a
+    giant PINGLIVE word in the section: "可以试试呀看看好了反正没事"). Two stills of the same
+    scene, with and without the word (`reference/look/mock/`, gitignored; generator
+    `gen.py`, an SVG drawing rendered with headless Chrome): dark lake per #51/#55,
+    PingLive Down beam (135°) as the only light, reaching as far as the range; inside it
+    the lake lights up — the bottom, timber, wreck and fish, with amber sonar-style edges;
+    outside it the lake stays half-dark. The cursor is the real transducer head cut from
+    the shaft-mount product photo. Variant A: "PINGLIVE" in Eurostile Heavy straddling the
+    surface — top half in the sky, bottom half refracted under water and lit where the
+    beam reaches. Variant B: a headline instead. Waiting for Jason's verdict. The section
+    itself is still not started.
+
+59. **2026-09-25** — **No giant product wordmark in the section** (Jason, on the #58
+    mocks: "我感觉网站首页大字的不合适 毕竟还有mini呢"). A "PINGLIVE" word would favour one
+    product while the section also shows PingLive Mini. The section uses the plain
+    variant: a short headline plus the device toggle. If a big type moment is ever
+    wanted, it must be product-neutral (e.g. the ACCUPHY brand, or a line like "See under
+    your boat"), and it is not planned now.
+
+60. **2026-09-25** — **Market learning gets a shared home: `docs/market/`** (Jason:
     "基于你对我们的全盘了解 做深入用户和市场研究 持续学习如何让accuphy卖得更好").
     Research round 1 builds on round 0 (`docs/users-and-market.md`, 2026-09-24) and sets up
     the loop for continuous learning:
@@ -708,3 +786,5 @@ Numbered log. Newest at the bottom.
       the ice season (Nov–Feb = 43 % of store orders) starts now.
     All recommendations are proposals: nothing in the store, Klaviyo, ads or the Lab changes
     until Jason says go.
+    (Written as #54 on the research branch `claude/modest-keller-ccfnhq`; renumbered #60
+    when merged with main, where #54–#59 were already taken.)
