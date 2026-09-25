@@ -968,3 +968,14 @@ Numbered log. Newest at the bottom.
     - **By physics, not a bug:** PLM Forward over 24 m water at 80 ft range shows no bottom.
       The Mini only sees the bottom from ~1.2 × the depth ahead, so a longer range shows it.
 
+
+69. **2026-09-25** — **Project boundary with `accuphy-website`** (Jason approved the
+    three-project layout: accuphy-website = Shopify landing platform, accuphy-visual-lab =
+    design and prototypes, Partner Portal; stale folders archived under `IT/_archive`).
+    The lab never touches Shopify: a final design is handed over through
+    `accuphy-website/handoffs/`, and that project owns the theme, translations, speed
+    measurement and publishing. Site facts and specs are read from the website project,
+    never copied here. Items already on the website side's backlog: the Lab page's home
+    (lab.accuphy.ca vs a store page), the lite section's Shopify test page, the Klaviyo
+    list and keys, Meta Pixel + UTM + "Shop PingLive" button, the US phone-checkout walk
+    (decision #57). Written into `CLAUDE.md` ("Boundary with the website project").

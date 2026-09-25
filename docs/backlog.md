@@ -146,6 +146,11 @@ the cheapest Android phone class). Phone size was emulated at 360×800.
 - ✅ React 19 + R3F `refCleanup` console error — gone since StrictMode was removed (no new occurrences in this session's checks)
 - ⬜ **Local for now** (Jason 2026-09-24): `npm run build` + `npm run preview` on this Mac. Public hosting + Shopify embed stay in the plan for later, unchanged
 
+## Handed to the website project (decision #69) — tracked in `accuphy-website/docs/backlog.md`
+- Lab page location (lab.accuphy.ca vs a store page) · lite section's Shopify test page · Klaviyo list,
+  opt-in and keys · Meta Pixel, UTM, "Shop PingLive" button · US phone checkout walk (decision #57).
+  The design work for each stays here; the Shopify side is theirs.
+
 ## Lite section (planning only — decision #48)
 - ⬜ **Do not build until Jason says go.** `docs/lite-section-plan.md`: the original side-view visualizer as a
   light web component `<accuphy-sonar>` for accuphy.ca sections — the fan is the screen (no phone inset),

@@ -10,6 +10,21 @@ It is **NOT** the RMA portal and **NOT** the Distributor Portal
 and nothing from those projects should be copied in here. Keep the two worlds
 separate.
 
+## Boundary with the website project (decision #69, Jason 2026-09-25)
+
+- This lab makes **designs and prototypes only**. It never touches the Shopify store.
+- Everything that must land on shop.accuphy.com (a section, a page, a form, a pixel, a
+  tracking tag, copy, translations) goes through the website project
+  `.../ACCUPHY/IT/accuphy-website` — the "Shopify landing platform". When a design is
+  final, write a handoff into `accuphy-website/handoffs/` (its `CLAUDE.md` has the format)
+  and stop; that project puts it into the theme, translates it, measures it and publishes.
+- Facts about the live site (markets, tools, weight, traffic) live in
+  `accuphy-website/docs/site-audit.md`; product specs only in `accuphy-website/docs/specs.md`.
+  Do not keep copies here; `docs/site-audit.md` is just a pointer.
+- Sidebar group = folder name. A lab chat runs in this folder; the chat
+  "网页section轻量化设计" was opened in the website folder by mistake — when the lite section
+  is resumed, open a new chat here.
+
 ## Stack (decision #2, 2026-09-23)
 
 **Vite + React 19 + Tailwind CSS 4 + Framer Motion.** Plain JavaScript/JSX,
