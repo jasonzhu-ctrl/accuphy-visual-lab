@@ -74,8 +74,36 @@ it is done. ✅ done · 🔧 in progress · ⬜ open.
 - ✅ Mobile portrait layout: phone above the control panel, guide strip hidden; fixed camera kept
 - ⬜ Device side-view cutouts (or stylised silhouettes) — still owed by Jason
 
+## Mobile + Meta ads readiness (real-device test 2026-09-24)
+Jason is weighing Meta ads, which bring mostly phone traffic, for this page. The numbers come from a
+production build of the decision #38 state in Chrome 153 on the V10 tablet (Unisoc T616 / Mali-G57 MP1,
+the cheapest Android phone class). Phone size was emulated at 360×800.
+- ⬜ **Phone smooth mode.** Measured fps: 10–13 at tablet size, 14–19 at phone size and 18–24 even at
+  dpr 1 (Panoramic and Combo are the slowest). The main thread is only ~17 % busy, so the page is
+  GPU-bound. Cut the fixed per-frame work (sonar strip passes, sonar shader, scene draws) until cheap
+  phones reach 30 fps, and pick the quality from the measured frame time.
+- ⬜ **First load.** A first visit downloads ~976 KB: JS 404 KB gzip, fonts 430 KB as TTF, logo PNG
+  144 KB. The 3D appears at 2.8 s on 9 Mbps/60 ms and at 4.4 s on 1.6 Mbps/150 ms, with a ~1.8 s
+  freeze while the scene builds. Fixes: WOFF2 subset fonts, SVG logo, a public build that ships only
+  this page, and a poster + progress bar shown at once.
+- ⬜ **Touch targets.** Panel buttons are 26 px tall and the range track is 4 px. The phone-inset app
+  buttons (the sign-up trigger) are only 8–13 px, so the gate is almost unreachable by finger. Give
+  them ~44 px hit areas and add one obvious sign-up button. Real-finger drag, taps and the slider
+  all work, with no page scroll or zoom.
+- ⬜ **360 px-wide phones.** The panel grows and overlaps the phone inset.
+- ⬜ **Orientation.** Jason leans towards landscape on phone and tablet. Tablet landscape already works.
+  Phone landscape (800×300) is broken: the panel and step cards cover the screen and hide the inset.
+  A web page cannot force landscape (iOS Safari has no orientation lock, and Instagram's iPhone app
+  does not rotate). Proposal, waiting on Jason: keep portrait fully working, add a compact phone
+  landscape layout and an optional dismissible "turn for a bigger view" hint. No rotate wall.
+- ⬜ **Before any ad spend:** public hosting; drop "← Lab" and the gallery from the public build;
+  add a "Shop PingLive" button with UTM tags; add the Meta Pixel; wire Klaviyo (see above); remove
+  the logo source files (.ai/.cdr/.zip/.DS_Store) from `public/`.
+- To re-run the test: see the `sonar-page-real-device-perf` memory note (adb reverse + Chrome
+  DevTools over adb).
+
 ## Engineering
 - ✅ Dev helper `?bigphone` (DEV only): the phone frame fills the viewport so the sonar picture can be inspected in screenshots
-- 🔧 Mobile performance: dpr capped at 1.5, high-performance GL context; real-device fps check still to do
+- 🔧 Mobile performance: dpr capped at 1.5, high-performance GL context; real-device check done 2026-09-24 (budget GPU 10–24 fps, see "Mobile + Meta ads readiness")
 - ✅ React 19 + R3F `refCleanup` console error — gone since StrictMode was removed (no new occurrences in this session's checks)
 - ⬜ **Local for now** (Jason 2026-09-24): `npm run build` + `npm run preview` on this Mac. Public hosting + Shopify embed stay in the plan for later, unchanged
