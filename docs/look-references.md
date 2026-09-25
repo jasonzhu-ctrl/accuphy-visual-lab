@@ -40,6 +40,9 @@ Sources used to find the 2026 examples: Utsubo "Best Three.js websites 2026", ho
 2026-09-25 (decision #54): **groups A and B are the taste** — dark cinematic product
 pages and interactive WebGL with one light source revealing a dark world. He did not
 single out C, D or E. "We don't talk technique: judge the final look."
+Added later the same day: he also likes **Shadertoy "Seascape"** (https://www.shadertoy.com/view/Ms2SD1)
+— a whole cinematic sea from one shader with no assets: the water look he wants is
+reachable procedurally, which is exactly the lite section's method.
 
 His own reference clip (`reference/look/jason-clip/`, a screen recording of a short
 video): **HTML Light Demo** — https://jinruozai.github.io/HTML-Light-Demo/ (source:
