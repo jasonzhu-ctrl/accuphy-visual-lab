@@ -17,23 +17,17 @@ const BIG_PHONE = import.meta.env.DEV && window.location.search.includes('bigpho
 // public. Colour map, gain, contrast, noise reject and the depth-range axis are calibration tools — dev only (?dev).
 const DEV_TOOLS = import.meta.env.DEV && window.location.search.includes('dev')
 
-// AUTO depth range (PL Forward, Jason 2026-09-24: "实际app里是有auto depth功能的 … 到深水了 底部还能看得见"):
-// the depth axis follows the deepest bottom inside the picture, which then sits at ~80 % of the screen height.
-// Steps like the app's depth-range control (8 · 9 · 10 · 12 · 14 · 16 · 18 m …, docs/app-chrome.md).
+// AUTO depth range (PL Forward), as the app does it (Jason 2026-09-24: 声纳是根据他垂直往下的深度来判断深度的
+// 然后auto depth是根据这个数字去调节画面depth range的): AUTO follows the depth READOUT — the water straight below
+// the transducer, the big number on the screen — and sets the depth range so that bottom sits at ~80 % of the
+// screen height, in the app's depth-range steps (8 · 9 · 10 · 12 · 14 · 16 · 18 m …, docs/app-chrome.md).
+// A deeper bottom ahead may run off the screen, like in the app. (The first version took the deepest bottom
+// anywhere in the picture; over a drop-off that counted water hidden behind the shelf edge, 80 ft over 18 ft.)
 const DEPTH_STEPS_M = [6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 22, 25, 30, 35, 40, 45, 50, 60, 70]
 const DEPTH_STEPS_FT = [20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100, 110, 120, 140, 160, 180, 200, 220, 240]
 function autoDepthFt(s, maxFt) {
-  const R = s.rangeM, ax = s.apex.x, az = s.apex.z, zt = -s.apex.y
-  let deepest = 0
-  for (let i = 0; i <= 64; i++) {
-    const X = -0.25 * R + (1.25 * R * i) / 64 // the picture spans 25 % of the range behind the apex to the range ahead
-    const yc = depthAt(ax + X, az) - zt
-    const w = Math.max(0, yc) * 0.18 // the fan is ±10° thick: the bottom a little to each side shows too
-    const Y = Math.max(yc, depthAt(ax + X, az - w) - zt, depthAt(ax + X, az + w) - zt)
-    if (Y <= 0 || (X < 0 && -X > Y)) continue // above the transducer, or outside the fan's back edge (45° behind)
-    deepest = Math.max(deepest, Y)
-  }
-  const needM = deepest / 0.8
+  const readoutM = depthAt(s.apex.x, s.apex.z) // the same number as the depth readout on the phone
+  const needM = readoutM / 0.8
   const steps = s.imperial ? DEPTH_STEPS_FT.map((ft) => ft * FT) : DEPTH_STEPS_M
   const m = steps.find((v) => v >= needM - 1e-6) ?? steps[steps.length - 1]
   return Math.min(maxFt, m / FT)

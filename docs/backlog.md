@@ -5,6 +5,7 @@ it is done. ✅ done · 🔧 in progress · ⬜ open.
 
 ## Sonar screen (Phase 4)
 - ✅ AUTO depth on PL Forward: bottom kept at ~80 % of the screen in deep water; sound reaches the whole picture box; the 3D curtain = that box (decision #38)
+- ✅ AUTO depth follows the depth readout under the boat, like the app, not the deepest bottom in the picture (decision #41)
 - ⬜ Down View in water deeper than the range: the bottom is out of range (the app behaves the same). Option for Jason: auto range in Down View too (the Range slider would move by itself) — not done without his call
 - ⬜ Down / PLM views: the app also draws echoes out to the screen corners beyond the range (PL Down 12 m frame, `reference/app-study/pl-down-menu.jpg`); the engine still cuts at the range arc there. Apply the box rule + box-shaped curtain to those views after checking the 3D look with Jason
 - ✅ Big fish bloom: bigger marks for big fish only (musky ×1.9, chinook ×1.6, bass ×1.1), range logic unchanged (decision #39)

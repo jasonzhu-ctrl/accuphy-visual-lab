@@ -283,8 +283,10 @@ bottom at 10.5 m across the full width (slant ≈ 13.6 m), and 18 m / 16 m fills
 the lower-right corner (slant ≈ 21 m). PL Down at 12 m also fills its lower
 corners. Engine (PL Forward, decision #38): the cutoff is the box's far corner
 `hypot(range, depth range)` (`uReach`), and the page runs the depth range on
-**AUTO**: the deepest bottom inside the picture lands at ~80 % of the height,
-in the app's steps, deeper at once and shallower only after 1.5 s.
+**AUTO** the way the app does: it follows the depth readout (the water straight
+below the transducer) and puts that bottom at ~80 % of the height, in the app's
+steps, deeper at once and shallower only after 1.5 s. A deeper bottom ahead may
+run off the screen, as in the app (decision #41).
 
 Engine: `screenLayout` takes range and depth range separately for PL Forward;
 the near-field rays and every mark are sized in metres, never in fractions of

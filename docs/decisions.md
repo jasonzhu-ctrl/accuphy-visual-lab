@@ -510,3 +510,13 @@ Numbered log. Newest at the bottom.
     - **Screens:** the whole word shows in the default view on 16:9 and wider;
       on 16:10 its right end is cut (backlog).
 
+41. **2026-09-24** — **AUTO depth follows the depth readout, like the app**
+    (Jason: 这里在浅水 声纳是根据他垂直往下的深度来判断深度的 然后auto depth是根据这个
+    数字去调节画面depth range的). The app judges depth from the water straight
+    below the transducer — the big readout — and sets the depth range from that
+    number. Decision #38 had taken the deepest bottom anywhere in the picture
+    instead; on the shelf that counted the deep water past the drop-off, which
+    the shelf edge hides from the sonar anyway, so 18 ft of water got an 80 ft
+    axis. Now the axis is the next app step at readout ÷ 0.8 (18 ft → 25 ft,
+    129 ft → 180 ft); a deeper bottom ahead runs off the screen, as in the app.
+
