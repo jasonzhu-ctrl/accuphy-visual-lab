@@ -123,6 +123,21 @@ the cheapest Android phone class). Phone size was emulated at 360×800.
   checkout are fixed; the Lab as an onboarding tool (reading the picture) and a dealer demo; show
   multi-device sharing; UTM, Pixel and Klaviyo tags before any ad spend. Next data to get: the HelpScout
   queue (~4,200 conversations) and a 5-question owner survey.
+- ⬜ **Market research round 1 + continuous learning (2026-09-25, decision #54, proposals waiting on
+  Jason):** `docs/market/` (start with `report-2026-09.md`; the loop is in `README.md`). Questions for
+  Jason, in this order:
+  1. **US store:** only the Mini is offered to US visitors, and duties are added at checkout (US
+     checkout completion 4.8 % vs Canada 19 %). Is keeping PingLive out of the US deliberate? May we run
+     one test checkout to a US address to see what is added (E1)?
+  2. **Pre-ice priorities** (the season starts now): product-page first screen "no display to buy" +
+     myth line (E15), checkout-abandon emails v2 (E4), ice campaign and kits (E5, E17), cold-weather
+     guide (E19), reviews from past buyers (E3). Which ones go?
+  3. **Continuous learning:** keep the monthly refresh + three seasonal reviews? Run them as a
+     scheduled routine (a fresh session each time, results committed here and summarised in Drive)?
+  4. Put round 1's Chinese summary into Drive `My Drive/Market Research/` next to round 0?
+  Remind Jason of these when he is back on this project. Next research round: Chinese low-cost live
+  sonar, rival display prices, Help Scout themes, the owner survey (search quota is 200 per session:
+  run it fresh).
 - ⬜ **Mobile plan: PLANNING ONLY, do not build until Jason says go** (decision #45: "我没说动不要动").
   `docs/mobile-marketing-plan.md`: no deadline (decision #47), so the plan optimises for the
   best mobile experience. The interactive experience is the core, shaped by the "Principles for

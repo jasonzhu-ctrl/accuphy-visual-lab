@@ -690,3 +690,21 @@ Numbered log. Newest at the bottom.
       tournament boat (decision #20). This is not yet asked.
 
     Planning only: nothing is built until Jason says go.
+
+54. **2026-09-25** — **Market learning gets a shared home: `docs/market/`** (Jason:
+    "基于你对我们的全盘了解 做深入用户和市场研究 持续学习如何让accuphy卖得更好").
+    Research round 1 builds on round 0 (`docs/users-and-market.md`, 2026-09-24) and sets up
+    the loop for continuous learning:
+    - `docs/market/` holds the working memory every chat reads before giving sales or
+      marketing advice: the round-1 report, a metrics baseline with the exact read-only
+      Shopify / Klaviyo queries to rerun, competitors, voice of the customer, a scored
+      experiments backlog (E1–E20) and an append-only learning log (L1–L24). Drive
+      `My Drive/Market Research/` stays Jason's long-term company copy.
+    - Cadence proposed: a light refresh in the first week of each month; deeper reviews after
+      Black Friday (≈ 10 Dec), after ice-out (≈ 1 Apr) and before the season plan (≈ 1 Aug).
+    - Round 1's headline findings: US shoppers can only buy the Mini online and lose most
+      checkouts at the last step (US market adds duties at checkout); "no black box" stopped
+      being unique when LiveScope 2 launched, "no display to buy" is the claim no rival has;
+      the ice season (Nov–Feb = 43 % of store orders) starts now.
+    All recommendations are proposals: nothing in the store, Klaviyo, ads or the Lab changes
+    until Jason says go.
