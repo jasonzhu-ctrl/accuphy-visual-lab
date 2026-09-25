@@ -56,7 +56,7 @@ export default function SonarLake3D() {
   const [mode, setMode] = useState('forward')
   const [rangeFt, setRangeFt] = useState(80)       // the visitor's own range (slider)
   const [autoRangeFt, setAutoRangeFt] = useState(0) // Down view: what the water depth needs (0 = nothing)
-  const [depthFt, setDepthFt] = useState(70) // PL Forward depth range (app: 12 m at 14 m range) — driven by AUTO below
+  const [depthFt, setDepthFt] = useState(70) // depth range (PL Forward; every PLM view) — driven by AUTO below
   const [autoDepth, setAutoDepth] = useState(true) // off only when the dev Depth slider is touched
   const [gate, setGate] = useState(false)          // sign-up gate open → the lake and the sonar picture freeze
   const [toast, setToast] = useState(false)
@@ -76,8 +76,14 @@ export default function SonarLake3D() {
     if (rangeFt > maxFt) setRangeFt(maxFt)
   }, [deviceId]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // PingLive Mini Down and Forward run on AUTO depth (Jason 2026-09-25: PLM的down和forward需要auto depth
+  // 他们的底能不能尽量align一点呢). Both use the SAME depth range, so the bottom under the boat sits at the same height
+  // (~80 %) in both and does not jump when the view changes. In Down the depth axis is the range, so PLM Down's range
+  // is that AUTO value. Combo keeps the app's own two scales (SonarScreen.jsx screenLayout).
+  const mini = deviceId === 'PLM'
+  const autoDepthOn = autoDepth && ((mini && mode !== 'combo') || (deviceId === 'PL' && mode === 'forward'))
   // the range everything uses: in Down view never shorter than what keeps the bottom on screen
-  const effRangeFt = mode === 'down' ? Math.max(rangeFt, autoRangeFt) : rangeFt
+  const effRangeFt = mini && mode === 'down' ? depthFt : mode === 'down' ? Math.max(rangeFt, autoRangeFt) : rangeFt
   const specs = useMemo(() => {
     const rangeFt = effRangeFt
     const sp = wedgeSpecs(device, mode, rangeFt * FT)
@@ -87,6 +93,9 @@ export default function SonarLake3D() {
     // Panoramic: the picture runs to its corners (range ahead × half-width sideways), so the curtain does too;
     // with the 5°–25° slab it then covers exactly what the screen shows (Jason 2026-09-24: coverage 错位)
     if (mode === 'panoramic' && sp[0]) { const R = rangeFt * FT; sp[0] = { ...sp[0], R: 1.6 * R, box: { xMin: -1e5, xMax: R, yMax: 1e5, zMax: panoHalfWidth * R } } }
+    // PLM Forward: range ahead × AUTO depth down, the sound reaching the box's far corner like PL Forward, so the
+    // bottom stays on the picture however deep the water is
+    if (deviceId === 'PLM' && mode === 'forward' && sp[0]) { const R = rangeFt * FT, D = depthFt * FT; sp[0] = { ...sp[0], R: Math.hypot(R, D) * 1.001, box: { xMin: -0.25 * R, xMax: R, yMax: D } } }
     return sp
   }, [device, deviceId, mode, effRangeFt, depthFt])
   const specKey = `${deviceId}-${mode}-${effRangeFt}`
@@ -117,7 +126,7 @@ export default function SonarLake3D() {
   // AUTO depth: deeper at once (the bottom never drops off the screen), shallower only after 1.5 s
   // so the axis does not pump while the boat crosses uneven bottom
   useEffect(() => {
-    if (!(autoDepth && deviceId === 'PL' && mode === 'forward')) return
+    if (!autoDepthOn) return
     let lowSince = 0, lowMax = 0
     const id = setInterval(() => {
       const s = state.current
@@ -130,11 +139,11 @@ export default function SonarLake3D() {
       } else lowSince = 0
     }, 200)
     return () => clearInterval(id)
-  }, [autoDepth, deviceId, mode, device, imperial])
+  }, [autoDepthOn, device, imperial])
 
   // AUTO range (Down view): raise at once when the bottom would leave the screen, come back down only after 1.5 s
   useEffect(() => {
-    if (mode !== 'down') { setAutoRangeFt(0); return }
+    if (mode !== 'down' || mini) { setAutoRangeFt(0); return }
     let lowSince = 0, lowMax = 0, cur = 0
     const id = setInterval(() => {
       const s = state.current
@@ -147,7 +156,7 @@ export default function SonarLake3D() {
       } else lowSince = 0
     }, 200)
     return () => clearInterval(id)
-  }, [mode, device, imperial])
+  }, [mode, mini, device, imperial])
 
   // the app's buttons on the phone are display-only: a tap asks for an email (once per browser)
   const onLocked = () => {
@@ -196,7 +205,8 @@ export default function SonarLake3D() {
           <div className="ac-seg">{device.modes.map((m) => <button key={m} className={`ac-btn ${mode === m ? 'is-active' : ''}`} onClick={() => setMode(m)}>{MODE_LABELS[m].replace(' View', '')}</button>)}</div>
         </Row>
         <Row label="Range">
-          <input type="range" min={20} max={maxFt} step={5} value={effRangeFt} onChange={(e) => setRangeFt(+e.target.value)} className="ac-range w-36" style={{ '--fill': `${((effRangeFt - 20) / (maxFt - 20)) * 100}%` }} />
+          {/* PLM Down: the range is the AUTO depth range, so the slider only shows it */}
+          <input type="range" min={20} max={maxFt} step={5} value={effRangeFt} disabled={mini && mode === 'down'} title={mini && mode === 'down' ? 'AUTO: follows the water depth' : undefined} onChange={(e) => setRangeFt(+e.target.value)} className="ac-range w-36" style={{ '--fill': `${((effRangeFt - 20) / (maxFt - 20)) * 100}%`, opacity: mini && mode === 'down' ? 0.45 : 1 }} />
           <button className="ac-value" onClick={() => setImperial((v) => !v)} title="ft / m">{fmt(effRangeFt)}</button>
           <span className="ac-soft text-[11px]">max {fmt(maxFt)}</span>
         </Row>
@@ -251,7 +261,7 @@ export default function SonarLake3D() {
           <div className="ph-band" style={{ ...ring('1.35%'), borderRadius: '6.6% / 13.8%', boxShadow: '16px 26px 44px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.45), inset 0 0 0 2px rgba(0,0,0,0.12)' }} />
           <div style={{ ...ring('1.25%'), inset: '1.35%', borderRadius: '6.1% / 12.7%', background: '#040404' }} />
           <div ref={(el) => { sonarRect.current.el = el }} style={{ position: 'absolute', inset: '2.6%', borderRadius: '5.4% / 11.3%', containerType: 'size', overflow: 'hidden' }}>
-            <SonarChrome layout={layout} deviceId={deviceId} mode={mode} rangeFt={effRangeFt} depthFt={depthFt} imperial={imperial} gain={gain} autoDepth={autoDepth} autoRange={effRangeFt > rangeFt} onLocked={onLocked} depthRef={(el) => { state.current.depthEl = el }} />
+            <SonarChrome layout={layout} deviceId={deviceId} mode={mode} rangeFt={effRangeFt} depthFt={depthFt} imperial={imperial} gain={gain} autoDepth={autoDepth} autoRange={(mini && mode === 'down') || effRangeFt > rangeFt} onLocked={onLocked} depthRef={(el) => { state.current.depthEl = el }} />
             <div className="ph-glass" />
           </div>
           {/* antenna lines in the titanium band (two per long edge, like the Pro Max) */}

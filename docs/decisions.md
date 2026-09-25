@@ -768,3 +768,25 @@ Numbered log. Newest at the bottom.
     variant: a short headline plus the device toggle. If a big type moment is ever
     wanted, it must be product-neutral (e.g. the ACCUPHY brand, or a line like "See under
     your boat"), and it is not planned now.
+
+60. **2026-09-25** — **PingLive Mini: AUTO depth in Down and Forward, bottoms aligned,
+    shallow water toned down** (Jason: "PingLive mini是不是在浅水太亮了 和之前pl一样的问题 还有
+    PLM的down和forward需要auto depth 他们的底能不能尽量align一点呢").
+    - PLM Down and PLM Forward share ONE AUTO depth range, the same rule as PL Forward
+      (#41): the depth readout / 0.8, in the app's depth steps, deeper at once, shallower
+      after 1.5 s. The bottom under the boat therefore sits at the same height (~80 %) in
+      both views and stays put when the view changes (checked at 17.6 ft: both at ~14 ft
+      on the ruler).
+    - PLM Down: the depth axis is the range, so its range IS that AUTO value; the page's
+      Range slider is greyed out there and the phone shows AUTO over the range.
+    - PLM Forward: range ahead × AUTO depth down, the sound reaching the box's far corner
+      like PL Forward. Physics still applies: the Mini cannot see closer than ~1.2 × the
+      depth, so in deep water with a short range the bottom is out of reach.
+    - Combo is unchanged: the app gives its two panels their own scales (~5 m Down vs
+      ~12 m Forward), and one shared depth axis would hide the Forward bottom behind the
+      Down panel.
+    - Shallow water: the Mini's narrow fan meets a shallow bottom at one range across
+      the whole fan, so AUTO zoom made a yellow-white slab. PLM gets extra near-range gain
+      in the side views, 0.62 at ≤ 5 m back to full by 18 m (`uBedGain`), so the
+      calibrated deep pictures do not change. Fish marks are untouched.
+

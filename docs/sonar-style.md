@@ -286,7 +286,10 @@ corners. Engine (PL Forward, decision #38): the cutoff is the box's far corner
 **AUTO** the way the app does: it follows the depth readout (the water straight
 below the transducer) and puts that bottom at ~80 % of the height, in the app's
 steps, deeper at once and shallower only after 1.5 s. A deeper bottom ahead may
-run off the screen, as in the app (decision #41).
+run off the screen, as in the app (decision #41). PingLive Mini Down and Forward use the same AUTO depth
+range (one value for both, so the bottom lines up between the views); Mini Down's
+range is that value, and Mini gets extra near-range gain 0.62 → 1 over 5–18 m
+against the shallow-water glare (decision #60).
 
 Engine: `screenLayout` takes range and depth range separately for PL Forward;
 the near-field rays and every mark are sized in metres, never in fractions of

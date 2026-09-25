@@ -38,6 +38,7 @@ export const sonarFragment = /* glsl */ `
   uniform float uApexU;
   uniform float uTime;
   uniform float uFlat;        // 1 = Panoramic (plan view)
+  uniform float uBedGain;     // extra near-range gain for the bottom + structure echo (PLM 0.62, PL 1)
   uniform float uStreak;      // 1 = radial streak texture, 0 = mottled speckle (PLM Down)
   uniform float uDebug;
   uniform sampler2D uLUT;
@@ -293,6 +294,10 @@ export const sonarFragment = /* glsl */ `
         // again from ~11 m (≈ 0.9 at 9 m), so the calibrated deeper pictures barely change; fish marks keep their
         // approved look. 5 m ≈ 0.43: the core just reaches white and keeps its streaks instead of a solid slab.
         float tvg = mix(0.32, 1.0, smoothstep(3.0, 11.0, r));
+        // PingLive Mini: its narrow 39° fan meets a shallow bottom at one range across the whole fan, and AUTO depth
+        // zooms that band in, so it still burnt to a yellow-white slab (Jason 2026-09-25: PingLive mini是不是在浅水太亮了
+        // 和之前pl一样的问题). Extra near gain for PLM only, back to full by 18 m: deep pictures keep their calibration.
+        tvg *= mix(uBedGain, 1.0, smoothstep(5.0, 18.0, r));
         echo = max(echo, max(acc * atten * tex * tvg, fishEcho(p, k)));
         echo = max(echo, logoEcho(p, k) * atten * (0.7 + 0.55 * (filament - 0.8)) * (0.72 + 0.28 * tex));
       }
