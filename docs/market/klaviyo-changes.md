@@ -126,7 +126,8 @@ appears only as Klaviyo's per-recipient `{% coupon_code %}` tag.
    - Until that is fixed, the wording fix in Email #2 changes nothing anyone sees.
 2. **The "Quick Setup Guide" link is dead.**
    - Several emails link to `accuphy.ca/blogs/news/setup-guide-for-pinglive-sonar`, which the
-     store audit (`docs/site-audit.md`, problem 3) found to be a 404.
+     store audit found to be a 404 (problem 3 of `docs/site-audit.md` in the repo
+     `jasonzhu-ctrl/accuphy-website`; this repo's `docs/site-audit.md` points there).
    - The link sits in a shared header block (Klaviyo *universal content*
      `4c481f92a5df46789ecf90129b8eabc8`). That block is used by Abandoned Cart Email #1, the
      Welcome email (variant B) and both 30-day emails. Changing the block once would fix all of
