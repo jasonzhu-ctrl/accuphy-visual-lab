@@ -16,7 +16,7 @@ function Gallery() {
   return (
     <main className="min-h-screen bg-neutral-50 text-neutral-900 px-6 py-16">
       <div className="mx-auto max-w-3xl">
-        <h1 className="text-3xl font-semibold tracking-tight">Accuphy Visual Lab</h1>
+        <h1 className="text-3xl font-semibold tracking-tight">Accuphy Lab</h1>
         <p className="mt-2 text-neutral-500">Design experiments for accuphy.ca. Pick one to open.</p>
         <ul className="mt-10 grid gap-4 sm:grid-cols-2">
           {experiments.map((e, i) => (

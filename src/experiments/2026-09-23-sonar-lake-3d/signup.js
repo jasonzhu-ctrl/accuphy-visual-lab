@@ -7,7 +7,7 @@
 // API (public site key — safe to ship in the page; no private key ever goes into this code).
 export const KLAVIYO = {
   publicKey: null,  // Klaviyo "Public API key / Site ID" (6 characters), e.g. 'AbC123'
-  listId: null,     // the list id for "Sonar Beam Explorer sign-ups"
+  listId: null,     // the list id for "Accuphy Lab sign-ups"
   revision: '2026-07-15', // Klaviyo API revision (each is supported ~2 years; bump when Klaviyo retires it)
 }
 
@@ -22,7 +22,7 @@ function rememberSignedUp() {
 
 export const isEmail = (s) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(s).trim())
 
-export async function submitSignup({ email, source = 'Sonar Beam Explorer' }) {
+export async function submitSignup({ email, source = 'Accuphy Lab' }) {
   const addr = String(email).trim()
   if (!isEmail(addr)) throw new Error('Please enter a valid email address.')
   if (KLAVIYO.publicKey && KLAVIYO.listId) {
@@ -36,7 +36,7 @@ export async function submitSignup({ email, source = 'Sonar Beam Explorer' }) {
             custom_source: source,
             profile: { data: { type: 'profile', attributes: {
               email: addr,
-              properties: { signup_page: 'sonar-beam-explorer' },
+              properties: { signup_page: 'accuphy-lab' },
               subscriptions: { email: { marketing: { consent: 'SUBSCRIBED' } } }, // the list's single/double opt-in setting still applies
             } } },
           },

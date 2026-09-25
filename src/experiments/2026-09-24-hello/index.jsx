@@ -14,7 +14,7 @@ export default function Hello() {
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.6, ease: 'easeOut' }}
       >
-        Accuphy Visual Lab
+        Accuphy Lab
       </motion.h1>
     </main>
   )

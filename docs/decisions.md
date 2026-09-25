@@ -527,3 +527,16 @@ Numbered log. Newest at the bottom.
     5 m, full again from 11 m), like a sonar's time-varying gain; fish marks and
     the deeper calibrated pictures are unchanged. `sonar-style.md` §7.16.
 
+
+43. **2026-09-24** — **Public name: Accuphy Lab** (Jason: PC和移动端都把这个项目叫做
+    Accuphy Lab吧). Desktop and mobile both call the page "Accuphy Lab":
+    - the browser tab title and the gallery heading;
+    - the panel header: the ACCUPHY wordmark followed by "Lab" instead of
+      "Beam explorer";
+    - the sign-up source ("Accuphy Lab", `signup_page = accuphy-lab`) and the
+      proposed Klaviyo list ("Accuphy Lab sign-ups").
+
+    The sign-up card's "Sonar app" tag stays, because it names the real app.
+    Internal names stay too: the repo and folder `accuphy-visual-lab` and the
+    experiment folders. A future public address could match the name (for
+    example `lab.accuphy.com`); that is Jason's call.

@@ -24,14 +24,14 @@ Copy on the card (English source, `SignupGate.jsx`):
 
 ## 2. Turning Klaviyo on (Jason, ~15 minutes, when the page goes public)
 
-1. **Create the list** in Klaviyo: *Audience → Lists & segments → Create → List*, name **"Sonar Beam Explorer sign-ups"**.
+1. **Create the list** in Klaviyo: *Audience → Lists & segments → Create → List*, name **"Accuphy Lab sign-ups"**.
 2. **Choose the opt-in** in the list's settings. **Double opt-in** is recommended (Klaviyo emails a confirm link; best proof of consent for CASL/GDPR). Klaviyo applies the list's setting to this form automatically.
 3. **Copy two values**:
    - the **public API key / Site ID** (6 characters): *Settings → Account → API keys → Public API key*. It is safe in a web page.
    - the **list ID**: open the list; the ID is in the URL (`.../list/AbC123/...`) or under *Settings*.
    Never use a **private** key (`pk_…`) in this page.
 4. **Paste them** into `KLAVIYO` in `src/experiments/2026-09-23-sonar-lake-3d/signup.js` (Claude can do it).
-5. **Test** with a real address: the profile appears on the list with source *Sonar Beam Explorer* and property `signup_page = sonar-beam-explorer`. With double opt-in the confirm email arrives first.
+5. **Test** with a real address: the profile appears on the list with source *Accuphy Lab* and property `signup_page = accuphy-lab`. With double opt-in the confirm email arrives first.
 6. **Optional:** a welcome flow triggered by the list (first email = what PingLive is + a link back to the page).
 
 What the page sends (Klaviyo "Create Client Subscription", revision `2026-07-15`):
@@ -40,7 +40,7 @@ What the page sends (Klaviyo "Create Client Subscription", revision `2026-07-15`
 POST https://a.klaviyo.com/client/subscriptions?company_id=<public key>
 headers: content-type: application/vnd.api+json · revision: 2026-07-15
 body: subscription → profile { email, properties.signup_page, subscriptions.email.marketing = SUBSCRIBED }
-      + custom_source "Sonar Beam Explorer" + list relationship
+      + custom_source "Accuphy Lab" + list relationship
 ```
 
 Only the email address is collected. No name, no phone, no tracking script.

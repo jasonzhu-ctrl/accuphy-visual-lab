@@ -1,4 +1,4 @@
-# Mobile plan: the Sonar Beam Explorer as an ad landing experience
+# Mobile plan: Accuphy Lab as an ad landing experience
 
 **Status:** proposal, 2026-09-24, waiting on Jason (see "Decisions for Jason" at the end).
 Jason asked: 移动端你帮我策划一下我应该怎么搞合理好用 符合我们最终用于体验营销.
@@ -62,7 +62,7 @@ The budget-GPU baseline is 10–24 fps; see the backlog.
   - WOFF2 subset fonts;
   - an SVG logo;
   - a public build that contains only this page (no gallery, no "← Lab").
-- Host a standalone page on a CDN subdomain (for example `explore.accuphy.com`), not an iframe
+- Host a standalone page on a CDN subdomain (for example `lab.accuphy.com`, matching the name), not an iframe
   inside Shopify.
 
 ## Conversion
