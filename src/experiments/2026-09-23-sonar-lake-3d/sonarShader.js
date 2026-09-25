@@ -267,7 +267,11 @@ export const sonarFragment = /* glsl */ `
         inAny = 1.0;
         float u = 0.5 + 0.5 * tan(a) / uFan[k].z;
         float acc = 0.0, peak = 0.0, spk = 0.0;
-        float jit = hash(gl_FragCoord.xy * 0.37 + 0.11);
+        // which thickness rows a pixel samples: the same set for a short run along the ray (0.08° × 0.67 m cells), not
+        // a fresh random set per pixel. Per-pixel sets turned big steel faces into salt-and-pepper dust (the wreck at
+        // 40 m, Jason 2026-09-25: 这个船的画面和 [app 的] 相差好远 结构和感觉完全不对); coherent sets draw them as the
+        // app does — solid masses with streaks along the beams (reference/app-study/pl-forward-wreck-*.jpg)
+        float jit = hash(vec2(floor(aWorld * 700.0), floor(r * 1.5)) + 0.11);
         float sigma = 0.22 + 0.010 * r;
         float tailLen = 0.35 + 0.015 * r;
         for (int j = 0; j < 24; j++) {
@@ -277,7 +281,7 @@ export const sonarFragment = /* glsl */ `
           float dr = r - hit;
           float structure = step(0.25, sampleTag(k, vec2(u, v)));
           // structure faces are sharp (real pulse ≈ 0.1 m) and solid; the bottom band is wider with a tail
-          float sg = mix(sigma, 0.08 + 0.004 * r, structure);
+          float sg = mix(sigma, (0.08 + 0.004 * r) * (1.0 + 1.5 * smoothstep(6.0, 30.0, r)), structure); // far faces: the beam smears them wider
           float pulse = exp(-dr * dr / (sg * sg)) * (1.0 - 0.22 * structure) * mix(1.0, 0.85 + 0.25 * filament, structure);
           float tail = dr > 0.0 ? 0.6 * exp(-dr / tailLen) : 0.0;
           float second = 0.10 * exp(-(r - 2.0 * hit) * (r - 2.0 * hit) / (4.0 * sigma * sigma));

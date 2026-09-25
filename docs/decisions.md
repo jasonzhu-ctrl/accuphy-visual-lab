@@ -808,3 +808,23 @@ Numbered log. Newest at the bottom.
     - In the 3D view the monument is fainter than before, because it sits under 40 m of
       water instead of 19.5 m.
 
+62. **2026-09-25** — **Big wreck moved a third of a length ahead; wreck faces drawn
+    solid** (Jason: "船再往前挪一点1/3个船位"; and, comparing with the PL Forward wreck
+    recording on the tablet: "目前这个船的画面和那个相差好远 结构和感觉完全不对 你核实 优化").
+    - **Move:** 9.3 m (a third of its 28 m) toward its bow, to (57.95, −46.84), clear of
+      the ACCUPHY LAB lockup behind its stern. Still on the flat 40 m floor.
+    - **Checked against `reference/app-study/pl-forward-wreck-*.jpg` and
+      `ideal-picture-2-pl-forward-wreck/`:** the app draws the wreck as a solid bright
+      mass (deck lines, dark hatches, a bright end face) with streaks along the beams.
+      The engine drew it as salt-and-pepper dust, because every pixel sampled a fresh
+      random set of the 24 rows across the slab thickness.
+    - **Fix (side views, every device):** pixels along a short run of the same ray
+      (0.08° × 0.67 m) now sample the same rows. Big steel faces come out as solid,
+      streaky masses, and far structure faces get a wider pulse (up to 2.5× by 30 m).
+      Timber, the bottom band and fish barely change (checked on the shelf scene).
+      Comparison: `reference/engine-compare/wreck-compare-2026-09-25.png`.
+    - **Still different, by physics:** the recording's wreck lies in ~10 m with a 12 m
+      depth scale, so it fills half the screen. Ours lies in 40 m, with AUTO depth at
+      180 ft (~55 m), so on the phone it is a low shape on the bottom. Moving it to
+      shallower water is Jason's call.
+
