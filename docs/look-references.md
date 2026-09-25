@@ -52,3 +52,16 @@ only light; what it sweeps over is revealed, the rest stays dark; the lamp swing
 inertia and settles. This is his "暗色湖底被点亮" (a dark lakebed lit up) concept: beam =
 lamp, lakebed = wall, sonar picture = what the light reveals, water = dark room. Not a
 limit, a direction: keep learning.
+
+## Jason's shared finds (Xiaohongshu favourites, 2026-09-25) — read through his Chrome, with verdicts
+
+| Find | What it really is | Verdict for us |
+|---|---|---|
+| "跪着看完！这大概就是网页交互的天花板吧" (Clara, 1113 likes) | A screen recording of **lusion.co**, the studio's own site (already #11 in the sheets; Lusion also made Oryzo, Everswap, Porsche Dream Machine, Devin AI). | **Yes, as a look reference.** Study it live (it needs a real GPU, headless Chrome only shows its loader). Cursor-driven, every pixel moves, dark, premium. Not a tool, a bar to reach. |
+| "一个 Skill 20 种 Liquid Glass 动态背景网页" (小白的AI学习笔记) | A prompt pack: 20 "liquid glass" background prompts taken from **motionsites.ai** (a paid prompt marketplace for Lovable / Bolt / Cursor / Claude), wrapped as a skill that outputs a single HTML file or a Vite + React + Tailwind project. | **Low value, some risk.** It produces generic gradient-and-glass backgrounds — the "very AI" template look Jason rejected (decision #22). We already have the approved frosted-glass UI (#37) and the section's look comes from the lake and the beam, not a background. Keep for UI polish ideas only. |
+| "Vibe Coding 自制设计师个人网站 — 用 Codex 搭建" (表哥懂设计) | A beginner tutorial for building a portfolio site with Codex. Its useful part is the three inspiration sources it recommends: **Motionsites** (whole-page motion references), **Pinterest** (layout / colour), **React Bits** (reactbits.dev — ready-made React animation components: text effects, cursor trails, card effects). | **Codex vs Claude Code: same class of tool, no change.** React Bits is a real, reliable open-source library, usable for micro-interactions on the full Lab page (React) — not in the lite section, which has no React by design. Motionsites: browse for layout rhythm, don't buy prompts. |
+
+Method note: the notes were read in Jason's own logged-in Chrome (the Claude in Chrome
+extension), so login-gated platforms are fine; his favourites page is
+`xiaohongshu.com/user/profile/5bfd6fa4e299a100010e6839?tab=fav`. Search pages on
+Xiaohongshu render nothing for automation; the profile/favourites page does.
