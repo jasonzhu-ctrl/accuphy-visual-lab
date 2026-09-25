@@ -123,6 +123,13 @@ met by *computing* the picture, not by simplifying it: everything below is per-p
 maths and CSS and costs no download. Where the 3D Lab spends bytes and GPU on
 geometry, the section spends them on light.
 
+**The guiding image (Jason, decision #54): a dark lakebed lit up.** Like a swinging lamp
+in a black room (his reference: the HTML Light Demo, `docs/look-references.md`): the
+beam is the only light, whatever it sweeps over is revealed, the rest stays dark, and
+the light has physical weight — it lags, sways and settles when the boat is dragged.
+Taste confirmed on the reference sheets: groups A (dark cinematic product pages) and
+B (one light source revealing a dark world).
+
 **Where the feel comes from**
 
 1. **Light in the water** (mood decided: dark cinematic, decision #51). Lit from the

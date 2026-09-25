@@ -37,5 +37,15 @@ Sources used to find the 2026 examples: Utsubo "Best Three.js websites 2026", ho
 
 ## Jason's picks
 
-Pending — he answers with numbers he likes and dislikes; the pattern goes into
-`docs/lite-section-plan.md` §3b and `docs/decisions.md`.
+2026-09-25 (decision #54): **groups A and B are the taste** — dark cinematic product
+pages and interactive WebGL with one light source revealing a dark world. He did not
+single out C, D or E. "We don't talk technique: judge the final look."
+
+His own reference clip (`reference/look/jason-clip/`, a screen recording of a short
+video): **HTML Light Demo** — https://jinruozai.github.io/HTML-Light-Demo/ (source:
+https://github.com/jinruozai/HTML-Light-Demo, a recreation of @kaolti's piece). A
+near-black room, a hanging lamp on a physical pendulum, a warm soft-edged cone as the
+only light; what it sweeps over is revealed, the rest stays dark; the lamp swings, has
+inertia and settles. This is his "暗色湖底被点亮" (a dark lakebed lit up) concept: beam =
+lamp, lakebed = wall, sonar picture = what the light reveals, water = dark room. Not a
+limit, a direction: keep learning.

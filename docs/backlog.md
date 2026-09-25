@@ -146,4 +146,4 @@ the cheapest Android phone class). Phone size was emulated at 360×800.
   lists the light, beam-volume, parallax, bloom, motion and glass-UI rules; phones get the same look with fewer samples.
   Jason reviews the prototype's look against the LVS34 frames, Accuphy's animations and the 3D Lab before packaging
 - ✅ Mood decided: dark cinematic water, the dusk palette of plan §3b (decision #51)
-- 🔧 Look references shown to Jason (`docs/look-references.md`, 19 sites in 5 groups, sheets in `reference/look/`); waiting for his picks
+- ✅ Look references: Jason picked groups A + B and gave the "dark lakebed lit up" lamp concept (decision #54, `docs/look-references.md`)

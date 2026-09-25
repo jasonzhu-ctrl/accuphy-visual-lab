@@ -690,3 +690,20 @@ Numbered log. Newest at the bottom.
       tournament boat (decision #20). This is not yet asked.
 
     Planning only: nothing is built until Jason says go.
+
+54. **2026-09-25** — **Look picks: groups A and B; the guiding concept is "a dark
+    lakebed lit up", like a swinging lamp** (Jason: "A B 都喜欢的 我们不说技术因为技术和最后
+    的呈现效果最有关系 我继续给你我想说的暗色湖底被点亮的概念吧 有一个我的录屏参考概念 但不要被
+    限制了 继续学习"). From `docs/look-references.md`: he likes A (dark cinematic product
+    pages: DJI, Apple, Hasselblad, GoPro) and B (interactive WebGL: Hubtown's glowing
+    object over dark water, Iventions' spotlight atmosphere, IVRESS). His own reference
+    is the "HTML Light Demo" (github.com/jinruozai/HTML-Light-Demo, a recreation of
+    @kaolti's piece; live at jinruozai.github.io/HTML-Light-Demo): a near-black room, one
+    hanging lamp on a physical pendulum, and a warm soft-edged cone that is the only
+    light — whatever it sweeps over is revealed, the rest stays dark; the lamp has
+    weight (swing, inertia, settle). Mapping for the section: the beam is the lamp, the
+    lakebed and its timber, rocks and fish are the wall, the amber sonar picture is
+    what the light reveals, the water is the dark room; the beam should carry physical
+    weight when the boat is dragged (lag, sway, settle). He asked not to be limited by
+    the clip and to keep learning. Judge by the final look, not the technique.
+    Still planning only.
