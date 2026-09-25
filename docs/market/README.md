@@ -30,6 +30,8 @@ the Drive folder (with Jason's OK).
 | `voice-of-customer.md` | What anglers say: motivations, objections, words they use, quotes with sources | Add quotes as found (anonymised) |
 | `experiments.md` | Hypotheses and proposed tests, scored, with status and results | Every test moves proposed → approved → running → result |
 | `learning-log.md` | Numbered, dated learnings (L1, L2 …), each with evidence and confidence | Append only, like `docs/decisions.md` |
+| `klaviyo-changes.md` | Every change to live Klaviyo content: before → after, approval, check; plus how Klaviyo edits work from a chat | Append a numbered entry per change |
+| `klaviyo-backups/` | Full template JSON taken before a Klaviyo change, for diffing and restoring | Add one file per template per change |
 
 ## The loop
 
@@ -69,3 +71,6 @@ season plan (≈ 1 Aug)**.
 - **WebSearch is capped at 200 searches per session**, shared with sub-agents. The first round
   used it all. Run each research round in a fresh session and split searches between agents
   deliberately (about 40–50 each).
+- **Klaviyo is read-only for flow emails.** The connector reads flows and templates, but saving a
+  flow email fails (404), so Jason makes flow-email edits in the Klaviyo editor and a chat checks
+  them against a backup. Details: `klaviyo-changes.md`.

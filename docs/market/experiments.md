@@ -80,6 +80,8 @@ alongside them.
   pay over time (E2), a reply-to-a-human line. No discount by default; test a small ice-season
   accessory gift instead of money off.
 - **Metric:** revenue per recipient (baseline CAD 44.6).
+- **First, before any v2 (2026-09-25):** the flow's Email #2 has not been sent since 2026-04-14
+  (L25). Reconnecting it is the cheapest win and resets the baseline.
 
 ### E5 — Q4 ice-season campaign
 - **Evidence:** Nov 2025 – Feb 2026 = 43 % of all orders; December 2025 was the best month

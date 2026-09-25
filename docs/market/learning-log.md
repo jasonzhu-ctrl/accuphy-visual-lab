@@ -146,3 +146,13 @@ L24. **2026-09-25 — Round 0 is the foundation; by units Accuphy is a B2B busin
 that friends (58 %) and fellow anglers (71 % most trusted) drive discovery. Round 1's store data
 agrees where the two overlap (Canada-heavy, winter-shaped, US checkout loss, Mini returns).
 *Confidence:* high for Round 0's own-data figures; see that file for its sources.
+
+L25. **2026-09-25 — The abandoned-cart coupon email stopped on 2026-04-14.** Email #2 of *Abandoned
+Cart Reminder (Email)* ("The discount is expiring soon.", 10 % coupon) reached 438 people (10
+orders, CAD 13.9k) between late September 2025 and mid-April 2026, and nobody after the flow was
+edited on 2026-04-14. Email #1 reached 182 people (13 orders, CAD 18.6k) in that later period.
+The Yes/No split after the 2-day wait sends people who have not ordered to the exit, and buyers
+toward the coupon email; the flow filter removes buyers first, so the email never goes out.
+*Evidence:* Klaviyo flow report (flow `WWs4V8`, 2026-04-15 → 2026-09-25) and the flow definition.
+*Confidence:* high that it is not sent; medium on the cause until someone checks the flow in the
+editor. Not changed; Jason decides (`klaviyo-changes.md` §1).

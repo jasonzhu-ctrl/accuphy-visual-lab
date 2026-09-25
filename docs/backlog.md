@@ -128,9 +128,10 @@ the cheapest Android phone class). Phone size was emulated at 360×800.
 - ⬜ **Market research round 1 + continuous learning (2026-09-25, decision #60, proposals waiting on
   Jason):** `docs/market/` (start with `report-2026-09.md`; the loop is in `README.md`). Questions for
   Jason, in this order:
-  1. **US store:** only the Mini is offered to US visitors, and duties are added at checkout (US
-     checkout completion 4.8 % vs Canada 19 %). Is keeping PingLive out of the US deliberate? May we run
-     one test checkout to a US address to see what is added (E1)?
+  1. **US store:** decision #57 settles the product (US = PingLive Mini is fine for ads). Still open:
+     US checkout completion is 4.8 % vs Canada 19 %, with duties added at checkout. The view-only phone
+     walk-through (Mobile section, #57) comes first; may we then run one test checkout to a US address
+     to see what is added (E1)?
   2. **Pre-ice priorities** (the season starts now): product-page first screen "no display to buy" +
      myth line (E15), checkout-abandon emails v2 (E4), ice campaign and kits (E5, E17), cold-weather
      guide (E19), reviews from past buyers (E3). Which ones go?
@@ -140,6 +141,13 @@ the cheapest Android phone class). Phone size was emulated at 360×800.
   Remind Jason of these when he is back on this project. Next research round: Chinese low-cost live
   sonar, rival display prices, Help Scout themes, the owner survey (search quota is 200 per session:
   run it fresh).
+- ⬜ **Klaviyo: "Simulator Mode" → "Playback Mode" in the two Abandoned Cart emails (2026-09-25, waiting
+  on Jason).** The connector cannot save flow emails (404), so Jason changes one word in each email in
+  the Klaviyo editor (about 5 minutes); a chat then diffs both against the backups. Found on the way,
+  his call: the flow's coupon email (#2) has not been sent since the 2026-04-14 edit (0 people since;
+  its Yes/No paths look swapped, L25); the shared header's "Quick Setup Guide" link is a 404 (site
+  audit); two blog posts still say "Simulator Mode". Steps and details: `docs/market/klaviyo-changes.md`.
+  Remind Jason when he is back on this project.
 - ⬜ **Mobile plan: PLANNING ONLY, do not build until Jason says go** (decision #45: "我没说动不要动").
   `docs/mobile-marketing-plan.md`: no deadline (decision #47), so the plan optimises for the
   best mobile experience. The interactive experience is the core, shaped by the "Principles for
