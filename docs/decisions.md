@@ -761,3 +761,10 @@ Numbered log. Newest at the bottom.
     surface — top half in the sky, bottom half refracted under water and lit where the
     beam reaches. Variant B: a headline instead. Waiting for Jason's verdict. The section
     itself is still not started.
+
+59. **2026-09-25** — **No giant product wordmark in the section** (Jason, on the #58
+    mocks: "我感觉网站首页大字的不合适 毕竟还有mini呢"). A "PINGLIVE" word would favour one
+    product while the section also shows PingLive Mini. The section uses the plain
+    variant: a short headline plus the device toggle. If a big type moment is ever
+    wanted, it must be product-neutral (e.g. the ACCUPHY brand, or a line like "See under
+    your boat"), and it is not planned now.

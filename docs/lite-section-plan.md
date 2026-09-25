@@ -178,7 +178,7 @@ boat" becomes the device itself; the boat, if shown at all, is scenery.)
 9. **Learned from Lusion's About page** (`docs/look-references.md`, Lusion study):
    a near-monochrome world with one light source; alive before touch (idle breathing),
    pointer = parallax, drag = reveal; foreground debris parallax for depth; bloom on
-   bright points; a huge wordmark partly behind the scene as a brand moment (to try);
+   bright points; (a huge product wordmark was tried and dropped, decision #59 — the section serves both devices);
    upright + italic caption lines; corner marks and one tiny hint line.
 
 **Cost and the phone rule.** Desktop gets everything. Phones get the *same look* with
