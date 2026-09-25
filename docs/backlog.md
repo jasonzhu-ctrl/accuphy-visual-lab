@@ -8,6 +8,7 @@ it is done. ✅ done · 🔧 in progress · ⬜ open.
 - ✅ AUTO depth follows the depth readout under the boat, like the app, not the deepest bottom in the picture (decision #41)
 - ✅ Shallow water no longer blows out: near-range gain on bottom and structure echoes (decision #42)
 - ✅ Panoramic shows only what the 5°–25° beam covers; the curtain matches the picture box (decision #44)
+- ✅ Panoramic background looks like sonar again: soft cross-beam speckle up to ~35 m, radial streaks only at long range, no weed clumps, soft shadows (decision #46)
 - ⬜ Option: a faint sidelobe near the apex in Panoramic (the app's lake recordings show some bottom there); off for now so the picture matches the curtain exactly
 - ⬜ Down View in water deeper than the range: the bottom is out of range (the app behaves the same). Option for Jason: auto range in Down View too (the Range slider would move by itself) — not done without his call
 - ⬜ Down / PLM views: the app also draws echoes out to the screen corners beyond the range (PL Down 12 m frame, `reference/app-study/pl-down-menu.jpg`); the engine still cuts at the range arc there. Apply the box rule + box-shaped curtain to those views after checking the 3D look with Jason
