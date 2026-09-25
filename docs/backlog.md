@@ -111,12 +111,15 @@ the cheapest Android phone class). Phone size was emulated at 360×800.
   the logo source files (.ai/.cdr/.zip/.DS_Store) from `public/`.
 - To re-run the test: see the `sonar-page-real-device-perf` memory note (adb reverse + Chrome
   DevTools over adb).
-- ⬜ **Users and market analysis (2026-09-24, proposals waiting on Jason):** `docs/users-and-market.md`.
+- ⬜ **Users and market analysis (2026-09-24, proposals waiting on Jason):** `docs/users-and-market.md`
+  (canonical, maintained copy: Google Drive `My Drive/Market Research/`).
   The real buyers are northern, portable-minded and value-driven (ice hole-hoppers, priced-out upgraders,
   LiveScope owners wanting a second unit, francophone and Chinese-speaking communities), not tournament
   bass pros. Proposals in its §7: lead with "live sonar on the phone you already own" (answers the
-  pending "aha" question with A); consider an aluminium-boat / kayak / ice-hole scene instead of the
-  tournament bass boat; target Canada before ice season, and the US only after its availability and
+  pending "aha" question with A); a "How do you fish? Boat · Kayak · Ice" scene choice instead of the
+  tournament bass boat (status-ladder study in Drive: no single vehicle carries the brand; the
+  default follows the season: ice in winter, an aluminium deep-V in open water, the kayak never
+  the default); target Canada before ice season, and the US only after its availability and
   checkout are fixed; the Lab as an onboarding tool (reading the picture) and a dealer demo; show
   multi-device sharing; UTM, Pixel and Klaviyo tags before any ad spend. Next data to get: the HelpScout
   queue (~4,200 conversations) and a 5-question owner survey.

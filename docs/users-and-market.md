@@ -5,6 +5,11 @@ Jason asked: 第一性原理分析一下 我们的用户群体画像 我们和�
 **Status:** analysis and proposals only. Nothing here is decided or built. Decisions go into
 `decisions.md` when Jason makes them.
 
+**The canonical, maintained copy is in Google Drive**, in `My Drive/Market Research/`, together
+with a Chinese summary and the follow-up study "Status ladder and the Lab scene". Jason wants this
+kept long-term as company market knowledge. This file is the 2026-09-24 snapshot, kept here for
+the Lab; its §7 carries the Lab-specific proposals.
+
 **Sources.** Four research tracks, all read-only and all reported as aggregates, with no personal
 data:
 1. Sales and traffic: the Shopify store (Apr 2025 – Sep 2026), Zoho CRM invoices (May–Sep 2026)
@@ -172,8 +177,15 @@ as good as Garmin's.
    the tablet you have" against $2,500+ systems. The pending "aha" question (A / B / C in the
    mobile plan) points to A; B ("as clear as the big brands") contradicts what customers say.
 3. **Scene.** The hero boat, a Ranger Z521R tournament bass boat, signals the persona the data
-   says is not ours. Consider a 16–18 ft aluminium boat, a kayak and an ice-hole scene. Ice
-   season is the buying peak, and the hole-hopper is P1.
+   says is not ours.
+   - Jason raised the kayak but senses a 鄙视链 (status ladder). The follow-up study in Drive
+     confirms three ladders: boats, screen size, and brand.
+   - Proposal: don't let any one vehicle carry the brand. Let the visitor choose, "How do you
+     fish? Boat · Kayak · Ice", so the hero becomes "one sonar, every way you fish".
+   - The default follows the season: Ice in winter, a 16–18 ft aluminium deep-V in open water.
+     The kayak is always offered but is never the default image.
+   - Status comes from the premium consumer-tech look (the DJI frame: "your phone is the
+     screen" means smart, not cheap), not from the boat.
 4. **Timing and geography.** Any Lab advertising should target Canada before the ice season. The
    US should wait until its availability and checkout problems are fixed; otherwise the ad money
    is wasted.
