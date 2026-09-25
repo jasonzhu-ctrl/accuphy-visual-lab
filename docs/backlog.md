@@ -36,7 +36,7 @@ it is done. ✅ done · 🔧 in progress · ⬜ open.
 - ✅ Forward View screen: apex ~20 % from the left, like the recordings
 - ✅ App chrome on the phone inset (`SonarChrome.jsx`, 2026-09-24): italic rulers on three edges from the live screen box, live depth readout (water depth under the transducer), temp/voltage, wordmark + `1440p (QHD)` tag, range −/+, pause, gain −/+, back, ⋯, PL-Forward depth-range control, Combo variant
 - ✅ App buttons on the phone are display-only (42 % opacity); a tap opens the sign-up gate, the picture freezes until sign-up (decision #38)
-- ⬜ Klaviyo: Jason creates the list "Sonar Beam Explorer sign-ups", picks single/double opt-in, sends the public key + list ID → paste into `signup.js` (`docs/signup-klaviyo-plan.md`)
+- ⬜ Klaviyo: Jason creates the list "Accuphy Lab sign-ups" (name per decision #43), picks single/double opt-in, sends the public key + list ID → paste into `signup.js` (`docs/signup-klaviyo-plan.md`)
 - ⬜ Before public launch: decide on a quiet "No thanks, just exploring" link under the sign-up button (GDPR consent-wall risk, plan §4)
 - ✅ App tone curve adopted (log compression + gain/dynamic-range window → LUT)
 - ✅ All 11 app colour maps available on the phone screen (amber default); gain slider
