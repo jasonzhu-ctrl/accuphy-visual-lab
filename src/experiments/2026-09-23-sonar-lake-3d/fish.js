@@ -23,8 +23,9 @@ export const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280
 const range = ([a, b]) => a + (b - a) * rnd()
 
 // Build the population: [{ species, len, home:[x,y,z], phase, radius, speed }]
-// `bedY(x,z)` gives the lakebed height so fish sit at realistic heights.
-export function makePopulation(bedY) {
+// `bedY(x,z)` gives the lakebed height so fish sit at realistic heights; `obstacles` (obstacles.js, as
+// circles) keeps every swim loop clear of timber, rocks, wrecks and the logo.
+export function makePopulation(bedY, obstacles) {
   const fish = []
   const add = (species, x, z, offBottom, n = 1, spread = 0) => {
     for (let i = 0; i < n; i++) {
@@ -96,6 +97,7 @@ export function makePopulation(bedY) {
     depth = Math.min(Math.max(depth, 0.9), D - 0.4)
     f.home[1] = -depth
   })
+  if (obstacles) clearPaths(fish, obstacles, bedY)
   // dev: ?fishtest — fixed fish at known spots so the sonar marks can be compared with the app's
   // frames (docs/sonar-style.md §7.2). The transducer sits ≈ (+3.0, −0.9, +0.5) from the ?boat point.
   // ?boat=28,11 → apex ≈ (31, −0.9, 11.5): Down view.  ?boat=16,11 → apex ≈ (19, −0.9, 11.5): PLM Forward.
@@ -113,6 +115,49 @@ export function makePopulation(bedY) {
     for (let i = 0; i < 40; i++) fish.push({ species: 'smelt', len: 0.16 + rnd() * 0.08, home: [31 + (rnd() - 0.5) * 4, -2.5 - rnd() * 4, 11.5 + (rnd() - 0.5) * 1.2], phase: rnd() * 6.28, radius: 0.3 + rnd() * 0.5, speed: 0.3 + rnd() * 0.3 })
   }
   return fish
+}
+
+// Keep every swim loop clear of solid structure (Jason 2026-09-24: 鱼穿过木头是个bug; only if it stays
+// cheap). A fish swims a fixed Lissajous loop that fills a rotated rectangle (±radius × ±0.6 radius) around
+// its home, so a loop is clear when no obstacle circle (grown by a third of the DRAWN body length) reaches
+// that rectangle at the fish's height. Fixed once at load — no per-frame cost: first a smaller loop in the
+// same spot, then the nearest free spot within 10 m, then lifting the fish over low structure. No rnd()
+// calls, so the rest of the lake stays exactly as it was.
+function clearPaths(fish, circles, bedY) {
+  const ring = (ds) => { const o = []; for (const d of ds) for (let i = 0; i < 16; i++) o.push([Math.cos((i * Math.PI) / 8) * d, Math.sin((i * Math.PI) / 8) * d]); return o }
+  const nearOffsets = [[0, 0], ...ring([1.5, 3, 4.5, 6])], farOffsets = ring([8, 10, 12, 14])
+  const rectDist = (o, hx, hz, c, s, r) => {
+    const dx = o.x - hx, dz = o.z - hz
+    const lx = c * dx + s * dz, lz = -s * dx + c * dz
+    return Math.hypot(Math.max(Math.abs(lx) - r, 0), Math.max(Math.abs(lz) - 0.6 * r, 0))
+  }
+  for (const f of fish) {
+    if (!f.radius) continue
+    const Ld = f.len * FISH_DISPLAY_SCALE, cl = 0.34 * Ld, hy = 0.12 * Ld + 0.3 + 0.25 // body half-height + the ±0.3 m bob + a margin
+    const c = Math.cos(f.rot || 0), s = Math.sin(f.rot || 0)
+    const near = circles.filter((o) => Math.hypot(o.x - f.home[0], o.z - f.home[2]) < f.radius + o.r + cl + 15)
+    const clash = (hx, y, hz, r) => near.some((o) => y + hy > o.y0 && y - hy < o.y1 && rectDist(o, hx, hz, c, s, r) < o.r + cl)
+    const [x0, y0, z0] = f.home, r0 = f.radius, h0 = y0 - bedY(x0, z0)
+    f.clear = 'ok'
+    if (!clash(x0, y0, z0, r0)) continue
+    const nearBottom = h0 < 3 // bottom fish keep their height above the bottom, the rest their depth
+    const tryAt = (offsets, how) => {
+      for (const [ox, oz] of offsets) {
+        const hx = x0 + ox, hz = z0 + oz, bed = bedY(hx, hz)
+        const y = nearBottom ? bed + h0 : Math.max(y0, bed + 0.6)
+        if (y > -0.9) continue
+        for (const k of [1, 0.75, 0.55, 0.4, 0.3]) if (!clash(hx, y, hz, r0 * k)) { f.home = [hx, y, hz]; f.radius = r0 * k; f.clear = ox || oz ? how : 'shrink'; return true }
+      }
+      return false
+    }
+    if (tryAt(nearOffsets, 'move')) continue
+    // lift over low structure (stumps, rocks, bushes) when that keeps it under water and not far from its layer
+    const tops = near.filter((o) => rectDist(o, x0, z0, c, s, r0 * 0.55) < o.r + cl).map((o) => o.y1)
+    const yl = tops.length ? Math.max(...tops) + hy + 0.05 : 0
+    if (tops.length && yl < -0.9 && yl - y0 < 6 && !clash(x0, yl, z0, r0 * 0.55)) { f.home = [x0, yl, z0]; f.radius = r0 * 0.55; f.clear = 'lift'; continue }
+    if (tryAt(farOffsets, 'move-far')) continue
+    f.radius = r0 * 0.3; f.clear = 'hover' // last resort: a tight hover where it is
+  }
 }
 
 // Simple wander around the home point; schools drift together via shared phase.

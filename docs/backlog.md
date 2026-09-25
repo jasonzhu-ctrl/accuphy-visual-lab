@@ -7,6 +7,8 @@ it is done. ✅ done · 🔧 in progress · ⬜ open.
 - ✅ AUTO depth on PL Forward: bottom kept at ~80 % of the screen in deep water; sound reaches the whole picture box; the 3D curtain = that box (decision #38)
 - ⬜ Down View in water deeper than the range: the bottom is out of range (the app behaves the same). Option for Jason: auto range in Down View too (the Range slider would move by itself) — not done without his call
 - ⬜ Down / PLM views: the app also draws echoes out to the screen corners beyond the range (PL Down 12 m frame, `reference/app-study/pl-down-menu.jpg`); the engine still cuts at the range arc there. Apply the box rule + box-shaped curtain to those views after checking the 3D look with Jason
+- ✅ Big fish bloom: bigger marks for big fish only (musky ×1.9, chinook ×1.6, bass ×1.1), range logic unchanged (decision #39)
+- ⬜ Panoramic in dense bait: the 64-mark cap is reached at ~15 % of boat positions (120 ft), so the weakest dashes drop out; raise to 96 if phone fps allows
 - ⬜ Deep water: the bottom band gets thick where the lake floor slopes sideways (the 20° slab is ≈ 11 m wide at 31 m). Physically right, but check against a deep app recording (all current app frames are ≈ 10 m)
 - ✅ Panoramic rebuilt as a plan-view photograph; fish = analytic persistence streaks with shadows in all views (decision #36)
 - ✅ Panoramic wreck: the 40 m cargo ship (decision #38) now shows hatches, masts and deck gear from above like the app's 35 m wreck. It lies at ~36 m; moving it shallower stays Jason's call
@@ -51,6 +53,9 @@ it is done. ✅ done · 🔧 in progress · ⬜ open.
 - ✅ Second, ~20 m, more complete wreck on the deep slope up-and-right
 - ✅ That wreck doubled to a 40 m cargo ship with holds, hatches, masts, derricks, crane, stern house, railings, lifeboats and debris (decision #38)
 - ✅ Bass / musky / salmon spread through the water column (bass 2–17 m, musky 5–13 m, salmon 4–33 m)
+- ✅ No fish swims through timber, rocks, wrecks or the logo: swim loops routed at load (decision #39)
+- ✅ Accuphy logo on the lakebed, standing in the boat's forward plane so Forward / Down image the whole mark (decision #39)
+- ⬜ Option for Jason: a guide step or a "find the logo" button that parks the boat on the logo's line (today: drag the boat to the logo's west side)
 - ✅ Salmon / lake trout also up-and-right in the deep water
 - ✅ App playback study done on the real V10 tablet (emulator route stays blocked by GLES 3.2): all PL and PLM views captured, findings in `sonar-style.md` §6 + `app-chrome.md`
 - ⬜ App study leftovers: every colour map on one frame, range stepping, imperial units (tablet route, cheap)

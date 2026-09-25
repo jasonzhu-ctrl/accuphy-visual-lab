@@ -11,8 +11,10 @@ import { wedgeGeometry } from '../2026-09-23-beam-shapes-3d/wedge'
 import { makeTallTree, makeBushTree, makeStump, makeLog, makeWeedTuft, makeRock, placeAll } from './vegetation'
 import { makeRangerBoat, TRANSDUCER_OFFSET } from './boat'
 import { makeFishGeometry } from './fishGeometry'
-import { makeCargoWreck, makeWreckDebris, WRECK_L } from './wreck'
-import SonarScreen, { SONAR_HIDE_LAYER, LAKEBED_LAYER, FISH_LAYER } from './SonarScreen'
+import { makeCargoWreck, makeWreckDebris, WRECK_L, BIG_WRECK, SMALL_WRECK } from './wreck'
+import { makeLogoGeometry, logoFrame } from './logo'
+import { buildObstacles, toCircles } from './obstacles'
+import SonarScreen, { SONAR_HIDE_LAYER, LAKEBED_LAYER, FISH_LAYER, LOGO_LAYER } from './SonarScreen'
 
 // ---------- lakebed ----------
 function Lakebed({ mat }) {
@@ -103,8 +105,8 @@ function Wreck({ mat }) {
     g.setAttribute('color', new THREE.BufferAttribute(col, 3))
     return g
   }, [])
-  const x = 16, z = -26
-  return <mesh geometry={geo} material={mat} position={[x, bedY(x, z) - 0.2, z]} rotation={[0.42, 0.6, 0.12]} />
+  const { x, z, rot } = SMALL_WRECK
+  return <mesh geometry={geo} material={mat} position={[x, bedY(x, z) - 0.2, z]} rotation={rot} />
 }
 
 // dev (?fishtest): a dock piling 12 m ahead of the ?boat=16,11 apex — the app's reference frame
@@ -129,7 +131,7 @@ function BigWreck({ mat }) {
     const d = makeWreckDebris()
     return { geo, debris: d.items }
   }, [])
-  const x = 44, z = -30, yaw = -0.9
+  const { x, z, yaw, list } = BIG_WRECK
   // follow the slope: bottom height under the bow and the stern
   const ax = Math.cos(yaw), az = -Math.sin(yaw)
   const yBow = bedY(x + ax * WRECK_L * 0.45, z + az * WRECK_L * 0.45), yStern = bedY(x - ax * WRECK_L * 0.45, z - az * WRECK_L * 0.45)
@@ -139,7 +141,7 @@ function BigWreck({ mat }) {
     <group>
       <group position={[x, y, z]} rotation-y={yaw}>
         <group rotation-z={pitch}>
-          <mesh geometry={geo} material={mat} rotation-x={0.3} />
+          <mesh geometry={geo} material={mat} rotation-x={list} />
         </group>
       </group>
       {debris.map((it, i) => {
@@ -148,6 +150,15 @@ function BigWreck({ mat }) {
       })}
     </group>
   )
+}
+
+// The Accuphy mark resting on the bottom (logo.js). Its own layer: the main view and the Panoramic top-down
+// map see the mesh; the side views (Down / Forward) draw it from its exact plane instead (sonarShader.js),
+// because a plate standing in the slice would otherwise only show its near edge.
+function Logo({ mat }) {
+  const geo = useMemo(makeLogoGeometry, [])
+  const { B, q } = useMemo(logoFrame, [])
+  return <mesh geometry={geo} material={mat} position={B} quaternion={q} onUpdate={(o) => o.layers.set(LOGO_LAYER)} />
 }
 
 // ---------- fish ----------
@@ -188,7 +199,7 @@ function FishGroup({ mat, body, fish }) {
   return <instancedMesh ref={ref} args={[geo, mat, fish.length]} frustumCulled={false} onUpdate={(o) => o.layers.set(FISH_LAYER)} />
 }
 function Fish({ mat, state }) {
-  const pop = useMemo(() => makePopulation(bedY), [])
+  const pop = useMemo(() => makePopulation(bedY, toCircles(buildObstacles())), []) // swim loops routed around structure
   if (import.meta.env.DEV) window.__fish = pop // dev: fish population for scene lookups
   state.current.pop = pop
   const groups = useMemo(() => {
@@ -324,6 +335,12 @@ function Rig({ state }) {
         return
       }
     }
+    if (s.logoCam) { // dev aid ?cam=logo — the lakebed logo, seen from its face side
+      const { B } = logoFrame()
+      camera.position.set(B.x - 7, B.y + 9, B.z + 21)
+      camera.lookAt(B.x, B.y + 3.2, B.z)
+      return
+    }
     if (s.wreckCam) { // dev aid ?cam=wreck — inspect the big wreck
       const a = performance.now() / 9000
       camera.position.set(44 + Math.cos(a) * 42, -4, -30 + Math.sin(a) * 42)
@@ -365,9 +382,9 @@ export default function LakeScene({ state, sonarRect, paused = false }) {
     fish.userData.uniforms.uHighlight.value.set('#ffe9a0') // fish light up warm, like a sonar return
     fish.userData.uniforms.uFogDensity.value = 0.006
     fish.side = THREE.DoubleSide // flat fins
-    return { bed: makeLakeMaterial(), inst: makeLakeMaterial({ structure: true }), fish }
+    return { bed: makeLakeMaterial(), inst: makeLakeMaterial({ structure: true }), logo: makeLakeMaterial({ logo: true }), fish }
   }, [])
-  const beamMats = useMemo(() => [mats.bed, mats.inst, mats.fish], [mats])
+  const beamMats = useMemo(() => [mats.bed, mats.inst, mats.fish, mats.logo], [mats])
   return (
     <Canvas frameloop={paused ? 'never' : 'always'} dpr={[1, 1.5]} camera={{ fov: 38, near: 0.5, far: 400, position: [-38, 34, 54] }} gl={{ antialias: true, powerPreference: 'high-performance' }}>
       <color attach="background" args={['#9cc1cf']} />
@@ -379,6 +396,7 @@ export default function LakeScene({ state, sonarRect, paused = false }) {
       <Structures mat={mats.inst} />
       <Wreck mat={mats.inst} />
       <BigWreck mat={mats.inst} />
+      <Logo mat={mats.logo} />
       {import.meta.env.DEV && /fishtest/.test(window.location.search) && <TestPiling mat={mats.inst} />}
       <Fish mat={mats.fish} state={state} />
       <Water state={state} />

@@ -5,6 +5,7 @@ import { MAX_FANS, sonarVertex, sonarFragment } from './sonarShader'
 import { colormapTexture } from './colormaps'
 import { depthAt } from './terrain'
 import { bakeTerrain, makeMarksTexture, computeMarks } from './sonarMarks'
+import { logoFrame } from './logo'
 
 // CSS 3D pose of the phone (index.jsx applies the same transform to the DOM frame)
 export const PHONE_POSE = { perspective: 1400, rotY: -16, rotX: 6 }
@@ -44,12 +45,16 @@ export function screenLayout(deviceId, mode, R, aspect, specs, depthM) {
 export const SONAR_HIDE_LAYER = 1
 export const LAKEBED_LAYER = 2
 export const FISH_LAYER = 3
+export const LOGO_LAYER = 4 // the lakebed logo: main view + Panoramic top-down map; the side views draw it analytically
 const TOP_N = 512 // top-down structure map for Panoramic (±range around the transducer)
 const STRIP_W = 1024, STRIP_H = 128 // 128 rows across the 18–20° thickness ≈ 0.15°/row: a 5 cm bait fish at 12 m still lands on a row (was 32 → dotted small fish)
 
 export default function SonarScreen({ state, rect, lakeMats }) {
   const { gl, scene, camera, size } = useThree()
-  if (import.meta.env.DEV) { window.__sonarGL = gl; window.__sonarState = state.current }
+  if (import.meta.env.DEV) {
+    window.__sonarGL = gl; window.__sonarState = state.current
+    window.__lakeSnap = () => { gl.setRenderTarget(null); gl.render(scene, camera); return gl.domElement.toDataURL('image/png') } // dev: the 3D view alone as a PNG
+  }
   const res = useMemo(() => {
     const targets = [0, 1].map(() => {
       // NEAREST: the colour target's alpha is a TAG (1 fish, 0.5 structure, 0 bottom); linear filtering
@@ -64,10 +69,11 @@ export default function SonarScreen({ state, rect, lakeMats }) {
     const topRT = new THREE.WebGLRenderTarget(TOP_N, TOP_N, { depthBuffer: true, minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter })
     topRT.depthTexture = new THREE.DepthTexture(TOP_N, TOP_N, THREE.FloatType)
     const topCam = new THREE.OrthographicCamera(-10, 10, 10, -10, 0.1, 70)
-    topCam.layers.set(0)
+    topCam.layers.set(0); topCam.layers.enable(LOGO_LAYER)
     topCam.up.set(1, 0, 0) // image up = forward (+x), image right = starboard (+z)
     const bake = bakeTerrain()
     const marks = makeMarksTexture()
+    const logo = logoFrame()
     const mat = new THREE.ShaderMaterial({
       vertexShader: sonarVertex, fragmentShader: sonarFragment, depthTest: false, depthWrite: false,
       uniforms: {
@@ -81,6 +87,7 @@ export default function SonarScreen({ state, rect, lakeMats }) {
         uTerrain: { value: bake.tex }, uTerrainHalf: { value: bake.H },
         uTop: { value: topRT.depthTexture }, uTopR: { value: 10 }, uTopCamY: { value: 2 }, uTopNearFar: { value: new THREE.Vector2(0.1, 70) },
         uApexXZ: { value: new THREE.Vector2() }, uApexDepth: { value: 0.9 },
+        uLogoB: { value: logo.B }, uLogoU: { value: logo.U }, uLogoV: { value: logo.V }, uLogoR: { value: logo.R },
         uLUT: { value: colormapTexture('garmin_amber') }, uGain: { value: 0.57 }, uDynRange: { value: 0.85 }, uContrast: { value: 0.4 }, uNoise: { value: 0.3 }, uGamma: { value: 0.75 }, // calibrated 2026-09-24 against the two confirmed frames (sonar-style.md §6.11)
       },
     })
@@ -143,7 +150,7 @@ export default function SonarScreen({ state, rect, lakeMats }) {
     }
     return { targets, cams, mat, overlay, quad, ortho, topRT, topCam, bake, marks }
   }, [])
-  useEffect(() => { [SONAR_HIDE_LAYER, LAKEBED_LAYER, FISH_LAYER].forEach((l) => camera.layers.enable(l)) }, [camera])
+  useEffect(() => { [SONAR_HIDE_LAYER, LAKEBED_LAYER, FISH_LAYER, LOGO_LAYER].forEach((l) => camera.layers.enable(l)) }, [camera])
   useEffect(() => () => { res.targets.forEach((t) => t.dispose()); res.topRT.dispose(); res.mat.dispose() }, [res])
 
   const tmpUp = useMemo(() => new THREE.Vector3(), [])

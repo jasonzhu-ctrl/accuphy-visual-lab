@@ -7,7 +7,7 @@ import * as THREE from 'three'
 //   inside ⇔ r=|(u,v)| < R, atan(v,u) ∈ [a0,a1], w ∈ [s0,s1]·u·tan(theta)
 export const MAX_BEAMS = 2
 
-export function makeLakeMaterial({ fish = false, structure = false } = {}) {
+export function makeLakeMaterial({ fish = false, structure = false, logo = false } = {}) {
   const uniforms = {
     uSun: { value: new THREE.Vector3(0.4, 0.8, 0.3).normalize() },
     uFogColor: { value: new THREE.Color('#17545f') },
@@ -28,7 +28,7 @@ export function makeLakeMaterial({ fish = false, structure = false } = {}) {
   const mat = new THREE.ShaderMaterial({
     uniforms,
     vertexColors: true,
-    defines: fish ? { FISH: 1 } : structure ? { STRUCTURE: 1 } : {},
+    defines: fish ? { FISH: 1 } : logo ? { STRUCTURE: 1, LOGO: 1 } : structure ? { STRUCTURE: 1 } : {},
     vertexShader: /* glsl */ `
       varying vec3 vWorld; varying vec3 vNormal; varying vec3 vColor;
       #ifdef FISH
@@ -154,6 +154,10 @@ export function makeLakeMaterial({ fish = false, structure = false } = {}) {
       #endif
         // outside the beam things stay murky; inside they pop (Garmin look)
         vec3 lit = base * (0.72 + 2.3 * beam) + uHighlight * 0.3 * beam + uHighlight * 0.9 * edge;
+      #ifdef LOGO
+        // the brand mark keeps Accuphy blue: a gentler beam lift, no cyan wash (the ×3 lift clipped it to cyan)
+        lit = base * (0.95 + 0.85 * beam) + uHighlight * 0.06 * beam + uHighlight * 0.5 * edge;
+      #endif
         // underwater fog by distance from camera
         float dist = length(vWorld - cameraPosition);
         float fog = 1.0 - exp(-dist * uFogDensity);

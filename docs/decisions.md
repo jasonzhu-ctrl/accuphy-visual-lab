@@ -454,3 +454,34 @@ Numbered log. Newest at the bottom.
       Down View needs ≥ 130 ft range to show the hull.
     - **Fish depths:** bass 2–17 m (40 % stay near the bottom, the rest
       suspend mid-water or shallow), musky 5–13 m, salmon 4–33 m.
+
+39. **2026-09-24** — **Fish never swim through structure; big fish bloom on the
+    sonar; the Accuphy logo stands on the lakebed** (Jason: 鱼好像穿过木头是个
+    bug … 验证下是不是鱼在木头附近会看不见 … 如果特别复杂或者网页加载很慢就不要做;
+    下面有一条大鱼 声纳上面显示也要再大一点; 湖的右上部分 … 放一个Accuphy的logo的
+    模型 … 船过去的时候 … 小窗里成像出logo的形状).
+    - **Fish paths:** every fish swims a fixed loop, so clashes are fixed once
+      at load (`obstacles.js` + `clearPaths` in `fish.js`): trunks, limb
+      crowns, brush, stumps, rocks, logs, both wrecks and the logo as simple
+      envelopes; a clashing loop gets smaller, else moves a few metres, else
+      lifts over low structure. Result: 149 fish untouched, 55 smaller loops,
+      94 moved (all but one within 6 m), no loop touches structure. Cost
+      ≈ 30 ms once at load, nothing per frame.
+    - **Visibility check:** sonar marks come from each fish's true position and
+      ignore structure, so a fish next to (or even inside) wood was never
+      missing from the sonar; where it overlaps a trunk's echo the two merge,
+      as on the real screen. What Jason saw was the 3D view: a fish inside a
+      trunk vanished into it — that was the bug, now gone.
+    - **Big fish bloom** (`sonarMarks.js`, `sonar-style.md` §7.14): bigger
+      marks for big fish only (musky ×1.9, chinook ×1.6, bass ×1.1, bait 1×).
+    - **Logo** (`logo.js`, §7.15): the brand icon measured from Jason's PNG
+      (47.3° half-angle, three bands), extruded 0.6 m, 7.5 m tall × 11 m wide,
+      standing in the boat's forward plane with its width along the heading,
+      leaning 11° and settled 0.45 m into the silt, on the flattest open patch
+      on the right of the lake (19 m deep). It stands rather than lies flat
+      because Forward and Down are vertical slices: a flat logo would be a thin
+      line there. Driving the boat along its line in Forward (or over it in
+      Down) images the whole mark; Panoramic shows it from above as a strip
+      with a shadow. Own material so it stays Accuphy blue inside the beam.
+      Dev aids: `?cam=logo` (close-up), `window.__lakeSnap()` (3D view PNG).
+

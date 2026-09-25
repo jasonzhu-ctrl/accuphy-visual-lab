@@ -625,3 +625,25 @@ Fish in a school now share swim direction and phase (parallel streaks), and
 the shelf got more bait for the Panoramic step (preset now 70 ft).
 Comparisons: `reference/engine-compare/compare-pl-panoramic-app-vs-engine.png`,
 `compare-pl-panoramic-wreck-app-vs-engine.png`.
+
+### 7.14 Big fish bloom (2026-09-24, Jason: "下面有一条大鱼 … 声纳上面显示也要再大一点")
+A strong echo spills into the neighbouring beams and range cells, so on a real
+screen a big fish paints a mark larger than its body. The marks now use a
+bloomed length `L × (1 + 0.9 · smoothstep(0.3 m, 1.1 m, L))` for the swept
+body, the radial thickness and the Panoramic streak: bait and panfish stay true
+size, bass ×1.1, chinook ×1.6, a 1.1 m+ musky ×1.9. Everything is still in
+metres, so the range logic of §6.9 is untouched (marks shrink at long range).
+
+### 7.15 A solid plate in the slice: the lakebed logo (2026-09-24)
+The Accuphy mark stands on the bottom in the boat's forward plane (`logo.js`).
+In the depth strips a plate that lies almost in the slice is seen nearly
+edge-on: rays across the 20° thickness hit it too sparsely and only its near
+edge would show. So the side views draw it like the fish, from its exact
+plane: for each pixel, the plate point with the same forward/depth position,
+kept if it lies inside the slab (same flat-topped beam pattern as the fish),
+painted with brighter edges and a darker speckled face (a flat metal face
+returns less than its edges). The Panoramic top-down map sees the mesh
+itself. Site rule learned the hard way: the bottom must be flat ACROSS the
+boat's line as well, otherwise the 20° slab sees a spread of bottom depths and
+the thick bottom echo buries the logo's lower band (first try on the drop-off).
+

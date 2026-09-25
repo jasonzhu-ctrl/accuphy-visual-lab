@@ -82,7 +82,7 @@ export default function SonarLake3D() {
   const state = useRef({
     boat: { x: b0[0] ?? -6, z: b0[1] ?? 4 }, target: { x: b0[0] ?? -6, z: b0[1] ?? 4 }, apex: new THREE.Vector3(), dragging: false,
     parallax: { x: 0, y: 0 }, specs, specKey,
-    closeCam: window.location.search.includes('cam=boat'), wreckCam: /cam=wreck/.test(window.location.search),
+    closeCam: window.location.search.includes('cam=boat'), wreckCam: /cam=wreck/.test(window.location.search), logoCam: /cam=logo/.test(window.location.search),
     fishCam: (/cam=fish:(\w+)/.exec(window.location.search) || [])[1],
     fishCamIndex: +((/cam=fish:\w+:(\d+)/.exec(window.location.search) || [])[1] || 0),
   })

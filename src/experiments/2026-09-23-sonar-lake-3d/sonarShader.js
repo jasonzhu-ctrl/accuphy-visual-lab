@@ -48,6 +48,8 @@ export const sonarFragment = /* glsl */ `
   uniform sampler2D uTerrain; uniform float uTerrainHalf;
   uniform sampler2D uTop; uniform float uTopR; uniform float uTopCamY; uniform vec2 uTopNearFar;
   uniform vec2 uApexXZ; uniform float uApexDepth;
+  // the lakebed logo (logo.js): plane origin B (bottom of the outer arc), width axis U, face-up axis V, size R
+  uniform vec3 uLogoB; uniform vec3 uLogoU; uniform vec3 uLogoV; uniform float uLogoR;
 
   float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
   float vnoise(vec2 q) { vec2 i = floor(q), f = fract(q); f = f * f * (3.0 - 2.0 * f);
@@ -88,6 +90,36 @@ export const sonarFragment = /* glsl */ `
       e = max(e, B.y * exp(-1.5 * d2) * along);
     }
     return e;
+  }
+  // ---- the lakebed logo: drawn from its exact plane, like the fish ----
+  // A plate standing in the slice would only show its near edge in the depth strips (the rays across the
+  // 20° thickness hit it too sparsely), so the side views take the part of the plate that lies inside this
+  // fan's slab and paint its shape: returns in (0, 1], brightest at the edges.
+  float logoEcho(vec2 p, int k) {
+    if (uLogoR <= 0.0) return 0.0;
+    vec2 w = vec2(uApexXZ.x + p.x, -uApexDepth - p.y);          // the pixel's point in the fan plane (world x, y)
+    vec2 d = w - uLogoB.xy;
+    float det = uLogoU.x * uLogoV.y - uLogoU.y * uLogoV.x;
+    float a = (d.x * uLogoV.y - d.y * uLogoV.x) / det;          // across the logo (m)
+    float b = (uLogoU.x * d.y - uLogoU.y * d.x) / det;          // up its face (m)
+    float zp = uLogoB.z + a * uLogoU.z + b * uLogoV.z;           // where that point of the plate is across the slab
+    float uc = p.x * sin(uFan[k].x) + p.y * cos(uFan[k].x);      // distance along the fan centre
+    float q = (zp - uApexXZ.y) / max(0.08, uc * uFan[k].w);
+    float wz = exp(-0.8 * q * q * q * q);                        // same flat-topped beam pattern as the fish marks
+    if (wz < 0.01) return 0.0;
+    vec2 L = vec2(a, b) / uLogoR - vec2(0.0, 1.0);               // logo units, apex at the origin
+    float rr = length(L);
+    float ang = atan(abs(L.x), -L.y);                            // from straight down
+    float dEdge = rr * sin(ang - 0.8255);                        // 47.3° straight edges
+    float dOut = rr - 1.0;
+    float c1 = length(L - vec2(0.0, -0.025)) - 0.153;            // top band
+    float c2 = length(L - vec2(0.0, -0.067)) - 0.216;            // middle band's inner arc
+    float dBand = min(c1, min(max(-c2, rr - 0.59), max(0.69 - rr, dOut)));
+    float dm = max(max(dEdge, dOut), dBand) * uLogoR;            // signed distance in metres (< 0 inside)
+    float inside = 1.0 - smoothstep(-0.06, 0.06, dm);
+    if (inside < 0.01) return 0.0;
+    float rim = 1.0 - smoothstep(0.0, 0.35, -dm);                // edges and corners return strongest; the flat face less
+    return wz * inside * (0.48 + 0.72 * rim);
   }
   float capsuleDist(vec2 p, vec2 a, vec2 b) { vec2 pa = p - a, ba = b - a; float h = clamp(dot(pa, ba) / max(dot(ba, ba), 1e-6), 0.0, 1.0); return length(pa - ba * h); }
   // fish shadows on the bottom (Panoramic): a rounded blotch where the body's image lands, longer along the ray
@@ -241,6 +273,7 @@ export const sonarFragment = /* glsl */ `
         acc = acc / 16.0 + 0.7 * peak + 0.9 * spk;
         float atten = 1.0 - 0.4 * clamp(r / uRange, 0.0, 1.0);
         echo = max(echo, max(acc * atten * tex, fishEcho(p, k)));
+        echo = max(echo, logoEcho(p, k) * atten * (0.7 + 0.55 * (filament - 0.8)) * (0.72 + 0.28 * tex));
       }
       float near = 1.0 - smoothstep(0.0, 2.4, r);
       echo = max(echo, inAny * near * near * (0.25 + 0.6 * rays) * tex * 0.5);

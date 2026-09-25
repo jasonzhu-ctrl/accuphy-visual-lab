@@ -71,7 +71,10 @@ export function computeMarks({ pop, t, specs, apex, flat, bake, rangeM }, marks)
   for (const f of pop) {
     const o = fishPose(f, t, pose)
     const o0 = fishPose(f, t - PERSIST, pose0)
-    const L = f.len
+    // big fish bloom: a strong echo spills into neighbouring beams and range cells, so a big fish paints a
+    // mark larger than its body (Jason 2026-09-24: 下面有一条大鱼 … 声纳上面显示也要再大一点). Bait and
+    // panfish stay true size; a 1.1 m+ musky ×1.9.
+    const L = f.len * (1 + 0.9 * smooth(0.3, 1.1, f.len))
     const dirx = Math.cos(o.heading), dirz = -Math.sin(o.heading)
     // trail endpoints (world x, z) with the body added at both ends along the swim direction
     let tx = o.x - o0.x, tz = o.z - o0.z; const tl = Math.hypot(tx, tz)

@@ -9,6 +9,9 @@ import { mergeGeometries as _merge } from 'three/addons/utils/BufferGeometryUtil
 const merge = (parts) => _merge(parts.map((g) => (g.index ? g.toNonIndexed() : g)))
 
 export const WRECK_L = 40, WRECK_B = 9
+// where the two wrecks lie (shared by the scene and the fish-path clearing in obstacles.js)
+export const BIG_WRECK = { x: 44, z: -30, yaw: -0.9, list: 0.3 }
+export const SMALL_WRECK = { x: 16, z: -26, rot: [0.42, 0.6, 0.12], L: 9.8 }
 
 // deterministic pseudo-random so the wreck is the same every load
 let seed = 4242
