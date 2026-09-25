@@ -130,6 +130,11 @@ the light has physical weight — it lags, sways and settles when the boat is dr
 Taste confirmed on the reference sheets: groups A (dark cinematic product pages) and
 B (one light source revealing a dark world).
 
+Jason's three rules (decision #55): the lake stays a realistic lake picture, half-dark
+with a logic to its darkness; the cursor is a small but real image of the transducer;
+wherever it goes, everything its beam can reach lights up. (This refines §3: "the
+boat" becomes the device itself; the boat, if shown at all, is scenery.)
+
 **Where the feel comes from**
 
 1. **Light in the water** (mood decided: dark cinematic, decision #51). Lit from the

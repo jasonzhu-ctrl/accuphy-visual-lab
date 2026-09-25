@@ -707,3 +707,16 @@ Numbered log. Newest at the bottom.
     weight when the boat is dragged (lag, sway, settle). He asked not to be limited by
     the clip and to keep learning. Judge by the final look, not the technique.
     Still planning only.
+
+55. **2026-09-25** — **The concept, in Jason's words** ("就是湖归湖的画面 他是半暗的或者是
+    有逻辑的暗和半暗 然后鼠标是声纳探头的缩小版本 但是真实图形 然后探头到了哪里 对应的声纳波束
+    能触达的地方就亮了"). Three rules for the lite section, replacing any looser reading
+    of #54: (1) **the lake stays a lake picture** — realistic, half-dark, with a logic
+    to what is dark and what is half-lit (surface light, depth), not a black void;
+    (2) **the cursor is the transducer itself** — a small but real image of the device
+    (PingLive / PingLive Mini), not a boat silhouette or an abstract marker; the
+    side-view device cutouts are therefore needed (backlog); (3) **wherever the device
+    goes, everything its beam can reach lights up** — the lit region is the beam's true
+    coverage, the rest stays as it was. Jason is open on tools and on how we
+    collaborate; he has more reference videos to share from a web platform.
+    Still planning only.
