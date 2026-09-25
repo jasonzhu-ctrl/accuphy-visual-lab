@@ -106,6 +106,8 @@ the cheapest Android phone class). Phone size was emulated at 360×800.
   A web page cannot force landscape (iOS Safari has no orientation lock, and Instagram's iPhone app
   does not rotate). Proposal, waiting on Jason: keep portrait fully working, add a compact phone
   landscape layout and an optional dismissible "turn for a bigger view" hint. No rotate wall.
+- ⬜ **Before any US ad spend (decision #57):** walk the US store's checkout on a phone (view only, no
+  payment) and find where US buyers drop off; US ads lead with the PingLive Mini.
 - ⬜ **Before any ad spend:** public hosting; drop "← Lab" and the gallery from the public build;
   add a "Shop PingLive" button with UTM tags; add the Meta Pixel; wire Klaviyo (see above); remove
   the logo source files (.ai/.cdr/.zip/.DS_Store) from `public/`.
