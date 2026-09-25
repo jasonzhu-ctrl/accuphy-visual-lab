@@ -105,6 +105,9 @@ the cheapest Android phone class). Phone size was emulated at 360×800.
   the logo source files (.ai/.cdr/.zip/.DS_Store) from `public/`.
 - To re-run the test: see the `sonar-page-real-device-perf` memory note (adb reverse + Chrome
   DevTools over adb).
+- ⬜ **Mobile plan (proposal, waiting on Jason):** `docs/mobile-marketing-plan.md` covers the
+  60-second portrait flow, layout, quality tiers, loading, conversion, measurement, ads and the
+  order of work. Decisions for Jason are listed at its end, to be asked one at a time.
 
 ## Engineering
 - ✅ Dev helper `?bigphone` (DEV only): the phone frame fills the viewport so the sonar picture can be inspected in screenshots
