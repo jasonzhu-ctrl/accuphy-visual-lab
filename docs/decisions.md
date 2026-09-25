@@ -676,3 +676,17 @@ Numbered log. Newest at the bottom.
     - **Wreck "往上":** confirmed as up the screen (decision #44 stands).
     - **16:10 framing:** Jason noted it ("哦"); no change asked.
 
+
+53. **2026-09-24** — **The Lab offers three ways to fish: Boat, Kayak, Ice**
+    (Jason: "船 kayak和冰钓好了", answering the status-ladder proposal in
+    `docs/users-and-market.md` §7 and the Drive study "Status ladder and the Lab
+    scene"). Visitors choose "How do you fish? Boat · Kayak · Ice", so no single
+    vehicle carries the brand. The hero becomes "one sonar, every way you fish",
+    and ads can deep-link to the matching scene.
+    Working assumptions, to confirm with Jason when building:
+    - the default scene follows the season (Ice in winter, Boat in open water);
+    - the kayak is always offered but is never the default image;
+    - the Boat scene becomes a 16–18 ft aluminium deep-V instead of the Ranger
+      tournament boat (decision #20). This is not yet asked.
+
+    Planning only: nothing is built until Jason says go.

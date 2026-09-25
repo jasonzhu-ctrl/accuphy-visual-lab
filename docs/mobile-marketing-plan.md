@@ -42,7 +42,9 @@ The "Principles for mobile" section below is the current thinking.
 7. **Landscape is "real device mode".** If the visitor rotates, the sonar fills the screen exactly
    like the real app, and the lake becomes a small inset (tap to enlarge). Portrait stays the
    default and complete; nothing ever asks the visitor to rotate.
-8. **Ask for the email after the "aha", never before.** Inline, dismissible, with "Shop PingLive"
+8. **Three ways to fish (decision #53).** "How do you fish? Boat · Kayak · Ice", on phone and
+   desktop alike. The default follows the season, and ads deep-link to the matching scene.
+9. **Ask for the email after the "aha", never before.** Inline, dismissible, with "Shop PingLive"
    next to it (decision #45).
 
 **Inputs:** the real-device test (backlog, "Mobile + Meta ads readiness") and decisions #38–#40.

@@ -117,7 +117,7 @@ the cheapest Android phone class). Phone size was emulated at 360×800.
   LiveScope owners wanting a second unit, francophone and Chinese-speaking communities), not tournament
   bass pros. Proposals in its §7: lead with "live sonar on the phone you already own" (answers the
   pending "aha" question with A); a "How do you fish? Boat · Kayak · Ice" scene choice instead of the
-  tournament bass boat (status-ladder study in Drive: no single vehicle carries the brand; the
+  tournament bass boat (**decided #53: Boat, Kayak, Ice**; the default and the boat type are still open) (status-ladder study in Drive: no single vehicle carries the brand; the
   default follows the season: ice in winter, an aluminium deep-V in open water, the kayak never
   the default); target Canada before ice season, and the US only after its availability and
   checkout are fixed; the Lab as an onboarding tool (reading the picture) and a dealer demo; show
