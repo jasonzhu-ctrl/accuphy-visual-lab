@@ -604,3 +604,25 @@ Numbered log. Newest at the bottom.
     instead of teleports, quality tiers done properly, landscape as "real device
     mode", email after the "aha". Still planning only — nothing is built until
     Jason says go.
+
+48. **2026-09-24** — **Lite section: the original side-view idea, rethought with
+    everything learned — planning only** (Jason: 现在这个项目基本都是3D的 你学习了非常多的
+    东西 我们现在重新利用你学习了解到的 重新思考最早的事如何坐在一个网页的section里 是不是
+    更加轻量化一点比较好 包括网页加载速度这些都很重要 他应该是一个一眼明了的东西 直接有互动
+    不要那么多选项的 … 我们只是做计划不要动哦). Plan in `docs/lite-section-plan.md`:
+    - a side-view lake as a web component `<accuphy-sonar>` for accuphy.ca page
+      sections; the boat follows the pointer along the surface; inside the fan the
+      scene becomes the sonar picture at the approved look. Down / Forward are
+      vertical slices, so the fan *is* the screen — no phone inset needed;
+    - two controls (view pills + device toggle; device can be preset per page); no
+      range slider, tuning, guide cards, phone frame or sign-up gate;
+    - no three.js / React / framer-motion: one 2D shader + a polar shadow map,
+      ≤ 90 KB first visit (vs ~976 KB), a poster on the first paint, ≥ 50 fps target
+      on the V10, vertical swipes keep scrolling the page;
+    - Panoramic out of v1 (a side view cannot show a flat fan); option later as a
+      top-down panel;
+    - the full 3D Lab stays a separate page linked from the section; on phones that
+      cannot run the 3D, the section's 2D engine is a better fallback than video
+      (decision #47 keeps the interactive experience as the core).
+    Nothing built. Jason decides go / no-go and the four smaller questions in the
+    plan's §9.

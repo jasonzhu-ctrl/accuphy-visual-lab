@@ -122,3 +122,9 @@ the cheapest Android phone class). Phone size was emulated at 360×800.
 - 🔧 Mobile performance: dpr capped at 1.5, high-performance GL context; real-device check done 2026-09-24 (budget GPU 10–24 fps, see "Mobile + Meta ads readiness")
 - ✅ React 19 + R3F `refCleanup` console error — gone since StrictMode was removed (no new occurrences in this session's checks)
 - ⬜ **Local for now** (Jason 2026-09-24): `npm run build` + `npm run preview` on this Mac. Public hosting + Shopify embed stay in the plan for later, unchanged
+
+## Lite section (planning only — decision #48)
+- ⬜ **Do not build until Jason says go.** `docs/lite-section-plan.md`: the original side-view visualizer as a
+  light web component `<accuphy-sonar>` for accuphy.ca sections — the fan is the screen (no phone inset),
+  two controls, no three.js, ≤ 90 KB first visit, ≥ 50 fps target on the V10. Remind Jason of the go/no-go
+  when he is back; when he says go, §8 of the plan is the build order (prototype → packaging → measure → Shopify test page)
