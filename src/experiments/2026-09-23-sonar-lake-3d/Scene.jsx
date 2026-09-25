@@ -12,7 +12,7 @@ import { makeTallTree, makeBushTree, makeStump, makeLog, makeWeedTuft, makeRock,
 import { makeRangerBoat, TRANSDUCER_OFFSET } from './boat'
 import { makeFishGeometry } from './fishGeometry'
 import { makeCargoWreck, makeWreckDebris, WRECK_L, BIG_WRECK, SMALL_WRECK } from './wreck'
-import { makeLogoGeometry, logoFrame } from './logo'
+import { makeLogoGeometry, makePlinthGeometry, logoFrame } from './logo'
 import { buildObstacles, toCircles } from './obstacles'
 import SonarScreen, { SONAR_HIDE_LAYER, LAKEBED_LAYER, FISH_LAYER, LOGO_LAYER } from './SonarScreen'
 
@@ -155,10 +155,16 @@ function BigWreck({ mat }) {
 // The Accuphy mark resting on the bottom (logo.js). Its own layer: the main view and the Panoramic top-down
 // map see the mesh; the side views (Down / Forward) draw it from its exact plane instead (sonarShader.js),
 // because a plate standing in the slice would otherwise only show its near edge.
-function Logo({ mat }) {
+function Logo({ mat, stoneMat }) {
   const geo = useMemo(makeLogoGeometry, [])
+  const plinth = useMemo(makePlinthGeometry, [])
   const { B, q } = useMemo(logoFrame, [])
-  return <mesh geometry={geo} material={mat} position={B} quaternion={q} onUpdate={(o) => o.layers.set(LOGO_LAYER)} />
+  return (
+    <group position={B} quaternion={q}>
+      <mesh geometry={geo} material={mat} onUpdate={(o) => o.layers.set(LOGO_LAYER)} />
+      <mesh geometry={plinth} material={stoneMat} />
+    </group>
+  )
 }
 
 // ---------- fish ----------
@@ -335,10 +341,10 @@ function Rig({ state }) {
         return
       }
     }
-    if (s.logoCam) { // dev aid ?cam=logo — the lakebed logo, seen from its face side
+    if (s.logoCam) { // dev aid ?cam=logo — the lakebed lockup, seen from its face side
       const { B } = logoFrame()
-      camera.position.set(B.x - 7, B.y + 9, B.z + 21)
-      camera.lookAt(B.x, B.y + 3.2, B.z)
+      camera.position.set(B.x - 3, B.y + 8, B.z + 25)
+      camera.lookAt(B.x, B.y + 2.2, B.z)
       return
     }
     if (s.wreckCam) { // dev aid ?cam=wreck — inspect the big wreck
@@ -396,7 +402,7 @@ export default function LakeScene({ state, sonarRect, paused = false }) {
       <Structures mat={mats.inst} />
       <Wreck mat={mats.inst} />
       <BigWreck mat={mats.inst} />
-      <Logo mat={mats.logo} />
+      <Logo mat={mats.logo} stoneMat={mats.inst} />
       {import.meta.env.DEV && /fishtest/.test(window.location.search) && <TestPiling mat={mats.inst} />}
       <Fish mat={mats.fish} state={state} />
       <Water state={state} />

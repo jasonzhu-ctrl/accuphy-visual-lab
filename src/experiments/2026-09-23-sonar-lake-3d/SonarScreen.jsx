@@ -5,7 +5,7 @@ import { MAX_FANS, sonarVertex, sonarFragment } from './sonarShader'
 import { colormapTexture } from './colormaps'
 import { depthAt } from './terrain'
 import { bakeTerrain, makeMarksTexture, computeMarks } from './sonarMarks'
-import { logoFrame } from './logo'
+import { logoFrame, makeLogoSdf, LOGO_SDF_MAX, LOCKUP, LOCKUP_SVG } from './logo'
 
 // CSS 3D pose of the phone (index.jsx applies the same transform to the DOM frame)
 export const PHONE_POSE = { perspective: 1400, rotY: -16, rotX: 6 }
@@ -87,7 +87,9 @@ export default function SonarScreen({ state, rect, lakeMats }) {
         uTerrain: { value: bake.tex }, uTerrainHalf: { value: bake.H },
         uTop: { value: topRT.depthTexture }, uTopR: { value: 10 }, uTopCamY: { value: 2 }, uTopNearFar: { value: new THREE.Vector2(0.1, 70) },
         uApexXZ: { value: new THREE.Vector2() }, uApexDepth: { value: 0.9 },
-        uLogoB: { value: logo.B }, uLogoU: { value: logo.U }, uLogoV: { value: logo.V }, uLogoR: { value: logo.R },
+        uLogoB: { value: logo.B }, uLogoU: { value: logo.U }, uLogoV: { value: logo.V },
+        uLogoSdf: { value: makeLogoSdf() }, uLogoMap: { value: new THREE.Vector4(1 / logo.s, LOCKUP_SVG.cx, LOCKUP_SVG.bottom, LOGO_SDF_MAX) },
+        uLogoSvg: { value: new THREE.Vector2(LOCKUP_SVG.w, LOCKUP_SVG.h) }, uLogoExt: { value: new THREE.Vector2(LOCKUP.width / 2 + 0.3, LOCKUP_SVG.bottom * logo.s + 0.3) },
         uLUT: { value: colormapTexture('garmin_amber') }, uGain: { value: 0.57 }, uDynRange: { value: 0.85 }, uContrast: { value: 0.4 }, uNoise: { value: 0.3 }, uGamma: { value: 0.75 }, // calibrated 2026-09-24 against the two confirmed frames (sonar-style.md §6.11)
       },
     })

@@ -485,3 +485,28 @@ Numbered log. Newest at the bottom.
       with a shadow. Own material so it stays Accuphy blue inside the beam.
       Dev aids: `?cam=logo` (close-up), `window.__lakeSnap()` (3D view PNG).
 
+40. **2026-09-24** — **The lakebed logo is the full ACCUPHY lockup, on a
+    stone plinth** (Jason: 我给你的是png 淡色的地方你好像没有看见 accuphy不见了 …
+    他是白色的; then 可以继续了). The PNG's white letters sat on transparency and
+    were invisible on a white preview, so decision #39 built only the fan.
+    - **Brand-exact outlines:** the vector lockup already in the repo
+      (`public/brand/logo/Untitled-1.svg`, top copy) — white A C C U P H Y with
+      the blue fan inside the U (its middle band is the U's bowl). Extruded with
+      three's SVG loader; the same paths are rasterised into the sonar's
+      signed-distance texture, so the side views need one texture fetch per
+      pixel (budget phones are GPU-bound).
+    - **Size and place:** 22 m wide (letters ≈ 3 m tall), so Forward at the
+      default 80 ft range shows the whole word; Down with the boat over the
+      middle shows it centred. On the flat 19.5 m patch on the right of the
+      lake, following its 2.5° trend, upright in the boat's forward plane.
+    - **Plinth:** the fan hangs 1.1 m below the letters' baseline and the
+      sonar's bottom echo swallows ~1.5 m, so on the bed the fan's outer band
+      disappeared (silt ridges under the letters were tried first and failed
+      the same way). A dark stone plinth, set into the silt, lifts the whole
+      mark 1.3 m; its top follows the baseline with a notch for the fan. The
+      stone is dark because the beam lifts structure ×3.
+    - **Fish** still route around it (the plinth is in the obstacle box); no
+      loop touches structure.
+    - **Screens:** the whole word shows in the default view on 16:9 and wider;
+      on 16:10 its right end is cut (backlog).
+

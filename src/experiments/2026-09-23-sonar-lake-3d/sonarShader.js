@@ -49,7 +49,11 @@ export const sonarFragment = /* glsl */ `
   uniform sampler2D uTop; uniform float uTopR; uniform float uTopCamY; uniform vec2 uTopNearFar;
   uniform vec2 uApexXZ; uniform float uApexDepth;
   // the lakebed logo (logo.js): plane origin B (bottom of the outer arc), width axis U, face-up axis V, size R
-  uniform vec3 uLogoB; uniform vec3 uLogoU; uniform vec3 uLogoV; uniform float uLogoR;
+  uniform vec3 uLogoB; uniform vec3 uLogoU; uniform vec3 uLogoV;
+  uniform sampler2D uLogoSdf;  // signed distance to the lockup outline (8-bit, ±uLogoMap.w metres)
+  uniform vec4 uLogoMap;       // x = SVG units per metre, y = SVG x of the word's centre, z = SVG y of the fan's bottom, w = distance range (m)
+  uniform vec2 uLogoSvg;       // SVG width, height covered by the texture
+  uniform vec2 uLogoExt;       // half-width, height of the lockup in metres (quick reject)
 
   float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
   float vnoise(vec2 q) { vec2 i = floor(q), f = fract(q); f = f * f * (3.0 - 2.0 * f);
@@ -91,34 +95,26 @@ export const sonarFragment = /* glsl */ `
     }
     return e;
   }
-  // ---- the lakebed logo: drawn from its exact plane, like the fish ----
+  // ---- the lakebed lockup (logo.js): drawn from its exact plane, like the fish ----
   // A plate standing in the slice would only show its near edge in the depth strips (the rays across the
-  // 20° thickness hit it too sparsely), so the side views take the part of the plate that lies inside this
-  // fan's slab and paint its shape: returns in (0, 1], brightest at the edges.
+  // 20° thickness hit it too sparsely), so the side views take the part of the plate inside this fan's slab
+  // and paint its outline from a signed-distance texture: ONE fetch per pixel, brightest at the edges.
   float logoEcho(vec2 p, int k) {
-    if (uLogoR <= 0.0) return 0.0;
     vec2 w = vec2(uApexXZ.x + p.x, -uApexDepth - p.y);          // the pixel's point in the fan plane (world x, y)
     vec2 d = w - uLogoB.xy;
     float det = uLogoU.x * uLogoV.y - uLogoU.y * uLogoV.x;
-    float a = (d.x * uLogoV.y - d.y * uLogoV.x) / det;          // across the logo (m)
-    float b = (uLogoU.x * d.y - uLogoU.y * d.x) / det;          // up its face (m)
+    float a = (d.x * uLogoV.y - d.y * uLogoV.x) / det;          // along the word from its centre (m)
+    float b = (uLogoU.x * d.y - uLogoU.y * d.x) / det;          // up the face from the fan's bottom (m)
+    if (abs(a) > uLogoExt.x || b < -0.3 || b > uLogoExt.y) return 0.0;
     float zp = uLogoB.z + a * uLogoU.z + b * uLogoV.z;           // where that point of the plate is across the slab
     float uc = p.x * sin(uFan[k].x) + p.y * cos(uFan[k].x);      // distance along the fan centre
     float q = (zp - uApexXZ.y) / max(0.08, uc * uFan[k].w);
     float wz = exp(-0.8 * q * q * q * q);                        // same flat-topped beam pattern as the fish marks
     if (wz < 0.01) return 0.0;
-    vec2 L = vec2(a, b) / uLogoR - vec2(0.0, 1.0);               // logo units, apex at the origin
-    float rr = length(L);
-    float ang = atan(abs(L.x), -L.y);                            // from straight down
-    float dEdge = rr * sin(ang - 0.8255);                        // 47.3° straight edges
-    float dOut = rr - 1.0;
-    float c1 = length(L - vec2(0.0, -0.025)) - 0.153;            // top band
-    float c2 = length(L - vec2(0.0, -0.067)) - 0.216;            // middle band's inner arc
-    float dBand = min(c1, min(max(-c2, rr - 0.59), max(0.69 - rr, dOut)));
-    float dm = max(max(dEdge, dOut), dBand) * uLogoR;            // signed distance in metres (< 0 inside)
-    float inside = 1.0 - smoothstep(-0.06, 0.06, dm);
-    if (inside < 0.01) return 0.0;
-    float rim = 1.0 - smoothstep(0.0, 0.35, -dm);                // edges and corners return strongest; the flat face less
+    vec2 svg = vec2(a * uLogoMap.x + uLogoMap.y, uLogoMap.z - b * uLogoMap.x);
+    float sd = (texture2D(uLogoSdf, vec2(svg.x / uLogoSvg.x, 1.0 - svg.y / uLogoSvg.y)).r - 0.5) * 2.0 * uLogoMap.w; // metres, < 0 inside
+    float inside = 1.0 - smoothstep(-0.04, 0.04, sd);
+    float rim = 1.0 - smoothstep(0.0, 0.25, -sd);                // edges and corners return strongest; flat faces less
     return wz * inside * (0.48 + 0.72 * rim);
   }
   float capsuleDist(vec2 p, vec2 a, vec2 b) { vec2 pa = p - a, ba = b - a; float h = clamp(dot(pa, ba) / max(dot(ba, ba), 1e-6), 0.0, 1.0); return length(pa - ba * h); }

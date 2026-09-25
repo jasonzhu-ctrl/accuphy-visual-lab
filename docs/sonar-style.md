@@ -634,16 +634,25 @@ body, the radial thickness and the Panoramic streak: bait and panfish stay true
 size, bass ×1.1, chinook ×1.6, a 1.1 m+ musky ×1.9. Everything is still in
 metres, so the range logic of §6.9 is untouched (marks shrink at long range).
 
-### 7.15 A solid plate in the slice: the lakebed logo (2026-09-24)
-The Accuphy mark stands on the bottom in the boat's forward plane (`logo.js`).
-In the depth strips a plate that lies almost in the slice is seen nearly
-edge-on: rays across the 20° thickness hit it too sparsely and only its near
-edge would show. So the side views draw it like the fish, from its exact
-plane: for each pixel, the plate point with the same forward/depth position,
-kept if it lies inside the slab (same flat-topped beam pattern as the fish),
-painted with brighter edges and a darker speckled face (a flat metal face
-returns less than its edges). The Panoramic top-down map sees the mesh
-itself. Site rule learned the hard way: the bottom must be flat ACROSS the
-boat's line as well, otherwise the 20° slab sees a spread of bottom depths and
-the thick bottom echo buries the logo's lower band (first try on the drop-off).
+### 7.15 A solid plate in the slice: the lakebed lockup (2026-09-24)
+The ACCUPHY lockup stands in the boat's forward plane (`logo.js`). In the depth
+strips a plate that lies almost in the slice is seen nearly edge-on: rays
+across the 20° thickness hit it too sparsely and only its near edge would show.
+So the side views draw it like the fish, from its exact plane: for each pixel,
+the plate point with the same forward/depth position, kept if it lies inside
+the slab (same flat-topped beam pattern as the fish), painted from a signed
+distance to the brand outline (8-bit texture, one fetch per pixel) with bright
+edges and a darker speckled face (a flat face returns less than its edges).
+The Panoramic top-down map sees the mesh itself.
 
+Two things learned placing it:
+- **The bottom echo swallows the lowest ~1.5 m.** The integrated bottom band
+  plus its tail is ~1.1–1.6 m thick at 20 m, so anything touching the bottom
+  merges into it. The fan hangs 1.1 m below the letters' baseline: standing on
+  the bed (or with the letters on silt ridges, tried first) the fan's outer band
+  vanished. The lockup therefore stands on a stone plinth that lifts it 1.3 m;
+  the plinth is ordinary structure, and its top shows as a bright line the
+  letters stand on, stepping down into the notch under the fan.
+- **The bottom must be flat across the boat's line.** On a sideways slope the
+  20° slab sees a spread of bottom depths and the thick echo buries low parts
+  (first logo try on the drop-off).
