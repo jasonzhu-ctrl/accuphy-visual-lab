@@ -924,3 +924,26 @@ Numbered log. Newest at the bottom.
     - Fish re-checked with the moved obstacle: 15 simulated minutes, 0 structure, bottom or
       surface hits.
 
+67. **2026-09-25** — **Panoramic structure: lit near faces and real shadows, no more rock
+    "bubbles"** (Jason, PL Panoramic over the rock hump: "这些石头感觉画面不正常". His references:
+    four early app Panoramic clips with structure (2025-03, `RPReplay_Final1741714*`, Desktop and
+    Downloads). Frames are in `reference/app-study/panoramic-structure/`.)
+    - **What the app shows:** the side of an object facing the boat is bright (branches as thin
+      bright lines, the near edge of a log or dock). Behind it a dark acoustic shadow trails
+      away along the beams (a post's shadow is a clear dark tongue).
+    - **What was wrong:** the facing was measured from the footprint's highest tap, so every rock
+      lit a ring all round, far side included, around a dim centre. Shadows needed ~5 blocked
+      samples of 40 to count, so a rock (1–2 samples) cast a faint dotted one, and they only
+      darkened 35 %.
+    - **Fix:** facing from the height right under the pixel vs a little toward the boat
+      (look-back max(0.35 m, 3 % of range)), weight 0.8. Shadows are full at 2 blocked
+      samples and darken 85 %. Result: rocks show a bright near half and a dark tail; trunks
+      and branches are bright with dark radial shadows.
+    - Tried and rejected for shadow edges: ray-coherent march offsets (parallel streak lines)
+      and fixed offsets (stair-stepped texels). Per-pixel offsets stay; edges are still grainy.
+    - The #66 white point is now side views only; the Panoramic field keeps its calibration
+      (LUT index 0.1–0.2 over the shelf).
+    - Still different from those clips: they were recorded at 72–78 % gain in 1–5 m of water,
+      so their whole fan is a bright orange field. Ours is calibrated to the newer 57 % frames
+      (§7.13).
+

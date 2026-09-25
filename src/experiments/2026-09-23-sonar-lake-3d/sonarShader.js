@@ -195,7 +195,7 @@ export const sonarFragment = /* glsl */ `
         // acoustic shadow: march back toward the transducer; what lies above the ray blocks it. The shadow builds
         // up with how much of the path is blocked, so solid things cast solid shadows and sparse brush only a faint
         // one (a single hit made every twig a hard, dotted black ray); per-pixel jitter keeps it soft
-        float jit = hash(gl_FragCoord.xy * 0.61 + t * 0.13);
+        float jit = hash(gl_FragCoord.xy * 0.61 + t * 0.13); // per-pixel offsets (tried 2026-09-25: ray-coherent ones drew parallel streak lines, fixed ones stair-stepped the top map's texels)
         float occl = 0.0;
         for (int s = 0; s < 40; s++) {
           float tt = r * (float(s) + jit) / 40.0;
@@ -205,7 +205,10 @@ export const sonarFragment = /* glsl */ `
           float line = target * tt / r;
           occl += smoothstep(0.1, 0.6, line - occ);
         }
-        float shade = clamp(occl / 5.0, 0.0, 1.0);
+        // Shadows (Jason 2026-09-25, rocks on the hump: 这些石头感觉画面不正常; app Panoramic structure clips, 2025-03,
+        // reference/app-study/panoramic-structure/): anything that blocks a couple of samples of the path is a real,
+        // dark shadow trailing away from the boat — a rock only blocked 1–2 samples, so it cast a faint dotted one
+        float shade = clamp(occl / 2.0, 0.0, 1.0);
         // Calibrated in echo units against the app's lake frames (§7.13): after the tone curve the field sits
         // at LUT index 0.10–0.25 (echo 0.099–0.138), shadows ≈ 0.03–0.06, faces toward the transducer higher.
         // The window is steep down there, so every texture is a SMALL multiplicative variation.
@@ -234,12 +237,19 @@ export const sonarFragment = /* glsl */ `
         float e = 0.126 * m * incid * lobe; // only what the 5°–25° slab reaches shows (the 3D curtain is the same slab)
         if (hasS) {
           // structure: the edge rising toward the transducer is hot, the rest a mid-bright granular clump
-          float Sn = min(topDepth(p - (p / r) * 0.35), terrainDepth(w - rw * 0.35));
-          float face = clamp((Sn - S) / 0.35, 0.0, 3.0);
-          float es = (0.17 + 0.14 * face) * (0.7 + 0.45 * mix(smear, grainP, longR)) * lobe;
+          // The side facing the transducer lights up (the app: bright near edges, bright branch lines). The facing is
+          // taken from the height right under the pixel against the height a little toward the boat; it used the
+          // footprint's highest tap, which lit a ring all round every rock (the "bubbles"), far side included.
+          float dN = max(0.35, 0.03 * r);
+          float S0 = topDepth(p), face = 0.0;
+          if (S0 < Db - 0.08) {
+            float Sn = min(topDepth(p - (p / r) * dN), terrainDepth(w - rw * dN));
+            face = clamp((Sn - S0) / dN, 0.0, 1.5);
+          }
+          float es = (0.17 + 0.8 * face) * (0.7 + 0.45 * mix(smear, grainP, longR)) * lobe;
           e = mix(e, max(e, es), smoothstep(0.08, 0.9, cov)); // sparse brush reads faint, solid rock/wood bright
         }
-        e *= (1.0 - 0.35 * shade) * (1.0 - 0.2 * fishShadow(p));
+        e *= (1.0 - 0.85 * shade) * (1.0 - 0.2 * fishShadow(p));
         // near the transducer: darker, with clutter speckle and bright spokes along a few beams (app)
         float near = 1.0 - smoothstep(0.0, 0.3 * uRange, r);
         e = mix(e, e * 0.84, near);
@@ -330,7 +340,7 @@ export const sonarFragment = /* glsl */ `
     float lv = log(1.0 + raw / bs) / log(1.0 + 65535.0 / bs);
     float width = clamp(uDynRange, 0.05, 1.0);
     float lo = (1.0 - width) * 0.5 + width * (uGain - 0.5) + 0.5 * width * uContrast;
-    float hi = lo + width * (1.0 - 0.45 * uContrast) * 1.15; // white point 15 % higher: fewer pixels burn to white (#66)
+    float hi = lo + width * (1.0 - 0.45 * uContrast) * (uFlat > 0.5 ? 1.0 : 1.15); // side views: white point 15 % higher, fewer pixels burn to white (#66); Panoramic keeps its own calibration (§7.13)
     float idx = echo > 0.0005 ? clamp((lv - lo) / (hi - lo), 0.0, 1.0) : 0.0;
     idx = pow(idx, uGamma) * inAny;
     vec3 col = texture2D(uLUT, vec2(idx * (255.0 / 256.0) + 0.5 / 256.0, 0.5)).rgb;
