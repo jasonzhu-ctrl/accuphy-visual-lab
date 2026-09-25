@@ -886,3 +886,20 @@ Numbered log. Newest at the bottom.
     - Dev: `window.__chase('laketrout' | 'salmon' | 'largemouth' | 'smallmouth')`
       makes the nearest fish of that species rise now.
 
+65. **2026-09-25** — **Down view fully AUTO on both devices; PL Down fills its box**
+    (Jason, PL Down at 145 ft range over 61 ft of water, the bottom in the top half and the
+    rest empty: "像这种情况 auto depth就好像没用一样 自动调整了以后有效画面应该在屏幕上会更大").
+    Replaces #52, whose AUTO only raised the range when the bottom would leave the screen,
+    so a visitor's long range left half the screen empty.
+    - Down's range IS the AUTO depth range (readout / 0.8 in the app's steps, deeper at once,
+      shallower after 1.5 s), for PL as for PingLive Mini (#60). Down and Forward share it, so
+      the bottom sits at the same height in both, on both devices.
+    - The page's Range slider is greyed out in Down, and the phone shows AUTO over the range.
+    - PL Down: the app draws echoes over the whole 1:1 box, its lower corners too
+      (`sonar-style.md` §6.9), so the sound reaches the box corners and the bottom runs across
+      the full width. The 3D curtain is that box too.
+    - Checked: 35 ft over the hump (145 ft before → AUTO 45 ft, the hump and its timber fill
+      the screen), 76 ft in the deep (AUTO 100 ft, bottom at ~75 % across the width),
+      Forward at the same spot with its bottom at the same height, no console errors. Over
+      uneven bottom a deeper side can still run off the screen, as in the app.
+

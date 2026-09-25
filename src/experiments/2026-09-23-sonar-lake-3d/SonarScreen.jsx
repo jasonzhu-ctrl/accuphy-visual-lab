@@ -26,7 +26,7 @@ export function screenLayout(deviceId, mode, R, aspect, specs, depthM) {
   }
   if (mode === 'down') {
     if (mini) { const hw = R * Math.tan(half) * 1.12; return { box0: { x0: -hw, y0: 0, w: 2 * hw, h: R }, apexU: 0.5, split: false, mottle: true } } // fan corners on the screen corners
-    const w = R * aspect; return { box0: { x0: -w / 2, y0: 0, w, h: R }, apexU: 0.5, split: false }      // 1:1, the 135° fan runs off the sides
+    const w = R * aspect; return { box0: { x0: -w / 2, y0: 0, w, h: R }, apexU: 0.5, split: false, reach: Math.hypot(w / 2, R) } // 1:1, the 135° fan runs off the sides; echoes fill the lower corners (§6.9)
   }
   // Panoramic (app lake frames, §7.13): 1:1, apex just below the bottom edge, top edge = range; the data
   // runs out to the screen corners (no arc), only the two straight fan edges are drawn
