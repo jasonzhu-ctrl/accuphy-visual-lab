@@ -57,3 +57,32 @@ no TypeScript. No backend, no database — front-end only.
   phone box; `?debug` shows live uniform values.
 - Jason is not comfortable with git/terminal: Claude drives git (commit, push),
   starts the dev server, and explains in plain language.
+
+## Several chats, one repo (Jason 2026-09-24: 本地文件协同一下相关对话 … 不要再和rma的混合在一起)
+
+This is a separate project from the RMA portal. Several Claude chats work on it at the same
+time, all in this one working copy, and they coordinate through the files here, not through
+anyone's memory.
+
+- **Folder:** every visual-lab chat runs with THIS folder as its working folder. A chat that
+  was started elsewhere (the RMA folder, an RMA worktree) must not do visual-lab work there: it
+  hands over through this repo and stops. Nothing from this project goes into RMA files or
+  RMA memory.
+- **Shared state lives in files:** decisions in `docs/decisions.md`, open work and open
+  questions in `docs/backlog.md`, and what Jason must be reminded of in the project memory
+  (`pending-reminders`). Write before you finish a turn; a decision that isn't written down
+  doesn't exist.
+- **Decision numbers:** re-read the last number in `docs/decisions.md` right before appending.
+  Two chats once wrote the same number.
+- **Git in a shared working copy:** run `git status` before editing. Leave files alone that
+  another chat has uncommitted changes in. Stage only your own files by path, never
+  `git add -A`. Commit and push right after each change. For multi-file work, tell the other
+  chats which files you are taking (cross-session message) and free them when done.
+- **Go-ahead:** build only after Jason explicitly says to start ("我没说动不要动"). Plans,
+  proposals and options are not approval; offer them, then wait.
+- **Chats as of 2026-09-24:** "网页移动端可行性评估" (mobile and ad landing plan; runs here),
+  "网页section轻量化设计" (lite section plan; runs here), and "Create accuphy-visual-lab repo
+  and scaffold it" (built this repo and the 3D sonar lake Lab page). That last one was
+  started inside an RMA worktree, which the app cannot move, so it is retiring; its open
+  questions are in `docs/backlog.md` and the reminders.
+
