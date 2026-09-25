@@ -845,3 +845,44 @@ Numbered log. Newest at the bottom.
     - Comparison: `reference/engine-compare/wreck-compare-2-2026-09-25.png` (app ·
       before · after at the same depth · after at the real 40 m spot).
 
+64. **2026-09-25** — **Deep floor 40 → 24 m; fish off the bottom; fish that chase**
+    (Jason, on `docs/deep-water-plan.md`: "我赞成 你做的时候仔细一点 做完验证一下bug啥的
+    另外鱼不能完全贴住底部 还有鱼的动作 … LK沉底的可以在船靠近的时候从底部自然但是比较快的
+    往上追饵 … 鲈鱼可以自然的偶尔有追吃饵鱼的感觉 三文速度也可以偶尔快一点 船靠近可以作为一种
+    触发 随机的可以顺着声纳扫的方向往上追"). Supersedes the 40 m of #14–#16.
+    - **Terrain:** `DEEP_M = 24` (rim 26). The edge line, shelf, plateau, hump and
+      basin do not move, so the deep share of the lake is unchanged.
+    - **Layout frozen:** timber, bushes, stumps, logs, weeds and rocks are placed
+      against `layoutDepth` (the 40 m profile), so all 1,207 keep their exact x/z and
+      size (checked item by item). Their heights follow the new bottom. All 298 fish
+      keep their x/z except 6, which path clearing re-routed (0.9–8 m).
+    - **Off the bottom:** a fish's lowest point (centre − bob − half the drawn body)
+      stays ≥ 0.4 m above the highest bottom under its whole swim loop, including
+      loops re-routed around structure. Measured minimum over every loop: 0.37 m.
+    - **Behaviours** (`fish.js` `stepBehaviours`, once per frame before any pose is
+      read; the 3D fish and the sonar marks share the pose, so they always agree):
+      - boat nearby (the transducer within 16 m lake trout, 14 m salmon, 12 m bass,
+        with the fish within 7 m of the sonar's vertical plane): lake trout often
+        (75 % on approach), salmon and bass sometimes, rise toward the boat into the
+        plane, the way fish come up to a jig. Up to 10 / 8 / 5 m at 3–4 m/s, nose up.
+        They hold 1–2 s in the plane with a small hover, so the whole chase stays
+        on the phone, then sink back to their loop over 5–9 s;
+      - bass: now and then (30–80 s apart) a dart at bait within 8 m, at ~4–5 m/s;
+        up to 8 smelt or crappie near the strike scatter;
+      - salmon: a speed burst every 20–50 s (×2.2–3 for 3–5 s).
+      Every run is sampled before it starts (86 points: structure, bottom, surface);
+      if anything is in the way, a smaller version is tried, else nothing happens.
+    - **Checked:**
+      - a 30-minute simulated boat run, every fish every frame: 0 structure hits,
+        0 bottom, 0 surface;
+      - behaviour cost: 0.036 ms a frame on average, worst 2.5 ms when a run starts;
+      - on the phone: the lockup (140 ft) and the wreck (110 ft) are clearly bigger;
+        Panoramic now shows the deep floor, the lockup and the wrecks; Mini Forward
+        sees the deep floor at 120 ft; the default view's phone picture is unchanged;
+      - no console errors.
+    - The calibration scene `?boat=4,-26` changed with the terrain: it now reads 76 ft
+      over a flat bottom, with the small wreck in the fan. Its old numbers no longer
+      apply (`sonar-style.md` §6.11).
+    - Dev: `window.__chase('laketrout' | 'salmon' | 'largemouth' | 'smallmouth')`
+      makes the nearest fish of that species rise now.
+

@@ -344,6 +344,12 @@ Engine after the balance loop (Black Body, gain 57 / contrast 40 / noise 30,
 | PLM Forward 60 ft (bottom + timber) | 0.90 | .081 | .114 | .125 | .144 | .170 | .154 | .098 | .037 | .016 | .060 |
 | PL Forward 120/100 ft (bottom band, wreck out of the fan) | 0.85 | .038 | .034 | .034 | .032 | .044 | .097 | .222 | .261 | .187 | .050 |
 
+2026-09-25 (decision #64): the deep floor moved from 40 m to 24 m, so the second scene is not the
+same picture any more. It now reads 76 ft over a flat bottom, with the small wreck in the fan:
+black 0.89 · .038 .042 .044 .042 .051 .046 .059 .088 .146 .444. The flat bottom tops out white
+across the beam, which is point (2) below. This is not a tuning change; pick a new second reference
+scene before the next balance loop.
+
 What the loop taught: (1) the bottom band must be a thin hot leading edge
 (first return) over an orange body (integrated thickness) — a wide white slab
 was the biggest mismatch; (2) the app's band tops at white only where the

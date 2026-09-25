@@ -5,7 +5,7 @@ import { mergeGeometries as _merge } from 'three/addons/utils/BufferGeometryUtil
 // Extrude geometries are non-indexed, primitives are indexed — normalise first.
 const mergeGeometries = (parts) => _merge(parts.map((g) => (g.index ? g.toNonIndexed() : g)))
 import { HALF, SEG, bedY, fbm } from './terrain'
-import { SPECIES, makePopulation, fishPose, rnd, FISH_DISPLAY_SCALE } from './fish'
+import { SPECIES, makePopulation, fishPose, stepBehaviours, forceRise, rnd, FISH_DISPLAY_SCALE } from './fish'
 import { makeLakeMaterial, setBeamUniforms } from './lakeMaterial'
 import { wedgeGeometry } from '../2026-09-23-beam-shapes-3d/wedge'
 import { makeTallTree, makeBushTree, makeStump, makeLog, makeWeedTuft, makeRock, placeAll } from './vegetation'
@@ -201,7 +201,7 @@ function FishGroup({ mat, body, fish }) {
     const t = clock.elapsedTime
     fish.forEach((f, i) => {
       const o = fishPose(f, t, tmp.pose)
-      tmp.e.set(0, o.heading, Math.sin(t * 6 + f.phase) * 0.08); tmp.q.setFromEuler(tmp.e)
+      tmp.e.set(0, o.heading, Math.sin(t * 6 + f.phase) * 0.08 + o.pitch); tmp.q.setFromEuler(tmp.e) // z: tail wag + nose up/down on a rise
       tmp.p.set(o.x, o.y, o.z); const L = f.len * FISH_DISPLAY_SCALE; tmp.s.set(L, L, L)
       tmp.m.compose(tmp.p, tmp.q, tmp.s)
       ref.current.setMatrixAt(i, tmp.m)
@@ -211,9 +211,18 @@ function FishGroup({ mat, body, fish }) {
   return <instancedMesh ref={ref} args={[geo, mat, fish.length]} frustumCulled={false} onUpdate={(o) => o.layers.set(FISH_LAYER)} />
 }
 function Fish({ mat, state }) {
-  const pop = useMemo(() => makePopulation(bedY, toCircles(buildObstacles())), []) // swim loops routed around structure
-  if (import.meta.env.DEV) window.__fish = pop // dev: fish population for scene lookups
+  const circles = useMemo(() => toCircles(buildObstacles()), [])
+  const pop = useMemo(() => makePopulation(bedY, circles), [circles]) // swim loops routed around structure
+  if (import.meta.env.DEV) {
+    window.__fish = pop // dev: fish population for scene lookups
+    window.__chase = (species = 'laketrout') => forceRise(pop, window.__lakeClock?.elapsedTime ?? 0, state.current.apex, species, circles, bedY) // dev: make the nearest fish rise now
+  }
   state.current.pop = pop
+  // behaviours (fish.js): boat-triggered rises, bass strikes on bait, salmon bursts — before anything reads a pose
+  useFrame(({ clock }, dt) => {
+    if (import.meta.env.DEV) window.__lakeClock = clock
+    stepBehaviours(pop, clock.elapsedTime, Math.min(dt, 0.1), state.current.apex, circles, bedY)
+  }, -1)
   const groups = useMemo(() => {
     const by = {}
     pop.forEach((f) => { const b = SPECIES[f.species].body; (by[b] ||= []).push(f) })

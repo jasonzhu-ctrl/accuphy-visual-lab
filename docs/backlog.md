@@ -43,7 +43,9 @@ it is done. ✅ done · 🔧 in progress · ⬜ open.
 - ✅ All 11 app colour maps available on the phone screen (amber default); gain slider
 
 ## 3D lake (Phase 3 polish)
-- ⬜ **Deep water 40 → 24 m** (planning only, Jason 2026-09-25): `docs/deep-water-plan.md` — waiting for Jason's go; then the wreck's own depth (§6)
+- ✅ Deep water 40 → 24 m, fish off the bottom, chasing / darting / bursting fish (decision #64)
+- ⬜ Option for Jason: the wreck in ~10–12 m so it fills the phone like the tablet recording (`docs/deep-water-plan.md` §6)
+- ⬜ Option for Jason: PLM Down in deep water — the bottom band is thick and bright (noticed 2026-09-25)
 - ✅ Bark striations on timber (procedural, in the lake shader)
 - 🔧 Boat restyled to Ranger Z521R proportions (charcoal metal flake, red waterline stripe, rub rail, wraparound windshield, Power-Poles, jack plate) — next: metal-flake sparkle, decals
 - ✅ Beam footprint rim on the bottom

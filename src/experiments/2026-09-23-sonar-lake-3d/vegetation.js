@@ -3,7 +3,7 @@
 // "树桩排列自然一些, 形状不同更细的有很多分叉的水底小树, 石头大小分布随机自然".
 import * as THREE from 'three'
 import { mergeGeometries as _merge } from 'three/addons/utils/BufferGeometryUtils.js'
-import { bedY, depthAt, fbm, ROCK_HUMPS } from './terrain'
+import { bedY, layoutDepth, fbm, ROCK_HUMPS } from './terrain'
 
 const merge = (parts) => _merge(parts.map((g) => (g.index ? g.toNonIndexed() : g)))
 let seed = 5
@@ -112,7 +112,7 @@ const clump = (x, z, f, off) => Math.pow(fbm(x * f + off, z * f + off * 2), 3) *
 
 export function placeAll() {
   setSeed(777)
-  const d = depthAt
+  const d = layoutDepth // placement bands keep the layout they were drawn with (terrain.js); heights use bedY
   const items = { tall: [], bush: [], stump: [], log: [], weed: [], rock: [] }
   // tall timber: along the old shoreline / drop-off (depth 7–14 m), clumped, plus the deep basin edge
   scatter(70, (x, z) => (d(x, z) > 7 && d(x, z) < 14 ? 0.9 : 0.03) * Math.min(1, clump(x, z, 0.06, 1)))

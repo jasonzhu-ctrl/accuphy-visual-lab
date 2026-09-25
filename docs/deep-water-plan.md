@@ -1,4 +1,4 @@
-# Deep water shallower — plan (2026-09-25, planning only)
+# Deep water shallower — plan (2026-09-25) · BUILT 2026-09-25 as decision #64
 
 Jason: "我觉得是我们额深水太深了 你感觉呢 要不要规划把深水浅一点 先别动 思考 然后规划
 尽可能避免错误". Nothing here is built until Jason says go.
