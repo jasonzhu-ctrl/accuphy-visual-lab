@@ -749,3 +749,15 @@ Numbered log. Newest at the bottom.
     `Market Research`. The rest of the order stands: tracking first, then our own
     list, then Canada before the ice season.
     Planning only.
+
+58. **2026-09-25** — **Wordmark look mock made — a still, not the build** (Jason, on a
+    giant PINGLIVE word in the section: "可以试试呀看看好了反正没事"). Two stills of the same
+    scene, with and without the word (`reference/look/mock/`, gitignored; generator
+    `gen.py`, an SVG drawing rendered with headless Chrome): dark lake per #51/#55,
+    PingLive Down beam (135°) as the only light, reaching as far as the range; inside it
+    the lake lights up — the bottom, timber, wreck and fish, with amber sonar-style edges;
+    outside it the lake stays half-dark. The cursor is the real transducer head cut from
+    the shaft-mount product photo. Variant A: "PINGLIVE" in Eurostile Heavy straddling the
+    surface — top half in the sky, bottom half refracted under water and lit where the
+    beam reaches. Variant B: a headline instead. Waiting for Jason's verdict. The section
+    itself is still not started.
