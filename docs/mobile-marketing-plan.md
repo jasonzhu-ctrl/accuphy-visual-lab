@@ -143,8 +143,8 @@ optimise for landing-page views or engagement; after that, optimise for Lead.
   leads and retargeting, not direct sales. The order is:
   1. tracking first;
   2. test on our own ~1,700 never-ordered subscribers, at no cost;
-  3. Canada before the ice season, and the US only after PingLive is available there and the
-     checkout problems are fixed;
+  3. Canada before the ice season. The US leads with the PingLive Mini (decision #57); check the US
+     checkout before spending there;
   4. the goal is an email lead, and Klaviyo does the selling.
 
 ## Order of work

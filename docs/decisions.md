@@ -735,3 +735,17 @@ Numbered log. Newest at the bottom.
       - only the scene in use is loaded, and the others download when tapped;
       - one scene renders at a time, so the per-frame cost does not grow.
     Planning only: nothing is built until Jason says go.
+
+57. **2026-09-25** — **US = PingLive Mini (PLM) is fine for ads** (Jason: "我赞成 美国做PLM是可以的哦").
+    The US market does not wait for the full-size PingLive.
+    - US ads lead with the Mini at US$699. That is the strongest price story (against
+      the Lowrance Eagle Eye 9 at $999) and fits the kayak and ice scenes.
+    - A Lab link from a US ad opens with the Mini selected.
+    - The remaining US check before spending: the store's checkout completion. The
+      2026-09-24 data showed ~5% of US checkouts completing, possibly inflated by
+      express-pay buttons.
+
+    This revises condition 3 of the Meta feasibility note in Google Drive's
+    `Market Research`. The rest of the order stands: tracking first, then our own
+    list, then Canada before the ice season.
+    Planning only.
