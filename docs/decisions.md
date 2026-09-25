@@ -627,7 +627,7 @@ Numbered log. Newest at the bottom.
     Nothing built. Jason decides go / no-go and the four smaller questions in the
     plan's §9.
 
-48. **2026-09-24** — **Big wreck turned 35° counter-clockwise** (Jason:
+49. **2026-09-24** — **Big wreck turned 35° counter-clockwise** (Jason:
     能不能把这个船 逆时针转35度), as seen from above / in the default view: yaw
     −0.9 → −0.289 rad, so it now lies almost level across the screen, stern
     house to the left. The debris ring turns with it; fish still route around
