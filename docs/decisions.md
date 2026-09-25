@@ -650,3 +650,11 @@ Numbered log. Newest at the bottom.
     3D Lab before anything is packaged; if it does not reach the 3D Lab's level it
     does not ship. Open question: dark cinematic water (recommended) or the daytime
     look of the 3D Lab. Still planning only.
+
+51. **2026-09-24** — **Lite section mood: dark cinematic water** (Jason: 深色电影感).
+    Closes the open question of #50: the section's water is the dusk palette of
+    `docs/lite-section-plan.md` §3b (deep teal → navy → near black, lit from the
+    surface, light shafts and depth fog) so the amber sonar picture glows — the
+    look of Garmin's LVS34 film and Accuphy's own mode animations, not the daytime
+    sky of the 3D Lab. The section is a dark block inside the light shop page.
+    Still planning only; nothing built.

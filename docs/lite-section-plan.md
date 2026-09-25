@@ -125,7 +125,8 @@ geometry, the section spends them on light.
 
 **Where the feel comes from**
 
-1. **Light in the water.** Lit from the surface: brightness falls with depth, slow
+1. **Light in the water** (mood decided: dark cinematic, decision #51). Lit from the
+   surface: brightness falls with depth, slow
    light shafts drift through the water column, a caustic shimmer plays on the
    shallow bottom, the surface is a thin bright line with a specular glint, and a
    soft depth fog swallows the far bottom. A dusk palette — deep teal → navy → near
@@ -323,8 +324,8 @@ Steps 1–3 are about two working sessions; step 4 is an hour plus Jason's revie
    product pages. (Recommended.)
 4. **First placement:** the PingLive product page. (Recommended.)
 5. **Fish tags** on the first reveal: yes or no.
-6. **Mood:** dark cinematic water (recommended: the amber picture glows, and it is the
-   Garmin / Accuphy-animation look) or the daytime look of the 3D Lab.
+6. ~~Mood~~: decided on 2026-09-24 (decision #51) — dark cinematic water (Jason: 深色电影感),
+   the dusk palette of §3b; a dark block inside the light shop page.
 
 Wording of the headline and captions comes after the prototype, so Jason judges it on
 the real thing.
