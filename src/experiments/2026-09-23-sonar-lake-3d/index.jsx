@@ -71,7 +71,7 @@ export default function SonarLake3D() {
   // Forward share ONE depth range, so the bottom under the boat sits at the same height (~80 %) in both and does not
   // jump when the view changes (Jason 2026-09-25: 他们的底能不能尽量align一点呢). In Down the depth axis is the range,
   // so Down's range is that AUTO value. Combo keeps the app's own two scales (SonarScreen.jsx screenLayout).
-  const autoDepthOn = autoDepth && (mode === 'down' || mode === 'forward')
+  const autoDepthOn = autoDepth && mode !== 'panoramic' // Down, Forward and Combo's Down panel
   // the range everything uses: Down's is the AUTO depth range; Forward and Panoramic use the visitor's range
   const effRangeFt = mode === 'down' ? depthFt : rangeFt
   const specs = useMemo(() => {
@@ -88,6 +88,12 @@ export default function SonarLake3D() {
     // PL Down: the app draws echoes over the whole 1:1 box (its lower corners too, sonar-style.md §6.9), so the sound
     // reaches the box corners and the bottom runs across the full width
     if (deviceId === 'PL' && mode === 'down' && sp[0]) { const D = rangeFt * FT, w = D * 2.08; sp[0] = { ...sp[0], R: Math.hypot(w / 2, D) * 1.001, box: { xMin: -w / 2, xMax: w / 2, yMax: D } } }
+    // PLM Combo: the Down fan reaches its AUTO-depth panel, the Forward fan its 0.7 × range panel (SonarScreen.jsx)
+    if (deviceId === 'PLM' && mode === 'combo' && sp[1]) {
+      const R = rangeFt * FT, D = depthFt * FT, wd = (D * 2.08) / 2
+      sp[0] = { ...sp[0], R: Math.hypot(0.8 * wd, D) * 1.001, box: { xMin: -0.2 * wd, xMax: 0.8 * wd, yMax: D } }
+      sp[1] = { ...sp[1], R: Math.hypot(R, 0.7 * R) * 1.001, box: { xMin: -0.25 * R, xMax: R, yMax: 0.7 * R } }
+    }
     if (deviceId === 'PLM' && mode === 'forward' && sp[0]) { const R = rangeFt * FT, D = depthFt * FT; sp[0] = { ...sp[0], R: Math.hypot(R, D) * 1.001, box: { xMin: -0.25 * R, xMax: R, yMax: D } } }
     return sp
   }, [device, deviceId, mode, effRangeFt, depthFt])

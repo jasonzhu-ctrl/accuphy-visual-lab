@@ -86,4 +86,5 @@ blue **AUTO** above its value, because the page runs the depth range on auto.
 Both devices (decisions #60, #65): Down and Forward share one AUTO depth range, so
 the bottom sits at the same height in both. In Down the range is that AUTO value: the
 page's Range slider is greyed out and the phone shows AUTO over the range. Combo keeps
-its own two panel scales.
+two panel scales: its Down panel on the same AUTO depth range, its Forward panel at
+0.7 × range (decision #68).

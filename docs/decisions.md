@@ -947,3 +947,24 @@ Numbered log. Newest at the bottom.
       so their whole fan is a bright orange field. Ours is calibrated to the newer 57 % frames
       (§7.13).
 
+68. **2026-09-25** — **QA pass; Combo's Down panel on AUTO depth** (Jason: "你整体再跑一遍看看
+    有没有bug要修复之类的 接着干"; also "不用" to moving the wreck shallower).
+    - **Checked:**
+      - production build: OK;
+      - 6 spots (default, shelf, hump, deep, lockup, drop-off) × 6 views (PL Down / Forward /
+        Panoramic, PLM Down / Forward / Combo): snapshot and LUT histogram of each, no console
+        errors, every fish position finite;
+      - ft ↔ m toggle: Down 70 ft ↔ 22 m, readout 16.6 m;
+      - the sign-up gate: opens, email focused, page inert;
+      - the mobile viewport (375 × 812).
+    - **Bug fixed:** Combo's Down panel was R / 3 deep. That matched the one app frame by
+      chance (4.1 m of water, 18 m range). In 54 ft of water at 80 ft range the bottom was off
+      the panel, and the phone was 98 % black. Now that panel uses the AUTO depth range; the
+      app frame confirms it (4.1 m of water, panel 0–5.5 m). The Forward panel keeps 0.7 × range.
+      Each fan reaches its panel's far corner, and the 3D curtains match.
+    - **Tried and reverted:** starting the bottom soft cap at 4–10 m instead of 6–14 m. An 8 m
+      hump went from 20 % to 15 % white, but the Mini's calibrated shelf lost its hot edge
+      (0.3 % white).
+    - **By physics, not a bug:** PLM Forward over 24 m water at 80 ft range shows no bottom.
+      The Mini only sees the bottom from ~1.2 × the depth ahead, so a longer range shows it.
+

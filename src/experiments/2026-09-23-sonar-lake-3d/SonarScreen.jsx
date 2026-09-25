@@ -31,13 +31,15 @@ export function screenLayout(deviceId, mode, R, aspect, specs, depthM) {
   // Panoramic (app lake frames, §7.13): 1:1, apex just below the bottom edge, top edge = range; the data
   // runs out to the screen corners (no arc), only the two straight fan edges are drawn
   if (mode === 'panoramic') { const h = 0.9 * R, w = h * aspect; return { box0: { x0: -w / 2, y0: 0.1 * R, w, h }, apexU: 0.5, split: false } }
-  // Combo (PLM): Forward panel upper-right (fan 1), Down panel lower-left (fan 0), shared apex at 20 %
-  // (not on AUTO depth: the app gives the two panels their own scales, ~5 m Down vs ~12 m Forward; one shared depth axis
-  // would put the Forward bottom behind the Down panel)
+  // Combo (PLM): Forward panel upper-right (fan 1), Down panel lower-left (fan 0), shared apex at 20 %. Each panel has
+  // its own scale, as in the app: Forward 0.7 × range deep; Down on the AUTO depth range (the app frame: 4.1 m of water,
+  // Down panel 0–5.5 m). It used R / 3, which matched that one frame by chance and in 54 ft of water at 80 ft range
+  // left the bottom off the Down panel (2026-09-25 QA). The sound reaches each panel's far corner.
+  const Dd = depthM ?? R / 3
   const fwd = { x0: -0.25 * R, y0: 0, w: 1.25 * R, h: 0.7 * R }
-  const Rd = R / 3, wd = (Rd * aspect) / 2 // the Down panel is zoomed in and stretched ×2 like Live Down
-  const down = { x0: -0.2 * wd, y0: 0, w: wd, h: Rd }
-  return { box0: fwd, box1: down, apexU: 0.2, split: true, mottle: false }
+  const wd = (Dd * aspect) / 2 // the Down panel is stretched ×2 like Live Down
+  const down = { x0: -0.2 * wd, y0: 0, w: wd, h: Dd }
+  return { box0: fwd, box1: down, apexU: 0.2, split: true, mottle: false, reach: Math.max(Math.hypot(R, 0.7 * R), Math.hypot(0.8 * wd, Dd)) }
 }
 
 // Takes over the frame loop (priority 1): renders a depth strip per fan from the transducer (Down /

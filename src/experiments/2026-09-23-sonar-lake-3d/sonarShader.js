@@ -311,7 +311,7 @@ export const sonarFragment = /* glsl */ `
         // (38–44 % of the lit pixels white in PL scenes; the app's bottom scenes 6–7 %). Past the near range (where TVG
         // already tames it) the integrated part saturates softly (K 0.4), so the body stays orange, and a thin
         // first-return line brings back the app's hot leading edge.
-        float accI = acc / 16.0, K = mix(3.0, 0.4, smoothstep(6.0, 14.0, r));
+        float accI = acc / 16.0, K = mix(3.0, 0.4, smoothstep(6.0, 14.0, r)); // (4–10 m tried: the Mini's calibrated shelf lost its hot edge, 6 → 0.3 % white)
         accI = K * (1.0 - exp(-accI / K));
         acc = accI + 0.7 * peak + 0.3 * edge * (0.55 + 0.6 * filament) + 0.9 * spk;
         float atten = 1.0 - 0.4 * clamp(r / uRange, 0.0, 1.0);
