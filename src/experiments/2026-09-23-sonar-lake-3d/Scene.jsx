@@ -148,8 +148,10 @@ function BigWreck({ mat }) {
         </group>
       </group>
       {debris.map((it, i) => {
-        const dx = x + it.dx * k, dz = z + it.dz * k
-        return <mesh key={i} geometry={it.g} material={mat} scale={k} position={[dx, bedY(dx, dz) + it.lift * k, dz]} />
+        // the debris ring turns with the ship (it was laid out for BIG_WRECK.debrisYaw)
+        const d = yaw - (BIG_WRECK.debrisYaw ?? yaw), c = Math.cos(d), s = Math.sin(d)
+        const dx = x + (it.dx * c + it.dz * s) * k, dz = z + (-it.dx * s + it.dz * c) * k
+        return <mesh key={i} geometry={it.g} material={mat} scale={k} rotation-y={d} position={[dx, bedY(dx, dz) + it.lift * k, dz]} />
       })}
     </group>
   )

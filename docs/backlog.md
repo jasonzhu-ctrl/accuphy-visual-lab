@@ -58,6 +58,7 @@ it is done. ✅ done · 🔧 in progress · ⬜ open.
 - ✅ Second, ~20 m, more complete wreck on the deep slope up-and-right
 - ✅ That wreck doubled to a 40 m cargo ship with holds, hatches, masts, derricks, crane, stern house, railings, lifeboats and debris (decision #38)
 - ✅ Big wreck moved 20 m up the default view to the 40 m basin floor and drawn at 70 % (decision #44)
+- ✅ Big wreck turned 35° counter-clockwise, debris with it (decision #48)
 - ✅ Bass / musky / salmon spread through the water column (bass 2–17 m, musky 5–13 m, salmon 4–33 m)
 - ✅ No fish swims through timber, rocks, wrecks or the logo: swim loops routed at load (decision #39)
 - ✅ Accuphy logo on the lakebed, standing in the boat's forward plane so Forward / Down image the whole mark (decision #39)
