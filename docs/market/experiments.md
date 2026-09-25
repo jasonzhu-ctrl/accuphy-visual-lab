@@ -84,6 +84,9 @@ alongside them.
   (L25). Reconnecting it is the cheapest win and resets the baseline.
 
 ### E5 — Q4 ice-season campaign
+- **Calendar check (2026-09-25):** the "Canada Shopify discount calendar 2026" has no events from
+  now to 1 December. Key dates: Thanksgiving (Canada) 12 Oct, Black Friday 27 Nov, Cyber Monday
+  30 Nov.
 - **Evidence:** Nov 2025 – Feb 2026 = 43 % of all orders; December 2025 was the best month
   (78 orders, 0.53 % conversion). Manitoba buys at 34 orders per million people vs Ontario 9.7;
   the US states that buy are Minnesota, Michigan, Wisconsin, North Dakota.

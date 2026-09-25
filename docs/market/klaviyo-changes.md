@@ -121,8 +121,10 @@ appears only as Klaviyo's per-recipient `{% coupon_code %}` tag.
    - **Rough cost:** at Email #2's old rate of CAD 32 per recipient, about 170 people would
      have received it, which is on the order of CAD 5k in attributed orders since April.
      Some of those buyers would have ordered anyway.
-   - **Fix, Jason's call:** in the flow editor, move the chain that is now on the No path
-     (tag → list → 20 min → Email #2) to the Yes path.
+   - **Fix, Jason's call.** Simplest: in the flow editor, open that split and change "zero times"
+     to "at least once". Then Yes (has ordered) ends the flow, and No (has not ordered) runs the
+     existing chain: tag → list → 20 min → Email #2. The alternative is to drag that chain onto
+     the Yes path.
    - Until that is fixed, the wording fix in Email #2 changes nothing anyone sees.
 2. **The "Quick Setup Guide" link is dead.**
    - Several emails link to `accuphy.ca/blogs/news/setup-guide-for-pinglive-sonar`, which the
@@ -133,7 +135,15 @@ appears only as Klaviyo's per-recipient `{% coupon_code %}` tag.
      Welcome email (variant B) and both 30-day emails. Changing the block once would fix all of
      them.
    - The PingLive thank-you email (`Vabeq6`) has its own link to the same page.
-   - Not checked from here: the sandbox cannot open store pages.
+   - **Cause (Shopify, read 2026-09-25):** the article still exists but is **unpublished**. It is
+     "PingLive Sonar Setup Guide: Power & Connection Instructions", handle
+     `setup-guide-for-pinglive-sonar`, blog `news`, created 2025-02-03, last edited 2026-04-13.
+     - Its body is one image, a wiring diagram (`Wireless_Installation_Diagram_2…png`).
+     - The same days (13–14 April) the welcome flows and this flow were edited too.
+   - **Fix options, Jason's call:**
+     - Republish the article. One click in Shopify fixes the store menu and every email at once;
+       check first that the diagram is still the right wiring.
+     - Or, if it was hidden on purpose, point the links to another page.
 3. **Two blog posts on the store still say "Simulator Mode":**
    - "Android Compatibility List" (about 623 sessions in round 1's data)
    - "Full List of Android Processors Compatible with the Accuphy Sonar App (2026 Update)"
