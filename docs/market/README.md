@@ -12,7 +12,7 @@ giving sales or marketing advice, and writes what it learns back here before its
 | Round | Date | Where | Sources that only that round had |
 |---|---|---|---|
 | 0 | 2026-09-24 | `docs/users-and-market.md` (canonical copy + Chinese summary: Google Drive `My Drive/Market Research/`) | ~150 customer email threads, Zoho invoices, local Sales files, customer-service and pro-staff files |
-| 1 | 2026-09-25 | this folder (`report-2026-09.md` and the files below) | Shopify market settings, Klaviyo reports, public forums / YouTube / competitor prices |
+| 1 | 2026-09-25 | this folder (`report-2026-09.md` and the files below); Chinese summary page for Jason (private artifact): https://claude.ai/artifact/1ke4uhCspxV4UJVHwJM3N5 | Shopify market settings, Klaviyo reports, public forums / YouTube / competitor prices |
 
 Round 0 is the foundation (personas P1–P4, "the screen is already in the angler's pocket", the
 B2B share, the status-ladder study behind decision #53). Round 1 builds on it and adds the
