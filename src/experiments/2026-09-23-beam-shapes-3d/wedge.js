@@ -7,9 +7,9 @@ import * as THREE from 'three'
 //   point(a, s) = R·(cos a·c + sin a·h) + s·R·cos a·tan(theta)·n
 // so on a flat bottom the footprint's long sides are straight, and the far
 // boundary is the arc of radius R in the fan plane.
-// Optional `box` {xMin, xMax, yMax} (metres from the apex: world x forward, y = depth below it) clips the
-// fan to the phone's screen box — PL Forward, where the picture is range-ahead × depth-range-down and the
-// sound reaches the whole box (sonar-style.md §6.9); the curtain then shows exactly what the phone shows.
+// Optional `box` {xMin, xMax, yMax, zMax} (metres from the apex: world x forward, y = depth below it, |z| =
+// sideways) clips the fan to the phone's screen box — PL Forward (range ahead × depth range down) and
+// Panoramic (range ahead × screen half-width sideways); the curtain then shows exactly what the phone shows.
 export function wedgeGeometry({ a0, a1, s0, s1, R, frame, theta, box, na = 48, ns = 6 }) {
   const { c, h, n } = frame
   const pos = []
@@ -21,6 +21,7 @@ export function wedgeGeometry({ a0, a1, s0, s1, R, frame, theta, box, na = 48, n
     if (fx > 1e-6) r = Math.min(r, box.xMax / fx)
     if (fx < -1e-6) r = Math.min(r, box.xMin / fx)
     if (fy < -1e-6) r = Math.min(r, box.yMax / -fy)
+    if (box.zMax != null) { const fz = c.z * Math.cos(a) + h.z * Math.sin(a); if (Math.abs(fz) > 1e-6) r = Math.min(r, box.zMax / Math.abs(fz)) }
     return r
   }
   const P = (a, s) => {
@@ -34,6 +35,7 @@ export function wedgeGeometry({ a0, a1, s0, s1, R, frame, theta, box, na = 48, n
   if (box) {
     const t = Math.atan2(c.x, -c.y) // tilt of the fan centre from straight down (vertical frames)
     for (const X of [box.xMin, box.xMax]) { const a = Math.atan2(X, box.yMax) - t; if (a > a0 && a < a1) angs.push(a) }
+    if (box.zMax != null) for (const sgn of [-1, 1]) { const a = sgn * Math.atan2(box.zMax * Math.hypot(c.x, c.y), box.xMax); if (a > a0 && a < a1) angs.push(a) } // flat fan: plan corners
     angs.sort((p, q) => p - q)
   }
   na = angs.length - 1

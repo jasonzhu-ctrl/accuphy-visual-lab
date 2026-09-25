@@ -540,3 +540,26 @@ Numbered log. Newest at the bottom.
     Internal names stay too: the repo and folder `accuphy-visual-lab` and the
     experiment folders. A future public address could match the name (for
     example `lab.accuphy.com`); that is Jason's call.
+
+44. **2026-09-24** — **Panoramic shows only what its beam covers; the big
+    wreck moved 20 m up the view and shrank 30 %** (Jason: Pano view … coverage
+    好像有错位 没有照到的东西也出来了 特别是那艘船 … 没有在探测的coverage里的东西是不会
+    显示的; 那艘大的船往上20米 尺寸缩小30%).
+    - **Coverage:** the flat fan is installed 5° down and 20° thick, so it covers
+      5°–25° below the transducer. The Panoramic picture now weights the bottom,
+      structures and fish by that slab (soft edges 2°–6° and 23°–28°); the old
+      response kept ~50 % out to 60°, so deep things the curtain never reaches —
+      the wreck at 36 m — showed anyway. The picture runs to its screen corners
+      (range ahead × half-width sideways), and the 3D curtain and the lit
+      lakebed are now clipped to the same box, so what the curtain touches is
+      exactly what the phone shows. Consequences: the bottom right under the
+      boat (steeper than 25°) and a bottom deeper than the slab reaches (e.g.
+      past a drop-off, or 40 m water) stay dark, which the app's own lake
+      recordings do not show as strongly (they have some sidelobe return near
+      the apex) — a faint sidelobe can be added back if wanted.
+    - **Wreck:** "up" read as up the default view (away from the camera): moved
+      from (44, −30) to (49, −49.5) on the flat 40 m basin floor, drawn at 70 %
+      (28 m). It no longer sits behind the ACCUPHY monument. At 40 m it is out
+      of Panoramic's reach within 240 ft; Forward (AUTO depth) and Down with
+      ≥ 140 ft range show it.
+

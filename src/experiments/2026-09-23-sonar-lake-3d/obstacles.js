@@ -25,12 +25,12 @@ export function buildObstacles() {
     const { x, z, rot, L } = SMALL_WRECK, yb = bedY(x, z)
     out.push(box(x, z, rot[1], L / 2 + 0.4, 2.8, yb - 1, yb + 5))
   }
-  { // the 40 m cargo ship: hull + deck gear, the stern house, the two masts (listing ~17°: widen the box)
-    const { x, z, yaw } = BIG_WRECK, ax = Math.cos(yaw), az = -Math.sin(yaw), yb = bedY(x, z)
-    out.push(box(x, z, yaw, WRECK_L / 2 + 0.8, WRECK_B / 2 + 2.2, yb - 2, yb + 9))
-    const at = (s) => [x + ax * s, z + az * s]
-    { const [hx, hz] = at(-WRECK_L * 0.38); out.push(box(hx, hz, yaw, 4.2, 6.5, yb + 6, yb + 18)) }        // stern house + funnel
-    for (const [s, h] of [[WRECK_L * 0.28, 12.5], [-1.6, 11.5]]) { const [mx, mz] = at(s); out.push(cyl(mx, mz, 2.6, yb + 6, yb + 7 + h)) } // masts, cross-trees, derricks
+  { // the cargo ship (drawn at BIG_WRECK.scale): hull + deck gear, the stern house, the two masts (listing ~17°)
+    const { x, z, yaw, scale: k } = BIG_WRECK, ax = Math.cos(yaw), az = -Math.sin(yaw), yb = bedY(x, z)
+    out.push(box(x, z, yaw, (WRECK_L / 2 + 0.8) * k, (WRECK_B / 2 + 2.2) * k, yb - 2 * k, yb + 9 * k))
+    const at = (s) => [x + ax * s * k, z + az * s * k]
+    { const [hx, hz] = at(-WRECK_L * 0.38); out.push(box(hx, hz, yaw, 4.2 * k, 6.5 * k, yb + 6 * k, yb + 18 * k)) } // stern house + funnel
+    for (const [s, h] of [[WRECK_L * 0.28, 12.5], [-1.6, 11.5]]) { const [mx, mz] = at(s); out.push(cyl(mx, mz, 2.6 * k, yb + 6 * k, yb + (7 + h) * k)) } // masts, cross-trees, derricks
   }
   out.push(logoObstacle())
   return out

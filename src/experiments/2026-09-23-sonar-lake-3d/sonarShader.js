@@ -145,7 +145,8 @@ export const sonarFragment = /* glsl */ `
     if (d >= 0.9999) return 1e3;
     return -(uTopCamY - (uTopNearFar.x + d * (uTopNearFar.y - uTopNearFar.x)));
   }
-  float panoLobe(float g) { return smoothstep(0.01, 0.07, g) * (1.0 - 0.55 * smoothstep(0.52, 1.13, g)); }
+  // the flat fan's coverage vs depression angle: 5°–25° with soft edges (sonarMarks.js panoLobe, same numbers)
+  float panoLobe(float g) { return smoothstep(0.035, 0.105, g) * (1.0 - smoothstep(0.4, 0.49, g)); }
 
   void main() {
     float vyDown = 1.0 - vUv.y;
@@ -211,12 +212,12 @@ export const sonarFragment = /* glsl */ `
         float grainP = hash(floor(vec2(r * aWorld / 0.07, r / 0.22)) + t);             // grains ≈ 7 cm across × 22 cm along the ray, per ping
         float bands = vnoise(vec2(aWorld * 16.0 + 5.3, 0.7));                         // wide beam-to-beam gain bands (the app's fan of rays)
         float m = 0.84 + 0.22 * patchesN + 0.08 * (streakP - 0.5) + 0.2 * (grainP - 0.5) + 0.05 * (speck - 0.5) + 0.06 * (beamGain - 0.5) + (0.24 + 0.2 * smoothstep(15.0, 50.0, uRange)) * (bands - 0.5);  // bands show more at long range (app 62 m frame)
-        float e = 0.126 * m * incid * mix(0.86, 1.0, lobe);
+        float e = 0.126 * m * incid * lobe; // only what the 5°–25° slab reaches shows (the 3D curtain is the same slab)
         if (hasS) {
           // structure: the edge rising toward the transducer is hot, the rest a mid-bright granular clump
           float Sn = min(topDepth(p - (p / r) * 0.35), terrainDepth(w - rw * 0.35));
           float face = clamp((Sn - S) / 0.35, 0.0, 3.0);
-          float es = (0.17 + 0.14 * face) * (0.7 + 0.45 * grainP) * mix(0.75, 1.0, lobe);
+          float es = (0.17 + 0.14 * face) * (0.7 + 0.45 * grainP) * lobe;
           e = mix(e, max(e, es), smoothstep(0.05, 0.6, cov));
         }
         e *= (1.0 - 0.3 * shade) * (1.0 - 0.28 * fishShadow(p));

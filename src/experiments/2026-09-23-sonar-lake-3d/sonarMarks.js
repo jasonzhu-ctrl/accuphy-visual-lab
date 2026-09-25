@@ -12,6 +12,8 @@ import { depthAt, HALF } from './terrain'
 import { fishPose } from './fish'
 
 export const MAX_MARKS = 64
+// Panoramic picture half-width in units of the range (screenLayout: h = 0.9 R, w = h × 2.08 aspect)
+export const panoHalfWidth = 0.45 * 2.08
 const TERRAIN_N = 512
 
 export function bakeTerrain() {
@@ -52,9 +54,11 @@ export function makeMarksTexture() {
 }
 
 const smooth = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t) }
-// Panoramic beam response vs depression angle (rad): main lobe ≈ 5°–25° (installed 5° down, 20° thick),
-// sidelobes fading out to ≈ 60° — the app's lake frames show bottom and fish right up to the apex
-export const panoLobe = (g) => smooth(0.01, 0.07, g) * (1 - 0.55 * smooth(0.52, 1.13, g))
+// Panoramic coverage vs depression angle (rad): the flat fan is installed 5° down and 20° thick, so it covers
+// 5°–25° below the transducer (soft edges 2°–6° and 23°–28°). Only what lies in that slab — the same slab the
+// 3D curtain draws — shows on the screen (Jason 2026-09-24: 没有在探测的coverage里的东西是不会显示的). The old
+// response kept ~50 % out to 60° and let deep things the curtain never reaches (the wreck) show.
+export const panoLobe = (g) => smooth(0.035, 0.105, g) * (1 - smooth(0.4, 0.49, g))
 
 const pose = {}, pose0 = {}
 const cand = []
@@ -83,7 +87,7 @@ export function computeMarks({ pop, t, specs, apex, flat, bake, rangeM }, marks)
     const ax1 = o.x + tx * L / 2, az1 = o.z + tz * L / 2
     const dx = o.x - apex.x, dy = o.y - apex.y, dz = o.z - apex.z
     const rl = Math.hypot(dx, dy, dz)
-    if (rl < 0.3 || rl > rangeM * 1.05) continue
+    if (rl < 0.3 || rl > rangeM * (flat ? 1.45 : 1.05)) continue // Panoramic's picture runs to its corners (≈ 1.37 R)
     const seed = (Math.abs(f.phase) * 7.13) % 1
     const size = Math.min(1.45, Math.max(0.55, Math.sqrt(L / 0.4)))
     // aspect: how broadside the body is to the ray (1 = broadside, 0 = head-on)
@@ -93,7 +97,7 @@ export function computeMarks({ pop, t, specs, apex, flat, bake, rangeM }, marks)
     const wink = 1 - (1 - aspect) * 0.4 * (0.5 + 0.5 * Math.sin(t * 7.3 + seed * 40))
     if (flat) {
       const d = Math.hypot(dx, dz)
-      if (d > rangeM * 1.02) continue
+      if (dx > rangeM * 1.01 || Math.abs(dz) > panoHalfWidth * rangeM) continue // outside the picture (and the curtain)
       const bearing = Math.atan2(dz, dx)
       const half = (specs[0].a1 - specs[0].a0) / 2
       if (Math.abs(bearing) > half + 0.04) continue

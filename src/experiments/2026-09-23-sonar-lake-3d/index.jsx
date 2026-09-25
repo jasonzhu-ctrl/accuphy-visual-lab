@@ -11,6 +11,7 @@ import { screenLayout } from './SonarScreen'
 import SignupGate from './SignupGate'
 import { isSignedUp } from './signup'
 import { depthAt } from './terrain'
+import { panoHalfWidth } from './sonarMarks'
 // dev: ?bigphone makes the phone huge so the sonar picture can be inspected in screenshots
 const BIG_PHONE = import.meta.env.DEV && window.location.search.includes('bigphone')
 // The page is for people who have never used live sonar (Jason 2026-09-24): only Device / View / Range are
@@ -67,6 +68,9 @@ export default function SonarLake3D() {
     // PL Forward: the sound covers the whole picture box (range ahead × depth range down, sonar-style.md §6.9);
     // the curtain in the lake is that box, so it touches exactly what the phone shows
     if (deviceId === 'PL' && mode === 'forward' && sp[0]) { const R = rangeFt * FT, D = depthFt * FT; sp[0] = { ...sp[0], R: Math.hypot(R, D) * 1.001, box: { xMin: -0.25 * R, xMax: R, yMax: D } } }
+    // Panoramic: the picture runs to its corners (range ahead × half-width sideways), so the curtain does too;
+    // with the 5°–25° slab it then covers exactly what the screen shows (Jason 2026-09-24: coverage 错位)
+    if (mode === 'panoramic' && sp[0]) { const R = rangeFt * FT; sp[0] = { ...sp[0], R: 1.6 * R, box: { xMin: -1e5, xMax: R, yMax: 1e5, zMax: panoHalfWidth * R } } }
     return sp
   }, [device, deviceId, mode, rangeFt, depthFt])
   const specKey = `${deviceId}-${mode}-${rangeFt}`
@@ -149,7 +153,7 @@ export default function SonarLake3D() {
         className="ac-panel pointer-events-auto absolute inset-x-3 bottom-3 flex flex-col gap-3 p-3.5 sm:inset-x-auto sm:bottom-auto sm:left-4 sm:top-14 sm:w-[400px] sm:p-4">
         <div className="flex items-center justify-between px-1 pt-0.5">
           <img src="/brand/logo/White Accuphy Logo.png" alt="Accuphy" className="h-[18px] w-auto drop-shadow-[0_1px_2px_rgba(0,20,30,0.25)]" draggable={false} />
-          <span className="ac-title">Beam explorer</span>
+          <span className="ac-title">Lab</span>
         </div>
         <div className="ac-divider" />
         <Row label="Device">

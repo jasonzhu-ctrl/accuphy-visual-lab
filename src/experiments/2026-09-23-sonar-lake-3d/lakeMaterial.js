@@ -19,7 +19,7 @@ export function makeLakeMaterial({ fish = false, structure = false, logo = false
     uN: { value: [new THREE.Vector3(), new THREE.Vector3()] },
     uAng: { value: [new THREE.Vector4(), new THREE.Vector4()] }, // a0, a1, s0, s1
     uRT: { value: [new THREE.Vector2(), new THREE.Vector2()] },  // R, tan(theta)
-    uBox: { value: [new THREE.Vector3(-1e5, 1e5, 1e5), new THREE.Vector3(-1e5, 1e5, 1e5)] }, // screen-box clip: xMin, xMax (forward), yMax (depth) from the apex
+    uBox: { value: [new THREE.Vector4(-1e5, 1e5, 1e5, 1e5), new THREE.Vector4(-1e5, 1e5, 1e5, 1e5)] }, // screen-box clip: xMin, xMax (forward), yMax (depth), zMax (|sideways|) from the apex
     uReveal: { value: 1.0 },
     uSonarPass: { value: 0.0 }, // 1 while rendering the sonar depth strips: alpha = fish mask
     uFishSonarScale: { value: 1.0 / 2.6 }, // fish are DRAWN ×2.6 in the lake (fish.js); the sonar sees them at true size (§7.4)
@@ -66,7 +66,7 @@ export function makeLakeMaterial({ fish = false, structure = false, logo = false
       uniform vec3 uSun; uniform vec3 uFogColor; uniform float uFogDensity;
       uniform int uBeamCount;
       uniform vec3 uApex[${MAX_BEAMS}]; uniform vec3 uC[${MAX_BEAMS}]; uniform vec3 uH[${MAX_BEAMS}]; uniform vec3 uN[${MAX_BEAMS}];
-      uniform vec4 uAng[${MAX_BEAMS}]; uniform vec2 uRT[${MAX_BEAMS}]; uniform vec3 uBox[${MAX_BEAMS}];
+      uniform vec4 uAng[${MAX_BEAMS}]; uniform vec2 uRT[${MAX_BEAMS}]; uniform vec4 uBox[${MAX_BEAMS}];
       uniform float uReveal; uniform vec3 uHighlight; uniform float uSonarPass;
       #ifdef FISH
         varying float vPattern; varying vec3 vBelly; varying vec3 vSide; varying vec3 vLocal;
@@ -86,7 +86,8 @@ export function makeLakeMaterial({ fish = false, structure = false, logo = false
         float inW = smoothstep(lo - sw, lo + sw, w) * (1.0 - smoothstep(hi - sw, hi + sw, w));
         float inR = 1.0 - smoothstep(uRT[k].x - 0.6 + margin * 30.0, uRT[k].x + margin * 30.0, r);
         // PL Forward: only the part of the fan the phone shows (range ahead × depth range down)
-        vec3 bx = uBox[k]; float bm = margin * 30.0;
+        vec4 bx = uBox[k]; float bm = margin * 30.0;
+        inR *= 1.0 - smoothstep(bx.w - 0.3 + bm, bx.w + 0.3 + bm, abs(d.z));
         inR *= smoothstep(bx.x - 0.3 - bm, bx.x + 0.3 - bm, d.x) * (1.0 - smoothstep(bx.y - 0.3 + bm, bx.y + 0.3 + bm, d.x)) * (1.0 - smoothstep(bx.z - 0.3 + bm, bx.z + 0.3 + bm, -d.y));
         // fade with range like a real beam
         float atten = 1.0 - 0.6 * clamp(r / uRT[k].x, 0.0, 1.0);
@@ -194,7 +195,7 @@ export function setBeamUniforms(materials, specs, apex) {
       u.uC.value[k].copy(s.frame.c); u.uH.value[k].copy(s.frame.h); u.uN.value[k].copy(s.frame.n)
       u.uAng.value[k].set(s.a0, s.a1, s.s0, s.s1)
       u.uRT.value[k].set(s.R, Math.tan(s.theta))
-      if (s.box) u.uBox.value[k].set(s.box.xMin, s.box.xMax, s.box.yMax); else u.uBox.value[k].set(-1e5, 1e5, 1e5)
+      if (s.box) u.uBox.value[k].set(s.box.xMin, s.box.xMax, s.box.yMax, s.box.zMax ?? 1e5); else u.uBox.value[k].set(-1e5, 1e5, 1e5, 1e5)
     })
   }
 }

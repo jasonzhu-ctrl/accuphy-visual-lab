@@ -131,22 +131,23 @@ function BigWreck({ mat }) {
     const d = makeWreckDebris()
     return { geo, debris: d.items }
   }, [])
-  const { x, z, yaw, list } = BIG_WRECK
+  const { x, z, yaw, list, scale: k } = BIG_WRECK
+  const L = WRECK_L * k
   // follow the slope: bottom height under the bow and the stern
   const ax = Math.cos(yaw), az = -Math.sin(yaw)
-  const yBow = bedY(x + ax * WRECK_L * 0.45, z + az * WRECK_L * 0.45), yStern = bedY(x - ax * WRECK_L * 0.45, z - az * WRECK_L * 0.45)
-  const pitch = Math.atan2(yBow - yStern, WRECK_L * 0.9)
-  const y = (yBow + yStern) / 2 - 1.1
+  const yBow = bedY(x + ax * L * 0.45, z + az * L * 0.45), yStern = bedY(x - ax * L * 0.45, z - az * L * 0.45)
+  const pitch = Math.atan2(yBow - yStern, L * 0.9)
+  const y = (yBow + yStern) / 2 - 1.1 * k
   return (
     <group>
-      <group position={[x, y, z]} rotation-y={yaw}>
+      <group position={[x, y, z]} rotation-y={yaw} scale={k}>
         <group rotation-z={pitch}>
           <mesh geometry={geo} material={mat} rotation-x={list} />
         </group>
       </group>
       {debris.map((it, i) => {
-        const dx = x + it.dx, dz = z + it.dz
-        return <mesh key={i} geometry={it.g} material={mat} position={[dx, bedY(dx, dz) + it.lift, dz]} />
+        const dx = x + it.dx * k, dz = z + it.dz * k
+        return <mesh key={i} geometry={it.g} material={mat} scale={k} position={[dx, bedY(dx, dz) + it.lift * k, dz]} />
       })}
     </group>
   )
@@ -348,9 +349,9 @@ function Rig({ state }) {
       return
     }
     if (s.wreckCam) { // dev aid ?cam=wreck — inspect the big wreck
-      const a = performance.now() / 9000
-      camera.position.set(44 + Math.cos(a) * 42, -4, -30 + Math.sin(a) * 42)
-      camera.lookAt(44, -30, -30)
+      const a = performance.now() / 9000, { x: wx, z: wz } = BIG_WRECK
+      camera.position.set(wx + Math.cos(a) * 30, -12, wz + Math.sin(a) * 30)
+      camera.lookAt(wx, -36, wz)
       return
     }
     if (s.closeCam) { // dev aid ?cam=boat — inspect the boat / fish up close

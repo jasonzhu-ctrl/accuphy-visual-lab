@@ -669,3 +669,13 @@ structure echoes by `mix(0.32, 1.0, smoothstep(3 m, 11 m, r))` (≈ 0.43 at 5 m,
 the fringe turns orange, and the calibrated ~10 m pictures barely change. Fish
 marks are not scaled, so the approved near-field fish look stays.
 
+### 7.17 Panoramic coverage = the curtain (2026-09-24, Jason: "没有照到的东西也出来了")
+The flat fan covers 5°–25° below the transducer; only that slab shows. The
+Panoramic shader and the fish marks share one coverage function
+(`panoLobe`: smoothstep 2°–6° up, 23°–28° down), applied to the bottom field,
+structure clumps and fish. The picture runs to its corners (forward ≤ range,
+|sideways| ≤ 0.936 range); the 3D curtain and the lakebed highlight are clipped
+to that box. Near the boat the bottom is steeper than the slab and stays dark;
+past a drop-off the deep bottom falls below the slab and only structure that
+reaches up into it shows.
+
