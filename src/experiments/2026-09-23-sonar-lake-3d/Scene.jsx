@@ -348,7 +348,7 @@ function Rig({ state }) {
     }
     if (s.logoCam) { // dev aid ?cam=logo — the lakebed lockup, seen from its face side
       const { B } = logoFrame()
-      camera.position.set(B.x - 3, B.y + 8, B.z + 25)
+      camera.position.set(B.x - 3, B.y + 9, B.z + 35)
       camera.lookAt(B.x, B.y + 2.2, B.z)
       return
     }

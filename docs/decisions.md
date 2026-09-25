@@ -790,3 +790,21 @@ Numbered log. Newest at the bottom.
       in the side views, 0.62 at ≤ 5 m back to full by 18 m (`uBedGain`), so the
       calibrated deep pictures do not change. Fish marks are untouched.
 
+61. **2026-09-25** — **The lakebed lockup reads ACCUPHY LAB and moved to the middle of
+    the view** (Jason, with a screenshot of the default view: "Accuphy现在的logo移动到截屏
+    这个区域好像更合理 然后我要你做成Accuphy Lab也就是在现在的后面加上Lab").
+    - **Where:** centre (15, −62), on the flat 40 m floor behind the drop-off. In the
+      default camera it sits at the top-middle of the screen on every window shape (the
+      old spot, x 57, was cut off at the right on 16:10 screens). Dead level along and
+      across its line.
+    - **LAB:** the brand font Eurostile Heavy (`public/brand/fonts`), traced once at high
+      resolution and stored as outlines in `logo.js`, at the wordmark's cap height, with
+      the wordmark's letter gap (~30 SVG units) and a word space after the Y. Uppercase,
+      as the page header writes the name (#43). Same white, same extrusion and plinth.
+    - Letters keep their size, so the monument grew from 22 m to 31.4 m.
+    - **Sonar:** PL Forward from `?boat=-14,-62.5` at 140 ft range images the whole
+      "ACCUPHY LAB" (checked). At 40 m the depth range runs on 180 ft AUTO, so the
+      letters are smaller on the phone than at the old 19.5 m spot.
+    - In the 3D view the monument is fainter than before, because it sits under 40 m of
+      water instead of 19.5 m.
+

@@ -63,7 +63,7 @@ it is done. ✅ done · 🔧 in progress · ⬜ open.
 - ✅ Bass / musky / salmon spread through the water column (bass 2–17 m, musky 5–13 m, salmon 4–33 m)
 - ✅ No fish swims through timber, rocks, wrecks or the logo: swim loops routed at load (decision #39)
 - ✅ Accuphy logo on the lakebed, standing in the boat's forward plane so Forward / Down image the whole mark (decision #39)
-- ⬜ Option for Jason: a guide step or a "find the logo" button that parks the boat on the lockup's line (today: a link with `?boat=41,1.5`, or drag the boat to the monument's west side)
+- ⬜ Option for Jason: a guide step or a "find the logo" button that parks the boat on the lockup's line (today: a link with `?boat=-14,-62.5` and range ≥ 140 ft, or drag the boat to the monument's west side; decision #61)
 - ✅ The full ACCUPHY lockup on the lakebed (the resume point after Jason's pause): white letters + blue fan from the brand SVG, 22 m wide, on a stone plinth that lifts it clear of the bottom echo; Forward and Down show the whole word at the default 80 ft (decision #40)
 - ⬜ Default camera on 16:10 screens: the word's right end is cut at the screen edge (fully visible on 16:9 and wider). Jason noted it ("哦"), no change asked; options if he wants one: pan the default camera ~3 m right, or shrink the word
 - ✅ Salmon / lake trout also up-and-right in the deep water
