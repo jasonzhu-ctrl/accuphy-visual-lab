@@ -679,3 +679,15 @@ to that box. Near the boat the bottom is steeper than the slab and stays dark;
 past a drop-off the deep bottom falls below the slab and only structure that
 reaches up into it shows.
 
+### 7.18 Panoramic bottom texture by range (2026-09-24, Jason: "背景太失真了")
+- ≤ ~35 m (app lake frames, 14–29 m): smooth field; fine texture = soft value
+  noise in (angle, range) with cells ≈ 1.6° across × 5 cm along the ray, two
+  octaves, re-seeded every ping (the app's speckle is smeared ACROSS the beams,
+  because a beam is much wider than a range cell); soft world-fixed patches;
+  wide beam-group sectors (≈ 11°).
+- ≥ ~55 m (app 62 m frame): radial streaks, grain and strong beam sectors.
+- Structure clumps: 8 taps on a ring rotated at random per pixel and ping;
+  blend `smoothstep(0.08, 0.9, coverage)` so sparse brush stays faint.
+- Shadows: accumulated along the ray (`occluded steps / 5`), per-pixel jitter.
+- Weeds are not in the top-down map (they return weak, diffuse echoes).
+

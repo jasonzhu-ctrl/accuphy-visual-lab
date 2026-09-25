@@ -44,7 +44,7 @@ function Lakebed({ mat }) {
 
 // ---------- structures ----------
 // One InstancedMesh per geometry variant; items are dealt round-robin across variants.
-function Instanced({ mat, geos, items }) {
+function Instanced({ mat, geos, items, layer }) {
   const refs = useRef([])
   const buckets = useMemo(() => geos.map((_, k) => items.filter((_, i) => i % geos.length === k)), [geos, items])
   useEffect(() => {
@@ -59,7 +59,7 @@ function Instanced({ mat, geos, items }) {
       mesh.instanceMatrix.needsUpdate = true
     })
   }, [buckets])
-  return geos.map((g, k) => <instancedMesh key={k} ref={(el) => { refs.current[k] = el }} args={[g, mat, Math.max(1, buckets[k].length)]} frustumCulled={false} />)
+  return geos.map((g, k) => <instancedMesh key={k} ref={(el) => { refs.current[k] = el }} args={[g, mat, Math.max(1, buckets[k].length)]} frustumCulled={false} onUpdate={(o) => { if (layer != null) o.layers.set(layer) }} />)
 }
 function Structures({ mat }) {
   const geos = useMemo(() => ({
@@ -73,7 +73,9 @@ function Structures({ mat }) {
       <Instanced mat={mat} geos={geos.bush} items={items.bush} />
       <Instanced mat={mat} geos={geos.stump} items={items.stump} />
       <Instanced mat={mat} geos={geos.log} items={items.log.map((it) => ({ ...it, sx: 1, sy: 0.12, sz: 0.12 }))} />
-      <Instanced mat={mat} geos={geos.weed} items={items.weed.map((it) => ({ ...it, sx: 0.8, sz: 0.8 }))} />
+      {/* weeds: soft, diffuse returns — left out of Panoramic's top-down structure map (they drew every tuft as a
+          bright clump); the side views and the lake still see them (LAKEBED_LAYER is in both) */}
+      <Instanced mat={mat} geos={geos.weed} items={items.weed.map((it) => ({ ...it, sx: 0.8, sz: 0.8 }))} layer={LAKEBED_LAYER} />
       <Instanced mat={mat} geos={geos.rock} items={items.rock} />
     </group>
   )

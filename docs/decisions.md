@@ -576,3 +576,18 @@ Numbered log. Newest at the bottom.
       story with video loops, the live 3D as an opt-in "try it" section).
       Claude recommends B first, with A's game inside it. The choice between
       the plans is Jason's.
+
+46. **2026-09-24** — **Panoramic background looks like sonar again** (Jason:
+    可以保留这个形式 但是我觉得背景太失真了 完全不像是声纳画面). The coverage rule of
+    #44 stays. The bottom texture now follows the app by range: up to ~35 m it
+    is a smooth field of soft speckle smeared across the beams (≈ 1.6° × 5 cm
+    cells, re-drawn every ping) over soft patches and a few wide sectors, as in
+    the app's 14–29 m lake recordings; from ~55 m the old radial streaks and
+    strong sectors of the app's 62 m frame take over. Weeds are left out of the
+    top-down structure map (every tuft had become a bright clump); structure
+    clumps are sampled with a randomly rotated ring (no texel grid), sparse
+    brush reads faint and solid things bright; shadows build up with how much of
+    the ray is blocked (no dotted black rays); fish shadows are softer. The
+    field stays at its calibrated brightness; the app recording looks brighter
+    mainly because it uses the crimson "red" map (backlog).
+

@@ -130,7 +130,7 @@ export const sonarFragment = /* glsl */ `
       float qr = dot(q, rh), qt = q.x * rh.y - q.y * rh.x;
       float d = length(vec2(qr / C.z, qt / C.w));
       d += (vnoise(p * 2.5 + float(i) * 3.1) - 0.5) * 0.8;    // irregular edge, like the app's blotches
-      s = max(s, 0.85 * (1.0 - smoothstep(0.55, 1.3, d)));
+      s = max(s, 0.7 * (1.0 - smoothstep(0.35, 1.5, d))); // soft-edged, like the app's darker blotches (not dark holes)
     }
     return s;
   }
@@ -175,11 +175,13 @@ export const sonarFragment = /* glsl */ `
         vec2 rw = vec2(p.y, p.x) / r;                // ray direction in world (x, z)
         vec2 w = uApexXZ + vec2(p.y, p.x);           // world (x, z) of this pixel
         float Db = terrainDepth(w);
-        // structure seen through the beam: coverage over the beam footprint (soft, fuzzy clumps, not line drawings)
-        float rb = max(0.3, r * 0.025);
+        // structure seen through the beam: coverage over the beam footprint (soft, fuzzy clumps, not line drawings);
+        // the tap ring is rotated at random per pixel and per ping, so the top map's texels never show as a grid
+        float rb = max(0.35, r * 0.03);
+        float rot = hash(gl_FragCoord.xy * 0.37 + floor(uTime * 8.0) * 0.11) * 6.2832;
         float S = topDepth(p), cov = 0.0;
         for (int q = 0; q < 8; q++) {
-          float ang = float(q) * 0.7854 + 0.4;
+          float ang = float(q) * 0.7854 + rot;
           float Sq = topDepth(p + rb * vec2(cos(ang), sin(ang)));
           cov += step(Sq, Db - 0.08);
           S = min(S, Sq);
@@ -188,17 +190,20 @@ export const sonarFragment = /* glsl */ `
         bool hasS = cov > 0.05;
         float target = (hasS ? S : Db) - uApexDepth; // depth below the transducer of what this pixel sees
         float lobe = panoLobe(atan(target, r));
-        // acoustic shadow: march back toward the transducer; anything (terrain, structure) above the ray blocks it
-        float jit = hash(floor(gl_FragCoord.xy / 3.0) * 0.61 + t * 0.13);    // 3-px cells: blotchy, not hairy
-        float shade = 0.0;
+        // acoustic shadow: march back toward the transducer; what lies above the ray blocks it. The shadow builds
+        // up with how much of the path is blocked, so solid things cast solid shadows and sparse brush only a faint
+        // one (a single hit made every twig a hard, dotted black ray); per-pixel jitter keeps it soft
+        float jit = hash(gl_FragCoord.xy * 0.61 + t * 0.13);
+        float occl = 0.0;
         for (int s = 0; s < 40; s++) {
           float tt = r * (float(s) + jit) / 40.0;
           if (tt < 0.4 || tt > r - 0.45) continue;
           vec2 pt = p * (tt / r);
           float occ = min(terrainDepth(uApexXZ + vec2(pt.y, pt.x)), topDepth(pt)) - uApexDepth;
           float line = target * tt / r;
-          shade = max(shade, smoothstep(0.1, 0.5, line - occ));
+          occl += smoothstep(0.1, 0.6, line - occ);
         }
+        float shade = clamp(occl / 5.0, 0.0, 1.0);
         // Calibrated in echo units against the app's lake frames (§7.13): after the tone curve the field sits
         // at LUT index 0.10–0.25 (echo 0.099–0.138), shadows ≈ 0.03–0.06, faces toward the transducer higher.
         // The window is steep down there, so every texture is a SMALL multiplicative variation.
@@ -211,16 +216,28 @@ export const sonarFragment = /* glsl */ `
         float incid = clamp(1.0 + 0.9 * slope, 0.82, 1.55);
         float grainP = hash(floor(vec2(r * aWorld / 0.07, r / 0.22)) + t);             // grains ≈ 7 cm across × 22 cm along the ray, per ping
         float bands = vnoise(vec2(aWorld * 16.0 + 5.3, 0.7));                         // wide beam-to-beam gain bands (the app's fan of rays)
-        float m = 0.84 + 0.22 * patchesN + 0.08 * (streakP - 0.5) + 0.2 * (grainP - 0.5) + 0.05 * (speck - 0.5) + 0.06 * (beamGain - 0.5) + (0.24 + 0.2 * smoothstep(15.0, 50.0, uRange)) * (bands - 0.5);  // bands show more at long range (app 62 m frame)
+        // Texture by range, as the app shows it (Jason 2026-09-24: 背景太失真了 完全不像是声纳画面):
+        //  - short/medium range (app lake frames, 14–29 m): a smooth crimson field whose fine texture is soft
+        //    speckle smeared ACROSS the beams (angular cells ≈ 1.6°, range cells ≈ 5 cm), re-drawn every ping,
+        //    over soft patches and a few wide brightness sectors;
+        //  - long range (app 62 m frame): radial streaks, grain and strong beam-to-beam sectors.
+        float ping = floor(uTime * 8.0);
+        float smearA = vnoise(vec2(aWorld / 0.028, r / 0.05) + vec2(ping * 7.13, ping * 3.71));
+        float smearB = vnoise(vec2(aWorld / 0.012, r / 0.03) + vec2(ping * 1.97, ping * 5.31));
+        float smear = 0.65 * smearA + 0.35 * smearB;
+        float longR = smoothstep(35.0, 55.0, uRange);
+        float sector = vnoise(vec2(aWorld * 5.0 + 5.3, 0.7));                            // wide beam-group sectors (≈ 11°)
+        float fine = mix(0.34 * (smear - 0.5), 0.08 * (streakP - 0.5) + 0.2 * (grainP - 0.5) + 0.05 * (speck - 0.5), longR);
+        float m = 0.84 + 0.22 * patchesN + fine + 0.12 * (sector - 0.5) + 0.06 * longR * (beamGain - 0.5) + 0.44 * longR * (bands - 0.5);
         float e = 0.126 * m * incid * lobe; // only what the 5°–25° slab reaches shows (the 3D curtain is the same slab)
         if (hasS) {
           // structure: the edge rising toward the transducer is hot, the rest a mid-bright granular clump
           float Sn = min(topDepth(p - (p / r) * 0.35), terrainDepth(w - rw * 0.35));
           float face = clamp((Sn - S) / 0.35, 0.0, 3.0);
-          float es = (0.17 + 0.14 * face) * (0.7 + 0.45 * grainP) * lobe;
-          e = mix(e, max(e, es), smoothstep(0.05, 0.6, cov));
+          float es = (0.17 + 0.14 * face) * (0.7 + 0.45 * mix(smear, grainP, longR)) * lobe;
+          e = mix(e, max(e, es), smoothstep(0.08, 0.9, cov)); // sparse brush reads faint, solid rock/wood bright
         }
-        e *= (1.0 - 0.3 * shade) * (1.0 - 0.28 * fishShadow(p));
+        e *= (1.0 - 0.35 * shade) * (1.0 - 0.2 * fishShadow(p));
         // near the transducer: darker, with clutter speckle and bright spokes along a few beams (app)
         float near = 1.0 - smoothstep(0.0, 0.3 * uRange, r);
         e = mix(e, e * 0.84, near);
