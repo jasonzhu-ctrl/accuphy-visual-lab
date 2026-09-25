@@ -268,7 +268,13 @@ export const sonarFragment = /* glsl */ `
         }
         acc = acc / 16.0 + 0.7 * peak + 0.9 * spk;
         float atten = 1.0 - 0.4 * clamp(r / uRange, 0.0, 1.0);
-        echo = max(echo, max(acc * atten * tex, fishEcho(p, k)));
+        // near-range gain (TVG): close returns get less gain, like a real sonar's time-varying gain. In shallow
+        // water every ray across the slab hits the bottom at the same range, the band saturates to a solid white
+        // slab and AUTO depth then zooms it (Jason 2026-09-24: 浅水的时候 … 过爆感太强了 可以折中一点). Full gain
+        // again from ~11 m (≈ 0.9 at 9 m), so the calibrated deeper pictures barely change; fish marks keep their
+        // approved look. 5 m ≈ 0.43: the core just reaches white and keeps its streaks instead of a solid slab.
+        float tvg = mix(0.32, 1.0, smoothstep(3.0, 11.0, r));
+        echo = max(echo, max(acc * atten * tex * tvg, fishEcho(p, k)));
         echo = max(echo, logoEcho(p, k) * atten * (0.7 + 0.55 * (filament - 0.8)) * (0.72 + 0.28 * tex));
       }
       float near = 1.0 - smoothstep(0.0, 2.4, r);

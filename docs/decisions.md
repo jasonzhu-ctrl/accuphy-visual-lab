@@ -520,3 +520,10 @@ Numbered log. Newest at the bottom.
     axis. Now the axis is the next app step at readout ÷ 0.8 (18 ft → 25 ft,
     129 ft → 180 ft); a deeper bottom ahead runs off the screen, as in the app.
 
+42. **2026-09-24** — **Near-range gain (TVG) tames the shallow-water bottom**
+    (Jason: 浅水的时候 声纳画面好像太亮了过爆感太强了 可以折中一点). With AUTO depth
+    zooming in over shallow water, the bottom band was a solid white slab. Bottom
+    and structure echoes now get less gain close to the transducer (≈ 0.43 at
+    5 m, full again from 11 m), like a sonar's time-varying gain; fish marks and
+    the deeper calibrated pictures are unchanged. `sonar-style.md` §7.16.
+

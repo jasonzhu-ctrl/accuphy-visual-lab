@@ -658,3 +658,14 @@ Two things learned placing it:
 - **The bottom must be flat across the boat's line.** On a sideways slope the
   20° slab sees a spread of bottom depths and the thick echo buries low parts
   (first logo try on the drop-off).
+
+### 7.16 Near-range gain in shallow water (2026-09-24, Jason: "浅水的时候 … 过爆感太强了 可以折中一点")
+In shallow water every ray across the 20° slab meets the bottom at almost the
+same range, so the integrated bottom band adds up to a solid white slab; AUTO
+depth then zooms the axis and the slab fills the picture. Real sonars damp near
+returns with their time-varying gain. The side views now scale bottom and
+structure echoes by `mix(0.32, 1.0, smoothstep(3 m, 11 m, r))` (≈ 0.43 at 5 m,
+0.9 at 9 m, 1 beyond 11 m): the core just reaches white and keeps its streaks,
+the fringe turns orange, and the calibrated ~10 m pictures barely change. Fish
+marks are not scaled, so the approved near-field fish look stays.
+
