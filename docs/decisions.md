@@ -903,3 +903,24 @@ Numbered log. Newest at the bottom.
       Forward at the same spot with its bottom at the same height, no console errors. Over
       uneven bottom a deeper side can still run off the screen, as in the app.
 
+66. **2026-09-25** — **Bottom toned down (orange body, thin hot edge); lockup moved into the
+    boat's reach** (Jason: "1. Accuphy那个logo貌似太靠上了 只能扫到一半 2.画面特别是底部貌似还是
+    太亮 深水也是 … 说白了就是高亮的部分和桔红色的关系 我感觉降低亮度的方式是对比度").
+    - **Measured first** (`__sonarHist`, share of lit pixels in the white bin): PLM shelf scene
+      6 %, which matched the app's 6.6 %. PL Forward and PL Down over the 17–24 m bottom were
+      at 37–44 %, and the wreck at 35 % (app: 14 %). Cause: over a flat bottom every row
+      across the slab lands at one range, and the summed echo burnt the whole band white.
+    - **Fix (side views):** past the near range the integrated bottom echo saturates softly
+      (K 0.4, fading in over 6–14 m, where TVG stops), so the band's body stays orange. A thin
+      first-return line (a narrow pulse, weight 0.3, with the filament texture) gives the
+      app's hot leading edge. The tone curve's white point is 15 % higher.
+    - **After:** PL bottom scenes 7 % white (app 6–7 %), wreck 8 %, PLM shelf 2 % (it looks
+      the same). Tried and rejected: white point alone (H 1.4) made the Mini and the wreck dull
+      (0.1 % and 4 % white), and a heavier leading edge put the white back to 45 %.
+    - **Lockup:** at z −62 its line lay outside the boat's drag area (±58 m), so a visitor
+      could only sweep its edge. It is now at (15, −52): reachable, lower in the default view,
+      still level (±2 cm along, 9 cm across). Checked by driving the boat there the normal way
+      (`?boat` not used): the whole ACCUPHY LAB images at 140 ft.
+    - Fish re-checked with the moved obstacle: 15 simulated minutes, 0 structure, bottom or
+      surface hits.
+

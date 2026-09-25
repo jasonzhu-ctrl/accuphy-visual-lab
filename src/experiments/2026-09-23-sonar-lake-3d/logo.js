@@ -19,7 +19,10 @@ import { bedY } from './terrain'
 // the default view — the flat 40 m floor behind the drop-off, where the monument sits near the screen centre on
 // every window shape (the first spot, x 57, was cut off at the right on 16:10 screens). Dead level along and
 // across its 31 m line. Letters keep their size; "LAB" made the monument 22 → 31.4 m long.
-export const LOCKUP = { x: 15, z: -62, width: 31.4, thick: 0.5, plinth: 1.3, plinthDepth: 1.4, sink: 0.35 }
+// Jason 2026-09-25 (after the 24 m floor, #64): 太靠上了 只能扫到一半 — at z −62 the line lay outside the boat's drag
+// area (±58 m, Scene.jsx), so a visitor could only sweep its edge. Now z −52: reachable, lower in the view, still
+// level (±2 cm along, 9 cm across).
+export const LOCKUP = { x: 15, z: -52, width: 31.4, thick: 0.5, plinth: 1.3, plinthDepth: 1.4, sink: 0.35 }
 // the lockup in its own SVG units (public/brand/logo/Untitled-1.svg, top copy, + LAB): width, height, horizontal
 // centre, fan bottom, letters' baseline, fan bottom x, and the notch the fan dips into
 export const LOCKUP_SVG = { w: 2809.2, h: 380, cx: 1404.7, bottom: 369.9, base: 273.3, fanX: 1027, notch: [852, 1206] }

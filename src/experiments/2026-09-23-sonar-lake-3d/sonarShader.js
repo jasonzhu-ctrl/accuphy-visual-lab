@@ -266,7 +266,7 @@ export const sonarFragment = /* glsl */ `
         if (abs(a) > uFan[k].y || r > uReach) continue;
         inAny = 1.0;
         float u = 0.5 + 0.5 * tan(a) / uFan[k].z;
-        float acc = 0.0, peak = 0.0, spk = 0.0;
+        float acc = 0.0, peak = 0.0, spk = 0.0, edge = 0.0;
         // which thickness rows a pixel samples: the same set for a short run along the ray (0.08° × 0.67 m cells), not
         // a fresh random set per pixel. Per-pixel sets turned big steel faces into salt-and-pepper dust (the wreck at
         // 40 m, Jason 2026-09-25: 这个船的画面和 [app 的] 相差好远 结构和感觉完全不对); coherent sets draw them as the
@@ -293,9 +293,17 @@ export const sonarFragment = /* glsl */ `
           float wgt = 0.55 + 0.9 * (1.0 - abs(v * 2.0 - 1.0));
           acc += (1.2 * pulse + tail + second) * wgt;
           peak = max(peak, pulse * (1.0 - structure));
+          edge = max(edge, exp(-dr * dr / (0.16 * sg * sg)) * (1.0 - structure)); // the first return: a thin hot line
           spk = max(spk, pulse * structure * (1.0 + 0.3 * steel));
         }
-        acc = acc / 16.0 + 0.7 * peak + 0.9 * spk;
+        // Bottom brightness (Jason 2026-09-25: 画面特别是底部貌似还是太亮 深水也是 … 高亮的部分和桔红色的关系): over a flat
+        // bottom every row across the slab lands at one range and the integrated echo added up to a solid white band
+        // (38–44 % of the lit pixels white in PL scenes; the app's bottom scenes 6–7 %). Past the near range (where TVG
+        // already tames it) the integrated part saturates softly (K 0.4), so the body stays orange, and a thin
+        // first-return line brings back the app's hot leading edge.
+        float accI = acc / 16.0, K = mix(3.0, 0.4, smoothstep(6.0, 14.0, r));
+        accI = K * (1.0 - exp(-accI / K));
+        acc = accI + 0.7 * peak + 0.3 * edge * (0.55 + 0.6 * filament) + 0.9 * spk;
         float atten = 1.0 - 0.4 * clamp(r / uRange, 0.0, 1.0);
         // near-range gain (TVG): close returns get less gain, like a real sonar's time-varying gain. In shallow
         // water every ray across the slab hits the bottom at the same range, the band saturates to a solid white
@@ -322,7 +330,7 @@ export const sonarFragment = /* glsl */ `
     float lv = log(1.0 + raw / bs) / log(1.0 + 65535.0 / bs);
     float width = clamp(uDynRange, 0.05, 1.0);
     float lo = (1.0 - width) * 0.5 + width * (uGain - 0.5) + 0.5 * width * uContrast;
-    float hi = lo + width * (1.0 - 0.45 * uContrast);
+    float hi = lo + width * (1.0 - 0.45 * uContrast) * 1.15; // white point 15 % higher: fewer pixels burn to white (#66)
     float idx = echo > 0.0005 ? clamp((lv - lo) / (hi - lo), 0.0, 1.0) : 0.0;
     idx = pow(idx, uGamma) * inAny;
     vec3 col = texture2D(uLUT, vec2(idx * (255.0 / 256.0) + 0.5 / 256.0, 0.5)).rgb;

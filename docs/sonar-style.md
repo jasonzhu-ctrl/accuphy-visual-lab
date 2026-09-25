@@ -350,6 +350,10 @@ black 0.89 · .038 .042 .044 .042 .051 .046 .059 .088 .146 .444. The flat bottom
 across the beam, which is point (2) below. This is not a tuning change; pick a new second reference
 scene before the next balance loop.
 
+2026-09-25 (decision #66): the flat-bottom glare was fixed with a soft cap on the integrated bottom
+echo past the near range, a thin first-return edge and a 15 % higher white point. White share:
+PL bottom scenes 37–44 % → ~7 %, wreck 35 % → 8 %, PLM shelf 6 % → 2 %.
+
 What the loop taught: (1) the bottom band must be a thin hot leading edge
 (first return) over an orange body (integrated thickness) — a wide white slab
 was the biggest mismatch; (2) the app's band tops at white only where the
