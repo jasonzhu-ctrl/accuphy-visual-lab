@@ -85,10 +85,12 @@ elsewhere (Europe sells through distributors).
    4–17 MB each load at once, plus 2 MB screen-recording GIFs). PingLive Mini page: 33 MB, 425
    requests. On a phone connection this is slow and costly — and 68 % of visitors are on phones.
    Several video boxes show as black rectangles until loaded.
-2. **Wrong or conflicting specs on the PingLive Mini page.** Router One spec still says
-   "Power Input: **10–18 VDC**" (correct: 11–18 VDC, decided 2026-07-02); a comparison block says
-   "**100 ft** Wi-Fi Range" while the Router One block says 70 ft (70 ft is correct, 2026-07-19).
-3. **Broken links.** The Help & Support menu's "Quick Set Up Guide" goes to
+2. **Specs disagree between markets, and with the manual** — see §8. The US pages still carry
+   the old website values; every other market was changed to the manual's values; the Mini page
+   says 11–18 V and 10–18 V on the same page; a comparison block says "**100 ft** Wi-Fi Range"
+   while the Router One block says 70 ft (70 ft is correct, 2026-07-19).
+3. **Broken links.** The US homepage links to `/en-us/products/pinglive-sonar`, which is a
+   **404** (PingLive is not sold in the US market). The Help & Support menu's "Quick Set Up Guide" goes to
    `/blogs/news/setup-guide-for-pinglive-sonar` → **404**. Old accuphy.ca deep links and old
    handles (`pingaio-sonar`) → 404; there are only 3 redirects.
 4. **Language mess.** On `/fr-fr` the menu is French but the hero stays English, and a raw
@@ -119,3 +121,29 @@ elsewhere (Europe sells through distributors).
 - **For the lite section:** the site's weight problem is the strongest argument for the section's
   ≤ 90 KB budget and for a poster-first load; it must be added per market template (context files),
   and its words must go through Shopify's own translations, not Weglot.
+
+## 8. Specs: the manual vs the website (Jason's PDF `产品信息数据.pdf`, 2026-08-24; site checked 2026-09-25)
+
+The PDF sets the Chinese manuals (精相科技 PingLive / PingLive Mini, part 8 "技术规格") beside
+screenshots of the website; the red notes are the manual's values.
+
+| Item | Manual | Website: US market (`/en-us`) | Website: all other markets |
+|---|---|---|---|
+| Router One power input | **10–18 VDC** | 11–18 VDC | 10–18 VDC |
+| Router One power usage | 2.5 W typ / 5 W max | 3 W / 6 W | 2.5 W / 5 W |
+| Router One Wi-Fi frequency | 5.8 GHz | 2.4 / 5.8 GHz | 5.8 GHz |
+| Router One Wi-Fi standard | 802.11 n/ac | 802.11 a/b/g/n/ac | n/ac |
+| Router One Wi-Fi range | — | 70 ft | 70 ft, **and 100 ft** in a comparison block |
+| PingLive sonar power input | **11–18 V** | (page is a 404 in the US) | — |
+| PingLive power usage | 22 W typ / 40 W max | — | 22 W / 40 W |
+| PingLive max depth / distance | **70 m (230 ft), fresh water** | — | 70 m (230 ft); the PDF shows an older "91 m (300 ft)" |
+| PingLive Mini power input | **10–18 VDC** | 11–18 VDC | 10–18 VDC in the spec, but "Operates on 11–18 VDC" in the description and "requires 11–18 VDC" in the FAQ on the same page |
+| PingLive Mini power usage | 12 W typ / 25 W max | 12 W / 25 W | 12 W / 25 W |
+| PingLive Mini max range | 70 m | 70 m | 70 m |
+| PingLive Mini beam | 39° (live) × 20° | — | — |
+
+**Open conflict — needs Jason:** on 2026-07-02 Jason set the input for PingLive Mini / Router One
+to **11–18 VDC** ("11V, safer"; RMA project memory and its `docs/rma-workflow.md` §2.1 pre-check
+use it), but the manuals and the non-US site now say **10–18 VDC**. Also note the PingLive
+manual itself says 11–18 V for the sonar and 10–18 VDC for its router. One number per device has
+to be chosen before any page is edited, and the RMA pre-check must follow the same number.
