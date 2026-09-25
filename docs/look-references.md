@@ -65,3 +65,49 @@ Method note: the notes were read in Jason's own logged-in Chrome (the Claude in 
 extension), so login-gated platforms are fine; his favourites page is
 `xiaohongshu.com/user/profile/5bfd6fa4e299a100010e6839?tab=fav`. Search pages on
 Xiaohongshu render nothing for automation; the profile/favourites page does.
+
+## Lusion study (2026-09-25, live in the browser with a real GPU)
+
+The clip Jason saved is Lusion's **About page** (lusion.co/about), not the homepage.
+
+**What the About page does, in order**
+1. **Loader**: black screen, a thin bar, a big counter 000 → 100 bottom-left, then the "L"
+   mark, then the scene fades in. Several seconds — the cost of a heavy scene.
+2. **Scene**: a monochrome dark planet at night. A cloud of thousands of glowing white
+   particles hangs in the sky in the shape of a human figure; it drifts, breathes, breaks
+   into a nebula and re-forms. Bloom on the particles is the only light source; it lights
+   the ground below it. Haze and fog toward the horizon, fine grain, floating rock
+   debris in the foreground. No colour at all — black, white, grey.
+3. **Mouse**: the cloud and camera shift a little with the pointer (parallax), nothing
+   more. The scene is alive before you touch it; the pointer only adds depth.
+4. **Scroll drives the camera**: the huge "LUSION" wordmark that sits *in front of* the
+   scene slides away; the camera tilts from the cloud down to a wide shot of the plain
+   with a tiny astronaut; the copy fades in split left / right, mixing upright and
+   italic lines ("WE ARE LUSION / A CREATIVE PRODUCTION STUDIO / CRAFTING UNIQUE DIGITAL
+   EXPERIENCES"). Everything eases; nothing snaps.
+5. **Chrome**: tiny "SCROLL TO EXPLORE", "+" corner marks, pill buttons "LET'S TALK" /
+   "MENU". Very few words.
+
+**Homepage, for contrast**: a light page with a framed, rounded 3D canvas of soft matte
+objects (jacks in white / blue / black); a huge headline "Bold Ideas, Brought to Life"
+with a blue ribbon that draws itself along the scroll; blue-duotone image tiles that
+morph; a pinned "PLAY REEL" frame that swaps clips as you scroll.
+
+**What we take (into `docs/lite-section-plan.md` §3b)**
+- **One light source, near-monochrome world.** Their cloud is the only light and the
+  world is grey; ours is the beam, and the lake should be desaturated deep teal so the
+  amber picture is the only warm thing on screen.
+- **Alive before touch.** Idle breathing (drifting particles, slow light shafts, the
+  device bobbing on the surface) — then the pointer adds parallax, and the drag adds
+  the reveal. Matches our auto-cruise rule.
+- **Foreground debris parallax** sells depth cheaply: our "marine snow" in front of the
+  fan plane, larger and slower than the far particles.
+- **Bloom on bright points** — their particles, our sonar marks and the beam edge.
+- **Type in the scene**: a huge wordmark partly behind the scene elements ("PINGLIVE"
+  behind the water surface, cut by the boat and the beam) is a strong brand moment worth
+  a try; upright + italic mixed lines for the caption.
+- **Scroll as a camera move**: in a section, a small tilt or the caption fading in as the
+  section scrolls into view — not a full scroll story.
+- **Restraint in chrome**: corner marks, one tiny hint line, pills.
+- **What we do not take**: the multi-second loader and the weight behind it. The look is
+  the target, not the cost — our poster shows at the first paint.

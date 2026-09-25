@@ -175,6 +175,11 @@ boat" becomes the device itself; the boat, if shown at all, is scenery.)
    widgets, no white cards, no drop-shadow soup.
 8. **Finishing.** A subtle vignette and film grain, a slow colour drift in the
    water, cinematic 16:9 framing on desktop.
+9. **Learned from Lusion's About page** (`docs/look-references.md`, Lusion study):
+   a near-monochrome world with one light source; alive before touch (idle breathing),
+   pointer = parallax, drag = reveal; foreground debris parallax for depth; bloom on
+   bright points; a huge wordmark partly behind the scene as a brand moment (to try);
+   upright + italic caption lines; corner marks and one tiny hint line.
 
 **Cost and the phone rule.** Desktop gets everything. Phones get the *same look* with
 fewer samples (light-shaft samples 24 → 8, bloom at 1/8 resolution, half the
