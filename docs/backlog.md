@@ -9,8 +9,8 @@ it is done. ✅ done · 🔧 in progress · ⬜ open.
 - ✅ Shallow water no longer blows out: near-range gain on bottom and structure echoes (decision #42)
 - ✅ Panoramic shows only what the 5°–25° beam covers; the curtain matches the picture box (decision #44)
 - ✅ Panoramic background looks like sonar again: soft cross-beam speckle up to ~35 m, radial streaks only at long range, no weed clumps, soft shadows (decision #46)
-- ⬜ Option: a faint sidelobe near the apex in Panoramic (the app's lake recordings show some bottom there); off for now so the picture matches the curtain exactly
-- ⬜ Down View in water deeper than the range: the bottom is out of range (the app behaves the same). Option for Jason: auto range in Down View too (the Range slider would move by itself) — not done without his call
+- ✅ Faint Panoramic sidelobe near the boat (≈ 0.8 from 25°, gone by 60°), like the app's lake recordings
+- ✅ Down View AUTO range: the range in use never leaves the bottom off screen; the phone shows AUTO when it is raised
 - ⬜ Down / PLM views: the app also draws echoes out to the screen corners beyond the range (PL Down 12 m frame, `reference/app-study/pl-down-menu.jpg`); the engine still cuts at the range arc there. Apply the box rule + box-shaped curtain to those views after checking the 3D look with Jason
 - ✅ Big fish bloom: bigger marks for big fish only (musky ×1.9, chinook ×1.6, bass ×1.1), range logic unchanged (decision #39)
 - ⬜ Panoramic in dense bait: the 64-mark cap is reached at ~15 % of boat positions (120 ft), so the weakest dashes drop out; raise to 96 if phone fps allows
@@ -59,13 +59,13 @@ it is done. ✅ done · 🔧 in progress · ⬜ open.
 - ✅ That wreck doubled to a 40 m cargo ship with holds, hatches, masts, derricks, crane, stern house, railings, lifeboats and debris (decision #38)
 - ✅ Big wreck moved 20 m up the default view to the 40 m basin floor and drawn at 70 % (decision #44)
 - ✅ Big wreck turned 35° counter-clockwise, debris with it (decision #49)
-- ⬜ Ask Jason: "往上20米" for the big wreck was done as 20 m up the screen (farther away, still on the bottom, now 40 m deep). If he meant 20 m shallower, move it onto a ~20 m patch instead (decision #44)
+- ✅ "往上20米" for the big wreck confirmed as up the screen (Jason 2026-09-24)
 - ✅ Bass / musky / salmon spread through the water column (bass 2–17 m, musky 5–13 m, salmon 4–33 m)
 - ✅ No fish swims through timber, rocks, wrecks or the logo: swim loops routed at load (decision #39)
 - ✅ Accuphy logo on the lakebed, standing in the boat's forward plane so Forward / Down image the whole mark (decision #39)
 - ⬜ Option for Jason: a guide step or a "find the logo" button that parks the boat on the lockup's line (today: a link with `?boat=41,1.5`, or drag the boat to the monument's west side)
 - ✅ The full ACCUPHY lockup on the lakebed (the resume point after Jason's pause): white letters + blue fan from the brand SVG, 22 m wide, on a stone plinth that lifts it clear of the bottom echo; Forward and Down show the whole word at the default 80 ft (decision #40)
-- ⬜ Default camera on 16:10 screens: the word's right end is cut at the screen edge (fully visible on 16:9 and wider). Options: pan the default camera ~3 m right, or shrink the word; every clear site further west hits the rock hump
+- ⬜ Default camera on 16:10 screens: the word's right end is cut at the screen edge (fully visible on 16:9 and wider). Jason noted it ("哦"), no change asked; options if he wants one: pan the default camera ~3 m right, or shrink the word
 - ✅ Salmon / lake trout also up-and-right in the deep water
 - ✅ App playback study done on the real V10 tablet (emulator route stays blocked by GLES 3.2): all PL and PLM views captured, findings in `sonar-style.md` §6 + `app-chrome.md`
 - ⬜ App study leftovers: every colour map on one frame, range stepping, imperial units (tablet route, cheap)

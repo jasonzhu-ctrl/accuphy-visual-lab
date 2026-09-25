@@ -658,3 +658,21 @@ Numbered log. Newest at the bottom.
     look of Garmin's LVS34 film and Accuphy's own mode animations, not the daytime
     sky of the 3D Lab. The section is a dark block inside the light shop page.
     Still planning only; nothing built.
+
+52. **2026-09-24** — **Panoramic gets a faint sidelobe near the boat; Down view gets AUTO
+    range** (Jason, answering the open questions: 1. 要的 但是要好 2. 不是 就是往屏幕上面移动
+    一些 3. 哦 4. 要的).
+    - **Panoramic sidelobe:** below the 5°–25° slab the response now continues at
+      ≈ 0.8 of the main lobe from 25° and fades out by 60°, so the bottom runs on
+      toward the boat a little darker (like the app's lake recordings) and only
+      the patch right under the transducer stays dark. Fish and structure use the
+      same response. The 3D curtain still draws the main slab.
+    - **Down view AUTO range:** in Down the depth axis is the range, so deep water
+      pushed the bottom off the screen. The range in use is now the larger of the
+      visitor's own setting and the next range step that puts the bottom (the
+      readout) at ~80 % of the height; it rises at once and comes back after
+      1.5 s. The slider shows the range in use; the phone marks a raised range
+      with a blue AUTO over it.
+    - **Wreck "往上":** confirmed as up the screen (decision #44 stands).
+    - **16:10 framing:** Jason noted it ("哦"); no change asked.
+

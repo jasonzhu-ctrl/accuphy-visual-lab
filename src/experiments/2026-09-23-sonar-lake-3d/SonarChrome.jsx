@@ -28,7 +28,7 @@ function LockedCtl({ onLocked, children, style }) {
   )
 }
 
-export default function SonarChrome({ layout, deviceId, mode, rangeFt, depthFt, imperial, gain, depthRef, onLocked, autoDepth = true }) {
+export default function SonarChrome({ layout, deviceId, mode, rangeFt, depthFt, imperial, gain, depthRef, onLocked, autoDepth = true, autoRange = false }) {
   const unit = imperial ? FT : 1 // metres per display unit
   const box = layout.box0
   const rangeLabel = imperial ? `${Math.round(rangeFt)}ft` : `${Math.round(rangeFt * FT)}m`
@@ -88,7 +88,12 @@ export default function SonarChrome({ layout, deviceId, mode, rangeFt, depthFt, 
         <LockedCtl onLocked={onLocked} style={{ position: 'absolute', left: '2.5%', top: '50%', transform: 'translateY(-50%)', fontSize: '7cqh', lineHeight: 1 }}>↶</LockedCtl>
         {!split && (
           <div style={{ position: 'absolute', left: '19%', top: '50%', transform: 'translate(-50%, -50%)', display: 'flex', alignItems: 'center', gap: '2.2cqh' }}>
-            <LockedCtl onLocked={onLocked}><Ring>−</Ring></LockedCtl><span className={num} style={{ fontSize: '4.8cqh', fontWeight: 500 }}>{rangeLabel}</span><LockedCtl onLocked={onLocked}><Ring>+</Ring></LockedCtl>
+            <LockedCtl onLocked={onLocked}><Ring>−</Ring></LockedCtl>
+            <span style={{ position: 'relative', lineHeight: 1.05 }}>
+              {autoRange && <span className={num} style={{ position: 'absolute', left: '50%', bottom: '100%', transform: 'translateX(-50%)', fontSize: '2.6cqh', fontWeight: 700, letterSpacing: '0.12em', color: '#7fcfff' }}>AUTO</span>}
+              <span className={num} style={{ fontSize: '4.8cqh', fontWeight: 500 }}>{rangeLabel}</span>
+            </span>
+            <LockedCtl onLocked={onLocked}><Ring>+</Ring></LockedCtl>
           </div>
         )}
         <LockedCtl onLocked={onLocked} style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}><Ring style={{ width: '9cqh', height: '9cqh', gap: '0.9cqh' }}><i style={{ display: 'block', width: '0.9cqh', height: '3.6cqh', background: '#fff', borderRadius: '0.3cqh' }} /><i style={{ display: 'block', width: '0.9cqh', height: '3.6cqh', background: '#fff', borderRadius: '0.3cqh' }} /></Ring></LockedCtl>

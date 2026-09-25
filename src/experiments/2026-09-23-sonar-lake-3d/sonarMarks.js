@@ -58,7 +58,11 @@ const smooth = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a
 // 5°–25° below the transducer (soft edges 2°–6° and 23°–28°). Only what lies in that slab — the same slab the
 // 3D curtain draws — shows on the screen (Jason 2026-09-24: 没有在探测的coverage里的东西是不会显示的). The old
 // response kept ~50 % out to 60° and let deep things the curtain never reaches (the wreck) show.
-export const panoLobe = (g) => smooth(0.035, 0.105, g) * (1 - smooth(0.4, 0.49, g))
+// Plus a sidelobe below the slab (Jason 2026-09-24: 要的 但是要好 — the app's lake recordings show bottom close to the
+// boat): ≈ 0.8 of the main response from 25° down, fading out by 60°, so the bottom continues toward the boat a
+// little darker and only the patch right under the transducer stays dark. The 3D curtain still draws the main slab.
+export const PANO_SIDELOBE = 0.8
+export const panoLobe = (g) => smooth(0.035, 0.105, g) * (1 - smooth(0.4, 0.49, g)) + PANO_SIDELOBE * smooth(0.4, 0.49, g) * (1 - smooth(0.62, 1.05, g))
 
 const pose = {}, pose0 = {}
 const cand = []

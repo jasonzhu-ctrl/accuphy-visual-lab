@@ -83,6 +83,8 @@ anyone's memory.
 - **Chats as of 2026-09-24:** "网页移动端可行性评估" (mobile and ad landing plan; runs here),
   "网页section轻量化设计" (lite section plan; runs here), and "Create accuphy-visual-lab repo
   and scaffold it" (built this repo and the 3D sonar lake Lab page). That last one was
-  started inside an RMA worktree, which the app cannot move, so it is retiring; its open
-  questions are in `docs/backlog.md` and the reminders.
+  started inside an RMA worktree, which the app cannot move; it keeps working on the Lab
+  (Jason's wish) but writes only into this folder and this project's memory, never RMA.
+- **The name:** "visual lab" and "Accuphy Lab" are the same project; Jason dropped "visual"
+  because the Lab is more than visuals. The folder keeps its name.
 

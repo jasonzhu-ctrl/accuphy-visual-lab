@@ -146,7 +146,8 @@ export const sonarFragment = /* glsl */ `
     return -(uTopCamY - (uTopNearFar.x + d * (uTopNearFar.y - uTopNearFar.x)));
   }
   // the flat fan's coverage vs depression angle: 5°–25° with soft edges (sonarMarks.js panoLobe, same numbers)
-  float panoLobe(float g) { return smoothstep(0.035, 0.105, g) * (1.0 - smoothstep(0.4, 0.49, g)); }
+  // + a sidelobe from 25° down (≈ 0.8, gone by 60°), same numbers as sonarMarks.js
+  float panoLobe(float g) { return smoothstep(0.035, 0.105, g) * (1.0 - smoothstep(0.4, 0.49, g)) + 0.8 * smoothstep(0.4, 0.49, g) * (1.0 - smoothstep(0.62, 1.05, g)); }
 
   void main() {
     float vyDown = 1.0 - vUv.y;

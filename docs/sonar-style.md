@@ -675,9 +675,11 @@ Panoramic shader and the fish marks share one coverage function
 (`panoLobe`: smoothstep 2°–6° up, 23°–28° down), applied to the bottom field,
 structure clumps and fish. The picture runs to its corners (forward ≤ range,
 |sideways| ≤ 0.936 range); the 3D curtain and the lakebed highlight are clipped
-to that box. Near the boat the bottom is steeper than the slab and stays dark;
-past a drop-off the deep bottom falls below the slab and only structure that
-reaches up into it shows.
+to that box. Past a drop-off the deep bottom falls below the slab and only structure that
+reaches up into it shows. Below the slab a sidelobe (≈ 0.8 of the main
+response from 25°, gone by 60°) lets the bottom run on toward the boat a little
+darker, as in the app's lake recordings; only the patch right under the
+transducer stays dark. The 3D curtain draws the main slab only.
 
 ### 7.18 Panoramic bottom texture by range (2026-09-24, Jason: "背景太失真了")
 - ≤ ~35 m (app lake frames, 14–29 m): smooth field; fine texture = soft value
