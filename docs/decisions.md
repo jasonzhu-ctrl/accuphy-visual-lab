@@ -563,3 +563,16 @@ Numbered log. Newest at the bottom.
       of Panoramic's reach within 240 ft; Forward (AUTO depth) and Down with
       ≥ 140 ft range show it.
 
+
+45. **2026-09-24** — **The ad page's main action is an email sign-up for an offer;
+    the mobile plan is planning only** (Jason: "a 但是这个事目前只是规划我没说动不要动
+    后面后面可以提醒提醒我以防万一我忘记 你多出一个移动端的方案吧").
+    - Main action: A, an email sign-up (Klaviyo) for an offer. "Shop PingLive"
+      is the secondary action.
+    - Nothing from `docs/mobile-marketing-plan.md` gets built until Jason says go.
+      Claude reminds him of the pending plan choice when he returns to this
+      project, and before any launch or ad work.
+    - A second option was added as Plan B ("story first, play second": scroll
+      story with video loops, the live 3D as an opt-in "try it" section).
+      Claude recommends B first, with A's game inside it. The choice between
+      the plans is Jason's.

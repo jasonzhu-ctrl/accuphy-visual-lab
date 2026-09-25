@@ -108,9 +108,11 @@ the cheapest Android phone class). Phone size was emulated at 360×800.
   the logo source files (.ai/.cdr/.zip/.DS_Store) from `public/`.
 - To re-run the test: see the `sonar-page-real-device-perf` memory note (adb reverse + Chrome
   DevTools over adb).
-- ⬜ **Mobile plan (proposal, waiting on Jason):** `docs/mobile-marketing-plan.md` covers the
-  60-second portrait flow, layout, quality tiers, loading, conversion, measurement, ads and the
-  order of work. Decisions for Jason are listed at its end, to be asked one at a time.
+- ⬜ **Mobile plan: PLANNING ONLY, do not build until Jason says go** (decision #45: "我没说动不要动").
+  `docs/mobile-marketing-plan.md` has Plan A (a 60-second guided game) and Plan B (story first,
+  play second), a comparison and the recommendation (B first, with A inside). The main action is
+  decided: an email sign-up for an offer. Remind Jason of the pending plan choice when he is back
+  on this project, and before any launch or ad work.
 
 ## Engineering
 - ✅ Dev helper `?bigphone` (DEV only): the phone frame fills the viewport so the sonar picture can be inspected in screenshots

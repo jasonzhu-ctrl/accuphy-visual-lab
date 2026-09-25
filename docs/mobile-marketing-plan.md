@@ -1,7 +1,13 @@
 # Mobile plan: Accuphy Lab as an ad landing experience
 
-**Status:** proposal, 2026-09-24, waiting on Jason (see "Decisions for Jason" at the end).
-Jason asked: 移动端你帮我策划一下我应该怎么搞合理好用 符合我们最终用于体验营销.
+**Status: planning only.** Nothing gets built until Jason says go. On 2026-09-24 he said
+"我没说动不要动 … 后面可以提醒提醒我以防万一我忘记". Claude reminds him of the pending choice when
+he is back on this project, and before any launch or ad work.
+
+He first asked 移动端你帮我策划一下我应该怎么搞合理好用 符合我们最终用于体验营销, then asked for a
+second option (你多出一个移动端的方案吧), which is Plan B below.
+
+**Decided:** the page's main action is an email sign-up for an offer. Jason chose A (decision #45).
 
 **Inputs:** the real-device test (backlog, "Mobile + Meta ads readiness") and decisions #38–#40.
 
@@ -15,7 +21,10 @@ in-app browser. On the page they should:
 3. finish a short guided play in about 60 s;
 4. leave an email for an offer, or tap through to the shop.
 
-## The 60-second experience (portrait)
+## Plan A: the 60-second guided game (portrait)
+
+The sections from here down to Plan B describe Plan A. Loading, Conversion, Measurement and Ads
+apply to both plans.
 
 | Time | What the visitor sees and does | What the page does |
 |---|---|---|
@@ -67,7 +76,7 @@ The budget-GPU baseline is 10–24 fps; see the backlog.
 
 ## Conversion
 
-- **Primary (proposed):** an email sign-up for an offer through Klaviyo. Show it after the "aha"
+- **Primary (decided, #45):** an email sign-up for an offer through Klaviyo. Show it after the "aha"
   moment (the end of the tour, or finding the sign), with a "No thanks, keep exploring" option.
 - **Secondary:** a "Shop PingLive" button that opens the Shopify product page, with UTM tags.
 - The display-only app buttons open the same offer card and can be dismissed. They are not a
@@ -102,9 +111,48 @@ optimise for landing-page views or engagement; after that, optimise for Lead.
 6. A small-budget ad test. After that: the landscape layout, the video fallback and more scene
    links.
 
+## Plan B: story first, play second (portrait)
+
+A short vertical story that the visitor scrolls, like a product page. Pre-recorded loops from
+the lab carry the message, and the live 3D is an opt-in "try it" section.
+
+| Section | What the visitor sees | Notes |
+|---|---|---|
+| 1. Hero (0–2 s) | A full-width looping clip: the boat passes and fish light up on the sonar. Headline: "See every fish under your boat, live." | Muted, autoplaying inline video with a poster image, so something shows at once |
+| 2. The beam | A loop of the 3D curtain touching fish and timber | One line of copy |
+| 3. Three views | Down, Forward and Panoramic, each a 3–4 s loop with one line on when to use it | Swipeable or stacked cards |
+| 4. Try it yourself | A card, "Drive the boat (live 3D)". Tapping it opens the interactive lab full screen | The 3D loads only on this tap. Phones that are too slow get a longer clip instead |
+| 5. The offer | An email field and a button for early offers and PingLive tips, with "Shop PingLive" below | An inline section, not a pop-up |
+| Always | After the first scroll, a sticky bottom bar: "Get the offer" | Within thumb reach; jumps to section 5 |
+
+- **Why:**
+  - It opens in about 1 s and plays smoothly on any phone, because video is decoded by hardware.
+  - It gets the message across even to visitors who never touch anything.
+  - The same loops become the ads, so the ad and the page match.
+- **Costs:**
+  - There is less play on mobile, because the game becomes optional.
+  - The clips have to be recorded from the lab, and recorded again whenever its look changes.
+- **Desktop** keeps the full interactive lab under either plan.
+
+## Plan A vs Plan B
+
+| | Plan A: guided game | Plan B: story + optional play |
+|---|---|---|
+| First thing on screen | A poster, then the 3D in 2–4 s | Video in about 1 s |
+| Cheap phones | Needs the smooth mode first | Smooth anywhere (video) |
+| "Wow" | Strong: visitors drive it themselves | Medium: they watch, then play if they want |
+| Work before launch | Large: performance, layout, tour | Medium: record clips, build the page |
+| Ads | Screen recordings | The same clips, so ad and page match |
+| Email sign-up | A card after finding the hidden sign | An inline section plus a sticky button |
+
+**Claude's recommendation:** launch with Plan B, because it is faster and lower-risk, and put Plan
+A's game inside it as the "Try it yourself" section. Improve the game over time with the
+smooth-mode work. If the data shows people love playing, move the game up front.
+
 ## Decisions for Jason (one at a time)
 
-1. **Main action:** an email for an offer (recommended), or straight to the shop.
-2. **The offer itself:** for example a discount, early access or free shipping.
-3. **Where the page lives:** the subdomain.
-4. **Wording** of the headline and the step cards (first drafts exist).
+1. ~~Main action~~: decided on 2026-09-24. It is an email sign-up for an offer (A, decision #45).
+2. **Which plan:** A, B, or B first with A inside (recommended).
+3. **The offer itself:** for example a discount, early access or free shipping.
+4. **Where the page lives:** the subdomain (for example `lab.accuphy.com`).
+5. **Wording** of the headline, the step cards and the story sections (first drafts exist).
