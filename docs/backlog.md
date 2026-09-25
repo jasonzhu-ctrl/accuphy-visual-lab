@@ -161,6 +161,7 @@ the cheapest Android phone class). Phone size was emulated at 360×800.
 - 🔧 Mobile performance: dpr capped at 1.5, high-performance GL context; real-device check done 2026-09-24 (budget GPU 10–24 fps, see "Mobile + Meta ads readiness")
 - ✅ React 19 + R3F `refCleanup` console error — gone since StrictMode was removed (no new occurrences in this session's checks)
 - ⬜ **Local for now** (Jason 2026-09-24): `npm run build` + `npm run preview` on this Mac. Public hosting + Shopify embed stay in the plan for later, unchanged
+- ✅ **Private preview link** (2026-09-25; Jason could not open localhost from a cloud chat): https://claude.ai/artifact/4GdHHYZKTHgYyEzjV12RmW, a claude.ai page only Jason can open (not public hosting). A snapshot of the Lab as on main `6738310`; it does not update by itself. To refresh it: `npx vite build --base ./` into a scratch folder, rewrite the logo path `/brand/logo/White Accuphy Logo.png` to `./brand/logo/white-accuphy-logo.png` (copy the file to that name), default the hash to `#2026-09-23-sonar-lake-3d`, publish only index + assets + fonts + that logo (never the .ai/.cdr/.zip sources), and pass this URL as `url` so the link stays the same. The sign-up gate sends nothing (no Klaviyo key yet).
 
 ## Lite section (planning only — decision #48)
 - ⬜ **Do not build until Jason says go.** `docs/lite-section-plan.md`: the original side-view visualizer as a
