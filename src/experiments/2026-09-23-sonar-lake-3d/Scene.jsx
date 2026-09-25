@@ -139,7 +139,8 @@ function BigWreck({ mat }) {
   const ax = Math.cos(yaw), az = -Math.sin(yaw)
   const yBow = bedY(x + ax * L * 0.45, z + az * L * 0.45), yStern = bedY(x - ax * L * 0.45, z - az * L * 0.45)
   const pitch = Math.atan2(yBow - yStern, L * 0.9)
-  const y = (yBow + yStern) / 2 - 1.1 * k
+  // dev ?wrecklift=m raises the wreck (imaging tests against the app's 10 m wreck recording)
+  const y = (yBow + yStern) / 2 - 1.1 * k + (import.meta.env.DEV ? +((/wrecklift=([\d.]+)/.exec(window.location.search) || [])[1] || 0) : 0)
   return (
     <group>
       <group position={[x, y, z]} rotation-y={yaw} scale={k}>
@@ -393,9 +394,9 @@ export default function LakeScene({ state, sonarRect, paused = false }) {
     fish.userData.uniforms.uHighlight.value.set('#ffe9a0') // fish light up warm, like a sonar return
     fish.userData.uniforms.uFogDensity.value = 0.006
     fish.side = THREE.DoubleSide // flat fins
-    return { bed: makeLakeMaterial(), inst: makeLakeMaterial({ structure: true }), logo: makeLakeMaterial({ logo: true }), fish }
+    return { bed: makeLakeMaterial(), inst: makeLakeMaterial({ structure: true }), steel: makeLakeMaterial({ steel: true }), logo: makeLakeMaterial({ logo: true }), fish }
   }, [])
-  const beamMats = useMemo(() => [mats.bed, mats.inst, mats.fish, mats.logo], [mats])
+  const beamMats = useMemo(() => [mats.bed, mats.inst, mats.steel, mats.fish, mats.logo], [mats])
   return (
     <Canvas frameloop={paused ? 'never' : 'always'} dpr={[1, 1.5]} camera={{ fov: 38, near: 0.5, far: 400, position: [-38, 34, 54] }} gl={{ antialias: true, powerPreference: 'high-performance' }}>
       <color attach="background" args={['#9cc1cf']} />
@@ -405,8 +406,8 @@ export default function LakeScene({ state, sonarRect, paused = false }) {
       <Lakebed mat={mats.bed} />
       <mesh rotation-x={-Math.PI / 2} position-y={-47} onUpdate={(o) => o.layers.set(SONAR_HIDE_LAYER)}><planeGeometry args={[900, 900]} /><meshBasicMaterial color="#17545f" /></mesh>
       <Structures mat={mats.inst} />
-      <Wreck mat={mats.inst} />
-      <BigWreck mat={mats.inst} />
+      <Wreck mat={mats.steel} />
+      <BigWreck mat={mats.steel} />
       <Logo mat={mats.logo} stoneMat={mats.inst} />
       {import.meta.env.DEV && /fishtest/.test(window.location.search) && <TestPiling mat={mats.inst} />}
       <Fish mat={mats.fish} state={state} />

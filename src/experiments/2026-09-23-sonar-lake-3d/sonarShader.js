@@ -24,7 +24,7 @@ export const sonarFragment = /* glsl */ `
   precision highp float;
   varying vec2 vUv;
   uniform sampler2D uDepth0; uniform sampler2D uDepth1;
-  uniform sampler2D uColor0; uniform sampler2D uColor1; // .a = tag: 0.5 structure, 0 bottom
+  uniform sampler2D uColor0; uniform sampler2D uColor1; // .a = tag: 0.75 steel (wrecks), 0.5 other structure, 0 bottom
   uniform int uFanCount;
   // per fan: x = centre angle from straight-down in the SCREEN plane (rad, +right),
   //          y = half wide angle (rad), z = tanH = tan(half wide), w = tanV = tan(half thick)
@@ -279,16 +279,21 @@ export const sonarFragment = /* glsl */ `
           float ty = (v * 2.0 - 1.0) * uFan[k].w;
           float hit = sampleDist(k, vec2(u, v), length(vec3(tan(a), ty, 1.0)));
           float dr = r - hit;
-          float structure = step(0.25, sampleTag(k, vec2(u, v)));
-          // structure faces are sharp (real pulse ≈ 0.1 m) and solid; the bottom band is wider with a tail
-          float sg = mix(sigma, (0.08 + 0.004 * r) * (1.0 + 1.5 * smoothstep(6.0, 30.0, r)), structure); // far faces: the beam smears them wider
+          float tag = sampleTag(k, vec2(u, v));
+          float structure = step(0.25, tag), steel = step(0.62, tag);
+          // timber and rock faces are sharp (real pulse ≈ 0.1 m) and solid; the bottom band is wider with a tail.
+          // Steel (wrecks) is by far the strongest reflector: after the log compression its pulse skirts and the
+          // ringing inside the hull stay bright, so the app draws a wreck as thick glowing bands with long tails,
+          // not a line drawing (Jason 2026-09-25: 结构物的成像不对劲; PL Forward wreck recording, same depth and scale:
+          // reference/engine-compare/wreck-compare-*.png)
+          float sg = mix(sigma, mix((0.08 + 0.004 * r) * (1.0 + 1.5 * smoothstep(6.0, 30.0, r)), sigma, steel), structure);
           float pulse = exp(-dr * dr / (sg * sg)) * (1.0 - 0.22 * structure) * mix(1.0, 0.85 + 0.25 * filament, structure);
-          float tail = dr > 0.0 ? 0.6 * exp(-dr / tailLen) : 0.0;
+          float tail = dr > 0.0 ? (0.6 + 0.6 * steel) * exp(-dr / (tailLen * (1.0 + 0.5 * steel))) : 0.0;
           float second = 0.10 * exp(-(r - 2.0 * hit) * (r - 2.0 * hit) / (4.0 * sigma * sigma));
           float wgt = 0.55 + 0.9 * (1.0 - abs(v * 2.0 - 1.0));
           acc += (1.2 * pulse + tail + second) * wgt;
           peak = max(peak, pulse * (1.0 - structure));
-          spk = max(spk, pulse * structure);
+          spk = max(spk, pulse * structure * (1.0 + 0.3 * steel));
         }
         acc = acc / 16.0 + 0.7 * peak + 0.9 * spk;
         float atten = 1.0 - 0.4 * clamp(r / uRange, 0.0, 1.0);

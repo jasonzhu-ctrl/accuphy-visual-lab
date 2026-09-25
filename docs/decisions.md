@@ -828,3 +828,20 @@ Numbered log. Newest at the bottom.
       180 ft (~55 m), so on the phone it is a low shape on the bottom. Moving it to
       shallower water is Jason's call.
 
+63. **2026-09-25** — **Wrecks image as steel: thick glowing bands, not a line drawing**
+    (Jason, after #62: "差距还是很大 和之前的问题一样 结构物的成像不对劲").
+    - **Checked like for like:** a dev option `?wrecklift=29` raises the big wreck so its
+      deck sits at ~7.5 m, like the recording's wreck. With `?dev`, range 45 ft and depth
+      40 ft (the recording's 14 m / 12 m), the engine drew the ship as a thin crisp outline
+      of its side (every structure face used a ~0.1 m pulse). The app draws thick bright
+      bands with long tails and streaks along the beams.
+    - **Why:** steel is by far the strongest reflector. After the log compression its pulse
+      skirts and the ringing inside the hull stay above the window, so the bands are
+      as wide as the bottom's, with longer tails.
+    - **Fix:** a new sonar tag, steel (0.75), for both wrecks and the debris (their own
+      `steel` material). Steel faces take the bottom's pulse width, a tail twice as
+      strong and 1.5× longer, and ×1.3 peak. Timber and rocks keep their sharp thin look
+      (checked on the shelf scene), and the bottom and fish are unchanged.
+    - Comparison: `reference/engine-compare/wreck-compare-2-2026-09-25.png` (app ·
+      before · after at the same depth · after at the real 40 m spot).
+
