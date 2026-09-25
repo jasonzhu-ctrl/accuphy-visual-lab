@@ -591,3 +591,16 @@ Numbered log. Newest at the bottom.
     field stays at its calibrated brightness; the app recording looks brighter
     mainly because it uses the crimson "red" map (backlog).
 
+
+47. **2026-09-24** — **No deadline for mobile; plan for the best experience, not the
+    fastest launch** (Jason: "我不着急 时间不是问题 我们只是规划 思考 如何把移动端做得更
+    合理"). This revises the recommendation in #45: the interactive experience is
+    the core of the page (the visitor drives it); Plan B's video story is only the
+    fallback for phones that cannot run the 3D, and its loops become the ad
+    creative. Current thinking is written as "Principles for mobile" in
+    `docs/mobile-marketing-plan.md`: the visitor's phone is the sonar screen (no
+    drawn iPhone frame on phones), the sonar picture re-laid for portrait rather
+    than shrunk, screen up / water down, drag anywhere in the water, hints
+    instead of teleports, quality tiers done properly, landscape as "real device
+    mode", email after the "aha". Still planning only — nothing is built until
+    Jason says go.

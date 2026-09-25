@@ -9,6 +9,42 @@ second option (你多出一个移动端的方案吧), which is Plan B below.
 
 **Decided:** the page's main action is an email sign-up for an offer. Jason chose A (decision #45).
 
+**Direction (decision #47):** there is no deadline. Jason: "我不着急 时间不是问题 我们只是规划 思考
+如何把移动端做得更合理". So the plan optimises for the best mobile experience, not the fastest
+launch. The interactive experience is the core (experiential marketing means the visitor drives
+it); Plan B's video story is the fallback for phones that cannot run the 3D, not the main plan.
+The "Principles for mobile" section below is the current thinking.
+
+## Principles for mobile (current thinking, 2026-09-24)
+
+1. **The visitor's phone is the sonar screen.** On desktop the sonar sits inside a drawn iPhone,
+   to say "this is what your phone shows". On a phone the visitor is already holding the device,
+   so the drawn frame is redundant and wastes pixels. Show the sonar picture edge to edge with the
+   real app's chrome, as if PingLive were running on this phone.
+2. **Re-lay the sonar picture for portrait, don't shrink the landscape one.** At full width the
+   app's 2:1 picture is only ~170 px tall on a 360 px phone. The engine already fills any box and
+   scales each axis on its own (`screenLayout`), so give the portrait picture a taller box
+   (about 6:5) and let the axes follow.
+3. **Screen up, water down.** Sonar at the top, where the eyes go (the unit on a boat's console);
+   the lake at the bottom, where the thumb is (the water below the boat). The view pills sit
+   between them, in the most reachable strip of the screen.
+4. **Drag anywhere in the water.** Dragging any point of the lake area moves the boat by the same
+   amount (relative drag), so the finger never has to land on the small boat and never covers it.
+   Tapping a fish or a structure sends the boat there (autopilot) as a second, touch-friendly way.
+5. **Guide with hints, not teleports.** The visitor drives to each moment (first fish, bass under
+   the timber, the wreck, the hidden ACCUPHY sign) following an arrow or a hint. Each moment gets a
+   small callout on the sonar picture ("Bass · 12 ft"). The boat starts next to fish, so the very
+   first drag already shows something.
+6. **Quality tiers done properly.** A mobile render path: dpr 1–1.5 by measured frame time, a
+   30 fps cap on slow phones, the sonar picture rendered at half resolution and upscaled (the
+   noise texture hides it), fewer plants. Target: 30 fps on V10-class hardware, 60 on good phones.
+   Video (Plan B) only for phones that still cannot.
+7. **Landscape is "real device mode".** If the visitor rotates, the sonar fills the screen exactly
+   like the real app, and the lake becomes a small inset (tap to enlarge). Portrait stays the
+   default and complete; nothing ever asks the visitor to rotate.
+8. **Ask for the email after the "aha", never before.** Inline, dismissible, with "Shop PingLive"
+   next to it (decision #45).
+
 **Inputs:** the real-device test (backlog, "Mobile + Meta ads readiness") and decisions #38–#40.
 
 ## Goal
@@ -145,14 +181,22 @@ the lab carry the message, and the live 3D is an opt-in "try it" section.
 | Ads | Screen recordings | The same clips, so ad and page match |
 | Email sign-up | A card after finding the hidden sign | An inline section plus a sticky button |
 
-**Claude's recommendation:** launch with Plan B, because it is faster and lower-risk, and put Plan
-A's game inside it as the "Try it yourself" section. Improve the game over time with the
-smooth-mode work. If the data shows people love playing, move the game up front.
+**Recommendation (revised, decision #47):** since there is no deadline, build the interactive
+experience properly along the principles above (Plan A's direction, reshaped by the principles).
+Plan B's video story is the fallback for phones that cannot run the 3D, and its loops double as
+the ad creative. The earlier "B first because it is faster" advice no longer applies.
 
 ## Decisions for Jason (one at a time)
 
 1. ~~Main action~~: decided on 2026-09-24. It is an email sign-up for an offer (A, decision #45).
-2. **Which plan:** A, B, or B first with A inside (recommended).
-3. **The offer itself:** for example a discount, early access or free shipping.
-4. **Where the page lives:** the subdomain (for example `lab.accuphy.com`).
-5. **Wording** of the headline, the step cards and the story sections (first drafts exist).
+2. ~~Which plan~~: decided on 2026-09-24 (#47). The interactive experience is the core; video is
+   the fallback for phones that cannot run the 3D.
+3. **The "aha":** what should a visitor from an ad understand or feel first? (a) "I can see the
+   fish under the water on my phone" (new to live sonar); (b) "PingLive's picture is as clear as
+   the big brands" (anglers who know LiveScope); (c) "See the fish first, then cast" (the outcome).
+   This sets the first ten seconds and the ad hook.
+4. **Layout:** screen up, water down (principle 3) versus lake up, sonar down (Plan A's table).
+5. **Guidance:** hints the visitor follows, or a tour that moves the boat.
+6. **The offer itself:** for example a discount, early access or free shipping.
+7. **Where the page lives:** the subdomain (for example `lab.accuphy.com`).
+8. **Wording** of the headline, the callouts and the story sections (first drafts exist).
