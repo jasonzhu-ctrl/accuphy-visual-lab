@@ -129,3 +129,6 @@ the cheapest Android phone class). Phone size was emulated at 360×800.
   light web component `<accuphy-sonar>` for accuphy.ca sections — the fan is the screen (no phone inset),
   two controls, no three.js, ≤ 90 KB first visit, ≥ 50 fps target on the V10. Remind Jason of the go/no-go
   when he is back; when he says go, §8 of the plan is the build order (prototype → packaging → measure → Shopify test page)
+- ⬜ **Look gate (decision #50):** premium + technical is a hard requirement (Jason: 视觉的高级感科技感非常非常重要). Plan §3b
+  lists the light, beam-volume, parallax, bloom, motion and glass-UI rules; phones get the same look with fewer samples.
+  Jason reviews the prototype's look against the LVS34 frames, Accuphy's animations and the 3D Lab before packaging

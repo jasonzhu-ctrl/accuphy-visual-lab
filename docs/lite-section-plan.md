@@ -77,7 +77,8 @@ Why the side view is the right form now, not a compromise:
 └────────────────────────────────────────────────────────────────┘
 ```
 
-- **Layout:** full-width section, about 16:9 on desktop and 4:3 on phones. Roughly a
+- **Layout:** full-width section, about 16:9 on desktop and 4:3 on phones (the look
+  itself is specified in §3b). Roughly a
   fifth sky (a shoreline silhouette, no art to load), the rest water: bottom, standing
   timber, rocks, a small wreck and a few schools of fish swimming fixed loops.
   Everything is drawn procedurally; nothing is downloaded except the poster (§6).
@@ -113,6 +114,73 @@ Why the side view is the right form now, not a compromise:
 - **Optional, Jason's call (§9):** when a fish enters the fan for the first time, a
   small tag next to its mark ("bass · 12 ft") for a second or two — the cheapest
   possible explanation of "this dash is that fish".
+
+## 3b. The look: premium and technical (hard requirement)
+
+Jason, 2026-09-24, on this plan: "视觉的高级感科技感非常非常重要!!!!!" — the premium,
+high-tech look comes first. **Light never means plain.** The weight targets in §6 are
+met by *computing* the picture, not by simplifying it: everything below is per-pixel
+maths and CSS and costs no download. Where the 3D Lab spends bytes and GPU on
+geometry, the section spends them on light.
+
+**Where the feel comes from**
+
+1. **Light in the water.** Lit from the surface: brightness falls with depth, slow
+   light shafts drift through the water column, a caustic shimmer plays on the
+   shallow bottom, the surface is a thin bright line with a specular glint, and a
+   soft depth fog swallows the far bottom. A dusk palette — deep teal → navy → near
+   black — so the amber sonar picture glows against it. This is the water of
+   Garmin's LVS34 film and of Accuphy's own mode animations
+   (`docs/3d-beam-reference.md`).
+2. **The beam as a volume, not a triangle.** Translucent cyan fill with a fresnel-like
+   edge glow and thin white edge lines (the measured Garmin look), brighter where it
+   meets the bottom (the lit footprint), a faint ping pulse travelling out along the
+   fan every ~0.8 s, and a second, fainter outline offset by the slab's thickness so
+   the fan reads as the 20° slab it is (2.5D).
+3. **Depth without a 3D engine.** Three or four parallax layers — far shore, deep
+   water, the fan plane, drifting particles in front ("marine snow") — that shift by
+   different amounts with the cursor and with the page scroll. The fan plane itself
+   never moves, so the 1:1 "what you see is what the sonar sees" mapping holds.
+4. **Materials, not clip-art.** Fish and timber are silhouettes lit from above with a
+   rim highlight and depth fog, never flat cartoon shapes; the bottom is a soft,
+   textured slope under the caustic light; the boat is a clean dark silhouette with
+   one specular edge (or a real side-view cutout of the device, if Jason supplies
+   one — still owed, `docs/backlog.md`).
+5. **The sonar picture, faithful and glowing.** garmin_amber, the filament texture,
+   the hot bottom edge, dashes with cores — plus a cheap bloom on the hot pixels (a
+   quarter-resolution blur pass) so marks glow like a real display. The app's own
+   readouts, not invented ones (decision #18): the big white depth number at the
+   transducer and the thin italic depth numbers along the fan's edge.
+6. **Motion.** 60 fps; the boat eases and leaves a wake ripple; the fan morphs with
+   easing on every device or view change; fish swim with natural body cycles; the
+   readout numbers tick; nothing snaps. Reduced-motion visitors get a still boat.
+7. **UI restraint.** The approved Apple-style frosted glass (decision #37) for the
+   pills and the readout: gradient hairline edge, one accent (brand blue `#028cdf`),
+   sentence-case labels, small uppercase tracked captions for the instrument
+   readouts. Brand typography is inherited from the theme for free — Eurostile Heavy
+   headings and Instrument Sans body are already on shop.accuphy.com. No default
+   widgets, no white cards, no drop-shadow soup.
+8. **Finishing.** A subtle vignette and film grain, a slow colour drift in the
+   water, cinematic 16:9 framing on desktop.
+
+**Cost and the phone rule.** Desktop gets everything. Phones get the *same look* with
+fewer samples (light-shaft samples 24 → 8, bloom at 1/8 resolution, half the
+particles) — never a different, plainer look. Every effect is switchable, so the
+frame-time governor sheds them in a fixed order (grain → bloom → light shafts →
+parallax) while the picture, the beam and the fish always stay.
+
+**Avoid (from Jason's earlier reviews):** the "very AI" white-card look (decision
+#22), panels so dark they lose the glass feel (#37), blurry or cartoon marks (#33),
+invented rings and grids on the sonar (#18), anything that reads as a diagram.
+
+**References for the look pass:** the LVS34 frames
+(`reference/app-study/livescope-lvs34/`), Accuphy's mode animations
+(`reference/animations/`), the 3D Lab's approved glass UI, and Apple / DJI product
+pages for spacing and restraint.
+
+**Gate.** Step 1 of §8 ends with a look review by Jason on the desktop and on his
+phone, side by side with those references, before anything is packaged. If the look
+does not reach the 3D Lab's level, the section does not ship.
 
 ## 4. What carries over from the 3D work
 
@@ -198,6 +266,7 @@ Option for later: a small "from above" panel that appears only when Panoramic is
 | V10 frame rate | 10–24 fps | ≥ 50 fps at dpr 1.5, never under 30 |
 | Controls | 3 + cards + inset buttons | 2 (or 1 with the device preset) |
 | Page scroll | blocked over the scene | vertical swipes scroll, horizontal drags steer |
+| Look | approved glass UI + the 3D lake | at least the 3D Lab’s level; Jason’s sign-off (§3b) |
 
 Risks, stated plainly: (1) the 2D picture must match the approved inset — one
 calibration round with the histogram check is planned, not assumed; (2) phone fps is
@@ -229,7 +298,8 @@ Instagram) have their own quirks — tested in step 2 of §8.
 1. **Prototype in the lab** — `src/experiments/<date>-sonar-section-lite/`: side
    view, boat, fan, the sonar picture inside, raw WebGL. Side by side with the 3D
    inset on the same scene rules, and the §6.11 histogram against the two reference
-   frames. Reviewed on the desktop and on the V10.
+   frames. Ends with the look review of §3b (Jason, desktop and phone, against the
+   references) — the gate before packaging.
 2. **Section packaging** — the web component, poster, lazy init, pills and toggle,
    auto-cruise, touch rules; a test page that fakes a long product page with the
    section in the middle, to prove scrolling and the in-app browsers.
@@ -253,6 +323,8 @@ Steps 1–3 are about two working sessions; step 4 is an hour plus Jason's revie
    product pages. (Recommended.)
 4. **First placement:** the PingLive product page. (Recommended.)
 5. **Fish tags** on the first reveal: yes or no.
+6. **Mood:** dark cinematic water (recommended: the amber picture glows, and it is the
+   Garmin / Accuphy-animation look) or the daytime look of the 3D Lab.
 
 Wording of the headline and captions comes after the prototype, so Jason judges it on
 the real thing.

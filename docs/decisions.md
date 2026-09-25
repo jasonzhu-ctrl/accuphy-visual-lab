@@ -633,3 +633,20 @@ Numbered log. Newest at the bottom.
     house to the left. The debris ring turns with it; fish still route around
     it (no loop touches structure).
 
+
+50. **2026-09-24** — **The lite section is judged on its look first: premium and
+    technical is a hard requirement** (Jason, on the #48 plan: 视觉的高级感科技感非常
+    非常重要!!!!!). Light never means plain: the section's weight targets are met by
+    computing the picture, not by simplifying it. `docs/lite-section-plan.md` §3b now
+    spells out where the feel comes from at zero download cost — water lit from the
+    surface with light shafts, caustics and depth fog in a dusk palette so the amber
+    picture glows; the beam as a translucent volume with fresnel edges, thin white
+    edge lines, a lit footprint, a travelling ping and a thickness outline (2.5D);
+    parallax layers and drifting particles; lit silhouettes instead of clip-art;
+    bloom on the hot sonar pixels and the app's own readouts; eased motion
+    everywhere; the approved frosted-glass UI with brand typography inherited from
+    the theme. Phones get the same look with fewer samples, never a plainer one.
+    Gate: Jason's look review against the LVS34 frames, Accuphy's animations and the
+    3D Lab before anything is packaged; if it does not reach the 3D Lab's level it
+    does not ship. Open question: dark cinematic water (recommended) or the daytime
+    look of the 3D Lab. Still planning only.
