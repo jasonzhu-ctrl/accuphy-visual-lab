@@ -139,6 +139,13 @@ optimise for landing-page views or engagement; after that, optimise for Lead.
 - **Links:** give each ad variant its own scene preset link (the wreck, bass under timber, the
   hidden sign), so the page opens on what the ad showed.
 - **Budget:** start small, compare cost per engaged visitor and cost per lead, then scale.
+- **Meta feasibility (2026-09-25; the Drive study "Meta ads feasibility"):** Meta fits awareness,
+  leads and retargeting, not direct sales. The order is:
+  1. tracking first;
+  2. test on our own ~1,700 never-ordered subscribers, at no cost;
+  3. Canada before the ice season, and the US only after PingLive is available there and the
+     checkout problems are fixed;
+  4. the goal is an email lead, and Klaviyo does the selling.
 
 ## Order of work
 
