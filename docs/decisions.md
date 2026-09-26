@@ -1025,3 +1025,19 @@ Numbered log. Newest at the bottom.
     - To update: rebuild, copy `<outDir>/pages/*` into a clone of that repository, commit, push.
       The link stays the same.
 
+73. **2026-09-26** — **Fix: the sonar picture was black in Safari** (Jason: a friend opened the public
+    test link on an iPad, in Safari: "小窗里的声纳画面是全黑的").
+    - **Cause:** the colour table (LUT) that turns echo strength into the orange palette was a
+      FloatType texture sampled with LinearFilter. Safari (iPad, iPhone and Mac) has no
+      OES_texture_float_linear, so the texture was incomplete and every lookup returned black.
+      Chrome filters float textures, which is why every desktop and Android check passed.
+    - **Fix:** the LUT is 8-bit RGBA (`colormaps.js`), which filters everywhere. The colour maps
+      are 8-bit colours anyway: the picture is identical in Chrome (same LUT histogram, white
+      7.9 %, black 88 %). The dev `__sonarHist` reads the 8-bit table.
+    - **Audit of the other textures:** the terrain is half-float with linear filtering (filterable
+      in WebGL2 everywhere), the marks are float with nearest filtering, and the depth textures
+      use nearest filtering. All are fine in Safari.
+    - The public test page (GitHub Pages) and the Artifact were rebuilt with the fix.
+    - **Lesson:** test Safari/WebKit before sharing. No Safari was drivable from this session,
+      because Xcode is not installed for the iOS simulator and Safari is read-only for Claude.
+
