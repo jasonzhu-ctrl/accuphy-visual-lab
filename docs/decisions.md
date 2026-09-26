@@ -979,3 +979,25 @@ Numbered log. Newest at the bottom.
     (lab.accuphy.ca vs a store page), the lite section's Shopify test page, the Klaviyo
     list and keys, Meta Pixel + UTM + "Shop PingLive" button, the US phone-checkout walk
     (decision #57). Written into `CLAUDE.md` ("Boundary with the website project").
+
+70. **2026-09-26** — **A friends test build, published as a private claude.ai Artifact**
+    (Jason: "可以暂时把他变成在一个网页里可以使用的版本吗 我想给我的朋友测试" and "是不是
+    artifacts就行 合适吗"). The tooling commit 3150b66 says "decision #69" by mistake: #69 is
+    the accuphy-website boundary, written by another chat at the same time.
+    - **What:** the 3D sonar lake alone, without the Lab gallery or its back link, as ONE
+      self-contained HTML file (2.25 MB): code, styles, the three brand fonts and the white logo
+      are all inlined, and nothing is loaded from other hosts.
+      Link: https://claude.ai/artifact/RnCBYTexY5vcEqJy2hAsN7 (private until Jason shares it
+      from the page's Share menu).
+    - **How to rebuild:** `node scripts/build-share.mjs <outDir>` (entry `share/`, config
+      `vite.share.config.js`), then republish the same file to that URL. The script refuses
+      to finish if any file reference is left un-inlined. It caught the minifier's backtick
+      strings and Vite's `../brand/fonts/` paths on the first runs.
+    - **Checked:** a local copy in a browser. Fonts and logo load from inside the page, there
+      are no requests to other files, and Down, Forward, Panoramic, Combo and Mini Forward
+      all render with no errors. The live link could not be opened from Claude's test browser,
+      which is not signed in to claude.ai.
+    - **Limits** (fine for a test, not for launch): the address is claude.ai's. The page
+      frame blocks calls to other hosts, so the sign-up gate works as UI but no email is
+      sent anywhere (Klaviyo was off anyway). The public launch still needs our own host.
+
