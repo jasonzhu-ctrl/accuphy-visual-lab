@@ -1001,3 +1001,12 @@ Numbered log. Newest at the bottom.
       frame blocks calls to other hosts, so the sign-up gate works as UI but no email is
       sent anywhere (Klaviyo was off anyway). The public launch still needs our own host.
 
+71. **2026-09-26** — **The friends test build has no sign-up gate** (Jason: "我要直接给链接给他
+    他能直接看 不要邮箱什么的"). In the share build (`vite.share.config.js` defines
+    `VITE_NO_GATE`), a tap on the phone's buttons only shows the hint ("These are the app's own
+    controls — use the panel to change the view."): no email form and no frozen page. The main
+    Lab page keeps its gate (#38). Republished to the same link as version 2. Checked locally:
+    no email field, no inert page, the hint shows.
+    For a friend to open the link without a claude.ai login, Jason turns on public sharing in the
+    page's Share menu. Claude cannot change sharing.
+
