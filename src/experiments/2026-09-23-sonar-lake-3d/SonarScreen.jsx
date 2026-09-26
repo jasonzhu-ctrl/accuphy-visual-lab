@@ -126,13 +126,13 @@ export default function SonarScreen({ state, rect, lakeMats }) {
         gl.setRenderTarget(histRT); gl.render(overlay, ortho); gl.setRenderTarget(null)
         const px = new Uint8Array(768 * 384 * 4); gl.readRenderTargetPixels(histRT, 0, 0, 768, 384, px)
         pos.array.set(savedP); aW.array.set(savedW); pos.needsUpdate = true; aW.needsUpdate = true
-        const lut = mat.uniforms.uLUT.value.image.data // 256×4 (rgba bytes)
+        const lut = mat.uniforms.uLUT.value.image.data // 256×4 RGBA, 0–255 (8-bit LUT since 2026-09-26)
         const hist = new Array(bins).fill(0); let black = 0, lit = 0
         for (let i = 0; i < px.length; i += 16) { // every 4th pixel
           const r = px[i], g = px[i + 1], b = px[i + 2]
           if (r + g + b < 24) { black++; continue }
           let best = 0, bd = 1e9
-          for (let k = 0; k < 256; k++) { const dr = r - 255 * lut[k * 4], dg = g - 255 * lut[k * 4 + 1], db = b - 255 * lut[k * 4 + 2]; const d = dr * dr + dg * dg + db * db; if (d < bd) { bd = d; best = k } }
+          for (let k = 0; k < 256; k++) { const dr = r - lut[k * 4], dg = g - lut[k * 4 + 1], db = b - lut[k * 4 + 2]; const d = dr * dr + dg * dg + db * db; if (d < bd) { bd = d; best = k } }
           hist[Math.min(bins - 1, Math.floor((best / 255) * bins))]++; lit++
         }
         return { black: black / (black + lit), lit, hist: hist.map((h) => +(h / lit).toFixed(3)) }

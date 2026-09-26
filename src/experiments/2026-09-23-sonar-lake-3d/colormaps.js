@@ -27,9 +27,13 @@ import * as THREE from 'three'
 // 256×1 RGBA float texture for a colour map name
 export function colormapTexture(name) {
   const src = COLORMAPS[name] || COLORMAPS.amber
-  const data = new Float32Array(256 * 4)
-  for (let i = 0; i < 256; i++) { data[i * 4] = src[i * 3]; data[i * 4 + 1] = src[i * 3 + 1]; data[i * 4 + 2] = src[i * 3 + 2]; data[i * 4 + 3] = 1 }
-  const t = new THREE.DataTexture(data, 256, 1, THREE.RGBAFormat, THREE.FloatType)
+  // 8-bit, not float: Safari (iPad, iPhone, Mac) cannot filter float textures linearly (no OES_texture_float_linear),
+  // so a float LUT sampled with LinearFilter read as all black there and the whole sonar picture was black
+  // (a friend's iPad, 2026-09-26). The colour maps are 8-bit colours anyway, so nothing is lost.
+  const data = new Uint8Array(256 * 4)
+  for (let i = 0; i < 256; i++) { data[i * 4] = Math.round(src[i * 3] * 255); data[i * 4 + 1] = Math.round(src[i * 3 + 1] * 255); data[i * 4 + 2] = Math.round(src[i * 3 + 2] * 255); data[i * 4 + 3] = 255 }
+  const t = new THREE.DataTexture(data, 256, 1, THREE.RGBAFormat, THREE.UnsignedByteType)
+  t.colorSpace = THREE.NoColorSpace // raw LUT values, same as the float version
   t.minFilter = t.magFilter = THREE.LinearFilter; t.wrapS = t.wrapT = THREE.ClampToEdgeWrapping; t.needsUpdate = true
   return t
 }
