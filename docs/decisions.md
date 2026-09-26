@@ -1010,3 +1010,18 @@ Numbered log. Newest at the bottom.
     For a friend to open the link without a claude.ai login, Jason turns on public sharing in the
     page's Share menu. Claude cannot change sharing.
 
+72. **2026-09-26** — **A public test link without any login: GitHub Pages** (Jason, after the
+    Artifact link asked his friend to sign in: "怎么还要sign in到claude?我要那种任何人点击link就能
+    打开的", then "可以" to a public repo on his GitHub).
+    - A claude.ai Artifact link is tied to Claude accounts, so it is the wrong tool for friends.
+    - New public repository `jasonzhu-ctrl/accuphy-lab-test` holding only the built page (the
+      same single file, as a full document with `noindex`, plus `robots.txt` Disallow and
+      `.nojekyll`). The Lab source stays private. `scripts/build-share.mjs` now also writes
+      `<outDir>/pages/`.
+    - The link will be https://jasonzhu-ctrl.github.io/accuphy-lab-test/ once GitHub Pages is on.
+      Claude's switch-on call was refused by the session's safety check ("create public
+      surface"), so Jason turns it on himself: repository Settings → Pages → Deploy from a
+      branch → main, / (root) → Save.
+    - To update: rebuild, copy `<outDir>/pages/*` into a clone of that repository, commit, push.
+      The link stays the same.
+

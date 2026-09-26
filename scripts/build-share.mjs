@@ -35,5 +35,19 @@ const page = `<title>Accuphy Lab</title>
 <script type="module">${js}</script>
 `
 fs.writeFileSync(path.join(outDir, 'accuphy-lab.html'), page)
+// the same page as a full document for an ordinary static host (GitHub Pages, decision #72): anyone with the link can
+// open it, no login; kept out of search engines
+fs.mkdirSync(path.join(outDir, 'pages'), { recursive: true })
+fs.writeFileSync(path.join(outDir, 'pages/index.html'), `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+${page}</head>
+</html>
+`.replace('</head>\n</html>', '</html>').replace(/(<\/style>\n)(<div id="root">)/, '$1</head>\n<body>\n$2').replace(/<\/html>\n$/, '</body>\n</html>\n'))
+fs.writeFileSync(path.join(outDir, 'pages/robots.txt'), 'User-agent: *\nDisallow: /\n')
+fs.writeFileSync(path.join(outDir, 'pages/.nojekyll'), '')
 fs.rmSync(tmp, { recursive: true, force: true })
 console.log(`${path.join(outDir, 'accuphy-lab.html')}: ${(page.length / 1e6).toFixed(2)} MB (logo inlined ${logoCount}×)`)
