@@ -143,7 +143,8 @@ export default function SonarLake3D() {
 
   // the app's buttons on the phone are display-only: a tap asks for an email (once per browser)
   const onLocked = () => {
-    if (!isSignedUp()) { setGate(true); return }
+    // the friends test build has no sign-up gate (Jason 2026-09-26: 他能直接看 不要邮箱什么的): only the hint
+    if (!import.meta.env.VITE_NO_GATE && !isSignedUp()) { setGate(true); return }
     setToast(true); clearTimeout(toastT.current); toastT.current = setTimeout(() => setToast(false), 2400)
   }
 
