@@ -1041,3 +1041,10 @@ Numbered log. Newest at the bottom.
     - **Lesson:** test Safari/WebKit before sharing. No Safari was drivable from this session,
       because Xcode is not installed for the iOS simulator and Safari is read-only for Claude.
 
+74. **2026-09-26** — **Retrospective: lessons and project skills** (Jason: "你们一起去回顾一下项目做下对之后有帮助的
+    技能总结吧"). `docs/lessons.md` sums up decisions #1–#73 and every Lab chat's notes, with a Chinese summary for
+    Jason. Three project skills in `.claude/skills/` (`sonar-qa`, `sonar-look-tuning`, `lab-test-link`) turn the
+    repeatable procedures into steps a new chat loads automatically. The node checks that were in the scratchpad are
+    now `scripts/dev/fish-sim.mjs` and `scripts/dev/layout-dump.mjs` (plus the import hook). `CLAUDE.md` points to
+    all of it.
+
