@@ -52,8 +52,9 @@ no TypeScript. No backend, no database — front-end only.
 
 ## Lessons and skills (2026-09-26)
 
-Read `docs/lessons.md` before working on the sonar lake: what went wrong and how it was found, the targets, and the
-dev tools. Repeatable procedures are project skills: `sonar-qa` (full QA pass), `sonar-look-tuning` (changing the
+Small, clear edits (a colour, a label, moving one object): just do them and check the one affected view — no need to
+read `docs/lessons.md` or run a skill. Read `docs/lessons.md` only for bigger work on the sonar picture, terrain, fish
+or sharing. Repeatable procedures are project skills: `sonar-qa` (full QA pass), `sonar-look-tuning` (changing the
 picture), `lab-test-link` (updating the public test link). Node checks live in `scripts/dev/`.
 
 ## Vocabulary

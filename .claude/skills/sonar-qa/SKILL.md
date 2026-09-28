@@ -1,9 +1,13 @@
 ---
 name: sonar-qa
-description: Full QA pass of the Accuphy Lab 3D sonar lake page (src/experiments/2026-09-23-sonar-lake-3d) — use after any change to the sonar picture, terrain, fish, layout or build, and before sharing a link. Checks 6 spots × 6 views, brightness histograms, console errors, units, sign-up gate, mobile, fish safety, production build and Safari-unsafe textures.
+description: QA of the Accuphy Lab 3D sonar lake page (src/experiments/2026-09-23-sonar-lake-3d) — scale it to the change: full pass only after big changes, before sharing a link, or when Jason asks for an overall check. Checks 6 spots × 6 views, brightness histograms, console errors, units, sign-up gate, mobile, fish safety, production build and Safari-unsafe textures.
 ---
 
 # Sonar Lab QA pass
+
+**Scale it to the change** (it is expensive: dozens of snapshots and a simulation). A small edit → only the view it
+touches plus the console. The full pass below → after big changes (shader, terrain, fish logic, build setup), before
+sharing a link, or when Jason asks for an overall check.
 
 Run all of it; report what failed and fix it. Details and history: `docs/lessons.md`, decisions #66–#68, #73.
 
