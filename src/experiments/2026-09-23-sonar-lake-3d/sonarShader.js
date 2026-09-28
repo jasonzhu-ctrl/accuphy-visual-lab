@@ -325,7 +325,8 @@ export const sonarFragment = /* glsl */ `
         // zooms that band in, so it still burnt to a yellow-white slab (Jason 2026-09-25: PingLive mini是不是在浅水太亮了
         // 和之前pl一样的问题). Extra near gain for PLM only, back to full by 18 m: deep pictures keep their calibration.
         tvg *= mix(uBedGain, 1.0, smoothstep(5.0, 18.0, r));
-        echo = max(echo, max(acc * atten * tex * tvg, fishEcho(p, k)));
+        // near-field fish 40 % brighter, fading back to normal by 16 m (Jason 2026-09-27: 近场的鱼要亮40%)
+        echo = max(echo, max(acc * atten * tex * tvg, fishEcho(p, k) * mix(1.4, 1.0, smoothstep(8.0, 16.0, r))));
         echo = max(echo, logoEcho(p, k) * atten * (0.7 + 0.55 * (filament - 0.8)) * (0.72 + 0.28 * tex));
       }
       float near = 1.0 - smoothstep(0.0, 2.4, r);

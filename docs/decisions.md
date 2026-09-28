@@ -1048,3 +1048,8 @@ Numbered log. Newest at the bottom.
     now `scripts/dev/fish-sim.mjs` and `scripts/dev/layout-dump.mjs` (plus the import hook). `CLAUDE.md` points to
     all of it.
 
+75. **2026-09-27** — **Near-field fish 40 % brighter** (Jason, on a PL Forward frame in ~18 ft with dim marks near
+    the boat: "进场[近场]的鱼要亮40%"). In the side views the fish echo is ×1.4 up to 8 m from the transducer, fading
+    back to ×1.0 by 16 m (`sonarShader.js`). Bottom, structure and Panoramic are unchanged. Quick check only
+    (small change): renders, no console errors.
+
