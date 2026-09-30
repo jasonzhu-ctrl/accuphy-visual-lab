@@ -1053,3 +1053,25 @@ Numbered log. Newest at the bottom.
     back to ×1.0 by 16 m (`sonarShader.js`). Bottom, structure and Panoramic are unchanged. Quick check only
     (small change): renders, no console errors.
 
+
+76. **2026-09-29** — **Public test link updated to the latest Lab (includes #75); phones use the same link**
+    (Jason: "手机版本的能不能也暂时上线一下", then "a" = update the existing link now rather than build the
+    planned mobile version).
+    - The public link https://jasonzhu-ctrl.github.io/accuphy-lab-test/ already worked on phones with the
+      current simple portrait layout. It is now rebuilt from fb3cec6, so it includes the near-field fish
+      ×1.4 (#75). Public repo commit c4acb14; the live page's md5 matched the build ~30 s after the push.
+    - Checks before sharing (a small change, so a scaled pass):
+      - production build OK;
+      - Safari texture audit OK: the linear-filtered textures are 8-bit (LUT, logo SDF) or half-float
+        (terrain), and the float textures are nearest-filtered;
+      - PL Down with near test fish renders bright, not black, with no console errors;
+      - the share build served locally: fonts inlined, zero network requests, no sign-up gate, title
+        and panel read "Accuphy Lab", Down / Panoramic / Mini Combo render, no console errors.
+    - Not done: the private claude.ai Artifact (#70) was not republished, so it is one version behind.
+      Friends use the GitHub link.
+    - The planned mobile version (`docs/mobile-marketing-plan.md`) is still planning only. The phone
+      layout on the link has known weak spots:
+      - the "Drag the boat" hint is cut at the left edge;
+      - the top half is mostly empty water;
+      - landscape phones are broken;
+      - budget Android runs at 10–24 fps.
