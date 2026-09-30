@@ -14,7 +14,9 @@ export const WRECK_L = 40, WRECK_B = 9
 // ground heading (0.25, −0.97)) onto the flat basin floor, and drawn at 70 % (28 m long)
 // Jason 2026-09-24: 逆时针转35度 — turned 35° counter-clockwise as seen from above (yaw −0.9 → −0.289 rad);
 // the debris layout was made for yaw −0.9 and turns with the ship (debrisYaw)
-export const BIG_WRECK = { x: 49, z: -49.5, yaw: -0.9 + (35 * Math.PI) / 180, debrisYaw: -0.9, list: 0.3, scale: 0.7 }
+// Jason 2026-09-25: 船再往前挪一点1/3个船位 — moved 9.3 m (a third of its 28 m) toward its bow, clear of the
+// ACCUPHY LAB lockup behind its stern; still on the flat 40 m floor
+export const BIG_WRECK = { x: 57.95, z: -46.84, yaw: -0.9 + (35 * Math.PI) / 180, debrisYaw: -0.9, list: 0.3, scale: 0.7 }
 export const SMALL_WRECK = { x: 16, z: -26, rot: [0.42, 0.6, 0.12], L: 9.8 }
 
 // deterministic pseudo-random so the wreck is the same every load

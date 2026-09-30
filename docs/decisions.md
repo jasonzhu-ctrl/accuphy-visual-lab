@@ -769,7 +769,314 @@ Numbered log. Newest at the bottom.
     wanted, it must be product-neutral (e.g. the ACCUPHY brand, or a line like "See under
     your boat"), and it is not planned now.
 
-60. **2026-09-25** — **Market learning gets a shared home: `docs/market/`** (Jason:
+60. **2026-09-25** — **PingLive Mini: AUTO depth in Down and Forward, bottoms aligned,
+    shallow water toned down** (Jason: "PingLive mini是不是在浅水太亮了 和之前pl一样的问题 还有
+    PLM的down和forward需要auto depth 他们的底能不能尽量align一点呢").
+    - PLM Down and PLM Forward share ONE AUTO depth range, the same rule as PL Forward
+      (#41): the depth readout / 0.8, in the app's depth steps, deeper at once, shallower
+      after 1.5 s. The bottom under the boat therefore sits at the same height (~80 %) in
+      both views and stays put when the view changes (checked at 17.6 ft: both at ~14 ft
+      on the ruler).
+    - PLM Down: the depth axis is the range, so its range IS that AUTO value; the page's
+      Range slider is greyed out there and the phone shows AUTO over the range.
+    - PLM Forward: range ahead × AUTO depth down, the sound reaching the box's far corner
+      like PL Forward. Physics still applies: the Mini cannot see closer than ~1.2 × the
+      depth, so in deep water with a short range the bottom is out of reach.
+    - Combo is unchanged: the app gives its two panels their own scales (~5 m Down vs
+      ~12 m Forward), and one shared depth axis would hide the Forward bottom behind the
+      Down panel.
+    - Shallow water: the Mini's narrow fan meets a shallow bottom at one range across
+      the whole fan, so AUTO zoom made a yellow-white slab. PLM gets extra near-range gain
+      in the side views, 0.62 at ≤ 5 m back to full by 18 m (`uBedGain`), so the
+      calibrated deep pictures do not change. Fish marks are untouched.
+
+61. **2026-09-25** — **The lakebed lockup reads ACCUPHY LAB and moved to the middle of
+    the view** (Jason, with a screenshot of the default view: "Accuphy现在的logo移动到截屏
+    这个区域好像更合理 然后我要你做成Accuphy Lab也就是在现在的后面加上Lab").
+    - **Where:** centre (15, −62), on the flat 40 m floor behind the drop-off. In the
+      default camera it sits at the top-middle of the screen on every window shape (the
+      old spot, x 57, was cut off at the right on 16:10 screens). Dead level along and
+      across its line.
+    - **LAB:** the brand font Eurostile Heavy (`public/brand/fonts`), traced once at high
+      resolution and stored as outlines in `logo.js`, at the wordmark's cap height, with
+      the wordmark's letter gap (~30 SVG units) and a word space after the Y. Uppercase,
+      as the page header writes the name (#43). Same white, same extrusion and plinth.
+    - Letters keep their size, so the monument grew from 22 m to 31.4 m.
+    - **Sonar:** PL Forward from `?boat=-14,-62.5` at 140 ft range images the whole
+      "ACCUPHY LAB" (checked). At 40 m the depth range runs on 180 ft AUTO, so the
+      letters are smaller on the phone than at the old 19.5 m spot.
+    - In the 3D view the monument is fainter than before, because it sits under 40 m of
+      water instead of 19.5 m.
+
+62. **2026-09-25** — **Big wreck moved a third of a length ahead; wreck faces drawn
+    solid** (Jason: "船再往前挪一点1/3个船位"; and, comparing with the PL Forward wreck
+    recording on the tablet: "目前这个船的画面和那个相差好远 结构和感觉完全不对 你核实 优化").
+    - **Move:** 9.3 m (a third of its 28 m) toward its bow, to (57.95, −46.84), clear of
+      the ACCUPHY LAB lockup behind its stern. Still on the flat 40 m floor.
+    - **Checked against `reference/app-study/pl-forward-wreck-*.jpg` and
+      `ideal-picture-2-pl-forward-wreck/`:** the app draws the wreck as a solid bright
+      mass (deck lines, dark hatches, a bright end face) with streaks along the beams.
+      The engine drew it as salt-and-pepper dust, because every pixel sampled a fresh
+      random set of the 24 rows across the slab thickness.
+    - **Fix (side views, every device):** pixels along a short run of the same ray
+      (0.08° × 0.67 m) now sample the same rows. Big steel faces come out as solid,
+      streaky masses, and far structure faces get a wider pulse (up to 2.5× by 30 m).
+      Timber, the bottom band and fish barely change (checked on the shelf scene).
+      Comparison: `reference/engine-compare/wreck-compare-2026-09-25.png`.
+    - **Still different, by physics:** the recording's wreck lies in ~10 m with a 12 m
+      depth scale, so it fills half the screen. Ours lies in 40 m, with AUTO depth at
+      180 ft (~55 m), so on the phone it is a low shape on the bottom. Moving it to
+      shallower water is Jason's call.
+
+63. **2026-09-25** — **Wrecks image as steel: thick glowing bands, not a line drawing**
+    (Jason, after #62: "差距还是很大 和之前的问题一样 结构物的成像不对劲").
+    - **Checked like for like:** a dev option `?wrecklift=29` raises the big wreck so its
+      deck sits at ~7.5 m, like the recording's wreck. With `?dev`, range 45 ft and depth
+      40 ft (the recording's 14 m / 12 m), the engine drew the ship as a thin crisp outline
+      of its side (every structure face used a ~0.1 m pulse). The app draws thick bright
+      bands with long tails and streaks along the beams.
+    - **Why:** steel is by far the strongest reflector. After the log compression its pulse
+      skirts and the ringing inside the hull stay above the window, so the bands are
+      as wide as the bottom's, with longer tails.
+    - **Fix:** a new sonar tag, steel (0.75), for both wrecks and the debris (their own
+      `steel` material). Steel faces take the bottom's pulse width, a tail twice as
+      strong and 1.5× longer, and ×1.3 peak. Timber and rocks keep their sharp thin look
+      (checked on the shelf scene), and the bottom and fish are unchanged.
+    - Comparison: `reference/engine-compare/wreck-compare-2-2026-09-25.png` (app ·
+      before · after at the same depth · after at the real 40 m spot).
+
+64. **2026-09-25** — **Deep floor 40 → 24 m; fish off the bottom; fish that chase**
+    (Jason, on `docs/deep-water-plan.md`: "我赞成 你做的时候仔细一点 做完验证一下bug啥的
+    另外鱼不能完全贴住底部 还有鱼的动作 … LK沉底的可以在船靠近的时候从底部自然但是比较快的
+    往上追饵 … 鲈鱼可以自然的偶尔有追吃饵鱼的感觉 三文速度也可以偶尔快一点 船靠近可以作为一种
+    触发 随机的可以顺着声纳扫的方向往上追"). Supersedes the 40 m of #14–#16.
+    - **Terrain:** `DEEP_M = 24` (rim 26). The edge line, shelf, plateau, hump and
+      basin do not move, so the deep share of the lake is unchanged.
+    - **Layout frozen:** timber, bushes, stumps, logs, weeds and rocks are placed
+      against `layoutDepth` (the 40 m profile), so all 1,207 keep their exact x/z and
+      size (checked item by item). Their heights follow the new bottom. All 298 fish
+      keep their x/z except 6, which path clearing re-routed (0.9–8 m).
+    - **Off the bottom:** a fish's lowest point (centre − bob − half the drawn body)
+      stays ≥ 0.4 m above the highest bottom under its whole swim loop, including
+      loops re-routed around structure. Measured minimum over every loop: 0.37 m.
+    - **Behaviours** (`fish.js` `stepBehaviours`, once per frame before any pose is
+      read; the 3D fish and the sonar marks share the pose, so they always agree):
+      - boat nearby (the transducer within 16 m lake trout, 14 m salmon, 12 m bass,
+        with the fish within 7 m of the sonar's vertical plane): lake trout often
+        (75 % on approach), salmon and bass sometimes, rise toward the boat into the
+        plane, the way fish come up to a jig. Up to 10 / 8 / 5 m at 3–4 m/s, nose up.
+        They hold 1–2 s in the plane with a small hover, so the whole chase stays
+        on the phone, then sink back to their loop over 5–9 s;
+      - bass: now and then (30–80 s apart) a dart at bait within 8 m, at ~4–5 m/s;
+        up to 8 smelt or crappie near the strike scatter;
+      - salmon: a speed burst every 20–50 s (×2.2–3 for 3–5 s).
+      Every run is sampled before it starts (86 points: structure, bottom, surface);
+      if anything is in the way, a smaller version is tried, else nothing happens.
+    - **Checked:**
+      - a 30-minute simulated boat run, every fish every frame: 0 structure hits,
+        0 bottom, 0 surface;
+      - behaviour cost: 0.036 ms a frame on average, worst 2.5 ms when a run starts;
+      - on the phone: the lockup (140 ft) and the wreck (110 ft) are clearly bigger;
+        Panoramic now shows the deep floor, the lockup and the wrecks; Mini Forward
+        sees the deep floor at 120 ft; the default view's phone picture is unchanged;
+      - no console errors.
+    - The calibration scene `?boat=4,-26` changed with the terrain: it now reads 76 ft
+      over a flat bottom, with the small wreck in the fan. Its old numbers no longer
+      apply (`sonar-style.md` §6.11).
+    - Dev: `window.__chase('laketrout' | 'salmon' | 'largemouth' | 'smallmouth')`
+      makes the nearest fish of that species rise now.
+
+65. **2026-09-25** — **Down view fully AUTO on both devices; PL Down fills its box**
+    (Jason, PL Down at 145 ft range over 61 ft of water, the bottom in the top half and the
+    rest empty: "像这种情况 auto depth就好像没用一样 自动调整了以后有效画面应该在屏幕上会更大").
+    Replaces #52, whose AUTO only raised the range when the bottom would leave the screen,
+    so a visitor's long range left half the screen empty.
+    - Down's range IS the AUTO depth range (readout / 0.8 in the app's steps, deeper at once,
+      shallower after 1.5 s), for PL as for PingLive Mini (#60). Down and Forward share it, so
+      the bottom sits at the same height in both, on both devices.
+    - The page's Range slider is greyed out in Down, and the phone shows AUTO over the range.
+    - PL Down: the app draws echoes over the whole 1:1 box, its lower corners too
+      (`sonar-style.md` §6.9), so the sound reaches the box corners and the bottom runs across
+      the full width. The 3D curtain is that box too.
+    - Checked: 35 ft over the hump (145 ft before → AUTO 45 ft, the hump and its timber fill
+      the screen), 76 ft in the deep (AUTO 100 ft, bottom at ~75 % across the width),
+      Forward at the same spot with its bottom at the same height, no console errors. Over
+      uneven bottom a deeper side can still run off the screen, as in the app.
+
+66. **2026-09-25** — **Bottom toned down (orange body, thin hot edge); lockup moved into the
+    boat's reach** (Jason: "1. Accuphy那个logo貌似太靠上了 只能扫到一半 2.画面特别是底部貌似还是
+    太亮 深水也是 … 说白了就是高亮的部分和桔红色的关系 我感觉降低亮度的方式是对比度").
+    - **Measured first** (`__sonarHist`, share of lit pixels in the white bin): PLM shelf scene
+      6 %, which matched the app's 6.6 %. PL Forward and PL Down over the 17–24 m bottom were
+      at 37–44 %, and the wreck at 35 % (app: 14 %). Cause: over a flat bottom every row
+      across the slab lands at one range, and the summed echo burnt the whole band white.
+    - **Fix (side views):** past the near range the integrated bottom echo saturates softly
+      (K 0.4, fading in over 6–14 m, where TVG stops), so the band's body stays orange. A thin
+      first-return line (a narrow pulse, weight 0.3, with the filament texture) gives the
+      app's hot leading edge. The tone curve's white point is 15 % higher.
+    - **After:** PL bottom scenes 7 % white (app 6–7 %), wreck 8 %, PLM shelf 2 % (it looks
+      the same). Tried and rejected: white point alone (H 1.4) made the Mini and the wreck dull
+      (0.1 % and 4 % white), and a heavier leading edge put the white back to 45 %.
+    - **Lockup:** at z −62 its line lay outside the boat's drag area (±58 m), so a visitor
+      could only sweep its edge. It is now at (15, −52): reachable, lower in the default view,
+      still level (±2 cm along, 9 cm across). Checked by driving the boat there the normal way
+      (`?boat` not used): the whole ACCUPHY LAB images at 140 ft.
+    - Fish re-checked with the moved obstacle: 15 simulated minutes, 0 structure, bottom or
+      surface hits.
+
+67. **2026-09-25** — **Panoramic structure: lit near faces and real shadows, no more rock
+    "bubbles"** (Jason, PL Panoramic over the rock hump: "这些石头感觉画面不正常". His references:
+    four early app Panoramic clips with structure (2025-03, `RPReplay_Final1741714*`, Desktop and
+    Downloads). Frames are in `reference/app-study/panoramic-structure/`.)
+    - **What the app shows:** the side of an object facing the boat is bright (branches as thin
+      bright lines, the near edge of a log or dock). Behind it a dark acoustic shadow trails
+      away along the beams (a post's shadow is a clear dark tongue).
+    - **What was wrong:** the facing was measured from the footprint's highest tap, so every rock
+      lit a ring all round, far side included, around a dim centre. Shadows needed ~5 blocked
+      samples of 40 to count, so a rock (1–2 samples) cast a faint dotted one, and they only
+      darkened 35 %.
+    - **Fix:** facing from the height right under the pixel vs a little toward the boat
+      (look-back max(0.35 m, 3 % of range)), weight 0.8. Shadows are full at 2 blocked
+      samples and darken 85 %. Result: rocks show a bright near half and a dark tail; trunks
+      and branches are bright with dark radial shadows.
+    - Tried and rejected for shadow edges: ray-coherent march offsets (parallel streak lines)
+      and fixed offsets (stair-stepped texels). Per-pixel offsets stay; edges are still grainy.
+    - The #66 white point is now side views only; the Panoramic field keeps its calibration
+      (LUT index 0.1–0.2 over the shelf).
+    - Still different from those clips: they were recorded at 72–78 % gain in 1–5 m of water,
+      so their whole fan is a bright orange field. Ours is calibrated to the newer 57 % frames
+      (§7.13).
+
+68. **2026-09-25** — **QA pass; Combo's Down panel on AUTO depth** (Jason: "你整体再跑一遍看看
+    有没有bug要修复之类的 接着干"; also "不用" to moving the wreck shallower).
+    - **Checked:**
+      - production build: OK;
+      - 6 spots (default, shelf, hump, deep, lockup, drop-off) × 6 views (PL Down / Forward /
+        Panoramic, PLM Down / Forward / Combo): snapshot and LUT histogram of each, no console
+        errors, every fish position finite;
+      - ft ↔ m toggle: Down 70 ft ↔ 22 m, readout 16.6 m;
+      - the sign-up gate: opens, email focused, page inert;
+      - the mobile viewport (375 × 812).
+    - **Bug fixed:** Combo's Down panel was R / 3 deep. That matched the one app frame by
+      chance (4.1 m of water, 18 m range). In 54 ft of water at 80 ft range the bottom was off
+      the panel, and the phone was 98 % black. Now that panel uses the AUTO depth range; the
+      app frame confirms it (4.1 m of water, panel 0–5.5 m). The Forward panel keeps 0.7 × range.
+      Each fan reaches its panel's far corner, and the 3D curtains match.
+    - **Tried and reverted:** starting the bottom soft cap at 4–10 m instead of 6–14 m. An 8 m
+      hump went from 20 % to 15 % white, but the Mini's calibrated shelf lost its hot edge
+      (0.3 % white).
+    - **By physics, not a bug:** PLM Forward over 24 m water at 80 ft range shows no bottom.
+      The Mini only sees the bottom from ~1.2 × the depth ahead, so a longer range shows it.
+
+
+69. **2026-09-25** — **Project boundary with `accuphy-website`** (Jason approved the
+    three-project layout: accuphy-website = Shopify landing platform, accuphy-visual-lab =
+    design and prototypes, Partner Portal; stale folders archived under `IT/_archive`).
+    The lab never touches Shopify: a final design is handed over through
+    `accuphy-website/handoffs/`, and that project owns the theme, translations, speed
+    measurement and publishing. Site facts and specs are read from the website project,
+    never copied here. Items already on the website side's backlog: the Lab page's home
+    (lab.accuphy.ca vs a store page), the lite section's Shopify test page, the Klaviyo
+    list and keys, Meta Pixel + UTM + "Shop PingLive" button, the US phone-checkout walk
+    (decision #57). Written into `CLAUDE.md` ("Boundary with the website project").
+
+70. **2026-09-26** — **A friends test build, published as a private claude.ai Artifact**
+    (Jason: "可以暂时把他变成在一个网页里可以使用的版本吗 我想给我的朋友测试" and "是不是
+    artifacts就行 合适吗"). The tooling commit 3150b66 says "decision #69" by mistake: #69 is
+    the accuphy-website boundary, written by another chat at the same time.
+    - **What:** the 3D sonar lake alone, without the Lab gallery or its back link, as ONE
+      self-contained HTML file (2.25 MB): code, styles, the three brand fonts and the white logo
+      are all inlined, and nothing is loaded from other hosts.
+      Link: https://claude.ai/artifact/RnCBYTexY5vcEqJy2hAsN7 (private until Jason shares it
+      from the page's Share menu).
+    - **How to rebuild:** `node scripts/build-share.mjs <outDir>` (entry `share/`, config
+      `vite.share.config.js`), then republish the same file to that URL. The script refuses
+      to finish if any file reference is left un-inlined. It caught the minifier's backtick
+      strings and Vite's `../brand/fonts/` paths on the first runs.
+    - **Checked:** a local copy in a browser. Fonts and logo load from inside the page, there
+      are no requests to other files, and Down, Forward, Panoramic, Combo and Mini Forward
+      all render with no errors. The live link could not be opened from Claude's test browser,
+      which is not signed in to claude.ai.
+    - **Limits** (fine for a test, not for launch): the address is claude.ai's. The page
+      frame blocks calls to other hosts, so the sign-up gate works as UI but no email is
+      sent anywhere (Klaviyo was off anyway). The public launch still needs our own host.
+
+71. **2026-09-26** — **The friends test build has no sign-up gate** (Jason: "我要直接给链接给他
+    他能直接看 不要邮箱什么的"). In the share build (`vite.share.config.js` defines
+    `VITE_NO_GATE`), a tap on the phone's buttons only shows the hint ("These are the app's own
+    controls — use the panel to change the view."): no email form and no frozen page. The main
+    Lab page keeps its gate (#38). Republished to the same link as version 2. Checked locally:
+    no email field, no inert page, the hint shows.
+    For a friend to open the link without a claude.ai login, Jason turns on public sharing in the
+    page's Share menu. Claude cannot change sharing.
+
+72. **2026-09-26** — **A public test link without any login: GitHub Pages** (Jason, after the
+    Artifact link asked his friend to sign in: "怎么还要sign in到claude?我要那种任何人点击link就能
+    打开的", then "可以" to a public repo on his GitHub).
+    - A claude.ai Artifact link is tied to Claude accounts, so it is the wrong tool for friends.
+    - New public repository `jasonzhu-ctrl/accuphy-lab-test` holding only the built page (the
+      same single file, as a full document with `noindex`, plus `robots.txt` Disallow and
+      `.nojekyll`). The Lab source stays private. `scripts/build-share.mjs` now also writes
+      `<outDir>/pages/`.
+    - The link will be https://jasonzhu-ctrl.github.io/accuphy-lab-test/ once GitHub Pages is on.
+      Claude's switch-on call was refused by the session's safety check ("create public
+      surface"), so Jason turns it on himself: repository Settings → Pages → Deploy from a
+      branch → main, / (root) → Save.
+    - To update: rebuild, copy `<outDir>/pages/*` into a clone of that repository, commit, push.
+      The link stays the same.
+
+73. **2026-09-26** — **Fix: the sonar picture was black in Safari** (Jason: a friend opened the public
+    test link on an iPad, in Safari: "小窗里的声纳画面是全黑的").
+    - **Cause:** the colour table (LUT) that turns echo strength into the orange palette was a
+      FloatType texture sampled with LinearFilter. Safari (iPad, iPhone and Mac) has no
+      OES_texture_float_linear, so the texture was incomplete and every lookup returned black.
+      Chrome filters float textures, which is why every desktop and Android check passed.
+    - **Fix:** the LUT is 8-bit RGBA (`colormaps.js`), which filters everywhere. The colour maps
+      are 8-bit colours anyway: the picture is identical in Chrome (same LUT histogram, white
+      7.9 %, black 88 %). The dev `__sonarHist` reads the 8-bit table.
+    - **Audit of the other textures:** the terrain is half-float with linear filtering (filterable
+      in WebGL2 everywhere), the marks are float with nearest filtering, and the depth textures
+      use nearest filtering. All are fine in Safari.
+    - The public test page (GitHub Pages) and the Artifact were rebuilt with the fix.
+    - **Lesson:** test Safari/WebKit before sharing. No Safari was drivable from this session,
+      because Xcode is not installed for the iOS simulator and Safari is read-only for Claude.
+
+74. **2026-09-26** — **Retrospective: lessons and project skills** (Jason: "你们一起去回顾一下项目做下对之后有帮助的
+    技能总结吧"). `docs/lessons.md` sums up decisions #1–#73 and every Lab chat's notes, with a Chinese summary for
+    Jason. Three project skills in `.claude/skills/` (`sonar-qa`, `sonar-look-tuning`, `lab-test-link`) turn the
+    repeatable procedures into steps a new chat loads automatically. The node checks that were in the scratchpad are
+    now `scripts/dev/fish-sim.mjs` and `scripts/dev/layout-dump.mjs` (plus the import hook). `CLAUDE.md` points to
+    all of it.
+
+75. **2026-09-27** — **Near-field fish 40 % brighter** (Jason, on a PL Forward frame in ~18 ft with dim marks near
+    the boat: "进场[近场]的鱼要亮40%"). In the side views the fish echo is ×1.4 up to 8 m from the transducer, fading
+    back to ×1.0 by 16 m (`sonarShader.js`). Bottom, structure and Panoramic are unchanged. Quick check only
+    (small change): renders, no console errors.
+
+
+76. **2026-09-29** — **Public test link updated to the latest Lab (includes #75); phones use the same link**
+    (Jason: "手机版本的能不能也暂时上线一下", then "a" = update the existing link now rather than build the
+    planned mobile version).
+    - The public link https://jasonzhu-ctrl.github.io/accuphy-lab-test/ already worked on phones with the
+      current simple portrait layout. It is now rebuilt from fb3cec6, so it includes the near-field fish
+      ×1.4 (#75). Public repo commit c4acb14; the live page's md5 matched the build ~30 s after the push.
+    - Checks before sharing (a small change, so a scaled pass):
+      - production build OK;
+      - Safari texture audit OK: the linear-filtered textures are 8-bit (LUT, logo SDF) or half-float
+        (terrain), and the float textures are nearest-filtered;
+      - PL Down with near test fish renders bright, not black, with no console errors;
+      - the share build served locally: fonts inlined, zero network requests, no sign-up gate, title
+        and panel read "Accuphy Lab", Down / Panoramic / Mini Combo render, no console errors.
+    - Not done: the private claude.ai Artifact (#70) was not republished, so it is one version behind.
+      Friends use the GitHub link.
+    - The planned mobile version (`docs/mobile-marketing-plan.md`) is still planning only. The phone
+      layout on the link has known weak spots:
+      - the "Drag the boat" hint is cut at the left edge;
+      - the top half is mostly empty water;
+      - landscape phones are broken;
+      - budget Android runs at 10–24 fps.
+
+77. **2026-09-25** — **Market learning gets a shared home: `docs/market/`** (Jason:
     "基于你对我们的全盘了解 做深入用户和市场研究 持续学习如何让accuphy卖得更好").
     Research round 1 builds on round 0 (`docs/users-and-market.md`, 2026-09-24) and sets up
     the loop for continuous learning:
@@ -786,5 +1093,5 @@ Numbered log. Newest at the bottom.
       the ice season (Nov–Feb = 43 % of store orders) starts now.
     All recommendations are proposals: nothing in the store, Klaviyo, ads or the Lab changes
     until Jason says go.
-    (Written as #54 on the research branch `claude/modest-keller-ccfnhq`; renumbered #60
-    when merged with main, where #54–#59 were already taken.)
+    (Written as #54, then #60 on the research branch `claude/modest-keller-ccfnhq`; renumbered #77 when
+    merged with main on 2026-09-30, where #54–#76 had been taken by other chats.)

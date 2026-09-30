@@ -24,7 +24,7 @@ export const sonarFragment = /* glsl */ `
   precision highp float;
   varying vec2 vUv;
   uniform sampler2D uDepth0; uniform sampler2D uDepth1;
-  uniform sampler2D uColor0; uniform sampler2D uColor1; // .a = tag: 0.5 structure, 0 bottom
+  uniform sampler2D uColor0; uniform sampler2D uColor1; // .a = tag: 0.75 steel (wrecks), 0.5 other structure, 0 bottom
   uniform int uFanCount;
   // per fan: x = centre angle from straight-down in the SCREEN plane (rad, +right),
   //          y = half wide angle (rad), z = tanH = tan(half wide), w = tanV = tan(half thick)
@@ -38,6 +38,7 @@ export const sonarFragment = /* glsl */ `
   uniform float uApexU;
   uniform float uTime;
   uniform float uFlat;        // 1 = Panoramic (plan view)
+  uniform float uBedGain;     // extra near-range gain for the bottom + structure echo (PLM 0.62, PL 1)
   uniform float uStreak;      // 1 = radial streak texture, 0 = mottled speckle (PLM Down)
   uniform float uDebug;
   uniform sampler2D uLUT;
@@ -194,7 +195,7 @@ export const sonarFragment = /* glsl */ `
         // acoustic shadow: march back toward the transducer; what lies above the ray blocks it. The shadow builds
         // up with how much of the path is blocked, so solid things cast solid shadows and sparse brush only a faint
         // one (a single hit made every twig a hard, dotted black ray); per-pixel jitter keeps it soft
-        float jit = hash(gl_FragCoord.xy * 0.61 + t * 0.13);
+        float jit = hash(gl_FragCoord.xy * 0.61 + t * 0.13); // per-pixel offsets (tried 2026-09-25: ray-coherent ones drew parallel streak lines, fixed ones stair-stepped the top map's texels)
         float occl = 0.0;
         for (int s = 0; s < 40; s++) {
           float tt = r * (float(s) + jit) / 40.0;
@@ -204,7 +205,10 @@ export const sonarFragment = /* glsl */ `
           float line = target * tt / r;
           occl += smoothstep(0.1, 0.6, line - occ);
         }
-        float shade = clamp(occl / 5.0, 0.0, 1.0);
+        // Shadows (Jason 2026-09-25, rocks on the hump: 这些石头感觉画面不正常; app Panoramic structure clips, 2025-03,
+        // reference/app-study/panoramic-structure/): anything that blocks a couple of samples of the path is a real,
+        // dark shadow trailing away from the boat — a rock only blocked 1–2 samples, so it cast a faint dotted one
+        float shade = clamp(occl / 2.0, 0.0, 1.0);
         // Calibrated in echo units against the app's lake frames (§7.13): after the tone curve the field sits
         // at LUT index 0.10–0.25 (echo 0.099–0.138), shadows ≈ 0.03–0.06, faces toward the transducer higher.
         // The window is steep down there, so every texture is a SMALL multiplicative variation.
@@ -233,12 +237,19 @@ export const sonarFragment = /* glsl */ `
         float e = 0.126 * m * incid * lobe; // only what the 5°–25° slab reaches shows (the 3D curtain is the same slab)
         if (hasS) {
           // structure: the edge rising toward the transducer is hot, the rest a mid-bright granular clump
-          float Sn = min(topDepth(p - (p / r) * 0.35), terrainDepth(w - rw * 0.35));
-          float face = clamp((Sn - S) / 0.35, 0.0, 3.0);
-          float es = (0.17 + 0.14 * face) * (0.7 + 0.45 * mix(smear, grainP, longR)) * lobe;
+          // The side facing the transducer lights up (the app: bright near edges, bright branch lines). The facing is
+          // taken from the height right under the pixel against the height a little toward the boat; it used the
+          // footprint's highest tap, which lit a ring all round every rock (the "bubbles"), far side included.
+          float dN = max(0.35, 0.03 * r);
+          float S0 = topDepth(p), face = 0.0;
+          if (S0 < Db - 0.08) {
+            float Sn = min(topDepth(p - (p / r) * dN), terrainDepth(w - rw * dN));
+            face = clamp((Sn - S0) / dN, 0.0, 1.5);
+          }
+          float es = (0.17 + 0.8 * face) * (0.7 + 0.45 * mix(smear, grainP, longR)) * lobe;
           e = mix(e, max(e, es), smoothstep(0.08, 0.9, cov)); // sparse brush reads faint, solid rock/wood bright
         }
-        e *= (1.0 - 0.35 * shade) * (1.0 - 0.2 * fishShadow(p));
+        e *= (1.0 - 0.85 * shade) * (1.0 - 0.2 * fishShadow(p));
         // near the transducer: darker, with clutter speckle and bright spokes along a few beams (app)
         float near = 1.0 - smoothstep(0.0, 0.3 * uRange, r);
         e = mix(e, e * 0.84, near);
@@ -265,8 +276,12 @@ export const sonarFragment = /* glsl */ `
         if (abs(a) > uFan[k].y || r > uReach) continue;
         inAny = 1.0;
         float u = 0.5 + 0.5 * tan(a) / uFan[k].z;
-        float acc = 0.0, peak = 0.0, spk = 0.0;
-        float jit = hash(gl_FragCoord.xy * 0.37 + 0.11);
+        float acc = 0.0, peak = 0.0, spk = 0.0, edge = 0.0;
+        // which thickness rows a pixel samples: the same set for a short run along the ray (0.08° × 0.67 m cells), not
+        // a fresh random set per pixel. Per-pixel sets turned big steel faces into salt-and-pepper dust (the wreck at
+        // 40 m, Jason 2026-09-25: 这个船的画面和 [app 的] 相差好远 结构和感觉完全不对); coherent sets draw them as the
+        // app does — solid masses with streaks along the beams (reference/app-study/pl-forward-wreck-*.jpg)
+        float jit = hash(vec2(floor(aWorld * 700.0), floor(r * 1.5)) + 0.11);
         float sigma = 0.22 + 0.010 * r;
         float tailLen = 0.35 + 0.015 * r;
         for (int j = 0; j < 24; j++) {
@@ -274,18 +289,31 @@ export const sonarFragment = /* glsl */ `
           float ty = (v * 2.0 - 1.0) * uFan[k].w;
           float hit = sampleDist(k, vec2(u, v), length(vec3(tan(a), ty, 1.0)));
           float dr = r - hit;
-          float structure = step(0.25, sampleTag(k, vec2(u, v)));
-          // structure faces are sharp (real pulse ≈ 0.1 m) and solid; the bottom band is wider with a tail
-          float sg = mix(sigma, 0.08 + 0.004 * r, structure);
+          float tag = sampleTag(k, vec2(u, v));
+          float structure = step(0.25, tag), steel = step(0.62, tag);
+          // timber and rock faces are sharp (real pulse ≈ 0.1 m) and solid; the bottom band is wider with a tail.
+          // Steel (wrecks) is by far the strongest reflector: after the log compression its pulse skirts and the
+          // ringing inside the hull stay bright, so the app draws a wreck as thick glowing bands with long tails,
+          // not a line drawing (Jason 2026-09-25: 结构物的成像不对劲; PL Forward wreck recording, same depth and scale:
+          // reference/engine-compare/wreck-compare-*.png)
+          float sg = mix(sigma, mix((0.08 + 0.004 * r) * (1.0 + 1.5 * smoothstep(6.0, 30.0, r)), sigma, steel), structure);
           float pulse = exp(-dr * dr / (sg * sg)) * (1.0 - 0.22 * structure) * mix(1.0, 0.85 + 0.25 * filament, structure);
-          float tail = dr > 0.0 ? 0.6 * exp(-dr / tailLen) : 0.0;
+          float tail = dr > 0.0 ? (0.6 + 0.6 * steel) * exp(-dr / (tailLen * (1.0 + 0.5 * steel))) : 0.0;
           float second = 0.10 * exp(-(r - 2.0 * hit) * (r - 2.0 * hit) / (4.0 * sigma * sigma));
           float wgt = 0.55 + 0.9 * (1.0 - abs(v * 2.0 - 1.0));
           acc += (1.2 * pulse + tail + second) * wgt;
           peak = max(peak, pulse * (1.0 - structure));
-          spk = max(spk, pulse * structure);
+          edge = max(edge, exp(-dr * dr / (0.16 * sg * sg)) * (1.0 - structure)); // the first return: a thin hot line
+          spk = max(spk, pulse * structure * (1.0 + 0.3 * steel));
         }
-        acc = acc / 16.0 + 0.7 * peak + 0.9 * spk;
+        // Bottom brightness (Jason 2026-09-25: 画面特别是底部貌似还是太亮 深水也是 … 高亮的部分和桔红色的关系): over a flat
+        // bottom every row across the slab lands at one range and the integrated echo added up to a solid white band
+        // (38–44 % of the lit pixels white in PL scenes; the app's bottom scenes 6–7 %). Past the near range (where TVG
+        // already tames it) the integrated part saturates softly (K 0.4), so the body stays orange, and a thin
+        // first-return line brings back the app's hot leading edge.
+        float accI = acc / 16.0, K = mix(3.0, 0.4, smoothstep(6.0, 14.0, r)); // (4–10 m tried: the Mini's calibrated shelf lost its hot edge, 6 → 0.3 % white)
+        accI = K * (1.0 - exp(-accI / K));
+        acc = accI + 0.7 * peak + 0.3 * edge * (0.55 + 0.6 * filament) + 0.9 * spk;
         float atten = 1.0 - 0.4 * clamp(r / uRange, 0.0, 1.0);
         // near-range gain (TVG): close returns get less gain, like a real sonar's time-varying gain. In shallow
         // water every ray across the slab hits the bottom at the same range, the band saturates to a solid white
@@ -293,7 +321,12 @@ export const sonarFragment = /* glsl */ `
         // again from ~11 m (≈ 0.9 at 9 m), so the calibrated deeper pictures barely change; fish marks keep their
         // approved look. 5 m ≈ 0.43: the core just reaches white and keeps its streaks instead of a solid slab.
         float tvg = mix(0.32, 1.0, smoothstep(3.0, 11.0, r));
-        echo = max(echo, max(acc * atten * tex * tvg, fishEcho(p, k)));
+        // PingLive Mini: its narrow 39° fan meets a shallow bottom at one range across the whole fan, and AUTO depth
+        // zooms that band in, so it still burnt to a yellow-white slab (Jason 2026-09-25: PingLive mini是不是在浅水太亮了
+        // 和之前pl一样的问题). Extra near gain for PLM only, back to full by 18 m: deep pictures keep their calibration.
+        tvg *= mix(uBedGain, 1.0, smoothstep(5.0, 18.0, r));
+        // near-field fish 40 % brighter, fading back to normal by 16 m (Jason 2026-09-27: 近场的鱼要亮40%)
+        echo = max(echo, max(acc * atten * tex * tvg, fishEcho(p, k) * mix(1.4, 1.0, smoothstep(8.0, 16.0, r))));
         echo = max(echo, logoEcho(p, k) * atten * (0.7 + 0.55 * (filament - 0.8)) * (0.72 + 0.28 * tex));
       }
       float near = 1.0 - smoothstep(0.0, 2.4, r);
@@ -308,7 +341,7 @@ export const sonarFragment = /* glsl */ `
     float lv = log(1.0 + raw / bs) / log(1.0 + 65535.0 / bs);
     float width = clamp(uDynRange, 0.05, 1.0);
     float lo = (1.0 - width) * 0.5 + width * (uGain - 0.5) + 0.5 * width * uContrast;
-    float hi = lo + width * (1.0 - 0.45 * uContrast);
+    float hi = lo + width * (1.0 - 0.45 * uContrast) * (uFlat > 0.5 ? 1.0 : 1.15); // side views: white point 15 % higher, fewer pixels burn to white (#66); Panoramic keeps its own calibration (§7.13)
     float idx = echo > 0.0005 ? clamp((lv - lo) / (hi - lo), 0.0, 1.0) : 0.0;
     idx = pow(idx, uGamma) * inAny;
     vec3 col = texture2D(uLUT, vec2(idx * (255.0 / 256.0) + 0.5 / 256.0, 0.5)).rgb;

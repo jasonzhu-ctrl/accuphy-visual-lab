@@ -5,7 +5,7 @@ import { mergeGeometries as _merge } from 'three/addons/utils/BufferGeometryUtil
 // Extrude geometries are non-indexed, primitives are indexed — normalise first.
 const mergeGeometries = (parts) => _merge(parts.map((g) => (g.index ? g.toNonIndexed() : g)))
 import { HALF, SEG, bedY, fbm } from './terrain'
-import { SPECIES, makePopulation, fishPose, rnd, FISH_DISPLAY_SCALE } from './fish'
+import { SPECIES, makePopulation, fishPose, stepBehaviours, forceRise, rnd, FISH_DISPLAY_SCALE } from './fish'
 import { makeLakeMaterial, setBeamUniforms } from './lakeMaterial'
 import { wedgeGeometry } from '../2026-09-23-beam-shapes-3d/wedge'
 import { makeTallTree, makeBushTree, makeStump, makeLog, makeWeedTuft, makeRock, placeAll } from './vegetation'
@@ -139,7 +139,8 @@ function BigWreck({ mat }) {
   const ax = Math.cos(yaw), az = -Math.sin(yaw)
   const yBow = bedY(x + ax * L * 0.45, z + az * L * 0.45), yStern = bedY(x - ax * L * 0.45, z - az * L * 0.45)
   const pitch = Math.atan2(yBow - yStern, L * 0.9)
-  const y = (yBow + yStern) / 2 - 1.1 * k
+  // dev ?wrecklift=m raises the wreck (imaging tests against the app's 10 m wreck recording)
+  const y = (yBow + yStern) / 2 - 1.1 * k + (import.meta.env.DEV ? +((/wrecklift=([\d.]+)/.exec(window.location.search) || [])[1] || 0) : 0)
   return (
     <group>
       <group position={[x, y, z]} rotation-y={yaw} scale={k}>
@@ -200,7 +201,7 @@ function FishGroup({ mat, body, fish }) {
     const t = clock.elapsedTime
     fish.forEach((f, i) => {
       const o = fishPose(f, t, tmp.pose)
-      tmp.e.set(0, o.heading, Math.sin(t * 6 + f.phase) * 0.08); tmp.q.setFromEuler(tmp.e)
+      tmp.e.set(0, o.heading, Math.sin(t * 6 + f.phase) * 0.08 + o.pitch); tmp.q.setFromEuler(tmp.e) // z: tail wag + nose up/down on a rise
       tmp.p.set(o.x, o.y, o.z); const L = f.len * FISH_DISPLAY_SCALE; tmp.s.set(L, L, L)
       tmp.m.compose(tmp.p, tmp.q, tmp.s)
       ref.current.setMatrixAt(i, tmp.m)
@@ -210,9 +211,18 @@ function FishGroup({ mat, body, fish }) {
   return <instancedMesh ref={ref} args={[geo, mat, fish.length]} frustumCulled={false} onUpdate={(o) => o.layers.set(FISH_LAYER)} />
 }
 function Fish({ mat, state }) {
-  const pop = useMemo(() => makePopulation(bedY, toCircles(buildObstacles())), []) // swim loops routed around structure
-  if (import.meta.env.DEV) window.__fish = pop // dev: fish population for scene lookups
+  const circles = useMemo(() => toCircles(buildObstacles()), [])
+  const pop = useMemo(() => makePopulation(bedY, circles), [circles]) // swim loops routed around structure
+  if (import.meta.env.DEV) {
+    window.__fish = pop // dev: fish population for scene lookups
+    window.__chase = (species = 'laketrout') => forceRise(pop, window.__lakeClock?.elapsedTime ?? 0, state.current.apex, species, circles, bedY) // dev: make the nearest fish rise now
+  }
   state.current.pop = pop
+  // behaviours (fish.js): boat-triggered rises, bass strikes on bait, salmon bursts — before anything reads a pose
+  useFrame(({ clock }, dt) => {
+    if (import.meta.env.DEV) window.__lakeClock = clock
+    stepBehaviours(pop, clock.elapsedTime, Math.min(dt, 0.1), state.current.apex, circles, bedY)
+  }, -1)
   const groups = useMemo(() => {
     const by = {}
     pop.forEach((f) => { const b = SPECIES[f.species].body; (by[b] ||= []).push(f) })
@@ -348,7 +358,7 @@ function Rig({ state }) {
     }
     if (s.logoCam) { // dev aid ?cam=logo — the lakebed lockup, seen from its face side
       const { B } = logoFrame()
-      camera.position.set(B.x - 3, B.y + 8, B.z + 25)
+      camera.position.set(B.x - 3, B.y + 9, B.z + 35)
       camera.lookAt(B.x, B.y + 2.2, B.z)
       return
     }
@@ -393,9 +403,9 @@ export default function LakeScene({ state, sonarRect, paused = false }) {
     fish.userData.uniforms.uHighlight.value.set('#ffe9a0') // fish light up warm, like a sonar return
     fish.userData.uniforms.uFogDensity.value = 0.006
     fish.side = THREE.DoubleSide // flat fins
-    return { bed: makeLakeMaterial(), inst: makeLakeMaterial({ structure: true }), logo: makeLakeMaterial({ logo: true }), fish }
+    return { bed: makeLakeMaterial(), inst: makeLakeMaterial({ structure: true }), steel: makeLakeMaterial({ steel: true }), logo: makeLakeMaterial({ logo: true }), fish }
   }, [])
-  const beamMats = useMemo(() => [mats.bed, mats.inst, mats.fish, mats.logo], [mats])
+  const beamMats = useMemo(() => [mats.bed, mats.inst, mats.steel, mats.fish, mats.logo], [mats])
   return (
     <Canvas frameloop={paused ? 'never' : 'always'} dpr={[1, 1.5]} camera={{ fov: 38, near: 0.5, far: 400, position: [-38, 34, 54] }} gl={{ antialias: true, powerPreference: 'high-performance' }}>
       <color attach="background" args={['#9cc1cf']} />
@@ -405,8 +415,8 @@ export default function LakeScene({ state, sonarRect, paused = false }) {
       <Lakebed mat={mats.bed} />
       <mesh rotation-x={-Math.PI / 2} position-y={-47} onUpdate={(o) => o.layers.set(SONAR_HIDE_LAYER)}><planeGeometry args={[900, 900]} /><meshBasicMaterial color="#17545f" /></mesh>
       <Structures mat={mats.inst} />
-      <Wreck mat={mats.inst} />
-      <BigWreck mat={mats.inst} />
+      <Wreck mat={mats.steel} />
+      <BigWreck mat={mats.steel} />
       <Logo mat={mats.logo} stoneMat={mats.inst} />
       {import.meta.env.DEV && /fishtest/.test(window.location.search) && <TestPiling mat={mats.inst} />}
       <Fish mat={mats.fish} state={state} />

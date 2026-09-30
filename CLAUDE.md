@@ -10,6 +10,21 @@ It is **NOT** the RMA portal and **NOT** the Distributor Portal
 and nothing from those projects should be copied in here. Keep the two worlds
 separate.
 
+## Boundary with the website project (decision #69, Jason 2026-09-25)
+
+- This lab makes **designs and prototypes only**. It never touches the Shopify store.
+- Everything that must land on shop.accuphy.com (a section, a page, a form, a pixel, a
+  tracking tag, copy, translations) goes through the website project
+  `.../ACCUPHY/IT/accuphy-website` — the "Shopify landing platform". When a design is
+  final, write a handoff into `accuphy-website/handoffs/` (its `CLAUDE.md` has the format)
+  and stop; that project puts it into the theme, translates it, measures it and publishes.
+- Facts about the live site (markets, tools, weight, traffic) live in
+  `accuphy-website/docs/site-audit.md`; product specs only in `accuphy-website/docs/specs.md`.
+  Do not keep copies here; `docs/site-audit.md` is just a pointer.
+- Sidebar group = folder name. A lab chat runs in this folder; the chat
+  "网页section轻量化设计" was opened in the website folder by mistake — when the lite section
+  is resumed, open a new chat here.
+
 ## Stack (decision #2, 2026-09-23)
 
 **Vite + React 19 + Tailwind CSS 4 + Framer Motion.** Plain JavaScript/JSX,
@@ -36,8 +51,15 @@ no TypeScript. No backend, no database — front-end only.
 - `docs/research.md` — tools/approach research and the reasons behind decision #5.
 - `docs/users-and-market.md` — round 0 of the market research (personas, first principles).
 - `docs/market/` — market learning: who buys, competitors, metrics, experiments, learning log
-  (decision #60). **Read `docs/market/README.md` before giving sales or marketing advice**, and
+  (decision #77). **Read `docs/market/README.md` before giving sales or marketing advice**, and
   write new learnings back there.
+
+## Lessons and skills (2026-09-26)
+
+Small, clear edits (a colour, a label, moving one object): just do them and check the one affected view — no need to
+read `docs/lessons.md` or run a skill. Read `docs/lessons.md` only for bigger work on the sonar picture, terrain, fish
+or sharing. Repeatable procedures are project skills: `sonar-qa` (full QA pass), `sonar-look-tuning` (changing the
+picture), `lab-test-link` (updating the public test link). Node checks live in `scripts/dev/`.
 
 ## Vocabulary
 

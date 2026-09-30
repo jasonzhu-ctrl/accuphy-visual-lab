@@ -43,6 +43,13 @@ it is done. ✅ done · 🔧 in progress · ⬜ open.
 - ✅ All 11 app colour maps available on the phone screen (amber default); gain slider
 
 ## 3D lake (Phase 3 polish)
+- ✅ Deep water 40 → 24 m, fish off the bottom, chasing / darting / bursting fish (decision #64)
+- ✅ Down view fully AUTO on both devices; PL Down fills its box to the corners (decision #65)
+- ✅ Bottom toned down to orange with a thin hot edge; lockup moved into the boat's reach (decision #66)
+- ✅ Panoramic structure: bright near faces, dark shadows, no rock rings (decision #67)
+- ⬜ Panoramic shadow edges are still grainy (per-pixel march offsets); smoother ones need a better method than the two tried in #67
+- ✖ The wreck in ~10–12 m so it fills the phone like the tablet recording — Jason 2026-09-25: 不用 (it stays on the 24 m floor)
+- ✅ PLM Down in deep water no longer burns white (~11 % white after decision #66)
 - ✅ Bark striations on timber (procedural, in the lake shader)
 - 🔧 Boat restyled to Ranger Z521R proportions (charcoal metal flake, red waterline stripe, rub rail, wraparound windshield, Power-Poles, jack plate) — next: metal-flake sparkle, decals
 - ✅ Beam footprint rim on the bottom
@@ -63,7 +70,7 @@ it is done. ✅ done · 🔧 in progress · ⬜ open.
 - ✅ Bass / musky / salmon spread through the water column (bass 2–17 m, musky 5–13 m, salmon 4–33 m)
 - ✅ No fish swims through timber, rocks, wrecks or the logo: swim loops routed at load (decision #39)
 - ✅ Accuphy logo on the lakebed, standing in the boat's forward plane so Forward / Down image the whole mark (decision #39)
-- ⬜ Option for Jason: a guide step or a "find the logo" button that parks the boat on the lockup's line (today: a link with `?boat=41,1.5`, or drag the boat to the monument's west side)
+- ⬜ Option for Jason: a guide step or a "find the logo" button that parks the boat on the lockup's line (today: a link with `?boat=-14,-52.5` and range ≥ 140 ft, or drag the boat to the monument's west side; decisions #61, #66)
 - ✅ The full ACCUPHY lockup on the lakebed (the resume point after Jason's pause): white letters + blue fan from the brand SVG, 22 m wide, on a stone plinth that lifts it clear of the bottom echo; Forward and Down show the whole word at the default 80 ft (decision #40)
 - ⬜ Default camera on 16:10 screens: the word's right end is cut at the screen edge (fully visible on 16:9 and wider). Jason noted it ("哦"), no change asked; options if he wants one: pan the default camera ~3 m right, or shrink the word
 - ✅ Salmon / lake trout also up-and-right in the deep water
@@ -125,7 +132,7 @@ the cheapest Android phone class). Phone size was emulated at 360×800.
   checkout are fixed; the Lab as an onboarding tool (reading the picture) and a dealer demo; show
   multi-device sharing; UTM, Pixel and Klaviyo tags before any ad spend. Next data to get: the HelpScout
   queue (~4,200 conversations) and a 5-question owner survey.
-- ⬜ **Market research round 1 + continuous learning (2026-09-25, decision #60, proposals waiting on
+- ⬜ **Market research round 1 + continuous learning (2026-09-25, decision #77, proposals waiting on
   Jason):** `docs/market/` (start with `report-2026-09.md`; the loop is in `README.md`). Questions for
   Jason, in this order:
   1. **US store:** decision #57 settles the product (US = PingLive Mini is fine for ads). Still open:
@@ -161,7 +168,27 @@ the cheapest Android phone class). Phone size was emulated at 360×800.
 - 🔧 Mobile performance: dpr capped at 1.5, high-performance GL context; real-device check done 2026-09-24 (budget GPU 10–24 fps, see "Mobile + Meta ads readiness")
 - ✅ React 19 + R3F `refCleanup` console error — gone since StrictMode was removed (no new occurrences in this session's checks)
 - ⬜ **Local for now** (Jason 2026-09-24): `npm run build` + `npm run preview` on this Mac. Public hosting + Shopify embed stay in the plan for later, unchanged
-- ✅ **Private preview link** (2026-09-25; Jason could not open localhost from a cloud chat): https://claude.ai/artifact/4GdHHYZKTHgYyEzjV12RmW, a claude.ai page only Jason can open (not public hosting). A snapshot of the Lab as on main `6738310`; it does not update by itself. To refresh it: `npx vite build --base ./` into a scratch folder, rewrite the logo path `/brand/logo/White Accuphy Logo.png` to `./brand/logo/white-accuphy-logo.png` (copy the file to that name), default the hash to `#2026-09-23-sonar-lake-3d`, publish only index + assets + fonts + that logo (never the .ai/.cdr/.zip sources), and pass this URL as `url` so the link stays the same. The sign-up gate sends nothing (no Klaviyo key yet).
+- ✅ **Old private preview link, superseded** (2026-09-25): https://claude.ai/artifact/4GdHHYZKTHgYyEzjV12RmW was built
+  from main `6738310`, before the Safari fix (#73), so on an iPhone or iPad its sonar picture can be black. Friends and
+  phones use the public test link (#72, #76): https://jasonzhu-ctrl.github.io/accuphy-lab-test/. Delete the old one
+  when Jason agrees (a delete needs his confirmation).
+- ⬜ **Who can see the code** (checked 2026-09-30, Jason: "这个别人看得到代码吗"):
+  - **Visible to anyone:** the public test page and its repository `accuphy-lab-test` (public, 4 files).
+    Anyone can save `index.html` from the page or download it from GitHub. It is one minified file.
+    It includes the shader code as plain text (the sonar look), the three brand fonts and the white logo.
+  - **Not exposed:** the source repository `accuphy-visual-lab` (private), with the docs and market
+    data. The page carries no keys (the Klaviyo key is empty) and no source maps.
+  - **Search engines:** `robots.txt` and `noindex` keep the page out of results. The GitHub repository
+    itself is public.
+  - **Open — font licence:** Eurostile Heavy is a commercial font and is now served publicly.
+    Confirm that the licence covers web embedding. If it does not, use a web-licensed copy or subset
+    before sharing more widely.
+  - **Limits:** code that runs in a browser cannot be hidden; obfuscation only slows a reader down.
+
+## Handed to the website project (decision #69) — tracked in `accuphy-website/docs/backlog.md`
+- Lab page location (lab.accuphy.ca vs a store page) · lite section's Shopify test page · Klaviyo list,
+  opt-in and keys · Meta Pixel, UTM, "Shop PingLive" button · US phone checkout walk (decision #57).
+  The design work for each stays here; the Shopify side is theirs.
 
 ## Lite section (planning only — decision #48)
 - ⬜ **Do not build until Jason says go.** `docs/lite-section-plan.md`: the original side-view visualizer as a

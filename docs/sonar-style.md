@@ -286,7 +286,10 @@ corners. Engine (PL Forward, decision #38): the cutoff is the box's far corner
 **AUTO** the way the app does: it follows the depth readout (the water straight
 below the transducer) and puts that bottom at ~80 % of the height, in the app's
 steps, deeper at once and shallower only after 1.5 s. A deeper bottom ahead may
-run off the screen, as in the app (decision #41).
+run off the screen, as in the app (decision #41). PingLive Mini Down and Forward use the same AUTO depth
+range (one value for both, so the bottom lines up between the views); Mini Down's
+range is that value, and Mini gets extra near-range gain 0.62 → 1 over 5–18 m
+against the shallow-water glare (decision #60).
 
 Engine: `screenLayout` takes range and depth range separately for PL Forward;
 the near-field rays and every mark are sized in metres, never in fractions of
@@ -340,6 +343,16 @@ Engine after the balance loop (Black Body, gain 57 / contrast 40 / noise 30,
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | PLM Forward 60 ft (bottom + timber) | 0.90 | .081 | .114 | .125 | .144 | .170 | .154 | .098 | .037 | .016 | .060 |
 | PL Forward 120/100 ft (bottom band, wreck out of the fan) | 0.85 | .038 | .034 | .034 | .032 | .044 | .097 | .222 | .261 | .187 | .050 |
+
+2026-09-25 (decision #64): the deep floor moved from 40 m to 24 m, so the second scene is not the
+same picture any more. It now reads 76 ft over a flat bottom, with the small wreck in the fan:
+black 0.89 · .038 .042 .044 .042 .051 .046 .059 .088 .146 .444. The flat bottom tops out white
+across the beam, which is point (2) below. This is not a tuning change; pick a new second reference
+scene before the next balance loop.
+
+2026-09-25 (decision #66): the flat-bottom glare was fixed with a soft cap on the integrated bottom
+echo past the near range, a thin first-return edge and a 15 % higher white point. White share:
+PL bottom scenes 37–44 % → ~7 %, wreck 35 % → 8 %, PLM shelf 6 % → 2 %.
 
 What the loop taught: (1) the bottom band must be a thin hot leading edge
 (first return) over an orange body (integrated thickness) — a wide white slab
