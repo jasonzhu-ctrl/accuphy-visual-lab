@@ -3,8 +3,9 @@
 // with a species profile for height/width; then flat fins as shapes:
 // caudal (forked or rounded), dorsal, anal, pectorals. One unit long.
 import * as THREE from 'three'
-import { mergeGeometries as _merge } from 'three/addons/utils/BufferGeometryUtils.js'
-const merge = (parts) => _merge(parts.map((g) => (g.index ? g.toNonIndexed() : g)))
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js'
+// The tube and the fin shapes are all indexed, so the merged fish stays indexed: a shared vertex is shaded once,
+// which matters now that the vertex shader bends the body (decision #86).
 
 // profile control points: [t along body 0=nose..1=peduncle end, height, width]
 const PROFILES = {
@@ -12,7 +13,7 @@ const PROFILES = {
   salmonid: { pts: [[0, 0.03, 0.03], [0.12, 0.14, 0.1], [0.28, 0.21, 0.13], [0.45, 0.23, 0.13], [0.7, 0.16, 0.1], [0.88, 0.08, 0.05], [1, 0.06, 0.04]], tail: 'fork', dorsal: [0.4, 0.58, 0.07], anal: [0.68, 0.8, 0.05], pec: 0.3 },
   pike:     { pts: [[0, 0.02, 0.03], [0.14, 0.07, 0.07], [0.3, 0.12, 0.1], [0.55, 0.14, 0.11], [0.78, 0.11, 0.08], [0.92, 0.07, 0.05], [1, 0.06, 0.04]], tail: 'fork', dorsal: [0.72, 0.9, 0.06], anal: [0.74, 0.9, 0.05], pec: 0.3 },
   panfish:  { pts: [[0, 0.03, 0.02], [0.1, 0.2, 0.06], [0.25, 0.36, 0.08], [0.45, 0.42, 0.08], [0.65, 0.32, 0.07], [0.85, 0.15, 0.04], [1, 0.1, 0.03]], tail: 'round', dorsal: [0.28, 0.74, 0.12], anal: [0.6, 0.82, 0.1], pec: 0.3 },
-  bait:     { pts: [[0, 0.02, 0.02], [0.12, 0.08, 0.06], [0.3, 0.12, 0.08], [0.5, 0.13, 0.08], [0.72, 0.1, 0.06], [0.9, 0.06, 0.04], [1, 0.05, 0.03]], tail: 'fork', dorsal: [0.45, 0.58, 0.04], anal: [0.7, 0.82, 0.03], pec: 0.3 },
+  bait:     { pts: [[0, 0.02, 0.02], [0.12, 0.08, 0.06], [0.3, 0.12, 0.08], [0.5, 0.13, 0.08], [0.72, 0.1, 0.06], [0.9, 0.06, 0.04], [1, 0.05, 0.03]], tail: 'fork', dorsal: [0.45, 0.58, 0.04], anal: [0.7, 0.82, 0.03], pec: 0.3, rings: 10, segs: 8 }, // small and many (205 smelt): a lighter tube
 }
 // smooth interpolation through control points (Catmull-Rom on each channel)
 function interp(pts, t, ch) {
@@ -61,7 +62,7 @@ function fin(points) { // flat fin in the x–y plane (z = 0), double-sided via 
 }
 export function makeFishGeometry(body) {
   const prof = PROFILES[body]
-  const parts = [bodyTube(prof)]
+  const parts = [bodyTube(prof, prof.rings, prof.segs)]
   const H = (t) => interp(prof.pts, t, 1) / 2
   const x = (t) => 0.5 - t
   // caudal fin from the peduncle
@@ -86,5 +87,5 @@ export function makeFishGeometry(body) {
     g.translate(x(pt), -0.02, side * pw)
     parts.push(g)
   }
-  return merge(parts)
+  return mergeGeometries(parts)
 }

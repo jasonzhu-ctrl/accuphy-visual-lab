@@ -59,6 +59,10 @@ repeatable procedures are also project skills in `.claude/skills/` (`sonar-qa`, 
   (acts ease in, hold, ease out), so the 3D fish and the sonar marks always agree (#64). Every act's path is sampled
   before it starts; `scripts/dev/fish-sim.mjs` must report 0 structure/bottom/surface hits. A fish that rises into
   the thin slab must hold still there, or it drifts out of the picture.
+- **Fish swimming (#86):** a vertex-shader body wave fed by one per-fish attribute (`aSwim`). Tune it with a quick
+  per-species simulation of speed, tail beat and bend before rendering anything: fish drawn 2.6× long on tight loops
+  saturate any bend that follows the path's curvature, and their slow speeds (0.1–0.4 body lengths per second) make a
+  pure speed-driven beat look rigid.
 - **Performance:** keep per-frame JS tiny (behaviours 0.04 ms, worst 1–2 ms when an act starts). Pre-filter
   obstacles near a path, cap cascades (≤ 8 bait scatter).
 
@@ -74,6 +78,10 @@ repeatable procedures are also project skills in `.claude/skills/` (`sonar-qa`, 
   GitHub Pages `jasonzhu-ctrl.github.io/accuphy-lab-test` (#72), built by `scripts/build-share.mjs` as ONE
   self-contained file (fonts and logo inlined, `noindex`, no sign-up gate, #71). The script refuses to finish if
   any file reference is left. Switching on a new public surface is Jason's click, not Claude's.
+- **Repeatable before/after clips (Playwright):** in an init script, freeze `performance.now()` and queue
+  `requestAnimationFrame` behind a `__step(ms)` virtual clock, and seed `Math.random`; run the old code from a frozen
+  copy on a second port. Frames come out byte-identical run to run. Playwright's own `page.clock` hung the screenshots,
+  and `waitForFunction` must poll on a timer (`polling: 100`), not on animation frames.
 - **Build gotchas:** the minifier writes string literals with backticks. Vite rewrites public CSS URLs to
   `../brand/…`. Both broke naive find-and-replace. `vite build` must pass before any share.
 - **Fonts:** the Lab's local `Eurostile-Heavy.otf` has an unverified web licence. The website moved to the Adobe kit
@@ -94,7 +102,7 @@ repeatable procedures are also project skills in `.claude/skills/` (`sonar-qa`, 
 
 | Tool | What it does |
 |---|---|
-| `?boat=x,z` · `?bigphone` · `?dev` · `?cam=logo/wreck/boat/fish:<sp>` · `?wrecklift=m` | Dev URL flags: park the boat, enlarge the phone, tuning rows, cameras, lift the wreck |
+| `?boat=x,z` · `?bigphone` · `?dev` · `?cam=logo/wreck/boat/fish:<sp>[:<i>][:top/side/tq]` · `?wrecklift=m` | Dev URL flags: park the boat, enlarge the phone, tuning rows, cameras (a fish from above, the side or three-quarter), lift the wreck |
 | `window.__sonarSnap()` + `POST /__snap?name=` | Save the sonar picture as a PNG in `reference/engine-compare/` (gitignored) |
 | `window.__lakeSnap()` | The 3D view alone as a PNG |
 | `window.__sonarHist(10)` | LUT-index histogram of the lit sonar pixels |

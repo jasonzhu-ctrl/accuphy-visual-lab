@@ -1205,3 +1205,42 @@ Numbered log. Newest at the bottom.
       - every other species keeps today's 2.6×.
       The sonar is not affected: its fish marks use the true length.
     - Still open: where the boat comes from (code, recommended, or a model). Phase 2 waits for Jason's go.
+
+86. **2026-10-03** — **Fish phase 1 built: the bodies swim with a travelling wave** (go: #85; plan:
+    `docs/boat-fish-plan.md` §3a).
+    - **What changed:**
+      - Each body bends sideways with a wave that runs from head to tail, drawn on the GPU (`lakeMaterial.js`). The
+        amplitude is a little head recoil growing to 0.1 of the length at the tail tip (the carangiform envelope),
+        times an activity that follows the fish's own speed: a gentle sway when it cruises slowly, a full beat from
+        about 1 body length per second.
+      - The tail beats at 1.5 × body lengths per second, with a cruising minimum that is slower for big fish
+        (musky ≈ 0.6 Hz, bass ≈ 0.95 Hz, smelt ≈ 1.6 Hz).
+      - The body curves into quick turns. When a fish slows hard (the end of a dart, a salmon burst), it straightens and
+        glides.
+      - The old "tail wag" is gone. It turned about the wrong axis, so every fish rocked its nose up and down at the
+        same ~1 Hz. Pitch now comes only from rising or sinking.
+      - The fish geometry stays indexed, so a shared vertex is computed once. The 205 smelt use a lighter body
+        (174 triangles instead of 742).
+      - Markings stay on the body when it bends. The sonar is untouched: its fish marks are computed separately.
+      - Per-species display size (#85): one helper, `drawnLen`, now sizes and clears every drawn fish, and a species
+        may set its own `scale`. All species still use 2.6×; the musky waits for Jason's pick from a side-by-side
+        (2.6× / 2.2× / 1.9×).
+    - **Tuned against the plan**, after simulating speed, beat and bend for every fish:
+      - The turn bend follows the turn rate, not the path's curvature. The curvature version held 30–50 % of the fish
+        in a permanent C, because the swim loops are tight for fish drawn 2.6× long.
+      - The activity starts at 0.35 instead of 0.15, and the beat has a minimum of 1/√(drawn length) Hz. Otherwise
+        most big fish (0.1–0.4 body lengths per second) drifted almost rigid.
+    - **Checks:**
+      - default desktop view: 95 draw calls (unchanged); 875,617 → 759,177 triangles per frame (−13 %);
+      - `fish-sim.mjs` for 15 simulated minutes: 0 structure, bottom or surface hits; lowest gap 0.37 m;
+      - the sonar screen is pixel-identical before and after (same virtual time, 3 frames);
+      - the build passes; no console errors on desktop or at 390×844; no new textures (Safari rule);
+      - before/after clips on a fixed virtual clock: seen from above, the bass is rigid before and shows an S-wave
+        about once a second after.
+    - **Known / next:**
+      - In the default overview the fish are small, so the change shows mostly up close.
+      - Not yet built: random glides for trout, and a pectoral flutter for hovering fish (phase 3, with the fins).
+      - From straight above, the dorsal fin (a flat card) shows as a thin dark line when the body bends. Phase 3 makes
+        the fins thinner and semi-transparent.
+    - **Dev aid:** `?cam=fish:<species>[:<index>][:top|:side|:tq]` now follows the fish on the scene's own clock (the old
+      camera used another clock and lost the fish). It can look from above, from the side, or three-quarter.

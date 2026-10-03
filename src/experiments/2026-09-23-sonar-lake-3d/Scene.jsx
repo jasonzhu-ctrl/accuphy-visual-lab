@@ -5,7 +5,7 @@ import { mergeGeometries as _merge } from 'three/addons/utils/BufferGeometryUtil
 // Extrude geometries are non-indexed, primitives are indexed — normalise first.
 const mergeGeometries = (parts) => _merge(parts.map((g) => (g.index ? g.toNonIndexed() : g)))
 import { HALF, SEG, bedY, fbm } from './terrain'
-import { SPECIES, makePopulation, fishPose, stepBehaviours, forceRise, rnd, FISH_DISPLAY_SCALE } from './fish'
+import { SPECIES, makePopulation, fishPose, stepBehaviours, forceRise, rnd, drawnLen } from './fish'
 import { makeLakeMaterial, setBeamUniforms } from './lakeMaterial'
 import { wedgeGeometry } from '../2026-09-23-beam-shapes-3d/wedge'
 import { makeTallTree, makeBushTree, makeStump, makeLog, makeWeedTuft, makeRock, placeAll } from './vegetation'
@@ -175,6 +175,10 @@ function Logo({ mat, stoneMat }) {
 
 // ---------- fish ----------
 // Realistic bodies per type — see fishGeometry.js
+// Swimming (decision #86, docs/boat-fish-plan.md §3a): each fish gets aSwim = (wave phase, activity, turn bend,
+// wavelength) every frame and the vertex shader bends the body (lakeMaterial.js). Body wavelength in body lengths.
+const WAVELENGTH = { bass: 0.95, panfish: 0.95, salmonid: 0.85, bait: 0.85, pike: 0.8 }
+const smooth01 = (a, b, x) => { const u = Math.min(1, Math.max(0, (x - a) / (b - a))); return u * u * (3 - 2 * u) }
 function FishGroup({ mat, body, fish }) {
   const geo = useMemo(() => {
     const g = makeFishGeometry(body)
@@ -188,6 +192,9 @@ function FishGroup({ mat, body, fish }) {
     g.setAttribute('aPattern', new THREE.InstancedBufferAttribute(pat, 1))
     g.setAttribute('aBelly', new THREE.InstancedBufferAttribute(belly, 3))
     g.setAttribute('aSide', new THREE.InstancedBufferAttribute(side, 3))
+    const swim = new Float32Array(fish.length * 4)
+    fish.forEach((f, i) => { swim[i * 4] = (i * 2.39996) % (2 * Math.PI); swim[i * 4 + 1] = 0.4; swim[i * 4 + 3] = WAVELENGTH[body] }) // tails out of step
+    g.setAttribute('aSwim', new THREE.InstancedBufferAttribute(swim, 4).setUsage(THREE.DynamicDrawUsage))
     return g
   }, [body, fish])
   const ref = useRef()
@@ -196,17 +203,34 @@ function FishGroup({ mat, body, fish }) {
     fish.forEach((f, i) => { c.set(SPECIES[f.species].back); ref.current.setColorAt(i, c) })
     ref.current.instanceColor.needsUpdate = true
   }, [fish])
-  const tmp = useMemo(() => ({ m: new THREE.Matrix4(), q: new THREE.Quaternion(), e: new THREE.Euler(), p: new THREE.Vector3(), s: new THREE.Vector3(), pose: {} }), [])
-  useFrame(({ clock }) => {
-    const t = clock.elapsedTime
+  const tmp = useMemo(() => ({ m: new THREE.Matrix4(), q: new THREE.Quaternion(), e: new THREE.Euler(), p: new THREE.Vector3(), s: new THREE.Vector3(), pose: {},
+    heading: new Float32Array(fish.length), speed: new Float32Array(fish.length), accel: new Float32Array(fish.length), first: true }), [fish])
+  useFrame(({ clock }, dt) => {
+    const t = clock.elapsedTime, d = Math.min(Math.max(dt, 1e-4), 0.1)
+    const fresh = tmp.first || dt > 0.25 // first frame, or back from a pause / hidden tab: no turn rate or slowing to read
+    const sw = geo.attributes.aSwim, a = sw.array
+    const eK = 1 - Math.exp(-d / 0.4), eB = 1 - Math.exp(-d / 0.25), eA = 1 - Math.exp(-d / 0.3) // smoothing, frame-rate independent
     fish.forEach((f, i) => {
       const o = fishPose(f, t, tmp.pose)
-      tmp.e.set(0, o.heading, Math.sin(t * 6 + f.phase) * 0.08 + o.pitch); tmp.q.setFromEuler(tmp.e) // z: tail wag + nose up/down on a rise
-      tmp.p.set(o.x, o.y, o.z); const L = f.len * FISH_DISPLAY_SCALE; tmp.s.set(L, L, L)
+      tmp.e.set(0, o.heading, o.pitch); tmp.q.setFromEuler(tmp.e) // z = pitch: nose up/down on a rise only (the old sin(6t) "wag" here rocked the nose)
+      const L = drawnLen(f)
+      tmp.p.set(o.x, o.y, o.z); tmp.s.set(L, L, L)
       tmp.m.compose(tmp.p, tmp.q, tmp.s)
       ref.current.setMatrixAt(i, tmp.m)
+      // swimming, from the fish's own motion: speed in body lengths per second, turn rate, slowing down
+      const U = o.speed, bl = U / L
+      let dh = o.heading - tmp.heading[i]; dh -= Math.round(dh / (2 * Math.PI)) * 2 * Math.PI
+      const turn = fresh ? 0 : dh / d, dU = fresh ? 0 : (U - tmp.speed[i]) / d
+      tmp.heading[i] = o.heading; tmp.speed[i] = U
+      tmp.accel[i] += (dU - tmp.accel[i]) * eA
+      const coast = tmp.accel[i] < -0.2 * L ? 0.3 : 1 // slowing hard (end of a dart, a burst): the body straightens and glides
+      a[i * 4 + 1] += ((0.35 + 0.65 * smooth01(0.05, 1, bl)) * coast - a[i * 4 + 1]) * eK // activity: a gentle sway when slow → full beat at 1 BL/s
+      a[i * 4 + 2] += (Math.max(-0.25, Math.min(0.25, -0.3 * turn)) - a[i * 4 + 2]) * eB // the body curves into a quick turn (by turn rate, rad/s); straight when cruising
+      a[i * 4] = (a[i * 4] + 2 * Math.PI * Math.min(6, Math.max(1 / Math.sqrt(L), 1.5 * bl)) * d) % (2 * Math.PI) // tail beat 1.5 × BL/s, at least a cruising beat (big fish slower: 0.7 Hz musky, 1.5 Hz smelt)
     })
+    tmp.first = false
     ref.current.instanceMatrix.needsUpdate = true
+    sw.needsUpdate = true
   })
   return <instancedMesh ref={ref} args={[geo, mat, fish.length]} frustumCulled={false} onUpdate={(o) => o.layers.set(FISH_LAYER)} />
 }
@@ -338,12 +362,15 @@ function Beams({ state }) {
 const CAM_T = new THREE.Vector3(3, -9, 0), CAM_D = new THREE.Vector3(-17, 61, 66) // desktop target, camera − target
 const LAKE_W = 50 // Jason 2026-10-03: 70 m made the boat a little too small — a middle value
 const FOG = { near: 160, far: 420, cam: 400 }
+// dev aid ?cam=fish:<species>[:<index>][:top|:side|:tq] — top: from above, nose up the screen (shows the body wave);
+// side: broadside, level with the fish; tq: three-quarter, above and to one side, turning with the fish; none: the old fixed offset
+const FISH_CAM_VIEW = import.meta.env.DEV ? (/cam=fish:\w+(?::\d+)?:(top|side|tq)/.exec(window.location.search) || [])[1] : undefined
 function Rig({ state, sonarRect, fogMats }) {
   const { camera, size, scene } = useThree()
   const tmp = useMemo(() => new THREE.Vector3(), [])
   const look = useMemo(() => new THREE.Vector3(), [])
   const k0 = useRef(0)
-  useFrame((_, dt) => {
+  useFrame(({ clock }, dt) => {
     const s = state.current
     const aspect = size.width / size.height
     const tanV = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2))
@@ -372,13 +399,16 @@ function Rig({ state, sonarRect, fogMats }) {
     }
     // fixed 3/4 aerial view like the PL animations; slight parallax from the pointer
     const px = s.parallax.x, py = s.parallax.y
-    if (s.fishCam && s.pop) { // dev aid ?cam=fish:<species> — follow the first fish of that species
+    if (s.fishCam && s.pop) { // dev aid ?cam=fish:<species> — follow one fish, on the fishes' own clock
       const list = s.pop.filter((x) => x.species === s.fishCam)
       const f = list[Math.min(list.length - 1, s.fishCamIndex || 0)]
       if (f) {
-        const o = fishPose(f, performance.now() / 1000, {})
-        const L = f.len * FISH_DISPLAY_SCALE
-        camera.position.set(o.x + L * 0.3, o.y + L * 0.35, o.z + L * 2.4)
+        const o = fishPose(f, clock.elapsedTime, {})
+        const L = drawnLen(f), ch = Math.cos(o.heading), sh = Math.sin(o.heading)
+        if (FISH_CAM_VIEW === 'top') { camera.up.set(ch, 0, -sh); camera.position.set(o.x, o.y + L * 2.6, o.z) }
+        else if (FISH_CAM_VIEW === 'side') { camera.up.set(0, 1, 0); camera.position.set(o.x + sh * L * 2.4, o.y + L * 0.25, o.z + ch * L * 2.4) }
+        else if (FISH_CAM_VIEW === 'tq') { camera.up.set(0, 1, 0); camera.position.set(o.x + sh * L * 1.5 - ch * L * 0.5, o.y + L * 1.5, o.z + ch * L * 1.5 + sh * L * 0.5) }
+        else { camera.up.set(0, 1, 0); camera.position.set(o.x + L * 0.3, o.y + L * 0.35, o.z + L * 2.4) }
         camera.lookAt(o.x, o.y, o.z)
         return
       }

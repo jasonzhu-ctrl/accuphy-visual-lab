@@ -1,7 +1,7 @@
 # Boat + fish plan: a real bass boat, fish that swim naturally (proposal, 2026-10-03)
 
-Status: boat decided (#83); fish decided and **phase 1 in progress** (#85). Phases 2–4 wait for Jason's go
-(CLAUDE.md: "我没说动不要动").
+Status: boat decided (#83); fish decided (#85); **phase 1 built (#86)**, waiting for Jason's look. Phases 2–4 wait for
+Jason's go (CLAUDE.md: "我没说动不要动").
 
 ## 中文摘要（给 Jason）
 
@@ -28,7 +28,7 @@ Status: boat decided (#83); fish decided and **phase 1 in progress** (#85). Phas
 2. 船怎么来：A 用代码自己做（推荐：没有授权风险、文件小、能精确放 PingLive）；B 试那个免费 CC-BY 模型（要在页面上署名，面数和质量待确认）；C 买付费模型（要确认授权允许网页使用，而且不能带品牌标志）。**还没定**，第 2 步开始前再定。
 3. ~~鱼的品种~~ 已定（#85）：现有的鱼都保留，第 3 步加黄鲈和北方狗鱼；数量（多放 walleye、少放小银鱼）到第 3 步给你看了再定。
 4. ~~鱼的大小~~ 已定（#85）：按鱼种分别定。musky 保持现在的大小或再小一点（给你看对比图再选），其他鱼保持现在的 2.6 倍。声纳屏幕不受影响。
-5. ~~先做第 1 步~~ 已定（#85）：第 1 步（鱼游自然）正在做。
+5. ~~先做第 1 步~~ 已定（#85）：第 1 步（鱼游自然）已做好（#86），等你看效果。musky 的大小请从对比图里选。
 
 ## Context (for Claude)
 
@@ -157,6 +157,14 @@ lateral. Let s = 0.5 − x (0 at the nose, 1 at the peduncle; the caudal fin rea
 - The sonar is unchanged.
 - `scripts/dev/fish-sim.mjs` must still report 0 hits (the bend stays within ±0.1 L).
 - Per-frame JS stays tiny: 298 × 3 floats.
+
+**Built (#86) — where it differs from the above** (tuned after simulating speed, beat and bend for every fish):
+- Turn bend β = −0.3 × turn rate (rad/s), clamped to ±0.25, instead of following the path's curvature. The curvature
+  version held 30–50 % of the fish in a permanent C, because the loops are tight for fish drawn 2.6× long.
+- Activity k = 0.35 + 0.65 · smoothstep(0.05, 1, U/L); 0.3 × that while slowing hard (coast). Tail beat
+  f = max(1/√L, 1.5 · U/L), at most 6 Hz (L = drawn length). Most big fish swim at 0.1–0.4 body lengths per second, and
+  the plan's values left them almost rigid.
+- Not built yet: random glides for trout, the hover flutter, the pike's C-start (musky have no rises).
 
 ### 3b. Anatomy (phase 3)
 
@@ -337,7 +345,7 @@ Each phase ends with a look and Jason's go before the next. Rebuild the public t
    walleye, fewer smelt) are shown in phase 3 for his look.
 4. ~~Fish display scale~~ decided (#85): per species. The musky stays at today's size or a little smaller (side-by-side
    for Jason); every other species keeps 2.6×. Sonar marks keep the true length.
-5. ~~Start with phase 1?~~ decided (#85): go; in progress on `claude/modest-keller-ccfnhq`.
+5. ~~Start with phase 1?~~ decided (#85): go; built (#86). Jason still picks the musky's size from the side-by-side.
 
 ## 9. Sources
 
