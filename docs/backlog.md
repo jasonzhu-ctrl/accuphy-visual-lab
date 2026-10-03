@@ -50,10 +50,9 @@ it is done. ✅ done · 🔧 in progress · ⬜ open.
   - (1) ✅ **built (#86), waiting for Jason's look:** the bodies swim with a travelling wave on the GPU, the tail beat
     follows the speed, the body curves into quick turns, the wrong-axis "wag" is gone, lighter smelt (−13 % triangles).
     The files it took are free again. Still open: Jason picks the musky's size (2.6× / 2.2× / 1.9× side-by-side).
-  - (2) 🔧 **in progress (#87, cloud chat, branch `claude/modest-keller-ccfnhq`):** the hull rebuilt in code with
-    `LoftGeometry`, new topsides, plus water contact (bob, foam line, wake). **Files taken:** `boat.js`, and in
-    `Scene.jsx` the `Boat` and `Water` components and the dev boat camera in `Rig`. Other chats: please leave these
-    until this entry says they are free.
+  - (2) ✅ **built (#88), waiting for Jason's look:** a low-key bass boat lofted in code (V hull, strakes, flat sheer,
+    flared bow), new decks, consoles, seats and outboard. The trolling motor and transducer are unchanged; there is a
+    gentle bob, a foam line and a V wake when dragged. The files it took are free again.
   - (3) fish eyes, fins, percid/pike bodies, perch and pike, more walleye;
   - (4) optional: world edge, depth light, caustics, weeds.
 - ⬜ **Desktop: range on the phone + phone size (approved #84, plan B; the local phone-layout chat builds it):**
@@ -62,6 +61,9 @@ it is done. ✅ done · 🔧 in progress · ⬜ open.
   - the app control set scales 1.3× on desktop (range ring ≈ 16 → 23 px);
   - the phone frame becomes `min(42vw, 600px, 83.2vh)` (≈ 74 % of a real 16 Pro Max on a laptop, ≈ real size
     on a 24″ monitor; true size would cover 57 % of a laptop screen).
+- ⬜ Optional: the water's wave displacement is applied within the plane (`p.y` of the rotated plane), so the drawn
+  surface is flat; only its shading suggests waves. A real vertical wave needs a finer grid near the camera
+  (today 10 m cells). Found in #88; harmless as it is.
 - ✅ Deep water 40 → 24 m, fish off the bottom, chasing / darting / bursting fish (decision #64)
 - ✅ Down view fully AUTO on both devices; PL Down fills its box to the corners (decision #65)
 - ✅ Bottom toned down to orange with a thin hot edge; lockup moved into the boat's reach (decision #66)
