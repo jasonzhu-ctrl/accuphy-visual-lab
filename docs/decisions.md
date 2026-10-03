@@ -1244,3 +1244,14 @@ Numbered log. Newest at the bottom.
         the fins thinner and semi-transparent.
     - **Dev aid:** `?cam=fish:<species>[:<index>][:top|:side|:tq]` now follows the fish on the scene's own clock (the old
       camera used another clock and lost the fish). It can look from above, from the side, or three-quarter.
+
+87. **2026-10-03** — **Boat phase 2 starts, built in code** (Jason, after the phase 1 report and the question "第 2 步（做新船）可以开始吗？
+    船用代码自己做（我推荐），可以吗？": "好的，确认一下，你这个现有的这个 task 跑完之后就可以开干了啊").
+    - Phase 2 of `docs/boat-fish-plan.md` (§5) is a go, with approach A: the hull and topsides are built in code (no
+      model licence, small, the transducer placed exactly).
+    - #83 still applies: a low-key bass boat, a nearly flat sheer, no raised bow, no Power-Poles, the trolling motor and
+      the PingLive transducer as they are (only re-seated on the new deck), a muted charcoal hull.
+    - The beam apex (`TRANSDUCER_OFFSET`) does not move, so the sonar picture stays the same.
+    - Still open: the musky's display size (it stays at 2.6× until Jason picks); no change to the swimming was asked for.
+    - Built by the cloud chat. Files taken: `boat.js` and, in `Scene.jsx`, the `Boat` and `Water` components and the dev
+      boat camera in `Rig` (backlog).
