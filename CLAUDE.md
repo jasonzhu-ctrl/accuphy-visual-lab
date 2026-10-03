@@ -51,7 +51,7 @@ no TypeScript. No backend, no database — front-end only.
 - `docs/research.md` — tools/approach research and the reasons behind decision #5.
 - `docs/users-and-market.md` — round 0 of the market research (personas, first principles).
 - `docs/market/` — market learning: who buys, competitors, metrics, experiments, learning log
-  (decision #79). **Read `docs/market/README.md` before giving sales or marketing advice**, and
+  (decision #82). **Read `docs/market/README.md` before giving sales or marketing advice**, and
   write new learnings back there.
 
 ## Lessons and skills (2026-09-26)

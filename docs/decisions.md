@@ -1117,7 +1117,35 @@ Numbered log. Newest at the bottom.
     - **Known:** at long ranges (≥ 120 ft) the Forward fan runs past the right screen edge on a phone. Still
       to do: touch drag (phase 3), landscape and quality tiers (phase 4).
 
-79. **2026-09-25** — **Market learning gets a shared home: `docs/market/`** (Jason:
+79. **2026-10-03** — **Phone app controls bigger and easier to tap, in the app's own style** (Jason: "range 的按键…稍微
+    大一点…加号跟减号能不能稍微分开一点…不要破坏原本 APP 的界面的协调性…图标…视觉上更容易分辨…点击起来更容易").
+    - On phones the whole app control set scales by 1.55× together: range, gain, pause, back, ⋯ and the depth
+      control. This keeps the proportions of the real app's bottom bar (`reference/app-study/pl-forward-empty-chrome.jpg`:
+      ring buttons ≈ 5 % of the screen height, thick white outlines).
+    - The range − and + are now 62 px apart, centre to centre (18 px rings with ~42 px hit areas, so they never
+      overlap).
+    - − and + are drawn as SVG (a thick circle outline plus round-capped bars), the same glyphs as the app. Before,
+      they were text characters, which sat off-centre.
+    - Working controls (range) are full white. Display-only controls keep the dimmed look, so the two are easy to
+      tell apart.
+    - Desktop keeps its sizes; it only gets the crisper SVG − / + glyphs.
+    - Checked at 390×844 and 1440×900, with no console errors; the build passes.
+
+80. **2026-10-03** — **Phone drag stays as it is: the boat runs to the finger and follows it** (Jason: "就是手，它会跑到这个
+    手指，就跟着这个下面，我觉得很好"). Phase 3's relative "swipe to move" drag (`docs/mobile-phone-layout-plan.md`) is
+    dropped. Its other point, keeping the drag hint inside the screen, was already done in #77.
+
+81. **2026-10-03** — **Public test link updated with the new phone layout** (Jason: "好啊，你把它公开出来").
+    https://jasonzhu-ctrl.github.io/accuphy-lab-test/ is rebuilt from b919bb3 and covers #77–#80. Public repo
+    commit 5bff6f7; the live md5 matched about 30 s after the push.
+    - **Checked before publishing:**
+      - the Safari texture audit is unchanged and OK;
+      - the share build was served locally at 390×844: phone layout, the panel hidden, the range + steps
+        80 → 100 ft;
+      - zero network requests, no sign-up gate, no console errors.
+    - The private Artifact (#70) is still not republished.
+
+82. **2026-09-25** — **Market learning gets a shared home: `docs/market/`** (Jason:
     "基于你对我们的全盘了解 做深入用户和市场研究 持续学习如何让accuphy卖得更好").
     Research round 1 builds on round 0 (`docs/users-and-market.md`, 2026-09-24) and sets up
     the loop for continuous learning:
@@ -1134,5 +1162,5 @@ Numbered log. Newest at the bottom.
       the ice season (Nov–Feb = 43 % of store orders) starts now.
     All recommendations are proposals: nothing in the store, Klaviyo, ads or the Lab changes
     until Jason says go.
-    (Written as #54, then #60 and #77 on the research branch `claude/modest-keller-ccfnhq`; renumbered #79
-    when merged with main on 2026-10-03, where #77 and #78 had been taken by the phone work.)
+    (Written as #54, then #60, #77 and #79 on the research branch `claude/modest-keller-ccfnhq`; renumbered #82
+    when merged with main on 2026-10-03, where #79–#81 had been taken by the phone work.)
