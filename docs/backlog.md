@@ -43,6 +43,24 @@ it is done. ✅ done · 🔧 in progress · ⬜ open.
 - ✅ All 11 app colour maps available on the phone screen (amber default); gain slider
 
 ## 3D lake (Phase 3 polish)
+- 🔧 **Boat + fish plan (2026-10-03):** `docs/boat-fish-plan.md`. Boat decided (#83): a low-key bass boat; no raised
+  bow, no Power-Poles; the trolling motor and transducer stay as they are. Fish decided (#85): all species stay, yellow
+  perch and northern pike join in phase 3, display size per species (musky today's size or a little smaller, the rest
+  2.6×). Four phases:
+  - (1) **in progress (cloud chat, branch `claude/modest-keller-ccfnhq`):** fish bend with a travelling body wave on the
+    GPU, fixing today's wrong-axis "wag"; cheaper bait geometry. **Files taken:** `fishGeometry.js`, `fish.js`,
+    `lakeMaterial.js` (the `FISH` vertex block) and `Scene.jsx` (`FishGroup` only). Other chats: please leave these
+    until this entry says they are free.
+  - (2) the hull rebuilt in code with `LoftGeometry`, plus water contact (waits for Jason's go; boat source still open,
+    code recommended);
+  - (3) fish eyes, fins, percid/pike bodies, perch and pike, more walleye;
+  - (4) optional: world edge, depth light, caustics, weeds.
+- ⬜ **Desktop: range on the phone + phone size (approved #84, plan B; the local phone-layout chat builds it):**
+  `docs/desktop-phone-controls-plan.md`. The desktop counterpart of #78/#79:
+  - the panel's Range row goes, and the app's own −/+ on the phone set the range;
+  - the app control set scales 1.3× on desktop (range ring ≈ 16 → 23 px);
+  - the phone frame becomes `min(42vw, 600px, 83.2vh)` (≈ 74 % of a real 16 Pro Max on a laptop, ≈ real size
+    on a 24″ monitor; true size would cover 57 % of a laptop screen).
 - ✅ Deep water 40 → 24 m, fish off the bottom, chasing / darting / bursting fish (decision #64)
 - ✅ Down view fully AUTO on both devices; PL Down fills its box to the corners (decision #65)
 - ✅ Bottom toned down to orange with a thin hot edge; lockup moved into the boat's reach (decision #66)
@@ -132,6 +150,29 @@ the cheapest Android phone class). Phone size was emulated at 360×800.
   checkout are fixed; the Lab as an onboarding tool (reading the picture) and a dealer demo; show
   multi-device sharing; UTM, Pixel and Klaviyo tags before any ad spend. Next data to get: the HelpScout
   queue (~4,200 conversations) and a 5-question owner survey.
+- ⬜ **Market research round 1 + continuous learning (2026-09-25, decision #82, proposals waiting on
+  Jason):** `docs/market/` (start with `report-2026-09.md`; the loop is in `README.md`). Questions for
+  Jason, in this order:
+  1. **US store:** decision #57 settles the product (US = PingLive Mini is fine for ads). Still open:
+     US checkout completion is 4.8 % vs Canada 19 %, with duties added at checkout. The view-only phone
+     walk-through (Mobile section, #57) comes first; may we then run one test checkout to a US address
+     to see what is added (E1)?
+  2. **Pre-ice priorities** (the season starts now): product-page first screen "no display to buy" +
+     myth line (E15), checkout-abandon emails v2 (E4), ice campaign and kits (E5, E17), cold-weather
+     guide (E19), reviews from past buyers (E3). Which ones go?
+  3. **Continuous learning:** keep the monthly refresh + three seasonal reviews? Run them as a
+     scheduled routine (a fresh session each time, results committed here and summarised in Drive)?
+  4. Put round 1's Chinese summary into Drive `My Drive/Market Research/` next to round 0?
+  Remind Jason of these when he is back on this project. Next research round: Chinese low-cost live
+  sonar, rival display prices, Help Scout themes, the owner survey (search quota is 200 per session:
+  run it fresh).
+- ⬜ **Klaviyo: "Simulator Mode" → "Playback Mode" in the two Abandoned Cart emails (2026-09-25, waiting
+  on Jason).** The connector cannot save flow emails (404), so Jason changes one word in each email in
+  the Klaviyo editor (about 5 minutes); a chat then diffs both against the backups. Found on the way,
+  his call: the flow's coupon email (#2) has not been sent since the 2026-04-14 edit (0 people since;
+  its Yes/No paths look swapped, L25); the shared header's "Quick Setup Guide" link is a 404 (site
+  audit); two blog posts still say "Simulator Mode". Steps and details: `docs/market/klaviyo-changes.md`.
+  Remind Jason when he is back on this project.
 - ⬜ **Phone layout + camera plan (2026-10-03, plan accepted, build on Jason's go):** `docs/mobile-phone-layout-plan.md`.
   Jason: "船应该更小一点…zoom out" and "手机能否保留边框 合理安排一下空间". Four phases:
   1. an aspect-aware camera, about 70 m of lake across on phones;
@@ -152,6 +193,22 @@ the cheapest Android phone class). Phone size was emulated at 360×800.
 - 🔧 Mobile performance: dpr capped at 1.5, high-performance GL context; real-device check done 2026-09-24 (budget GPU 10–24 fps, see "Mobile + Meta ads readiness")
 - ✅ React 19 + R3F `refCleanup` console error — gone since StrictMode was removed (no new occurrences in this session's checks)
 - ⬜ **Local for now** (Jason 2026-09-24): `npm run build` + `npm run preview` on this Mac. Public hosting + Shopify embed stay in the plan for later, unchanged
+- ✅ **Old private preview link, superseded** (2026-09-25): https://claude.ai/artifact/4GdHHYZKTHgYyEzjV12RmW was built
+  from main `6738310`, before the Safari fix (#73), so on an iPhone or iPad its sonar picture can be black. Friends and
+  phones use the public test link (#72, #76): https://jasonzhu-ctrl.github.io/accuphy-lab-test/. Delete the old one
+  when Jason agrees (a delete needs his confirmation).
+- ⬜ **Who can see the code** (checked 2026-09-30, Jason: "这个别人看得到代码吗"):
+  - **Visible to anyone:** the public test page and its repository `accuphy-lab-test` (public, 4 files).
+    Anyone can save `index.html` from the page or download it from GitHub. It is one minified file.
+    It includes the shader code as plain text (the sonar look), the three brand fonts and the white logo.
+  - **Not exposed:** the source repository `accuphy-visual-lab` (private), with the docs and market
+    data. The page carries no keys (the Klaviyo key is empty) and no source maps.
+  - **Search engines:** `robots.txt` and `noindex` keep the page out of results. The GitHub repository
+    itself is public.
+  - **Open — font licence:** Eurostile Heavy is a commercial font and is now served publicly.
+    Confirm that the licence covers web embedding. If it does not, use a web-licensed copy or subset
+    before sharing more widely.
+  - **Limits:** code that runs in a browser cannot be hidden; obfuscation only slows a reader down.
 
 ## Handed to the website project (decision #69) — tracked in `accuphy-website/docs/backlog.md`
 - Lab page location (lab.accuphy.ca vs a store page) · lite section's Shopify test page · Klaviyo list,

@@ -1144,3 +1144,64 @@ Numbered log. Newest at the bottom.
         80 → 100 ft;
       - zero network requests, no sign-up gate, no console errors.
     - The private Artifact (#70) is still not republished.
+
+82. **2026-09-25** — **Market learning gets a shared home: `docs/market/`** (Jason:
+    "基于你对我们的全盘了解 做深入用户和市场研究 持续学习如何让accuphy卖得更好").
+    Research round 1 builds on round 0 (`docs/users-and-market.md`, 2026-09-24) and sets up
+    the loop for continuous learning:
+    - `docs/market/` holds the working memory every chat reads before giving sales or
+      marketing advice: the round-1 report, a metrics baseline with the exact read-only
+      Shopify / Klaviyo queries to rerun, competitors, voice of the customer, a scored
+      experiments backlog (E1–E20) and an append-only learning log (L1–L24). Drive
+      `My Drive/Market Research/` stays Jason's long-term company copy.
+    - Cadence proposed: a light refresh in the first week of each month; deeper reviews after
+      Black Friday (≈ 10 Dec), after ice-out (≈ 1 Apr) and before the season plan (≈ 1 Aug).
+    - Round 1's headline findings: US shoppers can only buy the Mini online and lose most
+      checkouts at the last step (US market adds duties at checkout); "no black box" stopped
+      being unique when LiveScope 2 launched, "no display to buy" is the claim no rival has;
+      the ice season (Nov–Feb = 43 % of store orders) starts now.
+    All recommendations are proposals: nothing in the store, Klaviyo, ads or the Lab changes
+    until Jason says go.
+    (Written as #54, then #60, #77 and #79 on the research branch `claude/modest-keller-ccfnhq`; renumbered #82
+    when merged with main on 2026-10-03, where #79–#81 had been taken by the phone work.)
+
+83. **2026-10-03** — **The Lab's boat: a low-key bass boat, kept simple** (Jason, on `docs/boat-fish-plan.md`: "我觉得
+    bass boat 是 OK 的船型 … 船头上翘，我觉得不需要 … 两根 power pole 太麻烦了。传统的电动马达也先暂时不用动。船身的话做的稍微
+    低调一点 … 不用太抢眼了，这个不是重点").
+    - **Boat type:** a bass boat stays the Lab's boat. The #56 aluminium deep-V is not part of this work.
+    - **No raised bow.** Jason read "船头上翘" as the nose lifting while planing; that is not in the plan and stays out.
+      The hull's own deck line (sheer) is drawn almost flat, and Jason judges it on the first look.
+    - **No Power-Poles.**
+    - **The trolling motor and the PingLive transducer stay as they are** for now. Phase 2 therefore no longer needs
+      the product photo.
+    - **Low-key finish:** a muted hull (charcoal / dark grey), at most a subtle side line, no bold metalflake or
+      graphics. The boat is not the focus.
+    Planning only: the rebuild waits for Jason's go (`docs/boat-fish-plan.md` §5, phase 2).
+
+84. **2026-10-03** — **Desktop: the range moves onto the phone, and the phone gets a little bigger (plan B)** (Jason, on
+    `docs/desktop-phone-controls-plan.md`: "B 方案吧，然后本地的对话做好了").
+    - The desktop counterpart of #78/#79. The panel's Range row goes; the app's own range −/+ on the phone set the range on
+      every layout.
+    - The phone frame becomes `min(42vw, 600px, 83.2vh)`: about 74 % of a real iPhone 16 Pro Max on a laptop and about
+      real size on a 24″ monitor (true size would cover 57 % of a laptop screen).
+    - The whole app control set scales 1.3× on desktop (range ring ≈ 16 → 23 px), so the app keeps its proportions; − and
+      + sit further apart and get a hover state.
+    - Unchanged: the other app buttons stay display-only and open the sign-up gate; Down greys the range buttons (AUTO);
+      Combo shows none, as in the real app.
+    - **Built by the local phone-layout chat**, which owns `index.jsx` and `SonarChrome.jsx` (#77–#81). Build steps and
+      checks: the plan's "Build" section.
+
+85. **2026-10-03** — **Fish: phase 1 starts; the species stay; display size per species** (Jason, on
+    `docs/boat-fish-plan.md`: "鱼的第一步可以开始。鱼的品种还是保留吧。黄鲈鱼 OK 的可以放，就是你新的这些。二点六倍的话，要不稍微小一点？
+    呃，我觉得可能是要根据鱼种来了。就像 musky 的话，就保持现在的大小，就不要动了，甚至可能再小一点。但是剩下的鱼的话，我觉得现在的大小是
+    OK 的").
+    - **Phase 1 is a go** (plan §3a): the body bends with a travelling wave on the GPU, the tail beats faster when the fish
+      swims faster, the body curves in turns, the wrong-axis "wag" (a nose-up/down rock) goes, and bait fish get cheaper
+      geometry. The cloud chat builds it.
+    - **Species:** every species in the lake today stays. Yellow perch and northern pike are added in phase 3, with their
+      own body shapes (plan §3b–c). The new counts (more walleye, fewer smelt) are shown then for Jason's look.
+    - **Display size per species.** Fish are drawn larger than life so they read from the boat:
+      - the musky stays at today's size (2.6×, 3.4 m drawn) or a little smaller; Jason picks from a side-by-side;
+      - every other species keeps today's 2.6×.
+      The sonar is not affected: its fish marks use the true length.
+    - Still open: where the boat comes from (code, recommended, or a model). Phase 2 waits for Jason's go.
