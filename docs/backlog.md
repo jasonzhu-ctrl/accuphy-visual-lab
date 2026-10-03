@@ -155,6 +155,13 @@ the cheapest Android phone class). Phone size was emulated at 360×800.
   its Yes/No paths look swapped, L25); the shared header's "Quick Setup Guide" link is a 404 (site
   audit); two blog posts still say "Simulator Mode". Steps and details: `docs/market/klaviyo-changes.md`.
   Remind Jason when he is back on this project.
+- ⬜ **Phone layout + camera plan (2026-10-03, plan accepted, build on Jason's go):** `docs/mobile-phone-layout-plan.md`.
+  Jason: "船应该更小一点…zoom out" and "手机能否保留边框 合理安排一下空间". Four phases:
+  1. an aspect-aware camera, about 70 m of lake across on phones;
+  2. the iPhone frame on top, near-flat, with view pills in the middle and the lake on the
+     bottom ~65%;
+  3. relative touch drag and a clamped hint;
+  4. landscape real-device mode and quality tiers.
 - ⬜ **Mobile plan: PLANNING ONLY, do not build until Jason says go** (decision #45: "我没说动不要动").
   `docs/mobile-marketing-plan.md`: no deadline (decision #47), so the plan optimises for the
   best mobile experience. The interactive experience is the core, shaped by the "Principles for
