@@ -1116,3 +1116,17 @@ Numbered log. Newest at the bottom.
       - The build passes.
     - **Known:** at long ranges (≥ 120 ft) the Forward fan runs past the right screen edge on a phone. Still
       to do: touch drag (phase 3), landscape and quality tiers (phase 4).
+
+79. **2026-10-03** — **Phone app controls bigger and easier to tap, in the app's own style** (Jason: "range 的按键…稍微
+    大一点…加号跟减号能不能稍微分开一点…不要破坏原本 APP 的界面的协调性…图标…视觉上更容易分辨…点击起来更容易").
+    - On phones the whole app control set scales by 1.55× together: range, gain, pause, back, ⋯ and the depth
+      control. This keeps the proportions of the real app's bottom bar (`reference/app-study/pl-forward-empty-chrome.jpg`:
+      ring buttons ≈ 5 % of the screen height, thick white outlines).
+    - The range − and + are now 62 px apart, centre to centre (18 px rings with ~42 px hit areas, so they never
+      overlap).
+    - − and + are drawn as SVG (a thick circle outline plus round-capped bars), the same glyphs as the app. Before,
+      they were text characters, which sat off-centre.
+    - Working controls (range) are full white. Display-only controls keep the dimmed look, so the two are easy to
+      tell apart.
+    - Desktop keeps its sizes; it only gets the crisper SVG − / + glyphs.
+    - Checked at 390×844 and 1440×900, with no console errors; the build passes.

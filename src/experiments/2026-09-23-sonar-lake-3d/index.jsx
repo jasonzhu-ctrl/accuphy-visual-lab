@@ -256,7 +256,7 @@ export default function SonarLake3D() {
           <div className="ph-band" style={{ ...ring('1.35%'), borderRadius: '6.6% / 13.8%', boxShadow: '16px 26px 44px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.45), inset 0 0 0 2px rgba(0,0,0,0.12)' }} />
           <div style={{ ...ring('1.25%'), inset: '1.35%', borderRadius: '6.1% / 12.7%', background: '#040404' }} />
           <div ref={(el) => { sonarRect.current.el = el }} style={{ position: 'absolute', inset: '2.6%', borderRadius: '5.4% / 11.3%', containerType: 'size', overflow: 'hidden' }}>
-            <SonarChrome layout={layout} deviceId={deviceId} mode={mode} rangeFt={effRangeFt} depthFt={depthFt} imperial={imperial} gain={gain} autoDepth={autoDepth} autoRange={mode === 'down'} onRange={phone ? stepRange : undefined} onLocked={onLocked} depthRef={(el) => { state.current.depthEl = el }} />
+            <SonarChrome layout={layout} deviceId={deviceId} mode={mode} rangeFt={effRangeFt} depthFt={depthFt} imperial={imperial} gain={gain} autoDepth={autoDepth} autoRange={mode === 'down'} onRange={phone ? stepRange : undefined} phone={phone} onLocked={onLocked} depthRef={(el) => { state.current.depthEl = el }} />
             <div className="ph-glass" />
           </div>
           {/* antenna lines in the titanium band (two per long edge, like the Pro Max) */}
