@@ -132,6 +132,13 @@ the cheapest Android phone class). Phone size was emulated at 360×800.
   checkout are fixed; the Lab as an onboarding tool (reading the picture) and a dealer demo; show
   multi-device sharing; UTM, Pixel and Klaviyo tags before any ad spend. Next data to get: the HelpScout
   queue (~4,200 conversations) and a 5-question owner survey.
+- ⬜ **Phone layout + camera plan (2026-10-03, plan accepted, build on Jason's go):** `docs/mobile-phone-layout-plan.md`.
+  Jason: "船应该更小一点…zoom out" and "手机能否保留边框 合理安排一下空间". Four phases:
+  1. an aspect-aware camera, about 70 m of lake across on phones;
+  2. the iPhone frame on top, near-flat, with view pills in the middle and the lake on the
+     bottom ~65%;
+  3. relative touch drag and a clamped hint;
+  4. landscape real-device mode and quality tiers.
 - ⬜ **Mobile plan: PLANNING ONLY, do not build until Jason says go** (decision #45: "我没说动不要动").
   `docs/mobile-marketing-plan.md`: no deadline (decision #47), so the plan optimises for the
   best mobile experience. The interactive experience is the core, shaped by the "Principles for
