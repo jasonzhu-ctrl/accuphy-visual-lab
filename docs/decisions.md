@@ -1164,3 +1164,16 @@ Numbered log. Newest at the bottom.
     until Jason says go.
     (Written as #54, then #60, #77 and #79 on the research branch `claude/modest-keller-ccfnhq`; renumbered #82
     when merged with main on 2026-10-03, where #79–#81 had been taken by the phone work.)
+
+83. **2026-10-03** — **The Lab's boat: a low-key bass boat, kept simple** (Jason, on `docs/boat-fish-plan.md`: "我觉得
+    bass boat 是 OK 的船型 … 船头上翘，我觉得不需要 … 两根 power pole 太麻烦了。传统的电动马达也先暂时不用动。船身的话做的稍微
+    低调一点 … 不用太抢眼了，这个不是重点").
+    - **Boat type:** a bass boat stays the Lab's boat. The #56 aluminium deep-V is not part of this work.
+    - **No raised bow.** Jason read "船头上翘" as the nose lifting while planing; that is not in the plan and stays out.
+      The hull's own deck line (sheer) is drawn almost flat, and Jason judges it on the first look.
+    - **No Power-Poles.**
+    - **The trolling motor and the PingLive transducer stay as they are** for now. Phase 2 therefore no longer needs
+      the product photo.
+    - **Low-key finish:** a muted hull (charcoal / dark grey), at most a subtle side line, no bold metalflake or
+      graphics. The boat is not the focus.
+    Planning only: the rebuild waits for Jason's go (`docs/boat-fish-plan.md` §5, phase 2).

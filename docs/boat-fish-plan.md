@@ -18,16 +18,16 @@ Planning only. Nothing is built until Jason says go (CLAUDE.md: "我没说动不
 
 **建议分四步，每步做完给你看，你点头再做下一步**
 1. **鱼游自然**（约半天到一天）：在显卡上让身体按波浪弯曲。尾摆频率跟着游速走，转弯时身体弯成 C 形，冲刺后滑行，悬停时只轻轻摆，顺便修好"上下点头"的错。小银鱼减面，总面数反而下降。声纳屏幕上的鱼回波是另外算的，不受影响。
-2. **新船**（约 2 天）：用代码重新做一条 21 尺 bass boat：真正的 V 形船底、船头上翘、前后钓鱼甲板、双操作台加环绕挡风玻璃、桶形座椅、250 马力舷外机、两根 Power-Pole、船头电动马达。PingLive 探头按产品照片做在马达杆上。船身用带闪粉的高光漆面，侧面的图案自己设计，不用任何真实品牌。再让船随浪轻轻起伏，加上船边白沫和行驶时的尾浪；远处自动换成省面版本。
+2. **新船**（约 1.5 天）：用代码重新做一条低调的 21 尺 bass boat：真正的 V 形船底、几乎平直的船体线条、前后钓鱼甲板、双操作台加环绕挡风玻璃、桶形座椅、舷外机。按你 2026-10-03 的决定（#83）：船头不抬、不要 Power-Pole、电动马达和 PingLive 探头先保持原样、船身用暗色哑光，不抢眼。再让船随浪轻轻起伏，加上船边白沫和行驶时的尾浪；远处自动换成省面版本。
 3. **鱼的样子和品种**（约 1 天）：加眼睛（walleye 那种反光大眼）、两段背鳍、正确的尾形、半透明带鳍条的鳍；加黄鲈和北方狗鱼，多放些 walleye。
 4. **湖的整体感**（可选，约 1 天）：遮住湖的边界，浅处亮深处暗，浅水湖底加光斑，重做水草。
 
 **需要你拍板的**
-1. 船型：做 bass boat（你这次说的）？之前 #56 计划的"Boat 场景用铝制深 V 船"怎么办：以后做场景切换时再说，还是取消？
+1. ~~船型~~ 已定（#83）：低调的 bass boat，船头不抬，不要 Power-Pole，电动马达和探头先不动。
 2. 船怎么来：A 用代码自己做（推荐：没有授权风险、文件小、能精确放 PingLive）；B 试那个免费 CC-BY 模型（要在页面上署名，面数和质量待确认）；C 买付费模型（要确认授权允许网页使用，而且不能带品牌标志）。
 3. 鱼的品种：加黄鲈、北方狗鱼，多放 walleye？
 4. 鱼现在画成真实大小的 2.6 倍。船做真了以后，一条 1.3 米的 musky 会被画成 3.4 米，在船边像鲨鱼。保持、减小，还是离船近时缩小？
-5. 先从第 1 步（鱼）开始可以吗？做 PingLive 探头需要你 Mac 上 `reference/product-images/` 里的产品图（云端看不到），可以发我一张，或者让本地的 Lab 对话来做这一步。
+5. 先从第 1 步（鱼）开始可以吗？（探头先不动，所以不再需要产品图。）
 
 ## Context (for Claude)
 
@@ -243,8 +243,14 @@ Our `TRANSDUCER_OFFSET` (x = bow − 0.33 m, y = −0.95 m) is consistent with t
 
 ## 5. Boat plan (phase 2)
 
-**Decide first:** a bass boat (Jason's ask now) versus the #56 aluminium deep-V. Recommendation: the bass boat becomes the
-Lab's boat now; the deep-V stays an option for the scene chooser (#53/#56) if that is ever built.
+**Decided (#83, 2026-10-03):**
+- The bass boat stays.
+- No raised bow, and the sheer is drawn almost flat.
+- No Power-Poles.
+- The trolling motor and transducer stay as they are.
+- Low-key muted finish.
+
+The spec below follows #83; struck items are out.
 
 **Approach A, recommended: build it in code.** This means no licence risk, a few tens of KB, an exact PingLive transducer, and
 easy LOD.
@@ -252,7 +258,8 @@ easy LOD.
 **Hull:** `LoftGeometry` through about 20 stations (6.6 × 2.44 m):
 - V sections with about 21° deadrise at the transom, sharpening to the bow;
 - a narrow pad keel aft, two strakes per side and a chine flat;
-- sheer rising about 0.15 m to the bow; bow rake and flare;
+- ~~sheer rising about 0.15 m to the bow~~ an almost flat sheer (≤ 5 cm, Jason judges it on the first look); a pointed
+  bow with a little flare;
 - freeboard ≈ 0.55–0.65 m; waterline at ≈ 0.25 m draft.
 
 **Topsides:**
@@ -264,17 +271,16 @@ easy LOD.
 
 **Stern:**
 - the outboard cowl as a lofted shape (top cowl, a darker mid band, lower unit, prop), on a jack plate;
-- two Power-Pole arms on the transom corners.
+- ~~two Power-Pole arms on the transom corners~~ (out, #83).
 
 **Bow:**
-- a trolling motor deployed: head, shaft and lower unit, with the PingLive transducer on the shaft just under the hull line,
-  modelled from the product photo (`reference/product-images/`, on Jason's Mac only);
+- the existing trolling motor and PingLive transducer, unchanged (#83), re-seated on the new deck;
 - a bow display on its bracket.
 
 **Materials:**
-- hull: `MeshPhysicalMaterial` with clearcoat plus a procedural metalflake sparkle (a noise normal at fine scale), in a
-  charcoal or colour base;
-- a side graphic as our own vector stripe (no brand names or logos);
+- hull: low-key (#83), a muted charcoal / dark grey `MeshPhysicalMaterial` with a soft clearcoat and no bold
+  metalflake;
+- at most a thin, subtle side line (no brand names or logos);
 - carpet with a subtle noise.
 
 **Water contact:**
@@ -314,7 +320,7 @@ credit line, and swap in our own transducer.
 | Phase | What | Rough effort | Checks |
 |---|---|---|---|
 | 1 | Fish swimming + axis fix + bait LOD + indexed geometry | ½–1 day | `?cam=fish:<sp>` clips per body type; fish-sim 0 hits; sonar-qa quick pass (sonar unchanged); triangle count down; WebKit texture rule (no new float+linear) |
-| 2 | Bass boat in code + water contact + LOD | ~2 days | `?cam=boat` stills from 4 angles for Jason; default + phone camera; beam apex unchanged; fps on the Android baseline |
+| 2 | Bass boat in code (per #83) + water contact + LOD | ~1.5 days | `?cam=boat` stills from 4 angles for Jason; default + phone camera; beam apex unchanged; fps on the Android baseline |
 | 3 | Fish anatomy + percid/pike bodies + species mix | ~1 day | Per-species close-ups; fish-sim; sonar marks per species still sized correctly |
 | 4 (optional) | World edge, depth light logic, caustics, weeds | ~1 day | Look review against #51/#55; perf |
 
@@ -323,12 +329,11 @@ Each phase ends with a look and Jason's go before the next. Rebuild the public t
 
 ## 8. Decisions for Jason
 
-1. Boat type: bass boat now? What happens to the #56 deep-V plan (later, as a scene option, or dropped)?
+1. ~~Boat type~~ decided (#83): a low-key bass boat; no raised bow, no Power-Poles; the trolling motor stays.
 2. Boat source: A (code, recommended), B (BoatUS CC-BY model, credit needed), or C (paid)?
 3. Species: add yellow perch and northern pike, more walleye, fewer smelt?
 4. Fish display scale next to the new boat: keep 2.6×, reduce it, or shrink near the boat?
-5. Start with phase 1? Phase 2 needs one PingLive product photo (on Jason's Mac, `reference/product-images/`), sent here or
-   done in a local Lab chat.
+5. Start with phase 1? The product photo is no longer needed, because the transducer stays as it is (#83).
 
 ## 9. Sources
 
