@@ -15,7 +15,7 @@
      - 下面约 65%：湖面，拖船就在这里，拇指够得着
    - 原来那块占了下半屏的大控制面板没有了，所以湖面能多出一大块。
    - 顺便修掉 360 宽屏幕上面板和手机边框叠在一起的问题。
-3. **拖船更顺手：** 在水面任何地方用手指滑动，船就跟着同样移动，手指不会挡住船，也不用先点准那条小船。提示气泡始终留在屏幕里面。
+3. **（取消，#80：保持手指按哪船跑到哪）拖船更顺手：** 在水面任何地方用手指滑动，船就跟着同样移动，手指不会挡住船，也不用先点准那条小船。提示气泡始终留在屏幕里面。
 4. **横屏和流畅度（第二阶段）：** 手机横过来，就是"真机模式"：声呐全屏，像真的 app，湖面变成角落里的小窗。便宜手机自动降画质，目标每秒 30 帧。
 
 **不变的：** 电脑版布局、声呐画面的算法、所有已经调好的画面效果。三种钓法场景（船、皮划艇、冰钓）以后做，这次的排版会给它留好位置。
@@ -82,7 +82,7 @@ The direction matches `docs/mobile-marketing-plan.md` "Principles for mobile" (#
 - Keep the step cards hidden on phones in both orientations, using a pointer/height rule.
 - Add `viewport-fit=cover` and safe-area padding (notch, home bar).
 
-## Phase 3: touch drag (Scene.jsx `PickPlane`)
+## Phase 3: touch drag (Scene.jsx `PickPlane`) — DROPPED by #80; the absolute drag stays
 
 - On touch (`pointerType === 'touch'`), the drag is relative: the boat target moves by the
   finger's world delta. Keep the ±58 m clamp.

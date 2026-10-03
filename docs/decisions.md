@@ -1130,3 +1130,7 @@ Numbered log. Newest at the bottom.
       tell apart.
     - Desktop keeps its sizes; it only gets the crisper SVG − / + glyphs.
     - Checked at 390×844 and 1440×900, with no console errors; the build passes.
+
+80. **2026-10-03** — **Phone drag stays as it is: the boat runs to the finger and follows it** (Jason: "就是手，它会跑到这个
+    手指，就跟着这个下面，我觉得很好"). Phase 3's relative "swipe to move" drag (`docs/mobile-phone-layout-plan.md`) is
+    dropped. Its other point, keeping the drag hint inside the screen, was already done in #77.
