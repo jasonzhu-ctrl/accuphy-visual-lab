@@ -1134,3 +1134,13 @@ Numbered log. Newest at the bottom.
 80. **2026-10-03** — **Phone drag stays as it is: the boat runs to the finger and follows it** (Jason: "就是手，它会跑到这个
     手指，就跟着这个下面，我觉得很好"). Phase 3's relative "swipe to move" drag (`docs/mobile-phone-layout-plan.md`) is
     dropped. Its other point, keeping the drag hint inside the screen, was already done in #77.
+
+81. **2026-10-03** — **Public test link updated with the new phone layout** (Jason: "好啊，你把它公开出来").
+    https://jasonzhu-ctrl.github.io/accuphy-lab-test/ is rebuilt from b919bb3 and covers #77–#80. Public repo
+    commit 5bff6f7; the live md5 matched about 30 s after the push.
+    - **Checked before publishing:**
+      - the Safari texture audit is unchanged and OK;
+      - the share build was served locally at 390×844: phone layout, the panel hidden, the range + steps
+        80 → 100 ft;
+      - zero network requests, no sign-up gate, no console errors.
+    - The private Artifact (#70) is still not republished.
