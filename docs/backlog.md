@@ -43,6 +43,14 @@ it is done. ✅ done · 🔧 in progress · ⬜ open.
 - ✅ All 11 app colour maps available on the phone screen (amber default); gain slider
 
 ## 3D lake (Phase 3 polish)
+- ⬜ **Boat + fish plan (2026-10-03, proposal, waiting on Jason's go):** `docs/boat-fish-plan.md`. Jason: the boat
+  looks too crude, it should look like a real bass boat; fish should swim with natural body motion; find other problems.
+  Four phases: (1) fish bend with a travelling body wave on the GPU (ABZÛ / WebGL Aquarium technique; Videler & Hess
+  numbers), fixing today's wrong-axis "wag"; (2) a 21 ft bass boat built in code with `LoftGeometry`, the PingLive
+  transducer on the trolling-motor shaft, and water contact; (3) fish eyes, fins, percid/pike bodies, more walleye,
+  perch and pike; (4) optional: world edge, depth light logic, caustics, weeds. Five decisions for Jason in §8
+  (bass boat vs the #56 deep-V, how to source the boat, species, the 2.6× fish scale, start with phase 1). Phase 2 needs
+  one PingLive product photo from `reference/product-images/` (on Jason's Mac).
 - ✅ Deep water 40 → 24 m, fish off the bottom, chasing / darting / bursting fish (decision #64)
 - ✅ Down view fully AUTO on both devices; PL Down fills its box to the corners (decision #65)
 - ✅ Bottom toned down to orange with a thin hot edge; lockup moved into the boat's reach (decision #66)
