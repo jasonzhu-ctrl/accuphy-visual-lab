@@ -1,7 +1,7 @@
 # Boat + fish plan: a real bass boat, fish that swim naturally (proposal, 2026-10-03)
 
-Status: boat decided (#83); fish decided (#85); **phase 1 built (#86)**; **phase 2 (the boat, in code) in progress (#87)**.
-Phases 3–4 wait for Jason's go (CLAUDE.md: "我没说动不要动").
+Status: boat decided (#83); fish decided (#85); **phase 1 built (#86)**; **phase 2 built (#88)**, waiting for Jason's
+look. Phases 3–4 wait for Jason's go (CLAUDE.md: "我没说动不要动").
 
 ## 中文摘要（给 Jason）
 
@@ -303,6 +303,12 @@ easy LOD.
 
 **LOD and budget:** LOD0 about 15–25 k triangles for close views; LOD1 about 3 k for the default/phone camera (the boat is
 small there since #77). Material count stays about 6–8.
+
+**Built (#88) — where it differs from the above:**
+- The water surface is flat: its shader moves vertices within the plane. So the bob is a gentle visual motion, not a
+  sampled wave, and the wake is drawn as foam in the water's fragment shader.
+- No bow display: a dedicated screen would contradict "no display to buy".
+- LOD: about 9.4 k triangles near, about 4.4 k far (switch at 38 m).
 
 **Approach B:** try the BoatUS CC-BY model. Check its polycount and quality, decimate, compress (meshopt/Draco + KTX2), add the
 credit line, and swap in our own transducer.

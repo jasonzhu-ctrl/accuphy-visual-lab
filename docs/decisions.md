@@ -1255,3 +1255,38 @@ Numbered log. Newest at the bottom.
     - Still open: the musky's display size (it stays at 2.6× until Jason picks); no change to the swimming was asked for.
     - Built by the cloud chat. Files taken: `boat.js` and, in `Scene.jsx`, the `Boat` and `Water` components and the dev
       boat camera in `Rig` (backlog).
+
+88. **2026-10-03** — **Boat phase 2 built: a low-key bass boat in code** (go: #87; spec: #83 and `docs/boat-fish-plan.md` §5).
+    - **Hull** (`boat.js`): lofted with three.js `LoftGeometry` through 33 V sections, 6.63 × 2.44 m.
+      - About 19° deadrise at the transom, sharpening to about 32° forward. A pad keel aft, two lifting strakes and a
+        chine flat per side.
+      - The sheer is almost flat (+4 cm toward the bow). The bow is pointed and lightly flared, and the forefoot lifts
+        clear of the water about 1 m behind the tip. The transom is squared.
+      - A rub rail runs round the sheer. One thin, muted side line; a charcoal gelcoat with a soft clearcoat (low
+        metalness, so it is no longer pitch black); no logos.
+    - **Topsides:** bow and rear casting decks in grey carpet with hatch seams, and a sunken cockpit between them.
+      Rounded driver (starboard) and passenger consoles with wraparound tinted windshields and a wheel. A three-seat
+      bench, and bow and rear pedestal seats. A plain black 250-class outboard on a jack plate (no badges).
+    - **Unchanged (#83):** no Power-Poles. The trolling motor and the PingLive on its shaft are the old parts, only
+      lifted 23 cm onto the higher deck. The beam apex (`TRANSDUCER_OFFSET`) does not move.
+    - **No bow display:** real bass boats carry one, but a dedicated screen would contradict "no display to buy" (the
+      phone is the display).
+    - **Water contact** (`Scene.jsx`):
+      - a gentle visual bob (heave ±4 cm, roll ±0.9°, pitch ±0.6°); the beam apex stays put, so the sonar does not
+        jitter;
+      - a foam ribbon along the waterline, wider at the bow, which shows when the boat moves;
+      - a soft dark patch under the hull;
+      - a V wake at the Kelvin angle plus a churned centre while the boat is dragged, fading within about 10 m.
+    - **Found on the way:** the water's wave shader moves its vertices within the plane, so the drawn surface is flat,
+      and the old ripple-ring "wake" was never visible. The new wake is drawn as foam in the water's fragment shader
+      instead; the wave quirk itself is left as it is (backlog).
+    - **Two levels of detail:** about 9.4 k triangles up close; about 4.4 k from the overview or the phone camera (no
+      seams, rail, glass, wheel or pedestal seats). Default desktop view: draw calls 95 → 74 (the boat's parts are
+      merged by material); triangles 759 k → 756 k.
+    - **Checks:**
+      - before/after stills from six angles, and the desktop and phone views at rest and while dragging;
+      - the sonar screen is unchanged: identical on the phone layout; on the desktop, identical apart from 125 pixels
+        of anti-aliasing round the page's logo overlay;
+      - the build passes; no console errors; the only new texture is an 8-bit carpet noise (Safari-safe).
+    - **Dev aid:** `?cam=boat[:side|:bow|:stern|:top|:under]` views the boat from several angles. Without a suffix, it
+      is the old stern-quarter view.

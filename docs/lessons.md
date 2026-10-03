@@ -63,6 +63,9 @@ repeatable procedures are also project skills in `.claude/skills/` (`sonar-qa`, 
   per-species simulation of speed, tail beat and bend before rendering anything: fish drawn 2.6× long on tight loops
   saturate any bend that follows the path's curvature, and their slow speeds (0.1–0.4 body lengths per second) make a
   pure speed-driven beat look rigid.
+- **The water surface is flat (#88):** the water shader adds its waves to the rotated plane's `p.y`, which is
+  horizontal, and its grid has 10 m cells. Anything that should sit on the water (boat, foam) sits at y ≈ 0; a wake
+  has to be drawn in the fragment shader.
 - **Performance:** keep per-frame JS tiny (behaviours 0.04 ms, worst 1–2 ms when an act starts). Pre-filter
   obstacles near a path, cap cascades (≤ 8 bait scatter).
 
@@ -102,7 +105,7 @@ repeatable procedures are also project skills in `.claude/skills/` (`sonar-qa`, 
 
 | Tool | What it does |
 |---|---|
-| `?boat=x,z` · `?bigphone` · `?dev` · `?cam=logo/wreck/boat/fish:<sp>[:<i>][:top/side/tq]` · `?wrecklift=m` | Dev URL flags: park the boat, enlarge the phone, tuning rows, cameras (a fish from above, the side or three-quarter), lift the wreck |
+| `?boat=x,z` · `?bigphone` · `?dev` · `?cam=logo/wreck/boat[:side/bow/stern/top/under]/fish:<sp>[:<i>][:top/side/tq]` · `?wrecklift=m` | Dev URL flags: park the boat, enlarge the phone, tuning rows, cameras (the boat from six angles; a fish from above, the side or three-quarter), lift the wreck |
 | `window.__sonarSnap()` + `POST /__snap?name=` | Save the sonar picture as a PNG in `reference/engine-compare/` (gitignored) |
 | `window.__lakeSnap()` | The 3D view alone as a PNG |
 | `window.__sonarHist(10)` | LUT-index histogram of the lit sonar pixels |

@@ -9,7 +9,7 @@ import { SPECIES, makePopulation, fishPose, stepBehaviours, forceRise, rnd, draw
 import { makeLakeMaterial, setBeamUniforms } from './lakeMaterial'
 import { wedgeGeometry } from '../2026-09-23-beam-shapes-3d/wedge'
 import { makeTallTree, makeBushTree, makeStump, makeLog, makeWeedTuft, makeRock, placeAll } from './vegetation'
-import { makeRangerBoat, TRANSDUCER_OFFSET } from './boat'
+import { makeBassBoat, makeWaterContact, TRANSDUCER_OFFSET } from './boat'
 import { makeFishGeometry } from './fishGeometry'
 import { makeCargoWreck, makeWreckDebris, WRECK_L, BIG_WRECK, SMALL_WRECK } from './wreck'
 import { makeLogoGeometry, makePlinthGeometry, logoFrame } from './logo'
@@ -259,7 +259,7 @@ function Fish({ mat, state }) {
 function Water({ state }) {
   const mat = useMemo(() => new THREE.ShaderMaterial({
     transparent: true, depthWrite: false, side: THREE.DoubleSide,
-    uniforms: { uTime: { value: 0 }, uSun: { value: new THREE.Vector3(0.4, 0.8, 0.3).normalize() }, uSky: { value: new THREE.Color('#9cc1cf') }, uBoat: { value: new THREE.Vector3(0, 0, 0) }, uWake: { value: 0 } },
+    uniforms: { uTime: { value: 0 }, uSun: { value: new THREE.Vector3(0.4, 0.8, 0.3).normalize() }, uSky: { value: new THREE.Color('#9cc1cf') }, uBoat: { value: new THREE.Vector3(0, 0, 0) }, uWake: { value: 0 }, uBoatDir: { value: new THREE.Vector2(1, 0) } },
     vertexShader: /* glsl */ `
       uniform float uTime; uniform vec3 uBoat; uniform float uWake; varying vec3 vW; varying vec3 vN;
       void main() {
@@ -277,7 +277,7 @@ function Water({ state }) {
       }
     `,
     fragmentShader: /* glsl */ `
-      precision highp float; varying vec3 vW; varying vec3 vN; uniform vec3 uSun; uniform vec3 uSky; uniform float uTime;
+      precision highp float; varying vec3 vW; varying vec3 vN; uniform vec3 uSun; uniform vec3 uSky; uniform float uTime; uniform vec3 uBoat; uniform float uWake; uniform vec2 uBoatDir;
       float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
       float vnoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
         return mix(mix(hash(i), hash(i + vec2(1, 0)), f.x), mix(hash(i + vec2(0, 1)), hash(i + vec2(1, 1)), f.x), f.y); }
@@ -297,6 +297,16 @@ function Water({ state }) {
         // a touch of surface texture so it reads as a surface from above
         col += (n2 - 0.5) * 0.05;
         float alpha = 0.36 + 0.42 * fres;
+        // the boat's wake while it moves (#88): two arms at the Kelvin angle (19.5°) from the hull's corners and churned
+        // water down the middle, fading over ~10 m behind it, broken up by the ripple noise
+        vec2 rel = vW.xz - uBoat.xz;
+        float behind = -dot(rel, uBoatDir), side = abs(rel.x * uBoatDir.y - rel.y * uBoatDir.x);
+        float arm = abs(side - 1.1 - 0.354 * max(behind - 1.0, 0.0));
+        float wk = min(1.0, uWake * 1.3) * step(0.0, behind) * exp(-behind / 9.0);
+        float foam = wk * (0.6 * (1.0 - smoothstep(0.0, 0.35 + 0.06 * behind, arm)) + 0.4 * (1.0 - smoothstep(0.3, 1.0, side)) * smoothstep(1.5, 4.0, behind));
+        foam = clamp(foam * (0.25 + 1.0 * n2) * (0.45 + 0.8 * n1), 0.0, 1.0);
+        col = mix(col, vec3(0.9, 0.95, 0.96), foam * 0.7);
+        alpha = mix(alpha, 0.9, foam * 0.6);
         float dist = length(vW - cameraPosition);
         float fog = smoothstep(120.0, 420.0, dist);
         gl_FragColor = vec4(mix(col, uSky, fog), mix(alpha, 1.0, fog));
@@ -309,6 +319,7 @@ function Water({ state }) {
     const speed = Math.hypot(s.target.x - s.boat.x, s.target.z - s.boat.z)
     mat.uniforms.uBoat.value.set(s.boat.x, 0, s.boat.z)
     mat.uniforms.uWake.value += (Math.min(1, speed / 3) - mat.uniforms.uWake.value) * Math.min(1, dt * 3)
+    if (speed > 0.05) mat.uniforms.uBoatDir.value.set(s.target.x - s.boat.x, s.target.z - s.boat.z).normalize() // the wake trails the way it moves
   })
   return (
     <mesh rotation-x={-Math.PI / 2} material={mat} onUpdate={(o) => o.layers.set(SONAR_HIDE_LAYER)}>
@@ -319,17 +330,33 @@ function Water({ state }) {
 
 // ---------- boat + device + beams ----------
 function Boat({ state, beamMats }) {
-  const boat = useMemo(makeRangerBoat, [])
-  const group = useRef()
-  useFrame((_, dt) => {
+  const boat = useMemo(makeBassBoat, [])
+  const contact = useMemo(makeWaterContact, [])
+  const group = useRef(), ride = useRef()
+  useFrame(({ clock }, dt) => {
     const s = state.current
     s.boat.x += (s.target.x - s.boat.x) * Math.min(1, dt * 4)
     s.boat.z += (s.target.z - s.boat.z) * Math.min(1, dt * 4)
     group.current.position.set(s.boat.x, 0.02, s.boat.z)
     s.apex.copy(TRANSDUCER_OFFSET).add(group.current.position)
     setBeamUniforms(beamMats, s.specs, s.apex)
+    // visual only (#88): a gentle bob — heave ±4 cm on the phases of the water's wave shading, roll ±0.9°, pitch ±0.6°.
+    // (The water surface itself stays flat: its shader shifts vertices within the plane.) The beam apex above stays
+    // where it was, so the sonar picture does not jitter; the foam stays on the water.
+    const t = clock.elapsedTime, bx = s.boat.x
+    ride.current.position.y = 0.026 * Math.sin(t * 0.9 + bx * 0.6) + 0.013 * Math.sin(t * 1.6 + bx * 1.7)
+    ride.current.rotation.set(0.016 * Math.sin(t * 0.83 + 0.6), 0, 0.011 * Math.cos(t * 0.9 + bx * 0.6))
+    const speed = Math.hypot(s.target.x - s.boat.x, s.target.z - s.boat.z) * 4 // m/s (the boat closes on the target at 4/s)
+    const fm = contact.userData.foam.uniforms
+    fm.uTime.value = t
+    fm.uFoam.value += (Math.min(1, speed / 3) - fm.uFoam.value) * Math.min(1, dt * 3)
   })
-  return <group ref={group} onUpdate={(g) => g.traverse((o) => o.layers.set(SONAR_HIDE_LAYER))}><primitive object={boat} /></group>
+  return (
+    <group ref={group} onUpdate={(g) => g.traverse((o) => o.layers.set(SONAR_HIDE_LAYER))}>
+      <group ref={ride}><primitive object={boat} /></group>
+      <primitive object={contact} />
+    </group>
+  )
 }
 function Beams({ state }) {
   const group = useRef()
@@ -365,6 +392,12 @@ const FOG = { near: 160, far: 420, cam: 400 }
 // dev aid ?cam=fish:<species>[:<index>][:top|:side|:tq] — top: from above, nose up the screen (shows the body wave);
 // side: broadside, level with the fish; tq: three-quarter, above and to one side, turning with the fish; none: the old fixed offset
 const FISH_CAM_VIEW = import.meta.env.DEV ? (/cam=fish:\w+(?::\d+)?:(top|side|tq)/.exec(window.location.search) || [])[1] : undefined
+// dev aid ?cam=boat[:side|:bow|:stern|:top|:under] — the boat from several angles (none: the old stern-quarter view)
+const BOAT_CAM_VIEW = import.meta.env.DEV ? (/cam=boat:(side|bow|stern|top|under)/.exec(window.location.search) || [])[1] : undefined
+const BOAT_CAMS = { // camera offset from the boat, look-at offset from the boat
+  side: [[0.4, 1.7, 10.5], [0, 0.15, 0]], bow: [[8.5, 2.6, 6], [0, 0.1, 0]], stern: [[-8.5, 2.4, -5.5], [0, 0.2, 0]],
+  top: [[0.01, 13.5, 0], [0, 0, 0]], under: [[5.5, -2.6, 5.5], [0, -0.2, 0]],
+}
 function Rig({ state, sonarRect, fogMats }) {
   const { camera, size, scene } = useThree()
   const tmp = useMemo(() => new THREE.Vector3(), [])
@@ -426,6 +459,13 @@ function Rig({ state, sonarRect, fogMats }) {
       return
     }
     if (s.closeCam) { // dev aid ?cam=boat — inspect the boat / fish up close
+      const v = BOAT_CAMS[BOAT_CAM_VIEW]
+      if (v) {
+        if (BOAT_CAM_VIEW === 'top') camera.up.set(0, 0, -1); else camera.up.set(0, 1, 0) // top: bow to the right of the screen
+        camera.position.set(s.boat.x + v[0][0], v[0][1], s.boat.z + v[0][2])
+        camera.lookAt(s.boat.x + v[1][0], v[1][1], s.boat.z + v[1][2])
+        return
+      }
       camera.position.set(s.boat.x - 6 + px, 3.5 + py * 0.5, s.boat.z + 9)
       camera.lookAt(s.boat.x + 1, -0.6, s.boat.z)
       return
