@@ -43,19 +43,24 @@ it is done. ✅ done · 🔧 in progress · ⬜ open.
 - ✅ All 11 app colour maps available on the phone screen (amber default); gain slider
 
 ## 3D lake (Phase 3 polish)
-- ⬜ **Boat + fish plan (2026-10-03, proposal, waiting on Jason's go):** `docs/boat-fish-plan.md`. Boat decided (#83):
-  a low-key bass boat; no raised bow, no Power-Poles; the trolling motor and transducer stay as they are. Four phases:
-  (1) fish bend with a travelling body wave on the GPU (fixing today's wrong-axis "wag"); (2) the hull rebuilt in code
-  with `LoftGeometry`, plus water contact; (3) fish eyes, fins, percid/pike bodies, more walleye, perch and pike;
-  (4) optional: world edge, depth light, caustics, weeds. Still open for Jason (§8): boat source (code recommended),
-  species mix, the 2.6× fish scale, and the go for phase 1.
-- ⬜ **Desktop: range on the phone + phone size (2026-10-03, proposal, waiting on Jason's go):**
+- 🔧 **Boat + fish plan (2026-10-03):** `docs/boat-fish-plan.md`. Boat decided (#83): a low-key bass boat; no raised
+  bow, no Power-Poles; the trolling motor and transducer stay as they are. Fish decided (#85): all species stay, yellow
+  perch and northern pike join in phase 3, display size per species (musky today's size or a little smaller, the rest
+  2.6×). Four phases:
+  - (1) **in progress (cloud chat, branch `claude/modest-keller-ccfnhq`):** fish bend with a travelling body wave on the
+    GPU, fixing today's wrong-axis "wag"; cheaper bait geometry. **Files taken:** `fishGeometry.js`, `fish.js`,
+    `lakeMaterial.js` (the `FISH` vertex block) and `Scene.jsx` (`FishGroup` only). Other chats: please leave these
+    until this entry says they are free.
+  - (2) the hull rebuilt in code with `LoftGeometry`, plus water contact (waits for Jason's go; boat source still open,
+    code recommended);
+  - (3) fish eyes, fins, percid/pike bodies, perch and pike, more walleye;
+  - (4) optional: world edge, depth light, caustics, weeds.
+- ⬜ **Desktop: range on the phone + phone size (approved #84, plan B; the local phone-layout chat builds it):**
   `docs/desktop-phone-controls-plan.md`. The desktop counterpart of #78/#79:
   - the panel's Range row goes, and the app's own −/+ on the phone set the range;
   - the app control set scales 1.3× on desktop (range ring ≈ 16 → 23 px);
   - the phone frame becomes `min(42vw, 600px, 83.2vh)` (≈ 74 % of a real 16 Pro Max on a laptop, ≈ real size
     on a 24″ monitor; true size would cover 57 % of a laptop screen).
-  It touches the files the phone-layout chat edits, so that chat builds it, or this branch is merged first.
 - ✅ Deep water 40 → 24 m, fish off the bottom, chasing / darting / bursting fish (decision #64)
 - ✅ Down view fully AUTO on both devices; PL Down fills its box to the corners (decision #65)
 - ✅ Bottom toned down to orange with a thin hot edge; lockup moved into the boat's reach (decision #66)

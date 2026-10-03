@@ -1,6 +1,7 @@
 # Desktop: range on the phone, and the phone's size (proposal, 2026-10-03)
 
-Planning only; waits for Jason's go. It is the desktop counterpart of #78/#79, which did this on phones.
+**Approved (#84): plan B, built by the local phone-layout chat.** It is the desktop counterpart of #78/#79, which did
+this on phones.
 
 ## 中文摘要（给 Jason）
 
@@ -22,7 +23,9 @@ Planning only; waits for Jason's go. It is the desktop counterpart of #78/#79, w
   - Combo 视图里真实 APP 的屏幕上本来就没有 range 按钮，所以这里也不显示，沿用之前的 range（和手机版一致）。
 - **面板**：只剩 Device 和 View 两行，更干净。
 
-**工作量**：很小，大约 1 小时，加上桌面和手机两种尺寸的检查。这些文件和手机版（#78/#79）是同一批，本地那个对话正在改，所以建议由它来做；或者先把我这个分支合进 main，再由我做。
+**工作量**：很小，大约 1 小时，加上桌面和手机两种尺寸的检查。这些文件和手机版（#78/#79）是同一批，本地那个对话正在改，所以由它来做。
+
+**已定（#84）**：按 B 方案做，由本地对话来做。
 
 ## Context (for Claude)
 
