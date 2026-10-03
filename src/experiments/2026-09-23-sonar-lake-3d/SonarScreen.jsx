@@ -9,6 +9,10 @@ import { logoFrame, makeLogoSdf, LOGO_SDF_MAX, LOCKUP, LOCKUP_SVG } from './logo
 
 // CSS 3D pose of the phone (index.jsx applies the same transform to the DOM frame)
 export const PHONE_POSE = { perspective: 1400, rotY: -16, rotX: 6 }
+// phones (< 640 px wide): nearly flat, so the frame can fill the width (Jason 2026-10-03: 手机能否保留边框 合理安排一下空间)
+export const PHONE_POSE_PHONE = { perspective: 1400, rotY: -4, rotX: 2 }
+export const isPhoneLayout = () => typeof window !== 'undefined' && window.innerWidth < 640
+export const phonePose = () => (isPhoneLayout() ? PHONE_POSE_PHONE : PHONE_POSE)
 
 // How the app frames each view (measured on the tablet 2026-09-24, docs/app-chrome.md §2/§6).
 // A box is {x0, y0, w, h} in metres with the apex at (0,0) and y growing with depth;
@@ -256,7 +260,7 @@ export default function SonarScreen({ state, rect, lakeMats }) {
     const cr = gl.domElement.getBoundingClientRect(), fr = frame.getBoundingClientRect()
     if (fr.width < 8) return
     const cx = fr.left + fr.width / 2, cy = fr.top + fr.height / 2
-    const { perspective: P, rotY, rotX } = PHONE_POSE
+    const { perspective: P, rotY, rotX } = phonePose()
     const ay = (rotY * Math.PI) / 180, ax = (rotX * Math.PI) / 180
     const corners = [[el.offsetLeft, el.offsetTop], [el.offsetLeft + el.offsetWidth, el.offsetTop], [el.offsetLeft, el.offsetTop + el.offsetHeight], [el.offsetLeft + el.offsetWidth, el.offsetTop + el.offsetHeight]]
     const pos = res.quad.geometry.attributes.position, aW = res.quad.geometry.attributes.aW

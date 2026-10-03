@@ -80,3 +80,10 @@
 .ph-band { background: linear-gradient(160deg, #f1f0ec 0%, #d9d8d3 14%, #bfbdb7 30%, #e6e4df 48%, #a8a6a1 66%, #d2d0cb 84%, #bcbab5 100%); }
 .ph-btn { position: absolute; background: linear-gradient(90deg, #cfcdc8, #8e8c87); border-radius: 2px; box-shadow: 0 0 0 1px rgba(0,0,0,0.25); }
 .ph-glass { position: absolute; inset: 0; border-radius: inherit; pointer-events: none; background: linear-gradient(115deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.03) 28%, rgba(255,255,255,0) 45%, rgba(255,255,255,0) 70%, rgba(255,255,255,0.05) 100%); }
+/* live app control on the phone (range −/+): full brightness, ~36 px invisible hit area around the ring */
+.ph-live { pointer-events: auto; position: relative; display: inline-flex; align-items: center; justify-content: center; background: none; border: 0; padding: 0; color: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.ph-live::before { content: ''; position: absolute; inset: -12px; }
+.ph-live:disabled { opacity: 0.35; cursor: default; }
+.ph-live:active:not(:disabled) { transform: scale(0.92); }
+/* phones: the View capsule on the phone frame — finger-sized (≥ 40 px tall) */
+.ac-seg-lg .ac-btn { font-size: 14px; padding: 11px 18px; }

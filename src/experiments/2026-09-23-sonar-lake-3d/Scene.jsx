@@ -336,7 +336,7 @@ function Beams({ state }) {
 // the whole beam footprint shows (Jason 2026-10-03: 船应该更小一点 … zoom out); the lake is centred in the part of
 // the screen above the phone frame (view offset), and fog is thinned by the same factor so the lake stays as clear.
 const CAM_T = new THREE.Vector3(3, -9, 0), CAM_D = new THREE.Vector3(-17, 61, 66) // desktop target, camera − target
-const LAKE_W = 70
+const LAKE_W = 50 // Jason 2026-10-03: 70 m made the boat a little too small — a middle value
 const FOG = { near: 160, far: 420, cam: 400 }
 function Rig({ state, sonarRect, fogMats }) {
   const { camera, size, scene } = useThree()
@@ -349,7 +349,7 @@ function Rig({ state, sonarRect, fogMats }) {
     const tanV = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2))
     const k = Math.max(1, LAKE_W / (2 * tanV * aspect * CAM_D.length())) // 1 on desktop and landscape tablets
     // lake band = the screen above the phone frame on portrait phones (the frame and panel cover the rest)
-    const fr = sonarRect?.current?.frame
+    const fr = sonarRect?.current?.dock || sonarRect?.current?.frame
     const bandBottom = k > 1 && fr ? Math.max(size.height * 0.35, Math.min(size.height, fr.getBoundingClientRect().top)) : size.height
     const devCam = s.fishCam || s.logoCam || s.wreckCam || s.closeCam
     const offY = devCam ? 0 : Math.round(size.height / 2 - bandBottom / 2)

@@ -1091,3 +1091,28 @@ Numbered log. Newest at the bottom.
     - Checked at 390×844 (PL Forward, Down, Panoramic: boat and full footprint visible, no console errors)
       and at 1440×900 (same framing as before). The build passes.
     - Phases 2–4 (layout with the phone frame on top, touch drag, landscape and quality tiers) follow.
+
+78. **2026-10-03** — **Phone layout: the big panel goes, the controls move onto the phone, and the water gets the space**
+    (Jason: "船好像有一点太小了 可以取一个稍微中间一点的值"; "range … 直接做到手机 APP 里面去 … view … 胶囊 … 贴到手机框的
+    上面去 … 空间给更多的水面"). This applies below 640 px only; desktop is unchanged.
+    - The phone zoom is LAKE_W 50 m, between today's 29 m and #77's 70 m.
+    - The big Lab panel is hidden on phones.
+    - The phone frame sits at the bottom, full width with a 12 px gutter and a safe-area inset, in a near-flat
+      pose (rotY −4°, rotX 2°). `phonePose()` in `SonarScreen.jsx` keeps the GL picture's perspective
+      matching the frame.
+    - **Range is set with the app's own −/+ on the phone screen.** `LiveCtl` in `SonarChrome.jsx` gives full
+      brightness and a ~36 px hit area. The steps are 20 · 30 · 40 · 50 · 60 · 70 · 80 · 100 · 120 · 150 · 180 ·
+      200 · 240 ft, up to the device's maximum. The buttons are greyed out in Down (AUTO). The other app
+      buttons stay display-only.
+    - **The View capsule sits on the frame's top edge**, about 44 px tall. The device switch is a small
+      capsule at the top right, next to "← Lab".
+    - About 70 % of the screen is now lake. The camera frames the lake above the capsule.
+    - `viewport-fit=cover` was added to `index.html` and `share/index.html`.
+    - **Checked:**
+      - 390×844: PL Forward with the boat and the full footprint visible; range +/+ goes 80 → 100 → 120 ft;
+        no sign-up gate; no console errors.
+      - 360×740: PingLive Mini, no overlap.
+      - 1440×900: the panel and the locked app buttons are as before.
+      - The build passes.
+    - **Known:** at long ranges (≥ 120 ft) the Forward fan runs past the right screen edge on a phone. Still
+      to do: touch drag (phase 3), landscape and quality tiers (phase 4).
