@@ -33,14 +33,26 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
       varying vec3 vWorld; varying vec3 vNormal; varying vec3 vColor;
       #ifdef FISH
         attribute float aPattern; attribute vec3 aBelly; attribute vec3 aSide;
+        attribute vec4 aSwim; // per fish, set every frame in Scene.jsx: wave phase, activity, turn bend, wavelength
         varying float vPattern; varying vec3 vBelly; varying vec3 vSide; varying vec3 vLocal;
         uniform float uSonarPass; uniform float uFishSonarScale;
       #endif
       void main() {
-        vec3 pos = position;
+        vec3 pos = position, nrm = normal;
       #ifdef FISH
-        vPattern = aPattern; vBelly = aBelly; vSide = aSide; vLocal = position;
+        vPattern = aPattern; vBelly = aBelly; vSide = aSide; vLocal = position; // markings stay on the body
         // fish are not rendered in the sonar passes any more (analytic marks, sonarMarks.js)
+        // Swimming (decision #86, docs/boat-fish-plan.md §3a): the body bends sideways (local z) with a wave that
+        // runs from head to tail. s = 0 at the nose (x = +0.5) → 1 at the tail tip (x ≈ −0.7). Half-amplitude:
+        // a little head recoil, smallest just behind the head, 0.1 of the length at the tail tip (the carangiform
+        // envelope 0.02 − 0.0825 s + 0.1625 s²), times the activity. Plus a C-bend β (s − 0.3)² into the turn.
+        // The normal follows the bend exactly (a shear in x–z: n' = (nx − dz/dx · nz, ny, nz)).
+        float s = (0.5 - position.x) / 1.2;
+        float A = 1.2 * (0.02 - 0.0825 * s + 0.1625 * s * s), dA = 1.2 * (0.325 * s - 0.0825);
+        float kw = 6.2831853 / aSwim.w, ph = kw * s - aSwim.x, sn = sin(ph), cs = cos(ph), b = s - 0.3;
+        pos.z += aSwim.y * A * sn + aSwim.z * b * b;
+        float dzdx = -(aSwim.y * (dA * sn + A * kw * cs) + 2.0 * aSwim.z * b) / 1.2;
+        nrm = vec3(normal.x - dzdx * normal.z, normal.y, normal.z);
       #endif
         vec3 c = vec3(1.0);
         #ifdef USE_COLOR
@@ -56,7 +68,7 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
         #endif
         vec4 wp = m * vec4(pos, 1.0);
         vWorld = wp.xyz;
-        vNormal = normalize(mat3(m) * normal);
+        vNormal = normalize(mat3(m) * nrm);
         gl_Position = projectionMatrix * viewMatrix * wp;
       }
     `,

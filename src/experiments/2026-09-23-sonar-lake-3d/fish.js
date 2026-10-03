@@ -2,6 +2,9 @@
 // Jason 2026-09-24: at this camera distance real sizes are invisible, so fish are
 // DRAWN at FISH_DISPLAY_SCALE × their true length. Data stays true.
 export const FISH_DISPLAY_SCALE = 2.6
+// Drawn length of one fish. Decision #85: the display size can differ per species (`scale` in SPECIES, default
+// FISH_DISPLAY_SCALE); everything that sizes or clears a DRAWN fish goes through here. The sonar keeps f.len.
+export const drawnLen = (f) => f.len * (SPECIES[f.species].scale ?? FISH_DISPLAY_SCALE)
 // Colours/markings researched per species (2026-09-24, Jason: "仔细研究, 现在有重复").
 // back → side → belly gradient. pattern: 0 none · 1 dark vertical bars on the
 // sides · 2 light spots · 3 dark speckle all over · 4 dark lateral band of
@@ -122,7 +125,7 @@ export function makePopulation(bedY, obstacles) {
 // ±0.3 m bob and half its DRAWN body height — stays at least 0.4 m above the highest bottom anywhere under its
 // swim loop (the loop fills a rotated ±radius × ±0.6 radius rectangle; slopes used to put bellies into the bed).
 // Only raises fish; no rnd() calls, so x/z and the rest of the lake stay exactly as they were.
-export const bottomGap = (f) => 0.3 + 0.12 * f.len * FISH_DISPLAY_SCALE + 0.4
+export const bottomGap = (f) => 0.3 + 0.12 * drawnLen(f) + 0.4
 function loopBedTop(f, bedY, r = f.radius) {
   const c = Math.cos(f.rot || 0), s = Math.sin(f.rot || 0)
   let top = -1e9
@@ -156,7 +159,7 @@ function clearPaths(fish, circles, bedY) {
   }
   for (const f of fish) {
     if (!f.radius) continue
-    const Ld = f.len * FISH_DISPLAY_SCALE, cl = 0.34 * Ld, hy = 0.12 * Ld + 0.3 + 0.25 // body half-height + the ±0.3 m bob + a margin
+    const Ld = drawnLen(f), cl = 0.34 * Ld, hy = 0.12 * Ld + 0.3 + 0.25 // body half-height + the ±0.3 m bob + a margin
     const c = Math.cos(f.rot || 0), s = Math.sin(f.rot || 0)
     const near = circles.filter((o) => Math.hypot(o.x - f.home[0], o.z - f.home[2]) < f.radius + o.r + cl + 15)
     const clash = (hx, y, hz, r) => near.some((o) => y + hy > o.y0 && y - hy < o.y1 && rectDist(o, hx, hz, c, s, r) < o.r + cl)
@@ -228,6 +231,7 @@ export function fishPose(f, t, out) {
     hx = Math.cos(act.h) * 0.4 * e; hz = -Math.sin(act.h) * 0.4 * e // while it holds, it keeps facing the way it came up
   }
   out.x = x; out.y = y; out.z = z
+  out.speed = Math.hypot(dx, dy, dz) // m/s, drives the tail beat (Scene.jsx)
   out.heading = f.heading != null ? f.heading : Math.atan2(-(dz + hz), dx + hx)
   out.pitch = f.heading != null ? 0 : Math.max(-0.6, Math.min(0.8, Math.atan2(dy, Math.hypot(dx, dz) + 0.05))) // nose up on a rise
   return out
@@ -262,7 +266,7 @@ function makeAct(f, kind, t0, T1, T2, T3, dx, dy, dz) {
 // would this act keep the fish clear of structure, bottom and surface for its whole run?
 function pathClear(f, act, circles, bedY) {
   const keep = f.act; f.act = act
-  const Ld = f.len * FISH_DISPLAY_SCALE, cl = 0.34 * Ld, hy = 0.12 * Ld + 0.25, gap = bottomGap(f) - 0.3
+  const Ld = drawnLen(f), cl = 0.34 * Ld, hy = 0.12 * Ld + 0.25, gap = bottomGap(f) - 0.3
   const o = fishPose(f, act.t0, {}), reach = Math.hypot(act.tx - o.x, act.ty - o.y, act.tz - o.z) + 2 * f.radius + 2
   const near = circles.filter((c) => Math.hypot(c.x - o.x, c.z - o.z) < reach + c.r + cl) // only structure the run could reach
   const times = []

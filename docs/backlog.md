@@ -47,10 +47,9 @@ it is done. ✅ done · 🔧 in progress · ⬜ open.
   bow, no Power-Poles; the trolling motor and transducer stay as they are. Fish decided (#85): all species stay, yellow
   perch and northern pike join in phase 3, display size per species (musky today's size or a little smaller, the rest
   2.6×). Four phases:
-  - (1) **in progress (cloud chat, branch `claude/modest-keller-ccfnhq`):** fish bend with a travelling body wave on the
-    GPU, fixing today's wrong-axis "wag"; cheaper bait geometry. **Files taken:** `fishGeometry.js`, `fish.js`,
-    `lakeMaterial.js` (the `FISH` vertex block) and `Scene.jsx` (`FishGroup` only). Other chats: please leave these
-    until this entry says they are free.
+  - (1) ✅ **built (#86), waiting for Jason's look:** the bodies swim with a travelling wave on the GPU, the tail beat
+    follows the speed, the body curves into quick turns, the wrong-axis "wag" is gone, lighter smelt (−13 % triangles).
+    The files it took are free again. Still open: Jason picks the musky's size (2.6× / 2.2× / 1.9× side-by-side).
   - (2) the hull rebuilt in code with `LoftGeometry`, plus water contact (waits for Jason's go; boat source still open,
     code recommended);
   - (3) fish eyes, fins, percid/pike bodies, perch and pike, more walleye;
