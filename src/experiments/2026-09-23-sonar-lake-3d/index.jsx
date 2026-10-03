@@ -4,7 +4,7 @@ import * as THREE from 'three'
 import LakeScene from './Scene'
 import { DEVICES, FT, MODE_LABELS } from '../2026-09-23-sonar-beam/devices'
 import { wedgeSpecs } from '../2026-09-23-beam-shapes-3d/wedge'
-import { PHONE_POSE } from './SonarScreen'
+import { phonePose, isPhoneLayout } from './SonarScreen'
 import { COLORMAP_NAMES } from './colormaps'
 import SonarChrome from './SonarChrome'
 import { screenLayout } from './SonarScreen'
@@ -59,6 +59,9 @@ export default function SonarLake3D() {
   const [noise, setNoise] = useState(0.3)          // noise reject (inset cleaner than real use, decision #28): the smaller of the two, used last
   const [, tick] = useState(0)
   useEffect(() => { const id = requestAnimationFrame(() => tick(1)); return () => cancelAnimationFrame(id) }, [])
+  // phone layout and phone pose follow the window width (rotate / resize)
+  useEffect(() => { const on = () => tick((n) => n + 1); window.addEventListener('resize', on); return () => window.removeEventListener('resize', on) }, [])
+  const phone = isPhoneLayout()
 
   const device = DEVICES[deviceId]
   const maxFt = device.maxRangeFt
@@ -154,6 +157,13 @@ export default function SonarLake3D() {
     s.parallax.y = (e.clientY / window.innerHeight - 0.5) * 2
   }
   const fmt = (ft) => (imperial ? `${Math.round(ft)} ft` : `${(ft * FT).toFixed(1)} m`)
+  // phones: the range is changed with the app's own −/+ on the phone screen (Jason 2026-10-03), in steps
+  const RANGE_STEPS_FT = [20, 30, 40, 50, 60, 70, 80, 100, 120, 150, 180, 200, 240]
+  const stepRange = (dir) => {
+    const steps = RANGE_STEPS_FT.filter((v) => v <= maxFt)
+    const i = dir > 0 ? steps.findIndex((v) => v > rangeFt + 0.5) : steps.findLastIndex((v) => v < rangeFt - 0.5)
+    if (i >= 0) setRangeFt(steps[i])
+  }
 
   // the three-step guide (docs/3d-beam-reference.md §3): each step is a preset
   const [step, setStep] = useState(0)
@@ -165,6 +175,7 @@ export default function SonarLake3D() {
   const goStep = (i) => {
     const st = STEPS[i]; setStep(i); setDeviceId(st.device); setMode(st.mode); setRangeFt(st.range)
     state.current.target.x = st.boat[0]; state.current.target.z = st.boat[1]
+    state.current.frameX = st.boat[0] + 14 // phones: re-centre the zoomed-out view on the preset (boat left, beam right)
   }
 
   return (
@@ -176,7 +187,7 @@ export default function SonarLake3D() {
 
       {/* ---- control panel — Apple-style frosted glass over the lake (Jason 2026-09-24) ---- */}
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-        className="ac-panel pointer-events-auto absolute inset-x-3 bottom-3 flex flex-col gap-3 p-3.5 sm:inset-x-auto sm:bottom-auto sm:left-4 sm:top-14 sm:w-[400px] sm:p-4">
+        className="ac-panel pointer-events-auto absolute flex flex-col gap-3 max-sm:hidden sm:left-4 sm:top-14 sm:w-[400px] sm:p-4">
         <div className="flex items-center justify-between px-1 pt-0.5">
           <img src="/brand/logo/White Accuphy Logo.png" alt="Accuphy" className="h-[18px] w-auto drop-shadow-[0_1px_2px_rgba(0,20,30,0.25)]" draggable={false} />
           <span className="ac-title">Lab</span>
@@ -234,8 +245,8 @@ export default function SonarLake3D() {
            Proportions from the 15/16 Pro Max: body 2.08:1, corner radius ≈ 14 % of the short side,
            thin uniform bezel, Dynamic Island on the left in landscape, volume/action buttons on top,
            power button below; brushed titanium band; faint glass reflection over the display. ---- */}
-      <div ref={(el) => { sonarRect.current.frame = el }} className={`pointer-events-none absolute right-[4vw] bottom-[240px] w-[88vw] sm:right-[28px] sm:bottom-[24px] ${BIG_PHONE ? 'sm:w-[min(88vw,1400px)]' : 'sm:w-[min(38vw,560px)]'}`} style={{ aspectRatio: '2.08 / 1' }}>
-        <div style={{ position: 'relative', width: '100%', height: '100%', transform: `perspective(${PHONE_POSE.perspective}px) rotateY(${PHONE_POSE.rotY}deg) rotateX(${PHONE_POSE.rotX}deg)` }}>
+      <div ref={(el) => { sonarRect.current.frame = el }} className={`pointer-events-none absolute inset-x-3 bottom-[calc(14px+env(safe-area-inset-bottom))] sm:inset-x-auto sm:right-[28px] sm:bottom-[24px] ${BIG_PHONE ? 'sm:w-[min(88vw,1400px)]' : 'sm:w-[min(38vw,560px)]'}`} style={{ aspectRatio: '2.08 / 1' }}>
+        <div style={{ position: 'relative', width: '100%', height: '100%', transform: `perspective(${phonePose().perspective}px) rotateY(${phonePose().rotY}deg) rotateX(${phonePose().rotX}deg)` }}>
           {/* side buttons (on the top edge in landscape: action + volume; power on the bottom edge) */}
           <div className="ph-btn" style={{ left: '14%', top: '-1.2%', width: '2.2%', height: '1.6%' }} />
           <div className="ph-btn" style={{ left: '19.5%', top: '-1.2%', width: '4.6%', height: '1.6%' }} />
@@ -245,7 +256,7 @@ export default function SonarLake3D() {
           <div className="ph-band" style={{ ...ring('1.35%'), borderRadius: '6.6% / 13.8%', boxShadow: '16px 26px 44px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.45), inset 0 0 0 2px rgba(0,0,0,0.12)' }} />
           <div style={{ ...ring('1.25%'), inset: '1.35%', borderRadius: '6.1% / 12.7%', background: '#040404' }} />
           <div ref={(el) => { sonarRect.current.el = el }} style={{ position: 'absolute', inset: '2.6%', borderRadius: '5.4% / 11.3%', containerType: 'size', overflow: 'hidden' }}>
-            <SonarChrome layout={layout} deviceId={deviceId} mode={mode} rangeFt={effRangeFt} depthFt={depthFt} imperial={imperial} gain={gain} autoDepth={autoDepth} autoRange={mode === 'down'} onLocked={onLocked} depthRef={(el) => { state.current.depthEl = el }} />
+            <SonarChrome layout={layout} deviceId={deviceId} mode={mode} rangeFt={effRangeFt} depthFt={depthFt} imperial={imperial} gain={gain} autoDepth={autoDepth} autoRange={mode === 'down'} onRange={phone ? stepRange : undefined} onLocked={onLocked} depthRef={(el) => { state.current.depthEl = el }} />
             <div className="ph-glass" />
           </div>
           {/* antenna lines in the titanium band (two per long edge, like the Pro Max) */}
@@ -255,11 +266,24 @@ export default function SonarLake3D() {
           {/* Dynamic Island: vertical pill on the left in landscape */}
           <div style={{ position: 'absolute', left: '4.1%', top: '50%', width: '2.4%', height: '20%', transform: 'translateY(-50%)', borderRadius: 999, background: '#000', boxShadow: '0 0 0 1px #0a0a0a' }} />
         </div>
+        {/* phones: the View capsule sits on the phone frame's top edge (Jason 2026-10-03) — the big panel is gone */}
+        {phone && (
+          <div ref={(el) => { sonarRect.current.dock = el }} className="pointer-events-auto absolute bottom-full left-1/2 mb-2 -translate-x-1/2">
+            <div className="ac-seg ac-seg-lg">{device.modes.map((m) => <button key={m} className={`ac-btn ${mode === m ? 'is-active' : ''}`} onClick={() => setMode(m)}>{MODE_LABELS[m].replace(' View', '')}</button>)}</div>
+          </div>
+        )}
         {/* after sign-up the app buttons stay display-only: a short hint above the phone instead of the gate */}
-        <div role="status" aria-live="polite" className={`ac-hint absolute bottom-full right-0 mb-3 whitespace-nowrap px-3.5 py-2 text-[12px] font-medium transition-opacity duration-300 ${toast ? 'opacity-100' : 'opacity-0'}`}>
-          These are the app’s own controls — use the panel to change the view.
+        <div role="status" aria-live="polite" className={`ac-hint absolute bottom-full right-0 mb-3 max-sm:mb-16 whitespace-nowrap px-3.5 py-2 text-[12px] font-medium transition-opacity duration-300 ${toast ? 'opacity-100' : 'opacity-0'}`}>
+          {phone ? 'These are the app’s own controls — the range −/+ work.' : 'These are the app’s own controls — use the panel to change the view.'}
         </div>
       </div>
+
+      {/* ---- phones: device switch, top right (the panel is hidden there) ---- */}
+      {phone && (
+        <div className="pointer-events-auto absolute right-3 top-4">
+          <div className="ac-seg">{Object.values(DEVICES).map((d) => <button key={d.id} className={`ac-btn ${deviceId === d.id ? 'is-active' : ''}`} onClick={() => setDeviceId(d.id)}>{d.name}</button>)}</div>
+        </div>
+      )}
 
       {/* ---- guide strip ---- */}
       <div className="pointer-events-auto absolute right-[28px] top-4 hidden w-[min(620px,44vw)] items-stretch gap-2.5 md:flex">

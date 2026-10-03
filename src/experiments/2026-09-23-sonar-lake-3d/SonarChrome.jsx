@@ -28,7 +28,16 @@ function LockedCtl({ onLocked, children, style }) {
   )
 }
 
-export default function SonarChrome({ layout, deviceId, mode, rangeFt, depthFt, imperial, gain, depthRef, onLocked, autoDepth = true, autoRange = false }) {
+// a live app control (phones: the range −/+ — Jason 2026-10-03: range 直接做到手机 APP 里面去): full brightness and a
+// finger-sized invisible hit area around the small ring
+function LiveCtl({ onPress, disabled, children, label }) {
+  return (
+    <button type="button" className="ph-live" aria-label={label} disabled={disabled}
+      onPointerDown={(e) => e.stopPropagation()} onClick={(e) => { e.stopPropagation(); if (!disabled) onPress() }}>{children}</button>
+  )
+}
+
+export default function SonarChrome({ layout, deviceId, mode, rangeFt, depthFt, imperial, gain, depthRef, onLocked, autoDepth = true, autoRange = false, onRange }) {
   const unit = imperial ? FT : 1 // metres per display unit
   const box = layout.box0
   const rangeLabel = imperial ? `${Math.round(rangeFt)}ft` : `${Math.round(rangeFt * FT)}m`
@@ -88,12 +97,12 @@ export default function SonarChrome({ layout, deviceId, mode, rangeFt, depthFt, 
         <LockedCtl onLocked={onLocked} style={{ position: 'absolute', left: '2.5%', top: '50%', transform: 'translateY(-50%)', fontSize: '7cqh', lineHeight: 1 }}>↶</LockedCtl>
         {!split && (
           <div style={{ position: 'absolute', left: '19%', top: '50%', transform: 'translate(-50%, -50%)', display: 'flex', alignItems: 'center', gap: '2.2cqh' }}>
-            <LockedCtl onLocked={onLocked}><Ring>−</Ring></LockedCtl>
+            {onRange ? <LiveCtl label="Range shorter" disabled={autoRange} onPress={() => onRange(-1)}><Ring>−</Ring></LiveCtl> : <LockedCtl onLocked={onLocked}><Ring>−</Ring></LockedCtl>}
             <span style={{ position: 'relative', lineHeight: 1.05 }}>
               {autoRange && <span className={num} style={{ position: 'absolute', left: '50%', bottom: '100%', transform: 'translateX(-50%)', fontSize: '2.6cqh', fontWeight: 700, letterSpacing: '0.12em', color: '#7fcfff' }}>AUTO</span>}
               <span className={num} style={{ fontSize: '4.8cqh', fontWeight: 500 }}>{rangeLabel}</span>
             </span>
-            <LockedCtl onLocked={onLocked}><Ring>+</Ring></LockedCtl>
+            {onRange ? <LiveCtl label="Range longer" disabled={autoRange} onPress={() => onRange(1)}><Ring>+</Ring></LiveCtl> : <LockedCtl onLocked={onLocked}><Ring>+</Ring></LockedCtl>}
           </div>
         )}
         <LockedCtl onLocked={onLocked} style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}><Ring style={{ width: '9cqh', height: '9cqh', gap: '0.9cqh' }}><i style={{ display: 'block', width: '0.9cqh', height: '3.6cqh', background: '#fff', borderRadius: '0.3cqh' }} /><i style={{ display: 'block', width: '0.9cqh', height: '3.6cqh', background: '#fff', borderRadius: '0.3cqh' }} /></Ring></LockedCtl>

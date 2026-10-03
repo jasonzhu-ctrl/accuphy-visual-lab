@@ -1076,7 +1076,48 @@ Numbered log. Newest at the bottom.
       - landscape phones are broken;
       - budget Android runs at 10–24 fps.
 
-77. **2026-09-25** — **Market learning gets a shared home: `docs/market/`** (Jason:
+77. **2026-10-03** — **Phones: the camera zooms out so the boat is small and the whole beam footprint shows**
+    (Jason: "整个界面的比例有问题 … 应该是 zoom out … 这个船应该更小一点", then "开始吧，开搞" on the plan in
+    `docs/mobile-phone-layout-plan.md`, phase 1).
+    - `Rig` in `Scene.jsx` keeps the desktop view direction. When the screen is narrow it pulls the camera back
+      until ~70 m of lake fit across the screen. The factor is k = max(1, 70 / (2·tan(fov/2)·aspect·|D|)), so
+      it is 2.4× on a 390×844 phone and 1 on desktop.
+    - A view offset centres the lake in the part of the screen above the phone frame.
+    - Fog density and the scene fog are divided by k, and the far plane is multiplied by k, so the lake stays
+      as clear as on desktop.
+    - On phones a step preset re-centres the view on its boat (`frameX`), and there is no pointer parallax.
+    - The drag hint stays inside the screen.
+    - Desktop framing is unchanged (k = 1).
+    - Checked at 390×844 (PL Forward, Down, Panoramic: boat and full footprint visible, no console errors)
+      and at 1440×900 (same framing as before). The build passes.
+    - Phases 2–4 (layout with the phone frame on top, touch drag, landscape and quality tiers) follow.
+
+78. **2026-10-03** — **Phone layout: the big panel goes, the controls move onto the phone, and the water gets the space**
+    (Jason: "船好像有一点太小了 可以取一个稍微中间一点的值"; "range … 直接做到手机 APP 里面去 … view … 胶囊 … 贴到手机框的
+    上面去 … 空间给更多的水面"). This applies below 640 px only; desktop is unchanged.
+    - The phone zoom is LAKE_W 50 m, between today's 29 m and #77's 70 m.
+    - The big Lab panel is hidden on phones.
+    - The phone frame sits at the bottom, full width with a 12 px gutter and a safe-area inset, in a near-flat
+      pose (rotY −4°, rotX 2°). `phonePose()` in `SonarScreen.jsx` keeps the GL picture's perspective
+      matching the frame.
+    - **Range is set with the app's own −/+ on the phone screen.** `LiveCtl` in `SonarChrome.jsx` gives full
+      brightness and a ~36 px hit area. The steps are 20 · 30 · 40 · 50 · 60 · 70 · 80 · 100 · 120 · 150 · 180 ·
+      200 · 240 ft, up to the device's maximum. The buttons are greyed out in Down (AUTO). The other app
+      buttons stay display-only.
+    - **The View capsule sits on the frame's top edge**, about 44 px tall. The device switch is a small
+      capsule at the top right, next to "← Lab".
+    - About 70 % of the screen is now lake. The camera frames the lake above the capsule.
+    - `viewport-fit=cover` was added to `index.html` and `share/index.html`.
+    - **Checked:**
+      - 390×844: PL Forward with the boat and the full footprint visible; range +/+ goes 80 → 100 → 120 ft;
+        no sign-up gate; no console errors.
+      - 360×740: PingLive Mini, no overlap.
+      - 1440×900: the panel and the locked app buttons are as before.
+      - The build passes.
+    - **Known:** at long ranges (≥ 120 ft) the Forward fan runs past the right screen edge on a phone. Still
+      to do: touch drag (phase 3), landscape and quality tiers (phase 4).
+
+79. **2026-09-25** — **Market learning gets a shared home: `docs/market/`** (Jason:
     "基于你对我们的全盘了解 做深入用户和市场研究 持续学习如何让accuphy卖得更好").
     Research round 1 builds on round 0 (`docs/users-and-market.md`, 2026-09-24) and sets up
     the loop for continuous learning:
@@ -1093,5 +1134,5 @@ Numbered log. Newest at the bottom.
       the ice season (Nov–Feb = 43 % of store orders) starts now.
     All recommendations are proposals: nothing in the store, Klaviyo, ads or the Lab changes
     until Jason says go.
-    (Written as #54, then #60 on the research branch `claude/modest-keller-ccfnhq`; renumbered #77 when
-    merged with main on 2026-09-30, where #54–#76 had been taken by other chats.)
+    (Written as #54, then #60 and #77 on the research branch `claude/modest-keller-ccfnhq`; renumbered #79
+    when merged with main on 2026-10-03, where #77 and #78 had been taken by the phone work.)

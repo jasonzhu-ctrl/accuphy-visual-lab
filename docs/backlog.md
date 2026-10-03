@@ -132,7 +132,7 @@ the cheapest Android phone class). Phone size was emulated at 360×800.
   checkout are fixed; the Lab as an onboarding tool (reading the picture) and a dealer demo; show
   multi-device sharing; UTM, Pixel and Klaviyo tags before any ad spend. Next data to get: the HelpScout
   queue (~4,200 conversations) and a 5-question owner survey.
-- ⬜ **Market research round 1 + continuous learning (2026-09-25, decision #77, proposals waiting on
+- ⬜ **Market research round 1 + continuous learning (2026-09-25, decision #79, proposals waiting on
   Jason):** `docs/market/` (start with `report-2026-09.md`; the loop is in `README.md`). Questions for
   Jason, in this order:
   1. **US store:** decision #57 settles the product (US = PingLive Mini is fine for ads). Still open:
