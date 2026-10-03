@@ -1,7 +1,7 @@
 # Boat + fish plan: a real bass boat, fish that swim naturally (proposal, 2026-10-03)
 
-Status: boat decided (#83); fish decided (#85); **phase 1 built (#86)**, waiting for Jason's look. Phases 2–4 wait for
-Jason's go (CLAUDE.md: "我没说动不要动").
+Status: boat decided (#83); fish decided (#85); **phase 1 built (#86)**; **phase 2 (the boat, in code) in progress (#87)**.
+Phases 3–4 wait for Jason's go (CLAUDE.md: "我没说动不要动").
 
 ## 中文摘要（给 Jason）
 
@@ -25,7 +25,7 @@ Jason's go (CLAUDE.md: "我没说动不要动").
 
 **需要你拍板的**
 1. ~~船型~~ 已定（#83）：低调的 bass boat，船头不抬，不要 Power-Pole，电动马达和探头先不动。
-2. 船怎么来：A 用代码自己做（推荐：没有授权风险、文件小、能精确放 PingLive）；B 试那个免费 CC-BY 模型（要在页面上署名，面数和质量待确认）；C 买付费模型（要确认授权允许网页使用，而且不能带品牌标志）。**还没定**，第 2 步开始前再定。
+2. ~~船怎么来~~ 已定（#87）：用代码自己做。第 2 步已经开始。
 3. ~~鱼的品种~~ 已定（#85）：现有的鱼都保留，第 3 步加黄鲈和北方狗鱼；数量（多放 walleye、少放小银鱼）到第 3 步给你看了再定。
 4. ~~鱼的大小~~ 已定（#85）：按鱼种分别定。musky 保持现在的大小或再小一点（给你看对比图再选），其他鱼保持现在的 2.6 倍。声纳屏幕不受影响。
 5. ~~先做第 1 步~~ 已定（#85）：第 1 步（鱼游自然）已做好（#86），等你看效果。musky 的大小请从对比图里选。
@@ -339,8 +339,7 @@ Each phase ends with a look and Jason's go before the next. Rebuild the public t
 ## 8. Decisions for Jason
 
 1. ~~Boat type~~ decided (#83): a low-key bass boat; no raised bow, no Power-Poles; the trolling motor stays.
-2. Boat source: A (code, recommended), B (BoatUS CC-BY model, credit needed), or C (paid)? **Open**; decide before
-   phase 2.
+2. ~~Boat source~~ decided (#87): A, built in code.
 3. ~~Species~~ decided (#85): every species stays; yellow perch and northern pike join in phase 3. The counts (more
    walleye, fewer smelt) are shown in phase 3 for his look.
 4. ~~Fish display scale~~ decided (#85): per species. The musky stays at today's size or a little smaller (side-by-side
