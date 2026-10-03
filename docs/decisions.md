@@ -1075,3 +1075,19 @@ Numbered log. Newest at the bottom.
       - the top half is mostly empty water;
       - landscape phones are broken;
       - budget Android runs at 10–24 fps.
+
+77. **2026-10-03** — **Phones: the camera zooms out so the boat is small and the whole beam footprint shows**
+    (Jason: "整个界面的比例有问题 … 应该是 zoom out … 这个船应该更小一点", then "开始吧，开搞" on the plan in
+    `docs/mobile-phone-layout-plan.md`, phase 1).
+    - `Rig` in `Scene.jsx` keeps the desktop view direction. When the screen is narrow it pulls the camera back
+      until ~70 m of lake fit across the screen. The factor is k = max(1, 70 / (2·tan(fov/2)·aspect·|D|)), so
+      it is 2.4× on a 390×844 phone and 1 on desktop.
+    - A view offset centres the lake in the part of the screen above the phone frame.
+    - Fog density and the scene fog are divided by k, and the far plane is multiplied by k, so the lake stays
+      as clear as on desktop.
+    - On phones a step preset re-centres the view on its boat (`frameX`), and there is no pointer parallax.
+    - The drag hint stays inside the screen.
+    - Desktop framing is unchanged (k = 1).
+    - Checked at 390×844 (PL Forward, Down, Panoramic: boat and full footprint visible, no console errors)
+      and at 1440×900 (same framing as before). The build passes.
+    - Phases 2–4 (layout with the phone frame on top, touch drag, landscape and quality tiers) follow.

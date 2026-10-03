@@ -331,16 +331,43 @@ function Beams({ state }) {
 }
 
 // ---------- camera + picking ----------
-function Rig({ state }) {
-  const { camera, size } = useThree()
+// Desktop view: from the south, drop-off timber on the left, rock hump on the right. On narrow (phone) screens the
+// same view direction is pulled back until ~LAKE_W metres of lake fit across the screen, so the boat is small and
+// the whole beam footprint shows (Jason 2026-10-03: 船应该更小一点 … zoom out); the lake is centred in the part of
+// the screen above the phone frame (view offset), and fog is thinned by the same factor so the lake stays as clear.
+const CAM_T = new THREE.Vector3(3, -9, 0), CAM_D = new THREE.Vector3(-17, 61, 66) // desktop target, camera − target
+const LAKE_W = 70
+const FOG = { near: 160, far: 420, cam: 400 }
+function Rig({ state, sonarRect, fogMats }) {
+  const { camera, size, scene } = useThree()
   const tmp = useMemo(() => new THREE.Vector3(), [])
-  useFrame(() => {
+  const look = useMemo(() => new THREE.Vector3(), [])
+  const k0 = useRef(0)
+  useFrame((_, dt) => {
     const s = state.current
-    // drag hint follows the boat until the first drag
+    const aspect = size.width / size.height
+    const tanV = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2))
+    const k = Math.max(1, LAKE_W / (2 * tanV * aspect * CAM_D.length())) // 1 on desktop and landscape tablets
+    // lake band = the screen above the phone frame on portrait phones (the frame and panel cover the rest)
+    const fr = sonarRect?.current?.frame
+    const bandBottom = k > 1 && fr ? Math.max(size.height * 0.35, Math.min(size.height, fr.getBoundingClientRect().top)) : size.height
+    const devCam = s.fishCam || s.logoCam || s.wreckCam || s.closeCam
+    const offY = devCam ? 0 : Math.round(size.height / 2 - bandBottom / 2)
+    if (offY > 0) { if (!camera.view?.enabled || camera.view.offsetY !== offY || camera.view.fullWidth !== size.width || camera.view.fullHeight !== size.height) camera.setViewOffset(size.width, size.height, 0, offY, size.width, size.height) }
+    else if (camera.view?.enabled) camera.clearViewOffset()
+    if (k !== k0.current) { // thin the fog and push the far plane with the camera distance
+      k0.current = k
+      for (const m of fogMats) { const u = m.userData.uniforms.uFogDensity; u.base ??= u.value; u.value = u.base / k }
+      if (scene.fog) { scene.fog.near = FOG.near * k; scene.fog.far = FOG.far * k }
+      camera.far = FOG.cam * k; camera.updateProjectionMatrix()
+    }
+    // drag hint follows the boat until the first drag, kept inside the screen
     if (s.hintEl) {
       tmp.set(s.boat.x, 0.6, s.boat.z).project(camera)
-      const px = ((tmp.x + 1) / 2) * size.width, py = ((1 - tmp.y) / 2) * size.height
-      s.hintEl.style.transform = `translate(${px.toFixed(1)}px, ${(py - 46).toFixed(1)}px) translate(-50%, -100%)`
+      const hw = (s.hintEl.offsetWidth || 160) / 2 + 8
+      const px = Math.min(size.width - hw, Math.max(hw, ((tmp.x + 1) / 2) * size.width))
+      const py = Math.max((s.hintEl.offsetHeight || 34) + 54, ((1 - tmp.y) / 2) * size.height - (k > 1 ? 22 : 46))
+      s.hintEl.style.transform = `translate(${px.toFixed(1)}px, ${py.toFixed(1)}px) translate(-50%, -100%)`
       s.hintEl.style.opacity = s.hasDragged ? '0' : '1'
     }
     // fixed 3/4 aerial view like the PL animations; slight parallax from the pointer
@@ -373,9 +400,13 @@ function Rig({ state }) {
       camera.lookAt(s.boat.x + 1, -0.6, s.boat.z)
       return
     }
-    // view from the south: drop-off timber on the left, rock hump on the right
-    camera.position.set(-14 + px * 4, 52 + py * 2, 66 + px * 2)
-    camera.lookAt(3 + px * 2, -9, 0)
+    // view from the south (desktop exactly as before); phones: pulled back, re-centred on a step preset's boat
+    const fx = k > 1 && s.frameX != null ? s.frameX : CAM_T.x
+    s.camX = s.camX == null ? fx : s.camX + (fx - s.camX) * Math.min(1, dt * 2.5)
+    const pk = k > 1 ? 0 : 1 // no pointer parallax on phones (a dragging finger would shake the view)
+    look.set(s.camX + px * 2 * pk, CAM_T.y, CAM_T.z)
+    camera.position.set(look.x + CAM_D.x * k + px * 2 * pk, CAM_T.y + CAM_D.y * k + py * 2 * pk, CAM_T.z + CAM_D.z * k + px * 2 * pk)
+    camera.lookAt(look)
   })
   return null
 }
@@ -424,7 +455,7 @@ export default function LakeScene({ state, sonarRect, paused = false }) {
       <Boat state={state} beamMats={beamMats} />
       <Beams key={state.current.specKey} state={state} />
       <PickPlane state={state} />
-      <Rig state={state} />
+      <Rig state={state} sonarRect={sonarRect} fogMats={beamMats} />
       <SonarScreen state={state} rect={sonarRect} lakeMats={beamMats} />
     </Canvas>
   )
