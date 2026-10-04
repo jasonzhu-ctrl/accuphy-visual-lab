@@ -39,7 +39,7 @@ export const sonarFragment = /* glsl */ `
   uniform float uTime;
   uniform float uFlat;        // 1 = Panoramic (plan view)
   uniform float uBedGain;     // extra near-range gain for the bottom + structure echo (PLM 0.62, PL 1)
-  uniform float uDepthCap;    // 1 = the bottom's soft cap also follows the depth below the transducer (PL), 0 = range only (PLM)
+  uniform vec3 uCapDepth;     // the bottom's soft cap by depth below the transducer: from x to y metres, up to strength z
   uniform float uStreak;      // 1 = radial streak texture, 0 = mottled speckle (PLM Down)
   uniform float uDebug;
   uniform sampler2D uLUT;
@@ -312,16 +312,23 @@ export const sonarFragment = /* glsl */ `
         // (38–44 % of the lit pixels white in PL scenes; the app's bottom scenes 6–7 %). Past the near range (where TVG
         // already tames it) the integrated part saturates softly (K 0.4), so the body stays orange, and a thin
         // first-return line brings back the app's hot leading edge.
-        // PingLive: the cap also follows the depth below the transducer (#91). The middle of the lake became an 8–9 m
-        // valley (Jason 2026-10-04: 最深的地方做30ft深), which the wide fan meets at 8–11 m, inside the 6–14 m range
-        // ramp, and AUTO depth zooms it in: the default view went to 19–20 % white. Capping from 5.5 m below the
-        // transducer (~21 ft of water) to 7.5 m (~28 ft) brings it back to 4 % (Down) and 9 % (Forward) and leaves the
-        // shelf, the island and the deep floor as they were. The Mini's own near gain (uBedGain) already holds it at 5–8 %.
-        float capR = smoothstep(6.0, 14.0, r), capD = uDepthCap * smoothstep(5.5, 7.5, p.y);
+        // The cap also follows the depth below the transducer (#91, #92). The middle of the lake became shallower
+        // (Jason 2026-10-04: 最深的地方做30ft深, then 相对缓慢得向深水过度: a slope from ~30 to 80 ft), and those bottoms sit
+        // inside the 6–14 m range ramp while AUTO depth zooms them in: the default view went to 19–22 % white (PL) and
+        // 18–26 % (Mini, Down/Combo). PingLive caps from 5.5 m to 7.5 m below the transducer (~21–28 ft of water), full
+        // strength; the Mini from 7.5 m to 9.5 m (~28–34 ft) at 80 %, because its own near gain (uBedGain) already holds
+        // its 28–30 ft bottoms at 5–8 % and a full cap took its 36 ft bottom to 0 %. The shelf, the island and the deep
+        // floor keep their look.
+        float capR = smoothstep(6.0, 14.0, r), capD = uCapDepth.z * smoothstep(uCapDepth.x, uCapDepth.y, p.y);
         float accI = acc / 16.0, K = mix(3.0, 0.4, max(capR, capD)); // (4–10 m on range tried: the Mini's calibrated shelf lost its hot edge, 6 → 0.3 % white)
         accI = K * (1.0 - exp(-accI / K));
         acc = accI + 0.7 * peak + 0.3 * edge * (0.55 + 0.6 * filament) + 0.9 * spk;
-        float atten = 1.0 - 0.4 * clamp(r / uRange, 0.0, 1.0);
+        // Bottoms past the cap depth are toned no nearer than 80 % of the range window (#92). With the middle sloping
+        // from 30 to 80 ft, Forward (the visitor's fixed range) drew its nearer bottom at 11–22 % white against the old
+        // plateau's 8 %; now 7–12 %. Down's AUTO range already puts the bottom at ~80 %, so Down barely changes
+        // (0.9 started to dim the deep floor in Down, 8 → 5 %).
+        float rT = mix(r, max(r, 0.8 * uRange), capD);
+        float atten = 1.0 - 0.4 * clamp(rT / uRange, 0.0, 1.0);
         // near-range gain (TVG): close returns get less gain, like a real sonar's time-varying gain. In shallow
         // water every ray across the slab hits the bottom at the same range, the band saturates to a solid white
         // slab and AUTO depth then zooms it (Jason 2026-09-24: 浅水的时候 … 过爆感太强了 可以折中一点). Full gain

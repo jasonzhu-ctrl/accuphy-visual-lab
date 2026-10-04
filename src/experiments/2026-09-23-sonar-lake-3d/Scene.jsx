@@ -108,7 +108,17 @@ function Wreck({ mat }) {
     return g
   }, [])
   const { x, z, rot } = SMALL_WRECK
-  return <mesh geometry={geo} material={mat} position={[x, bedY(x, z) - 0.2, z]} rotation={rot} />
+  // it lay on the flat basin floor; on the #92 slope it follows the bottom (its up axis turned to the bed's normal,
+  // averaged over the hull's length), so neither end floats or digs in
+  const tilt = useMemo(() => {
+    const e = 3, n = new THREE.Vector3(bedY(x - e, z) - bedY(x + e, z), 2 * e, bedY(x, z - e) - bedY(x, z + e)).normalize()
+    return new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), n)
+  }, [x, z])
+  return (
+    <group position={[x, bedY(x, z) - 0.2, z]} quaternion={tilt}>
+      <mesh geometry={geo} material={mat} rotation={rot} />
+    </group>
+  )
 }
 
 // dev (?fishtest): a dock piling 12 m ahead of the ?boat=16,11 apex — the app's reference frame
