@@ -9,16 +9,20 @@ export const drawnLen = (f) => f.len * (SPECIES[f.species].scale ?? FISH_DISPLAY
 // back → side → belly gradient. pattern: 0 none · 1 dark vertical bars on the
 // sides · 2 light spots · 3 dark speckle all over · 4 dark lateral band of
 // blotches · 5 dark saddles on the back · 6 small black spots on the upper half
-// · 7 bright silver lateral stripe · 8 broken, irregular dark vertical bars (musky).
+// · 7 bright silver lateral stripe · 8 broken, irregular dark vertical bars (musky) · 9 rows of pale bean-shaped spots
+// (northern pike) · 10 dark bars tapering down a yellow side, orange lower fins (yellow perch).
 export const SPECIES = {
   largemouth: { name: 'Largemouth bass', len: [0.38, 0.55], body: 'bass',     back: '#2f4a1f', side: '#6f8f3f', belly: '#e9e7cc', pattern: 4 }, // green, black lateral band
   smallmouth: { name: 'Smallmouth bass', len: [0.33, 0.45], body: 'bass',     back: '#4a3d1c', side: '#8a6d34', belly: '#dccfa5', pattern: 1 }, // bronze-brown, vertical bars
-  walleye:    { name: 'Walleye',         len: [0.45, 0.70], body: 'salmonid', back: '#55582a', side: '#c49a3c', belly: '#f4efd8', pattern: 5 }, // golden-brass, dark saddles
+  walleye:    { name: 'Walleye',         len: [0.45, 0.70], body: 'walleye',  back: '#55582a', side: '#c49a3c', belly: '#f4efd8', pattern: 5 }, // golden-brass, dark saddles, glassy eye, white tail tip
   crappie:    { name: 'Crappie',         len: [0.25, 0.35], body: 'panfish',  back: '#4f5d5a', side: '#aab4b4', belly: '#f1f4f4', pattern: 3 }, // silver, dark mottling
   smelt:      { name: 'Smelt',           len: [0.12, 0.20], body: 'bait',     back: '#6a8a84', side: '#c7d6d8', belly: '#f4f8f8', pattern: 7 }, // translucent olive back, silver stripe
   musky:      { name: 'Muskellunge',     len: [0.75, 1.30], body: 'pike',     back: '#3f4a2c', side: '#8f9f6e', belly: '#e9e4cf', pattern: 8, scale: 2.2 }, // olive-brown back, silver-green/golden sides, broken dark bars; drawn 2.2× (Jason, #89)
   laketrout:  { name: 'Lake trout',      len: [0.60, 0.90], body: 'salmonid', back: '#2f3b37', side: '#5c6a63', belly: '#d9ddd4', pattern: 2 }, // dark grey-green, light spots
   salmon:     { name: 'Chinook salmon',  len: [0.70, 1.00], body: 'salmonid', back: '#34485a', side: '#b3c0c9', belly: '#f2f4f5', pattern: 6 }, // steel-blue back, silver, black spots
+  // phase 3 (#89, #90): Canada's staples
+  yellowperch: { name: 'Yellow perch',   len: [0.18, 0.30], body: 'perch',    back: '#4a5a24', side: '#c8b247', belly: '#efe6c2', pattern: 10 }, // olive back, yellow sides, dark bars
+  pike:       { name: 'Northern pike',   len: [0.50, 0.90], body: 'pike',     back: '#2f4426', side: '#6e8a4a', belly: '#e6e8d0', pattern: 9 }, // green, pale bean-shaped spots
 }
 
 let seed = 11
@@ -80,6 +84,15 @@ export function makePopulation(bedY, obstacles) {
   addOne('salmon', 2, -22, 9.0, 0.82); addOne('salmon', 14, -24, 12.0, 0.9); addOne('salmon', -8, -26, 10.0, 0.76)
   ;[[10, -36, 18], [22, -40, 24], [-4, -40, 15], [30, -34, 20], [6, -50, 26], [18, -52, 14], [-14, -46, 21], [38, -28, 16], [48, -38, 22], [56, -30, 12], [42, -46, 26]]
     .forEach(([x, z, off]) => addOne('salmon', x, z, off, 0.7 + rnd() * 0.3))
+  // phase 3 (Jason #85/#89): more walleye along the drop-off, yellow perch schools on the weedy shelf and the timber
+  // edge, northern pike cruising the weed edges. Appended after everyone else, so no earlier fish moves.
+  add('walleye', -14, 2, 0.6, 4, 12)
+  add('walleye', 4, -20, 0.8, 3, 12)
+  add('walleye', 14, 20, 0.7, 3, 10)
+  add('yellowperch', -46, 4, 1.2, 9, 7)
+  add('yellowperch', -32, 16, 1.0, 8, 6)
+  add('yellowperch', -24, -8, 1.4, 8, 6)
+  addOne('pike', -52, 9, 1.4, 0.62); addOne('pike', -40, -3, 1.6, 0.8); addOne('pike', -30, 22, 1.4, 0.55); addOne('pike', 34, 25, 1.8, 0.86)
   // Spread bass, musky and salmon through the water column — some deep, some shallow (Jason 2026-09-24:
   // 水层分散一点 有深有浅). Only the depth changes (x/z stay), from a per-fish hash so no rnd() calls shift.
   fish.forEach((f, i) => {
@@ -102,6 +115,10 @@ export function makePopulation(bedY, obstacles) {
   })
   keepOffBottom(fish, bedY)
   if (obstacles) clearPaths(fish, obstacles, bedY) // a moved loop keeps the same bottom gap at its new spot
+  // fewer smelt (phase 3, #85): every third one goes after placement, so the rest keep their exact places and the bait
+  // balls stay dense but cheaper
+  let nSmelt = 0
+  for (let i = fish.length - 1; i >= 0; i--) if (fish[i].species === 'smelt' && nSmelt++ % 3 === 2) fish.splice(i, 1)
   // dev: ?fishtest — fixed fish at known spots so the sonar marks can be compared with the app's
   // frames (docs/sonar-style.md §7.2). The transducer sits ≈ (+3.0, −0.9, +0.5) from the ?boat point.
   // ?boat=28,11 → apex ≈ (31, −0.9, 11.5): Down view.  ?boat=16,11 → apex ≈ (19, −0.9, 11.5): PLM Forward.
@@ -252,9 +269,10 @@ const CHASE = {
   salmon:     { r: 14, maxLen: 8, speed: 4.0, pEnter: 0.45, pStay: 0.025, rise: [0.3, 0.55], toward: [0.2, 0.4], T1: [1.8, 2.6], T2: [0.8, 1.5], T3: [5, 8], cool: [25, 50] },
   largemouth: { r: 12, maxLen: 5, speed: 3.0, pEnter: 0.35, pStay: 0.02, rise: [0.25, 0.5], toward: [0.2, 0.4], T1: [1.2, 1.8], T2: [0.6, 1.0], T3: [4, 6], cool: [20, 40] },
   smallmouth: { r: 12, maxLen: 5, speed: 3.0, pEnter: 0.35, pStay: 0.02, rise: [0.25, 0.5], toward: [0.2, 0.4], T1: [1.2, 1.8], T2: [0.6, 1.0], T3: [4, 6], cool: [20, 40] },
+  pike:       { r: 0, maxLen: 0, speed: 4.0, pEnter: 0, pStay: 0, rise: [0, 0], toward: [0, 0], T1: [1, 1], T2: [1, 1], T3: [4, 6], cool: [30, 60] }, // no rises to the boat; darts only
 }
-const BAIT = new Set(['smelt', 'crappie'])
-const BASS = new Set(['largemouth', 'smallmouth'])
+const BAIT = new Set(['smelt', 'crappie', 'yellowperch'])
+const DARTERS = new Set(['largemouth', 'smallmouth', 'pike']) // strike at bait now and then (pike: phase 3)
 const pick = ([a, b]) => a + (b - a) * Math.random()
 const actEnd = (a) => a.t0 + a.T1 + a.T2 + a.T3
 // an act that moves the fish by (dx, dy, dz) from where it is at t0
@@ -324,7 +342,7 @@ export function stepBehaviours(pop, t, dt, apex, circles, bedY) {
         if (t > f.nextBurst) { f.burst = { t0: t, D: pick([3, 5]), k: pick([2.2, 3.0]) }; f.nextBurst = t + f.burst.D + pick([20, 50]) }
       }
       // bass: a dart at bait within 8 m, now and then (15–40 s apart)
-      if (BASS.has(f.species) && free) {
+      if (DARTERS.has(f.species) && free) {
         if (!f.nextDart) f.nextDart = t + pick([5, 40])
         if (t > f.nextDart) {
           f.nextDart = t + pick([30, 80]) // now and then, not a feeding frenzy

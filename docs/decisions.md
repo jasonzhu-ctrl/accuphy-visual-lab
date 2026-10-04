@@ -1303,3 +1303,37 @@ Numbered log. Newest at the bottom.
       - the new counts (more walleye, fewer smelt) are shown to Jason when it is built.
       Built by the cloud chat. Files taken: `fishGeometry.js`, `fish.js`, `lakeMaterial.js` (the `FISH` blocks) and, in
       `Scene.jsx`, `FishGroup` and `Fish` (backlog).
+
+90. **2026-10-04** — **Fish phase 3 built: eyes, real fins, walleye's own body, yellow perch and northern pike** (go: #89;
+    plan: `docs/boat-fish-plan.md` §3b–c).
+    - **Anatomy** (`fishGeometry.js`, shaded in `lakeMaterial.js`):
+      - every fish has eyes: a black pupil, a gold iris (silver for smelt) and a catch-light; the walleye's eye is
+        milky-silver and glows a little in the beam;
+      - bass, walleye and perch get a spiny dorsal (a row of spines) plus a soft dorsal: joined by a notch on bass,
+        separate on the percids. Trout and salmon get the small adipose fin, and every fish gets paired pelvic fins;
+      - tails: bass slightly forked (was round); the walleye's lower lobe has its white tip;
+      - fins are see-through (tinted toward the water) with darker rays;
+      - smoother bodies on the big fish (16 sides instead of 14);
+      - round spots instead of square ones (crappie mottling, lake-trout and chinook spots); softer bass blotches and
+        walleye saddles.
+    - **New bodies and species:**
+      - walleye moves off the trout body onto a slender percid body;
+      - yellow perch: a deeper percid body, olive back, 6–8 dark bars tapering down yellow sides, orange lower fins;
+      - northern pike: on the pike body, green with rows of pale bean-shaped spots. Pike strike at bait now and then,
+        like bass (48 strikes in 15 simulated minutes); perch scatter like the other bait.
+    - **Counts** (Jason sees them now, #85):
+      - walleye 6 → 16, along the drop-off;
+      - yellow perch 25, in schools on the weedy shelf and the timber edge;
+      - northern pike 4, on the weed edges;
+      - smelt 205 → 137 (every third one removed after placement).
+      Total 298 → 269. The 229 fish that stayed are exactly where they were; only the musky moved slightly, from its
+      2.2× size (#89).
+    - **Cost:** fish triangles ≈ 105 k → ≈ 140 k. The default desktop view is 76 draw calls (two more body groups) and
+      791 k triangles: still below the 876 k before phase 1.
+    - **Checks:**
+      - `fish-sim.mjs` for 15 minutes: 0 structure, bottom or surface hits; lowest gap 0.37 m;
+      - close-ups of every species before and after;
+      - the shelf in Panoramic: fish marks look as before, with the new mix and no white blow-out;
+      - the build passes; no console errors on desktop or phone; no new textures.
+    - **Bug found and fixed while testing:** a body type missing from the swim wavelength table turned the fish
+      invisible (NaN). The table now falls back to 0.9.

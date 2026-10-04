@@ -52,10 +52,10 @@ it is done. ✅ done · 🔧 in progress · ⬜ open.
   - (2) ✅ **built (#88), waiting for Jason's look:** a low-key bass boat lofted in code (V hull, strakes, flat sheer,
     flared bow), new decks, consoles, seats and outboard. The trolling motor and transducer are unchanged; there is a
     gentle bob, a foam line and a V wake when dragged. The files it took are free again.
-  - (3) 🔧 **in progress (#89, cloud chat, branch `claude/modest-keller-ccfnhq`):** fish eyes, fins, percid/pike
-    bodies, perch and pike, more walleye, fewer smelt. **Files taken:** `fishGeometry.js`, `fish.js`, `lakeMaterial.js`
-    (the `FISH` blocks), and in `Scene.jsx` `FishGroup` and `Fish`. Other chats: please leave these until this entry
-    says they are free.
+  - (3) ✅ **built (#90), waiting for Jason's look:**
+    - eyes, spiny + soft dorsals, pelvic and adipose fins, see-through rayed fins, round spots;
+    - walleye on its own body; new yellow perch (25) and northern pike (4); walleye 16; smelt 137.
+    The files it took are free again.
   - (4) optional: world edge, depth light, caustics, weeds.
 - ⬜ **Desktop: range on the phone + phone size (approved #84, plan B; the local phone-layout chat builds it):**
   `docs/desktop-phone-controls-plan.md`. The desktop counterpart of #78/#79:
