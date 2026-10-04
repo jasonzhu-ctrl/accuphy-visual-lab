@@ -177,7 +177,7 @@ function Logo({ mat, stoneMat }) {
 // Realistic bodies per type — see fishGeometry.js
 // Swimming (decision #86, docs/boat-fish-plan.md §3a): each fish gets aSwim = (wave phase, activity, turn bend,
 // wavelength) every frame and the vertex shader bends the body (lakeMaterial.js). Body wavelength in body lengths.
-const WAVELENGTH = { bass: 0.95, panfish: 0.95, salmonid: 0.85, bait: 0.85, pike: 0.8 }
+const WAVELENGTH = { bass: 0.95, panfish: 0.95, perch: 0.9, walleye: 0.85, salmonid: 0.85, bait: 0.85, pike: 0.8 }
 const smooth01 = (a, b, x) => { const u = Math.min(1, Math.max(0, (x - a) / (b - a))); return u * u * (3 - 2 * u) }
 function FishGroup({ mat, body, fish }) {
   const geo = useMemo(() => {
@@ -193,7 +193,7 @@ function FishGroup({ mat, body, fish }) {
     g.setAttribute('aBelly', new THREE.InstancedBufferAttribute(belly, 3))
     g.setAttribute('aSide', new THREE.InstancedBufferAttribute(side, 3))
     const swim = new Float32Array(fish.length * 4)
-    fish.forEach((f, i) => { swim[i * 4] = (i * 2.39996) % (2 * Math.PI); swim[i * 4 + 1] = 0.4; swim[i * 4 + 3] = WAVELENGTH[body] }) // tails out of step
+    fish.forEach((f, i) => { swim[i * 4] = (i * 2.39996) % (2 * Math.PI); swim[i * 4 + 1] = 0.4; swim[i * 4 + 3] = WAVELENGTH[body] ?? 0.9 }) // tails out of step
     g.setAttribute('aSwim', new THREE.InstancedBufferAttribute(swim, 4).setUsage(THREE.DynamicDrawUsage))
     return g
   }, [body, fish])

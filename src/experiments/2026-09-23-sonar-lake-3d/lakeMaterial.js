@@ -34,13 +34,13 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
       #ifdef FISH
         attribute float aPattern; attribute vec3 aBelly; attribute vec3 aSide;
         attribute vec4 aSwim; // per fish, set every frame in Scene.jsx: wave phase, activity, turn bend, wavelength
-        varying float vPattern; varying vec3 vBelly; varying vec3 vSide; varying vec3 vLocal;
+        varying float vPattern; varying vec3 vBelly; varying vec3 vSide; varying vec3 vLocal; varying vec2 vUv;
         uniform float uSonarPass; uniform float uFishSonarScale;
       #endif
       void main() {
         vec3 pos = position, nrm = normal;
       #ifdef FISH
-        vPattern = aPattern; vBelly = aBelly; vSide = aSide; vLocal = position; // markings stay on the body
+        vPattern = aPattern; vBelly = aBelly; vSide = aSide; vLocal = position; vUv = uv; // markings stay on the body; uv: body, eye or fin (fishGeometry.js)
         // fish are not rendered in the sonar passes any more (analytic marks, sonarMarks.js)
         // Swimming (decision #86, docs/boat-fish-plan.md §3a): the body bends sideways (local z) with a wave that
         // runs from head to tail. s = 0 at the nose (x = +0.5) → 1 at the tail tip (x ≈ −0.7). Half-amplitude:
@@ -81,8 +81,16 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
       uniform vec4 uAng[${MAX_BEAMS}]; uniform vec2 uRT[${MAX_BEAMS}]; uniform vec4 uBox[${MAX_BEAMS}];
       uniform float uReveal; uniform vec3 uHighlight; uniform float uSonarPass;
       #ifdef FISH
-        varying float vPattern; varying vec3 vBelly; varying vec3 vSide; varying vec3 vLocal;
+        varying float vPattern; varying vec3 vBelly; varying vec3 vSide; varying vec3 vLocal; varying vec2 vUv;
         float hash3(vec3 p) { return fract(sin(dot(p, vec3(127.1, 311.7, 74.7))) * 43758.5453); }
+        float vn1(float x) { float i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f); return mix(hash3(vec3(i, 7.1, 3.3)), hash3(vec3(i + 1.0, 7.1, 3.3)), f); }
+        // round spots on a jittered grid (in some cells only): 1 inside a spot, soft edge
+        float spots(vec3 p, float scale, float rad, float keep) {
+          vec3 q = p * scale, c = floor(q);
+          vec3 j = vec3(hash3(c), hash3(c + 17.0), hash3(c + 31.0)) - 0.5;
+          float d = length(q - c - 0.5 - 0.5 * j);
+          return (1.0 - smoothstep(rad * 0.75, rad, d)) * step(1.0 - keep, hash3(c + 5.0));
+        }
       #endif
 
       float insideBeam(int k, vec3 p, float margin) {
@@ -112,6 +120,7 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
         float lambert = max(dot(n, uSun), 0.0);
         float hemi = 0.5 + 0.5 * n.y;
         vec3 albedo = vColor;
+        bool isEye = false;
       #ifdef FISH
         // back → side → belly gradient by local height (geometry is 1 unit long, |y| ≲ 0.23)
         float hgt = vLocal.y;
@@ -120,24 +129,37 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
         albedo = mix(mix(vColor, vSide, tb), vBelly, ts);
         float upper = 1.0 - ts; // 1 on back/sides, 0 on belly
         int pat = int(vPattern + 0.5);
-        if (pat == 1) { // dark vertical bars, strongest on the sides, fade on the belly
+        isEye = vUv.x < -0.5 && vUv.x > -1.5;
+        if (isEye) { // decision #90: a black pupil, an iris ring, a dark rim and a catch-light toward the nose
+          vec2 e = vec2((vUv.x + 1.0) * 5.0, vUv.y);
+          float r = length(e);
+          vec3 iris = pat == 5 ? vec3(0.66, 0.68, 0.56) : pat == 7 ? vec3(0.78, 0.8, 0.82) : vec3(0.72, 0.55, 0.2); // walleye milky-silver, smelt silver, the rest gold
+          albedo = mix(vec3(0.02), iris, smoothstep(0.4, 0.5, r));
+          albedo = mix(albedo, vec3(0.05), smoothstep(0.84, 0.96, r));
+          albedo += vec3(0.9) * (1.0 - smoothstep(0.0, 0.22, length(e - vec2(0.3, 0.32))));
+        } else if (vUv.x < -1.5) { // fins: see-through (toward the water's colour), with darker rays
+          float ray = smoothstep(0.22, 0.5, abs(fract(vUv.y * 9.0) - 0.5));
+          albedo = mix(vSide, uFogColor, 0.35) * (0.72 + 0.28 * ray);
+          if (pat == 5 && vLocal.x < -0.655 && hgt < -0.135) albedo = vec3(0.9, 0.9, 0.86);      // walleye: the white tip of the lower tail lobe
+          if (pat == 10 && hgt < -0.04) albedo = mix(albedo, vec3(0.86, 0.42, 0.12), 0.7);       // yellow perch: orange lower fins
+        } else if (pat == 1) { // dark vertical bars, strongest on the sides, fade on the belly
           float bar = smoothstep(0.3, 0.55, abs(fract(vLocal.x * 8.0 + 0.25) - 0.5) * 2.0);
           albedo *= mix(0.5, 1.0, bar) * upper + (1.0 - upper);
-        } else if (pat == 2) { // light spots
-          float sp = step(0.84, hash3(floor(vLocal * 24.0)));
+        } else if (pat == 2) { // light spots (round)
+          float sp = spots(vLocal, 24.0, 0.34, 0.45);
           albedo = mix(albedo, albedo * 1.9 + 0.2, sp * upper);
-        } else if (pat == 3) { // dark speckle / mottling
-          float sp = step(0.8, hash3(floor(vLocal * 26.0)));
+        } else if (pat == 3) { // dark speckle / mottling (round blotches)
+          float sp = max(spots(vLocal, 20.0, 0.42, 0.5), spots(vLocal + 0.37, 34.0, 0.38, 0.35));
           albedo = mix(albedo, albedo * 0.4, sp * (0.3 + 0.7 * upper));
         } else if (pat == 4) { // dark lateral band of blotches (largemouth)
-          float st = 1.0 - smoothstep(0.02, 0.05, abs(hgt + 0.02));
-          float br = step(0.35, hash3(floor(vLocal * vec3(9.0, 1.0, 1.0))));
+          float st = 1.0 - smoothstep(0.02, 0.05, abs(hgt + 0.02 + 0.012 * (vn1(vLocal.x * 23.0) - 0.5)));
+          float br = smoothstep(0.32, 0.45, vn1(vLocal.x * 9.0));
           albedo = mix(albedo, albedo * 0.3, st * br);
         } else if (pat == 5) { // dark saddles across the back (walleye)
-          float sad = step(0.45, hash3(floor(vLocal * vec3(6.0, 1.0, 1.0)))) * smoothstep(-0.02, 0.1, hgt);
+          float sad = smoothstep(0.42, 0.56, vn1(vLocal.x * 6.0 + 0.5)) * smoothstep(-0.02, 0.1, hgt);
           albedo = mix(albedo, albedo * 0.55, sad);
         } else if (pat == 6) { // small black spots on the upper half (chinook)
-          float sp = step(0.9, hash3(floor(vLocal * 30.0))) * smoothstep(-0.04, 0.06, hgt);
+          float sp = spots(vLocal, 30.0, 0.3, 0.42) * smoothstep(-0.04, 0.06, hgt);
           albedo = mix(albedo, vec3(0.05), sp);
         } else if (pat == 8) { // musky: dark olive-brown bars, broken into dashes, strongest mid-side
           float bx = fract(vLocal.x * 7.0 + 0.3);
@@ -145,6 +167,15 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
           float broken = step(0.3, hash3(floor(vLocal * vec3(7.0, 11.0, 1.0)) + 2.0)); // gaps in the bars
           float band = smoothstep(-0.12, -0.04, hgt) * (1.0 - smoothstep(0.06, 0.13, hgt));
           albedo = mix(albedo, vec3(0.16, 0.17, 0.09), bar * broken * band * 0.85);
+        } else if (pat == 9) { // northern pike: rows of pale, bean-shaped spots on the green sides
+          vec2 q = vec2(vLocal.x * 16.0 + 0.5 * floor(vLocal.y * 34.0), vLocal.y * 34.0);
+          float sp = 1.0 - smoothstep(0.24, 0.34, length((fract(q) - 0.5) * vec2(0.8, 1.5)));
+          float band = smoothstep(-0.11, -0.05, hgt) * (1.0 - smoothstep(0.07, 0.12, hgt));
+          albedo = mix(albedo, vec3(0.84, 0.85, 0.58), sp * band * 0.85);
+        } else if (pat == 10) { // yellow perch: 6–8 dark bars, broad on the back, tapering down the side
+          float bx = abs(fract(vLocal.x * 6.5 + 0.2) - 0.5);
+          float bar = 1.0 - smoothstep(0.12, 0.2 * smoothstep(-0.1, 0.08, hgt) + 0.02, bx);
+          albedo = mix(albedo, vec3(0.2, 0.22, 0.08), bar * smoothstep(-0.09, -0.02, hgt) * 0.8);
         } else if (pat == 7) { // bright silver lateral stripe (smelt)
           float st = 1.0 - smoothstep(0.015, 0.04, abs(hgt + 0.015));
           albedo = mix(albedo, vec3(0.95, 0.97, 1.0), st * 0.8);
@@ -190,6 +221,7 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
         vec3 V = normalize(cameraPosition - vWorld);
         float rim = pow(1.0 - max(dot(n, V), 0.0), 2.2);
         col += uHighlight * rim * beam * 1.6 + vec3(1.0, 0.98, 0.9) * pow(rim, 6.0) * beam * 1.2;
+        if (isEye && int(vPattern + 0.5) == 5) col += vec3(0.14, 0.15, 0.12) * (0.25 + beam); // walleye: the glassy eye catches the light
       #endif
         // sonar pass: alpha carries "is this a fish" so the screen can draw fish brighter
         gl_FragColor = vec4(col, uSonarPass > 0.5 ? isFish : 1.0);

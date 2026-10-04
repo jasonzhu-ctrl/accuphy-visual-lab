@@ -1,7 +1,7 @@
 # Boat + fish plan: a real bass boat, fish that swim naturally (proposal, 2026-10-03)
 
 Status: boat decided (#83); fish decided (#85); **phase 1 built (#86)**; **phase 2 built (#88)** and approved (#89);
-**phase 3 in progress (#89)**. Phase 4 waits for Jason's go (CLAUDE.md: "我没说动不要动").
+**phase 3 built (#90)**, waiting for Jason's look. Phase 4 waits for Jason's go (CLAUDE.md: "我没说动不要动").
 
 ## 中文摘要（给 Jason）
 
@@ -178,6 +178,11 @@ lateral. Let s = 0.5 − x (0 at the nose, 1 at the peduncle; the caudal fin rea
 - New bodies:
   - `percid` for walleye and yellow perch (CC0 perch mesh as a shape reference; yellow perch has 6–8 dark vertical bars);
   - a northern pike pattern (light oval spots on a green body).
+
+**Built (#90):**
+- Walleye and yellow perch got separate percid bodies (slender vs deep), not one shared `percid`.
+- Also added: pelvic fins on every fish and the adipose fin on salmonids. The square spots became round.
+- Fins are see-through by tint (no real transparency, so no sorting cost).
 
 ### 3c. Species mix (proposal, phase 3)
 
