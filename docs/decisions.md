@@ -1290,3 +1290,16 @@ Numbered log. Newest at the bottom.
       - the build passes; no console errors; the only new texture is an 8-bit carpet noise (Safari-safe).
     - **Dev aid:** `?cam=boat[:side|:bow|:stern|:top|:under]` views the boat from several angles. Without a suffix, it
       is the old stern-quarter view.
+
+89. **2026-10-04** — **The new boat is approved; the musky is drawn 2.2×; fish phase 3 starts** (Jason, on the #88 report:
+    "1. 可以 2. musky 2.2倍 3.可以").
+    - **Boat (#88):** approved as built.
+    - **Musky display size:** 2.2× its true length (was 2.6×), so the biggest musky (1.28 m) is drawn 2.8 m long instead
+      of 3.3 m. Set through the per-species `scale` in `fish.js` (#85). Every other species stays at 2.6×, and the
+      sonar keeps the true length. `fish-sim.mjs`: 0 hits.
+    - **Phase 3 is a go** (`docs/boat-fish-plan.md` §3b–c):
+      - eyes; a two-part dorsal fin for bass and percids; truer tails (walleye's white lower tip); fins with rays;
+      - a `percid` body for walleye and the new yellow perch, and northern pike on the pike body;
+      - the new counts (more walleye, fewer smelt) are shown to Jason when it is built.
+      Built by the cloud chat. Files taken: `fishGeometry.js`, `fish.js`, `lakeMaterial.js` (the `FISH` blocks) and, in
+      `Scene.jsx`, `FishGroup` and `Fish` (backlog).

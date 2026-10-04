@@ -45,15 +45,17 @@ it is done. ✅ done · 🔧 in progress · ⬜ open.
 ## 3D lake (Phase 3 polish)
 - 🔧 **Boat + fish plan (2026-10-03):** `docs/boat-fish-plan.md`. Boat decided (#83): a low-key bass boat; no raised
   bow, no Power-Poles; the trolling motor and transducer stay as they are. Fish decided (#85): all species stay, yellow
-  perch and northern pike join in phase 3, display size per species (musky today's size or a little smaller, the rest
-  2.6×). Four phases:
+  perch and northern pike join in phase 3, display size per species (musky 2.2× (#89), the rest 2.6×). Four phases:
   - (1) ✅ **built (#86), waiting for Jason's look:** the bodies swim with a travelling wave on the GPU, the tail beat
     follows the speed, the body curves into quick turns, the wrong-axis "wag" is gone, lighter smelt (−13 % triangles).
     The files it took are free again. Still open: Jason picks the musky's size (2.6× / 2.2× / 1.9× side-by-side).
   - (2) ✅ **built (#88), waiting for Jason's look:** a low-key bass boat lofted in code (V hull, strakes, flat sheer,
     flared bow), new decks, consoles, seats and outboard. The trolling motor and transducer are unchanged; there is a
     gentle bob, a foam line and a V wake when dragged. The files it took are free again.
-  - (3) fish eyes, fins, percid/pike bodies, perch and pike, more walleye;
+  - (3) 🔧 **in progress (#89, cloud chat, branch `claude/modest-keller-ccfnhq`):** fish eyes, fins, percid/pike
+    bodies, perch and pike, more walleye, fewer smelt. **Files taken:** `fishGeometry.js`, `fish.js`, `lakeMaterial.js`
+    (the `FISH` blocks), and in `Scene.jsx` `FishGroup` and `Fish`. Other chats: please leave these until this entry
+    says they are free.
   - (4) optional: world edge, depth light, caustics, weeds.
 - ⬜ **Desktop: range on the phone + phone size (approved #84, plan B; the local phone-layout chat builds it):**
   `docs/desktop-phone-controls-plan.md`. The desktop counterpart of #78/#79:
