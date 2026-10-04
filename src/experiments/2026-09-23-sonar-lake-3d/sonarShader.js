@@ -39,6 +39,7 @@ export const sonarFragment = /* glsl */ `
   uniform float uTime;
   uniform float uFlat;        // 1 = Panoramic (plan view)
   uniform float uBedGain;     // extra near-range gain for the bottom + structure echo (PLM 0.62, PL 1)
+  uniform float uDepthCap;    // 1 = the bottom's soft cap also follows the depth below the transducer (PL), 0 = range only (PLM)
   uniform float uStreak;      // 1 = radial streak texture, 0 = mottled speckle (PLM Down)
   uniform float uDebug;
   uniform sampler2D uLUT;
@@ -311,7 +312,13 @@ export const sonarFragment = /* glsl */ `
         // (38–44 % of the lit pixels white in PL scenes; the app's bottom scenes 6–7 %). Past the near range (where TVG
         // already tames it) the integrated part saturates softly (K 0.4), so the body stays orange, and a thin
         // first-return line brings back the app's hot leading edge.
-        float accI = acc / 16.0, K = mix(3.0, 0.4, smoothstep(6.0, 14.0, r)); // (4–10 m tried: the Mini's calibrated shelf lost its hot edge, 6 → 0.3 % white)
+        // PingLive: the cap also follows the depth below the transducer (#91). The middle of the lake became an 8–9 m
+        // valley (Jason 2026-10-04: 最深的地方做30ft深), which the wide fan meets at 8–11 m, inside the 6–14 m range
+        // ramp, and AUTO depth zooms it in: the default view went to 19–20 % white. Capping from 5.5 m below the
+        // transducer (~21 ft of water) to 7.5 m (~28 ft) brings it back to 4 % (Down) and 9 % (Forward) and leaves the
+        // shelf, the island and the deep floor as they were. The Mini's own near gain (uBedGain) already holds it at 5–8 %.
+        float capR = smoothstep(6.0, 14.0, r), capD = uDepthCap * smoothstep(5.5, 7.5, p.y);
+        float accI = acc / 16.0, K = mix(3.0, 0.4, max(capR, capD)); // (4–10 m on range tried: the Mini's calibrated shelf lost its hot edge, 6 → 0.3 % white)
         accI = K * (1.0 - exp(-accI / K));
         acc = accI + 0.7 * peak + 0.3 * edge * (0.55 + 0.6 * filament) + 0.9 * spk;
         float atten = 1.0 - 0.4 * clamp(r / uRange, 0.0, 1.0);

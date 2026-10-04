@@ -116,7 +116,7 @@ export function placeAll() {
   const items = { tall: [], bush: [], stump: [], log: [], weed: [], rock: [] }
   // tall timber: along the old shoreline / drop-off (depth 7–14 m), clumped, plus the deep basin edge
   scatter(70, (x, z) => (d(x, z) > 7 && d(x, z) < 14 ? 0.9 : 0.03) * Math.min(1, clump(x, z, 0.06, 1)))
-    .forEach(([x, z]) => items.tall.push({ x, z, y: bedY(x, z) - 0.2, s: 3 + rnd() * 7, rot: rnd() * 6.28, tilt: (rnd() - 0.5) * 0.2 }))
+    .forEach(([x, z]) => items.tall.push({ x, z, y: bedY(x, z) - 0.2, s: Math.min(3 + rnd() * 7, -bedY(x, z) - 1.2), rot: rnd() * 6.28, tilt: (rnd() - 0.5) * 0.2 })) // drowned: the top stays 1 m under water (#91)
   // bushy submerged trees: shelf and hump flanks (depth 4–10 m), tight clumps
   scatter(160, (x, z) => (d(x, z) > 3.5 && d(x, z) < 10 ? 0.9 : 0.05) * Math.min(1, clump(x, z, 0.09, 4)))
     .forEach(([x, z]) => items.bush.push({ x, z, y: bedY(x, z) - 0.05, s: 1.4 + rnd() * 2.1, rot: rnd() * 6.28, tilt: (rnd() - 0.5) * 0.25 }))

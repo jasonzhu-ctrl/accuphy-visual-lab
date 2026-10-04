@@ -43,6 +43,10 @@ repeatable procedures are also project skills in `.claude/skills/` (`sonar-qa`, 
 - **Materials matter.** Steel (wrecks) ≠ wood/rock (#63): a separate sonar tag gives steel wide bright bands and
   long tails, while timber stays sharp. A global change broke timber. Check the calibrated scenes after every
   change: the Mini shelf (`?boat=-40,-5`), the default view, the hump, the deep, the wreck, the lockup.
+- **A terrain change moves the calibration.** The bottom's soft cap and near gain ramp on range, tuned for the depths
+  the lake had (5 m shelf, 17 m middle). #91 put the main play area at 8–9 m, inside the 6–14 m ramp, and the default
+  view went to 20 % white. Run the grid after every terrain change, and prefer a fix that leaves the calibrated scenes
+  untouched (#91: a PingLive-only cap by depth below the transducer; a range-only ramp dimmed the shelf and the Mini).
 - **Physics limits are answers, not bugs:** the Mini cannot see the bottom closer than ~1.2 × depth ahead; the
   Panoramic flat fan meets a 40 m floor 86 m out. Explain them, then offer a design choice.
 - **Sampling noise:** per-pixel random row sampling turned big faces into dust; ray-coherent sampling fixed the side
@@ -53,6 +57,8 @@ repeatable procedures are also project skills in `.claude/skills/` (`sonar-qa`, 
 - **Changing terrain:** vegetation is seeded rejection sampling with depth bands, so any depth change reshuffles the
   whole lake. Place against a frozen `layoutDepth` and let only heights follow (#64). Prove it with
   `scripts/dev/layout-dump.mjs` before and after.
+- **Shallower water:** tall things on the bottom and fish placed at a height above it can break the surface. Cap them
+  (#91: drowned-tree tops ≥ 1.2 m under water, `keepUnderSurface` for fish) and count them with `layout-dump.mjs`.
 - **Placed objects must stay reachable:** the boat is clamped to ±58 m (`Scene.jsx`). The lockup at z −62 could not be
   swept (#66). Test by driving the boat, not with `?boat=`.
 - **Fish:** loops are cleared of structure at load (#39). Behaviours are pure functions of time layered on the loop

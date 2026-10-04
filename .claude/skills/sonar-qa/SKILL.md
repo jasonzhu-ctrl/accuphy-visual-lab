@@ -17,7 +17,7 @@ Run all of it; report what failed and fix it. Details and history: `docs/lessons
 3. **Fish:** `node --import ./scripts/dev/node-register.mjs scripts/dev/fish-sim.mjs 15` → violations all 0,
    lowest gap ≥ ~0.35 m.
 4. **Browser grid** (dev server, 1728×1000 viewport, `?bigphone`): for spots default (−6,4), shelf (−40,−5),
-   hump (22,8), deep (4,−40), lockup (−14,−52.5), drop-off (−20,6) × views PL Down/Forward/Panoramic and PLM
+   hump (22,8), deep (4,−40), lockup (−14,−52.5), drop-off (−3,−14) (since #91; (−20,6) is now the gentle shelf edge) × views PL Down/Forward/Panoramic and PLM
    Down/Forward/Combo: move the boat via `__sonarState.boat/target`, wait ~1.7 s, `__sonarSnap()` → `/__snap`,
    `__sonarHist(10)`. Tile the snapshots with PIL and look at every tile. Targets: bottom scenes ~6–10 % white;
    nothing fully black unless physics says so (Mini Forward in deep water at short range).
