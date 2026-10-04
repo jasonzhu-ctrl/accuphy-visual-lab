@@ -202,6 +202,12 @@ the cheapest Android phone class). Phone size was emulated at 360×800.
   from main `6738310`, before the Safari fix (#73), so on an iPhone or iPad its sonar picture can be black. Friends and
   phones use the public test link (#72, #76): https://jasonzhu-ctrl.github.io/accuphy-lab-test/. Delete the old one
   when Jason agrees (a delete needs his confirmation).
+- ✅ **Private preview updated** (2026-10-04, Jason: "给我链接先看一看"): https://claude.ai/artifact/RnCBYTexY5vcEqJy2hAsN7
+  (version 4) now shows main `6d12206`, with fish phase 1 (#86), the new boat (#88) and fish phase 3 (#90). Only Jason
+  can open it (he needs to be logged in to Claude). Tested before publishing: the share build has no gate, makes zero
+  network requests, loads the fonts and shows no console errors on desktop or phone.
+- ⬜ **Public test link still on the old build** (#81): https://jasonzhu-ctrl.github.io/accuphy-lab-test/. Rebuild it
+  (skill `lab-test-link`) only when Jason says so.
 - ⬜ **Who can see the code** (checked 2026-09-30, Jason: "这个别人看得到代码吗"):
   - **Visible to anyone:** the public test page and its repository `accuphy-lab-test` (public, 4 files).
     Anyone can save `index.html` from the page or download it from GitHub. It is one minified file.
