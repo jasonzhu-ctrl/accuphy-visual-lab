@@ -211,8 +211,9 @@ the cheapest Android phone class). Phone size was emulated at 360×800.
   phones use the public test link (#72, #76): https://jasonzhu-ctrl.github.io/accuphy-lab-test/. Delete the old one
   when Jason agrees (a delete needs his confirmation).
 - ✅ **Private preview updated** (2026-10-04, Jason: "给我链接先看一看"): https://claude.ai/artifact/RnCBYTexY5vcEqJy2hAsN7
-  (version 5) now shows main `42ae24e`, with fish phase 1 (#86), the new boat (#88), fish phase 3 (#90) and the 30 ft
-  valley without the wake streaks (#91). Only Jason can open it (he needs to be logged in to Claude). Tested before publishing: the share build has no gate, makes zero
+  (version 6) now shows main `340e98d`, with fish phase 1 (#86), the new boat (#88), fish phase 3 (#90), no wake
+  streaks (#91) and the middle sloping gently into the deep (#92). Only Jason can open it (he needs to be logged in
+  to Claude). Tested before publishing: the share build has no gate, makes zero
   network requests, loads the fonts and shows no console errors on desktop or phone.
 - ⬜ **Public test link still on the old build** (#81): https://jasonzhu-ctrl.github.io/accuphy-lab-test/. Rebuild it
   (skill `lab-test-link`) only when Jason says so.
