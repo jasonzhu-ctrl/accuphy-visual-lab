@@ -24,6 +24,9 @@ repeatable procedures are also project skills in `.claude/skills/` (`sonar-qa`, 
   an approval is a request; do it in full.
 - Show proof as images: before/after or app-vs-engine composites with Chinese labels (`reference/engine-compare/*`),
   sent with SendUserFile. He judges the look, not the numbers.
+- **When he marks an area on a screenshot,** project the outline through the scene camera onto the lakebed to find
+  the world area he means (#92). Then show the change the way he met it: he judged #91 by dragging the boat and
+  watching the depth number, so #92 was shown as the depth along that drag path and Down pictures along it.
 - Say plainly what was not verified (the live Artifact behind a login, Safari without a simulator).
 - The premium dark cinematic look is the first criterion (`visual-premium-tech-feel` memory, #50, #54, #55).
 
@@ -47,6 +50,9 @@ repeatable procedures are also project skills in `.claude/skills/` (`sonar-qa`, 
   the lake had (5 m shelf, 17 m middle). #91 put the main play area at 8–9 m, inside the 6–14 m ramp, and the default
   view went to 20 % white. Run the grid after every terrain change, and prefer a fix that leaves the calibrated scenes
   untouched (#91: a PingLive-only cap by depth below the transducer; a range-only ramp dimmed the shelf and the Mini).
+  #92 needed more: a per-device cap (the Mini's own near gain changes where it needs one) and, in Forward, bottoms
+  toned no nearer than 80 % of the visitor's fixed range window. The white share jumps with small gain changes when
+  a third of the lit pixels sit just under white, so measure every view, not just Down.
 - **Physics limits are answers, not bugs:** the Mini cannot see the bottom closer than ~1.2 × depth ahead; the
   Panoramic flat fan meets a 40 m floor 86 m out. Explain them, then offer a design choice.
 - **Sampling noise:** per-pixel random row sampling turned big faces into dust; ray-coherent sampling fixed the side

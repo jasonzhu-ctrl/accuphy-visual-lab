@@ -57,11 +57,13 @@ it is done. ✅ done · 🔧 in progress · ⬜ open.
     - walleye on its own body; new yellow perch (25) and northern pike (4); walleye 16; smelt 137.
     The files it took are free again.
   - (4) optional: world edge, depth light, caustics, weeds.
-- ✅ **Middle of the lake = a 30 ft valley; wake streaks removed (#91), waiting for Jason's look:**
-  - the shelf (16–21 ft) eases down to 28–29 ft between the shelf and the island, then up to the island (now 15 ft);
-  - the deep floor, wrecks and lockup are unchanged; no structure moved; drowned trees stay 1.2 m under water;
-  - PingLive's sonar bottom re-tuned for the new depth (default view 19–20 % → 4–9 % white);
-  - for Jason to judge: the calmer Down picture over the island, and Panoramic now lit over most of the screen.
+- ✅ **Middle of the lake: a gentle slope into the deep (#92), waiting for Jason's look.** #91 made the middle a 20–29 ft
+  valley and removed the wake streaks; Jason found the middle too flat and shallow and marked the area that should ease
+  into the deep ("相对缓慢得向深水过度"):
+  - now ~30 ft by the shelf–island line, ~36 ft at the boat's start, 50–60 ft by the north edge of his area, the floor
+    at ~78 ft; 10–20° slopes nearly everywhere; shelf, island (15 ft), deep floor and wrecks unchanged;
+  - the sonar bottom re-tuned for the new depths (PingLive and the Mini), all views back in their old ranges;
+  - still for Jason to judge from #91: the calmer Down picture over the island, Panoramic lit over most of the screen.
 - ⬜ **Desktop: range on the phone + phone size (approved #84, plan B; the local phone-layout chat builds it):**
   `docs/desktop-phone-controls-plan.md`. The desktop counterpart of #78/#79:
   - the panel's Range row goes, and the app's own −/+ on the phone set the range;

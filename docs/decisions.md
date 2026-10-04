@@ -1380,3 +1380,36 @@ Numbered log. Newest at the bottom.
     - **QA spots:** the sonar-qa "drop-off" spot (−20, 6) is now the gentle shelf edge (21 ft). The drop-off spot
       becomes (−3, −14): 37 ft, sloping to 70 ft (`.claude/skills/sonar-qa`).
     - **Checks:** the build passes; no console errors on desktop or phone; no new textures.
+
+92. **2026-10-04** — **The middle slopes gently into the deep water instead of staying at 20–29 ft** (Jason, on #91, with
+    a screenshot marking the area between the deep floor and the near middle: "刚刚的调整太不自然了 中间一下子变得只有20ft左右
+    我要的是附件标记的大致的区域是相对缓慢得向深水过度 你懂吗").
+    - **What was wrong with #91:** the whole middle sat at 20–29 ft, then dropped late and steeply to the deep floor
+      (30–50° slopes across z ≈ −6…−24). Dragging the boat out of the deep water, the depth fell from 75 ft to about
+      28 ft within 25 m and then stayed flat. Inside the marked area: 23–29 ft, median slope 5°.
+    - **Where the marked area is:** his outline was projected through the desktop camera onto the lakebed. It is the
+      corridor between the valley line and the island, from the deep floor's edge south to z ≈ +23 (x ≈ −7…17).
+    - **Terrain** (`terrain.js`):
+      - one long ramp from the #91 valley down to the 24 m floor across the middle. Along his drag path the depth is
+        29 ft (z +22), 32 (z +10), 35 (z +4), 41 (z −4), 51 (z −12), 59 (z −20), 68 (z −30) and 75 (z −40);
+      - inside the marked area the depth now runs from 23 to 61 ft, with a median slope of 13° (90 % under 23°);
+      - the ramp eases in from the shelf edge and keeps clear of the island, so neither gets a wall. The shelf (x < −30)
+        and the deep floor past the old edge (along ≥ 40) are exactly as before; the island top stays at 15 ft;
+      - the old basin at (15, −28) is no longer needed, because the ramp reaches the floor there;
+      - default spot: 36 ft (54 ft before #91, 28 ft in #91);
+      - the small workboat wreck now lies on the slope (65 ft), so it is tilted to the bed's normal; without that, one
+        end floated about 1 m off the bottom.
+    - **Nothing moved:** placement still uses the depths from before #91 (`layoutDepth`). `layout-dump.mjs`: 0 of 1,207
+      objects moved; 41 drowned trees are shorter than before #91 so that none breaks the surface. `fish-sim.mjs`,
+      15 simulated minutes: 0 structure, bottom or surface hits; lowest gap 0.43 m.
+    - **Sonar brightness** (`sonarShader.js`, `SonarScreen.jsx`; the #91 cap extended):
+      - PingLive keeps its depth cap (5.5–7.5 m below the transducer). New: bottoms past that depth are toned no nearer
+        than 80 % of the range window. In Forward (the visitor's fixed range), the nearer 30–40 ft bottom drew
+        11–22 % white; now 7–11 %. Down's AUTO range already puts the bottom at about 80 %, so Down barely changes.
+        At 0.9, Down in deep water started to dim (8 → 5 %);
+      - the Mini gets its own cap: 7.5–9.5 m below the transducer at 80 % strength. Its 36 ft default had gone to 18–26 %
+        (Down / Combo); now 8 % / 15 %. A full cap took it to 0 %, because its own near gain already dims it there;
+      - final grid (15 spots × 6 views, including the drag path): PingLive bottom scenes 4–10 % white in Down and
+        2–13 % in Forward. The Mini stays in its old ranges: 0 % on its shelf, 9–21 % in Combo. The shelf, the island,
+        the deep floor and the wrecks look as before. No console errors.
+    - **Checks:** build passes; desktop and phone show no errors; no new textures.
