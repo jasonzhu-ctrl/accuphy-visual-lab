@@ -91,7 +91,7 @@ export default function SonarScreen({ state, rect, lakeMats }) {
         uFanCount: { value: 0 }, uFan: { value: [new THREE.Vector4(), new THREE.Vector4()] },
         uNearFar: { value: new THREE.Vector2(0.3, 150) }, uRange: { value: 20 }, uReach: { value: 20 },
         uBox0: { value: new THREE.Vector4(-20, 0, 40, 30) }, uBox1: { value: new THREE.Vector4(-20, 0, 40, 30) }, uSplit: { value: 0 }, uApexU: { value: 0.5 },
-        uTime: { value: 0 }, uFlat: { value: 0 }, uBedGain: { value: 1 }, uStreak: { value: 1 }, uDebug: { value: window.location.search.includes('sonardebug') ? 1 : 0 },
+        uTime: { value: 0 }, uFlat: { value: 0 }, uBedGain: { value: 1 }, uDepthCap: { value: 1 }, uStreak: { value: 1 }, uDebug: { value: window.location.search.includes('sonardebug') ? 1 : 0 },
         uMarks: { value: marks.tex }, uMarkCount: { value: 0 }, uPulse: { value: 0.05 }, uBeamHalf: { value: 0.012 },
         uTerrain: { value: bake.tex }, uTerrainHalf: { value: bake.H },
         uTop: { value: topRT.depthTexture }, uTopR: { value: 10 }, uTopCamY: { value: 2 }, uTopNearFar: { value: new THREE.Vector2(0.1, 70) },
@@ -191,6 +191,7 @@ export default function SonarScreen({ state, rect, lakeMats }) {
       u.uStreak.value = lay.mottle ? 0 : 1
       u.uReach.value = lay.reach ?? s.rangeM
       u.uBedGain.value = s.deviceId === 'PLM' ? 0.62 : 1 // PLM near-range gain (sonarShader.js)
+      u.uDepthCap.value = s.deviceId === 'PLM' ? 0 : 1 // PL: the bottom's soft cap also by depth (#91, sonarShader.js)
       s.layout = lay // for the DOM chrome (rulers)
     }
 

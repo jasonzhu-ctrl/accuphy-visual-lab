@@ -1337,3 +1337,46 @@ Numbered log. Newest at the bottom.
       - the build passes; no console errors on desktop or phone; no new textures.
     - **Bug found and fixed while testing:** a body type missing from the swim wavelength table turned the fish
       invisible (NaN). The table now falls back to 0.9.
+
+91. **2026-10-04** — **The middle of the lake becomes a gentle valley, at most 30 ft deep; the boat's three wake streaks
+    are gone** (Jason, with a screenshot of the lake and the sonar at 55 ft: "这块区域左边是浅水 右边是岛屿
+    我想把中间的部分做自然过渡 最深的地方做30ft深 然后船的那个浪像射线一样的三条 去掉吧").
+    - **Terrain** (`terrain.js`):
+      - the middle, between the west shelf and the island, was a 17 m (55 ft) plateau with steep walls. It is now a
+        shallow valley. From the 5–6 m (16–21 ft) shelf the bottom eases down to about 9 m (28–29 ft) along a line
+        between the shelf and the island, then climbs the island;
+      - the deepest point in the middle is 29 ft (capped at 30 ft). 90 % of the middle slopes less than 10°; the
+        steepest slope is 20°, on the island's flank (it was 63°);
+      - the island now tops out at about 4.6 m (15 ft; it was about 8 m, 27 ft), so it still stands out above the
+        shallower middle. East of the island the bottom settles at about 7 m (23 ft);
+      - the deep floor past the drop-off is unchanged (24 m: lake trout, the wrecks, the lockup). The drop-off now runs
+        from 28 ft down to 80 ft, a longer and gentler slope. The wrecks and the lockup still sit on the bottom;
+      - at the default spot the depth goes from 54 ft to 28 ft (AUTO depth range 70 → 40 ft).
+    - **No structure moved:**
+      - the timber, bushes, rocks and weeds keep their places. Placement still uses the frozen depths of the lake
+        before #91 (`layoutDepth`, #64); `layout-dump.mjs` shows 0 of 1,207 objects moved;
+      - 44 of the 70 drowned trees are shorter, by 2.9 m on average, so every top stays at least 1.2 m under water.
+        Before this change, 7 trees already stuck out of the water;
+      - 40 of the 269 fish shift a few metres at load, by the existing step that keeps swim paths clear of structure.
+        The rest keep their places. A new `keepUnderSurface` (`fish.js`) keeps every fish under the surface;
+      - `fish-sim.mjs`, 15 simulated minutes: 0 structure, bottom or surface hits; lowest gap 0.43 m.
+    - **Sonar brightness** (`sonarShader.js`, `SonarScreen.jsx`):
+      - the problem: PingLive's wide fan met the new 8–9 m bottom inside the 6–14 m range where the bottom's soft cap
+        ramps in, and AUTO depth zoomed it in. White pixels in the default view went from 6 % / 8 % (Down / Forward)
+        to 19 % / 20 %;
+      - the fix: for PingLive, the cap now also follows the depth below the transducer, ramping in from 5.5 m to 7.5 m
+        (about 21–28 ft of water). The default view is back to 4 % / 9 %;
+      - unchanged by the fix: the shelf, the island, the deep floor and every PingLive Mini view;
+      - rejected: a range-only ramp (6–9 m), which dimmed the shelf (4.4 → 2.6 %) and the Mini at 28 ft (4.6 → 0.4 %);
+      - full grid (6 spots × 6 views, plus the valley, the middle and the new drop-off): PingLive bottom scenes 3–15 %
+        white. The Mini's range is as before: 0 % on its shelf, 9–21 % in Combo.
+    - **Side effects for Jason to look at:**
+      - over the island (now 15 ft deep), the Down view is a calmer orange. The shallow-water toning already used on
+        the shelf now applies to its rocks: PL Down 12 → 1 % white; PL Forward 21 → 7 %;
+      - Panoramic now meets the bottom over most of the screen, because the shallow middle is within its reach. At the
+        default spot the lit area goes from 27 % to 59 %, with the same even crimson field.
+    - **Wake:** the V wake (#88) is removed from the water shader. Its two Kelvin arms and the churned centre were the
+      "three rays". The foam line along the hull, the bob and the contact shade stay.
+    - **QA spots:** the sonar-qa "drop-off" spot (−20, 6) is now the gentle shelf edge (21 ft). The drop-off spot
+      becomes (−3, −14): 37 ft, sloping to 70 ft (`.claude/skills/sonar-qa`).
+    - **Checks:** the build passes; no console errors on desktop or phone; no new textures.

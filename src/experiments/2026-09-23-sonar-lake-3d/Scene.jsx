@@ -259,7 +259,7 @@ function Fish({ mat, state }) {
 function Water({ state }) {
   const mat = useMemo(() => new THREE.ShaderMaterial({
     transparent: true, depthWrite: false, side: THREE.DoubleSide,
-    uniforms: { uTime: { value: 0 }, uSun: { value: new THREE.Vector3(0.4, 0.8, 0.3).normalize() }, uSky: { value: new THREE.Color('#9cc1cf') }, uBoat: { value: new THREE.Vector3(0, 0, 0) }, uWake: { value: 0 }, uBoatDir: { value: new THREE.Vector2(1, 0) } },
+    uniforms: { uTime: { value: 0 }, uSun: { value: new THREE.Vector3(0.4, 0.8, 0.3).normalize() }, uSky: { value: new THREE.Color('#9cc1cf') }, uBoat: { value: new THREE.Vector3(0, 0, 0) }, uWake: { value: 0 } },
     vertexShader: /* glsl */ `
       uniform float uTime; uniform vec3 uBoat; uniform float uWake; varying vec3 vW; varying vec3 vN;
       void main() {
@@ -277,7 +277,7 @@ function Water({ state }) {
       }
     `,
     fragmentShader: /* glsl */ `
-      precision highp float; varying vec3 vW; varying vec3 vN; uniform vec3 uSun; uniform vec3 uSky; uniform float uTime; uniform vec3 uBoat; uniform float uWake; uniform vec2 uBoatDir;
+      precision highp float; varying vec3 vW; varying vec3 vN; uniform vec3 uSun; uniform vec3 uSky; uniform float uTime;
       float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
       float vnoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
         return mix(mix(hash(i), hash(i + vec2(1, 0)), f.x), mix(hash(i + vec2(0, 1)), hash(i + vec2(1, 1)), f.x), f.y); }
@@ -297,16 +297,6 @@ function Water({ state }) {
         // a touch of surface texture so it reads as a surface from above
         col += (n2 - 0.5) * 0.05;
         float alpha = 0.36 + 0.42 * fres;
-        // the boat's wake while it moves (#88): two arms at the Kelvin angle (19.5°) from the hull's corners and churned
-        // water down the middle, fading over ~10 m behind it, broken up by the ripple noise
-        vec2 rel = vW.xz - uBoat.xz;
-        float behind = -dot(rel, uBoatDir), side = abs(rel.x * uBoatDir.y - rel.y * uBoatDir.x);
-        float arm = abs(side - 1.1 - 0.354 * max(behind - 1.0, 0.0));
-        float wk = min(1.0, uWake * 1.3) * step(0.0, behind) * exp(-behind / 9.0);
-        float foam = wk * (0.6 * (1.0 - smoothstep(0.0, 0.35 + 0.06 * behind, arm)) + 0.4 * (1.0 - smoothstep(0.3, 1.0, side)) * smoothstep(1.5, 4.0, behind));
-        foam = clamp(foam * (0.25 + 1.0 * n2) * (0.45 + 0.8 * n1), 0.0, 1.0);
-        col = mix(col, vec3(0.9, 0.95, 0.96), foam * 0.7);
-        alpha = mix(alpha, 0.9, foam * 0.6);
         float dist = length(vW - cameraPosition);
         float fog = smoothstep(120.0, 420.0, dist);
         gl_FragColor = vec4(mix(col, uSky, fog), mix(alpha, 1.0, fog));
@@ -319,7 +309,6 @@ function Water({ state }) {
     const speed = Math.hypot(s.target.x - s.boat.x, s.target.z - s.boat.z)
     mat.uniforms.uBoat.value.set(s.boat.x, 0, s.boat.z)
     mat.uniforms.uWake.value += (Math.min(1, speed / 3) - mat.uniforms.uWake.value) * Math.min(1, dt * 3)
-    if (speed > 0.05) mat.uniforms.uBoatDir.value.set(s.target.x - s.boat.x, s.target.z - s.boat.z).normalize() // the wake trails the way it moves
   })
   return (
     <mesh rotation-x={-Math.PI / 2} material={mat} onUpdate={(o) => o.layers.set(SONAR_HIDE_LAYER)}>

@@ -114,6 +114,7 @@ export function makePopulation(bedY, obstacles) {
     f.home[1] = -depth
   })
   keepOffBottom(fish, bedY)
+  keepUnderSurface(fish, bedY)
   if (obstacles) clearPaths(fish, obstacles, bedY) // a moved loop keeps the same bottom gap at its new spot
   // fewer smelt (phase 3, #85): every third one goes after placement, so the rest keep their exact places and the bait
   // balls stay dense but cheaper
@@ -157,6 +158,17 @@ function keepOffBottom(fish, bedY) {
     if (!f.radius) continue
     const yMin = loopBedTop(f, bedY) + bottomGap(f)
     if (f.home[1] < yMin) f.home[1] = Math.min(yMin, -0.9)
+  }
+}
+
+// Nothing swims out of the water: a fish's highest point — its centre plus the ±0.3 m bob and half its DRAWN body
+// height — stays at least ~0.4 m under the surface (#91: the middle of the lake became 8–9 m deep, so schools set a
+// fixed height off the bottom would break it). Only lowers fish, never below their bottom gap; no rnd() calls.
+function keepUnderSurface(fish, bedY) {
+  for (const f of fish) {
+    if (!f.radius) continue
+    const cap = -1.3 - 0.12 * drawnLen(f)
+    if (f.home[1] > cap) f.home[1] = Math.max(cap, loopBedTop(f, bedY) + bottomGap(f))
   }
 }
 
