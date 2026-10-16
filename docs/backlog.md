@@ -259,4 +259,4 @@ the cheapest Android phone class). Phone size was emulated at 360×800.
 - ⬜ sonar-qa for the ice views (dial brightness vs the app's Ice Fishing View, the history's speckle floor)
 - ⬜ Publish as `/ice/` (`VITE_SCENE=ice`) + `docs/versions.md` — only when Jason says go
 - ✅ Direction: the SECTION camera (B), Jason 2026-10-16 night (#101)
-- ⬜ Section view tuning: phones (the band layout), the slab edge showing a hole's cut when the hole is near the wall, snow on the slab top, the water column's tint, the hint's spot; decide the fate of Top and Under the ice (keep as a switch, or drop)
+- ⬜ Section view tuning (round 1 done in #102: lens, slab face, soil, marine snow, cards under the panel, camp): still open — the slab edge opening where a hole is near the wall, snow lying on the slab top, the water column's tint, camp details, phone fine-tuning; decide the fate of Top and Under the ice (keep as a switch, or drop)

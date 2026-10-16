@@ -1598,3 +1598,20 @@ Numbered log. Newest at the bottom.
       Side effect: the partner portal is now within Vercel's terms too.
     - Not yet done: deploying the two Lab pages to Vercel (new project, `lab.accuphy.com` via one CNAME at Alibaba
       Cloud / 万网, Meta Pixel). Waiting on Jason: deploy now, or at the ad launch.
+
+102. **2026-10-16** — **The section view, first tuning round** (Jason: "换洞操作这样可以，继续把剖面版细调").
+     - **Lens:** the section camera uses a 46° lens (the lake keeps 38°) and looks a touch higher, so a sliver of sky with
+       the falling snow sits above the far ice, and the lit bottom still fits below. The lens goes back to 38° when
+       another camera is chosen.
+     - **The slab's cut face** is ice in section (`SectionFaces`, its own shader): white-blue and frosty at the top,
+       clearer and bluer below, thin horizontal layers from the freeze-up, a few bubbles caught in it; first too white,
+       then toned to blue ice. The waterline under it stays.
+     - **The soil** under the lakebed has a dark sediment band under the surface, then brown, then dark.
+     - **Marine snow** drifts in the water column in the section view too (cut at the wall).
+     - **Layout on the ice page:** the three step cards stack under the control panel on the left, measured from the
+       panel's height, so the whole ice band across the top is free for taps (it was under the cards). The camp stands
+       behind-right of the hole with the door toward it, the sled beside it.
+     - Checked at desktop and 375×812: the phone shows the ice band with the kit and the lit shelter, the slab edge and
+       the section with the cone above the app frame. No console errors.
+     - Left for later rounds: the slab edge opening where a hole is near the wall; snow lying on the slab top; the
+       water column's tint; the camp's details; whether Top and Under the ice stay in the Camera row.

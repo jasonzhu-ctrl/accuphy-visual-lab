@@ -58,6 +58,15 @@ export default function SonarLake3D({ scene: sceneProp }) {
   const [deviceId, setDeviceId] = useState(ONLY || 'PL')
   const [mode, setMode] = useState(ICE ? 'liveice' : 'forward')
   const [view, setView] = useState(ICE ? iceParams().view : 'top') // ice page cameras: top / under the ice / section (docs/ice-relationship-study.md)
+  // the ice page: the step cards stack under the control panel, so the ice band across the top stays open for taps
+  const panelRef = useRef(null)
+  const [cardsTop, setCardsTop] = useState(340)
+  useEffect(() => {
+    if (!ICE) return
+    const m = () => { const el = panelRef.current; if (el) setCardsTop(el.offsetTop + el.offsetHeight + 12) }
+    m(); const id = setTimeout(m, 400); window.addEventListener('resize', m)
+    return () => { clearTimeout(id); window.removeEventListener('resize', m) }
+  }, [ICE, view, mode])
   const [rangeFt, setRangeFt] = useState(80)       // the visitor's own range (slider)
   const [depthFt, setDepthFt] = useState(70) // depth range (PL Forward; every PLM view) — driven by AUTO below
   const [autoDepth, setAutoDepth] = useState(true) // off only when the dev Depth slider is touched
@@ -205,7 +214,7 @@ export default function SonarLake3D({ scene: sceneProp }) {
       </div>
 
       {/* ---- control panel — Apple-style frosted glass over the lake (Jason 2026-09-24) ---- */}
-      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+      <motion.div ref={panelRef} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
         className="ac-panel pointer-events-auto absolute flex flex-col gap-3 max-sm:hidden sm:left-4 sm:top-14 sm:w-[400px] sm:p-4">
         <div className="flex items-center justify-between px-1 pt-0.5">
           <img src="/brand/logo/White Accuphy Logo.png" alt="Accuphy" className="h-[18px] w-auto drop-shadow-[0_1px_2px_rgba(0,20,30,0.25)]" draggable={false} />
@@ -310,9 +319,9 @@ export default function SonarLake3D({ scene: sceneProp }) {
       )}
 
       {/* ---- guide strip ---- */}
-      <div className="pointer-events-auto absolute right-[28px] top-4 hidden w-[min(620px,44vw)] items-stretch gap-2.5 md:flex">
+      <div className={ICE ? 'pointer-events-auto absolute hidden flex-col gap-2 md:flex' : 'pointer-events-auto absolute right-[28px] top-4 hidden w-[min(620px,44vw)] items-stretch gap-2.5 md:flex'} style={ICE ? { left: 16, top: cardsTop, width: 400 } : undefined}>
         {STEPS.map((st, i) => (
-          <button key={st.n} onClick={() => goStep(i)} className={`ac-card flex-1 px-3.5 py-3 text-left ${step === i ? 'is-active' : ''}`}>
+          <button key={st.n} onClick={() => goStep(i)} className={`ac-card flex-1 text-left ${ICE ? 'px-3.5 py-2.5' : 'px-3.5 py-3'} ${step === i ? 'is-active' : ''}`}>
             <div className="flex items-center gap-2"><span className="ac-num">0{st.n}</span><span className="ac-label">Step</span></div>
             <div className="mt-1.5 text-[13.5px] font-semibold leading-tight">{st.title}</div>
             {step === i && <div className="ac-body mt-1.5 text-[11.5px] leading-snug">{st.text}</div>}

@@ -66,7 +66,7 @@ export const VIEWS = ['top', 'under', 'section']
 export const UNDER_CAM = { pos: [-10, -2.6, 23], look: [2, -5.6, -1] } // a little higher and further back: more ceiling in the frame
 // The camera stands 7 m up: from 3.6 m the visible ice (behind the wall) was a 170 px strip under the step cards and a
 // tap landed on the cut-away ground (2026-10-16 test). Now the ice fills the top ~38 % of the screen, the section the rest.
-export const SECTION_CAM = { pos: [-3, 7, 26], look: [2, -3.2, 0], cutZ: 6.5, slab: 0.8 } // cutZ: the wall, this far in front of the hole; slab: the ice edge as drawn (0.5 m real, a little taller to read from 25 m)
+export const SECTION_CAM = { pos: [-3, 7, 26], look: [2, -2.65, 0], cutZ: 6.5, slab: 0.8, fov: 46 } // fov 46 (the lake uses 38): the sky's edge above, the lit bottom below, both in frame // cutZ: the wall, this far in front of the hole; slab: the ice edge as drawn (0.5 m real, a little taller to read from 25 m)
 export function iceParams() {
   const q = typeof window !== 'undefined' ? window.location.search : ''
   const time = (/[?&]time=(dusk|day|night)/.exec(q) || [])[1] || 'dusk'

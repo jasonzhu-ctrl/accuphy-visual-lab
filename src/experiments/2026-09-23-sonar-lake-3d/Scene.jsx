@@ -492,9 +492,12 @@ function Rig({ state, sonarRect, fogMats, cam = LAKE_CAM }) {
       tmp.set(s.boat.x + C.look[0], C.look[1], s.boat.z + C.look[2]); s.camL.lerp(tmp, e)
       camera.up.set(0, 1, 0); camera.position.copy(s.camP); camera.lookAt(s.camL)
       if (camera.view?.enabled) camera.clearViewOffset()
+      const fov = C.fov ?? 38
+      if (camera.fov !== fov) { camera.fov = fov; camera.updateProjectionMatrix() }
       return
     }
     s.camP = null
+    if (camera.fov !== 38) { camera.fov = 38; camera.updateProjectionMatrix() }
     // view from the south (desktop exactly as before); phones: pulled back, re-centred on a step preset's boat
     const fx = k > 1 && s.frameX != null ? s.frameX : cam.T.x
     s.camX = s.camX == null ? fx : s.camX + (fx - s.camX) * Math.min(1, dt * 2.5)

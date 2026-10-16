@@ -147,9 +147,9 @@ export function IceCamp({ state, beamMats, iceMat, T }) {
     aim.visible = !!s.aiming && !!s.aim
     if (s.aim) aim.position.set(s.aim.x, s.view === 'under' ? -ICE_T - 0.02 : 0.015, s.aim.z)
     // the section view keeps the camp beside the hole, inside the cut; the other views leave it where the visitor started
-    const c = s.view === 'section' ? campAt(s.boat.x, s.boat.z, 9.5, 0.4) : camp
+    const c = s.view === 'section' ? campAt(s.boat.x, s.boat.z, 7.5, -3.0) : camp
     if (campG.current) { campG.current.position.set(c.x, 0, c.z); campG.current.rotation.y = c.yaw }
-    if (sledG.current) { sledG.current.position.set(c.x - 1.1, 0, c.z + (s.view === 'section' ? -2.6 : 2.3)); sledG.current.rotation.y = c.yaw + 0.5 }
+    if (sledG.current) { sledG.current.position.set(c.x + (s.view === 'section' ? 1.6 : -1.1), 0, c.z + (s.view === 'section' ? -2.2 : 2.3)); sledG.current.rotation.y = c.yaw + 0.5 }
     if (lampRef.current) lampRef.current.position.set(c.lamp.x, c.lamp.y + 0.2, c.lamp.z)
     u.uLamp.value.set(c.lamp.x, c.lamp.y, c.lamp.z, T.lamp)
   })
@@ -283,10 +283,11 @@ export function MarineSnow({ state }) {
   const { gl } = useThree()
   useFrame(({ clock }) => {
     const s = state.current
-    pts.visible = s.view === 'under'
+    pts.visible = s.view === 'under' || s.view === 'section'
     const u = pts.userData.uniforms
-    u.uTime.value = clock.elapsedTime; u.uAmount.value = 0.9; u.uPixelRatio.value = gl.getPixelRatio()
+    u.uTime.value = clock.elapsedTime; u.uAmount.value = s.view === 'section' ? 0.7 : 0.9; u.uPixelRatio.value = gl.getPixelRatio()
     u.uCenter.value.set(s.boat.x, -11.4, s.boat.z)
+    u.uClipZ.value = s.view === 'section' ? s.boat.z + SECTION_CAM.cutZ - 0.2 : 1e5
   })
   return <primitive object={pts} onUpdate={(o) => o.layers.set(SONAR_HIDE_LAYER)} />
 }
@@ -295,7 +296,29 @@ export function MarineSnow({ state }) {
 export function SectionFaces({ state }) {
   const parts = useMemo(() => {
     const slabT = SECTION_CAM.slab
-    const slab = new THREE.Mesh(new THREE.BoxGeometry(240, slabT, 0.04), new THREE.MeshStandardMaterial({ color: '#d4e6f2', emissive: '#8fb9d6', emissiveIntensity: 0.4, roughness: 0.55, transparent: true, opacity: 0.94 }))
+    // the slab's cut face: lake ice in section — white and frosty at the top, clearer and bluer below, thin horizontal
+    // layers from the freeze-up, a few bubbles caught in it (colours are display values)
+    const slabMat = new THREE.ShaderMaterial({
+      transparent: true,
+      uniforms: { uT: { value: slabT } },
+      vertexShader: /* glsl */ `varying vec3 vW; void main() { vec4 w = modelMatrix * vec4(position, 1.0); vW = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }`,
+      fragmentShader: /* glsl */ `precision highp float; varying vec3 vW; uniform float uT;
+        float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+        float vnoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f); return mix(mix(hash(i), hash(i + vec2(1, 0)), f.x), mix(hash(i + vec2(0, 1)), hash(i + vec2(1, 1)), f.x), f.y); }
+        void main() {
+          float d = clamp(-vW.y / uT, 0.0, 1.0);
+          vec3 top = vec3(0.84, 0.9, 0.95), mid = vec3(0.58, 0.74, 0.86), bot = vec3(0.34, 0.56, 0.74); // ice in section: white-blue over clear blue, not a white wall
+          vec3 c = d < 0.5 ? mix(top, mid, d * 2.0) : mix(mid, bot, (d - 0.5) * 2.0);
+          float layers = 0.5 + 0.5 * sin(vW.y * 70.0 + vnoise(vW.xz * 0.6) * 4.0);
+          c *= 0.9 + 0.1 * layers;
+          float bubbles = smoothstep(0.88, 0.96, vnoise(vec2(vW.x * 22.0, vW.y * 46.0)));
+          c = mix(c, vec3(0.95, 0.98, 1.0), bubbles * 0.5);
+          float frost = 1.0 - smoothstep(0.0, 0.1, d);
+          c = mix(c, vec3(0.95, 0.97, 1.0), frost * 0.7);
+          gl_FragColor = vec4(c, 0.92);
+        }`,
+    })
+    const slab = new THREE.Mesh(new THREE.BoxGeometry(240, slabT, 0.04), slabMat)
     const line = new THREE.Mesh(new THREE.BoxGeometry(240, 0.05, 0.05), new THREE.MeshBasicMaterial({ color: '#bfe9ff', transparent: true, opacity: 0.8 })) // the waterline under the slab
     const waterMat = new THREE.ShaderMaterial({
       transparent: true, depthWrite: false, side: THREE.DoubleSide,
@@ -324,12 +347,12 @@ export function SectionFaces({ state }) {
     const key = `${cx.toFixed(0)}|${cz.toFixed(1)}`
     if (key !== parts.key) { // the soil's top edge follows the lakebed along the cut
       parts.key = key
-      const N = 241, pos = new Float32Array(N * 6), colr = new Float32Array(N * 6), idx = []
-      const top = new THREE.Color('#5a4a2e'), bot = new THREE.Color('#1a140c')
+      const N = 241, pos = new Float32Array(N * 9), colr = new Float32Array(N * 9), idx = []
+      const sed = new THREE.Color('#262216'), mid = new THREE.Color('#4a3b26'), bot = new THREE.Color('#16110a') // sediment, brown, dark
       for (let i = 0; i < N; i++) {
         const x = cx - 120 + i, y = -depthAt(x, cz) - 0.05
-        pos.set([x, y, cz, x, -48, cz], i * 6); colr.set([top.r, top.g, top.b, bot.r, bot.g, bot.b], i * 6)
-        if (i < N - 1) idx.push(i * 2, i * 2 + 1, i * 2 + 2, i * 2 + 2, i * 2 + 1, i * 2 + 3)
+        pos.set([x, y, cz, x, y - 0.45, cz, x, -48, cz], i * 9); colr.set([sed.r, sed.g, sed.b, mid.r, mid.g, mid.b, bot.r, bot.g, bot.b], i * 9)
+        if (i < N - 1) { const a = i * 3, b = a + 3; idx.push(a, a + 1, b, b, a + 1, b + 1, a + 1, a + 2, b + 1, b + 1, a + 2, b + 2) }
       }
       const g = new THREE.BufferGeometry()
       g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setAttribute('color', new THREE.BufferAttribute(colr, 3)); g.setIndex(idx)
