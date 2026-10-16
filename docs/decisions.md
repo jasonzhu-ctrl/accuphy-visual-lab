@@ -1519,3 +1519,15 @@ Numbered log. Newest at the bottom.
     - Checked in the browser at dusk: the cracks read as photographs do; the far ice takes the lavender sky; the
       smelt school, the lockup and the lit strip show through. Open: Jason's verdict on the realism, the time of day,
       jet vs amber. The summer lake is untouched (the ice code only runs with `scene="ice"`).
+
+97. **2026-10-16** — **The black ice is shaded for the distance it is seen from** (Jason, on #96: "你的照片好像是黑冰的近景
+    但是实际的是远景 这种很长的线条在远景不太可能"). Right: the #96 references were 1–3 m close-ups; the Lab's camera
+    stands 45 m off with 40 m of lake across the screen. At that scale a thermal crack is a hairline a millimetre wide
+    — invisible — and what the eye reads from the air is tone, the sky's sheen and the snow.
+    - **Now** (`iceSheet.js`): a patchwork of clear black ice and milky refrozen "snow ice" plates (low-frequency
+      noise, pale grey-blue, half opaque); faint wind polish along the wind; blown snow as the main pattern — broad
+      patches and long strokes shaped by the wind, an opaque core with a thin dusting feathering out round it (cover
+      0.27); at most two long faint lines (spacing 36 and 52 m, a soft white line of snow in the groove, not a bright
+      crack); bubbles and specks only within ~30 m of the camera. The Fresnel sky mirror stays. The hairline families
+      and the bright crack cores of #96 are gone.
+    - The summer lake is untouched. Shown to Jason the same evening; his verdict pending.

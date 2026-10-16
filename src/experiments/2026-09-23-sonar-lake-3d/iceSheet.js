@@ -145,8 +145,8 @@ export function makeIceMaterial(terrain) {
       float drift(vec2 P) {
         vec2 Pw = vec2(dot(P, uWind), dot(P, vec2(-uWind.y, uWind.x)));
         float big = fbm4(P * 0.035 + 3.0);
-        float sast = fbm3(vec2(Pw.x * 0.09, Pw.y * 0.55) + 7.0);
-        return 0.68 * big + 0.32 * sast;
+        float sast = fbm3(vec2(Pw.x * 0.07, Pw.y * 0.6) + 7.0);
+        return 0.55 * big + 0.45 * sast; // the wind shapes the patches: elongated, with ridges along it
       }
       void main() {
         vec2 P = vWorld.xz;
@@ -180,8 +180,12 @@ export function makeIceMaterial(terrain) {
         vec2 Pw = vec2(dot(P, uWind), dot(P, vec2(-uWind.y, uWind.x)));
         float streakN = fbm3(vec2(Pw.x * 0.05, Pw.y * 0.7) + 2.0); // brush strokes of blown snow, long along the wind
         float streaks = smoothstep(0.645, 0.665, streakN + 0.03 * (vnoise(P * 3.0) - 0.5)); // crisp strokes with a feathered edge
-        float edgeW = mix(0.012, 0.035, uCover); // on black ice the dustings have ragged, crisp edges; deep cover blends softly
-        float snow = max(smoothstep(thr - edgeW, thr + edgeW, h + 0.02 * (vnoise(P * 2.3 + 9.0) - 0.5)), streaks) * (1.0 - clear);
+        // Seen from 40 m up (Jason 2026-10-16: 实际的是远景), blown snow is the pattern you read on black ice: broad patches
+        // and long strokes with an opaque core and a thin dusting that feathers out round it
+        float hh = h + 0.02 * (vnoise(P * 2.3 + 9.0) - 0.5);
+        float snowCore = smoothstep(thr - 0.012, thr + 0.012, hh);
+        float snowSkirt = smoothstep(thr - 0.09, thr - 0.005, hh);
+        float snow = max(max(snowCore, 0.4 * snowSkirt), streaks) * (1.0 - clear);
         float lamb = max(dot(N, uSun), 0.0);
         vec3 sky = mix(uSkyHorizon, uSkyZenith, 0.45);
         vec3 snowAlb = vec3(0.93, 0.95, 0.98);
@@ -192,8 +196,6 @@ export function makeIceMaterial(terrain) {
         litSnow += uSunColor * glint * 1.2;
         // ---- bare ice: a dark mirror of the sky, long white cracks, bubbles, frost, specks ----
         float camD = length(vWorld - cameraPosition);
-        float farFade = 1.0 - smoothstep(25.0, 90.0, camD);   // the fine detail only near the camera
-        float farFade2 = 1.0 - smoothstep(40.0, 140.0, camD);
         // the surface: flat glass with a faint frozen-in undulation, so the sky's mirror is not dead even
         vec3 Nn = normalize(vec3((vnoise(P * 0.23) - 0.5) * 0.05, 1.0, (vnoise(P * 0.23 + 5.0) - 0.5) * 0.05));
         float cosT = max(dot(V, Nn), 0.0);
@@ -202,24 +204,28 @@ export function makeIceMaterial(terrain) {
         vec3 reflSky = skyAt(reflect(-V, Nn));
         vec3 Hh = normalize(uSun + V);
         float specSun = pow(max(dot(Nn, Hh), 0.0), 180.0) * uSunI;
-        // cracks: two families of long bright ones, one of hairlines in patches
-        vec2 cA = crackFamily(P, 0.35, 19.0, 1.6, 1.7, 0.03, 0.1);
-        vec2 cB = crackFamily(P, 1.72, 12.5, 1.2, 4.3, 0.02, 0.06);
-        float hairZone = smoothstep(0.42, 0.6, fbm3(P * 0.03 + 7.0));
-        vec2 cC = crackFamily(P, -0.9, 2.8, 0.5, 9.1, 0.008, 0.016) * hairZone * farFade2 * 0.55;
-        vec2 cD = crackFamily(P, 2.4, 4.1, 0.6, 2.9, 0.008, 0.014) * hairZone * farFade * 0.4;
-        float core = clamp(cA.x + cB.x + cC.x + cD.x, 0.0, 1.0);
-        float halo = clamp(cA.y + cB.y, 0.0, 1.0);
-        float bub = bubbles(P) * farFade;
-        float frost = smoothstep(0.64, 0.8, fbm3(P * 0.9 + 11.0)) * smoothstep(0.48, 0.75, fbm3(P * 5.0 + 3.0)) * 0.4;
-        float speck = step(0.992, hash(floor(P * 14.0))) * farFade * 0.6;
-        float white = clamp(core + bub + frost + speck, 0.0, 1.0);
+        // At this scale (the camera 45 m off, 40 m of lake across the screen) a crack is a hairline a millimetre wide:
+        // invisible. What shows from the air is tone — a patchwork of clear black ice and milky refrozen 'snow ice' —
+        // the sky's sheen, the snow, and at most a couple of long faint lines where snow has settled in a pressure crack.
+        vec2 cA = crackFamily(P, 0.35, 36.0, 2.5, 1.7, 0.012, 0.03);
+        vec2 cB = crackFamily(P, 1.9, 52.0, 3.0, 4.3, 0.01, 0.025);
+        float core = clamp(cA.x + cB.x, 0.0, 1.0) * 0.5;
+        float halo = clamp(cA.y + cB.y, 0.0, 1.0) * 0.6; // the soft white line of snow in the groove is what the eye gets
+        float cloud = fbm4(P * 0.045 + 17.0);
+        float milky = smoothstep(0.5, 0.64, cloud) * (0.6 + 0.4 * fbm3(P * 0.6 + 2.0)); // opaque, pale grey-blue plates
+        float polish = 0.5 + 0.5 * fbm3(vec2(Pw.x * 0.12, Pw.y * 0.9) + 4.0);          // faint wind polish along the wind
+        float nearD = 1.0 - smoothstep(12.0, 32.0, camD);                                 // close-up detail only near the camera
+        float bub = bubbles(P) * nearD * 0.5;
+        float speck = step(0.994, hash(floor(P * 14.0))) * nearD * 0.4;
+        float white = clamp(core + bub + speck, 0.0, 1.0);
         vec3 whiteLit = vec3(0.86, 0.92, 1.0) * (sky * uAmbient * 1.6 + uSunColor * uSunI * 0.5 + 0.1);
+        vec3 milkyLit = vec3(0.62, 0.7, 0.8) * (sky * uAmbient * 1.5 + uSunColor * uSunI * 0.45 + 0.06) * (0.85 + 0.3 * polish);
         // the water below is what gives black ice its black; the sky is laid over it by Fresnel
-        vec3 iceCol = vec3(0.004, 0.012, 0.02) + reflSky * F * 1.5 + uSunColor * specSun * 0.6;
-        iceCol += whiteLit * halo * 0.45;
+        vec3 iceCol = vec3(0.004, 0.012, 0.02) + reflSky * F * 1.5 * (0.8 + 0.4 * polish) + uSunColor * specSun * 0.6;
+        iceCol = mix(iceCol, milkyLit, milky * 0.9);
+        iceCol += whiteLit * halo * 0.5;
         iceCol = mix(iceCol, whiteLit, white);
-        float iceAlpha = clamp(mix(0.5, 0.2, uClear) + F * 1.4 + white * 0.7 + halo * 0.3, 0.0, 1.0);
+        float iceAlpha = clamp(mix(0.5, 0.2, uClear) + F * 1.4 + milky * 0.6 + white * 0.7 + halo * 0.3, 0.0, 1.0);
         // ---- the window: along the line of sight through this bit of ice, does the eye meet the beam? (the lit
         //      bottom lies far behind the hole from the camera's angle, so a straight-down test cut the window in the
         //      wrong place) — march the view ray down through the water to the bottom
