@@ -12,7 +12,7 @@ import { setHoles } from './iceSheet'
 import { makeHoleKit, makeShelter, makeSled, makeAimRing, MINI_H, CABLE_TOP_Y, KIT_SCALE } from './iceProps'
 import { makeSnowfall } from './snow'
 import { makeSkyDome } from './iceSky'
-import { ICE_T, MINI_DROP, APEX_Y, HOLE_DRAW_R, MAX_HOLES, ICE_CAMP, CUT_R, ISLAND_R, col, dir } from './iceScene'
+import { ICE_T, MINI_DROP, APEX_Y, HOLE_DRAW_R, MAX_HOLES, ICE_CAMP, CUT_R, ISLAND_R, SECTION_CAM, col, dir } from './iceScene'
 import { setBeamUniforms } from './lakeMaterial'
 import { SONAR_HIDE_LAYER } from './SonarScreen'
 import { HALF, depthAt } from './terrain'
@@ -52,6 +52,7 @@ export function Snowfall({ state, T }) {
     u.uPixelRatio.value = gl.getPixelRatio()
     const s = state.current
     u.uCenter.value.set(s.camX ?? s.boat.x, 0, 0)
+    u.uClipZ.value = s.view === 'section' ? s.boat.z + SECTION_CAM.cutZ : 1e5
   })
   return <primitive object={snow} onUpdate={(o) => o.layers.set(SONAR_HIDE_LAYER)} />
 }
@@ -64,13 +65,15 @@ export function IceCamp({ state, beamMats, iceMat, T }) {
   const parts = useMemo(() => ({ mini: kit.getObjectByName('mini'), cable: kit.getObjectByName('cable'), auger: kit.getObjectByName('auger'), park: kit.getObjectByName('auger').position.clone(), lean: kit.getObjectByName('auger').rotation.z }), [kit])
   const s0 = state.current
   // the camp: shelter and sled a few metres from the first hole, the door toward it
-  const camp = useMemo(() => {
-    const cx = s0.boat.x + ICE_CAMP[0], cz = s0.boat.z + ICE_CAMP[1]
-    const ux = s0.boat.x - cx, uz = s0.boat.z - cz, L = Math.hypot(ux, uz)
+  const campAt = (hx, hz, dx, dz) => {
+    const cx = hx + dx, cz = hz + dz
+    const ux = hx - cx, uz = hz - cz, L = Math.hypot(ux, uz)
     const yaw = Math.atan2(uz / L, -ux / L)
     const lamp = shelter.userData.lampLocal.clone().applyAxisAngle(new THREE.Vector3(0, 1, 0), yaw).add(new THREE.Vector3(cx, 0, cz))
     return { x: cx, z: cz, yaw, lamp }
-  }, [shelter, s0])
+  }
+  const camp = useMemo(() => campAt(s0.boat.x, s0.boat.z, ICE_CAMP[0], ICE_CAMP[1]), [shelter, s0]) // eslint-disable-line react-hooks/exhaustive-deps
+  const campG = useRef(), sledG = useRef(), lampRef = useRef()
   useEffect(() => {
     const s = state.current
     s.holes = [{ x: s.boat.x, z: s.boat.z, r: HOLE_DRAW_R, live: true }]
@@ -113,7 +116,7 @@ export function IceCamp({ state, beamMats, iceMat, T }) {
     // the auger: parked beside the hole, or over it, spinning and going down 0.55 m then back up
     if (drilling > 0) {
       const inOut = Math.min(1, drilling / 0.12) * (1 - Math.max(0, (drilling - 0.88) / 0.12))
-      auger.position.set(park.x * (1 - inOut), -0.6 * Math.sin(Math.PI * Math.min(1, Math.max(0, (drilling - 0.12) / 0.76))), park.z * (1 - inOut))
+      auger.position.set(park.x * (1 - inOut), -0.9 * Math.sin(Math.PI * Math.min(1, Math.max(0, (drilling - 0.12) / 0.76))), park.z * (1 - inOut))
       auger.rotation.z = parts.lean * (1 - inOut)
       auger.rotation.y += dt * 22
     } else { auger.position.copy(park); auger.rotation.z = parts.lean }
@@ -140,17 +143,23 @@ export function IceCamp({ state, beamMats, iceMat, T }) {
     for (let k = fans.length; k < 2; k++) u.uCutBox.value[k].w = 0
     u.uBeamOn.value += ((s.noSignal ? 0 : 1) - u.uBeamOn.value) * Math.min(1, dt * 6)
     if (glowRef.current) { glowRef.current.position.set(s.boat.x, APEX_Y + 0.3 + lift, s.boat.z); glowRef.current.intensity = 3 * u.uBeamOn.value }
-    // the aim ring under the pointer
+    // the aim ring under the pointer (on the underside of the sheet in the under-ice view)
     aim.visible = !!s.aiming
-    if (s.aim) aim.position.set(s.aim.x, 0.015, s.aim.z)
+    if (s.aim) aim.position.set(s.aim.x, s.view === 'under' ? -ICE_T - 0.02 : 0.015, s.aim.z)
+    // the section view keeps the camp beside the hole, inside the cut; the other views leave it where the visitor started
+    const c = s.view === 'section' ? campAt(s.boat.x, s.boat.z, -9, 0.6) : camp
+    if (campG.current) { campG.current.position.set(c.x, 0, c.z); campG.current.rotation.y = c.yaw }
+    if (sledG.current) { sledG.current.position.set(c.x - 1.1, 0, c.z + (s.view === 'section' ? -2.6 : 2.3)); sledG.current.rotation.y = c.yaw + 0.5 }
+    if (lampRef.current) lampRef.current.position.set(c.lamp.x, c.lamp.y + 0.2, c.lamp.z)
+    u.uLamp.value.set(c.lamp.x, c.lamp.y, c.lamp.z, T.lamp)
   })
   return (
     <group onUpdate={(g) => g.traverse((o) => o.layers.set(SONAR_HIDE_LAYER))}>
       <primitive object={kit} />
-      <primitive object={shelter} position={[camp.x, 0, camp.z]} rotation-y={camp.yaw} />
-      <primitive object={sled} position={[camp.x - 1.1, 0, camp.z + 2.3]} rotation-y={camp.yaw + 0.5} />
+      <primitive ref={campG} object={shelter} position={[camp.x, 0, camp.z]} rotation-y={camp.yaw} />
+      <primitive ref={sledG} object={sled} position={[camp.x - 1.1, 0, camp.z + 2.3]} rotation-y={camp.yaw + 0.5} />
       <primitive object={aim} />
-      <pointLight position={[camp.lamp.x, camp.lamp.y + 0.2, camp.lamp.z]} color="#ffb060" intensity={T.lamp * 7} distance={10} decay={2} />
+      <pointLight ref={lampRef} position={[camp.lamp.x, camp.lamp.y + 0.2, camp.lamp.z]} color="#ffb060" intensity={T.lamp * 7} distance={10} decay={2} />
       <pointLight ref={(l) => { if (l) l.position.set(state.current.boat.x, APEX_Y + 0.3, state.current.boat.z); glowRef.current = l }} color="#7fe6ff" intensity={3} distance={4} decay={2} />
     </group>
   )
@@ -226,8 +235,107 @@ export function IcePick({ state }) {
   return (
     <mesh rotation-x={-Math.PI / 2} position-y={0.02} onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={onUp}>
       <planeGeometry args={[HALF * 2, HALF * 2]} />
-      <meshBasicMaterial transparent opacity={0} depthWrite={false} colorWrite={false} />
+      <meshBasicMaterial transparent opacity={0} depthWrite={false} colorWrite={false} side={THREE.DoubleSide} />
     </mesh>
+  )
+}
+
+// ---- view A: the hole's daylight, a soft column from the hole down to the bottom (under-ice photography's light shaft) ----
+export function LightShaft({ state }) {
+  const mesh = useMemo(() => {
+    const mat = new THREE.ShaderMaterial({
+      transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
+      uniforms: { uTime: { value: 0 }, uTop: { value: -ICE_T }, uBottom: { value: -12 } },
+      vertexShader: /* glsl */ `varying vec3 vW; varying vec3 vN; varying vec2 vUv;
+        void main() { vUv = uv; vec4 w = modelMatrix * vec4(position, 1.0); vW = w.xyz; vN = normalize(mat3(modelMatrix) * normal); gl_Position = projectionMatrix * viewMatrix * w; }`,
+      fragmentShader: /* glsl */ `precision highp float; varying vec3 vW; varying vec3 vN; varying vec2 vUv; uniform float uTime; uniform float uTop; uniform float uBottom;
+        float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+        float vnoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f); return mix(mix(hash(i), hash(i + vec2(1, 0)), f.x), mix(hash(i + vec2(0, 1)), hash(i + vec2(1, 1)), f.x), f.y); }
+        void main() {
+          float t = clamp((uTop - vW.y) / (uTop - uBottom), 0.0, 1.0);
+          float rays = 0.55 + 0.45 * vnoise(vec2(vUv.x * 7.0, vW.y * 0.35 - uTime * 0.12));
+          float rim = pow(abs(dot(normalize(vN), normalize(cameraPosition - vW))), 0.8);
+          float a = pow(1.0 - t, 1.6) * 0.42 * rays * rim;
+          gl_FragColor = vec4(vec3(0.7, 0.9, 1.0) * a, a);
+        }`,
+    })
+    const m = new THREE.Mesh(new THREE.CylinderGeometry(HOLE_DRAW_R * 1.05, HOLE_DRAW_R * 2.6, 1, 28, 1, true), mat)
+    m.frustumCulled = false; m.renderOrder = 3
+    return m
+  }, [])
+  useFrame(({ clock }) => {
+    const s = state.current
+    mesh.visible = s.view === 'under'
+    if (!mesh.visible) return
+    const D = depthAt(s.boat.x, s.boat.z), H = Math.max(1, D - ICE_T)
+    mesh.position.set(s.boat.x, -ICE_T - H / 2, s.boat.z); mesh.scale.y = H
+    mesh.material.uniforms.uTime.value = clock.elapsedTime; mesh.material.uniforms.uBottom.value = -D
+  })
+  return <primitive object={mesh} onUpdate={(o) => o.layers.set(SONAR_HIDE_LAYER)} />
+}
+
+// ---- view A: marine snow — slow specks in the water give the column its volume ----
+export function MarineSnow({ state }) {
+  const pts = useMemo(() => makeSnowfall(1400, new THREE.Vector3(70, 11, 70), { speed: 0.12, size: 0.6, alpha: 0.6, color: '#9fc7d8' }), [])
+  const { gl } = useThree()
+  useFrame(({ clock }) => {
+    const s = state.current
+    pts.visible = s.view === 'under'
+    const u = pts.userData.uniforms
+    u.uTime.value = clock.elapsedTime; u.uAmount.value = 0.9; u.uPixelRatio.value = gl.getPixelRatio()
+    u.uCenter.value.set(s.boat.x, -11.4, s.boat.z)
+  })
+  return <primitive object={pts} onUpdate={(o) => o.layers.set(SONAR_HIDE_LAYER)} />
+}
+
+// ---- view B: the cut faces of the section — the ice slab, the water column, the soil under the lakebed ----
+export function SectionFaces({ state }) {
+  const parts = useMemo(() => {
+    const slab = new THREE.Mesh(new THREE.BoxGeometry(240, ICE_T, 0.04), new THREE.MeshStandardMaterial({ color: '#d4e6f2', emissive: '#8fb9d6', emissiveIntensity: 0.4, roughness: 0.55, transparent: true, opacity: 0.94 }))
+    const waterMat = new THREE.ShaderMaterial({
+      transparent: true, depthWrite: false, side: THREE.DoubleSide,
+      uniforms: { uTop: { value: -ICE_T }, uTime: { value: 0 } },
+      vertexShader: /* glsl */ `varying vec3 vW; void main() { vec4 w = modelMatrix * vec4(position, 1.0); vW = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }`,
+      fragmentShader: /* glsl */ `precision highp float; varying vec3 vW; uniform float uTop; uniform float uTime;
+        void main() { float d = clamp((uTop - vW.y) / 24.0, 0.0, 1.0);
+          vec3 c = mix(vec3(0.07, 0.3, 0.36), vec3(0.01, 0.05, 0.08), pow(d, 0.7));
+          gl_FragColor = vec4(pow(c, vec3(1.0 / 2.2)), mix(0.28, 0.46, d)); }`,
+    })
+    const water = new THREE.Mesh(new THREE.PlaneGeometry(240, 60).translate(0, -30, 0), waterMat)
+    water.renderOrder = 2
+    const soil = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.DoubleSide }))
+    soil.frustumCulled = false
+    return { slab, water, soil, key: '' }
+  }, [])
+  useFrame(() => {
+    const s = state.current
+    const on = s.view === 'section'
+    parts.slab.visible = parts.water.visible = parts.soil.visible = on
+    if (!on) return
+    const cz = s.boat.z + SECTION_CAM.cutZ, cx = s.boat.x
+    parts.slab.position.set(cx, -ICE_T / 2, cz + 0.02)
+    parts.water.position.set(cx, -ICE_T, cz + 0.01)
+    const key = `${cx.toFixed(0)}|${cz.toFixed(1)}`
+    if (key !== parts.key) { // the soil's top edge follows the lakebed along the cut
+      parts.key = key
+      const N = 241, pos = new Float32Array(N * 6), colr = new Float32Array(N * 6), idx = []
+      const top = new THREE.Color('#5a4a2e'), bot = new THREE.Color('#1a140c')
+      for (let i = 0; i < N; i++) {
+        const x = cx - 120 + i, y = -depthAt(x, cz) - 0.05
+        pos.set([x, y, cz, x, -48, cz], i * 6); colr.set([top.r, top.g, top.b, bot.r, bot.g, bot.b], i * 6)
+        if (i < N - 1) idx.push(i * 2, i * 2 + 1, i * 2 + 2, i * 2 + 2, i * 2 + 1, i * 2 + 3)
+      }
+      const g = new THREE.BufferGeometry()
+      g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setAttribute('color', new THREE.BufferAttribute(colr, 3)); g.setIndex(idx)
+      parts.soil.geometry.dispose(); parts.soil.geometry = g
+    }
+  })
+  return (
+    <group onUpdate={(g) => g.traverse((o) => o.layers.set(SONAR_HIDE_LAYER))}>
+      <primitive object={parts.slab} />
+      <primitive object={parts.water} />
+      <primitive object={parts.soil} />
+    </group>
   )
 }
 

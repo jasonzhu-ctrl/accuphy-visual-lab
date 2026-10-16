@@ -3,7 +3,7 @@ import { motion } from 'framer-motion'
 import * as THREE from 'three'
 import LakeScene from './Scene'
 import { DEVICES, FT, MODE_LABELS, ICE_MODES } from '../2026-09-23-sonar-beam/devices'
-import { iceParams, ICE_START } from './iceScene'
+import { iceParams, ICE_START, VIEWS } from './iceScene'
 import { wedgeSpecs } from '../2026-09-23-beam-shapes-3d/wedge'
 import { phonePose, isPhoneLayout } from './SonarScreen'
 import { COLORMAP_NAMES } from './colormaps'
@@ -57,6 +57,7 @@ export default function SonarLake3D({ scene: sceneProp }) {
   const SHOWN_DEVICES = ONLY ? [DEVICES[ONLY]] : Object.values(DEVICES)
   const [deviceId, setDeviceId] = useState(ONLY || 'PL')
   const [mode, setMode] = useState(ICE ? 'liveice' : 'forward')
+  const [view, setView] = useState(ICE ? iceParams().view : 'top') // ice page cameras: top / under the ice / section (docs/ice-relationship-study.md)
   const [rangeFt, setRangeFt] = useState(80)       // the visitor's own range (slider)
   const [depthFt, setDepthFt] = useState(70) // depth range (PL Forward; every PLM view) — driven by AUTO below
   const [autoDepth, setAutoDepth] = useState(true) // off only when the dev Depth slider is touched
@@ -135,6 +136,7 @@ export default function SonarLake3D({ scene: sceneProp }) {
   state.current.noise = noise
   state.current.mode = mode
   state.current.deviceId = deviceId
+  state.current.view = view
   // the sonar picture is drawn by the GL canvas into the phone's screen element
   const sonarRect = useRef({ el: null, frame: null })
 
@@ -216,6 +218,11 @@ export default function SonarLake3D({ scene: sceneProp }) {
         <Row label="View">
           <div className="ac-seg">{modes.map((m) => <button key={m} className={`ac-btn ${mode === m ? 'is-active' : ''}`} onClick={() => setMode(m)}>{MODE_LABELS[m].replace(' View', '')}</button>)}</div>
         </Row>
+        {ICE && (
+          <Row label="Camera">
+            <div className="ac-seg">{VIEWS.map((v) => <button key={v} className={`ac-btn ${view === v ? 'is-active' : ''}`} onClick={() => setView(v)}>{{ top: 'Top', under: 'Under the ice', section: 'Section' }[v]}</button>)}</div>
+          </Row>
+        )}
         <Row label="Range">
           {/* Down: the range is the AUTO depth range, so the slider only shows it */}
           <input type="range" min={20} max={maxFt} step={5} value={effRangeFt} disabled={downLike} title={downLike ? 'AUTO: follows the water depth' : undefined} onChange={(e) => setRangeFt(+e.target.value)} className="ac-range w-36" style={{ '--fill': `${((effRangeFt - 20) / (maxFt - 20)) * 100}%`, opacity: downLike ? 0.45 : 1 }} />

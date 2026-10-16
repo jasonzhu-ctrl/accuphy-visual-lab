@@ -25,6 +25,7 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
     uFishSonarScale: { value: 1.0 / 2.6 }, // fish are DRAWN ×2.6 in the lake (fish.js); the sonar sees them at true size (§7.4)
     uHighlight: { value: new THREE.Color('#7fe6ff') },
     uRevealGain: { value: 1.0 }, // ice scene: a stronger lift inside the beam (the window in the snow must read lit)
+    uClip: { value: new THREE.Vector2(0, 0) }, // ice section view: x = on, y = world z of the cut wall; fragments beyond it are cut away in the main view
     uOutGamma: { value: 1.0 },   // ice scene: < 1 brightens the dark water world a little (main view only)
   }
   const mat = new THREE.ShaderMaterial({
@@ -81,7 +82,7 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
       uniform int uBeamCount;
       uniform vec3 uApex[${MAX_BEAMS}]; uniform vec3 uC[${MAX_BEAMS}]; uniform vec3 uH[${MAX_BEAMS}]; uniform vec3 uN[${MAX_BEAMS}];
       uniform vec4 uAng[${MAX_BEAMS}]; uniform vec2 uRT[${MAX_BEAMS}]; uniform vec4 uBox[${MAX_BEAMS}];
-      uniform float uReveal; uniform vec3 uHighlight; uniform float uSonarPass; uniform float uRevealGain; uniform float uOutGamma;
+      uniform float uReveal; uniform vec3 uHighlight; uniform float uSonarPass; uniform float uRevealGain; uniform float uOutGamma; uniform vec2 uClip;
       #ifdef FISH
         varying float vPattern; varying vec3 vBelly; varying vec3 vSide; varying vec3 vLocal; varying vec2 vUv;
         float hash3(vec3 p) { return fract(sin(dot(p, vec3(127.1, 311.7, 74.7))) * 43758.5453); }
@@ -117,6 +118,7 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
       }
 
       void main() {
+        if (uClip.x > 0.5 && uSonarPass < 0.5 && vWorld.z > uClip.y) discard; // the section cut (the sonar still sees the whole lake)
         vec3 n = normalize(vNormal);
         if (!gl_FrontFacing) n = -n;
         float lambert = max(dot(n, uSun), 0.0);

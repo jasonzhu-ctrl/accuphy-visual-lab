@@ -1553,3 +1553,21 @@ Numbered log. Newest at the bottom.
     - The cone-shaped thinning of #98 looked like a hole cut in the snow. Replaced: the snow stays clear within ~14 m of
       the hole (a soft, noisy edge — the angler set up on open ice) and thins only by half over the beam further out.
     - Shown to Jason the same evening; his verdict pending. The summer lake is unchanged.
+
+100. **2026-10-16** — **Both cameras from the study are built as a switch: Top · Under the ice · Section** (Jason, on
+     `docs/ice-relationship-study.md`: "a 和 b都做一下看看"). The ice page's panel has a Camera row; `?view=under|section`
+     opens one directly; the aerial view stays the default until he chooses.
+     - **A, under the ice** (`UNDER_CAM`): the camera sits in the water a few metres under the sheet, to one side and
+       behind the hole, following it. The sheet is drawn from below as a lit ceiling (`iceSheet.js`, the back-facing
+       branch): bright where the ice is clear (the sky through it, with the kit on the ice as silhouettes), dark under the
+       snow and the milky plates, cracks and bubbles as light leaks, the hole a disc of daylight with a soft light shaft
+       to the bottom (`LightShaft`), slow marine snow in the water (`MarineSnow`). The Mini hangs from the ceiling on
+       its cable, the cone opens below it, the lit strip and the fish are the summer world. The auger now reaches 0.9 m
+       down, so it breaks through the ceiling when the visitor hole-hops; the aim ring sits on the underside.
+     - **B, section** (`SECTION_CAM`): the camera near ice level in front of the hole; everything beyond a wall 6.5 m in
+       front of the hole is cut away — the lake materials and the ice discard it (`uClip`, never in the sonar passes), the
+       beam curtain and the snow are clipped — and the cut shows its faces (`SectionFaces`): the ice slab's pale edge, a
+       translucent water column darkening with depth, and the soil under the lakebed following the terrain profile. The
+       camp stands beside the hole inside the cut. The sky dome shows above the ice.
+     - The summer lake is unchanged (the new code runs only with `scene="ice"`; the cut uniforms default to off).
+     - Shown to Jason as two screenshots; his pick decides which becomes the ice page's camera (or whether both stay).

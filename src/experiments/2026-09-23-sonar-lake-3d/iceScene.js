@@ -57,11 +57,20 @@ export const LOOKS = {
 export const CUT_R = 7.0    // the pool's radius round the hole (m); the beam's footprint stretches it
 export const ISLAND_R = 1.9 // the ice island the kit stands on
 
+// The three cameras of the ice page (docs/ice-relationship-study.md, Jason 2026-10-16: a 和 b 都做一下看看):
+//   top     — the aerial view the summer lake uses (#94)
+//   under   — A: the camera in the water under the ice; the sheet is a lit ceiling, the hole a light shaft
+//   section — B: the camera near ice level, the lake cut open along a wall in front of the hole
+// Offsets are from the live hole; the camera follows the kit. ?view=top|under|section; the panel switches live.
+export const VIEWS = ['top', 'under', 'section']
+export const UNDER_CAM = { pos: [-10, -2.6, 23], look: [2, -5.6, -1] } // a little higher and further back: more ceiling in the frame
+export const SECTION_CAM = { pos: [-4, 4, 30], look: [2, -6, 0], cutZ: 6.5 } // cutZ: the wall, this far in front of the hole
 export function iceParams() {
   const q = typeof window !== 'undefined' ? window.location.search : ''
   const time = (/[?&]time=(dusk|day|night)/.exec(q) || [])[1] || 'dusk'
   const look = (/[?&]look=(snow|mixed|glass)/.exec(q) || [])[1] || 'glass' // Jason 2026-10-16: 图像关系我偏好最后一个 (the black ice)
-  return { time, look, T: TIMES[time], L: LOOKS[look] }
+  const view = (/[?&]view=(top|under|section)/.exec(q) || [])[1] || 'top'
+  return { time, look, view, T: TIMES[time], L: LOOKS[look] }
 }
 
 export const col = (hex) => new THREE.Color(hex)

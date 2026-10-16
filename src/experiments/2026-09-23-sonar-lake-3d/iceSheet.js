@@ -22,6 +22,7 @@ export function makeIceMaterial(terrain) {
     uWind: { value: WIND.clone() },
     uHighlight: { value: new THREE.Color('#7fe6ff') },
     uGlow: { value: new THREE.Color('#e08a5e') }, uGlowDir: { value: new THREE.Vector3(-0.8, 0, -0.45).normalize() }, // the afterglow, mirrored in the ice
+    uClip: { value: new THREE.Vector2(0, 0) }, // section view: x = on, y = world z of the cut wall
     // the cutaway: pool centre, its radius, the island's radius, and up to two beam boxes (xMin, xMax, zHalf, on) from the centre
     uCutOn: { value: 1 }, uCutC: { value: new THREE.Vector2(1e4, 1e4) }, uCutR: { value: 5.5 }, uIsland: { value: 1.9 },
     uCutBox: { value: [new THREE.Vector4(0, 0, 0, 0), new THREE.Vector4(0, 0, 0, 0)] },
@@ -52,7 +53,7 @@ export function makeIceMaterial(terrain) {
       uniform float uCover; uniform float uClear; uniform float uWindow;
       uniform vec4 uHoles[MAXH]; uniform int uHoleCount; uniform float uBeamOn;
       uniform vec4 uLamp; uniform vec3 uLampColor;
-      uniform sampler2D uTerrain; uniform float uTerrainHalf; uniform vec2 uWind; uniform vec3 uHighlight; uniform vec3 uGlow; uniform vec3 uGlowDir;
+      uniform sampler2D uTerrain; uniform float uTerrainHalf; uniform vec2 uWind; uniform vec3 uHighlight; uniform vec3 uGlow; uniform vec3 uGlowDir; uniform vec2 uClip;
       uniform float uCutOn; uniform vec2 uCutC; uniform float uCutR; uniform float uIsland; uniform vec4 uCutBox[MB];
       uniform int uBeamCount;
       uniform vec3 uApex[MB]; uniform vec3 uC[MB]; uniform vec3 uH[MB]; uniform vec3 uN[MB];
@@ -150,6 +151,7 @@ export function makeIceMaterial(terrain) {
       }
       void main() {
         vec2 P = vWorld.xz;
+        if (uClip.x > 0.5 && P.y > uClip.y) discard; // the section cut
         vec3 V = normalize(cameraPosition - vWorld);
         // ---- the holes ----
         float hole = 0.0, oldHole = 0.0, clear = 0.0, slush = 0.0, chips = 0.0, glow = 0.0;
@@ -279,6 +281,24 @@ export function makeIceMaterial(terrain) {
         vec3 toL = uLamp.xyz - vWorld; float dl = length(toL);
         float lamp = uLamp.w * 2.2 / (1.0 + dl * dl * 0.18) * max(dot(N, toL / max(dl, 0.01)), 0.0);
         col += uLampColor * lamp * mix(0.3, 1.0, snow);
+        if (!gl_FrontFacing) {
+          // view A, from under the ice (reference: under-ice photography, docs/ice-relationship-study.md): the sheet is a
+          // ceiling lit by the sky through it — bright where the ice is clear, dark under the snow, the milky plates in
+          // between, cracks and bubbles as light leaks, the hole a disc of open daylight. Clear ice stays a little
+          // see-through, so the kit on the ice reads as silhouettes.
+          vec3 skyUp = mix(uSkyHorizon, uSkyZenith, 0.35) * 1.6 + uGlow * 0.15;
+          float block = clamp(snow * 0.92 + milky * 0.55 + oldHole * 0.3, 0.0, 1.0);
+          float leak = clamp(core * 0.6 + halo * 0.25 + bub * 0.5, 0.0, 1.0);
+          float ripple = 0.9 + 0.2 * fbm3(P * 1.7 + 3.0); // frozen ripples on the underside
+          vec3 under = skyUp * (1.0 - block) * ripple * vec3(0.78, 0.9, 1.0) + skyUp * leak * 0.6 + vec3(0.02, 0.05, 0.07) * block;
+          under = mix(under, skyUp * 2.2 + vec3(0.2), hole);
+          float uAlpha = mix(0.72, 1.0, block) ; uAlpha = mix(uAlpha, 0.35, hole);
+          float dU = length(vWorld - cameraPosition);
+          float fogU = 1.0 - exp(-dU * 0.02);
+          under = mix(under, uWater * 1.5, fogU); uAlpha = mix(uAlpha, 1.0, fogU);
+          gl_FragColor = vec4(pow(max(under, 0.0), vec3(1.0 / 2.2)), uAlpha);
+          return;
+        }
         // distance fog
         float dist = length(vWorld - cameraPosition);
         float fog = 1.0 - exp(-dist * uFogDensity);

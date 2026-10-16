@@ -16,10 +16,10 @@ import { makeLogoGeometry, makePlinthGeometry, logoFrame } from './logo'
 import { buildObstacles, toCircles } from './obstacles'
 import SonarScreen, { SONAR_HIDE_LAYER, LAKEBED_LAYER, FISH_LAYER, LOGO_LAYER } from './SonarScreen'
 // the ice scene (Jason 2026-10-16): the same lake frozen over — iceScene.js has the story and the presets
-import { IceSky, IceSheet, IceCamp, IceWalls, Snowfall, IcePick } from './IceCamp'
+import { IceSky, IceSheet, IceCamp, IceWalls, Snowfall, IcePick, LightShaft, MarineSnow, SectionFaces } from './IceCamp'
 import { makeIceMaterial } from './iceSheet'
 import { bakeTerrain } from './sonarMarks'
-import { iceParams, ICE_CAM_T, ICE_CAM_D, ICE_LAKE_W, ICE_FOG, dir } from './iceScene'
+import { iceParams, ICE_CAM_T, ICE_CAM_D, ICE_LAKE_W, ICE_FOG, UNDER_CAM, SECTION_CAM, ICE_T, dir } from './iceScene'
 
 // ---------- lakebed ----------
 function Lakebed({ mat }) {
@@ -370,15 +370,20 @@ function Beams({ state, ice = false }) {
     return { g, e: new THREE.EdgesGeometry(g, 25) }
   }), [specs])
   useEffect(() => () => meshes.forEach((m) => { m.g.dispose(); m.e.dispose() }), [meshes]) // AUTO depth rebuilds the PL Forward curtain
-  useFrame(() => { group.current.position.copy(state.current.apex) })
+  const clip = useMemo(() => [new THREE.Plane(new THREE.Vector3(0, 0, -1), 1e5)], []) // the ice section view cuts the curtain at the wall
+  useFrame(() => {
+    const s = state.current
+    group.current.position.copy(s.apex)
+    clip[0].constant = ice && s.view === 'section' ? s.boat.z + SECTION_CAM.cutZ : 1e5
+  })
   return (
     <group ref={group} onUpdate={(g) => g.traverse((o) => o.layers.set(SONAR_HIDE_LAYER))}>
       {meshes.map((m, i) => (
         <group key={i}>
           <mesh geometry={m.g}>
-            <meshPhysicalMaterial color="#5fd3ff" transparent opacity={ice ? 0.2 : 0.11} side={THREE.DoubleSide} depthWrite={false} roughness={0.3} />
+            <meshPhysicalMaterial color="#5fd3ff" transparent opacity={ice ? 0.2 : 0.11} side={THREE.DoubleSide} depthWrite={false} roughness={0.3} clippingPlanes={ice ? clip : undefined} />
           </mesh>
-          <lineSegments geometry={m.e}><lineBasicMaterial color="#dff7ff" transparent opacity={ice ? 0.75 : 0.6} /></lineSegments>
+          <lineSegments geometry={m.e}><lineBasicMaterial color="#dff7ff" transparent opacity={ice ? 0.75 : 0.6} clippingPlanes={ice ? clip : undefined} /></lineSegments>
         </group>
       ))}
     </group>
@@ -432,7 +437,7 @@ function Rig({ state, sonarRect, fogMats, cam = LAKE_CAM }) {
       tmp.set(s.boat.x, 0.6, s.boat.z).project(camera)
       const hw = (s.hintEl.offsetWidth || 160) / 2 + 8
       const px = Math.min(size.width - hw, Math.max(hw, ((tmp.x + 1) / 2) * size.width))
-      const py = cam.hintBelow ? ((1 - tmp.y) / 2) * size.height + (k > 1 ? 30 : 44) : Math.max((s.hintEl.offsetHeight || 34) + 54, ((1 - tmp.y) / 2) * size.height - (k > 1 ? 22 : 46))
+      const py = cam.hintBelow ? ((1 - tmp.y) / 2) * size.height + (s.view === 'under' ? 150 : k > 1 ? 30 : 44) : Math.max((s.hintEl.offsetHeight || 34) + 54, ((1 - tmp.y) / 2) * size.height - (k > 1 ? 22 : 46))
       s.hintEl.style.transform = `translate(${px.toFixed(1)}px, ${py.toFixed(1)}px) translate(-50%, ${cam.hintBelow ? '0' : '-100%'})`
       s.hintEl.style.opacity = s.hasDragged ? '0' : '1'
     }
@@ -476,6 +481,19 @@ function Rig({ state, sonarRect, fogMats, cam = LAKE_CAM }) {
       camera.lookAt(s.boat.x + 1, -0.6, s.boat.z)
       return
     }
+    // the ice page's other two cameras (docs/ice-relationship-study.md A and B): offsets from the live hole, smooth follow
+    if (s.view === 'under' || s.view === 'section') {
+      const C = s.view === 'under' ? UNDER_CAM : SECTION_CAM
+      const e = Math.min(1, dt * 2.5)
+      tmp.set(s.boat.x + C.pos[0] + px * 1.2, C.pos[1] + py * 0.6, s.boat.z + C.pos[2])
+      if (!s.camP) { s.camP = tmp.clone(); s.camL = new THREE.Vector3(s.boat.x + C.look[0], C.look[1], s.boat.z + C.look[2]) }
+      s.camP.lerp(tmp, e)
+      tmp.set(s.boat.x + C.look[0], C.look[1], s.boat.z + C.look[2]); s.camL.lerp(tmp, e)
+      camera.up.set(0, 1, 0); camera.position.copy(s.camP); camera.lookAt(s.camL)
+      if (camera.view?.enabled) camera.clearViewOffset()
+      return
+    }
+    s.camP = null
     // view from the south (desktop exactly as before); phones: pulled back, re-centred on a step preset's boat
     const fx = k > 1 && s.frameX != null ? s.frameX : cam.T.x
     s.camX = s.camX == null ? fx : s.camX + (fx - s.camX) * Math.min(1, dt * 2.5)
@@ -501,6 +519,16 @@ function PickPlane({ state }) {
       <meshBasicMaterial transparent opacity={0} depthWrite={false} colorWrite={false} />
     </mesh>
   )
+}
+
+// the ice section view (B): every lake material and the ice discard what lies beyond the wall in front of the hole
+function SectionCut({ state, mats }) {
+  useFrame(() => {
+    const s = state.current
+    const on = s.view === 'section' ? 1 : 0, z = s.boat.z + SECTION_CAM.cutZ
+    for (const m of mats) m.userData.uniforms.uClip.value.set(on, z)
+  })
+  return null
 }
 
 // paused: the sign-up gate is open — stop the render loop so the lake and the sonar picture freeze
@@ -533,7 +561,7 @@ export default function LakeScene({ state, sonarRect, paused = false, scene = 'l
   const beamMats = useMemo(() => (iceMat ? [...lakeMats, iceMat] : lakeMats), [lakeMats, iceMat]) // the ice shows the beam's reach too
   const bg = ice ? P.T.bg : '#9cc1cf'
   return (
-    <Canvas frameloop={paused ? 'never' : 'always'} dpr={[1, 1.5]} camera={{ fov: 38, near: 0.5, far: 400, position: [-38, 34, 54] }} gl={{ antialias: true, powerPreference: 'high-performance' }}>
+    <Canvas frameloop={paused ? 'never' : 'always'} dpr={[1, 1.5]} camera={{ fov: 38, near: 0.5, far: 400, position: [-38, 34, 54] }} gl={{ antialias: true, powerPreference: 'high-performance' }} onCreated={({ gl }) => { gl.localClippingEnabled = true }}>
       <color attach="background" args={[bg]} />
       <fog attach="fog" args={ice ? [bg, ICE_FOG.near, ICE_FOG.far] : [bg, 160, 420]} />
       {ice ? (<>
@@ -556,6 +584,10 @@ export default function LakeScene({ state, sonarRect, paused = false, scene = 'l
         <IceSheet mat={iceMat} />
         <IceCamp state={state} beamMats={beamMats} iceMat={iceMat} T={P.T} />
         {P.L.cut > 0 && <IceWalls state={state} iceMat={iceMat} />}
+        <LightShaft state={state} />
+        <MarineSnow state={state} />
+        <SectionFaces state={state} />
+        <SectionCut state={state} mats={[...lakeMats, iceMat]} />
         <Snowfall state={state} T={P.T} />
         <IcePick state={state} />
       </>) : (<>
