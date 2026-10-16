@@ -1531,3 +1531,10 @@ Numbered log. Newest at the bottom.
       crack); bubbles and specks only within ~30 m of the camera. The Fresnel sky mirror stays. The hairline families
       and the bright crack cores of #96 are gone.
     - The summer lake is untouched. Shown to Jason the same evening; his verdict pending.
+
+98. **2026-10-16** — **The snow thins out over the beam, so the sonar coverage always shows** (Jason, on #97: "水里的声纳
+    coverage的渲染被白色的雪挡住了"). The blown-snow patches and the milky plates were opaque, and where one lay over the
+    cone the lit bottom disappeared. Now the view ray from each bit of ice is marched down through the water (the #94
+    window test); where it meets the beam, the snow and the milky ice are reduced to 6 % with a faint breath of the
+    beam's cyan, and the bare ice is left as it is. Decision #55 applied once more: whatever the beam reaches lights up.
+    `LOOKS.glass.window = 1`. The snow look keeps its cutaway instead.

@@ -170,6 +170,28 @@ export function makeIceMaterial(terrain) {
             slush = max(slush, 0.5 * (1.0 - smoothstep(r * 1.02, r * 1.4, d)) * smoothstep(r * 0.95, r * 1.08, d));
           }
         }
+        // ---- the window: along the line of sight through this bit of ice, does the eye meet the beam? (the lit
+        //      bottom lies far behind the hole from the camera's angle, so a straight-down test cut the window in the
+        //      wrong place) — march the view ray down through the water to the bottom
+        float beam = 0.0, wide = 0.0;
+        vec3 rd = -V;
+        if (rd.y < -0.05 && uBeamCount > 0) {
+          float tEnd = min(48.0, terrainDepth(P) * 1.25 / -rd.y);
+          float jit = hash(gl_FragCoord.xy * 0.37); // per-pixel offset: grain instead of stair-steps at the cone's edge
+          for (int j = 0; j < 20; j++) {
+            float t = (float(j) + jit) * tEnd / 20.0;
+            vec3 q = vWorld + rd * t;
+            if (q.y < -terrainDepth(q.xz) - 0.3) break;
+            for (int k = 0; k < MB; k++) {
+              if (k < uBeamCount) { beam = max(beam, insideBeam(k, q, 0.0)); wide = max(wide, insideBeam(k, q, 0.02)); }
+            }
+          }
+        }
+        // Jason 2026-10-16: 水里的声纳coverage的渲染被白色的雪挡住了 — over the beam the snow and the milky ice thin out
+        // (decision #55: whatever the beam reaches lights up), so the coverage always shows; bare ice is untouched
+        float win = smoothstep(0.04, 0.45, beam) * uWindow * uBeamOn;
+        float keep = 1.0 - 0.94 * win; // what is left of the snow / milky plates over the beam
+        float edge = clamp(wide - beam, 0.0, 1.0) * uWindow * uBeamOn;
         // ---- snow over the ice ----
         float h0 = drift(P);
         float e = 0.6;
@@ -185,7 +207,7 @@ export function makeIceMaterial(terrain) {
         float hh = h + 0.02 * (vnoise(P * 2.3 + 9.0) - 0.5);
         float snowCore = smoothstep(thr - 0.012, thr + 0.012, hh);
         float snowSkirt = smoothstep(thr - 0.09, thr - 0.005, hh);
-        float snow = max(max(snowCore, 0.4 * snowSkirt), streaks) * (1.0 - clear);
+        float snow = max(max(snowCore, 0.4 * snowSkirt), streaks) * (1.0 - clear) * keep;
         float lamb = max(dot(N, uSun), 0.0);
         vec3 sky = mix(uSkyHorizon, uSkyZenith, 0.45);
         vec3 snowAlb = vec3(0.93, 0.95, 0.98);
@@ -212,7 +234,7 @@ export function makeIceMaterial(terrain) {
         float core = clamp(cA.x + cB.x, 0.0, 1.0) * 0.5;
         float halo = clamp(cA.y + cB.y, 0.0, 1.0) * 0.6; // the soft white line of snow in the groove is what the eye gets
         float cloud = fbm4(P * 0.045 + 17.0);
-        float milky = smoothstep(0.5, 0.64, cloud) * (0.6 + 0.4 * fbm3(P * 0.6 + 2.0)); // opaque, pale grey-blue plates
+        float milky = smoothstep(0.5, 0.64, cloud) * (0.6 + 0.4 * fbm3(P * 0.6 + 2.0)) * keep; // opaque, pale grey-blue plates
         float polish = 0.5 + 0.5 * fbm3(vec2(Pw.x * 0.12, Pw.y * 0.9) + 4.0);          // faint wind polish along the wind
         float nearD = 1.0 - smoothstep(12.0, 32.0, camD);                                 // close-up detail only near the camera
         float bub = bubbles(P) * nearD * 0.5;
@@ -226,34 +248,12 @@ export function makeIceMaterial(terrain) {
         iceCol += whiteLit * halo * 0.5;
         iceCol = mix(iceCol, whiteLit, white);
         float iceAlpha = clamp(mix(0.5, 0.2, uClear) + F * 1.4 + milky * 0.6 + white * 0.7 + halo * 0.3, 0.0, 1.0);
-        // ---- the window: along the line of sight through this bit of ice, does the eye meet the beam? (the lit
-        //      bottom lies far behind the hole from the camera's angle, so a straight-down test cut the window in the
-        //      wrong place) — march the view ray down through the water to the bottom
-        float beam = 0.0, wide = 0.0;
-        vec3 rd = -V;
-        if (rd.y < -0.05 && uBeamCount > 0) {
-          float tEnd = min(48.0, terrainDepth(P) * 1.25 / -rd.y);
-          float jit = hash(gl_FragCoord.xy * 0.37); // per-pixel offset: grain instead of stair-steps at the cone's edge
-          for (int j = 0; j < 20; j++) {
-            float t = (float(j) + jit) * tEnd / 20.0;
-            vec3 q = vWorld + rd * t;
-            if (q.y < -terrainDepth(q.xz) - 0.3) break;
-            for (int k = 0; k < MB; k++) {
-              if (k < uBeamCount) { beam = max(beam, insideBeam(k, q, 0.0)); wide = max(wide, insideBeam(k, q, 0.02)); }
-            }
-          }
-        }
-        float win = pow(clamp(beam * 1.3, 0.0, 1.0), 0.7) * uWindow * uBeamOn; // the snow over the beam glows and goes half-clear
-        float edge = clamp(wide - beam, 0.0, 1.0) * uWindow * uBeamOn;
         // ---- put it together ----
         vec3 col = mix(iceCol, litSnow * (1.0 + 0.15 * streaks), snow);
         float alpha = mix(iceAlpha, 1.0, snow);
         float top = max(slush, chips); // fresh shavings and slush: the whitest thing on the ice
         col = mix(col, litSnow * 1.05, top); alpha = mix(alpha, 1.0, top);
-        vec3 glowCol = mix(litSnow, uHighlight * 1.1, 0.55); // snow lit from below: cyan through white
-        col = mix(col, glowCol, win * 0.8);
-        alpha = mix(alpha, mix(0.62, 0.3, snow * 0.0 + 0.5), win); // half-clear: the cone and the lit bottom show through, the snow's grain stays
-        col += uHighlight * edge * 0.25;
+        col += uHighlight * win * 0.06 * (1.0 - keep); // a breath of the beam's light under the thinned snow
         float rip = vnoise(P * 60.0 + uTime * vec2(0.9, -0.6)) - 0.5;
         vec3 holeCol = mix(vec3(0.01, 0.03, 0.05), vec3(0.25, 0.75, 0.95), glow * 0.85) + rip * 0.06;
         col = mix(col, holeCol, hole); alpha = mix(alpha, 0.96, hole);
