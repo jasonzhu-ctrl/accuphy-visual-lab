@@ -19,7 +19,7 @@ import SonarScreen, { SONAR_HIDE_LAYER, LAKEBED_LAYER, FISH_LAYER, LOGO_LAYER } 
 import { IceSky, IceSheet, IceCamp, IceWalls, Snowfall, IcePick, LightShaft, MarineSnow, SectionFaces } from './IceCamp'
 import { makeIceMaterial } from './iceSheet'
 import { bakeTerrain } from './sonarMarks'
-import { iceParams, ICE_CAM_T, ICE_CAM_D, ICE_LAKE_W, ICE_FOG, UNDER_CAM, SECTION_CAM, ICE_T, dir } from './iceScene'
+import { iceParams, ICE_CAM_T, ICE_CAM_D, ICE_LAKE_W, ICE_FOG, UNDER_CAM, SECTION_CAM, SECTION_CAM_PHONE, ICE_T, dir } from './iceScene'
 
 // ---------- lakebed ----------
 function Lakebed({ mat }) {
@@ -484,7 +484,7 @@ function Rig({ state, sonarRect, fogMats, cam = LAKE_CAM }) {
     }
     // the ice page's other two cameras (docs/ice-relationship-study.md A and B): offsets from the live hole, smooth follow
     if (s.view === 'under' || s.view === 'section') {
-      const C = s.view === 'under' ? UNDER_CAM : SECTION_CAM
+      const C = s.view === 'under' ? UNDER_CAM : (k > 1 ? SECTION_CAM_PHONE : SECTION_CAM) // k > 1: the portrait-phone layout
       const e = Math.min(1, dt * 2.5)
       tmp.set(s.boat.x + C.pos[0] + px * 1.2, C.pos[1] + py * 0.6, s.boat.z + C.pos[2])
       if (!s.camP) { s.camP = tmp.clone(); s.camL = new THREE.Vector3(s.boat.x + C.look[0], C.look[1], s.boat.z + C.look[2]) }

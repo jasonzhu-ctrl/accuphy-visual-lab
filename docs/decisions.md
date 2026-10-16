@@ -1616,3 +1616,15 @@ Numbered log. Newest at the bottom.
        the section with the cone above the app frame. No console errors.
      - Left for later rounds: the slab edge opening where a hole is near the wall; snow lying on the slab top; the
        water column's tint; the camp's details; whether Top and Under the ice stay in the Camera row.
+
+103. **2026-10-16** — **Section view, tuning round 2** (Jason: "好的" to round 1 — continue).
+     - **The far ice closes up:** toward the horizon the sheet's alpha rises with the grazing angle, so the sky's mirror
+       wins over what lies under it; the lakebed and the lockup no longer show through the far ice band (they did at
+       60 m). Straight down the ice stays a window.
+     - **Snow on the slab's edge:** the slab face re-evaluates the sheet's own snow mask (the same GLSL, fed the wind,
+       the cover and the hole) at the wall, so a white cap sits on the cut edge exactly where snow lies on the surface
+       behind it, and the open stretch round the hole stays bare.
+     - **Phones:** a second section camera (`SECTION_CAM_PHONE`, closer, looking further down, 50°) frames the ice
+       band, the slab and the cone with the lit bottom in the band above the app frame; the desktop camera is unchanged.
+     - Checked at desktop and 375×812; no console errors. Noted: on phones the lockup still shows faintly through the
+       ice band's lower part (a steeper angle); the shelter sits at the right edge there.

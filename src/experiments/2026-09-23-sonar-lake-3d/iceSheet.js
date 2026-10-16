@@ -254,7 +254,9 @@ export function makeIceMaterial(terrain) {
         iceCol = mix(iceCol, milkyLit, milky * 0.7);
         iceCol += whiteLit * halo * 0.5;
         iceCol = mix(iceCol, whiteLit, white);
-        float iceAlpha = clamp(mix(0.5, 0.26, uClear) + F * 1.4 + milky * 0.6 + white * 0.7 + halo * 0.3, 0.0, 1.0);
+        // toward the horizon the sheet closes up: the sky's mirror wins over what lies under it (#103)
+        float graze = pow(1.0 - cosT, 2.0);
+        float iceAlpha = clamp(mix(0.5, 0.26, uClear) + F * 1.4 + graze * 0.55 + milky * 0.6 + white * 0.7 + halo * 0.3, 0.0, 1.0);
         // ---- put it together ----
         vec3 col = mix(iceCol, litSnow * (1.0 + 0.15 * streaks), snow);
         float alpha = mix(iceAlpha, 1.0, snow);

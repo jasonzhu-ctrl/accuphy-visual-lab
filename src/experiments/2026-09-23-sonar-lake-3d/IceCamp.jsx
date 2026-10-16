@@ -12,7 +12,7 @@ import { setHoles } from './iceSheet'
 import { makeHoleKit, makeShelter, makeSled, makeAimRing, MINI_H, CABLE_TOP_Y, KIT_SCALE } from './iceProps'
 import { makeSnowfall } from './snow'
 import { makeSkyDome } from './iceSky'
-import { ICE_T, MINI_DROP, APEX_Y, HOLE_DRAW_R, MAX_HOLES, ICE_CAMP, CUT_R, ISLAND_R, SECTION_CAM, col, dir } from './iceScene'
+import { ICE_T, MINI_DROP, APEX_Y, HOLE_DRAW_R, MAX_HOLES, ICE_CAMP, CUT_R, ISLAND_R, SECTION_CAM, WIND, col, dir } from './iceScene'
 import { setBeamUniforms } from './lakeMaterial'
 import { SONAR_HIDE_LAYER } from './SonarScreen'
 import { HALF, depthAt } from './terrain'
@@ -300,13 +300,30 @@ export function SectionFaces({ state }) {
     // layers from the freeze-up, a few bubbles caught in it (colours are display values)
     const slabMat = new THREE.ShaderMaterial({
       transparent: true,
-      uniforms: { uT: { value: slabT } },
+      uniforms: { uT: { value: slabT }, uWind: { value: WIND.clone() }, uCover: { value: 0.27 }, uHole: { value: new THREE.Vector2(1e4, 1e4) } },
       vertexShader: /* glsl */ `varying vec3 vW; void main() { vec4 w = modelMatrix * vec4(position, 1.0); vW = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }`,
-      fragmentShader: /* glsl */ `precision highp float; varying vec3 vW; uniform float uT;
+      fragmentShader: /* glsl */ `precision highp float; varying vec3 vW; uniform float uT; uniform vec2 uWind; uniform float uCover; uniform vec2 uHole;
         float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
         float vnoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f); return mix(mix(hash(i), hash(i + vec2(1, 0)), f.x), mix(hash(i + vec2(0, 1)), hash(i + vec2(1, 1)), f.x), f.y); }
+        float fbm3(vec2 p) { return 0.5 * vnoise(p) + 0.25 * vnoise(p * 2.1 + 1.3) + 0.125 * vnoise(p * 4.3 + 2.7); }
+        float fbm4(vec2 p) { return fbm3(p) + 0.0625 * vnoise(p * 8.9 + 5.1); }
+        // the sheet's snow mask (iceSheet.js), evaluated at the wall, so the cap on the slab matches the snow behind it
+        float snowAt(vec2 P) {
+          vec2 Pw = vec2(dot(P, uWind), dot(P, vec2(-uWind.y, uWind.x)));
+          float big = fbm4(P * 0.035 + 3.0), sast = fbm3(vec2(Pw.x * 0.07, Pw.y * 0.6) + 7.0);
+          float h0 = 0.55 * big + 0.45 * sast;
+          float h = 0.82 * h0 + 0.18 * fbm3(P * 0.8 + 1.7);
+          float thr = mix(0.62, 0.30, uCover);
+          float streakN = fbm3(vec2(Pw.x * 0.05, Pw.y * 0.7) + 2.0);
+          float streaks = smoothstep(0.645, 0.665, streakN + 0.03 * (vnoise(P * 3.0) - 0.5));
+          float hh = h + 0.02 * (vnoise(P * 2.3 + 9.0) - 0.5);
+          float core = smoothstep(thr - 0.012, thr + 0.012, hh), skirt = smoothstep(thr - 0.09, thr - 0.005, hh);
+          float open = 1.0 - smoothstep(9.0, 16.0, distance(P, uHole) + 3.0 * (fbm3(P * 0.11 + 5.0) - 0.5));
+          return max(max(core, 0.4 * skirt), streaks) * (1.0 - 0.9 * open);
+        }
         void main() {
           float d = clamp(-vW.y / uT, 0.0, 1.0);
+          float snow = snowAt(vW.xz);
           vec3 top = vec3(0.84, 0.9, 0.95), mid = vec3(0.58, 0.74, 0.86), bot = vec3(0.34, 0.56, 0.74); // ice in section: white-blue over clear blue, not a white wall
           vec3 c = d < 0.5 ? mix(top, mid, d * 2.0) : mix(mid, bot, (d - 0.5) * 2.0);
           float layers = 0.5 + 0.5 * sin(vW.y * 70.0 + vnoise(vW.xz * 0.6) * 4.0);
@@ -315,6 +332,8 @@ export function SectionFaces({ state }) {
           c = mix(c, vec3(0.95, 0.98, 1.0), bubbles * 0.5);
           float frost = 1.0 - smoothstep(0.0, 0.1, d);
           c = mix(c, vec3(0.95, 0.97, 1.0), frost * 0.7);
+          float cap = snow * (1.0 - smoothstep(0.02, 0.16, d)); // the snow lying on the slab, seen on its cut edge
+          c = mix(c, vec3(0.97, 0.98, 1.0), cap * 0.95);
           gl_FragColor = vec4(c, 0.92);
         }`,
     })
@@ -342,6 +361,7 @@ export function SectionFaces({ state }) {
     if (!on) return
     const cz = s.boat.z + SECTION_CAM.cutZ, cx = s.boat.x
     parts.slab.position.set(cx, -parts.slabT / 2, cz + 0.02)
+    parts.slab.material.uniforms.uHole.value.set(s.boat.x, s.boat.z)
     parts.line.position.set(cx, -parts.slabT - 0.02, cz + 0.04)
     parts.water.position.set(cx, -parts.slabT, cz + 0.01)
     const key = `${cx.toFixed(0)}|${cz.toFixed(1)}`
