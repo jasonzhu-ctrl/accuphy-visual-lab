@@ -1571,3 +1571,19 @@ Numbered log. Newest at the bottom.
        camp stands beside the hole inside the cut. The sky dome shows above the ice.
      - The summer lake is unchanged (the new code runs only with `scene="ice"`; the cut uniforms default to off).
      - Shown to Jason as two screenshots; his pick decides which becomes the ice page's camera (or whether both stay).
+
+101. **2026-10-16** — **The section is the ice page's camera; hole-hopping is made for it** (Jason, on #100's two
+     screenshots: "我觉得是b 你要考虑冰上的移动操作哦").
+     - `?view=section` is the default (`iceParams`); Top and Under the ice stay in the Camera row for comparison.
+     - **Moving on the ice in the section view:** only the ice that is visible — behind the cut wall — takes a tap or a
+       drag. A ray that meets the sheet's plane in front of the wall came through the water column or the empty cut, so
+       it is ignored and the aim ring hides. After a tap the kit walks there, the auger drills, the Mini drops; the
+       camera and the wall follow the hole, so the new hole is again framed with its section (the cut faces rebuild as
+       the wall moves). The step presets use the same path.
+     - The camp stands to the right of the hole (the panel covers the left), inside the cut; the hint sits on the ice
+       above the hole (below it would hang in the water column).
+     - The slab's cut face is drawn 0.8 m tall (0.5 m real) with a bright waterline under it, so the layer reads from
+       25 m away; the water column face is more transparent near the top (0.28) so the Mini, the cone and the fish show.
+       The camera is a little closer (26 m) and lower.
+     - Still open for this view: phones; the slab edge should show the holes' cuts when a hole is near the wall; snow on
+       the slab top; tuning of the water column's tint; the "Under the ice" view's future.

@@ -437,8 +437,9 @@ function Rig({ state, sonarRect, fogMats, cam = LAKE_CAM }) {
       tmp.set(s.boat.x, 0.6, s.boat.z).project(camera)
       const hw = (s.hintEl.offsetWidth || 160) / 2 + 8
       const px = Math.min(size.width - hw, Math.max(hw, ((tmp.x + 1) / 2) * size.width))
-      const py = cam.hintBelow ? ((1 - tmp.y) / 2) * size.height + (s.view === 'under' ? 150 : k > 1 ? 30 : 44) : Math.max((s.hintEl.offsetHeight || 34) + 54, ((1 - tmp.y) / 2) * size.height - (k > 1 ? 22 : 46))
-      s.hintEl.style.transform = `translate(${px.toFixed(1)}px, ${py.toFixed(1)}px) translate(-50%, ${cam.hintBelow ? '0' : '-100%'})`
+      const below = cam.hintBelow && s.view !== 'section'
+      const py = below ? ((1 - tmp.y) / 2) * size.height + (s.view === 'under' ? 150 : k > 1 ? 30 : 44) : Math.max((s.hintEl.offsetHeight || 34) + 54, ((1 - tmp.y) / 2) * size.height - (k > 1 ? 22 : 46))
+      s.hintEl.style.transform = `translate(${px.toFixed(1)}px, ${py.toFixed(1)}px) translate(-50%, ${below ? '0' : '-100%'})`
       s.hintEl.style.opacity = s.hasDragged ? '0' : '1'
     }
     // fixed 3/4 aerial view like the PL animations; slight parallax from the pointer

@@ -144,10 +144,10 @@ export function IceCamp({ state, beamMats, iceMat, T }) {
     u.uBeamOn.value += ((s.noSignal ? 0 : 1) - u.uBeamOn.value) * Math.min(1, dt * 6)
     if (glowRef.current) { glowRef.current.position.set(s.boat.x, APEX_Y + 0.3 + lift, s.boat.z); glowRef.current.intensity = 3 * u.uBeamOn.value }
     // the aim ring under the pointer (on the underside of the sheet in the under-ice view)
-    aim.visible = !!s.aiming
+    aim.visible = !!s.aiming && !!s.aim
     if (s.aim) aim.position.set(s.aim.x, s.view === 'under' ? -ICE_T - 0.02 : 0.015, s.aim.z)
     // the section view keeps the camp beside the hole, inside the cut; the other views leave it where the visitor started
-    const c = s.view === 'section' ? campAt(s.boat.x, s.boat.z, -9, 0.6) : camp
+    const c = s.view === 'section' ? campAt(s.boat.x, s.boat.z, 9.5, 0.4) : camp
     if (campG.current) { campG.current.position.set(c.x, 0, c.z); campG.current.rotation.y = c.yaw }
     if (sledG.current) { sledG.current.position.set(c.x - 1.1, 0, c.z + (s.view === 'section' ? -2.6 : 2.3)); sledG.current.rotation.y = c.yaw + 0.5 }
     if (lampRef.current) lampRef.current.position.set(c.lamp.x, c.lamp.y + 0.2, c.lamp.z)
@@ -222,8 +222,11 @@ export function IceWalls({ state, iceMat }) {
 
 export function IcePick({ state }) {
   const clampXZ = (p) => ({ x: THREE.MathUtils.clamp(p.x, -58, 58), z: THREE.MathUtils.clamp(p.z, -58, 58) })
-  const onDown = (e) => { e.stopPropagation(); const s = state.current; s.aiming = true; s.aim = clampXZ(e.point); e.target.setPointerCapture?.(e.pointerId) }
-  const onMove = (e) => { const s = state.current; if (!s.aiming) return; s.aim = clampXZ(e.point) }
+  // the section view: the ice in front of the wall is cut away, so a tap counts only on the ice behind it (a ray that
+  // meets the sheet's plane in front of the wall came through the water column or the empty cut — ignored)
+  const onIce = (s, p) => s.view !== 'section' || p.z < s.boat.z + SECTION_CAM.cutZ - 0.4
+  const onDown = (e) => { e.stopPropagation(); const s = state.current; if (!onIce(s, e.point)) { s.aiming = false; s.aim = null; return } s.aiming = true; s.aim = clampXZ(e.point); e.target.setPointerCapture?.(e.pointerId) }
+  const onMove = (e) => { const s = state.current; if (!s.aiming) return; if (!onIce(s, e.point)) { s.aim = null; return } s.aim = clampXZ(e.point) }
   const onUp = () => {
     const s = state.current
     if (!s.aiming) return
@@ -291,10 +294,12 @@ export function MarineSnow({ state }) {
 // ---- view B: the cut faces of the section — the ice slab, the water column, the soil under the lakebed ----
 export function SectionFaces({ state }) {
   const parts = useMemo(() => {
-    const slab = new THREE.Mesh(new THREE.BoxGeometry(240, ICE_T, 0.04), new THREE.MeshStandardMaterial({ color: '#d4e6f2', emissive: '#8fb9d6', emissiveIntensity: 0.4, roughness: 0.55, transparent: true, opacity: 0.94 }))
+    const slabT = SECTION_CAM.slab
+    const slab = new THREE.Mesh(new THREE.BoxGeometry(240, slabT, 0.04), new THREE.MeshStandardMaterial({ color: '#d4e6f2', emissive: '#8fb9d6', emissiveIntensity: 0.4, roughness: 0.55, transparent: true, opacity: 0.94 }))
+    const line = new THREE.Mesh(new THREE.BoxGeometry(240, 0.05, 0.05), new THREE.MeshBasicMaterial({ color: '#bfe9ff', transparent: true, opacity: 0.8 })) // the waterline under the slab
     const waterMat = new THREE.ShaderMaterial({
       transparent: true, depthWrite: false, side: THREE.DoubleSide,
-      uniforms: { uTop: { value: -ICE_T }, uTime: { value: 0 } },
+      uniforms: { uTop: { value: -slabT }, uTime: { value: 0 } },
       vertexShader: /* glsl */ `varying vec3 vW; void main() { vec4 w = modelMatrix * vec4(position, 1.0); vW = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }`,
       fragmentShader: /* glsl */ `precision highp float; varying vec3 vW; uniform float uTop; uniform float uTime;
         void main() { float d = clamp((uTop - vW.y) / 24.0, 0.0, 1.0);
@@ -305,16 +310,17 @@ export function SectionFaces({ state }) {
     water.renderOrder = 2
     const soil = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.DoubleSide }))
     soil.frustumCulled = false
-    return { slab, water, soil, key: '' }
+    return { slab, water, soil, line, slabT, key: '' }
   }, [])
   useFrame(() => {
     const s = state.current
     const on = s.view === 'section'
-    parts.slab.visible = parts.water.visible = parts.soil.visible = on
+    parts.slab.visible = parts.water.visible = parts.soil.visible = parts.line.visible = on
     if (!on) return
     const cz = s.boat.z + SECTION_CAM.cutZ, cx = s.boat.x
-    parts.slab.position.set(cx, -ICE_T / 2, cz + 0.02)
-    parts.water.position.set(cx, -ICE_T, cz + 0.01)
+    parts.slab.position.set(cx, -parts.slabT / 2, cz + 0.02)
+    parts.line.position.set(cx, -parts.slabT - 0.02, cz + 0.04)
+    parts.water.position.set(cx, -parts.slabT, cz + 0.01)
     const key = `${cx.toFixed(0)}|${cz.toFixed(1)}`
     if (key !== parts.key) { // the soil's top edge follows the lakebed along the cut
       parts.key = key
@@ -333,6 +339,7 @@ export function SectionFaces({ state }) {
   return (
     <group onUpdate={(g) => g.traverse((o) => o.layers.set(SONAR_HIDE_LAYER))}>
       <primitive object={parts.slab} />
+      <primitive object={parts.line} />
       <primitive object={parts.water} />
       <primitive object={parts.soil} />
     </group>

@@ -64,12 +64,12 @@ export const ISLAND_R = 1.9 // the ice island the kit stands on
 // Offsets are from the live hole; the camera follows the kit. ?view=top|under|section; the panel switches live.
 export const VIEWS = ['top', 'under', 'section']
 export const UNDER_CAM = { pos: [-10, -2.6, 23], look: [2, -5.6, -1] } // a little higher and further back: more ceiling in the frame
-export const SECTION_CAM = { pos: [-4, 4, 30], look: [2, -6, 0], cutZ: 6.5 } // cutZ: the wall, this far in front of the hole
+export const SECTION_CAM = { pos: [-3, 3.6, 26], look: [2, -5.2, 0], cutZ: 6.5, slab: 0.8 } // cutZ: the wall, this far in front of the hole; slab: the ice edge as drawn (0.5 m real, a little taller to read from 25 m)
 export function iceParams() {
   const q = typeof window !== 'undefined' ? window.location.search : ''
   const time = (/[?&]time=(dusk|day|night)/.exec(q) || [])[1] || 'dusk'
   const look = (/[?&]look=(snow|mixed|glass)/.exec(q) || [])[1] || 'glass' // Jason 2026-10-16: 图像关系我偏好最后一个 (the black ice)
-  const view = (/[?&]view=(top|under|section)/.exec(q) || [])[1] || 'top'
+  const view = (/[?&]view=(top|under|section)/.exec(q) || [])[1] || 'section' // Jason 2026-10-16: 我觉得是 b (the section)
   return { time, look, view, T: TIMES[time], L: LOOKS[look] }
 }
 
