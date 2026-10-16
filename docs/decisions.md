@@ -1597,7 +1597,8 @@ Numbered log. Newest at the bottom.
       Jason upgraded it in the dashboard; verified by API: plan **pro**, active, period 2026-10-16 → 2026-11-16.
       Side effect: the partner portal is now within Vercel's terms too.
     - Not yet done: deploying the two Lab pages to Vercel (new project, `lab.accuphy.com` via one CNAME at Alibaba
-      Cloud / 万网, Meta Pixel). Waiting on Jason: deploy now, or at the ad launch.
+      Cloud / 万网, Meta Pixel). Jason: "到时再放" — deploy at the ad launch, not before. Friends keep the GitHub
+      Pages links until then.
 
 102. **2026-10-16** — **The section view, first tuning round** (Jason: "换洞操作这样可以，继续把剖面版细调").
      - **Lens:** the section camera uses a 46° lens (the lake keeps 38°) and looks a touch higher, so a sliver of sky with
