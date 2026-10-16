@@ -258,3 +258,4 @@ the cheapest Android phone class). Phone size was emulated at 360×800.
 - ⬜ Phones: the ice page at 375×812 and landscape; the hint and the aim ring under a finger
 - ⬜ sonar-qa for the ice views (dial brightness vs the app's Ice Fishing View, the history's speckle floor)
 - ⬜ Publish as `/ice/` (`VITE_SCENE=ice`) + `docs/versions.md` — only when Jason says go
+- ⬜ **Direction for the ice/water relationship** (2026-10-16 night, `docs/ice-relationship-study.md`): Jason to pick A (camera under the ice, recommended) / B (side cross-section) / C (aerial transparent with every cue restored). Nothing built until he picks
