@@ -1433,3 +1433,51 @@ Numbered log. Newest at the bottom.
       with the Lab commit and the public repo commit.
     - Where the pages should live long-term (Shopify, GitHub Pages with a custom domain, or another host) is being
       researched; nothing changes until Jason decides.
+
+94. **2026-10-16** — **The ice-fishing version: the same lake frozen over, built locally, not published** (Jason: "基于你现在
+    全部对我们设备的理解 利用网络上可以用的素材特效啥的做一个冰钓的版本 先不上线 先本地做了 视觉效果要好有问题要随时问我
+    有需要我来选的视觉效果可以propose给我先"). The Ice scene of decision #53, as a third page beside Both and Mini.
+    - **Where it lives:** inside the sonar lake experiment as `scene="ice"` (the lakebed, structure, fish, beams and the
+      sonar engine are shared; only the surface, the vehicle and the picking change), with its own gallery card and URL,
+      `src/experiments/2026-10-16-sonar-ice-3d` (`#2026-10-16-sonar-ice-3d`), and a build variant `VITE_SCENE=ice` for a
+      later `/ice/` page. New files in the lake folder: `iceScene.js` (constants, presets), `iceSheet.js` (the frozen
+      surface shader), `iceProps.js` (the Mini, the hole kit, shelter, sled, auger), `IceCamp.jsx` (the scene parts and the
+      hole-hopping sequence), `snow.js` (falling snow), `iceSky.js` (the dome).
+    - **The device is the PingLive Mini**, no device switch: the app's two ice views are the Mini's (home tiles "Ice
+      Fishing" and "Live Ice Fishing", `reference/app-study/home-plm-row.jpg`), the ice persona buys the Mini (#57,
+      `docs/market/report-2026-09.md` P1), and it fits a 10" hole.
+    - **The scene:** half a metre of ice over the summer lake; wind-blown snow drifts over black ice with pressure cracks,
+      bubble veins and frost where the wind scoured it; a 10" auger hole with a slush rim and shavings, the snow scooped
+      away round it; the Mini on its cable from a transducer arm; a bucket, an ice rod on its holder with the line down
+      the hole, a power auger standing in the snow; a pop-up hub shelter with a lit door and a sled a few metres away.
+      Falling snow drifts with the wind; a sky dome (gradient, afterglow, stars, an aurora in the night preset) stands
+      ready for the day the camera tilts up. Everything is procedural or built in code — no downloaded models or textures
+      (nothing to license, nothing to load; Safari-safe like #73). Free CC0 sources were checked (Poly Haven HDRIs,
+      ambientCG Snow/Ice) and can still be used if the look needs them.
+    - **Hole-hopping is the interaction** (the hole-hopper persona): tap or drag on the ice → a blue ring marks the spot;
+      on release the Mini is pulled up (the picture goes dark, like the app with the transducer out of the water), the kit
+      walks over, the auger spins down and breaks through, the hole opens, the Mini drops in and the picture returns. Old
+      holes stay as frozen-over discs (the ice remembers eight). The step presets (3 cards) use the same sequence.
+    - **The beam through the ice** (#55 applied to snow): along the line of sight through each bit of ice, if the eye
+      meets the beam the snow glows cyan-white and goes half-clear, so the cone and the lit bottom show through; the
+      rest stays snow. (A straight-down test cut the window in the wrong place: from this camera the lit bottom lies well
+      behind the hole.) Under the ice the lake materials get a stronger reveal and a lighter output curve
+      (`uRevealGain`, `uOutGamma`, both 1 = unchanged for the summer lake).
+    - **Display scales, like the fish (×2.6):** the hole ×2.4 (a real 10" hole is a 2 px dot), the Mini ×2.6, the hole
+      kit ×1.5; the shelter and sled are life size. The camera is closer than the boat scene's (≈ 44 m) and on phones
+      fits ~30 m of ice across.
+    - **The app's ice views on the phone:** `liveice` = Live Ice (the flasher dial + the Live Down fan), `ice` = Ice
+      Fishing (the dial + a scrolling 2D history, 8 pings a second, with the colour bar at the edge). The dial: depth
+      clockwise from the top round a white ring, one tick and label per ruler step, the depth readout in the centre,
+      returns from the Down fan's middle ±7° (fish included) painted in the app's **jet** map; both ice views draw in
+      jet, as the app's tiles do (`?icelut=amber` keeps the Lab's amber for comparison). View pills on the ice: Live Ice ·
+      Ice Fishing · Forward · Combo (Down is inside Live Ice). The range is AUTO in both ice views, like Down.
+    - **For Jason to choose** (asked 2026-10-16, with screenshots): time of day `?time=dusk|day|night` (dusk is the
+      default: blue-hour snow, the last warm light, the shelter lamp; day is a white-out where the glass UI loses
+      contrast; night is dark blue — the aurora only shows once the camera tilts up), snow cover `?look=snow|mixed|glass`,
+      and jet vs amber in the ice views.
+    - **Checks:** `vite build` passes; the summer lake page renders as before (PL Forward default view, no console
+      errors); the ice page runs with no console errors; hole-hopping, the flasher and the 2D history were watched in the
+      browser. Not yet checked: phones in detail, the sonar-qa grid for the ice views, the hidden-pane first-frame rule.
+    - **Not published**: no share build, `docs/versions.md` unchanged. A fourth public page would be
+      `VITE_SCENE=ice node scripts/build-share.mjs <out>` into `/ice/` when Jason says so.

@@ -2,7 +2,8 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import * as THREE from 'three'
 import LakeScene from './Scene'
-import { DEVICES, FT, MODE_LABELS } from '../2026-09-23-sonar-beam/devices'
+import { DEVICES, FT, MODE_LABELS, ICE_MODES } from '../2026-09-23-sonar-beam/devices'
+import { iceParams, ICE_START } from './iceScene'
 import { wedgeSpecs } from '../2026-09-23-beam-shapes-3d/wedge'
 import { phonePose, isPhoneLayout } from './SonarScreen'
 import { COLORMAP_NAMES } from './colormaps'
@@ -16,8 +17,10 @@ import { panoHalfWidth } from './sonarMarks'
 const BIG_PHONE = import.meta.env.DEV && window.location.search.includes('bigphone')
 // Build variant (Jason 2026-10-16): VITE_DEVICES='PLM' makes a PingLive Mini-only page — no device switch, the
 // Mini is the device, the step presets use its views. Unset: both devices (the default Lab).
-const ONLY = import.meta.env.VITE_DEVICES === 'PLM' ? 'PLM' : null
-const SHOWN_DEVICES = ONLY ? [DEVICES[ONLY]] : Object.values(DEVICES)
+const ONLY_ENV = import.meta.env.VITE_DEVICES === 'PLM' ? 'PLM' : null
+// Scene (Jason 2026-10-16: 做一个冰钓的版本): 'lake' = the boat; 'ice' = the frozen lake with the PingLive Mini in an auger hole
+// (IceCamp.jsx). The ice page is its own gallery entry (2026-10-16-sonar-ice-3d) and a build variant, VITE_SCENE=ice.
+const SCENE_ENV = import.meta.env.VITE_SCENE === 'ice' ? 'ice' : null
 // The page is for people who have never used live sonar (Jason 2026-09-24): only Device / View / Range are
 // public. Colour map, gain, contrast, noise reject and the depth-range axis are calibration tools — dev only (?dev).
 const DEV_TOOLS = import.meta.env.DEV && window.location.search.includes('dev')
@@ -47,9 +50,13 @@ export const meta = {
   description: '3D lake with real-scale structure and NA fish; PL/PLM beam volumes reveal the bottom; the app screen (computed from the scene) on an iPhone. Drag the boat.',
 }
 
-export default function SonarLake3D() {
+export default function SonarLake3D({ scene: sceneProp }) {
+  const scene = sceneProp || SCENE_ENV || (/[?&]scene=ice/.test(window.location.search) ? 'ice' : 'lake')
+  const ICE = scene === 'ice'
+  const ONLY = ICE ? 'PLM' : ONLY_ENV // on the ice the Mini is the device: the app's ice views are the Mini's
+  const SHOWN_DEVICES = ONLY ? [DEVICES[ONLY]] : Object.values(DEVICES)
   const [deviceId, setDeviceId] = useState(ONLY || 'PL')
-  const [mode, setMode] = useState('forward')
+  const [mode, setMode] = useState(ICE ? 'liveice' : 'forward')
   const [rangeFt, setRangeFt] = useState(80)       // the visitor's own range (slider)
   const [depthFt, setDepthFt] = useState(70) // depth range (PL Forward; every PLM view) — driven by AUTO below
   const [autoDepth, setAutoDepth] = useState(true) // off only when the dev Depth slider is touched
@@ -68,9 +75,10 @@ export default function SonarLake3D() {
   const phone = isPhoneLayout()
 
   const device = DEVICES[deviceId]
+  const modes = ICE ? ICE_MODES : device.modes
   const maxFt = device.maxRangeFt
   useEffect(() => {
-    if (!device.modes.includes(mode)) setMode('down')
+    if (!modes.includes(mode)) setMode(ICE ? 'liveice' : 'down')
     if (rangeFt > maxFt) setRangeFt(maxFt)
   }, [deviceId]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -79,8 +87,9 @@ export default function SonarLake3D() {
   // jump when the view changes (Jason 2026-09-25: 他们的底能不能尽量align一点呢). In Down the depth axis is the range,
   // so Down's range is that AUTO value. Combo keeps the app's own two scales (SonarScreen.jsx screenLayout).
   const autoDepthOn = autoDepth && mode !== 'panoramic' // Down, Forward and Combo's Down panel
+  const downLike = mode === 'down' || mode === 'ice' || mode === 'liveice' // the ice views are the Down fan (+ the flasher): AUTO range too
   // the range everything uses: Down's is the AUTO depth range; Forward and Panoramic use the visitor's range
-  const effRangeFt = mode === 'down' ? depthFt : rangeFt
+  const effRangeFt = downLike ? depthFt : rangeFt
   const specs = useMemo(() => {
     const rangeFt = effRangeFt
     const sp = wedgeSpecs(device, mode, rangeFt * FT)
@@ -109,7 +118,7 @@ export default function SonarLake3D() {
 
   const b0 = (/boat=(-?[\d.]+),(-?[\d.]+)/.exec(window.location.search) || []).slice(1).map(Number) // dev: ?boat=x,z
   const state = useRef({
-    boat: { x: b0[0] ?? -6, z: b0[1] ?? 4 }, target: { x: b0[0] ?? -6, z: b0[1] ?? 4 }, apex: new THREE.Vector3(), dragging: false,
+    boat: { x: b0[0] ?? (ICE ? ICE_START[0] : -6), z: b0[1] ?? (ICE ? ICE_START[1] : 4) }, target: { x: b0[0] ?? (ICE ? ICE_START[0] : -6), z: b0[1] ?? (ICE ? ICE_START[1] : 4) }, apex: new THREE.Vector3(), dragging: false,
     parallax: { x: 0, y: 0 }, specs, specKey,
     closeCam: window.location.search.includes('cam=boat'), wreckCam: /cam=wreck/.test(window.location.search), logoCam: /cam=logo/.test(window.location.search),
     fishCam: (/cam=fish:(\w+)/.exec(window.location.search) || [])[1],
@@ -171,7 +180,11 @@ export default function SonarLake3D() {
 
   // the three-step guide (docs/3d-beam-reference.md §3): each step is a preset
   const [step, setStep] = useState(0)
-  const STEPS = [
+  const STEPS = ICE ? [
+    { n: 1, title: 'The beam under the ice', text: 'The PingLive Mini hangs in the hole and pings straight down. Tap the ice anywhere to drill a new hole — whatever the beam touches lights up.', device: 'PLM', mode: 'liveice', range: 60, boat: ICE_START },
+    { n: 2, title: 'Watch them come in', text: 'The flasher is the dial: the bottom, your bait and every fish that rises, by depth around the ring. The panel beside it draws the same fish as marks.', device: 'PLM', mode: 'ice', range: 60, boat: [-8, -10] },
+    { n: 3, title: 'Look ahead without drilling', text: 'Forward View turns the beam sideways: fish and structure 60 ft away, under ice you never cut.', device: 'PLM', mode: 'forward', range: 60, boat: [16, 11] },
+  ] : [
     { n: 1, title: 'This is the beam', text: 'A thin curtain of sound under the boat. Drag the boat — whatever the curtain touches lights up.', device: 'PL', mode: 'down', range: 80, boat: [-20, 6] },
     { n: 2, title: 'This is what your phone shows', text: 'The screen is that curtain, seen edge-on: bottom, timber, fish. Forward View aims it ahead of the boat.', device: 'PL', mode: 'forward', range: 60, boat: [16, 11] }, // standing timber + bass 8–15 m ahead on the 7 m flat
     { n: 3, title: 'Which view, when', text: 'Panoramic scans wide to find fish and structure; Forward to cast at them; Down to fish straight below.', device: 'PL', mode: 'panoramic', range: 70, boat: [-50, 8] }, // on the 5 m shelf, scanning toward the drop-off: the flat fan paints the bottom
@@ -184,9 +197,9 @@ export default function SonarLake3D() {
 
   return (
     <>
-    <main inert={gate} aria-hidden={gate || undefined} className="font-brand fixed inset-0 select-none overflow-hidden bg-[#9cc1cf] text-white" onPointerMove={onMove}>
+    <main inert={gate} aria-hidden={gate || undefined} className="font-brand fixed inset-0 select-none overflow-hidden bg-[#9cc1cf] text-white" style={ICE ? { background: iceParams().T.bg } : undefined} onPointerMove={onMove}>
       <div className="absolute inset-0 touch-none">
-        <LakeScene state={state} sonarRect={sonarRect} paused={gate} />
+        <LakeScene state={state} sonarRect={sonarRect} paused={gate} scene={scene} />
       </div>
 
       {/* ---- control panel — Apple-style frosted glass over the lake (Jason 2026-09-24) ---- */}
@@ -201,11 +214,11 @@ export default function SonarLake3D() {
           <div className="ac-seg">{SHOWN_DEVICES.map((d) => <button key={d.id} className={`ac-btn ${deviceId === d.id ? 'is-active' : ''}`} onClick={() => setDeviceId(d.id)}>{d.name}</button>)}</div>
         </Row>
         <Row label="View">
-          <div className="ac-seg">{device.modes.map((m) => <button key={m} className={`ac-btn ${mode === m ? 'is-active' : ''}`} onClick={() => setMode(m)}>{MODE_LABELS[m].replace(' View', '')}</button>)}</div>
+          <div className="ac-seg">{modes.map((m) => <button key={m} className={`ac-btn ${mode === m ? 'is-active' : ''}`} onClick={() => setMode(m)}>{MODE_LABELS[m].replace(' View', '')}</button>)}</div>
         </Row>
         <Row label="Range">
           {/* Down: the range is the AUTO depth range, so the slider only shows it */}
-          <input type="range" min={20} max={maxFt} step={5} value={effRangeFt} disabled={mode === 'down'} title={mode === 'down' ? 'AUTO: follows the water depth' : undefined} onChange={(e) => setRangeFt(+e.target.value)} className="ac-range w-36" style={{ '--fill': `${((effRangeFt - 20) / (maxFt - 20)) * 100}%`, opacity: mode === 'down' ? 0.45 : 1 }} />
+          <input type="range" min={20} max={maxFt} step={5} value={effRangeFt} disabled={downLike} title={downLike ? 'AUTO: follows the water depth' : undefined} onChange={(e) => setRangeFt(+e.target.value)} className="ac-range w-36" style={{ '--fill': `${((effRangeFt - 20) / (maxFt - 20)) * 100}%`, opacity: downLike ? 0.45 : 1 }} />
           <button className="ac-value" onClick={() => setImperial((v) => !v)} title="ft / m">{fmt(effRangeFt)}</button>
           <span className="ac-soft text-[11px]">max {fmt(maxFt)}</span>
         </Row>
@@ -235,14 +248,14 @@ export default function SonarLake3D() {
         </Row>
         </>)}
         <div className="ac-soft hidden px-1 text-[11.5px] leading-snug sm:block">
-          {device.name} · {device.beamDeg}° × {device.thickDeg}° beam. Drag the boat — whatever the beam touches lights up.
+          {device.name} · {device.beamDeg}° × {device.thickDeg}° beam{ICE ? ', through the ice. Tap the ice to drill a new hole' : '. Drag the boat'} — whatever the beam touches lights up.
         </div>
       </motion.div>
 
       {/* ---- drag hint: follows the boat until the first drag (position set by the render loop) ---- */}
       <div ref={(el) => { state.current.hintEl = el }} className="ac-hint pointer-events-none absolute left-0 top-0 flex items-center gap-2 px-3.5 py-2" style={{ opacity: 0 }}>
         <svg className="hand" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#028cdf" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12h18M7 8l-4 4 4 4M17 8l4 4-4 4"/></svg>
-        <span className="font-brand-head text-[11px] uppercase tracking-wider">Drag the boat</span>
+        <span className="font-brand-head text-[11px] uppercase tracking-wider">{ICE ? 'Tap the ice to drill' : 'Drag the boat'}</span>
       </div>
 
       {/* ---- iPhone Pro Max, landscape, turned slightly in 3D (same pose as the GL picture).
@@ -260,7 +273,7 @@ export default function SonarLake3D() {
           <div className="ph-band" style={{ ...ring('1.35%'), borderRadius: '6.6% / 13.8%', boxShadow: '16px 26px 44px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.45), inset 0 0 0 2px rgba(0,0,0,0.12)' }} />
           <div style={{ ...ring('1.25%'), inset: '1.35%', borderRadius: '6.1% / 12.7%', background: '#040404' }} />
           <div ref={(el) => { sonarRect.current.el = el }} style={{ position: 'absolute', inset: '2.6%', borderRadius: '5.4% / 11.3%', containerType: 'size', overflow: 'hidden' }}>
-            <SonarChrome layout={layout} deviceId={deviceId} mode={mode} rangeFt={effRangeFt} depthFt={depthFt} imperial={imperial} gain={gain} autoDepth={autoDepth} autoRange={mode === 'down'} onRange={phone ? stepRange : undefined} phone={phone} onLocked={onLocked} depthRef={(el) => { state.current.depthEl = el }} />
+            <SonarChrome layout={layout} deviceId={deviceId} mode={mode} rangeFt={effRangeFt} depthFt={depthFt} imperial={imperial} gain={gain} autoDepth={autoDepth} autoRange={downLike} onRange={phone ? stepRange : undefined} phone={phone} onLocked={onLocked} depthRef={(el) => { state.current.depthEl = el }} />
             <div className="ph-glass" />
           </div>
           {/* antenna lines in the titanium band (two per long edge, like the Pro Max) */}
@@ -273,7 +286,7 @@ export default function SonarLake3D() {
         {/* phones: the View capsule sits on the phone frame's top edge (Jason 2026-10-03) — the big panel is gone */}
         {phone && (
           <div ref={(el) => { sonarRect.current.dock = el }} className="pointer-events-auto absolute bottom-full left-1/2 mb-2 -translate-x-1/2">
-            <div className="ac-seg ac-seg-lg">{device.modes.map((m) => <button key={m} className={`ac-btn ${mode === m ? 'is-active' : ''}`} onClick={() => setMode(m)}>{MODE_LABELS[m].replace(' View', '')}</button>)}</div>
+            <div className="ac-seg ac-seg-lg">{modes.map((m) => <button key={m} className={`ac-btn ${mode === m ? 'is-active' : ''}`} onClick={() => setMode(m)}>{MODE_LABELS[m].replace(' View', '')}</button>)}</div>
           </div>
         )}
         {/* after sign-up the app buttons stay display-only: a short hint above the phone instead of the gate */}

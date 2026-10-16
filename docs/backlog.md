@@ -245,3 +245,14 @@ the cheapest Android phone class). Phone size was emulated at 360×800.
   Jason reviews the prototype's look against the LVS34 frames, Accuphy's animations and the 3D Lab before packaging
 - ✅ Mood decided: dark cinematic water, the dusk palette of plan §3b (decision #51)
 - ✅ Look references: Jason picked groups A + B and gave the "dark lakebed lit up" lamp concept (decision #54, `docs/look-references.md`)
+
+## Ice scene (decision #94, 2026-10-16) — local only
+- ⬜ **Jason's look picks**: time of day (dusk / day / night), snow cover (snow / mixed / glass), ice views in jet or amber. Screenshots sent 2026-10-16; nothing changes until he answers
+- ⬜ Camera tilt (or an intro move) so the sky dome, the afterglow and the night aurora are in frame; the dome is built but the ⅔-aerial camera never sees the horizon
+- ⬜ Glass UI on bright scenes: on the `day` preset the frosted panel and cards lose contrast against white snow — a darker tint when the scene is bright
+- ⬜ Footprints and sled tracks in the snow between the camp and the holes (a stamped trail texture)
+- ⬜ Winter fish behaviour: walleye and perch should come in under the hole more often (the summer behaviours run unchanged); a jig mark on the flasher and in the 2D history
+- ⬜ Forward and Combo through the ice: check the window shape and the picture against the app's Live Forward; the Mini's forward range from a hole
+- ⬜ Phones: the ice page at 375×812 and landscape; the hint and the aim ring under a finger
+- ⬜ sonar-qa for the ice views (dial brightness vs the app's Ice Fishing View, the history's speckle floor)
+- ⬜ Publish as `/ice/` (`VITE_SCENE=ice`) + `docs/versions.md` — only when Jason says go

@@ -16,13 +16,13 @@ export const MAX_FANS = 2
 
 export const sonarVertex = /* glsl */ `
   attribute float aW; // per-vertex clip w: corners are given as (x*w, y*w) for the phone's perspective
-  varying vec2 vUv;
-  void main() { vUv = uv; gl_Position = vec4(position.xy, 0.0, aW); }
+  varying vec2 vUv0;
+  void main() { vUv0 = uv; gl_Position = vec4(position.xy, 0.0, aW); }
 `
 
 export const sonarFragment = /* glsl */ `
   precision highp float;
-  varying vec2 vUv;
+  varying vec2 vUv0;
   uniform sampler2D uDepth0; uniform sampler2D uDepth1;
   uniform sampler2D uColor0; uniform sampler2D uColor1; // .a = tag: 0.75 steel (wrecks), 0.5 other structure, 0 bottom
   uniform int uFanCount;
@@ -56,6 +56,9 @@ export const sonarFragment = /* glsl */ `
   uniform vec4 uLogoMap;       // x = SVG units per metre, y = SVG x of the word's centre, z = SVG y of the fan's bottom, w = distance range (m)
   uniform vec2 uLogoSvg;       // SVG width, height covered by the texture
   uniform vec2 uLogoExt;       // half-width, height of the lockup in metres (quick reject)
+  // the Mini's ice views (2026-10-16): 1 = Live Ice (flasher + Live Down), 2 = Ice Fishing (flasher + 2D history)
+  uniform float uIce; uniform float uIceSplit; uniform float uAspect; uniform float uTicks; uniform sampler2D uLUT2;
+  uniform sampler2D uHist; uniform sampler2D uHistPrev; uniform float uHistPass; uniform float uIceAmber;
 
   float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
   float vnoise(vec2 q) { vec2 i = floor(q), f = fract(q); f = f * f * (3.0 - 2.0 * f);
@@ -151,7 +154,154 @@ export const sonarFragment = /* glsl */ `
   // + a sidelobe from 25° down (≈ 0.8, gone by 60°), same numbers as sonarMarks.js
   float panoLobe(float g) { return smoothstep(0.035, 0.105, g) * (1.0 - smoothstep(0.4, 0.49, g)) + 0.8 * smoothstep(0.4, 0.49, g) * (1.0 - smoothstep(0.62, 1.05, g)); }
 
+  // ---- one fan's vertical-slab echo at p (metres: x along the screen, y down; r, aWorld its polar form), with the
+  //      pixel's texture terms. inFan = 1 when p lies inside the fan. Used by the picture and by the flasher.
+  float fanEcho(int k, vec2 p, float r, float aWorld, float tex, float filament, out float inFan) {
+    inFan = 0.0;
+    float a = aWorld - uFan[k].x;
+    if (abs(a) > uFan[k].y || r > uReach) return 0.0;
+    inFan = 1.0;
+    float u = 0.5 + 0.5 * tan(a) / uFan[k].z;
+    float acc = 0.0, peak = 0.0, spk = 0.0, edge = 0.0;
+    // which thickness rows a pixel samples: the same set for a short run along the ray (0.08° × 0.67 m cells), not
+    // a fresh random set per pixel. Per-pixel sets turned big steel faces into salt-and-pepper dust (the wreck at
+    // 40 m, Jason 2026-09-25: 这个船的画面和 [app 的] 相差好远 结构和感觉完全不对); coherent sets draw them as the
+    // app does — solid masses with streaks along the beams (reference/app-study/pl-forward-wreck-*.jpg)
+    float jit = hash(vec2(floor(aWorld * 700.0), floor(r * 1.5)) + 0.11);
+    float sigma = 0.22 + 0.010 * r;
+    float tailLen = 0.35 + 0.015 * r;
+    for (int j = 0; j < 24; j++) {
+      float v = (float(j) + jit) / 24.0;
+      float ty = (v * 2.0 - 1.0) * uFan[k].w;
+      float hit = sampleDist(k, vec2(u, v), length(vec3(tan(a), ty, 1.0)));
+      float dr = r - hit;
+      float tag = sampleTag(k, vec2(u, v));
+      float structure = step(0.25, tag), steel = step(0.62, tag);
+      // timber and rock faces are sharp (real pulse ≈ 0.1 m) and solid; the bottom band is wider with a tail.
+      // Steel (wrecks) is by far the strongest reflector: after the log compression its pulse skirts and the
+      // ringing inside the hull stay bright, so the app draws a wreck as thick glowing bands with long tails,
+      // not a line drawing (Jason 2026-09-25: 结构物的成像不对劲; PL Forward wreck recording, same depth and scale:
+      // reference/engine-compare/wreck-compare-*.png)
+      float sg = mix(sigma, mix((0.08 + 0.004 * r) * (1.0 + 1.5 * smoothstep(6.0, 30.0, r)), sigma, steel), structure);
+      float pulse = exp(-dr * dr / (sg * sg)) * (1.0 - 0.22 * structure) * mix(1.0, 0.85 + 0.25 * filament, structure);
+      float tail = dr > 0.0 ? (0.6 + 0.6 * steel) * exp(-dr / (tailLen * (1.0 + 0.5 * steel))) : 0.0;
+      float second = 0.10 * exp(-(r - 2.0 * hit) * (r - 2.0 * hit) / (4.0 * sigma * sigma));
+      float wgt = 0.55 + 0.9 * (1.0 - abs(v * 2.0 - 1.0));
+      acc += (1.2 * pulse + tail + second) * wgt;
+      peak = max(peak, pulse * (1.0 - structure));
+      edge = max(edge, exp(-dr * dr / (0.16 * sg * sg)) * (1.0 - structure)); // the first return: a thin hot line
+      spk = max(spk, pulse * structure * (1.0 + 0.3 * steel));
+    }
+    // Bottom brightness (Jason 2026-09-25: 画面特别是底部貌似还是太亮 深水也是 … 高亮的部分和桔红色的关系): over a flat
+    // bottom every row across the slab lands at one range and the integrated echo added up to a solid white band
+    // (38–44 % of the lit pixels white in PL scenes; the app's bottom scenes 6–7 %). Past the near range (where TVG
+    // already tames it) the integrated part saturates softly (K 0.4), so the body stays orange, and a thin
+    // first-return line brings back the app's hot leading edge.
+    // The cap also follows the depth below the transducer (#91, #92). The middle of the lake became shallower
+    // (Jason 2026-10-04: 最深的地方做30ft深, then 相对缓慢得向深水过度: a slope from ~30 to 80 ft), and those bottoms sit
+    // inside the 6–14 m range ramp while AUTO depth zooms them in: the default view went to 19–22 % white (PL) and
+    // 18–26 % (Mini, Down/Combo). PingLive caps from 5.5 m to 7.5 m below the transducer (~21–28 ft of water), full
+    // strength; the Mini from 7.5 m to 9.5 m (~28–34 ft) at 80 %, because its own near gain (uBedGain) already holds
+    // its 28–30 ft bottoms at 5–8 % and a full cap took its 36 ft bottom to 0 %. The shelf, the island and the deep
+    // floor keep their look.
+    float capR = smoothstep(6.0, 14.0, r), capD = uCapDepth.z * smoothstep(uCapDepth.x, uCapDepth.y, p.y);
+    float accI = acc / 16.0, K = mix(3.0, 0.4, max(capR, capD)); // (4–10 m on range tried: the Mini's calibrated shelf lost its hot edge, 6 → 0.3 % white)
+    accI = K * (1.0 - exp(-accI / K));
+    acc = accI + 0.7 * peak + 0.3 * edge * (0.55 + 0.6 * filament) + 0.9 * spk;
+    // Bottoms past the cap depth are toned no nearer than 80 % of the range window (#92). With the middle sloping
+    // from 30 to 80 ft, Forward (the visitor's fixed range) drew its nearer bottom at 11–22 % white against the old
+    // plateau's 8 %; now 7–12 %. Down's AUTO range already puts the bottom at ~80 %, so Down barely changes
+    // (0.9 started to dim the deep floor in Down, 8 → 5 %).
+    float rT = mix(r, max(r, 0.8 * uRange), capD);
+    float atten = 1.0 - 0.4 * clamp(rT / uRange, 0.0, 1.0);
+    // near-range gain (TVG): close returns get less gain, like a real sonar's time-varying gain. In shallow
+    // water every ray across the slab hits the bottom at the same range, the band saturates to a solid white
+    // slab and AUTO depth then zooms it (Jason 2026-09-24: 浅水的时候 … 过爆感太强了 可以折中一点). Full gain
+    // again from ~11 m (≈ 0.9 at 9 m), so the calibrated deeper pictures barely change; fish marks keep their
+    // approved look. 5 m ≈ 0.43: the core just reaches white and keeps its streaks instead of a solid slab.
+    float tvg = mix(0.32, 1.0, smoothstep(3.0, 11.0, r));
+    // PingLive Mini: its narrow 39° fan meets a shallow bottom at one range across the whole fan, and AUTO depth
+    // zooms that band in, so it still burnt to a yellow-white slab (Jason 2026-09-25: PingLive mini是不是在浅水太亮了
+    // 和之前pl一样的问题). Extra near gain for PLM only, back to full by 18 m: deep pictures keep their calibration.
+    tvg *= mix(uBedGain, 1.0, smoothstep(5.0, 18.0, r));
+    // near-field fish 40 % brighter, fading back to normal by 16 m (Jason 2026-09-27: 近场的鱼要亮40%)
+    float e = max(acc * atten * tex * tvg, fishEcho(p, k) * mix(1.4, 1.0, smoothstep(8.0, 16.0, r)));
+    e = max(e, logoEcho(p, k) * atten * (0.7 + 0.55 * (filament - 0.8)) * (0.72 + 0.28 * tex));
+    return e;
+  }
+  // the flasher: the echo at one depth straight under the transducer — the Down fan's middle beams (±7°), fish included
+  float flasherEcho(float depth) {
+    if (uFanCount < 1 || depth > uReach) return 0.0;
+    float e = 0.0;
+    for (int i = -2; i <= 2; i++) {
+      float a = float(i) * 0.06;
+      vec2 p = vec2(depth * sin(a), depth * cos(a));
+      float inF; e = max(e, fanEcho(0, p, depth, a, 1.0, 1.0, inF));
+    }
+    return e;
+  }
+  // the app's tone curve (assets/aio_shader.glsl): log compression → gain / dynamic-range window → LUT index
+  float toneIdx(float echo) {
+    float raw = echo * 65535.0;
+    float bs = 4000.0;
+    float lv = log(1.0 + raw / bs) / log(1.0 + 65535.0 / bs);
+    float width = clamp(uDynRange, 0.05, 1.0);
+    float lo = (1.0 - width) * 0.5 + width * (uGain - 0.5) + 0.5 * width * uContrast;
+    float hi = lo + width * (1.0 - 0.45 * uContrast) * (uFlat > 0.5 ? 1.0 : 1.15);
+    float idx = echo > 0.0005 ? clamp((lv - lo) / (hi - lo), 0.0, 1.0) : 0.0;
+    return pow(idx, uGamma);
+  }
+  vec3 lut2(float idx) { return texture2D(uLUT2, vec2(idx * (255.0 / 256.0) + 0.5 / 256.0, 0.5)).rgb; }
+  // the flasher dial (the Mini's Ice Fishing views): depth runs clockwise from the top round a white ring; the
+  // returns paint the ring in the app's jet colours; the pale centre disc carries the DOM depth readout
+  vec3 flasherPixel(vec2 uv) {
+    vec2 q = vec2(uv.x * uAspect, uv.y);
+    vec2 c = vec2(uIceSplit * uAspect * 0.5, 0.53); // a little above centre: the app's bottom bar runs under the dial
+    float R1 = 0.36, R0 = 0.235;
+    vec2 d = q - c; float r = length(d);
+    vec3 panel = vec3(0.045, 0.05, 0.065);
+    if (r > R1 + 0.01) return panel;
+    if (r < R0 - 0.004) return vec3(0.74, 0.76, 0.86);
+    float th = atan(d.x, d.y); if (th < 0.0) th += 6.2831853;
+    float depth = th / 6.2831853 * uRange;
+    float idx = toneIdx(flasherEcho(depth));
+    vec3 ring = vec3(0.9, 0.91, 0.94);
+    float on = smoothstep(0.05, 0.16, idx);
+    // the band fades at the ring's edges, like a lamp seen through a slot
+    float across = smoothstep(R0, R0 + 0.025, r) * (1.0 - smoothstep(R1 - 0.025, R1, r));
+    vec3 col = mix(ring, lut2(idx), on * (0.75 + 0.25 * across));
+    // tick marks on the inner edge, one per major division
+    float seg = th * uTicks / 6.2831853;
+    float tf = abs(fract(seg + 0.5) - 0.5) * 6.2831853 / uTicks * r;
+    float tick = (1.0 - smoothstep(0.0025, 0.005, tf)) * (1.0 - smoothstep(R0 + 0.03, R0 + 0.045, r));
+    col = mix(col, vec3(0.25, 0.27, 0.34), tick * (1.0 - 0.7 * on));
+    float rim = max(1.0 - smoothstep(0.0, 0.005, abs(r - R1)), 1.0 - smoothstep(0.0, 0.005, abs(r - R0)));
+    col = mix(col, vec3(0.62, 0.64, 0.7), rim * 0.7);
+    float aa = (1.0 - smoothstep(R1, R1 + 0.006, r)) * smoothstep(R0 - 0.004, R0 + 0.002, r);
+    return mix(r < R0 ? vec3(0.74, 0.76, 0.86) : panel, col, aa);
+  }
+
   void main() {
+    vec2 vUv = vUv0;
+    // ---- the 2D history pass (Ice Fishing View): shift the record one column left, draw the newest ping at the right edge
+    if (uHistPass > 0.5) {
+      float W = 384.0;
+      if (vUv.x < 1.0 - 1.0 / W) { gl_FragColor = texture2D(uHistPrev, vUv + vec2(1.0 / W, 0.0)); return; }
+      float depth = (1.0 - vUv.y) * uRange;
+      float n = hash(vec2(floor(uTime * 8.0), floor(vUv.y * 256.0)));
+      float floorN = max(0.0, 0.06 + 0.16 * n - 0.22 * uNoise) * 0.7 * (uFanCount > 0 ? 1.0 : 0.0);
+      gl_FragColor = vec4(toneIdx(max(flasherEcho(depth), floorN)), 0.0, 0.0, 1.0); return;
+    }
+    // ---- the ice views: the flasher on the left, the Live Down fan or the 2D history on the right
+    if (uIce > 0.5) {
+      if (vUv.x < uIceSplit) { gl_FragColor = vec4(flasherPixel(vUv), 1.0); return; }
+      if (vUv.x < uIceSplit + 0.006) { gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0); return; }
+      vUv.x = (vUv.x - uIceSplit - 0.006) / (1.0 - uIceSplit - 0.006);
+      if (uIce > 1.5) {
+        if (vUv.x > 0.965) { gl_FragColor = vec4(lut2(vUv.y), 1.0); return; } // the colour bar at the edge
+        gl_FragColor = vec4(lut2(texture2D(uHist, vec2(vUv.x / 0.965, vUv.y)).r), 1.0); return;
+      }
+    }
     float vyDown = 1.0 - vUv.y;
     int panel = 0;
     if (uSplit > 0.5) {
@@ -273,75 +423,10 @@ export const sonarFragment = /* glsl */ `
       if (uSplit > 0.5) { kFrom = panel == 0 ? 1 : 0; kTo = kFrom + 1; }
       for (int k = 0; k < ${MAX_FANS}; k++) {
         if (k < kFrom || k >= kTo) continue;
-        float a = aWorld - uFan[k].x;
-        if (abs(a) > uFan[k].y || r > uReach) continue;
-        inAny = 1.0;
-        float u = 0.5 + 0.5 * tan(a) / uFan[k].z;
-        float acc = 0.0, peak = 0.0, spk = 0.0, edge = 0.0;
-        // which thickness rows a pixel samples: the same set for a short run along the ray (0.08° × 0.67 m cells), not
-        // a fresh random set per pixel. Per-pixel sets turned big steel faces into salt-and-pepper dust (the wreck at
-        // 40 m, Jason 2026-09-25: 这个船的画面和 [app 的] 相差好远 结构和感觉完全不对); coherent sets draw them as the
-        // app does — solid masses with streaks along the beams (reference/app-study/pl-forward-wreck-*.jpg)
-        float jit = hash(vec2(floor(aWorld * 700.0), floor(r * 1.5)) + 0.11);
-        float sigma = 0.22 + 0.010 * r;
-        float tailLen = 0.35 + 0.015 * r;
-        for (int j = 0; j < 24; j++) {
-          float v = (float(j) + jit) / 24.0;
-          float ty = (v * 2.0 - 1.0) * uFan[k].w;
-          float hit = sampleDist(k, vec2(u, v), length(vec3(tan(a), ty, 1.0)));
-          float dr = r - hit;
-          float tag = sampleTag(k, vec2(u, v));
-          float structure = step(0.25, tag), steel = step(0.62, tag);
-          // timber and rock faces are sharp (real pulse ≈ 0.1 m) and solid; the bottom band is wider with a tail.
-          // Steel (wrecks) is by far the strongest reflector: after the log compression its pulse skirts and the
-          // ringing inside the hull stay bright, so the app draws a wreck as thick glowing bands with long tails,
-          // not a line drawing (Jason 2026-09-25: 结构物的成像不对劲; PL Forward wreck recording, same depth and scale:
-          // reference/engine-compare/wreck-compare-*.png)
-          float sg = mix(sigma, mix((0.08 + 0.004 * r) * (1.0 + 1.5 * smoothstep(6.0, 30.0, r)), sigma, steel), structure);
-          float pulse = exp(-dr * dr / (sg * sg)) * (1.0 - 0.22 * structure) * mix(1.0, 0.85 + 0.25 * filament, structure);
-          float tail = dr > 0.0 ? (0.6 + 0.6 * steel) * exp(-dr / (tailLen * (1.0 + 0.5 * steel))) : 0.0;
-          float second = 0.10 * exp(-(r - 2.0 * hit) * (r - 2.0 * hit) / (4.0 * sigma * sigma));
-          float wgt = 0.55 + 0.9 * (1.0 - abs(v * 2.0 - 1.0));
-          acc += (1.2 * pulse + tail + second) * wgt;
-          peak = max(peak, pulse * (1.0 - structure));
-          edge = max(edge, exp(-dr * dr / (0.16 * sg * sg)) * (1.0 - structure)); // the first return: a thin hot line
-          spk = max(spk, pulse * structure * (1.0 + 0.3 * steel));
-        }
-        // Bottom brightness (Jason 2026-09-25: 画面特别是底部貌似还是太亮 深水也是 … 高亮的部分和桔红色的关系): over a flat
-        // bottom every row across the slab lands at one range and the integrated echo added up to a solid white band
-        // (38–44 % of the lit pixels white in PL scenes; the app's bottom scenes 6–7 %). Past the near range (where TVG
-        // already tames it) the integrated part saturates softly (K 0.4), so the body stays orange, and a thin
-        // first-return line brings back the app's hot leading edge.
-        // The cap also follows the depth below the transducer (#91, #92). The middle of the lake became shallower
-        // (Jason 2026-10-04: 最深的地方做30ft深, then 相对缓慢得向深水过度: a slope from ~30 to 80 ft), and those bottoms sit
-        // inside the 6–14 m range ramp while AUTO depth zooms them in: the default view went to 19–22 % white (PL) and
-        // 18–26 % (Mini, Down/Combo). PingLive caps from 5.5 m to 7.5 m below the transducer (~21–28 ft of water), full
-        // strength; the Mini from 7.5 m to 9.5 m (~28–34 ft) at 80 %, because its own near gain (uBedGain) already holds
-        // its 28–30 ft bottoms at 5–8 % and a full cap took its 36 ft bottom to 0 %. The shelf, the island and the deep
-        // floor keep their look.
-        float capR = smoothstep(6.0, 14.0, r), capD = uCapDepth.z * smoothstep(uCapDepth.x, uCapDepth.y, p.y);
-        float accI = acc / 16.0, K = mix(3.0, 0.4, max(capR, capD)); // (4–10 m on range tried: the Mini's calibrated shelf lost its hot edge, 6 → 0.3 % white)
-        accI = K * (1.0 - exp(-accI / K));
-        acc = accI + 0.7 * peak + 0.3 * edge * (0.55 + 0.6 * filament) + 0.9 * spk;
-        // Bottoms past the cap depth are toned no nearer than 80 % of the range window (#92). With the middle sloping
-        // from 30 to 80 ft, Forward (the visitor's fixed range) drew its nearer bottom at 11–22 % white against the old
-        // plateau's 8 %; now 7–12 %. Down's AUTO range already puts the bottom at ~80 %, so Down barely changes
-        // (0.9 started to dim the deep floor in Down, 8 → 5 %).
-        float rT = mix(r, max(r, 0.8 * uRange), capD);
-        float atten = 1.0 - 0.4 * clamp(rT / uRange, 0.0, 1.0);
-        // near-range gain (TVG): close returns get less gain, like a real sonar's time-varying gain. In shallow
-        // water every ray across the slab hits the bottom at the same range, the band saturates to a solid white
-        // slab and AUTO depth then zooms it (Jason 2026-09-24: 浅水的时候 … 过爆感太强了 可以折中一点). Full gain
-        // again from ~11 m (≈ 0.9 at 9 m), so the calibrated deeper pictures barely change; fish marks keep their
-        // approved look. 5 m ≈ 0.43: the core just reaches white and keeps its streaks instead of a solid slab.
-        float tvg = mix(0.32, 1.0, smoothstep(3.0, 11.0, r));
-        // PingLive Mini: its narrow 39° fan meets a shallow bottom at one range across the whole fan, and AUTO depth
-        // zooms that band in, so it still burnt to a yellow-white slab (Jason 2026-09-25: PingLive mini是不是在浅水太亮了
-        // 和之前pl一样的问题). Extra near gain for PLM only, back to full by 18 m: deep pictures keep their calibration.
-        tvg *= mix(uBedGain, 1.0, smoothstep(5.0, 18.0, r));
-        // near-field fish 40 % brighter, fading back to normal by 16 m (Jason 2026-09-27: 近场的鱼要亮40%)
-        echo = max(echo, max(acc * atten * tex * tvg, fishEcho(p, k) * mix(1.4, 1.0, smoothstep(8.0, 16.0, r))));
-        echo = max(echo, logoEcho(p, k) * atten * (0.7 + 0.55 * (filament - 0.8)) * (0.72 + 0.28 * tex));
+        float inF;
+        float e = fanEcho(k, p, r, aWorld, tex, filament, inF);
+        inAny = max(inAny, inF);
+        echo = max(echo, e);
       }
       float near = 1.0 - smoothstep(0.0, 2.4, r);
       echo = max(echo, inAny * near * near * (0.25 + 0.6 * rays) * tex * 0.5);
@@ -349,16 +434,10 @@ export const sonarFragment = /* glsl */ `
     }
 
     if (uDebug > 0.5) { float d = texture2D(uDepth0, vUv).r; gl_FragColor = vec4(vec3(d >= 0.9999 ? 0.0 : 1.0 - linearize(d) / 60.0), 1.0); return; }
-    // the app's tone curve (assets/aio_shader.glsl): log compression → gain / dynamic-range window → LUT
-    float raw = echo * 65535.0;
-    float bs = 4000.0;
-    float lv = log(1.0 + raw / bs) / log(1.0 + 65535.0 / bs);
-    float width = clamp(uDynRange, 0.05, 1.0);
-    float lo = (1.0 - width) * 0.5 + width * (uGain - 0.5) + 0.5 * width * uContrast;
-    float hi = lo + width * (1.0 - 0.45 * uContrast) * (uFlat > 0.5 ? 1.0 : 1.15); // side views: white point 15 % higher, fewer pixels burn to white (#66); Panoramic keeps its own calibration (§7.13)
-    float idx = echo > 0.0005 ? clamp((lv - lo) / (hi - lo), 0.0, 1.0) : 0.0;
-    idx = pow(idx, uGamma) * inAny;
-    vec3 col = texture2D(uLUT, vec2(idx * (255.0 / 256.0) + 0.5 / 256.0, 0.5)).rgb;
+    float idx = toneIdx(echo) * inAny;
+    // the ice views draw their Live Down panel in the same jet map as the dial (the app's ice views, home-plm-row.jpg);
+    // ?icelut=amber keeps the Lab's amber there instead (for Jason to compare)
+    vec3 col = (uIce > 0.5 && uIceAmber < 0.5) ? lut2(idx) : texture2D(uLUT, vec2(idx * (255.0 / 256.0) + 0.5 / 256.0, 0.5)).rgb;
     col *= inAny;
     gl_FragColor = vec4(col, 1.0);
   }

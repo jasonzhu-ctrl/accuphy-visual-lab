@@ -29,7 +29,13 @@ export const MODE_LABELS = {
   forward: 'Forward View',
   combo: 'Combo View',
   panoramic: 'Panoramic View',
+  // the Mini's two ice views (app home: PingLive Mini › Ice Fishing / Live Ice Fishing, reference/app-study/home-plm-row.jpg):
+  // a flasher dial beside a scrolling 2D history, or beside the Live Down fan. Only the ice scene offers them (ICE_MODES).
+  ice: 'Ice Fishing View',
+  liveice: 'Live Ice View',
 }
+// the view pills of the ice scene (2026-10-16): Live Down is inside Live Ice, so it is not listed twice
+export const ICE_MODES = ['liveice', 'ice', 'forward', 'combo']
 
 // Forward-view tilt rule — CONFIRMED by Jason 2026-09-23 on the PLM Combo View
 // (he tuned the slider to 71°, i.e. the forward fan's leading edge lies on the
@@ -48,7 +54,7 @@ export function fanSpans(device, mode, tiltOverrideDeg) {
   const tilt = tiltOverrideDeg ?? forwardTiltDeg(device.beamDeg)
   const down = [-half, half]
   const forward = [-half + tilt, half + tilt]
-  if (mode === 'down') return [down]
+  if (mode === 'down' || mode === 'ice' || mode === 'liveice') return [down] // the ice views ping straight down through the hole
   if (mode === 'forward') return [forward]
   // Panoramic (PL only): the fan lies flat just under the surface, so from the
   // side you only see its thickness — a thin wedge skimming down from horizontal.

@@ -80,7 +80,7 @@ export function wedgeSpecs(device, mode, rangeM) {
   const half = beam / 2, th = device.thickDeg
   const vertical = (tilt) => ({ a0: d2r(-half), a1: d2r(half), s0: -1, s1: 1, R: rangeM, frame: verticalFrame(tilt), theta: d2r(th / 2) })
   const fwdTilt = 90 - half // leading edge on the surface (decision #7)
-  if (mode === 'down') return [vertical(0)]
+  if (mode === 'down' || mode === 'ice' || mode === 'liveice') return [vertical(0)] // the Mini's ice views: the Down fan through the hole
   if (mode === 'forward') return [vertical(fwdTilt)]
   if (mode === 'combo') return [vertical(0), vertical(fwdTilt)]
   if (mode === 'panoramic') return [{ a0: d2r(-half), a1: d2r(half), s0: 0, s1: 1, R: rangeM, frame: flatFrame, theta: d2r(th) }]

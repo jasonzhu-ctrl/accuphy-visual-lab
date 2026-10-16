@@ -24,6 +24,8 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
     uSonarPass: { value: 0.0 }, // 1 while rendering the sonar depth strips: alpha = fish mask
     uFishSonarScale: { value: 1.0 / 2.6 }, // fish are DRAWN ×2.6 in the lake (fish.js); the sonar sees them at true size (§7.4)
     uHighlight: { value: new THREE.Color('#7fe6ff') },
+    uRevealGain: { value: 1.0 }, // ice scene: a stronger lift inside the beam (the window in the snow must read lit)
+    uOutGamma: { value: 1.0 },   // ice scene: < 1 brightens the dark water world a little (main view only)
   }
   const mat = new THREE.ShaderMaterial({
     uniforms,
@@ -79,7 +81,7 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
       uniform int uBeamCount;
       uniform vec3 uApex[${MAX_BEAMS}]; uniform vec3 uC[${MAX_BEAMS}]; uniform vec3 uH[${MAX_BEAMS}]; uniform vec3 uN[${MAX_BEAMS}];
       uniform vec4 uAng[${MAX_BEAMS}]; uniform vec2 uRT[${MAX_BEAMS}]; uniform vec4 uBox[${MAX_BEAMS}];
-      uniform float uReveal; uniform vec3 uHighlight; uniform float uSonarPass;
+      uniform float uReveal; uniform vec3 uHighlight; uniform float uSonarPass; uniform float uRevealGain; uniform float uOutGamma;
       #ifdef FISH
         varying float vPattern; varying vec3 vBelly; varying vec3 vSide; varying vec3 vLocal; varying vec2 vUv;
         float hash3(vec3 p) { return fract(sin(dot(p, vec3(127.1, 311.7, 74.7))) * 43758.5453); }
@@ -197,7 +199,7 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
         albedo *= 1.0 - brown * 0.28 * groove;
       #endif
         // outside the beam things stay murky; inside they pop (Garmin look)
-        vec3 lit = base * (0.72 + 2.3 * beam) + uHighlight * 0.3 * beam + uHighlight * 0.9 * edge;
+        vec3 lit = base * (0.72 + 2.3 * beam * uRevealGain) + uHighlight * 0.3 * beam * uRevealGain + uHighlight * 0.9 * edge;
       #ifdef LOGO
         // the brand mark keeps Accuphy blue: a gentler beam lift, no cyan wash (the ×3 lift clipped it to cyan)
         lit = base * (0.95 + 0.85 * beam) + uHighlight * 0.06 * beam + uHighlight * 0.5 * edge;
@@ -207,6 +209,7 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
         float fog = 1.0 - exp(-dist * uFogDensity);
         fog *= 1.0 - 0.7 * beam; // the beam also cuts through the murk
         vec3 col = mix(lit, uFogColor, clamp(fog, 0.0, 0.92));
+        if (uSonarPass < 0.5 && uOutGamma != 1.0) col = pow(max(col, 0.0), vec3(uOutGamma));
         // sonar pass alpha: 1 = fish, 0.75 = steel (wrecks), 0.5 = other structure (timber, rocks), 0 = bottom
         float isFish = 0.0;
       #ifdef STRUCTURE

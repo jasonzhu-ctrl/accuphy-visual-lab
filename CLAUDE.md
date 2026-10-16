@@ -41,6 +41,10 @@ no TypeScript. No backend, no database — front-end only.
   experiment**, auto-discovered and listed on the gallery page (see
   `src/experiments/README.md`). Opens at `#<folder-name>`.
 - `src/App.jsx` — gallery + hash router. `src/experiments.js` — discovery.
+- `src/experiments/2026-10-16-sonar-ice-3d/` — the **ice-fishing page** (decision #94): a one-line wrapper that opens the
+  sonar lake with `scene="ice"`. The ice code lives in the lake folder (`iceScene.js`, `iceSheet.js`, `iceProps.js`,
+  `IceCamp.jsx`, `snow.js`, `iceSky.js`). Dev aids: `?time=dusk|day|night`, `?look=snow|mixed|glass`, `?icelut=amber`.
+  Local only until Jason says publish (`VITE_SCENE=ice` is the build variant).
 - `docs/decisions.md` — numbered log of design/tooling decisions. Any decision
   made in any Claude session must be written back here.
 - `docs/sonar-beam-visualizer-brief.md` — brief for the first real experiment

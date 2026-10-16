@@ -6,12 +6,15 @@ import { colormapTexture } from './colormaps'
 import { depthAt } from './terrain'
 import { bakeTerrain, makeMarksTexture, computeMarks } from './sonarMarks'
 import { logoFrame, makeLogoSdf, LOGO_SDF_MAX, LOCKUP, LOCKUP_SVG } from './logo'
+import { niceStep } from './SonarChrome'
+import { FT } from '../2026-09-23-sonar-beam/devices'
 
 // CSS 3D pose of the phone (index.jsx applies the same transform to the DOM frame)
 export const PHONE_POSE = { perspective: 1400, rotY: -16, rotX: 6 }
 // phones (< 640 px wide): nearly flat, so the frame can fill the width (Jason 2026-10-03: 手机能否保留边框 合理安排一下空间)
 export const PHONE_POSE_PHONE = { perspective: 1400, rotY: -4, rotX: 2 }
 export const isPhoneLayout = () => typeof window !== 'undefined' && window.innerWidth < 640
+export const ICE_SPLIT = 0.42 // the flasher panel's share of the display width in the ice views
 export const phonePose = () => (isPhoneLayout() ? PHONE_POSE_PHONE : PHONE_POSE)
 
 // How the app frames each view (measured on the tablet 2026-09-24, docs/app-chrome.md §2/§6).
@@ -28,6 +31,10 @@ export function screenLayout(deviceId, mode, R, aspect, specs, depthM) {
     // so the sound reaches the far corner of the box
     return { box0: { x0: -0.25 * R, y0: 0, w: 1.25 * R, h: D }, apexU: 0.2, split: false, reach: Math.hypot(R, D) } // apex 20 % in; axes independent
   }
+  // the Mini's ice views (2026-10-16, reference/product-images/PingLive Mini Views.png): the flasher dial fills the left
+  // ICE_SPLIT of the display; the right panel is the Live Down fan (liveice) or the scrolling 2D history (ice), drawn
+  // over the panel's own width, so the fan geometry is the Live Down one with the panel's aspect
+  if (mode === 'liveice' || mode === 'ice') { const hw = R * Math.tan(half) * 1.12 * 0.8; return { box0: { x0: -hw, y0: 0, w: 2 * hw, h: R }, apexU: 0.5, split: false, mottle: true, ice: mode === 'ice' ? 2 : 1, iceSplit: ICE_SPLIT } }
   if (mode === 'down') {
     if (mini) { const hw = R * Math.tan(half) * 1.12; return { box0: { x0: -hw, y0: 0, w: 2 * hw, h: R }, apexU: 0.5, split: false, mottle: true } } // fan corners on the screen corners
     const w = R * aspect; return { box0: { x0: -w / 2, y0: 0, w, h: R }, apexU: 0.5, split: false, reach: Math.hypot(w / 2, R) } // 1:1, the 135° fan runs off the sides; echoes fill the lower corners (§6.9)
@@ -61,7 +68,7 @@ const STRIP_W = 1024, STRIP_H = 128 // 128 rows across the 18–20° thickness �
 export default function SonarScreen({ state, rect, lakeMats }) {
   const { gl, scene, camera, size } = useThree()
   if (import.meta.env.DEV) {
-    window.__sonarGL = gl; window.__sonarState = state.current
+    window.__sonarGL = gl; window.__sonarState = state.current; window.__scene = scene
     window.__lakeSnap = () => { gl.setRenderTarget(null); gl.render(scene, camera); return gl.domElement.toDataURL('image/png') } // dev: the 3D view alone as a PNG
   }
   const res = useMemo(() => {
@@ -100,8 +107,21 @@ export default function SonarScreen({ state, rect, lakeMats }) {
         uLogoSdf: { value: makeLogoSdf() }, uLogoMap: { value: new THREE.Vector4(1 / logo.s, LOCKUP_SVG.cx, LOCKUP_SVG.bottom, LOGO_SDF_MAX) },
         uLogoSvg: { value: new THREE.Vector2(LOCKUP_SVG.w, LOCKUP_SVG.h) }, uLogoExt: { value: new THREE.Vector2(LOCKUP.width / 2 + 0.3, LOCKUP_SVG.bottom * logo.s + 0.3) },
         uLUT: { value: colormapTexture('garmin_amber') }, uGain: { value: 0.57 }, uDynRange: { value: 0.85 }, uContrast: { value: 0.4 }, uNoise: { value: 0.3 }, uGamma: { value: 0.75 }, // calibrated 2026-09-24 against the two confirmed frames (sonar-style.md §6.11)
+        // the Mini's ice views (2026-10-16): flasher + Live Down (1) or flasher + 2D history (2); the app draws them in its jet map
+        uIce: { value: 0 }, uIceSplit: { value: ICE_SPLIT }, uAspect: { value: 2.08 }, uTicks: { value: 5 }, uLUT2: { value: colormapTexture('jet') },
+        uHist: { value: null }, uHistPrev: { value: null }, uHistPass: { value: 0 }, uIceAmber: { value: /icelut=amber/.test(window.location.search) ? 1 : 0 },
       },
     })
+    // the 2D history (Ice Fishing View): 384 pings × 256 depth cells, ping-ponged — each ping shifts the record one
+    // column left and draws the newest column at the right edge (sonarShader.js, uHistPass)
+    const hist = [0, 1].map(() => new THREE.WebGLRenderTarget(384, 256, { depthBuffer: false, minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter }))
+    const histGeo = new THREE.BufferGeometry()
+    histGeo.setAttribute('position', new THREE.Float32BufferAttribute(new Float32Array([-1, 1, 0, 1, 1, 0, -1, -1, 0, 1, -1, 0]), 3))
+    histGeo.setAttribute('uv', new THREE.Float32BufferAttribute(new Float32Array([0, 1, 1, 1, 0, 0, 1, 0]), 2))
+    histGeo.setAttribute('aW', new THREE.Float32BufferAttribute(new Float32Array([1, 1, 1, 1]), 1))
+    histGeo.setIndex([0, 2, 1, 1, 2, 3])
+    const histScene = new THREE.Scene()
+    const histQuad = new THREE.Mesh(histGeo, mat); histQuad.frustumCulled = false; histScene.add(histQuad)
     const overlay = new THREE.Scene()
     // a 4-vertex quad whose corners are set every frame in CLIP space (x*w, y*w) with w per vertex,
     // so the picture gets the same perspective as the CSS-transformed phone and stays perspective-correct
@@ -159,15 +179,15 @@ export default function SonarScreen({ state, rect, lakeMats }) {
         return c.toDataURL('image/png')
       }
     }
-    return { targets, cams, mat, overlay, quad, ortho, topRT, topCam, bake, marks }
+    return { targets, cams, mat, overlay, quad, ortho, topRT, topCam, bake, marks, hist, histScene, histCur: 0, lastPing: -1 }
   }, [])
   useEffect(() => { [SONAR_HIDE_LAYER, LAKEBED_LAYER, FISH_LAYER, LOGO_LAYER].forEach((l) => camera.layers.enable(l)) }, [camera])
-  useEffect(() => () => { res.targets.forEach((t) => t.dispose()); res.topRT.dispose(); res.mat.dispose() }, [res])
+  useEffect(() => () => { res.targets.forEach((t) => t.dispose()); res.topRT.dispose(); res.mat.dispose(); res.hist.forEach((t) => t.dispose()) }, [res])
 
   const tmpUp = useMemo(() => new THREE.Vector3(), [])
   useFrame((root, dt) => {
     const s = state.current
-    const specs = s.specs.slice(0, MAX_FANS)
+    const specs = (s.noSignal ? [] : s.specs).slice(0, MAX_FANS) // ice: the Mini is out of the water while the visitor hole-hops → no picture
     const u = res.mat.uniforms
     u.uTime.value += dt
     u.uRange.value = s.rangeM
@@ -179,10 +199,14 @@ export default function SonarScreen({ state, rect, lakeMats }) {
     const flat = specs[0] && specs[0].frame.n.y !== 0 // panoramic: thickness normal is vertical
     u.uFlat.value = flat ? 1 : 0
     // screen box(es) in metres — the app fills the screen and scales each axis on its own
+    let lay
     {
       const el0 = rect.current.el
       const aspect = el0 && el0.offsetHeight > 0 ? el0.offsetWidth / el0.offsetHeight : 2
-      const lay = screenLayout(s.deviceId, s.mode, s.rangeM, aspect, specs, s.depthM)
+      lay = screenLayout(s.deviceId, s.mode, s.rangeM, aspect, s.specs.slice(0, MAX_FANS), s.depthM)
+      // the ice views: which panels, the display aspect for the dial, one tick per ruler step round the ring
+      u.uIce.value = lay.ice || 0; u.uIceSplit.value = lay.iceSplit ?? ICE_SPLIT; u.uAspect.value = aspect
+      if (lay.ice) { const unit = s.imperial ? FT : 1, span = s.rangeM / unit; u.uTicks.value = span / niceStep(span) }
       u.uBox0.value.set(lay.box0.x0, lay.box0.y0, lay.box0.w, lay.box0.h)
       const b1 = lay.box1 ?? lay.box0
       u.uBox1.value.set(b1.x0, b1.y0, b1.w, b1.h)
@@ -239,6 +263,18 @@ export default function SonarScreen({ state, rect, lakeMats }) {
     u.uApexXZ.value.set(s.apex.x, s.apex.z); u.uApexDepth.value = -s.apex.y
     // fish marks: every fish in the beam, projected into the view (sonarMarks.js)
     u.uMarkCount.value = computeMarks({ pop: s.pop, t: root.clock.elapsedTime, specs, apex: s.apex, flat, bake: res.bake, rangeM: flat ? s.rangeM : u.uReach.value }, res.marks)
+    // the 2D history: one new column per ping (8 a second), after the depth strips and the marks are current
+    if (lay.ice === 2) {
+      const now = root.clock.elapsedTime
+      if (now - res.lastPing >= 0.125) {
+        res.lastPing = now
+        const cur = res.histCur, prev = 1 - cur
+        u.uHistPass.value = 1; u.uHistPrev.value = res.hist[prev].texture
+        gl.setRenderTarget(res.hist[cur]); gl.render(res.histScene, res.ortho); gl.setRenderTarget(null)
+        u.uHistPass.value = 0; u.uHist.value = res.hist[cur].texture
+        res.histCur = prev
+      }
+    }
     // the app's depth readout: water depth under the transducer, in the user's unit
     if (s.depthEl) {
       const d = depthAt(s.apex.x, s.apex.z)

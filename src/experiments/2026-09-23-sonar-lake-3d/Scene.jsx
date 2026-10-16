@@ -15,6 +15,11 @@ import { makeCargoWreck, makeWreckDebris, WRECK_L, BIG_WRECK, SMALL_WRECK } from
 import { makeLogoGeometry, makePlinthGeometry, logoFrame } from './logo'
 import { buildObstacles, toCircles } from './obstacles'
 import SonarScreen, { SONAR_HIDE_LAYER, LAKEBED_LAYER, FISH_LAYER, LOGO_LAYER } from './SonarScreen'
+// the ice scene (Jason 2026-10-16): the same lake frozen over — iceScene.js has the story and the presets
+import { IceSky, IceSheet, IceCamp, Snowfall, IcePick } from './IceCamp'
+import { makeIceMaterial } from './iceSheet'
+import { bakeTerrain } from './sonarMarks'
+import { iceParams, ICE_CAM_T, ICE_CAM_D, ICE_LAKE_W, ICE_FOG, dir } from './iceScene'
 
 // ---------- lakebed ----------
 function Lakebed({ mat }) {
@@ -388,6 +393,8 @@ function Beams({ state }) {
 const CAM_T = new THREE.Vector3(3, -9, 0), CAM_D = new THREE.Vector3(-17, 61, 66) // desktop target, camera − target
 const LAKE_W = 50 // Jason 2026-10-03: 70 m made the boat a little too small — a middle value
 const FOG = { near: 160, far: 420, cam: 400 }
+const LAKE_CAM = { T: CAM_T, D: CAM_D, W: LAKE_W, FOG }
+const ICE_CAM = { T: ICE_CAM_T, D: ICE_CAM_D, W: ICE_LAKE_W, FOG: ICE_FOG, hintBelow: true }
 // dev aid ?cam=fish:<species>[:<index>][:top|:side|:tq] — top: from above, nose up the screen (shows the body wave);
 // side: broadside, level with the fish; tq: three-quarter, above and to one side, turning with the fish; none: the old fixed offset
 const FISH_CAM_VIEW = import.meta.env.DEV ? (/cam=fish:\w+(?::\d+)?:(top|side|tq)/.exec(window.location.search) || [])[1] : undefined
@@ -397,7 +404,7 @@ const BOAT_CAMS = { // camera offset from the boat, look-at offset from the boat
   side: [[0.4, 1.7, 10.5], [0, 0.15, 0]], bow: [[8.5, 2.6, 6], [0, 0.1, 0]], stern: [[-8.5, 2.4, -5.5], [0, 0.2, 0]],
   top: [[0.01, 13.5, 0], [0, 0, 0]], under: [[5.5, -2.6, 5.5], [0, -0.2, 0]],
 }
-function Rig({ state, sonarRect, fogMats }) {
+function Rig({ state, sonarRect, fogMats, cam = LAKE_CAM }) {
   const { camera, size, scene } = useThree()
   const tmp = useMemo(() => new THREE.Vector3(), [])
   const look = useMemo(() => new THREE.Vector3(), [])
@@ -406,7 +413,7 @@ function Rig({ state, sonarRect, fogMats }) {
     const s = state.current
     const aspect = size.width / size.height
     const tanV = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2))
-    const k = Math.max(1, LAKE_W / (2 * tanV * aspect * CAM_D.length())) // 1 on desktop and landscape tablets
+    const k = Math.max(1, cam.W / (2 * tanV * aspect * cam.D.length())) // 1 on desktop and landscape tablets
     // lake band = the screen above the phone frame on portrait phones (the frame and panel cover the rest)
     const fr = sonarRect?.current?.dock || sonarRect?.current?.frame
     const bandBottom = k > 1 && fr ? Math.max(size.height * 0.35, Math.min(size.height, fr.getBoundingClientRect().top)) : size.height
@@ -417,16 +424,16 @@ function Rig({ state, sonarRect, fogMats }) {
     if (k !== k0.current) { // thin the fog and push the far plane with the camera distance
       k0.current = k
       for (const m of fogMats) { const u = m.userData.uniforms.uFogDensity; u.base ??= u.value; u.value = u.base / k }
-      if (scene.fog) { scene.fog.near = FOG.near * k; scene.fog.far = FOG.far * k }
-      camera.far = FOG.cam * k; camera.updateProjectionMatrix()
+      if (scene.fog) { scene.fog.near = cam.FOG.near * k; scene.fog.far = cam.FOG.far * k }
+      camera.far = cam.FOG.cam * k; camera.updateProjectionMatrix()
     }
     // drag hint follows the boat until the first drag, kept inside the screen
     if (s.hintEl) {
       tmp.set(s.boat.x, 0.6, s.boat.z).project(camera)
       const hw = (s.hintEl.offsetWidth || 160) / 2 + 8
       const px = Math.min(size.width - hw, Math.max(hw, ((tmp.x + 1) / 2) * size.width))
-      const py = Math.max((s.hintEl.offsetHeight || 34) + 54, ((1 - tmp.y) / 2) * size.height - (k > 1 ? 22 : 46))
-      s.hintEl.style.transform = `translate(${px.toFixed(1)}px, ${py.toFixed(1)}px) translate(-50%, -100%)`
+      const py = cam.hintBelow ? ((1 - tmp.y) / 2) * size.height + (k > 1 ? 30 : 44) : Math.max((s.hintEl.offsetHeight || 34) + 54, ((1 - tmp.y) / 2) * size.height - (k > 1 ? 22 : 46))
+      s.hintEl.style.transform = `translate(${px.toFixed(1)}px, ${py.toFixed(1)}px) translate(-50%, ${cam.hintBelow ? '0' : '-100%'})`
       s.hintEl.style.opacity = s.hasDragged ? '0' : '1'
     }
     // fixed 3/4 aerial view like the PL animations; slight parallax from the pointer
@@ -470,11 +477,11 @@ function Rig({ state, sonarRect, fogMats }) {
       return
     }
     // view from the south (desktop exactly as before); phones: pulled back, re-centred on a step preset's boat
-    const fx = k > 1 && s.frameX != null ? s.frameX : CAM_T.x
+    const fx = k > 1 && s.frameX != null ? s.frameX : cam.T.x
     s.camX = s.camX == null ? fx : s.camX + (fx - s.camX) * Math.min(1, dt * 2.5)
     const pk = k > 1 ? 0 : 1 // no pointer parallax on phones (a dragging finger would shake the view)
-    look.set(s.camX + px * 2 * pk, CAM_T.y, CAM_T.z)
-    camera.position.set(look.x + CAM_D.x * k + px * 2 * pk, CAM_T.y + CAM_D.y * k + py * 2 * pk, CAM_T.z + CAM_D.z * k + px * 2 * pk)
+    look.set(s.camX + px * 2 * pk, cam.T.y, cam.T.z)
+    camera.position.set(look.x + cam.D.x * k + px * 2 * pk, cam.T.y + cam.D.y * k + py * 2 * pk, cam.T.z + cam.D.z * k + px * 2 * pk)
     camera.lookAt(look)
   })
   return null
@@ -497,35 +504,66 @@ function PickPlane({ state }) {
 }
 
 // paused: the sign-up gate is open — stop the render loop so the lake and the sonar picture freeze
-export default function LakeScene({ state, sonarRect, paused = false }) {
+// scene: 'lake' (the boat, default) or 'ice' (the frozen lake: IceCamp.jsx replaces the water, the boat and the pick plane;
+// the lakebed, structure, fish, beams and the sonar engine are the same)
+export default function LakeScene({ state, sonarRect, paused = false, scene = 'lake' }) {
+  const ice = scene === 'ice'
+  const P = useMemo(() => (ice ? iceParams() : null), [ice])
   const mats = useMemo(() => {
     const fish = makeLakeMaterial({ fish: true })
     fish.userData.uniforms.uHighlight.value.set('#ffe9a0') // fish light up warm, like a sonar return
     fish.userData.uniforms.uFogDensity.value = 0.006
     fish.side = THREE.DoubleSide // flat fins
-    return { bed: makeLakeMaterial(), inst: makeLakeMaterial({ structure: true }), steel: makeLakeMaterial({ steel: true }), logo: makeLakeMaterial({ logo: true }), fish }
-  }, [])
-  const beamMats = useMemo(() => [mats.bed, mats.inst, mats.steel, mats.fish, mats.logo], [mats])
+    const m = { bed: makeLakeMaterial(), inst: makeLakeMaterial({ structure: true }), steel: makeLakeMaterial({ steel: true }), logo: makeLakeMaterial({ logo: true }), fish }
+    if (ice) for (const k in m) { const u = m[k].userData.uniforms; u.uFogColor.value.set(P.T.water); u.uSun.value.copy(dir(P.T.sun.dir)); u.uRevealGain.value = 1.7; u.uOutGamma.value = 0.72 } // dark winter water, a stronger reveal
+    return m
+  }, [ice, P])
+  const lakeMats = useMemo(() => [mats.bed, mats.inst, mats.steel, mats.fish, mats.logo], [mats])
+  const iceMat = useMemo(() => {
+    if (!ice) return null
+    const m = makeIceMaterial(bakeTerrain())
+    const u = m.userData.uniforms, T = P.T, L = P.L
+    u.uSun.value.copy(dir(T.sun.dir)); u.uSunColor.value.set(T.sun.color); u.uSunI.value = T.sun.i
+    u.uSkyZenith.value.set(T.zenith); u.uSkyHorizon.value.set(T.horizon); u.uAmbient.value = T.hemi[2]
+    u.uFogColor.value.set(T.bg); u.uFogDensity.value = T.fogDensity; u.uWater.value.set(T.water)
+    u.uCover.value = L.cover; u.uClear.value = L.clear; u.uWindow.value = L.window
+    return m
+  }, [ice, P])
+  const beamMats = useMemo(() => (iceMat ? [...lakeMats, iceMat] : lakeMats), [lakeMats, iceMat]) // the ice shows the beam's reach too
+  const bg = ice ? P.T.bg : '#9cc1cf'
   return (
     <Canvas frameloop={paused ? 'never' : 'always'} dpr={[1, 1.5]} camera={{ fov: 38, near: 0.5, far: 400, position: [-38, 34, 54] }} gl={{ antialias: true, powerPreference: 'high-performance' }}>
-      <color attach="background" args={['#9cc1cf']} />
-      <fog attach="fog" args={['#9cc1cf', 160, 420]} />
-      <hemisphereLight args={['#dbe9f0', '#2a3a2a', 0.9]} />
-      <directionalLight position={[40, 80, 30]} intensity={1.4} />
+      <color attach="background" args={[bg]} />
+      <fog attach="fog" args={ice ? [bg, ICE_FOG.near, ICE_FOG.far] : [bg, 160, 420]} />
+      {ice ? (<>
+        <hemisphereLight args={P.T.hemi} />
+        <directionalLight position={dir(P.T.sun.dir).multiplyScalar(120).toArray()} color={P.T.sun.color} intensity={P.T.sun.i * 1.8} />
+        <IceSky T={P.T} />
+      </>) : (<>
+        <hemisphereLight args={['#dbe9f0', '#2a3a2a', 0.9]} />
+        <directionalLight position={[40, 80, 30]} intensity={1.4} />
+      </>)}
       <Lakebed mat={mats.bed} />
-      <mesh rotation-x={-Math.PI / 2} position-y={-47} onUpdate={(o) => o.layers.set(SONAR_HIDE_LAYER)}><planeGeometry args={[900, 900]} /><meshBasicMaterial color="#17545f" /></mesh>
+      <mesh rotation-x={-Math.PI / 2} position-y={-47} onUpdate={(o) => o.layers.set(SONAR_HIDE_LAYER)}><planeGeometry args={[900, 900]} /><meshBasicMaterial color={ice ? P.T.water : '#17545f'} /></mesh>
       <Structures mat={mats.inst} />
       <Wreck mat={mats.steel} />
       <BigWreck mat={mats.steel} />
       <Logo mat={mats.logo} stoneMat={mats.inst} />
       {import.meta.env.DEV && /fishtest/.test(window.location.search) && <TestPiling mat={mats.inst} />}
       <Fish mat={mats.fish} state={state} />
-      <Water state={state} />
-      <Boat state={state} beamMats={beamMats} />
+      {ice ? (<>
+        <IceSheet mat={iceMat} />
+        <IceCamp state={state} beamMats={beamMats} iceMat={iceMat} T={P.T} />
+        <Snowfall state={state} T={P.T} />
+        <IcePick state={state} />
+      </>) : (<>
+        <Water state={state} />
+        <Boat state={state} beamMats={beamMats} />
+        <PickPlane state={state} />
+      </>)}
       <Beams key={state.current.specKey} state={state} />
-      <PickPlane state={state} />
-      <Rig state={state} sonarRect={sonarRect} fogMats={beamMats} />
-      <SonarScreen state={state} rect={sonarRect} lakeMats={beamMats} />
+      <Rig state={state} sonarRect={sonarRect} fogMats={beamMats} cam={ice ? ICE_CAM : LAKE_CAM} />
+      <SonarScreen state={state} rect={sonarRect} lakeMats={lakeMats} />
     </Canvas>
   )
 }

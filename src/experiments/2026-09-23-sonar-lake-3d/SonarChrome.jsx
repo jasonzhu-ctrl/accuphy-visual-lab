@@ -7,7 +7,7 @@ import { FT } from '../2026-09-23-sonar-beam/devices'
 
 const num = 'font-brand-body tabular-nums'
 
-function niceStep(span) { // ruler step for ~5–8 labels over `span` display units
+export function niceStep(span) { // ruler step for ~5–8 labels over `span` display units
   const raw = span / 6
   const p = Math.pow(10, Math.floor(Math.log10(raw)))
   const m = raw / p
@@ -61,6 +61,13 @@ export default function SonarChrome({ layout, deviceId, mode, rangeFt, depthFt, 
   const mini = deviceId === 'PLM'
   const showDepthRange = !mini && mode === 'forward'
   const label = (v) => `${Math.abs(Math.round(v * 100) / 100)}`
+  // the Mini's ice views (reference/product-images/PingLive Mini Views.png): the flasher dial fills the left iceSplit of
+  // the display — depth labels round its ring, the big readout in its centre; the right panel keeps the depth ruler, the
+  // temperature and voltage sit at its top-right, the wordmark at its top-left. The Live Down fan still gets its top ruler.
+  const iceView = (layout.ice || 0) > 0, iceSplit = layout.iceSplit ?? 0.42, iceHistory = layout.ice === 2
+  const panelX = (x) => (iceView ? iceSplit * 100 + 0.6 + (100 - iceSplit * 100 - 0.6) * (x / 100) : x) // right-panel % → display %
+  const ringLabels = iceView ? ticks(0, box.h / unit, vStep).filter((v) => v < box.h / unit - 1e-6) : []
+  const ringR = 29.75, ringCy = 47, ringCx = iceSplit * 50 // cqh / cqw; the dial: outer 0.36, inner 0.235 of the height, centre 53 % up (sonarShader.js)
   const Ring = ({ children, style }) => (children === '−' || children === '+') ? (
     <svg viewBox="0 0 24 24" style={{ width: cq(7), height: cq(7), display: 'block', ...style }} aria-hidden="true">
       <circle cx="12" cy="12" r="10.6" fill="none" stroke="#fff" strokeWidth="2" />
@@ -72,19 +79,25 @@ export default function SonarChrome({ layout, deviceId, mode, rangeFt, depthFt, 
   return (
     <div className="absolute inset-0 select-none text-white" style={{ fontFamily: 'var(--font-body, "Instrument Sans", system-ui, sans-serif)' }}>
       {/* rulers: italic numbers, no lines (orange mode has no grid) */}
-      {top.map((v) => { const x = ((v - hx0) / (hx1 - hx0)) * 100; if (x < 1.5 || x > 98.5) return null; return <span key={`t${v}`} className={num} style={{ position: 'absolute', top: '1.5cqh', left: `${x}%`, transform: 'translateX(-50%)', fontSize: '3.2cqh', fontStyle: 'italic', opacity: 0.9 }}>{label(v)}</span> })}
+      {!iceHistory && top.map((v) => { const x = ((v - hx0) / (hx1 - hx0)) * 100; if (x < 1.5 || x > 98.5) return null; return <span key={`t${v}`} className={num} style={{ position: 'absolute', top: '1.5cqh', left: `${panelX(x)}%`, transform: 'translateX(-50%)', fontSize: '3.2cqh', fontStyle: 'italic', opacity: 0.9 }}>{label(v)}</span> })}
       {side.map((v) => { const y = ((v * unit - box.y0) / box.h) * 100; const yy = flat ? 100 - y : y; if (yy < 4 || yy > 96) return null; return <span key={`r${v}`} className={num} style={{ position: 'absolute', right: '0.6%', top: `${yy}%`, transform: 'translateY(-50%)', fontSize: '3.2cqh', opacity: 0.9 }}>{label(v)}</span> })}
-      {left.map((v) => { const y = ((v * unit - leftBox.y0) / leftBox.h) * 100; const yy = flat ? 100 - y : y; if (yy < 4 || yy > 96) return null; return <span key={`l${v}`} className={num} style={{ position: 'absolute', left: '0.6%', top: `${yy}%`, transform: 'translateY(-50%)', fontSize: '3.2cqh', opacity: 0.9 }}>{label(v)}</span> })}
+      {!iceView && left.map((v) => { const y = ((v * unit - leftBox.y0) / leftBox.h) * 100; const yy = flat ? 100 - y : y; if (yy < 4 || yy > 96) return null; return <span key={`l${v}`} className={num} style={{ position: 'absolute', left: '0.6%', top: `${yy}%`, transform: 'translateY(-50%)', fontSize: '3.2cqh', opacity: 0.9 }}>{label(v)}</span> })}
+      {/* the flasher's dial labels: depth clockwise from the top */}
+      {ringLabels.map((v) => { const th = (v / (box.h / unit)) * 2 * Math.PI; return <span key={`f${v}`} className={num} style={{ position: 'absolute', left: `calc(${ringCx}cqw + ${(Math.sin(th) * ringR).toFixed(2)}cqh)`, top: `calc(${ringCy}cqh - ${(Math.cos(th) * ringR).toFixed(2)}cqh)`, transform: 'translate(-50%, -50%)', fontSize: '3.1cqh', fontWeight: 600, color: '#2a2e3a' }}>{label(v)}</span> })}
 
-      {/* depth readout + water temp + voltage (top-left; Combo: top-right) */}
+      {/* depth readout + water temp + voltage (top-left; Combo: top-right; ice views: the readout in the dial, temp/volts top-right) */}
+      {iceView ? (<>
+        <div ref={depthRef} className={num} style={{ position: 'absolute', left: `${ringCx}cqw`, top: `${ringCy}cqh`, transform: 'translate(-50%, -50%)', fontSize: '9cqh', fontWeight: 700, lineHeight: 1, letterSpacing: '-0.02em', color: '#1b1e2a', whiteSpace: 'nowrap' }}>— —</div>
+        <div className={num} style={{ position: 'absolute', top: '6cqh', right: '4.5%', textAlign: 'right', fontSize: '4.2cqh', lineHeight: 1.5 }}>−1.2 °C<br />12.6 V</div>
+      </>) : (
       <div style={{ position: 'absolute', top: '11cqh', ...(split ? { right: '5%', textAlign: 'left' } : { left: '4%' }) }}>
         <div ref={depthRef} className={num} style={{ fontSize: '12cqh', fontWeight: 600, lineHeight: 1, letterSpacing: '-0.01em' }}>— —</div>
         <div className={num} style={{ fontSize: '4.2cqh', marginTop: '3cqh', lineHeight: 1.5 }}>21.8 °C<br />12.6 V</div>
-      </div>
+      </div>)}
 
       {/* wordmark + resolution tag (top-right) — not in Combo, where the readout sits there */}
       {!split && (
-        <div style={{ position: 'absolute', right: '3%', top: '6cqh', textAlign: 'right' }}>
+        <div style={{ position: 'absolute', ...(iceView ? { left: `${panelX(3)}%`, textAlign: 'left' } : { right: '3%', textAlign: 'right' }), top: '6cqh' }}>
           <img src="/brand/logo/White Accuphy Logo.png" alt="" style={{ height: '4.2cqh', width: 'auto', opacity: 0.55, display: 'inline-block' }} draggable={false} />
           <div className={num} style={{ fontSize: '2.8cqh', fontStyle: 'italic', opacity: 0.45, marginTop: '0.6cqh' }}>1440p (QHD)</div>
         </div>
