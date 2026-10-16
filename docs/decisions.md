@@ -1481,3 +1481,18 @@ Numbered log. Newest at the bottom.
       browser. Not yet checked: phones in detail, the sonar-qa grid for the ice views, the hidden-pane first-frame rule.
     - **Not published**: no share build, `docs/versions.md` unchanged. A fourth public page would be
       `VITE_SCENE=ice node scripts/build-share.mjs <out>` into `/ice/` when Jason says so.
+
+95. **2026-10-16** — **The ice is cut away round the hole: an ice island, a pool, the slab's edge** (Jason, on the first
+    ice version: "我感觉有点奇怪 水里的画面和冰面的关系 有点confusing"). The first version let the beam glow through
+    half-clear snow; with the snow opaque around it, the cone read as a glass pyramid standing on the surface.
+    - **Now:** the kit stands on a round ice island (1.9 m) with the hole; round it the ice is opened as far as the
+      beam reaches (a 7 m circle stretched by each fan's footprint — Forward opens a strip ahead), so the water, the
+      cone and the lit bottom are seen as in the summer lake; the cut shows the slab's thickness as pale ice walls
+      (`IceWalls`, rebuilt as the pool moves) with a bright lip on top. The Mini hangs under the island in plain view.
+      The pool follows the kit when the visitor hole-hops. The glow window is off (`window: 0`).
+    - The **black-ice look** (`?look=glass`) has no cut: the whole surface is see-through like the summer water, with
+      sparse drifts and a calmer crack network (fading with distance). Kept as the alternative if Jason prefers no
+      diorama; the snow-and-cutaway look is the default.
+    - Under the ice the lake materials are lifted a little more (`uRevealGain` 1.9, `uOutGamma` 0.62), the dusk water
+      is `#0e3240`, the beam curtain is a touch more solid on the ice page (0.2, edges 0.75). The summer lake is unchanged.
+    - Shown to Jason with screenshots the same evening; his verdict decides between the two looks.

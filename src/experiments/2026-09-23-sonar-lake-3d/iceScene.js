@@ -29,7 +29,7 @@ export const TIMES = {
     bg: '#3b4a66', fogDensity: 0.0038,
     hemi: ['#5f73a8', '#1c2130', 1.05], sun: { dir: [-0.62, 0.16, -0.35], color: '#ffd6bd', i: 0.42 },
     zenith: '#1a2746', horizon: '#7d82a6', glow: '#e08a5e', glowDir: [-0.8, 0, -0.45], stars: 0.55, aurora: 0,
-    lamp: 1.0, water: '#0a2630', snowfall: 0.6,
+    lamp: 1.0, water: '#0e3240', snowfall: 0.6,
   },
   day: { // bright overcast noon: white-out, soft shadowless light
     bg: '#d9e0e7', fogDensity: 0.0032,
@@ -47,11 +47,15 @@ export const TIMES = {
 // Snow cover — the second look choice. ?look=snow|mixed|glass
 //   cover: how much of the ice the drifts bury (0–1) · clear: how see-through the bare ice is · window: how strongly
 //   the beam's reach opens a window in the snow (decision #55: wherever the device goes, what its beam reaches lights up)
+// cut: the cutaway (Jason 2026-10-16 on the first version: 水里的画面和冰面的关系有点confusing) — an ice island round the hole,
+// a pool opened in the ice round it as far as the beam reaches, the slab's thickness showing at the cut. 0 = no cut.
 export const LOOKS = {
-  snow:  { cover: 0.78, clear: 0.55, window: 1.0 },
-  mixed: { cover: 0.5, clear: 0.6, window: 1.0 },
-  glass: { cover: 0.14, clear: 0.8, window: 0.7 },
+  snow:  { cover: 0.78, clear: 0.55, window: 0, cut: 1 },
+  mixed: { cover: 0.5, clear: 0.6, window: 0, cut: 1 },
+  glass: { cover: 0.14, clear: 0.8, window: 0, cut: 0 }, // black ice: the whole surface is see-through, like the summer water
 }
+export const CUT_R = 7.0    // the pool's radius round the hole (m); the beam's footprint stretches it
+export const ISLAND_R = 1.9 // the ice island the kit stands on
 
 export function iceParams() {
   const q = typeof window !== 'undefined' ? window.location.search : ''

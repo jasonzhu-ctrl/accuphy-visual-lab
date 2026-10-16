@@ -21,6 +21,9 @@ export function makeIceMaterial(terrain) {
     uTerrain: { value: terrain.tex }, uTerrainHalf: { value: terrain.H },
     uWind: { value: WIND.clone() },
     uHighlight: { value: new THREE.Color('#7fe6ff') },
+    // the cutaway: pool centre, its radius, the island's radius, and up to two beam boxes (xMin, xMax, zHalf, on) from the centre
+    uCutOn: { value: 1 }, uCutC: { value: new THREE.Vector2(1e4, 1e4) }, uCutR: { value: 5.5 }, uIsland: { value: 1.9 },
+    uCutBox: { value: [new THREE.Vector4(0, 0, 0, 0), new THREE.Vector4(0, 0, 0, 0)] },
     // the beams, exactly as lakeMaterial.js describes them (setBeamUniforms fills these)
     uBeamCount: { value: 0 },
     uApex: { value: [new THREE.Vector3(), new THREE.Vector3()] },
@@ -49,6 +52,7 @@ export function makeIceMaterial(terrain) {
       uniform vec4 uHoles[MAXH]; uniform int uHoleCount; uniform float uBeamOn;
       uniform vec4 uLamp; uniform vec3 uLampColor;
       uniform sampler2D uTerrain; uniform float uTerrainHalf; uniform vec2 uWind; uniform vec3 uHighlight;
+      uniform float uCutOn; uniform vec2 uCutC; uniform float uCutR; uniform float uIsland; uniform vec4 uCutBox[MB];
       uniform int uBeamCount;
       uniform vec3 uApex[MB]; uniform vec3 uC[MB]; uniform vec3 uH[MB]; uniform vec3 uN[MB];
       uniform vec4 uAng[MB]; uniform vec2 uRT[MB]; uniform vec4 uBox[MB];
@@ -87,6 +91,14 @@ export function makeIceMaterial(terrain) {
         return inA * inW * inR * atten;
       }
       float terrainDepth(vec2 w) { return texture2D(uTerrain, (w + uTerrainHalf) / (2.0 * uTerrainHalf)).r; }
+      float sdBox(vec2 p, vec2 b, float rr) { vec2 q = abs(p) - b + rr; return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - rr; }
+      // the pool: a circle round the hole plus the beams' footprints, minus the island (negative inside the pool)
+      float cutSDF(vec2 P) {
+        vec2 q = P - uCutC;
+        float d = length(q) - uCutR;
+        for (int k = 0; k < MB; k++) { vec4 b = uCutBox[k]; if (b.w > 0.5) d = min(d, sdBox(q - vec2((b.x + b.y) * 0.5, 0.0), vec2((b.y - b.x) * 0.5, b.z), 1.2)); }
+        return max(d, uIsland - length(q));
+      }
       // drift height 0..1: long dunes and sastrugi ridges along the wind (the fine crust is added for the mask only)
       float drift(vec2 P) {
         vec2 Pw = vec2(dot(P, uWind), dot(P, vec2(-uWind.y, uWind.x)));
@@ -134,15 +146,18 @@ export function makeIceMaterial(terrain) {
         litSnow += uSunColor * glint * 1.2;
         // ---- bare ice ----
         vec2 vA = voro(P * 0.5), vB = voro(P * 1.9 + 5.0);
-        float crack = (1.0 - smoothstep(0.0, 0.05, vA.y - vA.x)) * 0.9 + (1.0 - smoothstep(0.0, 0.03, vB.y - vB.x)) * 0.45;
-        float bubbles = smoothstep(0.78, 0.92, vnoise(P * 24.0)) * 0.4;
-        float frost = smoothstep(0.58, 0.9, fbm3(P * 2.4 + 11.0)) * 0.3;
+        float camD = length(vWorld - cameraPosition);
+        float farFade = 1.0 - smoothstep(25.0, 90.0, camD); // the fine network only near the camera; far ice is calm
+        float farFade2 = 1.0 - smoothstep(30.0, 110.0, camD);
+        float crack = ((1.0 - smoothstep(0.0, 0.035, vA.y - vA.x)) * 0.32 * farFade2 + (1.0 - smoothstep(0.0, 0.02, vB.y - vB.x)) * 0.16 * farFade) * step(0.55, hash(floor(P * 0.5 + 0.5))); // not every plate edge shows
+        float bubbles = smoothstep(0.82, 0.94, vnoise(P * 24.0)) * 0.28 * farFade;
+        float frost = smoothstep(0.62, 0.92, fbm3(P * 2.4 + 11.0)) * 0.22;
         float fres = pow(1.0 - max(dot(V, vec3(0.0, 1.0, 0.0)), 0.0), 3.0);
         vec3 reflSky = mix(uSkyHorizon, uSkyZenith, 0.3);
         vec3 iceSurf = mix(uWater, reflSky, 0.12 + 0.55 * fres);
         float white = clamp(max(crack, max(bubbles, frost)), 0.0, 1.0);
         vec3 iceCol = mix(iceSurf, vec3(0.86, 0.91, 0.96) * (0.5 + 0.5 * uAmbient), white * 0.85);
-        float iceAlpha = clamp(mix(0.9, 0.42, uClear) + white * 0.45 + fres * 0.35, 0.0, 1.0);
+        float iceAlpha = clamp(mix(0.9, 0.3, uClear) + white * 0.3 + fres * 0.35, 0.0, 1.0);
         // ---- the window: along the line of sight through this bit of ice, does the eye meet the beam? (the lit
         //      bottom lies far behind the hole from the camera's angle, so a straight-down test cut the window in the
         //      wrong place) — march the view ray down through the water to the bottom
@@ -176,6 +191,17 @@ export function makeIceMaterial(terrain) {
         col = mix(col, holeCol, hole); alpha = mix(alpha, 0.96, hole);
         vec3 skin = vec3(0.6, 0.68, 0.78) * (sky * uAmbient + uSunColor * uSunI * lamb * 0.5);
         col = mix(col, skin, oldHole); alpha = mix(alpha, 1.0, oldHole);
+        // the cutaway: inside the pool the ice is gone — still dark water shows the lit bottom and the beam like the
+        // summer lake; along the cut a pale lip is the slab's top edge (IceCamp.jsx adds the walls below it)
+        if (uCutOn > 0.5) {
+          float cd = cutSDF(P);
+          float inPool = 1.0 - smoothstep(-0.1, 0.02, cd);
+          float lip = (1.0 - smoothstep(0.0, 0.2, abs(cd - 0.08))) * (1.0 - inPool);
+          vec3 pool = mix(uWater * 1.6 + vec3(0.0, 0.03, 0.04), reflSky, 0.08 + 0.3 * fres) + rip * 0.03;
+          col = mix(col, pool, inPool); alpha = mix(alpha, 0.12, inPool);
+          vec3 lipCol = vec3(0.9, 0.95, 1.0) * (sky * uAmbient * 2.0 + uSunColor * uSunI * 0.6 + 0.12);
+          col = mix(col, lipCol, lip * 0.9); alpha = max(alpha, lip);
+        }
         // the shelter lamp: a warm pool on the snow by the door
         vec3 toL = uLamp.xyz - vWorld; float dl = length(toL);
         float lamp = uLamp.w * 2.2 / (1.0 + dl * dl * 0.18) * max(dot(N, toL / max(dl, 0.01)), 0.0);

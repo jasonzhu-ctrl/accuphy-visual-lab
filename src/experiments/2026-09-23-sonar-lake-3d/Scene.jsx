@@ -16,7 +16,7 @@ import { makeLogoGeometry, makePlinthGeometry, logoFrame } from './logo'
 import { buildObstacles, toCircles } from './obstacles'
 import SonarScreen, { SONAR_HIDE_LAYER, LAKEBED_LAYER, FISH_LAYER, LOGO_LAYER } from './SonarScreen'
 // the ice scene (Jason 2026-10-16): the same lake frozen over — iceScene.js has the story and the presets
-import { IceSky, IceSheet, IceCamp, Snowfall, IcePick } from './IceCamp'
+import { IceSky, IceSheet, IceCamp, IceWalls, Snowfall, IcePick } from './IceCamp'
 import { makeIceMaterial } from './iceSheet'
 import { bakeTerrain } from './sonarMarks'
 import { iceParams, ICE_CAM_T, ICE_CAM_D, ICE_LAKE_W, ICE_FOG, dir } from './iceScene'
@@ -362,7 +362,7 @@ function Boat({ state, beamMats }) {
     </group>
   )
 }
-function Beams({ state }) {
+function Beams({ state, ice = false }) {
   const group = useRef()
   const specs = state.current.specs
   const meshes = useMemo(() => specs.map((spec) => {
@@ -376,9 +376,9 @@ function Beams({ state }) {
       {meshes.map((m, i) => (
         <group key={i}>
           <mesh geometry={m.g}>
-            <meshPhysicalMaterial color="#5fd3ff" transparent opacity={0.11} side={THREE.DoubleSide} depthWrite={false} roughness={0.3} />
+            <meshPhysicalMaterial color="#5fd3ff" transparent opacity={ice ? 0.2 : 0.11} side={THREE.DoubleSide} depthWrite={false} roughness={0.3} />
           </mesh>
-          <lineSegments geometry={m.e}><lineBasicMaterial color="#dff7ff" transparent opacity={0.6} /></lineSegments>
+          <lineSegments geometry={m.e}><lineBasicMaterial color="#dff7ff" transparent opacity={ice ? 0.75 : 0.6} /></lineSegments>
         </group>
       ))}
     </group>
@@ -515,7 +515,7 @@ export default function LakeScene({ state, sonarRect, paused = false, scene = 'l
     fish.userData.uniforms.uFogDensity.value = 0.006
     fish.side = THREE.DoubleSide // flat fins
     const m = { bed: makeLakeMaterial(), inst: makeLakeMaterial({ structure: true }), steel: makeLakeMaterial({ steel: true }), logo: makeLakeMaterial({ logo: true }), fish }
-    if (ice) for (const k in m) { const u = m[k].userData.uniforms; u.uFogColor.value.set(P.T.water); u.uSun.value.copy(dir(P.T.sun.dir)); u.uRevealGain.value = 1.7; u.uOutGamma.value = 0.72 } // dark winter water, a stronger reveal
+    if (ice) for (const k in m) { const u = m[k].userData.uniforms; u.uFogColor.value.set(P.T.water); u.uSun.value.copy(dir(P.T.sun.dir)); u.uRevealGain.value = 1.9; u.uOutGamma.value = 0.62 } // dark winter water, a stronger reveal
     return m
   }, [ice, P])
   const lakeMats = useMemo(() => [mats.bed, mats.inst, mats.steel, mats.fish, mats.logo], [mats])
@@ -526,7 +526,7 @@ export default function LakeScene({ state, sonarRect, paused = false, scene = 'l
     u.uSun.value.copy(dir(T.sun.dir)); u.uSunColor.value.set(T.sun.color); u.uSunI.value = T.sun.i
     u.uSkyZenith.value.set(T.zenith); u.uSkyHorizon.value.set(T.horizon); u.uAmbient.value = T.hemi[2]
     u.uFogColor.value.set(T.bg); u.uFogDensity.value = T.fogDensity; u.uWater.value.set(T.water)
-    u.uCover.value = L.cover; u.uClear.value = L.clear; u.uWindow.value = L.window
+    u.uCover.value = L.cover; u.uClear.value = L.clear; u.uWindow.value = L.window; u.uCutOn.value = L.cut
     return m
   }, [ice, P])
   const beamMats = useMemo(() => (iceMat ? [...lakeMats, iceMat] : lakeMats), [lakeMats, iceMat]) // the ice shows the beam's reach too
@@ -554,6 +554,7 @@ export default function LakeScene({ state, sonarRect, paused = false, scene = 'l
       {ice ? (<>
         <IceSheet mat={iceMat} />
         <IceCamp state={state} beamMats={beamMats} iceMat={iceMat} T={P.T} />
+        {P.L.cut > 0 && <IceWalls state={state} iceMat={iceMat} />}
         <Snowfall state={state} T={P.T} />
         <IcePick state={state} />
       </>) : (<>
@@ -561,7 +562,7 @@ export default function LakeScene({ state, sonarRect, paused = false, scene = 'l
         <Boat state={state} beamMats={beamMats} />
         <PickPlane state={state} />
       </>)}
-      <Beams key={state.current.specKey} state={state} />
+      <Beams key={state.current.specKey} state={state} ice={ice} />
       <Rig state={state} sonarRect={sonarRect} fogMats={beamMats} cam={ice ? ICE_CAM : LAKE_CAM} />
       <SonarScreen state={state} rect={sonarRect} lakeMats={lakeMats} />
     </Canvas>
