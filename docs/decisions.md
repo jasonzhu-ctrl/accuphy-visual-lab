@@ -1587,3 +1587,14 @@ Numbered log. Newest at the bottom.
        The camera is a little closer (26 m) and lower.
      - Still open for this view: phones; the slab edge should show the holes' cuts when a hole is near the wall; snow on
        the slab top; tuning of the water column's tint; the "Under the ice" view's future.
+
+102. **2026-10-16** — **Where the Lab pages will live for ads: the existing Vercel team, upgraded to Pro** (Jason: "我担心
+    Cloudflare 啥的再加平台我管不过来", then "升级吧", then "好了").
+    - Research (Drive, Market Research: "2026-10-16 Hosting for the Accuphy Lab pages"): Shopify cannot hold a 2.3 MB
+      WebGL page (256 KB Liquid cap, theme interference, subdomains redirect only); GitHub Pages forbids commercial
+      sites, so it stays for friends testing only; Jason wants no new platform, so Cloudflare is out.
+    - Vercel team "Accuphy" (slug `accuphy`, 1 member, hosts partner.accuphy.ca) was on Hobby (non-commercial).
+      Jason upgraded it in the dashboard; verified by API: plan **pro**, active, period 2026-10-16 → 2026-11-16.
+      Side effect: the partner portal is now within Vercel's terms too.
+    - Not yet done: deploying the two Lab pages to Vercel (new project, `lab.accuphy.com` via one CNAME at Alibaba
+      Cloud / 万网, Meta Pixel). Waiting on Jason: deploy now, or at the ad launch.
