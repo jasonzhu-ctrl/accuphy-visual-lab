@@ -1413,3 +1413,23 @@ Numbered log. Newest at the bottom.
         2–13 % in Forward. The Mini stays in its old ranges: 0 % on its shelf, 9–21 % in Combo. The shelf, the island,
         the deep floor and the wrecks look as before. No console errors.
     - **Checks:** build passes; desktop and phone show no errors; no new textures.
+
+93. **2026-10-16** — **Two public test pages: PingLive + Mini, and Mini only; a version record** (Jason: "做两个不同的
+    版本 一个是 PingLive 和 PingLive Mini 的 还有一个是只有 PingLive Mini 的 做好 version 记录 … 上线到两个没有常规入口的网页里").
+    - A build variant: `VITE_DEVICES=PLM` (read by `vite.share.config.js`, used in `index.jsx`) makes the Mini-only
+      page: no device switch on desktop or phone, the Mini is the device, the three step presets use Down / Forward /
+      Combo with a Combo text for step 3. The page title is "Accuphy Lab · PingLive Mini". Unset, the page is the usual
+      Lab with both devices.
+    - Published on the existing GitHub Pages repository, both unlisted (noindex + robots Disallow), no sign-up gate:
+      - https://jasonzhu-ctrl.github.io/accuphy-lab-test/ — PingLive + PingLive Mini
+      - https://jasonzhu-ctrl.github.io/accuphy-lab-test/mini/ — PingLive Mini only
+    - Built from main at 340e98d + this commit, so both pages carry #86–#92 (new boat, swimming fish, perch and pike,
+      gentler lake middle) for the first time in public.
+    - **Checked before publishing** (share builds served locally): both pages at 390×844 and 1440×900; the Mini page
+      has no device switch and step 3 goes to Combo; the both page switches PingLive ↔ Mini; range + steps work; zero
+      network requests; no sign-up gate; no console errors; the Safari texture audit is unchanged; both live md5s
+      matched the builds.
+    - `docs/versions.md` is the version record from now on: page, who can open it, URL, and a history of every build
+      with the Lab commit and the public repo commit.
+    - Where the pages should live long-term (Shopify, GitHub Pages with a custom domain, or another host) is being
+      researched; nothing changes until Jason decides.

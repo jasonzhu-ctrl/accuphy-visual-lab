@@ -6,6 +6,8 @@ import fs from 'node:fs'
 import path from 'node:path'
 
 const outDir = path.resolve(process.argv[2] || 'dist-share')
+const variant = process.env.VITE_DEVICES === 'PLM' ? 'mini' : 'both' // two public pages (Jason 2026-10-16): PingLive + Mini, and Mini only
+const title = variant === 'mini' ? 'Accuphy Lab · PingLive Mini' : 'Accuphy Lab'
 const tmp = path.join(outDir, 'vite')
 await build({ configFile: 'vite.share.config.js', logLevel: 'warn', build: { outDir: tmp, emptyOutDir: true } })
 
@@ -27,7 +29,7 @@ if (left.length) throw new Error('unresolved absolute asset paths: ' + left.join
 // a literal </script> or </style> inside the code would end the inline tag early
 js = js.replace(/<\/script/gi, '<\\/script'); css = css.replace(/<\/style/gi, '<\\/style')
 
-const page = `<title>Accuphy Lab</title>
+const page = `<title>${title}</title>
 <style>html,body{height:100%;margin:0;background:#0f3b44;overscroll-behavior:none}#root{height:100%}</style>
 <style>${css}</style>
 <div id="root"></div>
@@ -50,4 +52,4 @@ ${page}</head>
 fs.writeFileSync(path.join(outDir, 'pages/robots.txt'), 'User-agent: *\nDisallow: /\n')
 fs.writeFileSync(path.join(outDir, 'pages/.nojekyll'), '')
 fs.rmSync(tmp, { recursive: true, force: true })
-console.log(`${path.join(outDir, 'accuphy-lab.html')}: ${(page.length / 1e6).toFixed(2)} MB (logo inlined ${logoCount}×)`)
+console.log(`${path.join(outDir, 'accuphy-lab.html')} [${variant}]: ${(page.length / 1e6).toFixed(2)} MB (logo inlined ${logoCount}×)`)

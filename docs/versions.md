@@ -1,0 +1,27 @@
+# Accuphy Lab — published versions
+
+Jason 2026-10-16: "你管理好不同的 version 哦 … 做好 version 记录". Every public or private page build is listed here
+with the source commit it was built from, so anyone can tell which version a link shows. Newest first.
+
+## Pages
+
+| Page | Who can open it | URL |
+|---|---|---|
+| **Both** — PingLive + PingLive Mini | anyone with the link, no login | https://jasonzhu-ctrl.github.io/accuphy-lab-test/ |
+| **Mini** — PingLive Mini only | anyone with the link, no login | https://jasonzhu-ctrl.github.io/accuphy-lab-test/mini/ |
+| Private preview | Jason only (claude.ai login) | https://claude.ai/artifact/RnCBYTexY5vcEqJy2hAsN7 |
+
+Both public pages are unlisted (`noindex`, `robots.txt` Disallow) and have no sign-up gate (#71).
+How to rebuild and publish: the `lab-test-link` skill (`node scripts/build-share.mjs <out>`; `VITE_DEVICES=PLM` for
+the Mini page).
+
+## History
+
+| Date | Page | Built from (Lab commit) | Public repo commit | What changed |
+|---|---|---|---|---|
+| 2026-10-16 | Both, Mini | _(this release — filled in below when pushed)_ | | New boat, swimming fish with eyes/fins, perch and pike, gentler lake middle (#86–#92); the Mini-only page is new |
+| 2026-10-03 | Both | b919bb3 | 5bff6f7 | Phone layout: zoomed-out lake, range −/+ in the app, View capsule, bigger app buttons (#77–#81) |
+| 2026-09-29 | Both | fb3cec6 | c4acb14 | Near-field fish 40 % brighter (#75, #76) |
+| 2026-09-26 | Both | 6e9f422 | afa4e06 | Fix: sonar picture black in Safari (#73) |
+| 2026-09-26 | Both | 3150b66 | 8dad017 | First public test page (#72) |
+| 2026-10-04 | Private preview | 340e98d | — | Private preview updated (#92) |

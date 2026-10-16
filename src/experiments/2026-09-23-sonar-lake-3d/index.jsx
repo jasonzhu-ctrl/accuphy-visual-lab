@@ -14,6 +14,10 @@ import { depthAt } from './terrain'
 import { panoHalfWidth } from './sonarMarks'
 // dev: ?bigphone makes the phone huge so the sonar picture can be inspected in screenshots
 const BIG_PHONE = import.meta.env.DEV && window.location.search.includes('bigphone')
+// Build variant (Jason 2026-10-16): VITE_DEVICES='PLM' makes a PingLive Mini-only page — no device switch, the
+// Mini is the device, the step presets use its views. Unset: both devices (the default Lab).
+const ONLY = import.meta.env.VITE_DEVICES === 'PLM' ? 'PLM' : null
+const SHOWN_DEVICES = ONLY ? [DEVICES[ONLY]] : Object.values(DEVICES)
 // The page is for people who have never used live sonar (Jason 2026-09-24): only Device / View / Range are
 // public. Colour map, gain, contrast, noise reject and the depth-range axis are calibration tools — dev only (?dev).
 const DEV_TOOLS = import.meta.env.DEV && window.location.search.includes('dev')
@@ -44,7 +48,7 @@ export const meta = {
 }
 
 export default function SonarLake3D() {
-  const [deviceId, setDeviceId] = useState('PL')
+  const [deviceId, setDeviceId] = useState(ONLY || 'PL')
   const [mode, setMode] = useState('forward')
   const [rangeFt, setRangeFt] = useState(80)       // the visitor's own range (slider)
   const [depthFt, setDepthFt] = useState(70) // depth range (PL Forward; every PLM view) — driven by AUTO below
@@ -171,7 +175,7 @@ export default function SonarLake3D() {
     { n: 1, title: 'This is the beam', text: 'A thin curtain of sound under the boat. Drag the boat — whatever the curtain touches lights up.', device: 'PL', mode: 'down', range: 80, boat: [-20, 6] },
     { n: 2, title: 'This is what your phone shows', text: 'The screen is that curtain, seen edge-on: bottom, timber, fish. Forward View aims it ahead of the boat.', device: 'PL', mode: 'forward', range: 60, boat: [16, 11] }, // standing timber + bass 8–15 m ahead on the 7 m flat
     { n: 3, title: 'Which view, when', text: 'Panoramic scans wide to find fish and structure; Forward to cast at them; Down to fish straight below.', device: 'PL', mode: 'panoramic', range: 70, boat: [-50, 8] }, // on the 5 m shelf, scanning toward the drop-off: the flat fan paints the bottom
-  ]
+  ].map((st) => (ONLY ? { ...st, device: ONLY, mode: st.mode === 'panoramic' ? 'combo' : st.mode, ...(st.mode === 'panoramic' ? { text: 'Combo shows Down and Forward side by side; Forward to cast at fish ahead; Down to fish straight below.' } : {}) } : st))
   const goStep = (i) => {
     const st = STEPS[i]; setStep(i); setDeviceId(st.device); setMode(st.mode); setRangeFt(st.range)
     state.current.target.x = st.boat[0]; state.current.target.z = st.boat[1]
@@ -194,7 +198,7 @@ export default function SonarLake3D() {
         </div>
         <div className="ac-divider" />
         <Row label="Device">
-          <div className="ac-seg">{Object.values(DEVICES).map((d) => <button key={d.id} className={`ac-btn ${deviceId === d.id ? 'is-active' : ''}`} onClick={() => setDeviceId(d.id)}>{d.name}</button>)}</div>
+          <div className="ac-seg">{SHOWN_DEVICES.map((d) => <button key={d.id} className={`ac-btn ${deviceId === d.id ? 'is-active' : ''}`} onClick={() => setDeviceId(d.id)}>{d.name}</button>)}</div>
         </Row>
         <Row label="View">
           <div className="ac-seg">{device.modes.map((m) => <button key={m} className={`ac-btn ${mode === m ? 'is-active' : ''}`} onClick={() => setMode(m)}>{MODE_LABELS[m].replace(' View', '')}</button>)}</div>
@@ -279,7 +283,7 @@ export default function SonarLake3D() {
       </div>
 
       {/* ---- phones: device switch, top right (the panel is hidden there) ---- */}
-      {phone && (
+      {phone && !ONLY && (
         <div className="pointer-events-auto absolute right-3 top-4">
           <div className="ac-seg">{Object.values(DEVICES).map((d) => <button key={d.id} className={`ac-btn ${deviceId === d.id ? 'is-active' : ''}`} onClick={() => setDeviceId(d.id)}>{d.name}</button>)}</div>
         </div>
