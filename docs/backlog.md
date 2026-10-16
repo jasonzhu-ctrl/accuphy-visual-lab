@@ -247,7 +247,9 @@ the cheapest Android phone class). Phone size was emulated at 360×800.
 - ✅ Look references: Jason picked groups A + B and gave the "dark lakebed lit up" lamp concept (decision #54, `docs/look-references.md`)
 
 ## Ice scene (decision #94, 2026-10-16) — local only
-- ⬜ **Jason's look picks**: time of day (dusk / day / night), snow cover (snow / mixed / glass), ice views in jet or amber. Screenshots sent 2026-10-16; nothing changes until he answers
+- ✅ Snow cover: black ice (`glass`) chosen 2026-10-16 (#96); the snow-and-cutaway look stays as `?look=snow`
+- ⬜ **Jason's look picks still open**: the black ice's realism (rebuilt from photographs in #96 — his verdict pending), time of day (dusk / day / night), ice views in jet or amber
+- ⬜ Black ice next steps if he wants more: methane bubble stacks, a pressure ridge or two, skate/boot scuffs near the hole, a thin snow film that the wind moves
 - ⬜ Camera tilt (or an intro move) so the sky dome, the afterglow and the night aurora are in frame; the dome is built but the ⅔-aerial camera never sees the horizon
 - ⬜ Glass UI on bright scenes: on the `day` preset the frosted panel and cards lose contrast against white snow — a darker tint when the scene is bright
 - ⬜ Footprints and sled tracks in the snow between the camp and the holes (a stamped trail texture)

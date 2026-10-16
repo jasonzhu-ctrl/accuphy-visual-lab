@@ -526,6 +526,7 @@ export default function LakeScene({ state, sonarRect, paused = false, scene = 'l
     u.uSun.value.copy(dir(T.sun.dir)); u.uSunColor.value.set(T.sun.color); u.uSunI.value = T.sun.i
     u.uSkyZenith.value.set(T.zenith); u.uSkyHorizon.value.set(T.horizon); u.uAmbient.value = T.hemi[2]
     u.uFogColor.value.set(T.bg); u.uFogDensity.value = T.fogDensity; u.uWater.value.set(T.water)
+    u.uGlow.value.set(T.glow); u.uGlowDir.value.copy(dir(T.glowDir))
     u.uCover.value = L.cover; u.uClear.value = L.clear; u.uWindow.value = L.window; u.uCutOn.value = L.cut
     return m
   }, [ice, P])

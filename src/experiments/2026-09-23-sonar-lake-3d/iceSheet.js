@@ -21,6 +21,7 @@ export function makeIceMaterial(terrain) {
     uTerrain: { value: terrain.tex }, uTerrainHalf: { value: terrain.H },
     uWind: { value: WIND.clone() },
     uHighlight: { value: new THREE.Color('#7fe6ff') },
+    uGlow: { value: new THREE.Color('#e08a5e') }, uGlowDir: { value: new THREE.Vector3(-0.8, 0, -0.45).normalize() }, // the afterglow, mirrored in the ice
     // the cutaway: pool centre, its radius, the island's radius, and up to two beam boxes (xMin, xMax, zHalf, on) from the centre
     uCutOn: { value: 1 }, uCutC: { value: new THREE.Vector2(1e4, 1e4) }, uCutR: { value: 5.5 }, uIsland: { value: 1.9 },
     uCutBox: { value: [new THREE.Vector4(0, 0, 0, 0), new THREE.Vector4(0, 0, 0, 0)] },
@@ -51,7 +52,7 @@ export function makeIceMaterial(terrain) {
       uniform float uCover; uniform float uClear; uniform float uWindow;
       uniform vec4 uHoles[MAXH]; uniform int uHoleCount; uniform float uBeamOn;
       uniform vec4 uLamp; uniform vec3 uLampColor;
-      uniform sampler2D uTerrain; uniform float uTerrainHalf; uniform vec2 uWind; uniform vec3 uHighlight;
+      uniform sampler2D uTerrain; uniform float uTerrainHalf; uniform vec2 uWind; uniform vec3 uHighlight; uniform vec3 uGlow; uniform vec3 uGlowDir;
       uniform float uCutOn; uniform vec2 uCutC; uniform float uCutR; uniform float uIsland; uniform vec4 uCutBox[MB];
       uniform int uBeamCount;
       uniform vec3 uApex[MB]; uniform vec3 uC[MB]; uniform vec3 uH[MB]; uniform vec3 uN[MB];
@@ -91,6 +92,47 @@ export function makeIceMaterial(terrain) {
         return inA * inW * inR * atten;
       }
       float terrainDepth(vec2 w) { return texture2D(uTerrain, (w + uTerrainHalf) / (2.0 * uTerrainHalf)).r; }
+      // the sky as the dome draws it (iceSky.js), for the mirror in the ice
+      vec3 skyAt(vec3 d) {
+        float el = d.y;
+        vec3 sk = mix(uSkyHorizon, uSkyZenith, pow(clamp(el * 1.6, 0.0, 1.0), 0.6));
+        float az = max(dot(normalize(vec3(d.x, 0.0, d.z)), uGlowDir), 0.0);
+        sk = mix(sk, uGlow, pow(az, 5.0) * exp(-max(el, 0.0) * 9.0) * 0.9);
+        return el < 0.0 ? mix(uFogColor, uSkyHorizon, exp(el * 40.0)) : sk;
+      }
+      // Real black ice (reference photos 2026-10-16: Unsplash 'frozen lake ice cracks', Waider's Norwegian lakes): long,
+      // nearly straight refrozen cracks tens of metres long, a few bright and wide with a frosty halo, many hairlines, each
+      // with its own brightness and breaks — not a honeycomb. One family of such lines: spacing sp, turned by ang.
+      // Returns (core, halo).
+      vec2 crackFamily(vec2 P, float ang, float sp, float wobble, float seed, float wMin, float wMax) {
+        float c = cos(ang), sn = sin(ang);
+        vec2 q = vec2(c * P.x - sn * P.y, sn * P.x + c * P.y);
+        float k = floor(q.x / sp + seed);
+        float jit = (hash(vec2(k, seed)) - 0.5) * sp * 0.5;
+        float wander = (vnoise(vec2(q.y * 0.05 + k * 3.1, seed)) - 0.5) * wobble;
+        float x0 = (k - seed + 0.5) * sp + jit + wander;
+        float tilt = (hash(vec2(k + 41.0, seed)) - 0.5) * 0.5; // ±14°: neighbours drift apart or cross, like real cracks
+        float yk = (hash(vec2(k + 53.0, seed)) - 0.5) * 60.0;
+        float d = abs((q.x - x0) * cos(tilt) + (q.y - yk) * sin(tilt));
+        float present = step(0.3, hash(vec2(k + 7.0, seed)));
+        float along = smoothstep(0.28, 0.5, vnoise(vec2(q.y * 0.1, k * 5.3 + seed)));
+        float bright = 0.35 + 0.65 * hash(vec2(k + 13.0, seed));
+        float w = mix(wMin, wMax, hash(vec2(k + 29.0, seed)));
+        float aa = fwidth(q.x) * 1.5;
+        float core = 1.0 - smoothstep(w, w + aa + 0.005, d);
+        float halo = (1.0 - smoothstep(w, w * 3.0 + 0.25, d)) * 0.4;
+        return vec2(core, halo) * present * along * bright;
+      }
+      // bubbles frozen into the ice: white discs, 3–10 cm, in one cell of seven
+      float bubbles(vec2 P) {
+        vec2 g = P * 1.6, cell = floor(g), f = fract(g);
+        float h = hash(cell);
+        if (h < 0.86) return 0.0;
+        vec2 o = vec2(hash(cell + 3.1), hash(cell + 7.7)) * 0.6 + 0.2;
+        float r = 0.05 + 0.11 * hash(cell + 11.0);
+        float d = length(f - o);
+        return (1.0 - smoothstep(r * 0.55, r, d)) * (0.45 + 0.55 * hash(cell + 19.0));
+      }
       float sdBox(vec2 p, vec2 b, float rr) { vec2 q = abs(p) - b + rr; return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - rr; }
       // the pool: a circle round the hole plus the beams' footprints, minus the island (negative inside the pool)
       float cutSDF(vec2 P) {
@@ -135,7 +177,11 @@ export function makeIceMaterial(terrain) {
         vec3 N = normalize(vec3(-(hx - h0) * 3.2, e * 0.9, -(hz - h0) * 3.2)); // soft, sculpted drifts
         float h = 0.82 * h0 + 0.18 * fbm3(P * 0.8 + 1.7);
         float thr = mix(0.62, 0.30, uCover); // drift heights sit mostly in 0.35–0.6: cover 0.78 leaves scoured patches in the troughs only
-        float snow = smoothstep(thr - 0.035, thr + 0.035, h) * (1.0 - clear);
+        vec2 Pw = vec2(dot(P, uWind), dot(P, vec2(-uWind.y, uWind.x)));
+        float streakN = fbm3(vec2(Pw.x * 0.05, Pw.y * 0.7) + 2.0); // brush strokes of blown snow, long along the wind
+        float streaks = smoothstep(0.645, 0.665, streakN + 0.03 * (vnoise(P * 3.0) - 0.5)); // crisp strokes with a feathered edge
+        float edgeW = mix(0.012, 0.035, uCover); // on black ice the dustings have ragged, crisp edges; deep cover blends softly
+        float snow = max(smoothstep(thr - edgeW, thr + edgeW, h + 0.02 * (vnoise(P * 2.3 + 9.0) - 0.5)), streaks) * (1.0 - clear);
         float lamb = max(dot(N, uSun), 0.0);
         vec3 sky = mix(uSkyHorizon, uSkyZenith, 0.45);
         vec3 snowAlb = vec3(0.93, 0.95, 0.98);
@@ -144,20 +190,36 @@ export function makeIceMaterial(terrain) {
         float cell = hash(floor(P * 26.0));
         float glint = step(0.986, cell) * (0.5 + 0.5 * sin(uTime * 3.0 + cell * 60.0)) * lamb * uSunI; // facets catching the sun
         litSnow += uSunColor * glint * 1.2;
-        // ---- bare ice ----
-        vec2 vA = voro(P * 0.5), vB = voro(P * 1.9 + 5.0);
+        // ---- bare ice: a dark mirror of the sky, long white cracks, bubbles, frost, specks ----
         float camD = length(vWorld - cameraPosition);
-        float farFade = 1.0 - smoothstep(25.0, 90.0, camD); // the fine network only near the camera; far ice is calm
-        float farFade2 = 1.0 - smoothstep(30.0, 110.0, camD);
-        float crack = ((1.0 - smoothstep(0.0, 0.035, vA.y - vA.x)) * 0.32 * farFade2 + (1.0 - smoothstep(0.0, 0.02, vB.y - vB.x)) * 0.16 * farFade) * step(0.55, hash(floor(P * 0.5 + 0.5))); // not every plate edge shows
-        float bubbles = smoothstep(0.82, 0.94, vnoise(P * 24.0)) * 0.28 * farFade;
-        float frost = smoothstep(0.62, 0.92, fbm3(P * 2.4 + 11.0)) * 0.22;
-        float fres = pow(1.0 - max(dot(V, vec3(0.0, 1.0, 0.0)), 0.0), 3.0);
-        vec3 reflSky = mix(uSkyHorizon, uSkyZenith, 0.3);
-        vec3 iceSurf = mix(uWater, reflSky, 0.12 + 0.55 * fres);
-        float white = clamp(max(crack, max(bubbles, frost)), 0.0, 1.0);
-        vec3 iceCol = mix(iceSurf, vec3(0.86, 0.91, 0.96) * (0.5 + 0.5 * uAmbient), white * 0.85);
-        float iceAlpha = clamp(mix(0.9, 0.3, uClear) + white * 0.3 + fres * 0.35, 0.0, 1.0);
+        float farFade = 1.0 - smoothstep(25.0, 90.0, camD);   // the fine detail only near the camera
+        float farFade2 = 1.0 - smoothstep(40.0, 140.0, camD);
+        // the surface: flat glass with a faint frozen-in undulation, so the sky's mirror is not dead even
+        vec3 Nn = normalize(vec3((vnoise(P * 0.23) - 0.5) * 0.05, 1.0, (vnoise(P * 0.23 + 5.0) - 0.5) * 0.05));
+        float cosT = max(dot(V, Nn), 0.0);
+        float F = 0.02 + 0.98 * pow(1.0 - cosT, 5.0);        // Fresnel: a window straight down, a mirror toward the horizon
+        float fres = F;
+        vec3 reflSky = skyAt(reflect(-V, Nn));
+        vec3 Hh = normalize(uSun + V);
+        float specSun = pow(max(dot(Nn, Hh), 0.0), 180.0) * uSunI;
+        // cracks: two families of long bright ones, one of hairlines in patches
+        vec2 cA = crackFamily(P, 0.35, 19.0, 1.6, 1.7, 0.03, 0.1);
+        vec2 cB = crackFamily(P, 1.72, 12.5, 1.2, 4.3, 0.02, 0.06);
+        float hairZone = smoothstep(0.42, 0.6, fbm3(P * 0.03 + 7.0));
+        vec2 cC = crackFamily(P, -0.9, 2.8, 0.5, 9.1, 0.008, 0.016) * hairZone * farFade2 * 0.55;
+        vec2 cD = crackFamily(P, 2.4, 4.1, 0.6, 2.9, 0.008, 0.014) * hairZone * farFade * 0.4;
+        float core = clamp(cA.x + cB.x + cC.x + cD.x, 0.0, 1.0);
+        float halo = clamp(cA.y + cB.y, 0.0, 1.0);
+        float bub = bubbles(P) * farFade;
+        float frost = smoothstep(0.64, 0.8, fbm3(P * 0.9 + 11.0)) * smoothstep(0.48, 0.75, fbm3(P * 5.0 + 3.0)) * 0.4;
+        float speck = step(0.992, hash(floor(P * 14.0))) * farFade * 0.6;
+        float white = clamp(core + bub + frost + speck, 0.0, 1.0);
+        vec3 whiteLit = vec3(0.86, 0.92, 1.0) * (sky * uAmbient * 1.6 + uSunColor * uSunI * 0.5 + 0.1);
+        // the water below is what gives black ice its black; the sky is laid over it by Fresnel
+        vec3 iceCol = vec3(0.004, 0.012, 0.02) + reflSky * F * 1.5 + uSunColor * specSun * 0.6;
+        iceCol += whiteLit * halo * 0.45;
+        iceCol = mix(iceCol, whiteLit, white);
+        float iceAlpha = clamp(mix(0.5, 0.2, uClear) + F * 1.4 + white * 0.7 + halo * 0.3, 0.0, 1.0);
         // ---- the window: along the line of sight through this bit of ice, does the eye meet the beam? (the lit
         //      bottom lies far behind the hole from the camera's angle, so a straight-down test cut the window in the
         //      wrong place) — march the view ray down through the water to the bottom
@@ -178,7 +240,7 @@ export function makeIceMaterial(terrain) {
         float win = pow(clamp(beam * 1.3, 0.0, 1.0), 0.7) * uWindow * uBeamOn; // the snow over the beam glows and goes half-clear
         float edge = clamp(wide - beam, 0.0, 1.0) * uWindow * uBeamOn;
         // ---- put it together ----
-        vec3 col = mix(iceCol, litSnow, snow);
+        vec3 col = mix(iceCol, litSnow * (1.0 + 0.15 * streaks), snow);
         float alpha = mix(iceAlpha, 1.0, snow);
         float top = max(slush, chips); // fresh shavings and slush: the whitest thing on the ice
         col = mix(col, litSnow * 1.05, top); alpha = mix(alpha, 1.0, top);

@@ -52,7 +52,7 @@ export const TIMES = {
 export const LOOKS = {
   snow:  { cover: 0.78, clear: 0.55, window: 0, cut: 1 },
   mixed: { cover: 0.5, clear: 0.6, window: 0, cut: 1 },
-  glass: { cover: 0.14, clear: 0.8, window: 0, cut: 0 }, // black ice: the whole surface is see-through, like the summer water
+  glass: { cover: 0.1, clear: 0.85, window: 0, cut: 0 }, // black ice: the whole surface is see-through, like the summer water (the default)
 }
 export const CUT_R = 7.0    // the pool's radius round the hole (m); the beam's footprint stretches it
 export const ISLAND_R = 1.9 // the ice island the kit stands on
@@ -60,7 +60,7 @@ export const ISLAND_R = 1.9 // the ice island the kit stands on
 export function iceParams() {
   const q = typeof window !== 'undefined' ? window.location.search : ''
   const time = (/[?&]time=(dusk|day|night)/.exec(q) || [])[1] || 'dusk'
-  const look = (/[?&]look=(snow|mixed|glass)/.exec(q) || [])[1] || 'snow'
+  const look = (/[?&]look=(snow|mixed|glass)/.exec(q) || [])[1] || 'glass' // Jason 2026-10-16: 图像关系我偏好最后一个 (the black ice)
   return { time, look, T: TIMES[time], L: LOOKS[look] }
 }
 

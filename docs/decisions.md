@@ -1496,3 +1496,26 @@ Numbered log. Newest at the bottom.
     - Under the ice the lake materials are lifted a little more (`uRevealGain` 1.9, `uOutGamma` 0.62), the dusk water
       is `#0e3240`, the beam curtain is a touch more solid on the ice page (0.2, edges 0.75). The summer lake is unchanged.
     - Shown to Jason with screenshots the same evening; his verdict decides between the two looks.
+
+96. **2026-10-16** — **Black ice is the look; the surface rebuilt from real photographs** (Jason, on #95's two options:
+    "图像关系我偏好最后一个 但是冰面的感觉有点太不真实了 你仔细想想调研一下").
+    - **The picture relationship:** the whole frozen surface is see-through, like the summer water — the lakebed, the
+      fish, the cone and the lit bottom show through it everywhere; no cutaway, no glow window. `?look=glass` is the
+      default; `?look=snow` keeps the snow-and-cutaway version of #95.
+    - **What looked fake and why:** the first black ice drew a honeycomb of equal voronoi cells over the whole lake,
+      grey, the same everywhere; its snow was grey smears; the surface had no sky in it.
+    - **Research (same evening):** reference photographs — Unsplash "frozen lake ice cracks" (dark ice with white
+      cracks), Jan Erik Waider's Norwegian frozen-lake series (northlandscapes.com), Abraham Lake / Baikal bubble ice.
+      Real clear lake ice: long, nearly straight refrozen cracks tens of metres long, a few bright and wide with a
+      frosty halo, many hairlines, each with its own brightness and breaks, crossing at varied angles (not cells of one
+      size); white bubbles frozen in; feathery frost patches; blown snow as crisp white brush strokes along the wind;
+      and the surface is a mirror of the sky toward the horizon while it is a window straight down (Fresnel).
+    - **The shader now** (`iceSheet.js`): Fresnel on a faintly undulating surface mirrors the same sky gradient the
+      dome draws (horizon, zenith, afterglow — `uGlow`, `uGlowDir` from the time preset) plus a broad sun highlight;
+      four crack families (two long bright ones, two hairline families in patches, fading with distance), each line
+      with its own width, brightness, wander, breaks and a ±14° tilt so a family is a loose fan; bubbles; frost;
+      specks; blown-snow strokes (anisotropic noise along the wind) with crisp feathered edges; the dark water shows
+      through at ~80 % straight down. The same code shades the scoured patches of the snow look.
+    - Checked in the browser at dusk: the cracks read as photographs do; the far ice takes the lavender sky; the
+      smelt school, the lockup and the lit strip show through. Open: Jason's verdict on the realism, the time of day,
+      jet vs amber. The summer lake is untouched (the ice code only runs with `scene="ice"`).
