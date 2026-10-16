@@ -515,7 +515,7 @@ export default function LakeScene({ state, sonarRect, paused = false, scene = 'l
     fish.userData.uniforms.uFogDensity.value = 0.006
     fish.side = THREE.DoubleSide // flat fins
     const m = { bed: makeLakeMaterial(), inst: makeLakeMaterial({ structure: true }), steel: makeLakeMaterial({ steel: true }), logo: makeLakeMaterial({ logo: true }), fish }
-    if (ice) for (const k in m) { const u = m[k].userData.uniforms; u.uFogColor.value.set(P.T.water); u.uSun.value.copy(dir(P.T.sun.dir)); u.uRevealGain.value = 1.9; u.uOutGamma.value = 0.62 } // dark winter water, a stronger reveal
+    if (ice) for (const k in m) { const u = m[k].userData.uniforms; u.uFogColor.value.set(P.T.water); u.uSun.value.copy(dir(P.T.sun.dir)); u.uRevealGain.value = 2.4; u.uOutGamma.value = 0.8; u.uFogDensity.value *= 2.4 } // dark winter water: the bottom fades to black, the beam cuts through (#99)
     return m
   }, [ice, P])
   const lakeMats = useMemo(() => [mats.bed, mats.inst, mats.steel, mats.fish, mats.logo], [mats])

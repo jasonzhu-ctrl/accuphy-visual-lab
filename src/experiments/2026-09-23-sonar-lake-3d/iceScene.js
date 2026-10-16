@@ -6,10 +6,10 @@ import * as THREE from 'three'
 
 export const ICE_T = 0.5            // ice thickness (m): mid-January on a prairie lake
 export const HOLE_R = 0.127         // a 10" auger hole
-export const HOLE_SCALE = 2.4       // drawn bigger, like the fish (×2.6): a real 10" hole is a 2 px dot from this camera
+export const HOLE_SCALE = 3.4       // drawn bigger, like the fish (×2.6): a real 10" hole is a 2 px dot from this camera (#99: 3.4)
 export const HOLE_DRAW_R = HOLE_R * HOLE_SCALE
-export const MINI_SCALE = 2.6       // the Mini is drawn at the fishes' display scale (a 12 cm device is invisible at true size)
-export const MINI_DROP = 0.45       // the Mini hangs this far below the ice bottom
+export const MINI_SCALE = 3.8       // the Mini is drawn bigger than the fish (a 12 cm device is invisible at true size; #99: 3.8)
+export const MINI_DROP = 0.9        // the Mini hangs this far below the ice bottom (#99: lower, so it clearly hangs under the sheet)
 export const APEX_Y = -(ICE_T + MINI_DROP)
 export const MAX_HOLES = 8          // open + old holes the ice remembers (the oldest skins over and is forgotten)
 export const WIND = new THREE.Vector2(0.86, 0.5).normalize() // where the drifts and the snow blow
@@ -29,7 +29,7 @@ export const TIMES = {
     bg: '#3b4a66', fogDensity: 0.0038,
     hemi: ['#5f73a8', '#1c2130', 1.05], sun: { dir: [-0.62, 0.16, -0.35], color: '#ffd6bd', i: 0.42 },
     zenith: '#1a2746', horizon: '#7d82a6', glow: '#e08a5e', glowDir: [-0.8, 0, -0.45], stars: 0.55, aurora: 0,
-    lamp: 1.0, water: '#0e3240', snowfall: 0.6,
+    lamp: 1.0, water: '#061a24', snowfall: 0.6,
   },
   day: { // bright overcast noon: white-out, soft shadowless light
     bg: '#d9e0e7', fogDensity: 0.0032,

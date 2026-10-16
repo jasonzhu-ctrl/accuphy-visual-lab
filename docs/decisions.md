@@ -1538,3 +1538,18 @@ Numbered log. Newest at the bottom.
     window test); where it meets the beam, the snow and the milky ice are reduced to 6 % with a faint breath of the
     beam's cyan, and the bare ice is left as it is. Decision #55 applied once more: whatever the beam reaches lights up.
     `LOOKS.glass.window = 1`. The snow look keeps its cutaway instead.
+
+99. **2026-10-16** — **Dark water under a skin of ice; the beam is the only lamp** (Jason, on #98: "感觉水里的部分和冰的关系
+    还是很奇怪"). Three causes, fixed together instead of patched one by one:
+    - The lakebed under the ice had been lifted (#94's `uOutGamma`, `uRevealGain`) until it was as bright as the ice,
+      so the two layers merged. Now the water is dark: the lake materials' fog is 2.4× denser under the ice, the fog
+      colour `#061a24`, the output curve back to 0.8, and the reveal inside the beam stronger (2.4) — the bottom fades to
+      black except where the beam lights it (decision #54's lamp in a dark room).
+    - The sheet had no presence of its own: a faint constant skin of sky (Fresnel floor 0.045) now lies over the dark
+      water everywhere, with the snow whiter against it (×1.35), so the eye reads a glassy surface over black depth.
+    - The hole and the Mini were too small to tell the story "the device hangs through the ice": the hole is drawn
+      ×3.4, the Mini ×3.8 and 0.9 m below the sheet, the hole shows its own wall (half a metre of pale ice, a bright
+      rim) and a small cyan light at the Mini lights the wall and the device from below.
+    - The cone-shaped thinning of #98 looked like a hole cut in the snow. Replaced: the snow stays clear within ~14 m of
+      the hole (a soft, noisy edge — the angler set up on open ice) and thins only by half over the beam further out.
+    - Shown to Jason the same evening; his verdict pending. The summer lake is unchanged.

@@ -67,6 +67,13 @@ export function makeHoleKit() {
   cable.scale.y = cableLen
   cable.name = 'cable'
   g.add(cable)
+  // the hole's wall: half a metre of pale ice, seen inside the hole — the sheet's thickness in one glance (#99)
+  const wall = new THREE.Mesh(new THREE.CylinderGeometry(HOLE_DRAW_R * 0.98, HOLE_DRAW_R * 0.98, ICE_T, 32, 1, true).translate(0, -ICE_T / 2, 0),
+    new THREE.MeshStandardMaterial({ color: '#dbe9f4', emissive: '#9cc0d8', emissiveIntensity: 0.35, roughness: 0.6, side: THREE.BackSide }))
+  g.add(wall)
+  const rim = new THREE.Mesh(new THREE.RingGeometry(HOLE_DRAW_R * 0.98, HOLE_DRAW_R * 1.12, 32).rotateX(-Math.PI / 2).translate(0, 0.006, 0),
+    new THREE.MeshStandardMaterial({ color: '#eef6fb', emissive: '#b9d3e4', emissiveIntensity: 0.3, roughness: 0.8 }))
+  g.add(rim)
   // transducer arm: a short post beside the hole with a horizontal arm over it
   const ax = -(HOLE_DRAW_R + 0.1 * k)
   const arm = merge([cyl(0.014 * k, 0.016 * k, CABLE_TOP_Y, ax, CABLE_TOP_Y / 2, 0, 8), box(-ax + 0.03 * k, 0.02 * k, 0.03 * k, ax / 2 - 0.02 * k, CABLE_TOP_Y, 0), box(0.12 * k, 0.015 * k, 0.12 * k, ax, 0.008 * k, 0)])

@@ -190,7 +190,11 @@ export function makeIceMaterial(terrain) {
         // Jason 2026-10-16: 水里的声纳coverage的渲染被白色的雪挡住了 — over the beam the snow and the milky ice thin out
         // (decision #55: whatever the beam reaches lights up), so the coverage always shows; bare ice is untouched
         float win = smoothstep(0.04, 0.45, beam) * uWindow * uBeamOn;
-        float keep = 1.0 - 0.94 * win; // what is left of the snow / milky plates over the beam
+        // the angler set up on an open stretch: less snow within ~14 m of the hole (soft, noisy edge), and a gentle
+        // thinning over the beam further out — no cone-shaped hole in the snow (#99)
+        float openD = distance(P, uCutC);
+        float open = 1.0 - smoothstep(9.0, 16.0, openD + 3.0 * (fbm3(P * 0.11 + 5.0) - 0.5));
+        float keep = (1.0 - 0.5 * win) * (1.0 - 0.9 * open); // what is left of the snow / milky plates
         float edge = clamp(wide - beam, 0.0, 1.0) * uWindow * uBeamOn;
         // ---- snow over the ice ----
         float h0 = drift(P);
@@ -211,7 +215,7 @@ export function makeIceMaterial(terrain) {
         float lamb = max(dot(N, uSun), 0.0);
         vec3 sky = mix(uSkyHorizon, uSkyZenith, 0.45);
         vec3 snowAlb = vec3(0.93, 0.95, 0.98);
-        vec3 litSnow = snowAlb * (sky * uAmbient * (0.7 + 0.3 * N.y) + uSunColor * uSunI * lamb);
+        vec3 litSnow = snowAlb * (sky * uAmbient * (0.7 + 0.3 * N.y) * 1.35 + uSunColor * uSunI * lamb + 0.03);
         litSnow *= mix(vec3(0.84, 0.9, 1.0), vec3(1.0), smoothstep(0.25, 0.7, h)); // the troughs go blue
         float cell = hash(floor(P * 26.0));
         float glint = step(0.986, cell) * (0.5 + 0.5 * sin(uTime * 3.0 + cell * 60.0)) * lamb * uSunI; // facets catching the sun
@@ -222,6 +226,7 @@ export function makeIceMaterial(terrain) {
         vec3 Nn = normalize(vec3((vnoise(P * 0.23) - 0.5) * 0.05, 1.0, (vnoise(P * 0.23 + 5.0) - 0.5) * 0.05));
         float cosT = max(dot(V, Nn), 0.0);
         float F = 0.02 + 0.98 * pow(1.0 - cosT, 5.0);        // Fresnel: a window straight down, a mirror toward the horizon
+        F = 0.045 + F;                                       // and a faint skin of sky everywhere, so the sheet reads as a surface over the dark water (#99)
         float fres = F;
         vec3 reflSky = skyAt(reflect(-V, Nn));
         vec3 Hh = normalize(uSun + V);
@@ -244,10 +249,10 @@ export function makeIceMaterial(terrain) {
         vec3 milkyLit = vec3(0.62, 0.7, 0.8) * (sky * uAmbient * 1.5 + uSunColor * uSunI * 0.45 + 0.06) * (0.85 + 0.3 * polish);
         // the water below is what gives black ice its black; the sky is laid over it by Fresnel
         vec3 iceCol = vec3(0.004, 0.012, 0.02) + reflSky * F * 1.5 * (0.8 + 0.4 * polish) + uSunColor * specSun * 0.6;
-        iceCol = mix(iceCol, milkyLit, milky * 0.9);
+        iceCol = mix(iceCol, milkyLit, milky * 0.7);
         iceCol += whiteLit * halo * 0.5;
         iceCol = mix(iceCol, whiteLit, white);
-        float iceAlpha = clamp(mix(0.5, 0.2, uClear) + F * 1.4 + milky * 0.6 + white * 0.7 + halo * 0.3, 0.0, 1.0);
+        float iceAlpha = clamp(mix(0.5, 0.26, uClear) + F * 1.4 + milky * 0.6 + white * 0.7 + halo * 0.3, 0.0, 1.0);
         // ---- put it together ----
         vec3 col = mix(iceCol, litSnow * (1.0 + 0.15 * streaks), snow);
         float alpha = mix(iceAlpha, 1.0, snow);

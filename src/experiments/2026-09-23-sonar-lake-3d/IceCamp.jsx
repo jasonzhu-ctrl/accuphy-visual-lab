@@ -80,6 +80,7 @@ export function IceCamp({ state, beamMats, iceMat, T }) {
     u.uLampColor.value.set('#ffb060')
   }, [iceMat, camp, T, state])
   const cableLen = ICE_T + MINI_DROP - MINI_H + CABLE_TOP_Y
+  const glowRef = useRef()
   useFrame((_, dt) => {
     const s = state.current
     const d = (s.drill ||= { phase: 'idle', t: 0, opened: false })
@@ -138,6 +139,7 @@ export function IceCamp({ state, beamMats, iceMat, T }) {
     })
     for (let k = fans.length; k < 2; k++) u.uCutBox.value[k].w = 0
     u.uBeamOn.value += ((s.noSignal ? 0 : 1) - u.uBeamOn.value) * Math.min(1, dt * 6)
+    if (glowRef.current) { glowRef.current.position.set(s.boat.x, APEX_Y + 0.3 + lift, s.boat.z); glowRef.current.intensity = 3 * u.uBeamOn.value }
     // the aim ring under the pointer
     aim.visible = !!s.aiming
     if (s.aim) aim.position.set(s.aim.x, 0.015, s.aim.z)
@@ -149,6 +151,7 @@ export function IceCamp({ state, beamMats, iceMat, T }) {
       <primitive object={sled} position={[camp.x - 1.1, 0, camp.z + 2.3]} rotation-y={camp.yaw + 0.5} />
       <primitive object={aim} />
       <pointLight position={[camp.lamp.x, camp.lamp.y + 0.2, camp.lamp.z]} color="#ffb060" intensity={T.lamp * 7} distance={10} decay={2} />
+      <pointLight ref={(l) => { if (l) l.position.set(state.current.boat.x, APEX_Y + 0.3, state.current.boat.z); glowRef.current = l }} color="#7fe6ff" intensity={3} distance={4} decay={2} />
     </group>
   )
 }
