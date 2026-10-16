@@ -17,7 +17,7 @@ export const WIND = new THREE.Vector2(0.86, 0.5).normalize() // where the drifts
 // Camera: closer than the boat scene (its 90 m framed a 6.6 m boat; here the hole kit is 0.3–2 m), and on phones
 // ~30 m of ice across the screen instead of 50.
 export const ICE_CAM_T = new THREE.Vector3(-1.5, -5, 0) // the first hole sits right of centre, clear of the control panel
-export const ICE_CAMP = [6.2, 3.8] // the shelter and sled, from the first hole (right and toward the camera: clear of the step cards)
+export const ICE_CAMP = [-8, 5] // the shelter and sled, from the first hole: left and toward the camera — clear of the step cards, outside the Down pool (7 m) and never in the Forward strip (which opens to +x)
 export const ICE_CAM_D = new THREE.Vector3(-9, 28, 33)
 export const ICE_LAKE_W = 30
 export const ICE_START = [1, 1] // the first hole: 36 ft of water on the gentle middle slope, walleye and perch within reach
