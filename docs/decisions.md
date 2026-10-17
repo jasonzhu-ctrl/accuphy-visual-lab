@@ -1748,3 +1748,6 @@ Numbered log. Newest at the bottom.
        shallow water brings it in again.
      - Checked at 375×812: the kit and the shelter in the top third, the slab, the cone with its lit bottom well above the
        View capsule (zoom 1.25, pitch +2.6 m). Desktop behaviour at the default spot is unchanged.
+     - Same night, Jason: "还是看不见" — phones now aim the ice line at 26 % of the band and keep the bottom inside 80 %
+       (was 30 % / 86 %), so the lit bottom sits about a third of the band above the View capsule (f0a502b). Still to
+       confirm on his own phone (he may have reopened the first .html file instead of the updated preview).
