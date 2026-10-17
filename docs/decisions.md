@@ -1641,7 +1641,7 @@ Numbered log. Newest at the bottom.
     z −52). `frameX` moved from 30 to 15: the lockup is fully in view, the boat sits left of centre, the timber
     and the Forward beam stay on the right. Checked at 390×844, no console errors, build passes.
 
-104. **2026-10-16** — **The Mini sits on a sonar pole, not on a dangling cable** (Jason: "声呐pole的使用方式你了解一下 他是固定
+105. **2026-10-16** — **The Mini sits on a sonar pole, not on a dangling cable** (Jason: "声呐pole的使用方式你了解一下 他是固定
      在杆子下方的头上的").
      - **How an ice sonar pole works** (Garmin's Panoptix ice pole mount, Patriot IceFix 360, Summit / Brew City poles,
        Accuphy's own 0° Mount, sold as compatible with PingLive and PingLive Mini): the transducer is clamped to a head
