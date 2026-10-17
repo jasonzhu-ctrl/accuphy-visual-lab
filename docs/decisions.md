@@ -1759,3 +1759,16 @@ Numbered log. Newest at the bottom.
     empty and the sonar picture was black for good. `index.jsx` now gates on `live = started || !phone`: desktop width
     always runs; the phone keeps "pick a view first". Verified: a 1440×900 tab that had mounted narrow renders the fans
     again (specs 1, uFanCount 1). The build passes.
+
+113. **2026-10-16** — **The section camera solves its framing outright** (follow-up to #111; Jason: "你继续优化").
+     - The per-frame nudging controller (#111) converged slowly, jumped on the first long frames (scene build), and
+       settled at different zooms per browser (Chromium 1.0 vs WebKit 1.51 at the same 390×844) because its dead
+       zones left many equilibria; 9 s after load the desktop picture was still mostly sky (shot D1).
+     - Now `Rig` bisects on a probe camera that carries the live projection (fov + phone view offset): the look height
+       `secDy` so the ice line at the hole sits at 26 % of the band on phones / 45 % on desktop, then the smallest
+       zoom ≥ 1 that keeps the bottom under the hole inside 80 % / 90 % (16 + 14×16 placements, cached while the hole,
+       the depth, the viewport and the band are unchanged; re-solved every frame only while the kit walks).
+     - Result: identical framing at 4 s and at 12 s and in both engines (desktop zoom 1.00 / dy 1.33; 390×844
+       zoom 1.06 / dy 1.90; 375×667 zoom 1.17; 430×932 zoom 1.05). The camera still eases toward the solved target, so
+       hole-hopping keeps its smooth follow. Tooling: headless GPU screenshots (Playwright 1.63 browsers already on
+       this Mac, `playwright-core` in the session scratchpad) now give pixel-exact desktop, phone and WebKit shots.
