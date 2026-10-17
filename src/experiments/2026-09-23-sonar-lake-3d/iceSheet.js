@@ -68,6 +68,7 @@ export function makeIceMaterial(terrain) {
     uGlow: { value: new THREE.Color('#e08a5e') }, uGlowDir: { value: new THREE.Vector3(-0.8, 0, -0.45).normalize() }, // the afterglow, mirrored in the ice
     uClip: { value: new THREE.Vector2(0, 0) }, // section view: x = on, y = world z of the cut wall
     uCenter: { value: new THREE.Vector2(0, 0) }, // where the near (displaced) sheet is centred
+    uNearFade: { value: new THREE.Vector2(100, 116) }, // the relief fades to flat between these distances from uCenter (keep inside the near mesh's half-size)
     // the cutaway: pool centre, its radius, the island's radius, and up to two beam boxes (xMin, xMax, zHalf, on) from the centre
     uCutOn: { value: 1 }, uCutC: { value: new THREE.Vector2(1e4, 1e4) }, uCutR: { value: 5.5 }, uIsland: { value: 1.9 },
     uCutBox: { value: [new THREE.Vector4(0, 0, 0, 0), new THREE.Vector4(0, 0, 0, 0)] },
@@ -85,8 +86,8 @@ export function makeIceMaterial(terrain) {
     uniforms, transparent: true, depthWrite: false, side: THREE.DoubleSide,
     vertexShader: /* glsl */ `
       attribute float aDisp;
-      uniform vec2 uWind; uniform float uCover; uniform vec2 uCutC; uniform vec2 uCenter;
-      varying vec3 vWorld;
+      uniform vec2 uWind; uniform float uCover; uniform vec2 uCutC; uniform vec2 uCenter; uniform vec2 uNearFade;
+      varying vec3 vWorld; varying vec3 vNsnow;
       ${NOISE_GLSL}
       ${SNOW_GLSL}
       vec3 snowParts(vec2 P) { return iceSnowParts(P, uWind, uCover, uCutC); }
@@ -94,8 +95,21 @@ export function makeIceMaterial(terrain) {
       void main() {
         vec4 wp = modelMatrix * vec4(position, 1.0);
         // real relief (#106): the near sheet (aDisp = 1, 0.5 m mesh) rises by the snow's depth, fading to flat at its edge
-        float fade = aDisp * (1.0 - smoothstep(100.0, 116.0, distance(wp.xz, uCenter)));
-        if (fade > 0.001) wp.y += snowDepth(wp.xz, snowParts(wp.xz)) * fade;
+        float fade = aDisp * (1.0 - smoothstep(uNearFade.x, uNearFade.y, distance(wp.xz, uCenter)));
+        // the snow's slopes for the shading, per vertex (M07: per pixel they were half the frame), faded with the relief
+        // so the far plane and the ring where the relief ends get the same flat normal — no seam
+        vNsnow = vec3(0.0, 1.0, 0.0);
+        if (fade > 0.001) {
+          vec2 P = wp.xz;
+          vec3 sp = snowParts(P);
+          float sd = snowDepth(P, sp);
+          wp.y += sd * fade;
+          if (iceSnowMask(sp) > 0.0) {
+            float e = 0.35;
+            float sdx = snowDepth(P + vec2(e, 0.0), snowParts(P + vec2(e, 0.0))), sdz = snowDepth(P + vec2(0.0, e), snowParts(P + vec2(0.0, e)));
+            vNsnow = mix(vNsnow, normalize(vec3(-(sdx - sd), e, -(sdz - sd))), fade);
+          }
+        }
         vWorld = wp.xyz; gl_Position = projectionMatrix * viewMatrix * wp;
       }
     `,
@@ -103,7 +117,7 @@ export function makeIceMaterial(terrain) {
       precision highp float;
       #define MAXH ${MAX_HOLES}
       #define MB ${MAX_BEAMS}
-      varying vec3 vWorld;
+      varying vec3 vWorld; varying vec3 vNsnow;
       uniform float uTime; uniform vec3 uSun; uniform vec3 uSunColor; uniform float uSunI;
       uniform vec3 uSkyZenith; uniform vec3 uSkyHorizon; uniform float uAmbient;
       uniform vec3 uFogColor; uniform float uFogDensity; uniform vec3 uWater;
@@ -253,12 +267,7 @@ export function makeIceMaterial(terrain) {
         float sd = snowDepth(P, sp);
         float snow = iceSnowMask(sp) * (1.0 - clear) * keep;
         // the slopes only where there is snow: N = mix(up, Nsnow, smoothstep(0, 0.3, snow)) is exactly up without it
-        vec3 Nsnow = vec3(0.0, 1.0, 0.0);
-        if (snow > 0.0) {
-          float e = 0.35;
-          float sdx = snowDepth(P + vec2(e, 0.0), snowParts(P + vec2(e, 0.0))), sdz = snowDepth(P + vec2(0.0, e), snowParts(P + vec2(0.0, e)));
-          Nsnow = normalize(vec3(-(sdx - sd), e, -(sdz - sd)));
-        }
+        vec3 Nsnow = snow > 0.0 ? normalize(vNsnow) : vec3(0.0, 1.0, 0.0); // the slopes come from the vertex stage
         vec2 Pw = vec2(dot(P, uWind), dot(P, vec2(-uWind.y, uWind.x)));
         float streaks = sp.z;
         vec3 N = normalize(mix(vec3(0.0, 1.0, 0.0), Nsnow, smoothstep(0.0, 0.3, snow)));
