@@ -443,12 +443,17 @@ function Rig({ state, sonarRect, fogMats, cam = LAKE_CAM }) {
     }
     // drag hint follows the boat until the first drag, kept inside the screen
     if (s.hintEl) {
-      tmp.set(s.boat.x, 0.6, s.boat.z).project(camera)
+      // ice section: the hint sits ON open ice behind the cut wall, left of the kit (where a tap drills), not on the rig
+      const iceSec = s.view === 'section' && s.holes !== undefined
+      if (iceSec) tmp.set(s.boat.x - (k > 1 ? 2.8 : 4), 0, s.boat.z + (k > 1 ? 3.6 : 2)).project(camera) // near ice, left of the kit
+      else tmp.set(s.boat.x, 0.6, s.boat.z).project(camera)
       const hw = (s.hintEl.offsetWidth || 160) / 2 + 8
-      const px = Math.min(size.width - hw, Math.max(hw, ((tmp.x + 1) / 2) * size.width))
+      const minX = iceSec && size.width >= 1024 ? 440 + hw : hw // desktop: clear of the glass panel and the step cards
+      const px = Math.min(size.width - hw, Math.max(minX, ((tmp.x + 1) / 2) * size.width))
       const below = cam.hintBelow && s.view !== 'section'
       const py = below ? ((1 - tmp.y) / 2) * size.height + (s.view === 'under' ? 150 : k > 1 ? 30 : 44) : Math.max((s.hintEl.offsetHeight || 34) + 54, ((1 - tmp.y) / 2) * size.height - (k > 1 ? 22 : 46))
-      s.hintEl.style.transform = `translate(${px.toFixed(1)}px, ${py.toFixed(1)}px) translate(-50%, ${below ? '0' : '-100%'})`
+      const qy = iceSec ? Math.max((s.hintEl.offsetHeight || 34) + 54, ((1 - tmp.y) / 2) * size.height) : py
+      s.hintEl.style.transform = `translate(${px.toFixed(1)}px, ${qy.toFixed(1)}px) translate(-50%, ${iceSec ? '-50%' : below ? '0' : '-100%'})`
       s.hintEl.style.opacity = s.hasDragged ? '0' : '1'
     }
     // fixed 3/4 aerial view like the PL animations; slight parallax from the pointer

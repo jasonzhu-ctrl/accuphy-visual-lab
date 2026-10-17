@@ -295,7 +295,9 @@ export default function SonarLake3D({ scene: sceneProp }) {
 
       {/* ---- drag hint: follows the boat until the first drag (position set by the render loop) ---- */}
       <div ref={(el) => { state.current.hintEl = el }} className="ac-hint pointer-events-none absolute left-0 top-0 flex items-center gap-2 px-3.5 py-2" style={{ opacity: 0 }}>
-        <svg className="hand" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#028cdf" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12h18M7 8l-4 4 4 4M17 8l4 4-4 4"/></svg>
+        {ICE /* a tap, not a drag: a dot with a ripple */
+          ? <svg className="hand" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#028cdf" strokeWidth="2"><circle cx="12" cy="12" r="3" fill="#028cdf" /><circle cx="12" cy="12" r="8" opacity="0.55" /></svg>
+          : <svg className="hand" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#028cdf" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12h18M7 8l-4 4 4 4M17 8l4 4-4 4"/></svg>}
         <span className="font-brand-head text-[11px] uppercase tracking-wider">{ICE ? 'Tap the ice to drill' : 'Drag the boat'}</span>
       </div>
 
