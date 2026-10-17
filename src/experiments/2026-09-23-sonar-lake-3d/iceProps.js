@@ -35,6 +35,19 @@ const M = {
   face: new THREE.MeshStandardMaterial({ color: '#dfe3e8', roughness: 0.6 }),
 }
 export const KIT_MATERIALS = M
+// a soft contact shadow on the ice: things on a plane need one or they float (#109). A dark blue disc, fading out;
+// drawn after the (transparent) sheet. Sits 3 cm up so the thin snow relief never buries it.
+const shadeMat = new THREE.ShaderMaterial({
+  transparent: true, depthWrite: false,
+  vertexShader: /* glsl */ `varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+  fragmentShader: /* glsl */ `precision highp float; varying vec2 vUv;
+    void main() { float r = length((vUv - 0.5) * 2.0); gl_FragColor = vec4(0.01, 0.025, 0.05, 0.55 * (1.0 - smoothstep(0.3, 1.0, r))); }`,
+})
+export function shadow(rx, rz, x = 0, z = 0) {
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(rx * 2, rz * 2).rotateX(-Math.PI / 2), shadeMat)
+  m.position.set(x, 0.03, z); m.renderOrder = 2
+  return m
+}
 
 // ---------- the PingLive Mini: a shield-shaped puck on its cable (reference/product-images/PingLive Mini (1).png) ----------
 export function makeMini() {
@@ -92,6 +105,7 @@ export function makePoleRig() {
   const up = new THREE.CatmullRomCurve3([new THREE.Vector3(0.02 * k, headY + 0.02 * k, 0.025 * k), new THREE.Vector3(0.02 * k, hubY, 0.028 * k), new THREE.Vector3(0.02 * k, POLE_TOP - 0.05 * k, 0.03 * k), new THREE.Vector3(0.14 * k, POLE_TOP - 0.2 * k, 0.12 * k), new THREE.Vector3(0.36 * k, 0.35 * k, 0.32 * k), new THREE.Vector3(0.48 * k, 0.14 * k, 0.46 * k)])
   rig.add(mesh(new THREE.TubeGeometry(up, 40, 0.006 * k, 6, false), M.cable))
   rig.add(mesh(rbox(0.3 * k, 0.17 * k, 0.2 * k, 0.03 * k, 0.5 * k, 0.085 * k, 0.5 * k), new THREE.MeshStandardMaterial({ color: '#2b2f34', roughness: 0.95 }))) // the router + battery bag
+  rig.add(shadow(0.55 * k, 0.55 * k), shadow(0.22 * k, 0.17 * k, 0.5 * k, 0.5 * k))
   return rig
 }
 
@@ -109,10 +123,12 @@ export function makeHoleKit() {
   const bucket = merge([cyl(0.15 * k, 0.13 * k, 0.38 * k, bx, 0.19 * k, bz, 14), cyl(0.155 * k, 0.155 * k, 0.025 * k, bx, 0.385 * k, bz, 14)])
   g.add(mesh(bucket, M.white))
   g.add(mesh(cyl(0.12 * k, 0.12 * k, 0.012 * k, bx, 0.4 * k, bz, 14), M.black))
+  g.add(shadow(0.2 * k, 0.2 * k, bx, bz))
   // the ice rod on its holder, tip over the hole, line down the hole
   const rx = 0.38 * k, rz = -0.3 * k
   const holder = merge([box(0.1 * k, 0.02 * k, 0.14 * k, rx, 0.01 * k, rz), cyl(0.01 * k, 0.012 * k, 0.16 * k, rx, 0.09 * k, rz, 6)])
   g.add(mesh(holder, M.black))
+  g.add(shadow(0.1 * k, 0.1 * k, rx, rz))
   const rod = new THREE.Group()
   rod.position.set(rx, 0.16 * k, rz)
   const rodGeo = merge([cyl(0.003 * k, 0.006 * k, 0.72 * k, 0, 0.36 * k, 0, 6), cyl(0.022 * k, 0.022 * k, 0.03 * k, 0, 0.06 * k, 0.02 * k, 10)]) // blank + reel
@@ -150,6 +166,7 @@ export function makeAuger() {
   g.add(mesh(head, M.black))
   const grips = merge([cyl(0.018 * k, 0.018 * k, 0.12 * k, 0, headY + 0.12 * k, 0.16 * k, 8).rotateZ(Math.PI / 2).translate(0.3 * k, 0, 0), cyl(0.018 * k, 0.018 * k, 0.12 * k, 0, headY + 0.12 * k, 0.16 * k, 8).rotateZ(Math.PI / 2).translate(-0.3 * k, 0, 0)])
   g.add(mesh(grips, M.blue))
+  g.add(shadow(0.16 * k, 0.16 * k))
   g.userData.shaftH = shaftH
   return g
 }
@@ -174,6 +191,7 @@ export function makeShelter() {
   g.add(face)
   // stovepipe out of the roof
   g.add(mesh(merge([cyl(0.045, 0.045, 0.6, 0.35, H + 0.5, 0.25, 8), cyl(0.07, 0.07, 0.06, 0.35, H + 0.82, 0.25, 8)]), M.black))
+  g.add(shadow(1.5, 1.5))
   g.userData = { lampLocal: new THREE.Vector3(-apo - 0.25, 1.0, 0) } // where the lamp light comes from (world after the group transform)
   return g
 }
@@ -185,6 +203,7 @@ export function makeSled() {
   g.add(mesh(rbox(1.18, 0.1, 0.52, 0.03, 0, 0.3, 0), M.dark)) // the cavity read as a dark top
   g.add(mesh(rbox(0.6, 0.3, 0.38, 0.08, -0.15, 0.4, 0), new THREE.MeshStandardMaterial({ color: '#4b5158', roughness: 0.95 })))
   g.add(mesh(rbox(0.3, 0.2, 0.22, 0.03, 0.4, 0.36, 0.1), M.dark)) // battery box
+  g.add(shadow(0.85, 0.5))
   return g
 }
 

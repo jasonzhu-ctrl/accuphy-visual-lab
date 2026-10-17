@@ -46,6 +46,17 @@ export function makeSkyDome(radius = 1000) {
           vec3 ac = mix(vec3(0.15, 0.95, 0.5), vec3(0.6, 0.3, 0.9), smoothstep(0.3, 0.75, el));
           sky += ac * curtain * ray * uAurora * 0.75;
         }
+        // the far shore (#109): a dark spruce line just above the horizon, hazed, with a few cabin lights among the trees
+        float ang2 = atan(d.x, d.z);
+        float tops = 0.006 + 0.011 * vnoise(vec2(ang2 * 60.0, 1.0)) + 0.004 * vnoise(vec2(ang2 * 260.0, 3.0));
+        float shore = (1.0 - smoothstep(tops - 0.0012, tops + 0.0012, el)) * step(0.0, el);
+        vec3 treeCol = mix(vec3(0.015, 0.025, 0.035), uHorizon, 0.35 + 0.4 * smoothstep(0.0, tops, el)); // hazed toward the tops
+        sky = mix(sky, treeCol, shore);
+        float cellA = floor(ang2 * 28.0);
+        float lit = step(0.9, hash(vec2(cellA, 9.0)));
+        vec2 lp = vec2((fract(ang2 * 28.0) - 0.5 - (hash(vec2(cellA, 4.0)) - 0.5) * 0.5) / 28.0, el - 0.0035);
+        float cabin = lit * (1.0 - smoothstep(0.0, 0.0022, length(lp))) * shore;
+        sky += vec3(1.0, 0.72, 0.38) * cabin * 1.6;
         vec3 col = el < 0.0 ? mix(uBelow, uHorizon, smoothstep(-0.05, 0.0, el) * 0.0 + exp(el * 40.0)) : sky;
         gl_FragColor = vec4(pow(max(col, 0.0), vec3(1.0 / 2.2)), 1.0);
       }

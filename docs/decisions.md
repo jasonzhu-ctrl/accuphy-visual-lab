@@ -1703,3 +1703,12 @@ Numbered log. Newest at the bottom.
      wind-polished, dustings and strokes of a few centimetres with low drifts, the scooped ring of bare ice round the
      hole. Option 2 (first-ice season, no snow at all) and option 3 (deep snow) are not pursued. The snow look of #95
      stays reachable as `?look=snow` for comparison only.
+
+109. **2026-10-16** — **The far shore and contact shadows** (the "大厂" pass, continued).
+     - **The far shore** (`iceSky.js`): a dark spruce line sits just above the horizon all round, its tops uneven, hazed
+       toward the horizon colour, with a few warm cabin lights among the trees. The section camera sees it in its sliver
+       of sky; the summer lake never sees the dome.
+     - **Contact shadows** (`iceProps.js shadow()`): a soft dark disc on the ice under the pole rig's base and the bag,
+       the bucket, the rod holder, the auger (it travels with it when drilling), the shelter and the sled — things on a
+       plane float without one.
+     - Checked at desktop; no console errors of our own. Phone check with the next republish.
