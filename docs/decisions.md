@@ -1816,3 +1816,8 @@ Numbered log. Newest at the bottom.
         face shows a soft daylight shaft under the hole and a lit ice underside around it (faint at night).
      - Summer page unchanged (regression shots within run-to-run noise). Lesson about cost: see memory
        `no-big-agent-fanouts` — ask Jason before any multi-agent run.
+
+117. **Phone app menu: Color Map only** (Jason 2026-10-17: "noise reject这些功能不要加进去"). The ⋯ image-settings panel
+     inside the phone (#114) no longer has the Contrast, Noise Reject and TVG rows or the greyed "Image Stabilization ·
+     Interference Rejection · Fishing Mode" line; only Color Map ▸ and its list stay. Gain −/+, pause, depth −/+ and the
+     back-to-Home button are unchanged. Contrast and noise reject keep their tuned demo values (dev sliders only).

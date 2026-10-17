@@ -41,7 +41,7 @@ function LiveCtl({ onPress, disabled, children, label, style }) {
 export default function SonarChrome({ layout, deviceId, mode, rangeFt, depthFt, imperial, gain, depthRef, onLocked, autoDepth = true, autoRange = false, onRange, onHome, phone = false, waterTempC = 21.8, app }) {
   // `app` (phones, Jason 2026-10-16: 这些控制都做在手机上 … 模拟真实的 Accuphy Sonar app 里面的功能): the app's own controls are
   // live — gain −/+ (1 % a tap), pause, the depth-range −/+ (manual steps, AUTO off) and the ⋯ menu's image settings
-  // (contrast, noise reject, colour map — docs/app-chrome.md §3). Without `app` they stay display-only (desktop).
+  // (colour map only — Jason 2026-10-17: noise reject 这些功能不要加进去). Without `app` they stay display-only (desktop).
   const [menu, setMenu] = useState(false)
   // water temperature readout: comes from the page (summer lake 21.8 °C; under ice about +1…+4 °C — the ice chat asked
   // for this on 2026-10-16: −1.2 °C is physically impossible for liquid water)
@@ -157,24 +157,12 @@ export default function SonarChrome({ layout, deviceId, mode, rangeFt, depthFt, 
   )
 }
 
-// The ⋯ menu's image-settings tab, as a right-hand panel like the app (docs/app-chrome.md §3): Contrast, Noise Reject and TVG
-// rows with − / + and a value, then Color Map ▸ with the list. Only the image tab is live; the other two tabs are decorative.
+// The ⋯ menu's image-settings tab, as a right-hand panel like the app (docs/app-chrome.md §3). Only Color Map ▸ with its list:
+// Jason 2026-10-17 "noise reject 这些功能不要加进去" — no Contrast / Noise Reject / TVG rows or the other settings line.
+// Only the image tab is live; the other two tabs are decorative.
 const MAP_LABELS = { garmin_amber: 'orange', accuphy_red: 'red', HSV_Rainbow: 'rainbow', MPL_Inferno: 'inferno', Moreland_Black_Body: 'black body', MyCarta_Linear_L_Rainbow: 'linear rainbow', Parula: 'parula', amber: 'amber', coolwarm: 'coolwarm', freeze: 'freeze', gist_heat: 'heat', ice: 'ice', jet: 'classic' }
 function AppMenu({ app, onClose }) {
   const [maps, setMaps] = useState(false)
-  const R = ({ label, value, onStep }) => (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '2.2cqh 0', borderBottom: '0.3cqh solid #262626' }}>
-      <span style={{ fontSize: '4.2cqh' }}>{label}</span>
-      <span style={{ display: 'flex', alignItems: 'center', gap: '3cqh' }}>
-        {onStep ? <LiveCtl label={`${label} lower`} onPress={() => onStep(-1)}><RingS>−</RingS></LiveCtl> : null}
-        <span className={num} style={{ fontSize: '4.2cqh', minWidth: '9cqh', textAlign: 'center', opacity: onStep ? 1 : 0.5 }}>{value}</span>
-        {onStep ? <LiveCtl label={`${label} higher`} onPress={() => onStep(1)}><RingS>+</RingS></LiveCtl> : null}
-      </span>
-    </div>
-  )
-  const RingS = ({ children }) => (
-    <svg viewBox="0 0 24 24" style={{ width: '7cqh', height: '7cqh', display: 'block' }} aria-hidden="true"><circle cx="12" cy="12" r="10.6" fill="none" stroke="#fff" strokeWidth="2" /><path d={children === '+' ? 'M7 12h10M12 7v10' : 'M7 12h10'} stroke="#fff" strokeWidth="2.4" strokeLinecap="round" /></svg>
-  )
   return (
     <div className="ph-menu" role="dialog" aria-label="Image settings" onPointerDown={(e) => e.stopPropagation()}
       style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: '52%', display: 'flex', background: 'rgba(14,14,14,0.96)', color: '#fff', fontFamily: 'var(--font-body, "Instrument Sans", system-ui, sans-serif)', boxShadow: '-2cqh 0 6cqh rgba(0,0,0,0.5)' }}>
@@ -187,13 +175,9 @@ function AppMenu({ app, onClose }) {
           <LiveCtl label="Close menu" onPress={onClose}><span style={{ fontSize: '6cqh', lineHeight: 1 }}>×</span></LiveCtl>
         </div>
         {!maps ? (<>
-          <R label="Contrast" value={`${Math.round(app.contrast * 100)}%`} onStep={app.onContrast} />
-          <R label="Noise Reject" value={`${Math.round(app.noise * 100)}%`} onStep={app.onNoise} />
-          <R label="TVG" value="25%" />
           <LiveCtl label="Color Map" onPress={() => setMaps(true)} style={{ width: '100%' }}>
             <span style={{ display: 'flex', width: '100%', justifyContent: 'space-between', padding: '2.2cqh 0', fontSize: '4.2cqh' }}><span>Color Map</span><span style={{ opacity: 0.7 }}>{MAP_LABELS[app.colormap] || app.colormap} ▸</span></span>
           </LiveCtl>
-          <div style={{ fontSize: '3.6cqh', opacity: 0.45, paddingTop: '1.5cqh' }}>Image Stabilization Off ▸ · Interference Rejection Off ▸ · Fishing Mode Static ▸</div>
         </>) : (<>
           <LiveCtl label="Back to image settings" onPress={() => setMaps(false)}><span style={{ fontSize: '4cqh', opacity: 0.8 }}>‹ Color Map</span></LiveCtl>
           {app.colormaps.map((m) => (
