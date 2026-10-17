@@ -58,7 +58,7 @@ export const sonarFragment = /* glsl */ `
   uniform vec2 uLogoExt;       // half-width, height of the lockup in metres (quick reject)
   // the Mini's ice views (2026-10-16): 1 = Live Ice (flasher + Live Down), 2 = Ice Fishing (flasher + 2D history)
   uniform float uIce; uniform float uIceSplit; uniform float uAspect; uniform float uTicks; uniform sampler2D uLUT2;
-  uniform sampler2D uHist; uniform sampler2D uHistPrev; uniform float uHistPass; uniform float uIceAmber;
+  uniform sampler2D uHist; uniform sampler2D uHistPrev; uniform float uHistPass; uniform float uHistFill; uniform float uIceAmber;
   uniform float uSignal; // the ice page's signal gate (IceCamp.jsx s.signal): 0 while the Mini is out of the water; always 1 on the summer lake
 
   float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
@@ -287,11 +287,18 @@ export const sonarFragment = /* glsl */ `
     // ---- the 2D history pass (Ice Fishing View): shift the record one column left, draw the newest ping at the right edge
     if (uHistPass > 0.5) {
       float W = 384.0;
-      if (vUv.x < 1.0 - 1.0 / W) { gl_FragColor = texture2D(uHistPrev, vUv + vec2(1.0 / W, 0.0)); return; }
-      float depth = (1.0 - vUv.y) * uRange;
-      float n = hash(vec2(floor(uTime * 8.0), floor(vUv.y * 256.0)));
+      // uHistFill: the first time the view opens, every column is written at once as a plausible recent record (the
+      // angler has sat on this hole a while): the same bottom with per-ping speckle and a hair of depth wobble, so the
+      // panel is never empty for its first 48 s (2026-10-17)
+      bool fill = uHistFill > 0.5;
+      if (!fill && vUv.x < 1.0 - 1.0 / W) { gl_FragColor = texture2D(uHistPrev, vUv + vec2(1.0 / W, 0.0)); return; }
+      float col = fill ? floor(vUv.x * W) : 0.0, cell = floor(vUv.y * 256.0);
+      float wob = fill ? 0.04 * sin(col * 0.05) + 0.025 * sin(col * 0.17 + 1.3) : 0.0;
+      float depth = (1.0 - vUv.y) * uRange + wob;
+      float n = hash(vec2(fill ? col * 1.37 + 11.0 : floor(uTime * 8.0), cell));
       float floorN = max(0.0, 0.06 + 0.16 * n - 0.22 * uNoise) * 0.7 * (uFanCount > 0 ? 1.0 : 0.0) * uSignal; // no signal: the record scrolls a dark gap
-      gl_FragColor = vec4(toneIdx(max(flasherEcho(depth), floorN)), 0.0, 0.0, 1.0); return;
+      float e = flasherEcho(depth) * (fill ? 0.82 + 0.36 * hash(vec2(col * 0.71, cell + 5.0)) : 1.0);
+      gl_FragColor = vec4(toneIdx(max(e, floorN)), 0.0, 0.0, 1.0); return;
     }
     // ---- the ice views: the flasher on the left, the Live Down fan or the 2D history on the right
     if (uIce > 0.5) {

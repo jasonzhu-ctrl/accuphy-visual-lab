@@ -109,7 +109,7 @@ export default function SonarScreen({ state, rect, lakeMats }) {
         uLUT: { value: colormapTexture('garmin_amber') }, uGain: { value: 0.57 }, uDynRange: { value: 0.85 }, uContrast: { value: 0.4 }, uNoise: { value: 0.3 }, uGamma: { value: 0.75 }, // calibrated 2026-09-24 against the two confirmed frames (sonar-style.md §6.11)
         // the Mini's ice views (2026-10-16): flasher + Live Down (1) or flasher + 2D history (2); the app draws them in its jet map
         uIce: { value: 0 }, uIceSplit: { value: ICE_SPLIT }, uAspect: { value: 2.08 }, uTicks: { value: 5 }, uLUT2: { value: colormapTexture('jet') },
-        uHist: { value: null }, uHistPrev: { value: null }, uHistPass: { value: 0 }, uIceAmber: { value: /icelut=amber/.test(window.location.search) ? 1 : 0 },
+        uHist: { value: null }, uHistPrev: { value: null }, uHistPass: { value: 0 }, uHistFill: { value: 0 }, uIceAmber: { value: /icelut=amber/.test(window.location.search) ? 1 : 0 },
         uSignal: { value: 1 }, // the ice page's signal gate (IceCamp.jsx s.signal); 1 on the summer lake
       },
     })
@@ -267,12 +267,14 @@ export default function SonarScreen({ state, rect, lakeMats }) {
     // the 2D history: one new column per ping (8 a second), after the depth strips and the marks are current
     if (lay.ice === 2) {
       const now = root.clock.elapsedTime
-      if (now - res.lastPing >= 0.125) {
+      const fill = !res.histFilled && sig > 0.95 // first open with a live signal: write the whole record at once
+      if (fill || now - res.lastPing >= 0.125) {
         res.lastPing = now
         const cur = res.histCur, prev = 1 - cur
-        u.uHistPass.value = 1; u.uHistPrev.value = res.hist[prev].texture
+        u.uHistPass.value = 1; u.uHistFill.value = fill ? 1 : 0; u.uHistPrev.value = res.hist[prev].texture
         gl.setRenderTarget(res.hist[cur]); gl.render(res.histScene, res.ortho); gl.setRenderTarget(null)
-        u.uHistPass.value = 0; u.uHist.value = res.hist[cur].texture
+        u.uHistPass.value = 0; u.uHistFill.value = 0; u.uHist.value = res.hist[cur].texture
+        if (fill) res.histFilled = true
         res.histCur = prev
       }
     }
