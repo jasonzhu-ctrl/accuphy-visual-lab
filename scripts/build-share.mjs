@@ -6,8 +6,8 @@ import fs from 'node:fs'
 import path from 'node:path'
 
 const outDir = path.resolve(process.argv[2] || 'dist-share')
-const variant = process.env.VITE_DEVICES === 'PLM' ? 'mini' : 'both' // two public pages (Jason 2026-10-16): PingLive + Mini, and Mini only
-const title = variant === 'mini' ? 'Accuphy Lab · PingLive Mini' : 'Accuphy Lab'
+const variant = process.env.VITE_SCENE === 'ice' ? 'ice' : process.env.VITE_DEVICES === 'PLM' ? 'mini' : 'both' // pages (Jason 2026-10-16): PingLive + Mini, Mini only, and the ice-fishing page
+const title = variant === 'ice' ? 'Accuphy Lab · Ice' : variant === 'mini' ? 'Accuphy Lab · PingLive Mini' : 'Accuphy Lab'
 const tmp = path.join(outDir, 'vite')
 await build({ configFile: 'vite.share.config.js', logLevel: 'warn', build: { outDir: tmp, emptyOutDir: true } })
 
