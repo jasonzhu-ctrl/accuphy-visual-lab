@@ -20,6 +20,7 @@ the Mini page; `VITE_SCENE=ice` for the ice page — private preview only, not o
 
 | Date | Page | Built from (Lab commit) | Public repo commit | What changed |
 |---|---|---|---|---|
+| 2026-10-17 | Ice (private preview) | 3ee96d8 (#113–#116) | — | Camera solves its framing; signal gate on hops; Ice Fishing history opens filled; drill hint off the rig; a jig on line, dial, fan and history; real lake ice in the section and a light shaft under the hole |
 | 2026-10-16 | Ice (private preview) | f0a502b (#111) | — | Phones: more room under the lit bottom (ice line at 26 % of the band, bottom inside 80 %) after Jason still saw it hidden |
 | 2026-10-16 | Ice (private preview) | 12216ea (#111) | — | The section camera frames itself on phones: the lit bottom no longer hides under the app frame; deep holes back the camera off |
 | 2026-10-16 | Ice (private preview) | 3a194ff (#108–#109) | — | Black ice with thin snow confirmed, a spruce shore with cabin lights on the horizon, contact shadows under the props |
