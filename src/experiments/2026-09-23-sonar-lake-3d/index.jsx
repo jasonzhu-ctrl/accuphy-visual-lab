@@ -73,7 +73,11 @@ export default function SonarLake3D({ scene: sceneProp }) {
   const [autoDepth, setAutoDepth] = useState(true) // off only when the dev Depth slider is touched
   const [gate, setGate] = useState(false)          // sign-up gate open → the lake and the sonar picture freeze
   const [toast, setToast] = useState(false)
-  const [home, setHome] = useState(false)         // phones: the app's Home page is open inside the phone display
+  // Phones (lake scene) open ON the app's Home page and nothing starts until a view is picked (Jason 2026-10-16:
+  // 显示首页选视图 而且应该必须先选才能开始): no beam, no sonar picture, no capsules until the first pick.
+  const homeFirst = isPhoneLayout() && !ICE
+  const [home, setHome] = useState(homeFirst)      // the app's Home page is open inside the phone display
+  const [started, setStarted] = useState(!homeFirst) // a view has been picked (always true on desktop and on the ice page)
   const toastT = useRef(0)
   const [imperial, setImperial] = useState(true)
   const [colormap, setColormap] = useState('garmin_amber') // LiveScope-measured amber (§7.7); the app's own 'orange' is Moreland_Black_Body
@@ -125,7 +129,8 @@ export default function SonarLake3D({ scene: sceneProp }) {
     if (deviceId === 'PLM' && mode === 'forward' && sp[0]) { const R = rangeFt * FT, D = depthFt * FT; sp[0] = { ...sp[0], R: Math.hypot(R, D) * 1.001, box: { xMin: -0.25 * R, xMax: R, yMax: D } } }
     return sp
   }, [device, deviceId, mode, effRangeFt, depthFt])
-  const specKey = `${deviceId}-${mode}-${effRangeFt}`
+  const liveSpecs = started ? specs : [] // before the first pick on a phone: no fans at all
+  const specKey = `${deviceId}-${mode}-${effRangeFt}-${started ? 1 : 0}`
   const layout = useMemo(() => screenLayout(deviceId, mode, effRangeFt * FT, 2.08, specs, depthFt * FT), [deviceId, mode, effRangeFt, depthFt, specs]) // display aspect = phone frame aspect
 
   const b0 = (/boat=(-?[\d.]+),(-?[\d.]+)/.exec(window.location.search) || []).slice(1).map(Number) // dev: ?boat=x,z
@@ -137,13 +142,13 @@ export default function SonarLake3D({ scene: sceneProp }) {
   const state = useRef({
     boat: { x: START[0], z: START[1] }, target: { x: START[0], z: START[1] }, apex: new THREE.Vector3(), dragging: false,
     frameX: phone && !ICE && b0.length !== 2 ? PHONE_START[0] - 1 : undefined, // phones: boat left, timber right, and the ACCUPHY LAB lockup (x −1…31 at z −52) fully in view (Jason 2026-10-16: 把 Accuphy Lab 露出来)
-    parallax: { x: 0, y: 0 }, specs, specKey,
+    parallax: { x: 0, y: 0 }, specs: liveSpecs, specKey,
     closeCam: window.location.search.includes('cam=boat'), wreckCam: /cam=wreck/.test(window.location.search), logoCam: /cam=logo/.test(window.location.search),
     fishCam: (/cam=fish:(\w+)/.exec(window.location.search) || [])[1],
     fishCamIndex: +((/cam=fish:\w+:(\d+)/.exec(window.location.search) || [])[1] || 0),
     rigCam: import.meta.env.DEV && /rigcam/.test(window.location.search), // ice: the hole kit up close
   })
-  state.current.specs = specs
+  state.current.specs = liveSpecs
   state.current.specKey = specKey
   state.current.rangeM = effRangeFt * FT
   state.current.depthM = depthFt * FT
@@ -298,8 +303,8 @@ export default function SonarLake3D({ scene: sceneProp }) {
           <div className="ph-band" style={{ ...ring('1.35%'), borderRadius: '6.6% / 13.8%', boxShadow: '16px 26px 44px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.45), inset 0 0 0 2px rgba(0,0,0,0.12)' }} />
           <div style={{ ...ring('1.25%'), inset: '1.35%', borderRadius: '6.1% / 12.7%', background: '#040404' }} />
           <div ref={(el) => { sonarRect.current.el = el }} style={{ position: 'absolute', inset: '2.6%', borderRadius: '5.4% / 11.3%', containerType: 'size', overflow: 'hidden' }}>
-            <SonarChrome layout={layout} deviceId={deviceId} mode={mode} rangeFt={effRangeFt} depthFt={depthFt} imperial={imperial} gain={gain} autoDepth={autoDepth} autoRange={downLike} onRange={phone ? stepRange : undefined} onHome={phone ? () => setHome(true) : undefined} phone={phone} onLocked={onLocked} depthRef={(el) => { state.current.depthEl = el }} />
-            {phone && home && <AppHome devices={SHOWN_DEVICES} deviceId={deviceId} mode={mode} onPick={(d, m) => { setDeviceId(d); setMode(m); setHome(false) }} />}
+            <SonarChrome layout={layout} deviceId={deviceId} mode={mode} rangeFt={effRangeFt} depthFt={depthFt} imperial={imperial} gain={gain} autoDepth={autoDepth} autoRange={downLike} onRange={phone ? stepRange : undefined} onHome={phone && !ICE ? () => setHome(true) : undefined} phone={phone} onLocked={onLocked} depthRef={(el) => { state.current.depthEl = el }} />
+            {phone && home && <AppHome devices={SHOWN_DEVICES} deviceId={started ? deviceId : null} mode={started ? mode : null} onPick={(d, m) => { setDeviceId(d); setMode(m); setHome(false); setStarted(true) }} />}
             <div className="ph-glass" />
           </div>
           {/* antenna lines in the titanium band (two per long edge, like the Pro Max) */}
@@ -310,7 +315,7 @@ export default function SonarLake3D({ scene: sceneProp }) {
           <div style={{ position: 'absolute', left: '4.1%', top: '50%', width: '2.4%', height: '20%', transform: 'translateY(-50%)', borderRadius: 999, background: '#000', boxShadow: '0 0 0 1px #0a0a0a' }} />
         </div>
         {/* phones: the View capsule sits on the phone frame's top edge (Jason 2026-10-03) — the big panel is gone */}
-        {phone && (
+        {phone && started && (
           <div ref={(el) => { sonarRect.current.dock = el }} className="pointer-events-auto absolute bottom-full left-1/2 mb-2 -translate-x-1/2">
             <div className="ac-seg ac-seg-lg">{modes.map((m) => <button key={m} className={`ac-btn ${mode === m ? 'is-active' : ''}`} onClick={() => setMode(m)}>{MODE_LABELS[m].replace(' View', '')}</button>)}</div>
           </div>
@@ -322,7 +327,7 @@ export default function SonarLake3D({ scene: sceneProp }) {
       </div>
 
       {/* ---- phones: device switch, top right (the panel is hidden there) ---- */}
-      {phone && !ONLY && (
+      {phone && !ONLY && started && (
         <div className="pointer-events-auto absolute right-3 top-4">
           <div className="ac-seg">{Object.values(DEVICES).map((d) => <button key={d.id} className={`ac-btn ${deviceId === d.id ? 'is-active' : ''}`} onClick={() => setDeviceId(d.id)}>{d.name}</button>)}</div>
         </div>

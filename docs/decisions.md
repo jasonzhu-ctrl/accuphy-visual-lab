@@ -1712,3 +1712,25 @@ Numbered log. Newest at the bottom.
        the bucket, the rod holder, the auger (it travels with it when drilling), the shelter and the sled — things on a
        plane float without one.
      - Checked at desktop; no console errors of our own. Phone check with the next republish.
+
+110. **2026-10-16** — **Phones open on the app's Home page; the view must be picked before anything starts; the Mini row
+    shows all seven app views, unavailable ones under a frosted layer** (Jason: "我觉得是显示首页选视图 而且应该必须先选
+    才能开始" and, with his screenshot of the Mini row: "可以只给 live down live forward combo ice fishing 其他的用那种我们也
+    有的雾蒙蒙的一层的 点了就弹窗一下 available with Accuphy PingLive Mini").
+    - **Home first (lake page, phones only):** the page opens with the lake and the boat alive but no beam and no sonar
+      picture, the phone showing Home, and no View / device capsules. Picking a tile starts everything at once; ↶ reopens
+      Home later. Implementation: `started` state in `index.jsx`; until the first pick `state.specs` is empty, so Beams,
+      the sonar passes and the lakebed glow are off. Desktop and the ice page are untouched (they start as before).
+    - **Mini row = the app's seven tiles** in the app's order and wording: Live Panoramic · Live Forward · Live Down ·
+      Down Scan · Chirp Sonar · Ice Fishing · Live Ice Fishing, plus the "Combo" section with Live Combo (the app lists
+      Live Combo under Combo, not in the Mini row — which is why Jason's screenshot had none). Thumbnails are crops of the
+      app's own tiles (`home/*.jpg`, 11 files).
+    - **Live:** Live Forward, Live Down, Live Combo (and the three PingLive views). **Frosted** (`.ph-frost`, the Lab's
+      glass look, dimmed label): Live Panoramic, Down Scan, Chirp Sonar — a tap shows the toast "Available with Accuphy
+      PingLive Mini" for ~2 s. **Ice Fishing / Live Ice Fishing** open the ice page where it has an address (dev: the
+      gallery entry; public: `VITE_ICE_URL` once the ice page is published) and are frosted otherwise — so on today's
+      public pages they are frosted too.
+    - Share build: 11 data-URI thumbnails, 2.55 MB, no stray asset paths, no ice URL baked in.
+    - **Checked** at 390×844: Home at start, no beam, 3 frosted tiles, toast text, Live Forward starts the view with
+      beam + capsules, ↶ returns to Home; 1440×900 unchanged (no Home, panel, locked ↶); production build passes; no
+      console errors. Public pages not yet rebuilt.
