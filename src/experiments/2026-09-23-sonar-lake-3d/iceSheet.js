@@ -9,10 +9,13 @@ import { MAX_HOLES, WIND } from './iceScene'
 
 // ---- GLSL shared with other ice shaders (the slab face in IceCamp.jsx imports these, so its snow cap and the sheet's
 //      snow cannot drift apart). Plain strings, no backticks inside. ----
-// value noise on a hashed lattice
+// value noise on a hashed lattice. The lattice wraps every 1024 cells (wrapL is the identity for |i| < 512, so nothing
+// changes near the hole): without it, world coordinates up to 450 m times scales up to 60 feed sin() arguments of
+// ~1e7, where mobile GPUs (Adreno, Mali) lose range reduction and the noise bands into stripes (M31).
 export const NOISE_GLSL = /* glsl */ `
   float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
-  float hashL(vec2 i) { return hash(i); }
+  vec2 wrapL(vec2 i) { return mod(i + 512.0, 1024.0) - 512.0; }
+  float hashL(vec2 i) { return hash(wrapL(i)); }
   float vnoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
     return mix(mix(hashL(i), hashL(i + vec2(1, 0)), f.x), mix(hashL(i + vec2(0, 1)), hashL(i + vec2(1, 1)), f.x), f.y); }
   float fbm3(vec2 p) { return 0.5 * vnoise(p) + 0.25 * vnoise(p * 2.1 + 1.3) + 0.125 * vnoise(p * 4.3 + 2.7); }
@@ -115,16 +118,6 @@ export function makeIceMaterial(terrain) {
 
       ${NOISE_GLSL}
       ${SNOW_GLSL}
-      // nearest two cell seeds: pressure cracks run along the cell borders
-      vec2 voro(vec2 p) {
-        vec2 i = floor(p), f = fract(p); float f1 = 8.0, f2 = 8.0;
-        for (int y = -1; y <= 1; y++) for (int x = -1; x <= 1; x++) {
-          vec2 g = vec2(float(x), float(y)); vec2 o = vec2(hash(i + g), hash(i + g + 19.3));
-          vec2 r = g + o - f; float d = dot(r, r);
-          if (d < f1) { f2 = f1; f1 = d; } else if (d < f2) { f2 = d; }
-        }
-        return sqrt(vec2(f1, f2));
-      }
       float insideBeam(int k, vec3 p, float margin) {
         vec3 d = p - uApex[k];
         float u = dot(d, uC[k]), v = dot(d, uH[k]), w = dot(d, uN[k]);
@@ -177,7 +170,7 @@ export function makeIceMaterial(terrain) {
       }
       // bubbles frozen into the ice: white discs, 3–10 cm, in one cell of seven
       float bubbles(vec2 P) {
-        vec2 g = P * 1.6, cell = floor(g), f = fract(g);
+        vec2 g = P * 1.6, cell = wrapL(floor(g)), f = fract(g);
         float h = hash(cell);
         if (h < 0.86) return 0.0;
         vec2 o = vec2(hash(cell + 3.1), hash(cell + 7.7)) * 0.6 + 0.2;
@@ -263,7 +256,7 @@ export function makeIceMaterial(terrain) {
         vec3 snowAlb = vec3(0.93, 0.95, 0.98);
         vec3 litSnow = snowAlb * (sky * uAmbient * (0.7 + 0.3 * N.y) * 1.35 + uSunColor * uSunI * lamb + 0.03);
         litSnow *= mix(vec3(0.84, 0.9, 1.0), vec3(1.0), smoothstep(0.02, 0.16, sd)); // the thin edges go blue, the ridges white
-        float cell = hash(floor(P * 26.0));
+        float cell = hashL(floor(P * 26.0));
         float glint = step(0.986, cell) * (0.5 + 0.5 * sin(uTime * 3.0 + cell * 60.0)) * lamb * uSunI; // facets catching the sun
         litSnow += uSunColor * glint * 1.2;
         // ---- bare ice: a dark mirror of the sky, long white cracks, bubbles, frost, specks ----
@@ -289,7 +282,7 @@ export function makeIceMaterial(terrain) {
         float polish = 0.5 + 0.5 * fbm3(vec2(Pw.x * 0.12, Pw.y * 0.9) + 4.0);          // faint wind polish along the wind
         float nearD = 1.0 - smoothstep(12.0, 32.0, camD);                                 // close-up detail only near the camera
         float bub = bubbles(P) * nearD * 0.5;
-        float speck = step(0.994, hash(floor(P * 14.0))) * nearD * 0.4;
+        float speck = step(0.994, hashL(floor(P * 14.0))) * nearD * 0.4;
         float white = clamp(core + bub + speck, 0.0, 1.0);
         vec3 whiteLit = vec3(0.86, 0.92, 1.0) * (sky * uAmbient * 1.6 + uSunColor * uSunI * 0.5 + 0.1);
         vec3 milkyLit = vec3(0.62, 0.7, 0.8) * (sky * uAmbient * 1.5 + uSunColor * uSunI * 0.45 + 0.06) * (0.85 + 0.3 * polish);
