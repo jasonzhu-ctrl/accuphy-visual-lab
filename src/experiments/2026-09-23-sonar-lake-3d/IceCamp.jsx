@@ -12,7 +12,7 @@ import { setHoles } from './iceSheet'
 import { makeHoleKit, makeShelter, makeSled, makeAimRing, KIT_SCALE } from './iceProps'
 import { makeSnowfall } from './snow'
 import { makeSkyDome } from './iceSky'
-import { ICE_T, MINI_DROP, APEX_Y, HOLE_DRAW_R, MAX_HOLES, ICE_CAMP, CUT_R, ISLAND_R, SECTION_CAM, WIND, col, dir } from './iceScene'
+import { ICE_T, MINI_DROP, APEX_Y, HOLE_DRAW_R, MAX_HOLES, ICE_CAMP, CUT_R, ISLAND_R, SECTION_CAM, WIND, col, dir, iceParams } from './iceScene'
 import { setBeamUniforms } from './lakeMaterial'
 import { SONAR_HIDE_LAYER } from './SonarScreen'
 import { HALF, depthAt } from './terrain'
@@ -388,31 +388,52 @@ export function SectionFaces({ state }) {
           return max(max(core, 0.4 * skirt), streaks) * (1.0 - 0.9 * open);
         }
         void main() {
+          // lake ice in section (2026-10-17, after photos of cut lake ice): a thin white snow-ice crust on top, then clear
+          // black ice that reads dark blue-grey and glassy (you see the dark water through it), grown in vertical columns
+          // ("candles") with strings of tiny bubbles rising through it; the cut edge catches the sky; a rough, darker
+          // underside. No horizontal stripes — lake ice grows down, so its texture is vertical.
           float d = clamp(-vW.y / uT, 0.0, 1.0);
           float snow = snowAt(vW.xz);
-          vec3 top = vec3(0.84, 0.9, 0.95), mid = vec3(0.58, 0.74, 0.86), bot = vec3(0.34, 0.56, 0.74); // ice in section: white-blue over clear blue, not a white wall
-          vec3 c = d < 0.5 ? mix(top, mid, d * 2.0) : mix(mid, bot, (d - 0.5) * 2.0);
-          float layers = 0.5 + 0.5 * sin(vW.y * 70.0 + vnoise(vW.xz * 0.6) * 4.0);
-          c *= 0.9 + 0.1 * layers;
-          float bubbles = smoothstep(0.88, 0.96, vnoise(vec2(vW.x * 22.0, vW.y * 46.0)));
-          c = mix(c, vec3(0.95, 0.98, 1.0), bubbles * 0.5);
-          float frost = 1.0 - smoothstep(0.0, 0.1, d);
-          c = mix(c, vec3(0.95, 0.97, 1.0), frost * 0.7);
+          float crust = 1.0 - smoothstep(0.08, 0.16, d + 0.04 * (vnoise(vec2(vW.x * 3.0, 1.0)) - 0.5));
+          vec3 clear = mix(vec3(0.24, 0.38, 0.48), vec3(0.11, 0.21, 0.30), smoothstep(0.1, 1.0, d));
+          float candle = vnoise(vec2(vW.x * 7.0, vW.y * 0.9)) * 0.6 + vnoise(vec2(vW.x * 19.0, vW.y * 2.0)) * 0.4;
+          clear *= 0.86 + 0.28 * candle;
+          float str = smoothstep(0.9, 0.97, vnoise(vec2(vW.x * 26.0, 3.0)));
+          float bub = str * smoothstep(0.55, 0.8, vnoise(vec2(vW.x * 26.0, vW.y * 30.0)));
+          clear = mix(clear, vec3(0.78, 0.88, 0.95), bub * 0.55);
+          vec3 white = vec3(0.86, 0.9, 0.94) * (0.94 + 0.08 * vnoise(vW.xy * vec2(40.0, 60.0)));
+          vec3 c = mix(clear, white, crust);
+          c += vec3(0.16, 0.18, 0.2) * (1.0 - smoothstep(0.0, 0.035, d)); // the cut edge catching the sky
+          c *= 1.0 - 0.35 * smoothstep(0.82, 1.0, d + 0.06 * (vnoise(vec2(vW.x * 2.5, 7.0)) - 0.5)); // the rough underside
           float cap = snow * (1.0 - smoothstep(0.02, 0.16, d)); // the snow lying on the slab, seen on its cut edge
           c = mix(c, vec3(0.97, 0.98, 1.0), cap * 0.95);
-          gl_FragColor = vec4(c, 0.92);
+          gl_FragColor = vec4(c, mix(0.96, 0.84, smoothstep(0.1, 0.25, d)));
         }`,
     })
     const slab = new THREE.Mesh(new THREE.BoxGeometry(240, slabT, 0.04), slabMat)
-    const line = new THREE.Mesh(new THREE.BoxGeometry(240, 0.05, 0.05), new THREE.MeshBasicMaterial({ color: '#bfe9ff', transparent: true, opacity: 0.8 })) // the waterline under the slab
+    const line = new THREE.Mesh(new THREE.BoxGeometry(240, 0.05, 0.05), new THREE.MeshBasicMaterial({ color: '#a9d8ec', transparent: true, opacity: 0.55 })) // the waterline under the slab
     const waterMat = new THREE.ShaderMaterial({
       transparent: true, depthWrite: false, side: THREE.DoubleSide,
-      uniforms: { uTop: { value: -slabT }, uTime: { value: 0 } },
+      uniforms: { uTop: { value: -slabT }, uTime: { value: 0 }, uCam: { value: new THREE.Vector3() }, uHole: { value: new THREE.Vector3(0, 0, 1e4) }, uIceT: { value: ICE_T }, uSky: { value: { dusk: 1, day: 1.3, night: 0.3 }[iceParams().time] ?? 1 } },
       vertexShader: /* glsl */ `varying vec3 vW; void main() { vec4 w = modelMatrix * vec4(position, 1.0); vW = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }`,
-      fragmentShader: /* glsl */ `precision highp float; varying vec3 vW; uniform float uTop; uniform float uTime;
+      fragmentShader: /* glsl */ `precision highp float; varying vec3 vW; uniform float uTop; uniform float uTime; uniform vec3 uCam; uniform vec3 uHole; uniform float uIceT; uniform float uSky;
         void main() { float d = clamp((uTop - vW.y) / 24.0, 0.0, 1.0);
-          vec3 c = mix(vec3(0.07, 0.3, 0.36), vec3(0.01, 0.05, 0.08), pow(d, 0.7));
-          gl_FragColor = vec4(pow(c, vec3(1.0 / 2.2)), mix(0.28, 0.46, d)); }`,
+          vec3 c = mix(vec3(0.05, 0.24, 0.32), vec3(0.008, 0.04, 0.07), pow(d, 0.7));
+          // what lies behind this pixel at the hole's distance: follow the view ray from the face back to z = hole.z
+          float t = (uCam.z - uHole.z) / max(0.1, uCam.z - vW.z);
+          vec2 q = uCam.xy + (vW.xy - uCam.xy) * t; // (x, y) on the hole's plane
+          float below = max(0.0, -uIceT - q.y);    // metres under the ice
+          // the light shaft: daylight through the open hole, a soft column widening and fading with depth, faint rays
+          float w = 0.45 + 0.14 * below;
+          float rays = 0.8 + 0.2 * sin((q.x - uHole.x) * 9.0 / w + uTime * 0.6);
+          float shaft = exp(-pow((q.x - uHole.x) / w, 2.0)) * exp(-below / 7.0) * step(0.0, -uIceT - q.y + 0.05) * rays * uSky; // daylight: faint at night
+          // the ice underside lit around the hole
+          float under = exp(-pow((q.x - uHole.x) / 5.0, 2.0)) * exp(-below / 0.5) * step(0.0, -uIceT - q.y + 0.05);
+          vec3 lit = vec3(0.42, 0.62, 0.66) * shaft + vec3(0.2, 0.36, 0.4) * under * 0.6;
+          c += lit;
+          // the face is only ~30 % opaque, so the light has to bring its own coverage or it vanishes in the blend
+          float a = mix(0.3, 0.55, d) + 0.45 * clamp(shaft + 0.5 * under, 0.0, 1.0);
+          gl_FragColor = vec4(pow(c, vec3(1.0 / 2.2)), min(0.85, a)); }`,
     })
     const water = new THREE.Mesh(new THREE.PlaneGeometry(240, 60).translate(0, -30, 0), waterMat)
     water.renderOrder = 2
@@ -420,9 +441,11 @@ export function SectionFaces({ state }) {
     soil.frustumCulled = false
     return { slab, water, soil, line, slabT, key: '' }
   }, [])
-  useFrame(() => {
+  useFrame(({ camera, clock }) => {
     const s = state.current
     const on = s.view === 'section'
+    const wu = parts.water.material.uniforms
+    wu.uCam.value.copy(camera.position); wu.uHole.value.set(s.boat.x, 0, s.boat.z); wu.uTime.value = clock.elapsedTime
     parts.slab.visible = parts.water.visible = parts.soil.visible = parts.line.visible = on
     if (!on) return
     const cz = s.boat.z + SECTION_CAM.cutZ, cx = s.boat.x
