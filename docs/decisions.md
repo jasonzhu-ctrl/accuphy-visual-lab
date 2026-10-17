@@ -1637,3 +1637,6 @@ Numbered log. Newest at the bottom.
     (−6, 4); the ice scene keeps its own start; `?boat=` still overrides. The lake itself is untouched.
     Checked: 390×844 boat (16, 11), trunks and fish on the sonar, hint on screen, no console errors; 1440×900 start
     unchanged; the build passes. Public pages not yet rebuilt.
+    Same day, Jason: "我想正好把 Accuphy lab 露出来" — the opening view cut the ACCUPHY LAB lockup (x −1…31 at
+    z −52). `frameX` moved from 30 to 15: the lockup is fully in view, the boat sits left of centre, the timber
+    and the Forward beam stay on the right. Checked at 390×844, no console errors, build passes.

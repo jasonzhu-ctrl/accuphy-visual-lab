@@ -134,7 +134,7 @@ export default function SonarLake3D({ scene: sceneProp }) {
   const START = b0.length === 2 ? b0 : ICE ? ICE_START : phone ? PHONE_START : [-6, 4]
   const state = useRef({
     boat: { x: START[0], z: START[1] }, target: { x: START[0], z: START[1] }, apex: new THREE.Vector3(), dragging: false,
-    frameX: phone && !ICE && b0.length !== 2 ? PHONE_START[0] + 14 : undefined, // phones: boat left, timber and beam right
+    frameX: phone && !ICE && b0.length !== 2 ? PHONE_START[0] - 1 : undefined, // phones: boat left, timber right, and the ACCUPHY LAB lockup (x −1…31 at z −52) fully in view (Jason 2026-10-16: 把 Accuphy Lab 露出来)
     parallax: { x: 0, y: 0 }, specs, specKey,
     closeCam: window.location.search.includes('cam=boat'), wreckCam: /cam=wreck/.test(window.location.search), logoCam: /cam=logo/.test(window.location.search),
     fishCam: (/cam=fish:(\w+)/.exec(window.location.search) || [])[1],
