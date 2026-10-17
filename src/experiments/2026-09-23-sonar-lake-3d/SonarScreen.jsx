@@ -263,7 +263,7 @@ export default function SonarScreen({ state, rect, lakeMats }) {
     lakeMats.forEach((m) => { m.userData.uniforms.uSonarPass.value = 0 })
     u.uApexXZ.value.set(s.apex.x, s.apex.z); u.uApexDepth.value = -s.apex.y
     // fish marks: every fish in the beam, projected into the view (sonarMarks.js)
-    u.uMarkCount.value = computeMarks({ pop: s.pop, t: root.clock.elapsedTime, specs: sig < 0.6 ? [] : specs, apex: s.apex, flat, bake: res.bake, rangeM: flat ? s.rangeM : u.uReach.value }, res.marks)
+    u.uMarkCount.value = computeMarks({ jig: s.jig, pop: s.pop, t: root.clock.elapsedTime, specs: sig < 0.6 ? [] : specs, apex: s.apex, flat, bake: res.bake, rangeM: flat ? s.rangeM : u.uReach.value }, res.marks)
     // the 2D history: one new column per ping (8 a second), after the depth strips and the marks are current
     if (lay.ice === 2) {
       const now = root.clock.elapsedTime

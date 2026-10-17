@@ -137,10 +137,22 @@ export function makeHoleKit() {
   rodMesh.rotation.y = Math.atan2(rz, -rx) + Math.PI
   rod.add(rodMesh)
   g.add(rod)
-  const line = mesh(new THREE.CylinderGeometry(0.0015 * k, 0.0015 * k, 1.2, 4).translate(0, -0.6, 0), M.face)
-  line.position.set(0.06 * k, 0.16 * k + 0.68 * k * Math.sin(THREE.MathUtils.degToRad(22)), -0.03 * k)
-  line.material = new THREE.MeshStandardMaterial({ color: '#cfd6dd', roughness: 0.6, transparent: true, opacity: 0.7 })
+  // the line from the rod tip straight down the hole to the jig (IceCamp stretches it every frame): a 1-px line so it
+  // reads at the section camera's 30 m, where a real 0.2 mm line (or a 2 mm cylinder) is far below a pixel
+  const tip = new THREE.Vector3(0.06 * k, 0.16 * k + 0.68 * k * Math.sin(THREE.MathUtils.degToRad(22)), -0.03 * k)
+  const lineGeo = new THREE.BufferGeometry().setFromPoints([tip.clone(), tip.clone().setY(-2)])
+  const line = new THREE.Line(lineGeo, new THREE.LineBasicMaterial({ color: '#dfe8ef', transparent: true, opacity: 0.55, depthWrite: false }))
+  line.name = 'fishline'; line.userData.tip = tip; line.frustumCulled = false
   g.add(line)
+  // the jig: a small gold spoon (drawn ~4× life size so it reads at 30 m, like the hole) that flashes when it is lifted
+  const jig = new THREE.Group(); jig.name = 'jig'
+  const spoonMat = new THREE.MeshStandardMaterial({ color: '#d9b25a', metalness: 0.85, roughness: 0.28, emissive: '#ffd27a', emissiveIntensity: 0.25 })
+  const spoon = new THREE.Mesh(new THREE.SphereGeometry(0.09, 12, 8).scale(0.45, 1, 0.22), spoonMat)
+  spoon.position.y = -0.09
+  jig.add(spoon, new THREE.Mesh(new THREE.SphereGeometry(0.012, 6, 4), M.black)) // the split ring / knot at the top
+  jig.position.set(tip.x, -2, tip.z)
+  jig.userData.mat = spoonMat
+  g.add(jig)
   // the auger, standing in the snow on the other side (named: the drill animation moves it)
   const auger = makeAuger()
   auger.position.set(0.1 * k, 0, 0.85 * k)

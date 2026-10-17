@@ -72,7 +72,8 @@ const cand = []
 const PERSIST = 0.7
 // Fills the marks texture. Rows: 0 = segment (x0,y0,x1,y1) in screen metres; 1 = (halfWidth, strength,
 // fan, seed); 2 = shadow blotch (cx, cy, half-axis along the ray, half-axis across); 3 = (0, 0, hasShadow, 0).
-export function computeMarks({ pop, t, specs, apex, flat, bake, rangeM }, marks) {
+const JIG_S = (() => { const m = typeof window !== 'undefined' && /jigs=([\d.]+)/.exec(window.location.search); return m ? +m[1] : 0.6 })() // dev aid ?jigs=
+export function computeMarks({ jig, pop, t, specs, apex, flat, bake, rangeM }, marks) {
   cand.length = 0
   if (!pop || !specs.length) return 0
   const zt = -apex.y // transducer depth below the surface
@@ -143,6 +144,21 @@ export function computeMarks({ pop, t, specs, apex, flat, bake, rangeM }, marks)
         cand.push({ x0: ax0 - apex.x, y0: -(ay0 - apex.y), x1: ax1 - apex.x, y1: Y, hw: 0.15 * L + 0.015, s: Math.min(1.4, 1.6 * size * wz * (0.5 + 0.5 * aspect) * wink * (0.7 + 0.3 * seed)), fan: k, seed, sh: 0 })
       })
     }
+  }
+  // the ice page's jig (IceCamp s.jig): a small, faint mark like a little baitfish, with a short trail as it pops and
+  // falls — on jet it lands in the cyan-green, never the red of the bottom (tuned by eye against the dial)
+  if (jig && !flat) {
+    const X = jig.x - apex.x, Y = -(jig.y - apex.y), dz = jig.z - apex.z
+    specs.forEach((sp, k) => {
+      const centre = Math.atan2(sp.frame.c.x, -sp.frame.c.y), half = (sp.a1 - sp.a0) / 2
+      if (Y <= 0.3 || Math.abs(Math.atan2(X, Y) - centre) > half + 0.03) return
+      const u = X * sp.frame.c.x - Y * sp.frame.c.y
+      if (Math.abs(dz) > Math.max(0.08, u * Math.tan(sp.theta)) * 1.25) return
+      // a 4 cm spoon is far below a range cell: the app paints it as a short dash ~ a beam wide and a cell or two tall,
+      // so the mark gets a minimum size (hw 8 cm, 15 cm tall) plus the trail of its last pop
+      const y0 = Math.min(-(jig.yPrev - apex.y), Y - 0.15)
+      cand.push({ x0: X, y0, x1: X, y1: Y, hw: 0.08, s: JIG_S, fan: k, seed: 0.37, sh: 0 })
+    })
   }
   cand.sort((a, b) => b.s - a.s)
   const n = Math.min(MAX_MARKS, cand.length)

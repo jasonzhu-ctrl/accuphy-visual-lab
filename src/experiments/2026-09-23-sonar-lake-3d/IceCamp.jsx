@@ -89,7 +89,7 @@ export function IceCamp({ state, beamMats, iceMat, T }) {
   const shelter = useMemo(makeShelter, [])
   const sled = useMemo(makeSled, [])
   const aim = useMemo(makeAimRing, [])
-  const parts = useMemo(() => ({ rig: kit.getObjectByName('rig'), head: kit.getObjectByName('head'), auger: kit.getObjectByName('auger'), park: kit.getObjectByName('auger').position.clone(), lean: kit.getObjectByName('auger').rotation.z }), [kit])
+  const parts = useMemo(() => ({ fishline: kit.getObjectByName('fishline'), jig: kit.getObjectByName('jig'), rig: kit.getObjectByName('rig'), head: kit.getObjectByName('head'), auger: kit.getObjectByName('auger'), park: kit.getObjectByName('auger').position.clone(), lean: kit.getObjectByName('auger').rotation.z }), [kit])
   const s0 = state.current
   // the camp: shelter and sled a few metres from the first hole, the door toward it
   const campAt = (hx, hz, dx, dz) => {
@@ -147,6 +147,33 @@ export function IceCamp({ state, beamMats, iceMat, T }) {
       auger.rotation.y += dt * 22
     } else { auger.position.copy(park); auger.rotation.z = parts.lean }
     kit.position.set(s.boat.x, 0, s.boat.z)
+    // the jig (2026-10-17): every ice-sonar maker sells "watch fish come to your jig", and step 02 promises "your bait".
+    // Held ~1.6 m above the bottom (clear of the bottom band) under the hole and worked like an angler does: three quick pops (0.3 m up in 0.15 s,
+    // a slow 1 s fall), then a 2.4 s dead stick with a 2 cm tremble. During a hop it is reeled up; after the drop it
+    // sinks back at 2.5 m/s. s.jig feeds the sonar marks (SonarScreen → computeMarks), so the dial, the fan and the
+    // history all show it from one source.
+    {
+      const tt = performance.now() / 1000, cyc = tt % 6
+      let off
+      if (cyc < 3.6) { const c = cyc % 1.2; off = c < 0.15 ? 0.3 * (c / 0.15) : 0.3 * Math.exp(-(c - 0.15) * 3.2) }
+      else off = 0.02 * Math.sin(tt * 18) * Math.sin(tt * 2.3)
+      const bottomY = -depthAt(s.boat.x, s.boat.z)
+      const want = Math.min(-ICE_T - 0.4, bottomY + 1.6 + off)
+      const up = -ICE_T - 0.15
+      if (d.phase !== 'idle') s.jigY = up
+      else if (s.jigY === undefined || s.jigY > want + 0.02) s.jigY = Math.max(want, (s.jigY ?? up) - 2.5 * dt)
+      else s.jigY = want
+      s.jigTrail = s.jigTrail === undefined ? s.jigY : s.jigTrail + (s.jigY - s.jigTrail) * Math.min(1, dt * 6)
+      const wet = s.jigY < -ICE_T - 0.2
+      const tip = parts.fishline.userData.tip, pa = parts.fishline.geometry.attributes.position
+      pa.setY(1, s.jigY); pa.needsUpdate = true
+      parts.fishline.visible = d.phase === 'idle' || d.phase === 'drop'
+      parts.jig.visible = wet && parts.fishline.visible
+      parts.jig.position.set(tip.x, s.jigY, tip.z)
+      parts.jig.rotation.y = tt * 1.7 // the spoon turns on the line, so it flashes
+      parts.jig.userData.mat.emissiveIntensity = 0.7 + 2.2 * Math.max(0, Math.min(1, (off - 0.08) / 0.2))
+      s.jig = wet && d.phase === 'idle' ? { x: s.boat.x + tip.x, z: s.boat.z + tip.z, y: s.jigY, yPrev: s.jigTrail } : null
+    }
     parts.rig.position.y = lift // the whole pole rig comes out of the hole and goes back in
     // the head turns with the view: the Mini's face forward for Forward and Combo, down for Down, Live Ice and Ice Fishing
     const headT = s.mode === 'forward' || s.mode === 'combo' ? 0 : -Math.PI / 2
