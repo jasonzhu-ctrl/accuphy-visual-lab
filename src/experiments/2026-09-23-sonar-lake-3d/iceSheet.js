@@ -31,10 +31,14 @@ export const SNOW_GLSL = /* glsl */ `
     float h = 0.82 * (0.55 * big + 0.45 * sast) + 0.18 * fbm3(P * 0.8 + 1.7);
     float thr = mix(0.62, 0.30, cover);
     float hh = h + 0.02 * (vnoise(P * 2.3 + 9.0) - 0.5);
-    float core = smoothstep(thr - 0.012, thr + 0.012, hh);
+    // soft edges (M32): wind-packed snow thins out over a hand's width, it is not cut out with scissors
+    float core = smoothstep(thr - 0.03, thr + 0.03, hh);
     float skirt = smoothstep(thr - 0.09, thr - 0.005, hh);
-    float streakN = fbm3(vec2(Pw.x * 0.05, Pw.y * 0.7) + 2.0);
-    float streaks = smoothstep(0.645, 0.665, streakN + 0.03 * (vnoise(P * 3.0) - 0.5));
+    float jit = 0.03 * (vnoise(P * 3.0) - 0.5);
+    float streaks = smoothstep(0.62, 0.69, fbm3(vec2(Pw.x * 0.05, Pw.y * 0.7) + 2.0) + jit);
+    // and each stroke trails off downwind: the same stroke noise 3 m upwind, at half strength
+    float tail = smoothstep(0.62, 0.69, fbm3(vec2((Pw.x - 3.0) * 0.05, Pw.y * 0.7) + 2.0) + jit);
+    streaks = max(streaks, 0.45 * tail);
     float open = 1.0 - smoothstep(9.0, 16.0, distance(P, cutC) + 3.0 * (fbm3(P * 0.11 + 5.0) - 0.5));
     return vec3(core, skirt, streaks) * (1.0 - 0.9 * open);
   }
@@ -319,8 +323,11 @@ export function makeIceMaterial(terrain) {
         float graze = pow(1.0 - cosT, 2.0);
         float iceAlpha = clamp(mix(0.5, 0.26, uClear) + F * 1.4 + graze * 0.55 + milky * 0.6 + white * 0.7 + halo * 0.3 + specL * 0.5, 0.0, 1.0);
         // ---- put it together ----
-        vec3 col = mix(iceCol, litSnow * (1.0 + 0.15 * streaks), snow);
-        float alpha = mix(iceAlpha, 1.0, snow);
+        // a 1 cm dusting is not a sheet of paint: how much snow hides the ice depends on how thick it lies (fresh snow
+        // e-folds light in well under a centimetre — 0.5 cm 0.55, 1 cm 0.8, 2 cm 0.96), so dark ice shows through the thin edges (M32)
+        float snowOpaq = 1.0 - exp(-sd * 160.0);
+        vec3 col = mix(iceCol, litSnow * (1.0 + 0.15 * streaks), snow * snowOpaq);
+        float alpha = mix(iceAlpha, 1.0, snow * snowOpaq);
         float top = max(slush, chips); // fresh shavings and slush: the whitest thing on the ice
         col = mix(col, litSnow * 1.05, top); alpha = mix(alpha, 1.0, top);
         // a breath of the beam's light under the thinned snow and milky plates — only there: on bare black ice the lit
