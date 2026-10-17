@@ -514,11 +514,11 @@ function Rig({ state, sonarRect, fogMats, cam = LAKE_CAM }) {
         const D = depthAt(s.boat.x, s.boat.z)
         const toFrac = (v) => ((1 - v.project(probe).y) / 2) * size.height / bandBottom
         const fracI = toFrac(new THREE.Vector3(s.boat.x, 0, s.boat.z)), fracB = toFrac(new THREE.Vector3(s.boat.x, -D, s.boat.z))
-        const iceWant = k > 1 ? 0.3 : 0.45
+        const iceWant = k > 1 ? 0.26 : 0.45, bottomMax = k > 1 ? 0.8 : 0.9 // phones: more room under the lit bottom (Jason 2026-10-16: 还是看不见)
         if (fracI < iceWant - 0.04) s.secDy = Math.min(10, s.secDy + 3 * dt)       // ice line too high → look higher, the scene slides down
         else if (fracI > iceWant + 0.04) s.secDy = Math.max(-8, s.secDy - 3 * dt)
-        if (fracB > 0.9) s.secZoom = Math.min(2.6, s.secZoom * (1 + 1.2 * dt))
-        else if (fracB < 0.78) s.secZoom = Math.max(1, s.secZoom * (1 - 1.2 * dt))
+        if (fracB > bottomMax) s.secZoom = Math.min(2.6, s.secZoom * (1 + 1.2 * dt))
+        else if (fracB < bottomMax - 0.14) s.secZoom = Math.max(1, s.secZoom * (1 - 1.2 * dt))
         zoom = s.secZoom
       } else if (camera.view?.enabled) camera.clearViewOffset()
       const lk = new THREE.Vector3(s.boat.x + C.look[0], C.look[1] + (s.view === 'section' ? s.secDy : 0), s.boat.z + C.look[2])
