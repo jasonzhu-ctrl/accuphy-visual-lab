@@ -118,25 +118,44 @@ export function makeIceMaterial(terrain) {
 
       ${NOISE_GLSL}
       ${SNOW_GLSL}
-      float insideBeam(int k, vec3 p, float margin) {
-        vec3 d = p - uApex[k];
-        float u = dot(d, uC[k]), v = dot(d, uH[k]), w = dot(d, uN[k]);
-        float r = length(vec2(u, v));
-        float ang = atan(v, u);
-        float soft = 0.03;
-        float inA = smoothstep(uAng[k].x - margin - soft, uAng[k].x - margin + soft, ang) * (1.0 - smoothstep(uAng[k].y + margin - soft, uAng[k].y + margin + soft, ang));
-        float lim = max(u, 0.0) * uRT[k].y;
-        float lo = uAng[k].z * lim - margin * 4.0 * lim, hi = uAng[k].w * lim + margin * 4.0 * lim;
-        float sw = max(0.12, 0.05 * lim);
-        float inW = smoothstep(lo - sw, lo + sw, w) * (1.0 - smoothstep(hi - sw, hi + sw, w));
-        float inR = 1.0 - smoothstep(uRT[k].x - 0.6 + margin * 30.0, uRT[k].x + margin * 30.0, r);
-        vec4 bx = uBox[k]; float bm = margin * 30.0;
-        inR *= 1.0 - smoothstep(bx.w - 0.3 + bm, bx.w + 0.3 + bm, abs(d.z));
-        inR *= smoothstep(bx.x - 0.3 - bm, bx.x + 0.3 - bm, d.x) * (1.0 - smoothstep(bx.y - 0.3 + bm, bx.y + 0.3 + bm, d.x)) * (1.0 - smoothstep(bx.z - 0.3 + bm, bx.z + 0.3 + bm, -d.y));
-        float atten = 1.0 - 0.6 * clamp(r / uRT[k].x, 0.0, 1.0);
-        return inA * inW * inR * atten;
-      }
       float terrainDepth(vec2 w) { return texture2D(uTerrain, (w + uTerrainHalf) / (2.0 * uTerrainHalf)).r; }
+      // keep the part of the ray o + rd t where a + b t >= 0
+      void clipHalf(float a, float b, inout float t0, inout float t1) {
+        if (abs(b) < 1e-6) { if (a < 0.0) t1 = -1.0; }
+        else if (b > 0.0) t0 = max(t0, -a / b);
+        else t1 = min(t1, -a / b);
+      }
+      // The beam's reach along the view ray, in closed form (M17; lakeMaterial.js describes the wedge: p - apex = (u, v, w)
+      // in the beam's frame, inside if atan(v, u) in [a0, a1], w in [s0, s1] u tan(theta), |(u, v)| < R, and the box).
+      // The wedge is convex — two angle planes and two thickness planes through the apex, the box's planes, the range
+      // cylinder — so the ray crosses it in one interval; one terrain fetch at its middle clips it to the bottom. No
+      // march, no jitter: one soft shape instead of grain. Returns (chord length in m, the beam's falloff with range).
+      vec2 beamChord(int k, vec3 o, vec3 rd, float tMax) {
+        vec3 d0 = o - uApex[k];
+        float u0 = dot(d0, uC[k]), ut = dot(rd, uC[k]), v0 = dot(d0, uH[k]), vt = dot(rd, uH[k]), w0 = dot(d0, uN[k]), wt = dot(rd, uN[k]);
+        vec4 A = uAng[k]; float R = uRT[k].x, T = uRT[k].y; vec4 bx = uBox[k];
+        float t0 = 0.0, t1 = tMax;
+        float s0 = sin(A.x), c0 = cos(A.x), s1 = sin(A.y), c1 = cos(A.y);
+        clipHalf(c0 * v0 - s0 * u0, c0 * vt - s0 * ut, t0, t1);   // atan(v, u) >= a0
+        clipHalf(s1 * u0 - c1 * v0, s1 * ut - c1 * vt, t0, t1);   // atan(v, u) <= a1
+        clipHalf(w0 - A.z * T * u0, wt - A.z * T * ut, t0, t1);   // w >= s0 u tan(theta)
+        clipHalf(A.w * T * u0 - w0, A.w * T * ut - wt, t0, t1);   // w <= s1 u tan(theta)
+        clipHalf(d0.x - bx.x, rd.x, t0, t1); clipHalf(bx.y - d0.x, -rd.x, t0, t1);
+        clipHalf(d0.y + bx.z, rd.y, t0, t1);
+        clipHalf(bx.w - d0.z, -rd.z, t0, t1); clipHalf(bx.w + d0.z, rd.z, t0, t1);
+        float qa = ut * ut + vt * vt, qb = u0 * ut + v0 * vt, qc = u0 * u0 + v0 * v0 - R * R;
+        float disc = qb * qb - qa * qc;
+        if (qa < 1e-8) { if (qc > 0.0) t1 = -1.0; }
+        else if (disc < 0.0) t1 = -1.0;
+        else { float sq = sqrt(disc); t0 = max(t0, (-qb - sq) / qa); t1 = min(t1, (-qb + sq) / qa); }
+        if (t1 <= t0) return vec2(0.0);
+        vec3 qm = o + rd * (0.5 * (t0 + t1));
+        t1 = min(t1, (o.y + terrainDepth(qm.xz) + 0.3) / -rd.y); // the bottom (rd.y < -0.05 here)
+        if (t1 <= t0) return vec2(0.0);
+        float tr = clamp(-qb / max(qa, 1e-8), t0, t1); // where the ray passes nearest the apex: the beam's strongest part on the way
+        float r = length(vec2(u0 + ut * tr, v0 + vt * tr));
+        return vec2(t1 - t0, 1.0 - 0.6 * clamp(r / R, 0.0, 1.0));
+      }
       // the sky as the dome draws it (iceSky.js), for the mirror in the ice
       vec3 skyAt(vec3 d) {
         float el = d.y;
@@ -213,19 +232,12 @@ export function makeIceMaterial(terrain) {
         }
         // ---- the window: along the line of sight through this bit of ice, does the eye meet the beam? (the lit
         //      bottom lies far behind the hole from the camera's angle, so a straight-down test cut the window in the
-        //      wrong place) — march the view ray down through the water to the bottom
-        float beam = 0.0, wide = 0.0;
+        //      wrong place) — the view ray's way through the beam, down to the bottom; a longer chord, a clearer window
+        float beam = 0.0;
         vec3 rd = -V;
-        if (rd.y < -0.05 && uBeamCount > 0) {
-          float tEnd = min(48.0, terrainDepth(P) * 1.25 / -rd.y);
-          float jit = hash(gl_FragCoord.xy * 0.37); // per-pixel offset: grain instead of stair-steps at the cone's edge
-          for (int j = 0; j < 20; j++) {
-            float t = (float(j) + jit) * tEnd / 20.0;
-            vec3 q = vWorld + rd * t;
-            if (q.y < -terrainDepth(q.xz) - 0.3) break;
-            for (int k = 0; k < MB; k++) {
-              if (k < uBeamCount) { beam = max(beam, insideBeam(k, q, 0.0)); wide = max(wide, insideBeam(k, q, 0.02)); }
-            }
+        if (rd.y < -0.05 && uBeamCount > 0 && uWindow * uBeamOn > 0.02) {
+          for (int k = 0; k < MB; k++) {
+            if (k < uBeamCount) { vec2 ch = beamChord(k, vWorld, rd, 48.0); beam = max(beam, (1.0 - exp(-ch.x / 1.0)) * ch.y); }
           }
         }
         // Jason 2026-10-16: 水里的声纳coverage的渲染被白色的雪挡住了 — over the beam the snow and the milky ice thin out
@@ -236,7 +248,6 @@ export function makeIceMaterial(terrain) {
         float openD = distance(P, uCutC);
         float open = 1.0 - smoothstep(9.0, 16.0, openD + 3.0 * (fbm3(P * 0.11 + 5.0) - 0.5));
         float keep = (1.0 - 0.5 * win) * (1.0 - 0.9 * open); // what is left of the snow / milky plates
-        float edge = clamp(wide - beam, 0.0, 1.0) * uWindow * uBeamOn;
         // ---- snow over the ice: the mask, the depth and the real slopes (#106) ----
         vec3 sp = snowParts(P);
         float sd = snowDepth(P, sp);
@@ -278,7 +289,8 @@ export function makeIceMaterial(terrain) {
         float core = clamp(cA.x + cB.x, 0.0, 1.0) * 0.5;
         float halo = clamp(cA.y + cB.y, 0.0, 1.0) * 0.6; // the soft white line of snow in the groove is what the eye gets
         float cloud = fbm4(P * 0.045 + 17.0);
-        float milky = smoothstep(0.5, 0.64, cloud) * (0.6 + 0.4 * fbm3(P * 0.6 + 2.0)) * keep; // opaque, pale grey-blue plates
+        float milkyRaw = smoothstep(0.5, 0.64, cloud) * (0.6 + 0.4 * fbm3(P * 0.6 + 2.0));
+        float milky = milkyRaw * keep; // opaque, pale grey-blue plates
         float polish = 0.5 + 0.5 * fbm3(vec2(Pw.x * 0.12, Pw.y * 0.9) + 4.0);          // faint wind polish along the wind
         float nearD = 1.0 - smoothstep(12.0, 32.0, camD);                                 // close-up detail only near the camera
         float bub = bubbles(P) * nearD * 0.5;
@@ -302,7 +314,9 @@ export function makeIceMaterial(terrain) {
         float alpha = mix(iceAlpha, 1.0, snow);
         float top = max(slush, chips); // fresh shavings and slush: the whitest thing on the ice
         col = mix(col, litSnow * 1.05, top); alpha = mix(alpha, 1.0, top);
-        col += uHighlight * win * 0.06 * (1.0 - keep); // a breath of the beam's light under the thinned snow
+        // a breath of the beam's light under the thinned snow and milky plates — only there: on bare black ice the lit
+        // bottom itself shows through, so no painted footprint (M17)
+        col += uHighlight * win * 0.06 * (1.0 - keep) * max(max(sp.x, sp.z), milkyRaw);
         float rip = vnoise(P * 60.0 + uTime * vec2(0.9, -0.6)) - 0.5;
         vec3 holeCol = mix(vec3(0.01, 0.03, 0.05), vec3(0.25, 0.75, 0.95), glow * 0.85) + rip * 0.06;
         col = mix(col, holeCol, hole); alpha = mix(alpha, 0.96, hole);
