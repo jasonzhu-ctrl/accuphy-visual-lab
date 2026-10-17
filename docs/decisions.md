@@ -1730,7 +1730,9 @@ Numbered log. Newest at the bottom.
       PingLive Mini" for ~2 s. **Ice Fishing / Live Ice Fishing** open the ice page where it has an address (dev: the
       gallery entry; public: `VITE_ICE_URL` once the ice page is published) and are frosted otherwise — so on today's
       public pages they are frosted too.
-    - Share build: 11 data-URI thumbnails, 2.55 MB, no stray asset paths, no ice URL baked in.
+    - Same evening, Jason: "留一个 live ice fishing 吧" — the "Ice Fishing" (2D flasher) tile is dropped; the Mini row shows
+      six tiles and Live Ice Fishing is the one ice entry.
+    - Share build: 10 data-URI thumbnails, ~2.5 MB, no stray asset paths, no ice URL baked in.
     - **Checked** at 390×844: Home at start, no beam, 3 frosted tiles, toast text, Live Forward starts the view with
       beam + capsules, ↶ returns to Home; 1440×900 unchanged (no Home, panel, locked ↶); production build passes; no
       console errors. Public pages not yet rebuilt.

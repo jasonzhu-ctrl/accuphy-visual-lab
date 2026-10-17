@@ -1,7 +1,8 @@
 // The real app's Home — its view-selection page — drawn inside the phone display (Jason 2026-10-16: 不同的 view
 // option 可以模拟在手机上的 app 的官方版本的选择页面进入吗 … 显示首页选视图 而且应该必须先选才能开始). Layout from
 // reference/app-study/home*.jpg: a dark page, one section per device — "PingLive" (Panoramic / Forward / Down),
-// "PingLive Mini" (all seven of the app's tiles) and "Combo" (Live Combo) — rounded dark panels, labels under the
+// "PingLive Mini" (six of the app's seven tiles — Jason 2026-10-16 kept only Live Ice Fishing of the two ice views) and
+// "Combo" (Live Combo) — rounded dark panels, labels under the
 // tiles, and the Setting · Home · Map tab bar. The thumbnails are crops of the app's own tiles.
 // Tiles the Lab can show are live. The others are shown under a frosted layer (Jason: 其他的用那种我们也有的雾蒙蒙的一层)
 // and a tap only shows "Available with Accuphy PingLive Mini". Sizes are in cqh of the display, like SonarChrome.
@@ -14,7 +15,6 @@ import plmForward from './plm-forward.jpg'
 import plmDown from './plm-down.jpg'
 import plmDownscan from './plm-downscan.jpg'
 import plmChirp from './plm-chirp.jpg'
-import plmIce from './plm-ice.jpg'
 import plmLiveIce from './plm-liveice.jpg'
 import plmCombo from './plm-combo.jpg'
 
@@ -34,7 +34,6 @@ const SECTIONS = {
     { mode: 'down', label: 'Live Down', img: plmDown },
     { label: 'Down Scan', img: plmDownscan },
     { label: 'Chirp Sonar', img: plmChirp },
-    { label: 'Ice Fishing', img: plmIce, href: ICE_URL },
     { label: 'Live Ice Fishing', img: plmLiveIce, href: ICE_URL },
   ] },
 }
