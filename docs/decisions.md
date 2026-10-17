@@ -1799,3 +1799,20 @@ Numbered log. Newest at the bottom.
      - During a hop the phone reads "app on, no echo" (white dial ring, '-- ft', navy fan, a dark gap in the Ice Fishing
        history) and comes back bottom first. Whether the real app does exactly this out of the water is unverified —
        show Jason. Every new knob is 1 on the summer lake (regression shots: no change beyond run-to-run noise).
+
+116. **2026-10-17** — **Ice polish, narrowed round: four improvements** (Jason, after a token-heavy review round he paused:
+     "要不要把范围稍微缩小一点点" → "可以啊 … 你觉得必要的就做嘛"). Picked from the ranked critique (35 items, 15 packages,
+     kept in the session scratchpad); the rest waits, including every taste choice.
+     1. **Ice Fishing history opens filled**: a one-shot prefill writes a plausible recent record (same bottom, per-ping
+        speckle, a hair of wobble) the first time the view opens with a live signal; it used to be empty for 48 s.
+     2. **The drill hint** sits on open ice left of the kit (not on the pole rig), clear of the desktop panel, with a tap
+        icon instead of the drag arrow.
+     3. **A jig**: a 1-px line from the rod tip straight down the hole to a small gold spoon held 1.6 m above the bottom
+        and worked like an angler (three quick pops, a dead stick with a tremble; reeled up during a hop, sinks back after).
+        It is one small mark in sonarMarks (`s.jig`), so the dial, the Live Down fan and the 2D history all show it —
+        cyan-yellow, far fainter than the red bottom (`?jigs=` tunes it, default 0.6). Fish rising to it: not yet.
+     4. **The section**: the cut face is lake ice as photographed — a thin white crust over dark glassy black ice with
+        vertical candles and bubble strings, a sky-lit edge and a rough underside (no more horizontal stripes); the water
+        face shows a soft daylight shaft under the hole and a lit ice underside around it (faint at night).
+     - Summer page unchanged (regression shots within run-to-run noise). Lesson about cost: see memory
+       `no-big-agent-fanouts` — ask Jason before any multi-agent run.
