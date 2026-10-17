@@ -118,3 +118,31 @@ contact shadows, sharp specular, visible depth-tinted lakebed, a volumetric cone
 weakest idiom, already tried four times.
 
 **Status:** nothing built for A/B/C yet; waiting for Jason's choice. The current default page is #99 (black ice, aerial).
+
+---
+
+## 七、冰面应该是什么状态：黑冰还是积雪？（2026-10-16 晚，Jason："雪堆不正常吧 冰钓一般不会选雪很厚的地方 理想的是黑冰？"）
+
+查到的东西：
+
+- **清澈的黑冰 / 蓝冰最结实、最安全**；"白冰"（雪或雪泥冻成的）只有一半的强度；雪会给冰保温、让冰长得慢、盖住薄弱处。
+  冰钓安全指南一律按清冰给厚度表。（WindRider "Black ice vs white ice vs snow ice"；NJ Fish & Wildlife 冰钓安全；Boreal River
+  "6 fundamentals of ice assessment"；Outdoor Canada。）
+- **雪厚的地方意味着雪泥（slush）和白冰**，向导和钓手都躲着走：明尼苏达 Otter Tail 一位向导描述那种年份是"雪 / 雪泥 / 水 / 9–11 英寸冰"
+  的 20 英寸稀汤，车都上不去（ottertaillakescountry.com）；Bemidji 的报告说"多数湖都有雪泥问题"。
+- **温尼伯湖**（我们核心买家 P1 的湖）：大风把雪刮得又薄又匀，三月冰厚接近三英尺；雪泥只在压力脊附近雪堆起来的地方出现
+  （Penticton Herald 转载 "Slush pockets catching Lake Winnipeg riders off guard"）。小的、有林子挡风的湖才会积深雪。
+- **"初冰 / 黑冰季"**（12 月头上）是冰钓最好的窗口：10–15 cm 清冰，能走路、能透过冰看见鱼，雪还没来。
+
+结论：Jason 的直觉对。大湖上典型的冰钓场景是**黑冰 + 被风刮薄的雪**——雪只是一层薄薄的、顺风的雪尘和几厘米高的小雪垄，
+不是雪丘。真正的厚雪 = 雪泥 = 没人去的地方。
+
+三个选项：
+
+1. **温尼伯湖式黑冰（推荐，已按这个做了预设）**：冰 0.5 m 厚（一月），冰面是打磨过的黑冰，雪只有 1–3 cm 的雪尘和顺风的
+   笔触、几厘米高的小雪垄，洞周围一圈刮净的冰。雪有真实的厚度和起伏（顶面受光、背风面发蓝、低角度有轮廓），但不是雪堆。
+2. **初冰季**：12 月初的 10–15 cm 清冰，几乎没有雪，只有霜。更纯粹、更透，但冰层切面会变成一条细线，声呐杆底座和冰钻的
+   "厚冰"语境弱一些。
+3. **林间小湖的深雪**（之前那版）：一月的 20–30 cm 积雪和雪丘。真实存在，但正是钓手避开的状态，而且把水下盖住。
+
+技术上 1 和 2 只差参数（雪的深度与覆盖率、冰的厚度），切换成本很低。
