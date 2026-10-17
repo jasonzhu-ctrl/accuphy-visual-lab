@@ -97,3 +97,7 @@
 .ph-tile.is-off { cursor: default; }
 .ph-tile.is-off:active img { transform: none; }
 .ph-toast { position: absolute; left: 50%; bottom: 20cqh; transform: translateX(-50%); padding: 2cqh 4cqh; border-radius: 999px; font-size: 3.8cqh; font-weight: 600; white-space: nowrap; pointer-events: none; transition: opacity .3s; }
+/* the ⋯ menu inside the phone display */
+.ph-menu { pointer-events: auto; }
+/* iOS: repeated taps on the live controls and tiles must not trigger double-tap zoom (phone review, 2026-10-16) */
+.ph-live, .ph-tile, .ph-ctl, .ac-btn { touch-action: manipulation; }

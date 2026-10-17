@@ -3,6 +3,7 @@
 // container-query units of the display, so it scales with the phone frame.
 // The app's buttons are display-only here: dimmed like a disabled iOS control (values stay bright) and a tap
 // opens the sign-up gate (onLocked) — Jason 2026-09-24. The depth axis runs on AUTO.
+import { useState } from 'react'
 import { FT } from '../2026-09-23-sonar-beam/devices'
 
 const num = 'font-brand-body tabular-nums'
@@ -37,7 +38,11 @@ function LiveCtl({ onPress, disabled, children, label, style }) {
   )
 }
 
-export default function SonarChrome({ layout, deviceId, mode, rangeFt, depthFt, imperial, gain, depthRef, onLocked, autoDepth = true, autoRange = false, onRange, onHome, phone = false, waterTempC = 21.8 }) {
+export default function SonarChrome({ layout, deviceId, mode, rangeFt, depthFt, imperial, gain, depthRef, onLocked, autoDepth = true, autoRange = false, onRange, onHome, phone = false, waterTempC = 21.8, app }) {
+  // `app` (phones, Jason 2026-10-16: 这些控制都做在手机上 … 模拟真实的 Accuphy Sonar app 里面的功能): the app's own controls are
+  // live — gain −/+ (1 % a tap), pause, the depth-range −/+ (manual steps, AUTO off) and the ⋯ menu's image settings
+  // (contrast, noise reject, colour map — docs/app-chrome.md §3). Without `app` they stay display-only (desktop).
+  const [menu, setMenu] = useState(false)
   // water temperature readout: comes from the page (summer lake 21.8 °C; under ice about +1…+4 °C — the ice chat asked
   // for this on 2026-10-16: −1.2 °C is physically impossible for liquid water)
   const tempLabel = `${waterTempC.toFixed(1)} °C`
@@ -109,12 +114,12 @@ export default function SonarChrome({ layout, deviceId, mode, rangeFt, depthFt, 
       {/* depth-range control on the right edge (PL Forward only) */}
       {showDepthRange && (
         <div style={{ position: 'absolute', right: '5.5%', top: '50%', transform: 'translateY(-50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: cq(2) }}>
-          <LockedCtl onLocked={onLocked}><Ring>−</Ring></LockedCtl>
+          {app ? <LiveCtl label="Depth range shallower" onPress={() => app.onDepth(-1)}><Ring>−</Ring></LiveCtl> : <LockedCtl onLocked={onLocked}><Ring>−</Ring></LockedCtl>}
           <span style={{ textAlign: 'center', lineHeight: 1.05 }}>
             {autoDepth && <span className={num} style={{ display: 'block', fontSize: cq(2.6), fontWeight: 700, letterSpacing: '0.12em', color: '#7fcfff' }}>AUTO</span>}
             <span className={num} style={{ fontSize: cq(4.6), fontWeight: 500 }}>{depthLabel}</span>
           </span>
-          <LockedCtl onLocked={onLocked}><Ring>+</Ring></LockedCtl>
+          {app ? <LiveCtl label="Depth range deeper" onPress={() => app.onDepth(1)}><Ring>+</Ring></LiveCtl> : <LockedCtl onLocked={onLocked}><Ring>+</Ring></LockedCtl>}
         </div>
       )}
 
@@ -134,13 +139,69 @@ export default function SonarChrome({ layout, deviceId, mode, rangeFt, depthFt, 
             {onRange ? <LiveCtl label="Range longer" disabled={autoRange} onPress={() => onRange(1)}><Ring>+</Ring></LiveCtl> : <LockedCtl onLocked={onLocked}><Ring>+</Ring></LockedCtl>}
           </div>
         )}
-        <LockedCtl onLocked={onLocked} style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}><Ring style={{ width: cq(9), height: cq(9), gap: cq(0.9) }}><i style={{ display: 'block', width: cq(0.9), height: cq(3.6), background: '#fff', borderRadius: cq(0.3) }} /><i style={{ display: 'block', width: cq(0.9), height: cq(3.6), background: '#fff', borderRadius: cq(0.3) }} /></Ring></LockedCtl>
+        {(() => { const glyph = app && app.paused
+          ? <i style={{ display: 'block', width: 0, height: 0, marginLeft: cq(0.8), borderTop: `${cq(2)} solid transparent`, borderBottom: `${cq(2)} solid transparent`, borderLeft: `${cq(3.4)} solid #fff` }} />
+          : <><i style={{ display: 'block', width: cq(0.9), height: cq(3.6), background: '#fff', borderRadius: cq(0.3) }} /><i style={{ display: 'block', width: cq(0.9), height: cq(3.6), background: '#fff', borderRadius: cq(0.3) }} /></>
+          const ring = <Ring style={{ width: cq(9), height: cq(9), gap: cq(0.9) }}>{glyph}</Ring>
+          const st = { position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }
+          return app ? <LiveCtl label={app.paused ? 'Resume' : 'Pause'} onPress={app.onPause} style={st}>{ring}</LiveCtl> : <LockedCtl onLocked={onLocked} style={st}>{ring}</LockedCtl> })()}
         {!split && (
           <div style={{ position: 'absolute', left: phone ? '77%' : '75%', top: '50%', transform: 'translate(-50%, -50%)', display: 'flex', alignItems: 'center', gap: gapPM }}>
-            <LockedCtl onLocked={onLocked}><Ring>−</Ring></LockedCtl><span className={num} style={{ fontSize: cq(4.8), fontWeight: 500 }}>{Math.round(gain * 100)}%</span><LockedCtl onLocked={onLocked}><Ring>+</Ring></LockedCtl>
+            {app ? <LiveCtl label="Gain lower" onPress={() => app.onGain(-1)}><Ring>−</Ring></LiveCtl> : <LockedCtl onLocked={onLocked}><Ring>−</Ring></LockedCtl>}<span className={num} style={{ fontSize: cq(4.8), fontWeight: 500 }}>{Math.round(gain * 100)}%</span>{app ? <LiveCtl label="Gain higher" onPress={() => app.onGain(1)}><Ring>+</Ring></LiveCtl> : <LockedCtl onLocked={onLocked}><Ring>+</Ring></LockedCtl>}
           </div>
         )}
-        <LockedCtl onLocked={onLocked} style={{ position: 'absolute', right: '2.5%', top: '50%', transform: 'translateY(-50%)', fontSize: cq(7), lineHeight: 0.6, letterSpacing: '-0.05em' }}>•••</LockedCtl>
+        {app ? <LiveCtl label="Menu" onPress={() => setMenu((v) => !v)} style={{ position: 'absolute', right: '2.5%', top: '50%', transform: 'translateY(-50%)', fontSize: cq(7), lineHeight: 0.6, letterSpacing: '-0.05em' }}>•••</LiveCtl> : <LockedCtl onLocked={onLocked} style={{ position: 'absolute', right: '2.5%', top: '50%', transform: 'translateY(-50%)', fontSize: cq(7), lineHeight: 0.6, letterSpacing: '-0.05em' }}>•••</LockedCtl>}
+      </div>
+      {app && menu && <AppMenu app={app} onClose={() => setMenu(false)} />}
+    </div>
+  )
+}
+
+// The ⋯ menu's image-settings tab, as a right-hand panel like the app (docs/app-chrome.md §3): Contrast, Noise Reject and TVG
+// rows with − / + and a value, then Color Map ▸ with the list. Only the image tab is live; the other two tabs are decorative.
+const MAP_LABELS = { garmin_amber: 'orange', accuphy_red: 'red', HSV_Rainbow: 'rainbow', MPL_Inferno: 'inferno', Moreland_Black_Body: 'black body', MyCarta_Linear_L_Rainbow: 'linear rainbow', Parula: 'parula', amber: 'amber', coolwarm: 'coolwarm', freeze: 'freeze', gist_heat: 'heat', ice: 'ice', jet: 'classic' }
+function AppMenu({ app, onClose }) {
+  const [maps, setMaps] = useState(false)
+  const R = ({ label, value, onStep }) => (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '2.2cqh 0', borderBottom: '0.3cqh solid #262626' }}>
+      <span style={{ fontSize: '4.2cqh' }}>{label}</span>
+      <span style={{ display: 'flex', alignItems: 'center', gap: '3cqh' }}>
+        {onStep ? <LiveCtl label={`${label} lower`} onPress={() => onStep(-1)}><RingS>−</RingS></LiveCtl> : null}
+        <span className={num} style={{ fontSize: '4.2cqh', minWidth: '9cqh', textAlign: 'center', opacity: onStep ? 1 : 0.5 }}>{value}</span>
+        {onStep ? <LiveCtl label={`${label} higher`} onPress={() => onStep(1)}><RingS>+</RingS></LiveCtl> : null}
+      </span>
+    </div>
+  )
+  const RingS = ({ children }) => (
+    <svg viewBox="0 0 24 24" style={{ width: '7cqh', height: '7cqh', display: 'block' }} aria-hidden="true"><circle cx="12" cy="12" r="10.6" fill="none" stroke="#fff" strokeWidth="2" /><path d={children === '+' ? 'M7 12h10M12 7v10' : 'M7 12h10'} stroke="#fff" strokeWidth="2.4" strokeLinecap="round" /></svg>
+  )
+  return (
+    <div className="ph-menu" role="dialog" aria-label="Image settings" onPointerDown={(e) => e.stopPropagation()}
+      style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: '52%', display: 'flex', background: 'rgba(14,14,14,0.96)', color: '#fff', fontFamily: 'var(--font-body, "Instrument Sans", system-ui, sans-serif)', boxShadow: '-2cqh 0 6cqh rgba(0,0,0,0.5)' }}>
+      <div style={{ flex: '0 0 11cqh', background: '#1a1a1a', display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: '2cqh', gap: '4cqh', fontSize: '5cqh' }}>
+        <span style={{ color: '#2f8fff' }}>☰</span><span style={{ opacity: 0.55 }}>⚙</span><span style={{ opacity: 0.55 }}>⟲</span>
+      </div>
+      <div style={{ flex: 1, minWidth: 0, overflowY: 'auto', padding: '2cqh 4cqh' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1cqh' }}>
+          <span style={{ fontSize: '4.6cqh', fontWeight: 600 }}>Image settings</span>
+          <LiveCtl label="Close menu" onPress={onClose}><span style={{ fontSize: '6cqh', lineHeight: 1 }}>×</span></LiveCtl>
+        </div>
+        {!maps ? (<>
+          <R label="Contrast" value={`${Math.round(app.contrast * 100)}%`} onStep={app.onContrast} />
+          <R label="Noise Reject" value={`${Math.round(app.noise * 100)}%`} onStep={app.onNoise} />
+          <R label="TVG" value="25%" />
+          <LiveCtl label="Color Map" onPress={() => setMaps(true)} style={{ width: '100%' }}>
+            <span style={{ display: 'flex', width: '100%', justifyContent: 'space-between', padding: '2.2cqh 0', fontSize: '4.2cqh' }}><span>Color Map</span><span style={{ opacity: 0.7 }}>{MAP_LABELS[app.colormap] || app.colormap} ▸</span></span>
+          </LiveCtl>
+          <div style={{ fontSize: '3.6cqh', opacity: 0.45, paddingTop: '1.5cqh' }}>Image Stabilization Off ▸ · Interference Rejection Off ▸ · Fishing Mode Static ▸</div>
+        </>) : (<>
+          <LiveCtl label="Back to image settings" onPress={() => setMaps(false)}><span style={{ fontSize: '4cqh', opacity: 0.8 }}>‹ Color Map</span></LiveCtl>
+          {app.colormaps.map((m) => (
+            <LiveCtl key={m} label={MAP_LABELS[m] || m} onPress={() => { app.onColormap(m); setMaps(false) }} style={{ width: '100%' }}>
+              <span style={{ display: 'flex', width: '100%', justifyContent: 'space-between', padding: '1.8cqh 0', fontSize: '4.2cqh', color: m === app.colormap ? '#2f8fff' : '#fff' }}><span>{MAP_LABELS[m] || m}</span>{m === app.colormap && <span>✓</span>}</span>
+            </LiveCtl>
+          ))}
+        </>)}
       </div>
     </div>
   )

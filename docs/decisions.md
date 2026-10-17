@@ -1772,3 +1772,18 @@ Numbered log. Newest at the bottom.
        zoom 1.06 / dy 1.90; 375×667 zoom 1.17; 430×932 zoom 1.05). The camera still eases toward the solved target, so
        hole-hopping keeps its smooth follow. Tooling: headless GPU screenshots (Playwright 1.63 browsers already on
        this Mac, `playwright-core` in the session scratchpad) now give pixel-exact desktop, phone and WebKit shots.
+
+114. **2026-10-17** — **Phones: every control is the real app's own control** (Jason: "这些控制我想都做在手机上控制的那一头
+    模拟真实的 accuphy sonar app 里面的功能 我记得你以前是用过看过的"). The Lab's View and device capsules are gone on phones;
+    the phone's chrome does everything, modelled on `docs/app-chrome.md`:
+    - Home (↶) picks device + view (#107, #110); range −/+ (#78); **gain −/+ live, 1 % a tap**; **pause/resume** (freezes the
+      lake and the picture, the ring shows ▶ while paused); **depth-range −/+ on PL Forward live** (the app's steps, AUTO goes
+      off on the first tap); **⋯ opens the image-settings panel** like the app's right-hand menu (three tabs down the left,
+      image tab live): Contrast −/+ (5 %), Noise Reject −/+ (5 %), TVG (display 25 %), Color Map ▸ list of the 13 maps with
+      app-style names (orange = garmin_amber, classic = jet …), × closes. Desktop keeps its panel; its app buttons stay
+      display-only.
+    - `SonarChrome` takes an `app` object (`index.jsx` builds it on phones only); `AppMenu` lives in SonarChrome.jsx.
+    - `touch-action: manipulation` on the live controls, tiles and buttons (no iOS double-tap zoom on repeated taps —
+      the one phone-review finding that survived before the review was cut off by the session limit).
+    - Checked at 390×844: no capsules; gain 57→59 %, depth 70→80 ft manual, pause/resume, menu: contrast 40→45 %, noise
+      30→25 %, map → classic; no console errors; build passes.

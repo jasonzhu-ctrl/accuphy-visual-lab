@@ -201,6 +201,13 @@ export default function SonarLake3D({ scene: sceneProp }) {
   const fmt = (ft) => (imperial ? `${Math.round(ft)} ft` : `${(ft * FT).toFixed(1)} m`)
   // phones: the range is changed with the app's own −/+ on the phone screen (Jason 2026-10-03), in steps
   const RANGE_STEPS_FT = [20, 30, 40, 50, 60, 70, 80, 100, 120, 150, 180, 200, 240]
+  const [paused, setPaused] = useState(false)
+  const stepDepth = (dir) => { // the app's depth-range −/+ : manual steps, AUTO off
+    const steps = (imperial ? DEPTH_STEPS_FT : DEPTH_STEPS_M.map((m) => m / FT)).filter((v) => v <= device.maxDepthFt + 0.01)
+    const i = dir > 0 ? steps.findIndex((v) => v > depthFt + 0.5) : steps.findLastIndex((v) => v < depthFt - 0.5)
+    if (i >= 0) { setAutoDepth(false); setDepthFt(steps[i]) }
+  }
+  const appCtl = phone && !ICE ? { paused, onPause: () => setPaused((v) => !v), onGain: (d) => setGain((g) => Math.min(1, Math.max(0.3, +(g + d * 0.01).toFixed(2)))), onDepth: stepDepth, contrast, noise, colormap, colormaps: COLORMAP_NAMES, onContrast: (d) => setContrast((v) => Math.min(1, Math.max(0, +(v + d * 0.05).toFixed(2)))), onNoise: (d) => setNoise((v) => Math.min(1, Math.max(0, +(v + d * 0.05).toFixed(2)))), onColormap: setColormap } : undefined
   const stepRange = (dir) => {
     const steps = RANGE_STEPS_FT.filter((v) => v <= maxFt)
     const i = dir > 0 ? steps.findIndex((v) => v > rangeFt + 0.5) : steps.findLastIndex((v) => v < rangeFt - 0.5)
@@ -228,7 +235,7 @@ export default function SonarLake3D({ scene: sceneProp }) {
     <>
     <main inert={gate} aria-hidden={gate || undefined} className="font-brand fixed inset-0 select-none overflow-hidden bg-[#9cc1cf] text-white" style={ICE ? { background: iceParams().T.bg } : undefined} onPointerMove={onMove}>
       <div className="absolute inset-0 touch-none">
-        <LakeScene state={state} sonarRect={sonarRect} paused={gate} scene={scene} />
+        <LakeScene state={state} sonarRect={sonarRect} paused={gate || paused} scene={scene} />
       </div>
 
       {/* ---- control panel — Apple-style frosted glass over the lake (Jason 2026-09-24) ---- */}
@@ -307,7 +314,7 @@ export default function SonarLake3D({ scene: sceneProp }) {
           <div className="ph-band" style={{ ...ring('1.35%'), borderRadius: '6.6% / 13.8%', boxShadow: '16px 26px 44px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.45), inset 0 0 0 2px rgba(0,0,0,0.12)' }} />
           <div style={{ ...ring('1.25%'), inset: '1.35%', borderRadius: '6.1% / 12.7%', background: '#040404' }} />
           <div ref={(el) => { sonarRect.current.el = el }} style={{ position: 'absolute', inset: '2.6%', borderRadius: '5.4% / 11.3%', containerType: 'size', overflow: 'hidden' }}>
-            <SonarChrome layout={layout} deviceId={deviceId} mode={mode} rangeFt={effRangeFt} depthFt={depthFt} imperial={imperial} gain={gain} autoDepth={autoDepth} autoRange={downLike} onRange={phone ? stepRange : undefined} onHome={phone && !ICE ? () => setHome(true) : undefined} phone={phone} waterTempC={ICE ? 1.6 : 21.8} onLocked={onLocked} depthRef={(el) => { state.current.depthEl = el }} />
+            <SonarChrome layout={layout} deviceId={deviceId} mode={mode} rangeFt={effRangeFt} depthFt={depthFt} imperial={imperial} gain={gain} autoDepth={autoDepth} autoRange={downLike} onRange={phone ? stepRange : undefined} onHome={phone && !ICE ? () => setHome(true) : undefined} phone={phone} waterTempC={ICE ? 1.6 : 21.8} app={appCtl} onLocked={onLocked} depthRef={(el) => { state.current.depthEl = el }} />
             {phone && home && <AppHome devices={SHOWN_DEVICES} deviceId={started ? deviceId : null} mode={started ? mode : null} onPick={(d, m) => { setDeviceId(d); setMode(m); setHome(false); setStarted(true) }} />}
             <div className="ph-glass" />
           </div>
@@ -319,7 +326,7 @@ export default function SonarLake3D({ scene: sceneProp }) {
           <div style={{ position: 'absolute', left: '4.1%', top: '50%', width: '2.4%', height: '20%', transform: 'translateY(-50%)', borderRadius: 999, background: '#000', boxShadow: '0 0 0 1px #0a0a0a' }} />
         </div>
         {/* phones: the View capsule sits on the phone frame's top edge (Jason 2026-10-03) — the big panel is gone */}
-        {phone && started && (
+        {false && phone && started && (
           <div ref={(el) => { sonarRect.current.dock = el }} className="pointer-events-auto absolute bottom-full left-1/2 mb-2 -translate-x-1/2">
             <div className="ac-seg ac-seg-lg">{modes.map((m) => <button key={m} className={`ac-btn ${mode === m ? 'is-active' : ''}`} onClick={() => setMode(m)}>{MODE_LABELS[m].replace(' View', '')}</button>)}</div>
           </div>
@@ -331,7 +338,7 @@ export default function SonarLake3D({ scene: sceneProp }) {
       </div>
 
       {/* ---- phones: device switch, top right (the panel is hidden there) ---- */}
-      {phone && !ONLY && started && (
+      {false && phone && !ONLY && started && (
         <div className="pointer-events-auto absolute right-3 top-4">
           <div className="ac-seg">{Object.values(DEVICES).map((d) => <button key={d.id} className={`ac-btn ${deviceId === d.id ? 'is-active' : ''}`} onClick={() => setDeviceId(d.id)}>{d.name}</button>)}</div>
         </div>
