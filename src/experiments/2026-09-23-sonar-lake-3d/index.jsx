@@ -127,8 +127,14 @@ export default function SonarLake3D({ scene: sceneProp }) {
   const layout = useMemo(() => screenLayout(deviceId, mode, effRangeFt * FT, 2.08, specs, depthFt * FT), [deviceId, mode, effRangeFt, depthFt, specs]) // display aspect = phone frame aspect
 
   const b0 = (/boat=(-?[\d.]+),(-?[\d.]+)/.exec(window.location.search) || []).slice(1).map(Number) // dev: ?boat=x,z
+  // Phones open on the standing-timber flat (18 ft; bass, walleye and pike 8–15 m ahead), so the 50 m-wide phone view
+  // shows structure and fish at once (Jason 2026-10-16: 手机版本这块地方没什么结构和鱼 … 只是改手机). Desktop keeps
+  // (-6, 4) and the ice scene keeps its own start; ?boat= overrides all of them.
+  const PHONE_START = [16, 11]
+  const START = b0.length === 2 ? b0 : ICE ? ICE_START : phone ? PHONE_START : [-6, 4]
   const state = useRef({
-    boat: { x: b0[0] ?? (ICE ? ICE_START[0] : -6), z: b0[1] ?? (ICE ? ICE_START[1] : 4) }, target: { x: b0[0] ?? (ICE ? ICE_START[0] : -6), z: b0[1] ?? (ICE ? ICE_START[1] : 4) }, apex: new THREE.Vector3(), dragging: false,
+    boat: { x: START[0], z: START[1] }, target: { x: START[0], z: START[1] }, apex: new THREE.Vector3(), dragging: false,
+    frameX: phone && !ICE && b0.length !== 2 ? PHONE_START[0] + 14 : undefined, // phones: boat left, timber and beam right
     parallax: { x: 0, y: 0 }, specs, specKey,
     closeCam: window.location.search.includes('cam=boat'), wreckCam: /cam=wreck/.test(window.location.search), logoCam: /cam=logo/.test(window.location.search),
     fishCam: (/cam=fish:(\w+)/.exec(window.location.search) || [])[1],

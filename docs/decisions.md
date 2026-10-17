@@ -1628,3 +1628,12 @@ Numbered log. Newest at the bottom.
        band, the slab and the cone with the lit bottom in the band above the app frame; the desktop camera is unchanged.
      - Checked at desktop and 375×812; no console errors. Noted: on phones the lockup still shows faintly through the
        ice band's lower part (a steeper angle); the shelter sits at the right edge there.
+
+104. **2026-10-16** — **Phones open on the standing-timber flat** (Jason: "手机版本这块地方没什么结构和鱼怎么办", then
+    "只是改手机"). The 50 m-wide phone view around the old start (−6, 4; 35 ft of open water) showed no structure, and
+    the Forward picture was a bare bottom line, although ~90 fish live within 25 m of either spot. On phones the boat
+    now starts at (16, 11), the 18 ft flat with standing timber and bass, walleye and pike 8–15 m ahead (the same spot
+    as guide step 2), and the view is framed with the boat left and the timber right (`frameX` 30). Desktop keeps
+    (−6, 4); the ice scene keeps its own start; `?boat=` still overrides. The lake itself is untouched.
+    Checked: 390×844 boat (16, 11), trunks and fish on the sonar, hint on screen, no console errors; 1440×900 start
+    unchanged; the build passes. Public pages not yet rebuilt.
