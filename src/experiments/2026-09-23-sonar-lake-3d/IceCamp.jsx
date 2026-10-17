@@ -9,7 +9,7 @@ import { useEffect, useMemo, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { setHoles } from './iceSheet'
-import { makeHoleKit, makeShelter, makeSled, makeAimRing, MINI_H, CABLE_TOP_Y, KIT_SCALE } from './iceProps'
+import { makeHoleKit, makeShelter, makeSled, makeAimRing, KIT_SCALE } from './iceProps'
 import { makeSnowfall } from './snow'
 import { makeSkyDome } from './iceSky'
 import { ICE_T, MINI_DROP, APEX_Y, HOLE_DRAW_R, MAX_HOLES, ICE_CAMP, CUT_R, ISLAND_R, SECTION_CAM, WIND, col, dir } from './iceScene'
@@ -62,7 +62,7 @@ export function IceCamp({ state, beamMats, iceMat, T }) {
   const shelter = useMemo(makeShelter, [])
   const sled = useMemo(makeSled, [])
   const aim = useMemo(makeAimRing, [])
-  const parts = useMemo(() => ({ mini: kit.getObjectByName('mini'), cable: kit.getObjectByName('cable'), auger: kit.getObjectByName('auger'), park: kit.getObjectByName('auger').position.clone(), lean: kit.getObjectByName('auger').rotation.z }), [kit])
+  const parts = useMemo(() => ({ rig: kit.getObjectByName('rig'), head: kit.getObjectByName('head'), auger: kit.getObjectByName('auger'), park: kit.getObjectByName('auger').position.clone(), lean: kit.getObjectByName('auger').rotation.z }), [kit])
   const s0 = state.current
   // the camp: shelter and sled a few metres from the first hole, the door toward it
   const campAt = (hx, hz, dx, dz) => {
@@ -82,7 +82,6 @@ export function IceCamp({ state, beamMats, iceMat, T }) {
     u.uLamp.value.set(camp.lamp.x, camp.lamp.y, camp.lamp.z, T.lamp)
     u.uLampColor.value.set('#ffb060')
   }, [iceMat, camp, T, state])
-  const cableLen = ICE_T + MINI_DROP - MINI_H + CABLE_TOP_Y
   const glowRef = useRef()
   useFrame((_, dt) => {
     const s = state.current
@@ -121,9 +120,10 @@ export function IceCamp({ state, beamMats, iceMat, T }) {
       auger.rotation.y += dt * 22
     } else { auger.position.copy(park); auger.rotation.z = parts.lean }
     kit.position.set(s.boat.x, 0, s.boat.z)
-    parts.mini.position.y = APEX_Y + lift
-    parts.cable.position.y = parts.mini.position.y + MINI_H
-    parts.cable.scale.y = Math.max(0.05, cableLen - lift)
+    parts.rig.position.y = lift // the whole pole rig comes out of the hole and goes back in
+    // the head turns with the view: the Mini's face forward for Forward and Combo, down for Down, Live Ice and Ice Fishing
+    const headT = s.mode === 'forward' || s.mode === 'combo' ? 0 : -Math.PI / 2
+    parts.head.rotation.z += (headT - parts.head.rotation.z) * Math.min(1, dt * 4)
     s.noSignal = d.phase !== 'idle'
     s.apex.set(s.boat.x, APEX_Y, s.boat.z)
     setBeamUniforms(beamMats, s.specs, s.apex)

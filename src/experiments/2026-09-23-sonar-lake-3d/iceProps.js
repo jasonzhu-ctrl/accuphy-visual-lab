@@ -52,32 +52,58 @@ export function makeMini() {
   return g // origin = the pointed bottom (the beam apex), face toward +z
 }
 
+// ---------- the pole rig: base, pole, handle, head with the Mini, cable, router bag ----------
+export const POLE_TOP = 1.25 * KIT_SCALE   // the handle's height above the ice
+export function makePoleRig() {
+  const k = KIT_SCALE
+  const rig = new THREE.Group(); rig.name = 'rig'
+  const headY = -(ICE_T + MINI_DROP) + MINI_H // the pole's foot: the head bracket; the Mini hangs MINI_H below it (its tip = the beam apex)
+  // three-leg base: a sleeve hub over the hole, legs splayed to rubber feet
+  const hubY = 0.42 * k
+  const legs = []
+  for (let i = 0; i < 3; i++) {
+    const a = Math.PI / 2 + (i * 2 * Math.PI) / 3, fx = Math.cos(a) * 0.42 * k, fz = Math.sin(a) * 0.42 * k
+    const len = Math.hypot(0.42 * k, hubY - 0.02 * k)
+    const leg = new THREE.CylinderGeometry(0.011 * k, 0.013 * k, len, 8)
+    const dir = new THREE.Vector3(fx, 0.02 * k - hubY, fz).normalize()
+    leg.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir))
+    leg.translate(fx / 2, (hubY + 0.02 * k) / 2, fz / 2)
+    legs.push(leg, new THREE.CylinderGeometry(0.03 * k, 0.035 * k, 0.03 * k, 10).translate(fx, 0.015 * k, fz))
+  }
+  rig.add(mesh(merge(legs), M.black))
+  rig.add(mesh(merge([cyl(0.034 * k, 0.034 * k, 0.14 * k, 0, hubY, 0, 12), new THREE.TorusGeometry(0.04 * k, 0.012 * k, 8, 20).rotateX(Math.PI / 2).translate(0, hubY + 0.08 * k, 0)]), M.dark)) // the hub sleeve and the depth collar the pole rests on
+  // the pole: from the head up through the hub to the handle
+  const poleLen = POLE_TOP - headY
+  rig.add(mesh(cyl(0.016 * k, 0.016 * k, poleLen, 0, headY + poleLen / 2, 0, 10), M.metal))
+  // the handle: a bent cane at the top with a grip, a small arrow cap shows where the beam points
+  const cane = new THREE.TorusGeometry(0.09 * k, 0.016 * k, 8, 16, Math.PI / 2).rotateY(Math.PI / 2).rotateZ(Math.PI).translate(0.09 * k, POLE_TOP, 0)
+  rig.add(mesh(merge([cane, cyl(0.016 * k, 0.016 * k, 0.2 * k, 0.19 * k, POLE_TOP + 0.09 * k, 0, 8).rotateZ(Math.PI / 2).translate(0, 0, 0)]), M.metal))
+  rig.add(mesh(cyl(0.022 * k, 0.022 * k, 0.12 * k, 0, 0, 0, 10).rotateZ(Math.PI / 2).translate(0.24 * k, POLE_TOP + 0.09 * k, 0), M.blue)) // the grip, brand blue
+  rig.add(mesh(new THREE.ConeGeometry(0.03 * k, 0.05 * k, 3).rotateZ(-Math.PI / 2).translate(0.05 * k, POLE_TOP + 0.01 * k, 0), M.face)) // the arrow: forward = +x
+  // the head: a bracket at the foot of the pole; the Mini hangs from it and pivots with the view (IceCamp.jsx)
+  const head = new THREE.Group(); head.name = 'head'; head.position.set(0, headY, 0)
+  head.add(mesh(merge([rbox(0.06 * k, 0.07 * k, 0.04 * k, 0.008 * k, 0, 0.01 * k, 0), box(0.05 * k, 0.012 * k, 0.03 * k, 0.03 * k, -0.02 * k, 0)]), M.black))
+  const mini = makeMini(); mini.name = 'mini'
+  mini.rotation.y = Math.PI / 2 // the face toward +x: Forward
+  mini.position.set(0.02 * k, -MINI_H, 0)
+  head.add(mini)
+  rig.add(head)
+  // the cable: up the pole, over the handle, down in a sag to the router bag on the ice
+  const up = new THREE.CatmullRomCurve3([new THREE.Vector3(0.02 * k, headY + 0.02 * k, 0.025 * k), new THREE.Vector3(0.02 * k, hubY, 0.028 * k), new THREE.Vector3(0.02 * k, POLE_TOP - 0.05 * k, 0.03 * k), new THREE.Vector3(0.14 * k, POLE_TOP - 0.2 * k, 0.12 * k), new THREE.Vector3(0.36 * k, 0.35 * k, 0.32 * k), new THREE.Vector3(0.48 * k, 0.14 * k, 0.46 * k)])
+  rig.add(mesh(new THREE.TubeGeometry(up, 40, 0.006 * k, 6, false), M.cable))
+  rig.add(mesh(rbox(0.3 * k, 0.17 * k, 0.2 * k, 0.03 * k, 0.5 * k, 0.085 * k, 0.5 * k), new THREE.MeshStandardMaterial({ color: '#2b2f34', roughness: 0.95 }))) // the router + battery bag
+  return rig
+}
+
 // ---------- what sits at the live hole ----------
 export function makeHoleKit() {
   const k = KIT_SCALE
   const g = new THREE.Group()
-  // the Mini, hanging in the hole; its cable runs up through the hole to the arm
-  const mini = makeMini()
-  mini.position.set(0, -(ICE_T + MINI_DROP), 0)
-  mini.name = 'mini'
-  g.add(mini)
-  const cableLen = ICE_T + MINI_DROP - MINI_H + CABLE_TOP_Y
-  const cable = mesh(new THREE.CylinderGeometry(0.007 * k, 0.007 * k, 1, 6).translate(0, 0.5, 0), M.cable) // unit length, scaled in y
-  cable.position.set(-0.125 * MINI_SCALE * 0.32, -(ICE_T + MINI_DROP) + MINI_H, 0)
-  cable.scale.y = cableLen
-  cable.name = 'cable'
-  g.add(cable)
-  // the hole's wall: half a metre of pale ice, seen inside the hole — the sheet's thickness in one glance (#99)
-  const wall = new THREE.Mesh(new THREE.CylinderGeometry(HOLE_DRAW_R * 0.98, HOLE_DRAW_R * 0.98, ICE_T, 32, 1, true).translate(0, -ICE_T / 2, 0),
-    new THREE.MeshStandardMaterial({ color: '#dbe9f4', emissive: '#9cc0d8', emissiveIntensity: 0.35, roughness: 0.6, side: THREE.BackSide }))
-  g.add(wall)
-  const rim = new THREE.Mesh(new THREE.RingGeometry(HOLE_DRAW_R * 0.98, HOLE_DRAW_R * 1.12, 32).rotateX(-Math.PI / 2).translate(0, 0.006, 0),
-    new THREE.MeshStandardMaterial({ color: '#eef6fb', emissive: '#b9d3e4', emissiveIntensity: 0.3, roughness: 0.8 }))
-  g.add(rim)
-  // transducer arm: a short post beside the hole with a horizontal arm over it
-  const ax = -(HOLE_DRAW_R + 0.1 * k)
-  const arm = merge([cyl(0.014 * k, 0.016 * k, CABLE_TOP_Y, ax, CABLE_TOP_Y / 2, 0, 8), box(-ax + 0.03 * k, 0.02 * k, 0.03 * k, ax / 2 - 0.02 * k, CABLE_TOP_Y, 0), box(0.12 * k, 0.015 * k, 0.12 * k, ax, 0.008 * k, 0)])
-  g.add(mesh(arm, M.black))
+  // the sonar pole (Jason 2026-10-16: 声呐pole … 固定在杆子下方的头上): like the ice pole mounts sold for live sonar
+  // (Garmin's Panoptix ice pole mount, Patriot IceFix 360, Accuphy's own 0° mount), the Mini is clamped to a head at the
+  // bottom of a rigid pole; the pole stands in a three-leg base over the hole and turns by a handle at the top; the
+  // cable runs up the pole and down to the router bag on the ice. The whole rig lifts out when the visitor hole-hops.
+  g.add(makePoleRig())
   // the bucket (the classic seat), behind and to the side of the hole
   const bx = -0.55 * k, bz = 0.42 * k
   const bucket = merge([cyl(0.15 * k, 0.13 * k, 0.38 * k, bx, 0.19 * k, bz, 14), cyl(0.155 * k, 0.155 * k, 0.025 * k, bx, 0.385 * k, bz, 14)])

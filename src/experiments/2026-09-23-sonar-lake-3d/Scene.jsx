@@ -482,6 +482,11 @@ function Rig({ state, sonarRect, fogMats, cam = LAKE_CAM }) {
       camera.lookAt(s.boat.x + 1, -0.6, s.boat.z)
       return
     }
+    if (import.meta.env.DEV && s.rigCam) { // dev aid ?rigcam — the hole kit up close (the pole rig, the auger, the bucket)
+      camera.up.set(0, 1, 0); camera.position.set(s.boat.x - 2.6, 2.0, s.boat.z + 4.2); camera.lookAt(s.boat.x + 0.2, 0.1, s.boat.z)
+      if (camera.fov !== 38) { camera.fov = 38; camera.updateProjectionMatrix() }
+      return
+    }
     // the ice page's other two cameras (docs/ice-relationship-study.md A and B): offsets from the live hole, smooth follow
     if (s.view === 'under' || s.view === 'section') {
       const C = s.view === 'under' ? UNDER_CAM : (k > 1 ? SECTION_CAM_PHONE : SECTION_CAM) // k > 1: the portrait-phone layout

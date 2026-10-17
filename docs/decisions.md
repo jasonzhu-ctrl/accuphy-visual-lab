@@ -1640,3 +1640,21 @@ Numbered log. Newest at the bottom.
     Same day, Jason: "我想正好把 Accuphy lab 露出来" — the opening view cut the ACCUPHY LAB lockup (x −1…31 at
     z −52). `frameX` moved from 30 to 15: the lockup is fully in view, the boat sits left of centre, the timber
     and the Forward beam stay on the right. Checked at 390×844, no console errors, build passes.
+
+104. **2026-10-16** — **The Mini sits on a sonar pole, not on a dangling cable** (Jason: "声呐pole的使用方式你了解一下 他是固定
+     在杆子下方的头上的").
+     - **How an ice sonar pole works** (Garmin's Panoptix ice pole mount, Patriot IceFix 360, Summit / Brew City poles,
+       Accuphy's own 0° Mount, sold as compatible with PingLive and PingLive Mini): the transducer is clamped to a head
+       (a 0° bracket) at the bottom of a rigid pole; the pole stands in a three-leg base with a sleeve hub over the hole,
+       a collar sets how deep the head sits, a handle at the top turns the pole to aim the beam, an arrow on the handle
+       shows where it points; the cable runs up the pole to the shuttle or bag. Live sonar on ice is used exactly this
+       way; nobody hangs the puck on its cable.
+     - **Built** (`iceProps.js makePoleRig`): the three-leg base with rubber feet, the hub sleeve and depth collar, the
+       pole (handle 1.25 m × kit scale above the ice), a cane handle with a brand-blue grip and the direction arrow, the
+       head bracket at the foot with the Mini hanging from it, the cable up the pole and in a sag down to a router bag on
+       the ice. The Mini is back at the fishes' display scale (×2.6, it had been pushed to ×3.8 to be seen on the cable),
+       the hole drawn ×3.0.
+     - **The head turns with the view** (`IceCamp.jsx`): the Mini's face forward for Forward and Combo, down for Down,
+       Live Ice and Ice Fishing, with a short ease — as the angler would turn the 0° bracket.
+     - **Hole-hopping lifts the whole rig** out of the hole and sets it down over the new one.
+     - Dev aid: `?rigcam` looks at the hole kit from 4 m.

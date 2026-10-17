@@ -139,6 +139,7 @@ export default function SonarLake3D({ scene: sceneProp }) {
     closeCam: window.location.search.includes('cam=boat'), wreckCam: /cam=wreck/.test(window.location.search), logoCam: /cam=logo/.test(window.location.search),
     fishCam: (/cam=fish:(\w+)/.exec(window.location.search) || [])[1],
     fishCamIndex: +((/cam=fish:\w+:(\d+)/.exec(window.location.search) || [])[1] || 0),
+    rigCam: import.meta.env.DEV && /rigcam/.test(window.location.search), // ice: the hole kit up close
   })
   state.current.specs = specs
   state.current.specKey = specKey
