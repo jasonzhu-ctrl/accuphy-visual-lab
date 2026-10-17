@@ -20,6 +20,7 @@ the Mini page; `VITE_SCENE=ice` for the ice page — private preview only, not o
 
 | Date | Page | Built from (Lab commit) | Public repo commit | What changed |
 |---|---|---|---|---|
+| 2026-10-16 | Ice (private preview) | 3a194ff (#108–#109) | — | Black ice with thin snow confirmed, a spruce shore with cabin lights on the horizon, contact shadows under the props |
 | 2026-10-16 | Ice (private preview) | af95159 (#106) | — | Real snow relief, the shelter lamp mirrored in the ice, thin wind-swept snow on black ice (research §七) |
 | 2026-10-16 | Ice (private preview) | 2eee2df (#105) | — | The Mini on a sonar pole rig (tripod base, pole, handle, head that turns with the view) instead of a hanging cable |
 | 2026-10-16 | Ice (private preview) | dc10a55 (#94–#103) | — | First preview of the ice-fishing page: the lake frozen, the Mini in an auger hole, section camera, hole-hopping, Live Ice / Ice Fishing views. Not public |
