@@ -23,6 +23,7 @@ export function makeIceMaterial(terrain) {
     uHighlight: { value: new THREE.Color('#7fe6ff') },
     uGlow: { value: new THREE.Color('#e08a5e') }, uGlowDir: { value: new THREE.Vector3(-0.8, 0, -0.45).normalize() }, // the afterglow, mirrored in the ice
     uClip: { value: new THREE.Vector2(0, 0) }, // section view: x = on, y = world z of the cut wall
+    uCenter: { value: new THREE.Vector2(0, 0) }, // where the near (displaced) sheet is centred
     // the cutaway: pool centre, its radius, the island's radius, and up to two beam boxes (xMin, xMax, zHalf, on) from the centre
     uCutOn: { value: 1 }, uCutC: { value: new THREE.Vector2(1e4, 1e4) }, uCutR: { value: 5.5 }, uIsland: { value: 1.9 },
     uCutBox: { value: [new THREE.Vector4(0, 0, 0, 0), new THREE.Vector4(0, 0, 0, 0)] },
@@ -39,8 +40,47 @@ export function makeIceMaterial(terrain) {
   const mat = new THREE.ShaderMaterial({
     uniforms, transparent: true, depthWrite: false, side: THREE.DoubleSide,
     vertexShader: /* glsl */ `
+      attribute float aDisp;
+      uniform vec2 uWind; uniform float uCover; uniform vec2 uCutC; uniform vec2 uCenter;
       varying vec3 vWorld;
-      void main() { vec4 wp = modelMatrix * vec4(position, 1.0); vWorld = wp.xyz; gl_Position = projectionMatrix * viewMatrix * wp; }
+      float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+      float vnoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
+        return mix(mix(hash(i), hash(i + vec2(1, 0)), f.x), mix(hash(i + vec2(0, 1)), hash(i + vec2(1, 1)), f.x), f.y); }
+      float fbm3(vec2 p) { return 0.5 * vnoise(p) + 0.25 * vnoise(p * 2.1 + 1.3) + 0.125 * vnoise(p * 4.3 + 2.7); }
+      float fbm4(vec2 p) { return fbm3(p) + 0.0625 * vnoise(p * 8.9 + 5.1); }
+      // The snow on the ice, as a mask and as a depth (metres). Shared by the vertex stage (which raises the sheet by it)
+      // and the fragment stage (which shades it with the real slopes). x = the opaque core, y = the thin dusting round it,
+      // z = the blown-snow strokes along the wind; open clears a soft stretch round the hole (the angler set up on bare ice).
+      vec3 snowParts(vec2 P) {
+        vec2 Pw = vec2(dot(P, uWind), dot(P, vec2(-uWind.y, uWind.x)));
+        float big = fbm4(P * 0.035 + 3.0), sast = fbm3(vec2(Pw.x * 0.07, Pw.y * 0.6) + 7.0);
+        float h = 0.82 * (0.55 * big + 0.45 * sast) + 0.18 * fbm3(P * 0.8 + 1.7);
+        float thr = mix(0.62, 0.30, uCover);
+        float hh = h + 0.02 * (vnoise(P * 2.3 + 9.0) - 0.5);
+        float core = smoothstep(thr - 0.012, thr + 0.012, hh);
+        float skirt = smoothstep(thr - 0.09, thr - 0.005, hh);
+        float streakN = fbm3(vec2(Pw.x * 0.05, Pw.y * 0.7) + 2.0);
+        float streaks = smoothstep(0.645, 0.665, streakN + 0.03 * (vnoise(P * 3.0) - 0.5));
+        float open = 1.0 - smoothstep(9.0, 16.0, distance(P, uCutC) + 3.0 * (fbm3(P * 0.11 + 5.0) - 0.5));
+        return vec3(core, skirt, streaks) * (1.0 - 0.9 * open);
+      }
+      // how thick the snow lies: the drifts' cores up to ~25 cm, the dusting a few cm, the strokes in between, with a
+      // fine wind-rippled crust; nothing within the scooped ring round the live hole
+      float snowDepth(vec2 P, vec3 sp) {
+        float hole = 1.0 - smoothstep(2.4, 3.4, distance(P, uCutC));
+        // a wind-swept big lake (Lake Winnipeg: strong winds keep the snow thin and even): low drifts of a few cm, a
+        // dusting, strokes — not dunes. Deep snow means slush and white ice, which ice anglers avoid (decision #106)
+        float d = sp.x * (0.06 + 0.03 * fbm3(P * 0.9 + 4.0)) + sp.y * 0.01 + sp.z * 0.025;
+        d += (fbm3(P * 2.6 + 1.0) - 0.5) * 0.012 * max(max(sp.x, sp.y), sp.z);
+        return max(d, 0.0) * (1.0 - hole);
+      }
+      void main() {
+        vec4 wp = modelMatrix * vec4(position, 1.0);
+        // real relief (#106): the near sheet (aDisp = 1, 0.5 m mesh) rises by the snow's depth, fading to flat at its edge
+        float fade = aDisp * (1.0 - smoothstep(100.0, 116.0, distance(wp.xz, uCenter)));
+        if (fade > 0.001) wp.y += snowDepth(wp.xz, snowParts(wp.xz)) * fade;
+        vWorld = wp.xyz; gl_Position = projectionMatrix * viewMatrix * wp;
+      }
     `,
     fragmentShader: /* glsl */ `
       precision highp float;
@@ -54,7 +94,7 @@ export function makeIceMaterial(terrain) {
       uniform vec4 uHoles[MAXH]; uniform int uHoleCount; uniform float uBeamOn;
       uniform vec4 uLamp; uniform vec3 uLampColor;
       uniform sampler2D uTerrain; uniform float uTerrainHalf; uniform vec2 uWind; uniform vec3 uHighlight; uniform vec3 uGlow; uniform vec3 uGlowDir; uniform vec2 uClip;
-      uniform float uCutOn; uniform vec2 uCutC; uniform float uCutR; uniform float uIsland; uniform vec4 uCutBox[MB];
+      uniform float uCutOn; uniform vec2 uCutC; uniform float uCutR; uniform float uIsland; uniform vec4 uCutBox[MB]; uniform vec2 uCenter;
       uniform int uBeamCount;
       uniform vec3 uApex[MB]; uniform vec3 uC[MB]; uniform vec3 uH[MB]; uniform vec3 uN[MB];
       uniform vec4 uAng[MB]; uniform vec2 uRT[MB]; uniform vec4 uBox[MB];
@@ -142,6 +182,32 @@ export function makeIceMaterial(terrain) {
         for (int k = 0; k < MB; k++) { vec4 b = uCutBox[k]; if (b.w > 0.5) d = min(d, sdBox(q - vec2((b.x + b.y) * 0.5, 0.0), vec2((b.y - b.x) * 0.5, b.z), 1.2)); }
         return max(d, uIsland - length(q));
       }
+      // The snow on the ice, as a mask and as a depth (metres). Shared by the vertex stage (which raises the sheet by it)
+      // and the fragment stage (which shades it with the real slopes). x = the opaque core, y = the thin dusting round it,
+      // z = the blown-snow strokes along the wind; open clears a soft stretch round the hole (the angler set up on bare ice).
+      vec3 snowParts(vec2 P) {
+        vec2 Pw = vec2(dot(P, uWind), dot(P, vec2(-uWind.y, uWind.x)));
+        float big = fbm4(P * 0.035 + 3.0), sast = fbm3(vec2(Pw.x * 0.07, Pw.y * 0.6) + 7.0);
+        float h = 0.82 * (0.55 * big + 0.45 * sast) + 0.18 * fbm3(P * 0.8 + 1.7);
+        float thr = mix(0.62, 0.30, uCover);
+        float hh = h + 0.02 * (vnoise(P * 2.3 + 9.0) - 0.5);
+        float core = smoothstep(thr - 0.012, thr + 0.012, hh);
+        float skirt = smoothstep(thr - 0.09, thr - 0.005, hh);
+        float streakN = fbm3(vec2(Pw.x * 0.05, Pw.y * 0.7) + 2.0);
+        float streaks = smoothstep(0.645, 0.665, streakN + 0.03 * (vnoise(P * 3.0) - 0.5));
+        float open = 1.0 - smoothstep(9.0, 16.0, distance(P, uCutC) + 3.0 * (fbm3(P * 0.11 + 5.0) - 0.5));
+        return vec3(core, skirt, streaks) * (1.0 - 0.9 * open);
+      }
+      // how thick the snow lies: the drifts' cores up to ~25 cm, the dusting a few cm, the strokes in between, with a
+      // fine wind-rippled crust; nothing within the scooped ring round the live hole
+      float snowDepth(vec2 P, vec3 sp) {
+        float hole = 1.0 - smoothstep(2.4, 3.4, distance(P, uCutC));
+        // a wind-swept big lake (Lake Winnipeg: strong winds keep the snow thin and even): low drifts of a few cm, a
+        // dusting, strokes — not dunes. Deep snow means slush and white ice, which ice anglers avoid (decision #106)
+        float d = sp.x * (0.06 + 0.03 * fbm3(P * 0.9 + 4.0)) + sp.y * 0.01 + sp.z * 0.025;
+        d += (fbm3(P * 2.6 + 1.0) - 0.5) * 0.012 * max(max(sp.x, sp.y), sp.z);
+        return max(d, 0.0) * (1.0 - hole);
+      }
       // drift height 0..1: long dunes and sastrugi ridges along the wind (the fine crust is added for the mask only)
       float drift(vec2 P) {
         vec2 Pw = vec2(dot(P, uWind), dot(P, vec2(-uWind.y, uWind.x)));
@@ -198,27 +264,21 @@ export function makeIceMaterial(terrain) {
         float open = 1.0 - smoothstep(9.0, 16.0, openD + 3.0 * (fbm3(P * 0.11 + 5.0) - 0.5));
         float keep = (1.0 - 0.5 * win) * (1.0 - 0.9 * open); // what is left of the snow / milky plates
         float edge = clamp(wide - beam, 0.0, 1.0) * uWindow * uBeamOn;
-        // ---- snow over the ice ----
-        float h0 = drift(P);
-        float e = 0.6;
-        float hx = drift(P + vec2(e, 0.0)), hz = drift(P + vec2(0.0, e));
-        vec3 N = normalize(vec3(-(hx - h0) * 3.2, e * 0.9, -(hz - h0) * 3.2)); // soft, sculpted drifts
-        float h = 0.82 * h0 + 0.18 * fbm3(P * 0.8 + 1.7);
-        float thr = mix(0.62, 0.30, uCover); // drift heights sit mostly in 0.35–0.6: cover 0.78 leaves scoured patches in the troughs only
+        // ---- snow over the ice: the mask, the depth and the real slopes (#106) ----
+        vec3 sp = snowParts(P);
+        float sd = snowDepth(P, sp);
+        float e = 0.35;
+        float sdx = snowDepth(P + vec2(e, 0.0), snowParts(P + vec2(e, 0.0))), sdz = snowDepth(P + vec2(0.0, e), snowParts(P + vec2(0.0, e)));
+        vec3 Nsnow = normalize(vec3(-(sdx - sd), e, -(sdz - sd)));
         vec2 Pw = vec2(dot(P, uWind), dot(P, vec2(-uWind.y, uWind.x)));
-        float streakN = fbm3(vec2(Pw.x * 0.05, Pw.y * 0.7) + 2.0); // brush strokes of blown snow, long along the wind
-        float streaks = smoothstep(0.645, 0.665, streakN + 0.03 * (vnoise(P * 3.0) - 0.5)); // crisp strokes with a feathered edge
-        // Seen from 40 m up (Jason 2026-10-16: 实际的是远景), blown snow is the pattern you read on black ice: broad patches
-        // and long strokes with an opaque core and a thin dusting that feathers out round it
-        float hh = h + 0.02 * (vnoise(P * 2.3 + 9.0) - 0.5);
-        float snowCore = smoothstep(thr - 0.012, thr + 0.012, hh);
-        float snowSkirt = smoothstep(thr - 0.09, thr - 0.005, hh);
-        float snow = max(max(snowCore, 0.4 * snowSkirt), streaks) * (1.0 - clear) * keep;
+        float streaks = sp.z;
+        float snow = max(max(sp.x, 0.4 * sp.y), sp.z) * (1.0 - clear) * keep;
+        vec3 N = normalize(mix(vec3(0.0, 1.0, 0.0), Nsnow, smoothstep(0.0, 0.3, snow)));
         float lamb = max(dot(N, uSun), 0.0);
         vec3 sky = mix(uSkyHorizon, uSkyZenith, 0.45);
         vec3 snowAlb = vec3(0.93, 0.95, 0.98);
         vec3 litSnow = snowAlb * (sky * uAmbient * (0.7 + 0.3 * N.y) * 1.35 + uSunColor * uSunI * lamb + 0.03);
-        litSnow *= mix(vec3(0.84, 0.9, 1.0), vec3(1.0), smoothstep(0.25, 0.7, h)); // the troughs go blue
+        litSnow *= mix(vec3(0.84, 0.9, 1.0), vec3(1.0), smoothstep(0.02, 0.16, sd)); // the thin edges go blue, the ridges white
         float cell = hash(floor(P * 26.0));
         float glint = step(0.986, cell) * (0.5 + 0.5 * sin(uTime * 3.0 + cell * 60.0)) * lamb * uSunI; // facets catching the sun
         litSnow += uSunColor * glint * 1.2;
@@ -250,13 +310,16 @@ export function makeIceMaterial(terrain) {
         vec3 whiteLit = vec3(0.86, 0.92, 1.0) * (sky * uAmbient * 1.6 + uSunColor * uSunI * 0.5 + 0.1);
         vec3 milkyLit = vec3(0.62, 0.7, 0.8) * (sky * uAmbient * 1.5 + uSunColor * uSunI * 0.45 + 0.06) * (0.85 + 0.3 * polish);
         // the water below is what gives black ice its black; the sky is laid over it by Fresnel
-        vec3 iceCol = vec3(0.004, 0.012, 0.02) + reflSky * F * 1.5 * (0.8 + 0.4 * polish) + uSunColor * specSun * 0.6;
+        vec3 Lv = uLamp.xyz - vWorld; float dlm = max(length(Lv), 0.1); vec3 Hl = normalize(Lv / dlm + V);
+        float lampF = uLamp.w / (1.0 + dlm * dlm * 0.015);
+        float specL = (pow(max(dot(Nn, Hl), 0.0), 320.0) * 3.0 + pow(max(dot(Nn, Hl), 0.0), 24.0) * 0.12) * lampF; // the lit door, mirrored in the ice (#106)
+        vec3 iceCol = vec3(0.004, 0.012, 0.02) + reflSky * F * 1.5 * (0.8 + 0.4 * polish) + uSunColor * specSun * 0.6 + uLampColor * specL;
         iceCol = mix(iceCol, milkyLit, milky * 0.7);
         iceCol += whiteLit * halo * 0.5;
         iceCol = mix(iceCol, whiteLit, white);
         // toward the horizon the sheet closes up: the sky's mirror wins over what lies under it (#103)
         float graze = pow(1.0 - cosT, 2.0);
-        float iceAlpha = clamp(mix(0.5, 0.26, uClear) + F * 1.4 + graze * 0.55 + milky * 0.6 + white * 0.7 + halo * 0.3, 0.0, 1.0);
+        float iceAlpha = clamp(mix(0.5, 0.26, uClear) + F * 1.4 + graze * 0.55 + milky * 0.6 + white * 0.7 + halo * 0.3 + specL * 0.5, 0.0, 1.0);
         // ---- put it together ----
         vec3 col = mix(iceCol, litSnow * (1.0 + 0.15 * streaks), snow);
         float alpha = mix(iceAlpha, 1.0, snow);

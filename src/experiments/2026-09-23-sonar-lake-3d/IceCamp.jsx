@@ -33,12 +33,39 @@ export function IceSky({ T }) {
   return <primitive object={dome} onUpdate={(o) => o.layers.set(SONAR_HIDE_LAYER)} />
 }
 
-export function IceSheet({ mat }) {
-  useFrame(({ clock }) => { mat.userData.uniforms.uTime.value = clock.elapsedTime })
+// The sheet is two meshes (#106): a near square, 240 m at 0.5 m, whose vertices rise by the snow's depth (real drifts, with
+// silhouettes and shading at a low camera), following the hole in 2 m steps; and a far flat plane with a square hole for
+// it. The shader's noise lives in world space, so the near mesh can move without the snow moving.
+const NEAR = 240
+export function IceSheet({ mat, state }) {
+  const near = useMemo(() => {
+    const g = new THREE.PlaneGeometry(NEAR, NEAR, 480, 480); g.rotateX(-Math.PI / 2)
+    g.setAttribute('aDisp', new THREE.BufferAttribute(new Float32Array(g.attributes.position.count).fill(1), 1))
+    return g
+  }, [])
+  const far = useMemo(() => {
+    const sh = new THREE.Shape(); sh.moveTo(-450, -450); sh.lineTo(450, -450); sh.lineTo(450, 450); sh.lineTo(-450, 450); sh.closePath()
+    const hole = new THREE.Path(); const h = NEAR / 2 - 0.05; hole.moveTo(-h, -h); hole.lineTo(-h, h); hole.lineTo(h, h); hole.lineTo(h, -h); hole.closePath()
+    sh.holes.push(hole)
+    const g = new THREE.ShapeGeometry(sh); g.rotateX(-Math.PI / 2)
+    g.setAttribute('aDisp', new THREE.BufferAttribute(new Float32Array(g.attributes.position.count), 1))
+    return g
+  }, [])
+  const nearRef = useRef(), farRef = useRef()
+  useFrame(({ clock }) => {
+    const u = mat.userData.uniforms
+    u.uTime.value = clock.elapsedTime
+    const s = state.current
+    const cx = Math.round(s.boat.x / 2) * 2, cz = Math.round(s.boat.z / 2) * 2
+    u.uCenter.value.set(cx, cz)
+    if (nearRef.current) nearRef.current.position.set(cx, 0, cz)
+    if (farRef.current) farRef.current.position.set(cx, -0.002, cz)
+  })
   return (
-    <mesh rotation-x={-Math.PI / 2} material={mat} renderOrder={1} onUpdate={(o) => o.layers.set(SONAR_HIDE_LAYER)}>
-      <planeGeometry args={[900, 900]} />
-    </mesh>
+    <group onUpdate={(g) => g.traverse((o) => o.layers.set(SONAR_HIDE_LAYER))}>
+      <mesh ref={nearRef} geometry={near} material={mat} renderOrder={1} frustumCulled={false} />
+      <mesh ref={farRef} geometry={far} material={mat} renderOrder={1} frustumCulled={false} />
+    </group>
   )
 }
 

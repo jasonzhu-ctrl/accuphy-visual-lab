@@ -1675,3 +1675,25 @@ Numbered log. Newest at the bottom.
       Home closes after a pick, the page scrolls; production and share builds pass.
     - **Open for Jason:** should phones open ON the Home page (pick a view first, like the real app) or, as now, open
       straight on the sonar view with Home behind the ↶ button?
+
+106. **2026-10-16** — **The ice surface, rebuilt for a professional look: real snow relief, the lamp mirrored in the ice,
+     and the right amount of snow** (Jason: "效果要有大厂专业的感觉 现在既然画面关系变了我感觉冰面可以再逼真一点", then
+     "雪堆不正常吧 冰钓一般不会选雪很厚的地方 理想的是黑冰？你调研一下再propose").
+     - **Research** (`docs/ice-relationship-study.md` §七): clear black ice is the strongest and safest; snow insulates
+       the ice, hides weak spots and makes slush and white ice, which guides and anglers avoid; on Lake Winnipeg (the
+       core buyer's lake) strong winds keep the snow thin and even, slush only where it piles up at pressure ridges;
+       deep snow belongs to small sheltered lakes; the first-ice black-ice window in early December is the prime time.
+       Jason's instinct was right: the real surface is black ice with wind-thinned snow, not drifts.
+     - **Snow relief** (`iceSheet.js`, `IceCamp.jsx IceSheet`): the sheet is now two meshes — a 240 m square at 0.5 m
+       that follows the hole and is raised by the snow's depth in the vertex stage, and a far flat plane with a hole for
+       it; the noise is in world space, so the near mesh moves without the snow moving. The snow mask and depth are one
+       GLSL function shared by both stages; the fragment shades the snow with the true slopes (lit faces toward the sun,
+       lee faces blue), so at the section camera's low angle the dustings and low drifts have edges and shadow instead
+       of being decals. Depths: drift cores 6–9 cm, dusting 1 cm, strokes 2–3 cm, a 1 cm wind crust; nothing in the
+       scooped ring round the hole; cover 0.2. The deeper drifts of the first attempt (25 cm) are gone with the research.
+     - **The lamp in the ice:** the shelter's lit door is mirrored in the black ice — a tight glint plus a broad warm
+       sheen toward the camera, like a lamp in a wet street — and raises the sheet's opacity where it shines.
+     - **Options left for Jason** (§七): 1 Lake-Winnipeg black ice with thin snow (built, recommended); 2 first-ice
+       season, 10–15 cm clear ice and no snow at all; 3 the deep-snow small lake (not recommended). 1 and 2 differ only
+       in parameters.
+     - Also this evening: decision numbers clashed with the phone chat (both #104); the pole rig became #105.

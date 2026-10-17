@@ -590,7 +590,7 @@ export default function LakeScene({ state, sonarRect, paused = false, scene = 'l
       {import.meta.env.DEV && /fishtest/.test(window.location.search) && <TestPiling mat={mats.inst} />}
       <Fish mat={mats.fish} state={state} />
       {ice ? (<>
-        <IceSheet mat={iceMat} />
+        <IceSheet mat={iceMat} state={state} />
         <IceCamp state={state} beamMats={beamMats} iceMat={iceMat} T={P.T} />
         {P.L.cut > 0 && <IceWalls state={state} iceMat={iceMat} />}
         <LightShaft state={state} />
