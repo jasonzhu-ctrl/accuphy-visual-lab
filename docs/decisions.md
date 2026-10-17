@@ -1751,3 +1751,11 @@ Numbered log. Newest at the bottom.
      - Same night, Jason: "还是看不见" — phones now aim the ice line at 26 % of the band and keep the bottom inside 80 %
        (was 30 % / 86 %), so the lit bottom sits about a third of the band above the View capsule (f0a502b). Still to
        confirm on his own phone (he may have reopened the first .html file instead of the updated preview).
+
+112. **2026-10-16** — **Fix: the Home-first gate is tied to the current layout, not only to the first pick.**
+    Found while snapshotting the sonar for the realism review: a page that MOUNTS narrow (phone → Home first, `started`
+    false) and then becomes wide (a phone rotated to landscape, a resized window, a browser pane that grows) switched to
+    the desktop layout, where there is no Home page to pick from, but `started` stayed false — so `state.specs` stayed
+    empty and the sonar picture was black for good. `index.jsx` now gates on `live = started || !phone`: desktop width
+    always runs; the phone keeps "pick a view first". Verified: a 1440×900 tab that had mounted narrow renders the fans
+    again (specs 1, uFanCount 1). The build passes.

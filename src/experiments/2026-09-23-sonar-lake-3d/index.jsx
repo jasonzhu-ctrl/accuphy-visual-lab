@@ -129,8 +129,12 @@ export default function SonarLake3D({ scene: sceneProp }) {
     if (deviceId === 'PLM' && mode === 'forward' && sp[0]) { const R = rangeFt * FT, D = depthFt * FT; sp[0] = { ...sp[0], R: Math.hypot(R, D) * 1.001, box: { xMin: -0.25 * R, xMax: R, yMax: D } } }
     return sp
   }, [device, deviceId, mode, effRangeFt, depthFt])
-  const liveSpecs = started ? specs : [] // before the first pick on a phone: no fans at all
-  const specKey = `${deviceId}-${mode}-${effRangeFt}-${started ? 1 : 0}`
+  // Before the first pick on a phone there are no fans at all. The gate is tied to the CURRENT layout, not only to the
+  // `started` flag: if the page mounted narrow (Home first) and then became wide (phone rotated to landscape, a resized
+  // window, or a browser pane that grew), desktop has no Home page to pick from, so it must run as started.
+  const live = started || !phone
+  const liveSpecs = live ? specs : []
+  const specKey = `${deviceId}-${mode}-${effRangeFt}-${live ? 1 : 0}`
   const layout = useMemo(() => screenLayout(deviceId, mode, effRangeFt * FT, 2.08, specs, depthFt * FT), [deviceId, mode, effRangeFt, depthFt, specs]) // display aspect = phone frame aspect
 
   const b0 = (/boat=(-?[\d.]+),(-?[\d.]+)/.exec(window.location.search) || []).slice(1).map(Number) // dev: ?boat=x,z
