@@ -1787,3 +1787,15 @@ Numbered log. Newest at the bottom.
       the one phone-review finding that survived before the review was cut off by the session limit).
     - Checked at 390×844: no capsules; gain 57→59 %, depth 70→80 ft manual, pause/resume, menu: contrast 40→45 %, noise
       30→25 %, map → classic; no console errors; build passes.
+
+115. **2026-10-17** — **Ice: one signal gate for everything the sonar lights** (ice polish round, Jason: "你继续优化").
+     - Hole-hopping showed cause and effect apart: the cone and lit bottom kept shining and slid with the kit while the
+       Mini hung in the air, the destination lit before the auger broke through, the readout kept counting, and the
+       screen snapped back in one frame.
+     - Now one scalar `s.signal` (0..1), set in IceCamp from the geometry (transducer below the ice's underside, ±5 cm
+       hysteresis; falls at 10/s, recovers at 3/s), drives the lit footprint (`uBeamGain`), the ice window and hole glow
+       (`uBeamOn`), the cyan light, the wedge opacities, the phone's echo (`uSignal`), fish marks (from 0.6) and the
+       depth readout ('-- ft' below 0.5). `s.noSignal` stays the hop state machine's boolean.
+     - During a hop the phone reads "app on, no echo" (white dial ring, '-- ft', navy fan, a dark gap in the Ice Fishing
+       history) and comes back bottom first. Whether the real app does exactly this out of the water is unverified —
+       show Jason. Every new knob is 1 on the summer lake (regression shots: no change beyond run-to-run noise).

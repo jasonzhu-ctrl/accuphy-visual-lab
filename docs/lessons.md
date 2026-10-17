@@ -125,3 +125,10 @@ repeatable procedures are also project skills in `.claude/skills/` (`sonar-qa`, 
 | `window.__fish`, `window.__sonarState` | The population; the page state (boat, target, apex, depthM …) |
 | `scripts/dev/fish-sim.mjs`, `scripts/dev/layout-dump.mjs` | Node checks (run with `--import ./scripts/dev/node-register.mjs`) |
 | `scripts/build-share.mjs <outDir>` | Self-contained share build (Artifact file + `pages/` for GitHub Pages) |
+
+## Ice: noSignal is state, signal is the visual gate (2026-10-17)
+`s.noSignal` is the hop state machine's boolean; `s.signal` (0..1) is "is the transducer wet". Drive every visual from
+`s.signal`, never from `noSignal` or a private ease, or the cone, bottom and screen fall out of step (worst at phone fps).
+Gate with a multiplier uniform defaulting to 1, not by passing [] specs (that pops, and zeroes `uFanCount`, turning the
+fan black instead of "no echo"). In lakeMaterial scale `beam` and `edge` after the rim (`edge = wide - beam`). Beams
+remounts on specKey (AUTO range change mid-hop): find its materials by walking the group each frame.
