@@ -7,6 +7,47 @@ import * as THREE from 'three'
 import { MAX_BEAMS } from './lakeMaterial'
 import { MAX_HOLES, WIND } from './iceScene'
 
+// ---- GLSL shared with other ice shaders (the slab face in IceCamp.jsx imports these, so its snow cap and the sheet's
+//      snow cannot drift apart). Plain strings, no backticks inside. ----
+// value noise on a hashed lattice
+export const NOISE_GLSL = /* glsl */ `
+  float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+  float hashL(vec2 i) { return hash(i); }
+  float vnoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
+    return mix(mix(hashL(i), hashL(i + vec2(1, 0)), f.x), mix(hashL(i + vec2(0, 1)), hashL(i + vec2(1, 1)), f.x), f.y); }
+  float fbm3(vec2 p) { return 0.5 * vnoise(p) + 0.25 * vnoise(p * 2.1 + 1.3) + 0.125 * vnoise(p * 4.3 + 2.7); }
+  float fbm4(vec2 p) { return fbm3(p) + 0.0625 * vnoise(p * 8.9 + 5.1); }
+`
+// The snow on the ice (needs NOISE_GLSL first), as a mask and as a depth (metres). x = the opaque core, y = the thin
+// dusting round it, z = the blown-snow strokes along the wind; open clears a soft stretch round the hole cutC (the
+// angler set up on bare ice). wind = the unit wind direction, cover = how much the drifts bury (LOOKS).
+export const SNOW_GLSL = /* glsl */ `
+  vec3 iceSnowParts(vec2 P, vec2 wind, float cover, vec2 cutC) {
+    vec2 Pw = vec2(dot(P, wind), dot(P, vec2(-wind.y, wind.x)));
+    float big = fbm4(P * 0.035 + 3.0), sast = fbm3(vec2(Pw.x * 0.07, Pw.y * 0.6) + 7.0);
+    float h = 0.82 * (0.55 * big + 0.45 * sast) + 0.18 * fbm3(P * 0.8 + 1.7);
+    float thr = mix(0.62, 0.30, cover);
+    float hh = h + 0.02 * (vnoise(P * 2.3 + 9.0) - 0.5);
+    float core = smoothstep(thr - 0.012, thr + 0.012, hh);
+    float skirt = smoothstep(thr - 0.09, thr - 0.005, hh);
+    float streakN = fbm3(vec2(Pw.x * 0.05, Pw.y * 0.7) + 2.0);
+    float streaks = smoothstep(0.645, 0.665, streakN + 0.03 * (vnoise(P * 3.0) - 0.5));
+    float open = 1.0 - smoothstep(9.0, 16.0, distance(P, cutC) + 3.0 * (fbm3(P * 0.11 + 5.0) - 0.5));
+    return vec3(core, skirt, streaks) * (1.0 - 0.9 * open);
+  }
+  // how thick the snow lies: a wind-swept big lake (Lake Winnipeg: strong winds keep the snow thin and even) — low
+  // drifts of a few cm, a dusting, strokes, not dunes (decision #106), with a fine wind-rippled crust; nothing within
+  // the scooped ring round the live hole
+  float iceSnowDepth(vec2 P, vec3 sp, vec2 cutC) {
+    float hole = 1.0 - smoothstep(2.4, 3.4, distance(P, cutC));
+    float d = sp.x * (0.06 + 0.03 * fbm3(P * 0.9 + 4.0)) + sp.y * 0.01 + sp.z * 0.025;
+    d += (fbm3(P * 2.6 + 1.0) - 0.5) * 0.012 * max(max(sp.x, sp.y), sp.z);
+    return max(d, 0.0) * (1.0 - hole);
+  }
+  // the coverage the eye gets: the core, the dusting at 40 %, the strokes
+  float iceSnowMask(vec3 sp) { return max(max(sp.x, 0.4 * sp.y), sp.z); }
+`
+
 export function makeIceMaterial(terrain) {
   const uniforms = {
     uTime: { value: 0 },
@@ -43,37 +84,10 @@ export function makeIceMaterial(terrain) {
       attribute float aDisp;
       uniform vec2 uWind; uniform float uCover; uniform vec2 uCutC; uniform vec2 uCenter;
       varying vec3 vWorld;
-      float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
-      float vnoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
-        return mix(mix(hash(i), hash(i + vec2(1, 0)), f.x), mix(hash(i + vec2(0, 1)), hash(i + vec2(1, 1)), f.x), f.y); }
-      float fbm3(vec2 p) { return 0.5 * vnoise(p) + 0.25 * vnoise(p * 2.1 + 1.3) + 0.125 * vnoise(p * 4.3 + 2.7); }
-      float fbm4(vec2 p) { return fbm3(p) + 0.0625 * vnoise(p * 8.9 + 5.1); }
-      // The snow on the ice, as a mask and as a depth (metres). Shared by the vertex stage (which raises the sheet by it)
-      // and the fragment stage (which shades it with the real slopes). x = the opaque core, y = the thin dusting round it,
-      // z = the blown-snow strokes along the wind; open clears a soft stretch round the hole (the angler set up on bare ice).
-      vec3 snowParts(vec2 P) {
-        vec2 Pw = vec2(dot(P, uWind), dot(P, vec2(-uWind.y, uWind.x)));
-        float big = fbm4(P * 0.035 + 3.0), sast = fbm3(vec2(Pw.x * 0.07, Pw.y * 0.6) + 7.0);
-        float h = 0.82 * (0.55 * big + 0.45 * sast) + 0.18 * fbm3(P * 0.8 + 1.7);
-        float thr = mix(0.62, 0.30, uCover);
-        float hh = h + 0.02 * (vnoise(P * 2.3 + 9.0) - 0.5);
-        float core = smoothstep(thr - 0.012, thr + 0.012, hh);
-        float skirt = smoothstep(thr - 0.09, thr - 0.005, hh);
-        float streakN = fbm3(vec2(Pw.x * 0.05, Pw.y * 0.7) + 2.0);
-        float streaks = smoothstep(0.645, 0.665, streakN + 0.03 * (vnoise(P * 3.0) - 0.5));
-        float open = 1.0 - smoothstep(9.0, 16.0, distance(P, uCutC) + 3.0 * (fbm3(P * 0.11 + 5.0) - 0.5));
-        return vec3(core, skirt, streaks) * (1.0 - 0.9 * open);
-      }
-      // how thick the snow lies: the drifts' cores up to ~25 cm, the dusting a few cm, the strokes in between, with a
-      // fine wind-rippled crust; nothing within the scooped ring round the live hole
-      float snowDepth(vec2 P, vec3 sp) {
-        float hole = 1.0 - smoothstep(2.4, 3.4, distance(P, uCutC));
-        // a wind-swept big lake (Lake Winnipeg: strong winds keep the snow thin and even): low drifts of a few cm, a
-        // dusting, strokes — not dunes. Deep snow means slush and white ice, which ice anglers avoid (decision #106)
-        float d = sp.x * (0.06 + 0.03 * fbm3(P * 0.9 + 4.0)) + sp.y * 0.01 + sp.z * 0.025;
-        d += (fbm3(P * 2.6 + 1.0) - 0.5) * 0.012 * max(max(sp.x, sp.y), sp.z);
-        return max(d, 0.0) * (1.0 - hole);
-      }
+      ${NOISE_GLSL}
+      ${SNOW_GLSL}
+      vec3 snowParts(vec2 P) { return iceSnowParts(P, uWind, uCover, uCutC); }
+      float snowDepth(vec2 P, vec3 sp) { return iceSnowDepth(P, sp, uCutC); }
       void main() {
         vec4 wp = modelMatrix * vec4(position, 1.0);
         // real relief (#106): the near sheet (aDisp = 1, 0.5 m mesh) rises by the snow's depth, fading to flat at its edge
@@ -99,11 +113,8 @@ export function makeIceMaterial(terrain) {
       uniform vec3 uApex[MB]; uniform vec3 uC[MB]; uniform vec3 uH[MB]; uniform vec3 uN[MB];
       uniform vec4 uAng[MB]; uniform vec2 uRT[MB]; uniform vec4 uBox[MB];
 
-      float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
-      float vnoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
-        return mix(mix(hash(i), hash(i + vec2(1, 0)), f.x), mix(hash(i + vec2(0, 1)), hash(i + vec2(1, 1)), f.x), f.y); }
-      float fbm3(vec2 p) { return 0.5 * vnoise(p) + 0.25 * vnoise(p * 2.1 + 1.3) + 0.125 * vnoise(p * 4.3 + 2.7); }
-      float fbm4(vec2 p) { return fbm3(p) + 0.0625 * vnoise(p * 8.9 + 5.1); }
+      ${NOISE_GLSL}
+      ${SNOW_GLSL}
       // nearest two cell seeds: pressure cracks run along the cell borders
       vec2 voro(vec2 p) {
         vec2 i = floor(p), f = fract(p); float f1 = 8.0, f2 = 8.0;
@@ -182,39 +193,8 @@ export function makeIceMaterial(terrain) {
         for (int k = 0; k < MB; k++) { vec4 b = uCutBox[k]; if (b.w > 0.5) d = min(d, sdBox(q - vec2((b.x + b.y) * 0.5, 0.0), vec2((b.y - b.x) * 0.5, b.z), 1.2)); }
         return max(d, uIsland - length(q));
       }
-      // The snow on the ice, as a mask and as a depth (metres). Shared by the vertex stage (which raises the sheet by it)
-      // and the fragment stage (which shades it with the real slopes). x = the opaque core, y = the thin dusting round it,
-      // z = the blown-snow strokes along the wind; open clears a soft stretch round the hole (the angler set up on bare ice).
-      vec3 snowParts(vec2 P) {
-        vec2 Pw = vec2(dot(P, uWind), dot(P, vec2(-uWind.y, uWind.x)));
-        float big = fbm4(P * 0.035 + 3.0), sast = fbm3(vec2(Pw.x * 0.07, Pw.y * 0.6) + 7.0);
-        float h = 0.82 * (0.55 * big + 0.45 * sast) + 0.18 * fbm3(P * 0.8 + 1.7);
-        float thr = mix(0.62, 0.30, uCover);
-        float hh = h + 0.02 * (vnoise(P * 2.3 + 9.0) - 0.5);
-        float core = smoothstep(thr - 0.012, thr + 0.012, hh);
-        float skirt = smoothstep(thr - 0.09, thr - 0.005, hh);
-        float streakN = fbm3(vec2(Pw.x * 0.05, Pw.y * 0.7) + 2.0);
-        float streaks = smoothstep(0.645, 0.665, streakN + 0.03 * (vnoise(P * 3.0) - 0.5));
-        float open = 1.0 - smoothstep(9.0, 16.0, distance(P, uCutC) + 3.0 * (fbm3(P * 0.11 + 5.0) - 0.5));
-        return vec3(core, skirt, streaks) * (1.0 - 0.9 * open);
-      }
-      // how thick the snow lies: the drifts' cores up to ~25 cm, the dusting a few cm, the strokes in between, with a
-      // fine wind-rippled crust; nothing within the scooped ring round the live hole
-      float snowDepth(vec2 P, vec3 sp) {
-        float hole = 1.0 - smoothstep(2.4, 3.4, distance(P, uCutC));
-        // a wind-swept big lake (Lake Winnipeg: strong winds keep the snow thin and even): low drifts of a few cm, a
-        // dusting, strokes — not dunes. Deep snow means slush and white ice, which ice anglers avoid (decision #106)
-        float d = sp.x * (0.06 + 0.03 * fbm3(P * 0.9 + 4.0)) + sp.y * 0.01 + sp.z * 0.025;
-        d += (fbm3(P * 2.6 + 1.0) - 0.5) * 0.012 * max(max(sp.x, sp.y), sp.z);
-        return max(d, 0.0) * (1.0 - hole);
-      }
-      // drift height 0..1: long dunes and sastrugi ridges along the wind (the fine crust is added for the mask only)
-      float drift(vec2 P) {
-        vec2 Pw = vec2(dot(P, uWind), dot(P, vec2(-uWind.y, uWind.x)));
-        float big = fbm4(P * 0.035 + 3.0);
-        float sast = fbm3(vec2(Pw.x * 0.07, Pw.y * 0.6) + 7.0);
-        return 0.55 * big + 0.45 * sast; // the wind shapes the patches: elongated, with ridges along it
-      }
+      vec3 snowParts(vec2 P) { return iceSnowParts(P, uWind, uCover, uCutC); }
+      float snowDepth(vec2 P, vec3 sp) { return iceSnowDepth(P, sp, uCutC); }
       void main() {
         vec2 P = vWorld.xz;
         if (uClip.x > 0.5 && P.y > uClip.y) discard; // the section cut
@@ -267,12 +247,16 @@ export function makeIceMaterial(terrain) {
         // ---- snow over the ice: the mask, the depth and the real slopes (#106) ----
         vec3 sp = snowParts(P);
         float sd = snowDepth(P, sp);
-        float e = 0.35;
-        float sdx = snowDepth(P + vec2(e, 0.0), snowParts(P + vec2(e, 0.0))), sdz = snowDepth(P + vec2(0.0, e), snowParts(P + vec2(0.0, e)));
-        vec3 Nsnow = normalize(vec3(-(sdx - sd), e, -(sdz - sd)));
+        float snow = iceSnowMask(sp) * (1.0 - clear) * keep;
+        // the slopes only where there is snow: N = mix(up, Nsnow, smoothstep(0, 0.3, snow)) is exactly up without it
+        vec3 Nsnow = vec3(0.0, 1.0, 0.0);
+        if (snow > 0.0) {
+          float e = 0.35;
+          float sdx = snowDepth(P + vec2(e, 0.0), snowParts(P + vec2(e, 0.0))), sdz = snowDepth(P + vec2(0.0, e), snowParts(P + vec2(0.0, e)));
+          Nsnow = normalize(vec3(-(sdx - sd), e, -(sdz - sd)));
+        }
         vec2 Pw = vec2(dot(P, uWind), dot(P, vec2(-uWind.y, uWind.x)));
         float streaks = sp.z;
-        float snow = max(max(sp.x, 0.4 * sp.y), sp.z) * (1.0 - clear) * keep;
         vec3 N = normalize(mix(vec3(0.0, 1.0, 0.0), Nsnow, smoothstep(0.0, 0.3, snow)));
         float lamb = max(dot(N, uSun), 0.0);
         vec3 sky = mix(uSkyHorizon, uSkyZenith, 0.45);
