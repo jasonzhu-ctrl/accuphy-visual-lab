@@ -1736,3 +1736,15 @@ Numbered log. Newest at the bottom.
     - **Checked** at 390×844: Home at start, no beam, 3 frosted tiles, toast text, Live Forward starts the view with
       beam + capsules, ↶ returns to Home; 1440×900 unchanged (no Home, panel, locked ↶); production build passes; no
       console errors. Public pages not yet rebuilt.
+
+111. **2026-10-16** — **The section camera frames itself: the ice line and the lake bottom always fit** (Jason: "手机版水下的
+     画面会挡住 是不是应该拉远一点还是我担心多了" — he was right; the section showed only ~11 m of water, and the default hole is
+     11.5 m deep, so the lit bottom sat under the app frame on phones and would vanish at deeper holes).
+     - On phones the band above the app frame is centred in the camera (a view offset, as the top view does for the lake).
+     - Each frame the camera measures where the ice line at the hole and the bottom under it land in the band, then nudges
+       two things: the pitch (the look point rises or sinks) until the ice line sits a third down the band on phones (45 %
+       on desktop, where the sky and the camp matter), and the distance (1× to 2.6× along the line of sight) until the
+       bottom sits inside 86 % of the band. Both ease, so hole-hopping to deep water backs the camera off smoothly and
+       shallow water brings it in again.
+     - Checked at 375×812: the kit and the shelter in the top third, the slab, the cone with its lit bottom well above the
+       View capsule (zoom 1.25, pitch +2.6 m). Desktop behaviour at the default spot is unchanged.

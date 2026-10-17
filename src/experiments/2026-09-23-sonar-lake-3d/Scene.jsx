@@ -4,7 +4,7 @@ import * as THREE from 'three'
 import { mergeGeometries as _merge } from 'three/addons/utils/BufferGeometryUtils.js'
 // Extrude geometries are non-indexed, primitives are indexed — normalise first.
 const mergeGeometries = (parts) => _merge(parts.map((g) => (g.index ? g.toNonIndexed() : g)))
-import { HALF, SEG, bedY, fbm } from './terrain'
+import { HALF, SEG, bedY, fbm, depthAt } from './terrain'
 import { SPECIES, makePopulation, fishPose, stepBehaviours, forceRise, rnd, drawnLen } from './fish'
 import { makeLakeMaterial, setBeamUniforms } from './lakeMaterial'
 import { wedgeGeometry } from '../2026-09-23-beam-shapes-3d/wedge'
@@ -491,14 +491,43 @@ function Rig({ state, sonarRect, fogMats, cam = LAKE_CAM }) {
     if (s.view === 'under' || s.view === 'section') {
       const C = s.view === 'under' ? UNDER_CAM : (k > 1 ? SECTION_CAM_PHONE : SECTION_CAM) // k > 1: the portrait-phone layout
       const e = Math.min(1, dt * 2.5)
-      tmp.set(s.boat.x + C.pos[0] + px * 1.2, C.pos[1] + py * 0.6, s.boat.z + C.pos[2])
-      if (!s.camP) { s.camP = tmp.clone(); s.camL = new THREE.Vector3(s.boat.x + C.look[0], C.look[1], s.boat.z + C.look[2]) }
-      s.camP.lerp(tmp, e)
-      tmp.set(s.boat.x + C.look[0], C.look[1], s.boat.z + C.look[2]); s.camL.lerp(tmp, e)
-      camera.up.set(0, 1, 0); camera.position.copy(s.camP); camera.lookAt(s.camL)
-      if (camera.view?.enabled) camera.clearViewOffset()
       const fov = C.fov ?? 38
       if (camera.fov !== fov) { camera.fov = fov; camera.updateProjectionMatrix() }
+      // the section fits what matters into the band above the app frame (phones) or the window (desktop): the ice line at
+      // the wall and the lake bottom under the hole. The camera backs off along its line of sight until the bottom sits
+      // near 86 % of the band, and comes back in when it can (Jason 2026-10-16: 手机版水下的画面会挡住 是不是应该拉远一点).
+      // On phones the band is centred in the camera (view offset), like the top view does for the lake.
+      let zoom = 1
+      if (s.view === 'section') {
+        const fr = sonarRect?.current?.dock || sonarRect?.current?.frame
+        const bandBottom = k > 1 && fr ? Math.max(size.height * 0.35, Math.min(size.height, fr.getBoundingClientRect().top)) : size.height
+        const offY = k > 1 ? Math.round(size.height / 2 - bandBottom / 2) : 0
+        if (offY > 0) { if (!camera.view?.enabled || camera.view.offsetY !== offY || camera.view.fullWidth !== size.width || camera.view.fullHeight !== size.height) camera.setViewOffset(size.width, size.height, 0, offY, size.width, size.height) }
+        else if (camera.view?.enabled) camera.clearViewOffset()
+        s.secZoom = s.secZoom ?? 1; s.secDy = s.secDy ?? 0
+        // measure where the ice line (the hole) and the bottom under it would land with the camera as it is, then nudge:
+        // the pitch (secDy lifts or lowers the look point) puts the ice line near a third of the band on phones (45 % on
+        // desktop, where the sky and the camp above matter), the zoom keeps the bottom inside 86 %
+        const lookT = new THREE.Vector3(s.boat.x + C.look[0], C.look[1] + s.secDy, s.boat.z + C.look[2])
+        const posT = new THREE.Vector3(s.boat.x + C.pos[0], C.pos[1], s.boat.z + C.pos[2]).sub(lookT).multiplyScalar(s.secZoom).add(lookT)
+        const probe = camera.clone(); probe.position.copy(posT); probe.up.set(0, 1, 0); probe.lookAt(lookT); probe.updateMatrixWorld(true); probe.updateProjectionMatrix()
+        const D = depthAt(s.boat.x, s.boat.z)
+        const toFrac = (v) => ((1 - v.project(probe).y) / 2) * size.height / bandBottom
+        const fracI = toFrac(new THREE.Vector3(s.boat.x, 0, s.boat.z)), fracB = toFrac(new THREE.Vector3(s.boat.x, -D, s.boat.z))
+        const iceWant = k > 1 ? 0.3 : 0.45
+        if (fracI < iceWant - 0.04) s.secDy = Math.min(10, s.secDy + 3 * dt)       // ice line too high → look higher, the scene slides down
+        else if (fracI > iceWant + 0.04) s.secDy = Math.max(-8, s.secDy - 3 * dt)
+        if (fracB > 0.9) s.secZoom = Math.min(2.6, s.secZoom * (1 + 1.2 * dt))
+        else if (fracB < 0.78) s.secZoom = Math.max(1, s.secZoom * (1 - 1.2 * dt))
+        zoom = s.secZoom
+      } else if (camera.view?.enabled) camera.clearViewOffset()
+      const lk = new THREE.Vector3(s.boat.x + C.look[0], C.look[1] + (s.view === 'section' ? s.secDy : 0), s.boat.z + C.look[2])
+      tmp.set(s.boat.x + C.pos[0], C.pos[1], s.boat.z + C.pos[2]).sub(lk).multiplyScalar(zoom).add(lk)
+      tmp.x += px * 1.2; tmp.y += py * 0.6
+      if (!s.camP) { s.camP = tmp.clone(); s.camL = lk.clone() }
+      s.camP.lerp(tmp, e)
+      s.camL.lerp(lk, e)
+      camera.up.set(0, 1, 0); camera.position.copy(s.camP); camera.lookAt(s.camL)
       return
     }
     s.camP = null
