@@ -1697,3 +1697,9 @@ Numbered log. Newest at the bottom.
       Home closes after a pick, the page scrolls; production and share builds pass.
     - **Open for Jason:** should phones open ON the Home page (pick a view first, like the real app) or, as now, open
       straight on the sonar view with Home behind the ↶ button?
+
+108. **2026-10-16** — **The ice is Lake-Winnipeg black ice with thin, wind-swept snow** (Jason, on the three options of
+     #106 / `docs/ice-relationship-study.md` §七: "1吧"). Option 1 stands as built: 0.5 m of mid-January ice, black and
+     wind-polished, dustings and strokes of a few centimetres with low drifts, the scooped ring of bare ice round the
+     hole. Option 2 (first-ice season, no snow at all) and option 3 (deep snow) are not pursued. The snow look of #95
+     stays reachable as `?look=snow` for comparison only.
