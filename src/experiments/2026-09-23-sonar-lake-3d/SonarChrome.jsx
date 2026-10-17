@@ -37,7 +37,10 @@ function LiveCtl({ onPress, disabled, children, label, style }) {
   )
 }
 
-export default function SonarChrome({ layout, deviceId, mode, rangeFt, depthFt, imperial, gain, depthRef, onLocked, autoDepth = true, autoRange = false, onRange, onHome, phone = false }) {
+export default function SonarChrome({ layout, deviceId, mode, rangeFt, depthFt, imperial, gain, depthRef, onLocked, autoDepth = true, autoRange = false, onRange, onHome, phone = false, waterTempC = 21.8 }) {
+  // water temperature readout: comes from the page (summer lake 21.8 °C; under ice about +1…+4 °C — the ice chat asked
+  // for this on 2026-10-16: −1.2 °C is physically impossible for liquid water)
+  const tempLabel = `${waterTempC.toFixed(1)} °C`
   // phones: the whole control set is scaled up together (the app's proportions kept), and − / + sit further apart
   // (Jason 2026-10-03: range 的按键稍微大一点 … 加号跟减号稍微分开一点 … 不要破坏原本 APP 的协调性)
   const S = phone ? 1.55 : 1
@@ -88,11 +91,11 @@ export default function SonarChrome({ layout, deviceId, mode, rangeFt, depthFt, 
       {/* depth readout + water temp + voltage (top-left; Combo: top-right; ice views: the readout in the dial, temp/volts top-right) */}
       {iceView ? (<>
         <div ref={depthRef} className={num} style={{ position: 'absolute', left: `${ringCx}cqw`, top: `${ringCy}cqh`, transform: 'translate(-50%, -50%)', fontSize: '9cqh', fontWeight: 700, lineHeight: 1, letterSpacing: '-0.02em', color: '#1b1e2a', whiteSpace: 'nowrap' }}>— —</div>
-        <div className={num} style={{ position: 'absolute', top: '6cqh', right: '4.5%', textAlign: 'right', fontSize: '4.2cqh', lineHeight: 1.5 }}>−1.2 °C<br />12.6 V</div>
+        <div className={num} style={{ position: 'absolute', top: '6cqh', right: '4.5%', textAlign: 'right', fontSize: '4.2cqh', lineHeight: 1.5 }}>{tempLabel}<br />12.6 V</div>
       </>) : (
       <div style={{ position: 'absolute', top: '11cqh', ...(split ? { right: '5%', textAlign: 'left' } : { left: '4%' }) }}>
         <div ref={depthRef} className={num} style={{ fontSize: '12cqh', fontWeight: 600, lineHeight: 1, letterSpacing: '-0.01em' }}>— —</div>
-        <div className={num} style={{ fontSize: '4.2cqh', marginTop: '3cqh', lineHeight: 1.5 }}>21.8 °C<br />12.6 V</div>
+        <div className={num} style={{ fontSize: '4.2cqh', marginTop: '3cqh', lineHeight: 1.5 }}>{tempLabel}<br />12.6 V</div>
       </div>)}
 
       {/* wordmark + resolution tag (top-right) — not in Combo, where the readout sits there */}
