@@ -30,14 +30,14 @@ function LockedCtl({ onLocked, children, style }) {
 
 // a live app control (phones: the range −/+ — Jason 2026-10-03: range 直接做到手机 APP 里面去): full brightness and a
 // finger-sized invisible hit area around the small ring
-function LiveCtl({ onPress, disabled, children, label }) {
+function LiveCtl({ onPress, disabled, children, label, style }) {
   return (
-    <button type="button" className="ph-live" aria-label={label} disabled={disabled}
+    <button type="button" className="ph-live" aria-label={label} disabled={disabled} style={style}
       onPointerDown={(e) => e.stopPropagation()} onClick={(e) => { e.stopPropagation(); if (!disabled) onPress() }}>{children}</button>
   )
 }
 
-export default function SonarChrome({ layout, deviceId, mode, rangeFt, depthFt, imperial, gain, depthRef, onLocked, autoDepth = true, autoRange = false, onRange, phone = false }) {
+export default function SonarChrome({ layout, deviceId, mode, rangeFt, depthFt, imperial, gain, depthRef, onLocked, autoDepth = true, autoRange = false, onRange, onHome, phone = false }) {
   // phones: the whole control set is scaled up together (the app's proportions kept), and − / + sit further apart
   // (Jason 2026-10-03: range 的按键稍微大一点 … 加号跟减号稍微分开一点 … 不要破坏原本 APP 的协调性)
   const S = phone ? 1.55 : 1
@@ -117,7 +117,10 @@ export default function SonarChrome({ layout, deviceId, mode, rangeFt, depthFt, 
 
       {/* bottom bar: back · range −/+ · pause · gain −/+ · ⋯ */}
       <div style={{ position: 'absolute', left: 0, right: 0, bottom: '2.5cqh', height: cq(9) }}>
-        <LockedCtl onLocked={onLocked} style={{ position: 'absolute', left: '2.5%', top: '50%', transform: 'translateY(-50%)', fontSize: cq(7), lineHeight: 1 }}>↶</LockedCtl>
+        {/* the app's back button: on phones it is live and opens the app's Home (view selection) page (Jason 2026-10-16) */}
+        {onHome
+          ? <LiveCtl label="Home" onPress={onHome} style={{ position: 'absolute', left: '2.5%', top: '50%', transform: 'translateY(-50%)', fontSize: cq(7), lineHeight: 1 }}>↶</LiveCtl>
+          : <LockedCtl onLocked={onLocked} style={{ position: 'absolute', left: '2.5%', top: '50%', transform: 'translateY(-50%)', fontSize: cq(7), lineHeight: 1 }}>↶</LockedCtl>}
         {!split && (
           <div style={{ position: 'absolute', left: phone ? '23%' : '19%', top: '50%', transform: 'translate(-50%, -50%)', display: 'flex', alignItems: 'center', gap: gapPM }}>
             {onRange ? <LiveCtl label="Range shorter" disabled={autoRange} onPress={() => onRange(-1)}><Ring>−</Ring></LiveCtl> : <LockedCtl onLocked={onLocked}><Ring>−</Ring></LockedCtl>}

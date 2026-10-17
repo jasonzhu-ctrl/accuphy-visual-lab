@@ -87,3 +87,8 @@
 .ph-live:active:not(:disabled) { transform: scale(0.92); }
 /* phones: the View capsule on the phone frame — finger-sized (≥ 40 px tall) */
 .ac-seg-lg .ac-btn { font-size: 14px; padding: 11px 18px; }
+/* the app's Home page inside the phone display: thumbnail tiles are real buttons */
+.ph-home { pointer-events: auto; }
+.ph-tile { background: none; border: 0; padding: 0; color: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.ph-tile:active img { transform: scale(0.97); }
+.ph-tile img { transition: transform .12s; }

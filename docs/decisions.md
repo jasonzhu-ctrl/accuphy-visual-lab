@@ -1658,3 +1658,20 @@ Numbered log. Newest at the bottom.
        Live Ice and Ice Fishing, with a short ease — as the angler would turn the 0° bracket.
      - **Hole-hopping lifts the whole rig** out of the hole and sets it down over the new one.
      - Dev aid: `?rigcam` looks at the hole kit from 4 m.
+
+106. **2026-10-16** — **Phones: the app's Home (view-selection) page inside the phone** (Jason: "不同的 view option
+    可以模拟在手机上的 app 的官方版本的选择页面进入吗", with "先接着优化 … 你自己再看看").
+    - `home/AppHome.jsx` redraws the real app's Home from `reference/app-study/home*.jpg`: a dark page with one
+      section per device — "PingLive" (Panoramic / Forward / Down, fan thumbnails), "PingLive Mini" (Live Forward /
+      Live Down) and "Combo" (Live Combo) — rounded dark panels, labels under the tiles, and the Setting · Home · Map
+      tab bar. The thumbnails are crops of the app's own tiles (`home/*.jpg`, 8–17 KB each). The page scrolls like
+      the app. Sizes are in cqh of the display, like SonarChrome.
+    - **Flow:** on phones the app's ↶ button (bottom-left of the sonar screen) is live and opens Home; tapping a tile
+      enters that device + view and closes Home. The View capsule and the device capsule still work as shortcuts.
+      The Mini-only build shows only the Mini and Combo sections. Desktop is unchanged (↶ stays display-only).
+    - The share build inlines the thumbnails (`assetsInlineLimit` in `vite.share.config.js`), so the public page
+      stays one file (2.45 MB; 6 data-URI JPEGs, no stray asset paths).
+    - **Checked** at 390×844: Home opens with all six tiles loaded, "Down View" → PL Down, "Live Combo" → Mini Combo,
+      Home closes after a pick, the page scrolls; production and share builds pass.
+    - **Open for Jason:** should phones open ON the Home page (pick a view first, like the real app) or, as now, open
+      straight on the sonar view with Home behind the ↶ button?

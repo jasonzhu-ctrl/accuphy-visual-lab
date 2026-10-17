@@ -10,6 +10,7 @@ import { COLORMAP_NAMES } from './colormaps'
 import SonarChrome from './SonarChrome'
 import { screenLayout } from './SonarScreen'
 import SignupGate from './SignupGate'
+import AppHome from './home/AppHome' // the app's Home (view selection) page inside the phone, phones only (2026-10-16)
 import { isSignedUp } from './signup'
 import { depthAt } from './terrain'
 import { panoHalfWidth } from './sonarMarks'
@@ -72,6 +73,7 @@ export default function SonarLake3D({ scene: sceneProp }) {
   const [autoDepth, setAutoDepth] = useState(true) // off only when the dev Depth slider is touched
   const [gate, setGate] = useState(false)          // sign-up gate open → the lake and the sonar picture freeze
   const [toast, setToast] = useState(false)
+  const [home, setHome] = useState(false)         // phones: the app's Home page is open inside the phone display
   const toastT = useRef(0)
   const [imperial, setImperial] = useState(true)
   const [colormap, setColormap] = useState('garmin_amber') // LiveScope-measured amber (§7.7); the app's own 'orange' is Moreland_Black_Body
@@ -296,7 +298,8 @@ export default function SonarLake3D({ scene: sceneProp }) {
           <div className="ph-band" style={{ ...ring('1.35%'), borderRadius: '6.6% / 13.8%', boxShadow: '16px 26px 44px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.45), inset 0 0 0 2px rgba(0,0,0,0.12)' }} />
           <div style={{ ...ring('1.25%'), inset: '1.35%', borderRadius: '6.1% / 12.7%', background: '#040404' }} />
           <div ref={(el) => { sonarRect.current.el = el }} style={{ position: 'absolute', inset: '2.6%', borderRadius: '5.4% / 11.3%', containerType: 'size', overflow: 'hidden' }}>
-            <SonarChrome layout={layout} deviceId={deviceId} mode={mode} rangeFt={effRangeFt} depthFt={depthFt} imperial={imperial} gain={gain} autoDepth={autoDepth} autoRange={downLike} onRange={phone ? stepRange : undefined} phone={phone} onLocked={onLocked} depthRef={(el) => { state.current.depthEl = el }} />
+            <SonarChrome layout={layout} deviceId={deviceId} mode={mode} rangeFt={effRangeFt} depthFt={depthFt} imperial={imperial} gain={gain} autoDepth={autoDepth} autoRange={downLike} onRange={phone ? stepRange : undefined} onHome={phone ? () => setHome(true) : undefined} phone={phone} onLocked={onLocked} depthRef={(el) => { state.current.depthEl = el }} />
+            {phone && home && <AppHome devices={SHOWN_DEVICES} deviceId={deviceId} mode={mode} onPick={(d, m) => { setDeviceId(d); setMode(m); setHome(false) }} />}
             <div className="ph-glass" />
           </div>
           {/* antenna lines in the titanium band (two per long edge, like the Pro Max) */}
