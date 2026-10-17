@@ -371,19 +371,28 @@ function Beams({ state, ice = false }) {
   }), [specs])
   useEffect(() => () => meshes.forEach((m) => { m.g.dispose(); m.e.dispose() }), [meshes]) // AUTO depth rebuilds the PL Forward curtain
   const clip = useMemo(() => [new THREE.Plane(new THREE.Vector3(0, 0, -1), 1e5)], []) // the ice section view cuts the curtain at the wall
+  const sig0 = state.current.signal ?? 1 // a remount mid-hop (AUTO range → specKey) starts at the current gate, not at full opacity
   useFrame(() => {
     const s = state.current
     group.current.position.copy(s.apex)
     clip[0].constant = ice && s.view === 'section' ? s.boat.z + SECTION_CAM.cutZ : 1e5
+    // the ice signal gate (IceCamp.jsx s.signal; undefined on the summer lake → 1): the wedge goes out with the Mini.
+    // The materials are found by walking the group every frame, so a keyed remount (specKey) can never leave stale refs
+    const sig = s.signal ?? 1
+    group.current.visible = sig > 0.004
+    group.current.traverse((o) => {
+      if (!o.material) return
+      o.material.opacity = (o.isLineSegments ? (ice ? 0.75 : 0.6) : (ice ? 0.2 : 0.11)) * sig
+    })
   })
   return (
-    <group ref={group} onUpdate={(g) => g.traverse((o) => o.layers.set(SONAR_HIDE_LAYER))}>
+    <group ref={group} visible={sig0 > 0.004} onUpdate={(g) => g.traverse((o) => o.layers.set(SONAR_HIDE_LAYER))}>
       {meshes.map((m, i) => (
         <group key={i}>
           <mesh geometry={m.g}>
-            <meshPhysicalMaterial color="#5fd3ff" transparent opacity={ice ? 0.2 : 0.11} side={THREE.DoubleSide} depthWrite={false} roughness={0.3} clippingPlanes={ice ? clip : undefined} />
+            <meshPhysicalMaterial color="#5fd3ff" transparent opacity={(ice ? 0.2 : 0.11) * sig0} side={THREE.DoubleSide} depthWrite={false} roughness={0.3} clippingPlanes={ice ? clip : undefined} />
           </mesh>
-          <lineSegments geometry={m.e}><lineBasicMaterial color="#dff7ff" transparent opacity={ice ? 0.75 : 0.6} clippingPlanes={ice ? clip : undefined} /></lineSegments>
+          <lineSegments geometry={m.e}><lineBasicMaterial color="#dff7ff" transparent opacity={(ice ? 0.75 : 0.6) * sig0} clippingPlanes={ice ? clip : undefined} /></lineSegments>
         </group>
       ))}
     </group>

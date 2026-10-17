@@ -151,9 +151,21 @@ export function IceCamp({ state, beamMats, iceMat, T }) {
     // the head turns with the view: the Mini's face forward for Forward and Combo, down for Down, Live Ice and Ice Fishing
     const headT = s.mode === 'forward' || s.mode === 'combo' ? 0 : -Math.PI / 2
     parts.head.rotation.z += (headT - parts.head.rotation.z) * Math.min(1, dt * 4)
+    // two things, kept apart: s.noSignal is the state machine's boolean (a hop is under way); s.signal (0..1) is the
+    // visual gate, from the geometry — the transducer is wet while it is below the ice's underside. Everything the
+    // sonar lights (the wedge, the lit bottom, the ice window, the cyan glow, the phone's picture and readout) follows
+    // s.signal, so cause and effect stay together: the cone rides up with the Mini and goes out as it leaves the water
+    // (~0.3 s), stays dark on the walk and the drill, and wakes with the picture after the drop (~3/s, bottom first)
     s.noSignal = d.phase !== 'idle'
-    s.apex.set(s.boat.x, APEX_Y, s.boat.z)
+    const apexY = APEX_Y + lift
+    const wet = apexY < -ICE_T - 0.05 ? 1 : apexY > -ICE_T + 0.05 ? 0 : (s.signalT ?? 1) // ±5 cm hysteresis round the underside
+    s.signalT = wet
+    if (s.signal === undefined) s.signal = 1
+    s.signal += (wet - s.signal) * Math.min(1, dt * (wet < s.signal ? 10 : 3))
+    if (Math.abs(wet - s.signal) < 1e-3) s.signal = wet
+    s.apex.set(s.boat.x, Math.min(apexY, -ICE_T - 0.05), s.boat.z) // the wedge's apex never pokes through the sheet
     setBeamUniforms(beamMats, s.specs, s.apex)
+    for (const m of beamMats) { const bu = m.userData.uniforms; if (bu.uBeamGain) bu.uBeamGain.value = s.signal }
     const u = iceMat.userData.uniforms
     // the cutaway's shape (iceSheet.js cutSDF, IceWalls below): a circle round the hole, stretched by each fan's reach —
     // its footprint on the bottom under the hole and everything above it, with a margin
@@ -168,8 +180,8 @@ export function IceCamp({ state, beamMats, iceMat, T }) {
       u.uCutBox.value[k].set(xMin, xMax, zHalf, 1)
     })
     for (let k = fans.length; k < 2; k++) u.uCutBox.value[k].w = 0
-    u.uBeamOn.value += ((s.noSignal ? 0 : 1) - u.uBeamOn.value) * Math.min(1, dt * 6)
-    if (glowRef.current) { glowRef.current.position.set(s.boat.x, APEX_Y + 0.3 + lift, s.boat.z); glowRef.current.intensity = 3 * u.uBeamOn.value }
+    u.uBeamOn.value = s.signal // the ice window over the beam and the live hole's glow (iceSheet.js) go with the same gate
+    if (glowRef.current) { glowRef.current.position.set(s.boat.x, APEX_Y + 0.3 + lift, s.boat.z); glowRef.current.intensity = 3 * s.signal }
     // the aim ring under the pointer (on the underside of the sheet in the under-ice view)
     aim.visible = !!s.aiming && !!s.aim
     if (s.aim) aim.position.set(s.aim.x, s.view === 'under' ? -ICE_T - 0.02 : 0.015, s.aim.z)

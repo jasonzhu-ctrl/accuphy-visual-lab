@@ -110,6 +110,7 @@ export default function SonarScreen({ state, rect, lakeMats }) {
         // the Mini's ice views (2026-10-16): flasher + Live Down (1) or flasher + 2D history (2); the app draws them in its jet map
         uIce: { value: 0 }, uIceSplit: { value: ICE_SPLIT }, uAspect: { value: 2.08 }, uTicks: { value: 5 }, uLUT2: { value: colormapTexture('jet') },
         uHist: { value: null }, uHistPrev: { value: null }, uHistPass: { value: 0 }, uIceAmber: { value: /icelut=amber/.test(window.location.search) ? 1 : 0 },
+        uSignal: { value: 1 }, // the ice page's signal gate (IceCamp.jsx s.signal); 1 on the summer lake
       },
     })
     // the 2D history (Ice Fishing View): 384 pings × 256 depth cells, ping-ponged — each ping shifts the record one
@@ -187,8 +188,12 @@ export default function SonarScreen({ state, rect, lakeMats }) {
   const tmpUp = useMemo(() => new THREE.Vector3(), [])
   useFrame((root, dt) => {
     const s = state.current
-    const specs = (s.noSignal ? [] : s.specs).slice(0, MAX_FANS) // ice: the Mini is out of the water while the visitor hole-hops → no picture
+    const specs = s.specs.slice(0, MAX_FANS)
     const u = res.mat.uniforms
+    // ice: while the visitor hole-hops the Mini is out of the water. The app stays on — the fans keep their shape and
+    // the dial its ring — but nothing echoes (sonarShader.js uSignal); the depth strips are not even rendered then
+    const sig = s.signal ?? 1, wet = sig >= 0.02
+    u.uSignal.value = sig
     u.uTime.value += dt
     u.uRange.value = s.rangeM
     if (s.colormap !== u.uLUT.name) { u.uLUT.value.dispose?.(); u.uLUT.value = colormapTexture(s.colormap); u.uLUT.name = s.colormap }
@@ -229,9 +234,7 @@ export default function SonarScreen({ state, rect, lakeMats }) {
       cam.position.set(s.apex.x, 2, s.apex.z)
       cam.lookAt(s.apex.x, -60, s.apex.z)
       cam.updateProjectionMatrix()
-      gl.setRenderTarget(res.topRT)
-      gl.clear()
-      gl.render(scene, cam)
+      if (wet) { gl.setRenderTarget(res.topRT); gl.clear(); gl.render(scene, cam) }
       u.uTopR.value = R; u.uTopCamY.value = 2; u.uTopNearFar.value.set(cam.near, cam.far)
       const sp = specs[0]
       u.uFan.value[0].set(0, (sp.a1 - sp.a0) / 2, Math.tan((sp.a1 - sp.a0) / 2), Math.tan(sp.theta))
@@ -250,9 +253,7 @@ export default function SonarScreen({ state, rect, lakeMats }) {
         cam.up.copy(tmpUp)
         const c = sp.frame.c
         cam.lookAt(s.apex.x + c.x, s.apex.y + c.y, s.apex.z + c.z)
-        gl.setRenderTarget(res.targets[k])
-        gl.clear()
-        gl.render(scene, cam)
+        if (wet) { gl.setRenderTarget(res.targets[k]); gl.clear(); gl.render(scene, cam) }
         // screen-plane centre angle: the tilt of the fan centre from straight-down
         u.uFan.value[k].set(Math.atan2(c.x, -c.y), half, tanH, tanV)
       })
@@ -262,7 +263,7 @@ export default function SonarScreen({ state, rect, lakeMats }) {
     lakeMats.forEach((m) => { m.userData.uniforms.uSonarPass.value = 0 })
     u.uApexXZ.value.set(s.apex.x, s.apex.z); u.uApexDepth.value = -s.apex.y
     // fish marks: every fish in the beam, projected into the view (sonarMarks.js)
-    u.uMarkCount.value = computeMarks({ pop: s.pop, t: root.clock.elapsedTime, specs, apex: s.apex, flat, bake: res.bake, rangeM: flat ? s.rangeM : u.uReach.value }, res.marks)
+    u.uMarkCount.value = computeMarks({ pop: s.pop, t: root.clock.elapsedTime, specs: sig < 0.6 ? [] : specs, apex: s.apex, flat, bake: res.bake, rangeM: flat ? s.rangeM : u.uReach.value }, res.marks)
     // the 2D history: one new column per ping (8 a second), after the depth strips and the marks are current
     if (lay.ice === 2) {
       const now = root.clock.elapsedTime
@@ -278,7 +279,7 @@ export default function SonarScreen({ state, rect, lakeMats }) {
     // the app's depth readout: water depth under the transducer, in the user's unit
     if (s.depthEl) {
       const d = depthAt(s.apex.x, s.apex.z)
-      const txt = s.imperial ? `${(d / 0.3048).toFixed(1)} ft` : `${d.toFixed(1)} m`
+      const txt = sig < 0.5 ? (s.imperial ? '-- ft' : '-- m') : s.imperial ? `${(d / 0.3048).toFixed(1)} ft` : `${d.toFixed(1)} m` // no signal: no depth
       if (s.depthEl.textContent !== txt) s.depthEl.textContent = txt
     }
     if (s.debugEl) s.debugEl.textContent = `sonar fans ${specs.length} flat ${flat ? 1 : 0} fan0 ${u.uFan.value[0].toArray().map((v) => v.toFixed(2)).join(',')} apex ${s.apex.toArray().map((v) => v.toFixed(1)).join(',')}`

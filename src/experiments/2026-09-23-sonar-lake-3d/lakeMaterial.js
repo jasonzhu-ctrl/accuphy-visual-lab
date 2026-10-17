@@ -27,6 +27,7 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
     uRevealGain: { value: 1.0 }, // ice scene: a stronger lift inside the beam (the window in the snow must read lit)
     uClip: { value: new THREE.Vector2(0, 0) }, // ice section view: x = on, y = world z of the cut wall; fragments beyond it are cut away in the main view
     uOutGamma: { value: 1.0 },   // ice scene: < 1 brightens the dark water world a little (main view only)
+    uBeamGain: { value: 1.0 },   // ice scene: the signal gate (IceCamp.jsx s.signal): the lit footprint fades out while the Mini is out of the water
   }
   const mat = new THREE.ShaderMaterial({
     uniforms,
@@ -82,7 +83,7 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
       uniform int uBeamCount;
       uniform vec3 uApex[${MAX_BEAMS}]; uniform vec3 uC[${MAX_BEAMS}]; uniform vec3 uH[${MAX_BEAMS}]; uniform vec3 uN[${MAX_BEAMS}];
       uniform vec4 uAng[${MAX_BEAMS}]; uniform vec2 uRT[${MAX_BEAMS}]; uniform vec4 uBox[${MAX_BEAMS}];
-      uniform float uReveal; uniform vec3 uHighlight; uniform float uSonarPass; uniform float uRevealGain; uniform float uOutGamma; uniform vec2 uClip;
+      uniform float uReveal; uniform vec3 uHighlight; uniform float uSonarPass; uniform float uRevealGain; uniform float uOutGamma; uniform vec2 uClip; uniform float uBeamGain;
       #ifdef FISH
         varying float vPattern; varying vec3 vBelly; varying vec3 vSide; varying vec3 vLocal; varying vec2 vUv;
         float hash3(vec3 p) { return fract(sin(dot(p, vec3(127.1, 311.7, 74.7))) * 43758.5453); }
@@ -191,6 +192,7 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
         for (int k = 0; k < ${MAX_BEAMS}; k++) { if (k < uBeamCount) { beam = max(beam, insideBeam(k, vWorld, 0.0)); wide = max(wide, insideBeam(k, vWorld, 0.02)); } }
         beam *= uReveal;
         float edge = clamp(wide - beam, 0.0, 1.0) * uReveal; // thin bright rim where the beam footprint ends
+        beam *= uBeamGain; edge *= uBeamGain; // the signal gate (1 on the summer lake): after the rim, so the rim fades too instead of widening
         // procedural surface texture: fine speckle for sand/bark
         float tex = 0.9 + 0.2 * fract(sin(dot(floor(vWorld * 9.0), vec3(12.9898, 78.233, 37.719))) * 43758.5453);
         albedo *= tex;

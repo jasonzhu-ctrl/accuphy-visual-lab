@@ -59,6 +59,7 @@ export const sonarFragment = /* glsl */ `
   // the Mini's ice views (2026-10-16): 1 = Live Ice (flasher + Live Down), 2 = Ice Fishing (flasher + 2D history)
   uniform float uIce; uniform float uIceSplit; uniform float uAspect; uniform float uTicks; uniform sampler2D uLUT2;
   uniform sampler2D uHist; uniform sampler2D uHistPrev; uniform float uHistPass; uniform float uIceAmber;
+  uniform float uSignal; // the ice page's signal gate (IceCamp.jsx s.signal): 0 while the Mini is out of the water; always 1 on the summer lake
 
   float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
   float vnoise(vec2 q) { vec2 i = floor(q), f = fract(q); f = f * f * (3.0 - 2.0 * f);
@@ -238,7 +239,7 @@ export const sonarFragment = /* glsl */ `
       vec2 p = vec2(depth * sin(a), depth * cos(a));
       float inF; e = max(e, fanEcho(0, p, depth, a, 1.0, 1.0, inF));
     }
-    return e;
+    return e * uSignal; // no signal: the ring stays lit, no returns on it
   }
   // the app's tone curve (assets/aio_shader.glsl): log compression → gain / dynamic-range window → LUT index
   float toneIdx(float echo) {
@@ -289,7 +290,7 @@ export const sonarFragment = /* glsl */ `
       if (vUv.x < 1.0 - 1.0 / W) { gl_FragColor = texture2D(uHistPrev, vUv + vec2(1.0 / W, 0.0)); return; }
       float depth = (1.0 - vUv.y) * uRange;
       float n = hash(vec2(floor(uTime * 8.0), floor(vUv.y * 256.0)));
-      float floorN = max(0.0, 0.06 + 0.16 * n - 0.22 * uNoise) * 0.7 * (uFanCount > 0 ? 1.0 : 0.0);
+      float floorN = max(0.0, 0.06 + 0.16 * n - 0.22 * uNoise) * 0.7 * (uFanCount > 0 ? 1.0 : 0.0) * uSignal; // no signal: the record scrolls a dark gap
       gl_FragColor = vec4(toneIdx(max(flasherEcho(depth), floorN)), 0.0, 0.0, 1.0); return;
     }
     // ---- the ice views: the flasher on the left, the Live Down fan or the 2D history on the right
@@ -432,6 +433,9 @@ export const sonarFragment = /* glsl */ `
       echo = max(echo, inAny * near * near * (0.25 + 0.6 * rays) * tex * 0.5);
       echo = max(echo, inAny * floorTex * 0.7);
     }
+    // the signal gate: the fan keeps its shape but carries no returns (LUT index 0) while the Mini is out of the water,
+    // and the picture comes back through the tone window as the signal ramps up (the bottom, the strongest echo, first)
+    echo *= uSignal;
 
     if (uDebug > 0.5) { float d = texture2D(uDepth0, vUv).r; gl_FragColor = vec4(vec3(d >= 0.9999 ? 0.0 : 1.0 - linearize(d) / 60.0), 1.0); return; }
     float idx = toneIdx(echo) * inAny;
