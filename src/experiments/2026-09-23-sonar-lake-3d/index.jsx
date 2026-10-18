@@ -207,7 +207,7 @@ export default function SonarLake3D({ scene: sceneProp }) {
     const i = dir > 0 ? steps.findIndex((v) => v > depthFt + 0.5) : steps.findLastIndex((v) => v < depthFt - 0.5)
     if (i >= 0) { setAutoDepth(false); setDepthFt(steps[i]) }
   }
-  const appCtl = phone && !ICE ? { paused, onPause: () => setPaused((v) => !v), onGain: (d) => setGain((g) => Math.min(1, Math.max(0.3, +(g + d * 0.01).toFixed(2)))), onDepth: stepDepth, colormap, colormaps: COLORMAP_NAMES, onColormap: setColormap } : undefined // no contrast / noise reject on the phone (Jason 2026-10-17)
+  const appCtl = phone && !ICE ? { paused, onPause: () => setPaused((v) => !v), onGain: (d) => setGain((g) => Math.min(1, Math.max(0.3, +(g + d * 0.01).toFixed(2)))), onDepth: stepDepth } : undefined // no image settings on the phone: the ⋯ button is greyed (Jason 2026-10-17/18)
   const stepRange = (dir) => {
     const steps = RANGE_STEPS_FT.filter((v) => v <= maxFt)
     const i = dir > 0 ? steps.findIndex((v) => v > rangeFt + 0.5) : steps.findLastIndex((v) => v < rangeFt - 0.5)

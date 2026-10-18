@@ -1821,3 +1821,8 @@ Numbered log. Newest at the bottom.
      inside the phone (#114) no longer has the Contrast, Noise Reject and TVG rows or the greyed "Image Stabilization ·
      Interference Rejection · Fishing Mode" line; only Color Map ▸ and its list stay. Gain −/+, pause, depth −/+ and the
      back-to-Home button are unchanged. Contrast and noise reject keep their tuned demo values (dev sliders only).
+
+118. **Phone ⋯ settings: greyed and closed** (Jason 2026-10-18: "不对 把color map也去掉 这三个点的设置灰色按钮不让进";
+     replaces #117). The image-settings panel is gone entirely, Color Map included. On phones the app's ⋯ button is drawn
+     greyed like the other display-only controls and a tap does nothing. The live phone controls are now Home ↶, range −/+,
+     pause, gain −/+ and depth −/+ (PL Forward). Colour map stays a dev-only slider (?dev).

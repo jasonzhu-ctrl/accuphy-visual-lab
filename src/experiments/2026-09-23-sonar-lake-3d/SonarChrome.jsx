@@ -3,7 +3,6 @@
 // container-query units of the display, so it scales with the phone frame.
 // The app's buttons are display-only here: dimmed like a disabled iOS control (values stay bright) and a tap
 // opens the sign-up gate (onLocked) — Jason 2026-09-24. The depth axis runs on AUTO.
-import { useState } from 'react'
 import { FT } from '../2026-09-23-sonar-beam/devices'
 
 const num = 'font-brand-body tabular-nums'
@@ -40,9 +39,8 @@ function LiveCtl({ onPress, disabled, children, label, style }) {
 
 export default function SonarChrome({ layout, deviceId, mode, rangeFt, depthFt, imperial, gain, depthRef, onLocked, autoDepth = true, autoRange = false, onRange, onHome, phone = false, waterTempC = 21.8, app }) {
   // `app` (phones, Jason 2026-10-16: 这些控制都做在手机上 … 模拟真实的 Accuphy Sonar app 里面的功能): the app's own controls are
-  // live — gain −/+ (1 % a tap), pause, the depth-range −/+ (manual steps, AUTO off) and the ⋯ menu's image settings
-  // (colour map only — Jason 2026-10-17: noise reject 这些功能不要加进去). Without `app` they stay display-only (desktop).
-  const [menu, setMenu] = useState(false)
+  // live — gain −/+ (1 % a tap), pause and the depth-range −/+ (manual steps, AUTO off). The ⋯ settings button stays greyed and cannot be opened
+  // (Jason 2026-10-17/18: noise reject 这些功能不要加进去 … 把 color map 也去掉). Without `app` they stay display-only (desktop).
   // water temperature readout: comes from the page (summer lake 21.8 °C; under ice about +1…+4 °C — the ice chat asked
   // for this on 2026-10-16: −1.2 °C is physically impossible for liquid water)
   const tempLabel = `${waterTempC.toFixed(1)} °C`
@@ -150,42 +148,8 @@ export default function SonarChrome({ layout, deviceId, mode, rangeFt, depthFt, 
             {app ? <LiveCtl label="Gain lower" onPress={() => app.onGain(-1)}><Ring>−</Ring></LiveCtl> : <LockedCtl onLocked={onLocked}><Ring>−</Ring></LockedCtl>}<span className={num} style={{ fontSize: cq(4.8), fontWeight: 500 }}>{Math.round(gain * 100)}%</span>{app ? <LiveCtl label="Gain higher" onPress={() => app.onGain(1)}><Ring>+</Ring></LiveCtl> : <LockedCtl onLocked={onLocked}><Ring>+</Ring></LockedCtl>}
           </div>
         )}
-        {app ? <LiveCtl label="Menu" onPress={() => setMenu((v) => !v)} style={{ position: 'absolute', right: '2.5%', top: '50%', transform: 'translateY(-50%)', fontSize: cq(7), lineHeight: 0.6, letterSpacing: '-0.05em' }}>•••</LiveCtl> : <LockedCtl onLocked={onLocked} style={{ position: 'absolute', right: '2.5%', top: '50%', transform: 'translateY(-50%)', fontSize: cq(7), lineHeight: 0.6, letterSpacing: '-0.05em' }}>•••</LockedCtl>}
-      </div>
-      {app && menu && <AppMenu app={app} onClose={() => setMenu(false)} />}
-    </div>
-  )
-}
-
-// The ⋯ menu's image-settings tab, as a right-hand panel like the app (docs/app-chrome.md §3). Only Color Map ▸ with its list:
-// Jason 2026-10-17 "noise reject 这些功能不要加进去" — no Contrast / Noise Reject / TVG rows or the other settings line.
-// Only the image tab is live; the other two tabs are decorative.
-const MAP_LABELS = { garmin_amber: 'orange', accuphy_red: 'red', HSV_Rainbow: 'rainbow', MPL_Inferno: 'inferno', Moreland_Black_Body: 'black body', MyCarta_Linear_L_Rainbow: 'linear rainbow', Parula: 'parula', amber: 'amber', coolwarm: 'coolwarm', freeze: 'freeze', gist_heat: 'heat', ice: 'ice', jet: 'classic' }
-function AppMenu({ app, onClose }) {
-  const [maps, setMaps] = useState(false)
-  return (
-    <div className="ph-menu" role="dialog" aria-label="Image settings" onPointerDown={(e) => e.stopPropagation()}
-      style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: '52%', display: 'flex', background: 'rgba(14,14,14,0.96)', color: '#fff', fontFamily: 'var(--font-body, "Instrument Sans", system-ui, sans-serif)', boxShadow: '-2cqh 0 6cqh rgba(0,0,0,0.5)' }}>
-      <div style={{ flex: '0 0 11cqh', background: '#1a1a1a', display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: '2cqh', gap: '4cqh', fontSize: '5cqh' }}>
-        <span style={{ color: '#2f8fff' }}>☰</span><span style={{ opacity: 0.55 }}>⚙</span><span style={{ opacity: 0.55 }}>⟲</span>
-      </div>
-      <div style={{ flex: 1, minWidth: 0, overflowY: 'auto', padding: '2cqh 4cqh' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1cqh' }}>
-          <span style={{ fontSize: '4.6cqh', fontWeight: 600 }}>Image settings</span>
-          <LiveCtl label="Close menu" onPress={onClose}><span style={{ fontSize: '6cqh', lineHeight: 1 }}>×</span></LiveCtl>
-        </div>
-        {!maps ? (<>
-          <LiveCtl label="Color Map" onPress={() => setMaps(true)} style={{ width: '100%' }}>
-            <span style={{ display: 'flex', width: '100%', justifyContent: 'space-between', padding: '2.2cqh 0', fontSize: '4.2cqh' }}><span>Color Map</span><span style={{ opacity: 0.7 }}>{MAP_LABELS[app.colormap] || app.colormap} ▸</span></span>
-          </LiveCtl>
-        </>) : (<>
-          <LiveCtl label="Back to image settings" onPress={() => setMaps(false)}><span style={{ fontSize: '4cqh', opacity: 0.8 }}>‹ Color Map</span></LiveCtl>
-          {app.colormaps.map((m) => (
-            <LiveCtl key={m} label={MAP_LABELS[m] || m} onPress={() => { app.onColormap(m); setMaps(false) }} style={{ width: '100%' }}>
-              <span style={{ display: 'flex', width: '100%', justifyContent: 'space-between', padding: '1.8cqh 0', fontSize: '4.2cqh', color: m === app.colormap ? '#2f8fff' : '#fff' }}><span>{MAP_LABELS[m] || m}</span>{m === app.colormap && <span>✓</span>}</span>
-            </LiveCtl>
-          ))}
-        </>)}
+        {/* ⋯ settings: always greyed; on phones a tap does nothing (Jason 2026-10-18: 这三个点的设置灰色按钮不让进) */}
+        <LockedCtl onLocked={app ? undefined : onLocked} style={{ position: 'absolute', right: '2.5%', top: '50%', transform: 'translateY(-50%)', fontSize: cq(7), lineHeight: 0.6, letterSpacing: '-0.05em' }}>•••</LockedCtl>
       </div>
     </div>
   )
