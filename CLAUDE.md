@@ -102,8 +102,12 @@ anyone's memory.
   questions in `docs/backlog.md`, and what Jason must be reminded of in the project memory
   (`pending-reminders`). Write before you finish a turn; a decision that isn't written down
   doesn't exist.
-- **Decision numbers:** re-read the last number in `docs/decisions.md` right before appending.
-  Two chats once wrote the same number.
+- **Decision numbers:** re-read the last number in `docs/decisions.md` right before appending, and again
+  after `git fetch` just before the commit (renumber if another chat took it meanwhile). Two chats wrote #69
+  twice and #102 twice (Jason 2026-10-18: 以后注意避免).
+- **Lake and ice share code (#94):** the ice page lives in the lake folder. Any change there for the ice page is
+  checked on the summer lake (desktop and phone, a sonar-qa grid against the last commit) before it is merged, and
+  any lake change is checked on the ice page (Jason 2026-10-18: 这个确实要非常注意).
 - **Git in a shared working copy:** run `git status` before editing. Leave files alone that
   another chat has uncommitted changes in. Stage only your own files by path, never
   `git add -A`. Commit and push right after each change. For multi-file work, tell the other

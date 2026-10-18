@@ -201,6 +201,11 @@ the cheapest Android phone class). Phone size was emulated at 360×800.
   fallback for slow phones. Decided: main action = email for an offer (#45). Next question for
   Jason: the "aha" (what a visitor should feel first). Remind him when he is back on this project.
 
+- ⬜ **Phone landscape "real device mode" (proposed 2026-10-18, #119, build on Jason's go):** a sideways phone shows
+  the sonar full-screen with the app's controls (no phone frame inside the phone) and the lake as a small inset that
+  taps to enlarge; `docs/mobile-phone-layout-plan.md` Phase 4. Today 844×390 is broken (panel and cards cover it).
+- ⬜ **iPad layout: on hold (#119).** iPads get the desktop controls today; Jason decides after the phone layout is final.
+
 ## Engineering
 - ✅ Dev helper `?bigphone` (DEV only): the phone frame fills the viewport so the sonar picture can be inspected in screenshots
 - 🔧 Mobile performance: dpr capped at 1.5, high-performance GL context; real-device check done 2026-09-24 (budget GPU 10–24 fps, see "Mobile + Meta ads readiness")
