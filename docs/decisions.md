@@ -1826,3 +1826,20 @@ Numbered log. Newest at the bottom.
      replaces #117). The image-settings panel is gone entirely, Color Map included. On phones the app's ⋯ button is drawn
      greyed like the other display-only controls and a tap does nothing. The live phone controls are now Home ↶, range −/+,
      pause, gain −/+ and depth −/+ (PL Forward). Colour map stays a dev-only slider (?dev).
+
+119. **2026-10-18** — **Check-up after the parallel chats: no conflict; answers on the open points** (Jason asked whether the
+    lake work (#91–#92) and the phone / ice work (#93–#118) conflict: "先调研一下有没有冲突 有没有问题").
+    - **Checked on main `37c434f`:** the build passes; the desktop sonar grid (6 spots × 6 views) matches the #92 commit
+      (largest difference 0.8 % white, fish positions); `fish-sim.mjs` 0 hits; no console errors at 390×844, 844×390,
+      820×1180 and 1180×820.
+    - **Found:** phone landscape is broken (the desktop panel and step cards cover the screen); iPads get the desktop
+      controls; the public pages and the private preview predate the phone app UI (#107–#118); the ice page shares the
+      lake folder (#94); #102 was used twice.
+    - **Jason's answers:**
+      - phone landscape: putting a phone frame inside a sideways phone is hard to use. The plan's "real device mode"
+        (`docs/mobile-phone-layout-plan.md` Phase 4) is proposed: the sonar full-screen with the app's controls, the
+        lake as a small inset. Waiting for his go;
+      - iPad: not decided yet, because it depends on the final phone layout;
+      - public pages and the private preview: leave them for now;
+      - lake and ice sharing code: "这个确实要非常注意". Now a rule in `CLAUDE.md`;
+      - decision numbers: avoid duplicates from now on (`CLAUDE.md` rule tightened). #102 stays as it is.
