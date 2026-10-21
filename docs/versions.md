@@ -10,16 +10,18 @@ with the source commit it was built from, so anyone can tell which version a lin
 | **Both** — PingLive + PingLive Mini | anyone with the link, no login | https://jasonzhu-ctrl.github.io/accuphy-lab-test/ |
 | **Mini** — PingLive Mini only | anyone with the link, no login | https://jasonzhu-ctrl.github.io/accuphy-lab-test/mini/ |
 | Private preview | Jason only (claude.ai login) | https://claude.ai/artifact/RnCBYTexY5vcEqJy2hAsN7 |
-| **Ice (private preview)** — the ice-fishing page, section camera | Jason only (claude.ai login) | https://claude.ai/artifact/G5uZM8imcgsQNzoKfPkiMa |
+| **Ice (trial)** — the ice-fishing page, section camera | anyone with the link, no login | https://jasonzhu-ctrl.github.io/accuphy-lab-test/ice/ |
+| Ice (private preview) | Jason only (claude.ai login) | https://claude.ai/artifact/G5uZM8imcgsQNzoKfPkiMa |
 
 Both public pages are unlisted (`noindex`, `robots.txt` Disallow) and have no sign-up gate (#71).
 How to rebuild and publish: the `lab-test-link` skill (`node scripts/build-share.mjs <out>`; `VITE_DEVICES=PLM` for
-the Mini page; `VITE_SCENE=ice` for the ice page — private preview only, not on GitHub Pages).
+the Mini page; `VITE_SCENE=ice` for the ice page → `/ice/` on GitHub Pages since 2026-10-20, Jason: "先给个试用的线上版本链接给我").
 
 ## History
 
 | Date | Page | Built from (Lab commit) | Public repo commit | What changed |
 |---|---|---|---|---|
+| 2026-10-20 | **Ice (trial)** `/ice/` | f09a3b6 | bc757c9 | First public trial link of the ice page (Jason asked for one); unlisted, noindex; same build as the private preview |
 | 2026-10-18 | Private preview | 37c434f (#104–#118) | — | Phone version for Jason to try in the Claude app: camera zoomed out, app Home first (pick a view), frosted unavailable tiles, all controls inside the phone (gain, pause, range, depth), ⋯ settings greyed. Public pages not updated yet |
 | 2026-10-17 | Ice (private preview) | 3ee96d8 (#113–#116) | — | Camera solves its framing; signal gate on hops; Ice Fishing history opens filled; drill hint off the rig; a jig on line, dial, fan and history; real lake ice in the section and a light shaft under the hole |
 | 2026-10-16 | Ice (private preview) | f0a502b (#111) | — | Phones: more room under the lit bottom (ice line at 26 % of the band, bottom inside 80 %) after Jason still saw it hidden |
