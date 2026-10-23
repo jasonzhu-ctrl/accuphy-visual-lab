@@ -739,3 +739,39 @@ acoustics); checked against the app's own frames (`reference/app-study/fish-near
 controls stretch the picture by different amounts (PL Forward at 25 ft range / 45 ft depth: ×3 wider than tall), so
 a near fish under the boat is legitimately a long horizontal streak there.
 
+
+## 8. The Mini's two ice views, as the real app 2.0.0 draws them (tablet, 2026-10-23)
+
+Source: the app's built-in demo data on the V10 tablet, `reference/app-study/2026-10-23/` (12 m range, metric, Color
+Map yellow). The Lab's ice page (#94–#116) was built before any real capture existed; this section overrides it.
+
+**Ice Fishing View** (`21-…`, `23-icefishing-55s.jpg`)
+- The 2D history fills the WHOLE screen, scrolling right → left, drawn in the **Color Map** (yellow/orange here, like
+  Down Scan): brown water, a bright yellow bottom band, short yellow fish arcs, a thin yellow line along the very top.
+  When the view opens the record starts at the right edge and grows leftward (empty black before it) — no prefill.
+- The **flasher dial floats over the left third** of the history; it is not a separate panel.
+- At the far right a narrow **vertical A-scope bar in jet** shows the current ping by depth (red at the fish and the
+  bottom, cyan/blue water between).
+- Depth rulers (0–12 m) on both the left and right edges; temperature and voltage top-centre-right; the ACCUPHY
+  wordmark + resolution top-left; a "20°" cone icon bottom-left; bottom bar: ↶, − range +, pause, − gain % +, ⋯.
+- The dial: outer **echo ring in jet**, fully coloured all round in this data (cyan/blue water, green noise, red at the
+  surface 0–0.5 m, at fish and at the bottom); a white inner ring with ticks and labels 0, 2, 4 … 10 clockwise from the
+  top (the full circle = the range, 12 m); a light-grey centre with the depth readout ("10.0 m", decimals smaller);
+  a white marker at 0. The dial stays jet while the history follows the Color Map.
+
+**Live Ice Fishing View** (`30-…`, `31-liveice-17s.jpg`)
+- The **Live Down fan fills the screen behind the dial**, black background, echoes only, in the Color Map (yellow):
+  the apex at the top, about three quarters across; a horizontal range ruler along the top (6 4 2 0 2); no drawn fan
+  outline and no blue field.
+- The same dial on the left; here the echo ring is **white where there is no return**, with red arcs at the surface
+  (0–2 m clutter), the bottom (≈ 10–11 m) and short jet slivers for fish (≈ 4.3 m).
+
+**What the Lab's ice page gets wrong** (to fix only with Jason's go):
+1. Layout: the Lab splits the screen 42 % dial panel | 58 % picture with a black gap; the app lays the picture
+   full-width and floats the dial over the left.
+2. Colours: the Lab draws the fan and the history in jet on a blue field; the app draws them in the Color Map (black
+   field for the fan, brown for the history in yellow) and keeps jet only for the dial ring and the A-scope bar.
+3. The A-scope jet bar at the right edge of Ice Fishing is missing in the Lab.
+4. The Lab's dial ring is white with one coloured wedge; the app's ring shows every depth's colour (white only where
+   nothing returns in Live Ice) and a strong red surface-clutter arc at 0–2 m.
+5. The Lab prefills the history (#116); the real view starts empty at the right and grows leftward.
