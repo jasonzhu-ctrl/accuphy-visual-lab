@@ -445,15 +445,21 @@ function Rig({ state, sonarRect, fogMats, cam = LAKE_CAM }) {
     if (s.hintEl) {
       // ice section: the hint sits ON open ice behind the cut wall, left of the kit (where a tap drills), not on the rig
       const iceSec = s.view === 'section' && s.holes !== undefined
-      if (iceSec) tmp.set(s.boat.x - (k > 1 ? 2.8 : 4), 0, s.boat.z + (k > 1 ? 3.6 : 2)).project(camera) // near ice, left of the kit
-      else tmp.set(s.boat.x, 0.6, s.boat.z).project(camera)
+      // (2026-10-23) the cue is a reticle lying on the ice (IceCamp.jsx, s.hintAnchor), like the ground reticle of AR
+      // placement, with a plain caption under it — no glass pill, no glowing dot (Jason: 看着太 AI 了)
+      if (iceSec) {
+        s.hintAnchor = s.hintAnchor || { x: 0, z: 0 }
+        s.hintAnchor.x = s.boat.x - (k > 1 ? 1.5 : 2.6); s.hintAnchor.z = s.boat.z + (k > 1 ? 3.8 : 2.2)
+        tmp.set(s.hintAnchor.x, 0, s.hintAnchor.z).project(camera)
+      } else { s.hintAnchor = null; tmp.set(s.boat.x, 0.6, s.boat.z).project(camera) }
       const hw = (s.hintEl.offsetWidth || 160) / 2 + 8
       const minX = iceSec && size.width >= 1024 ? 440 + hw : hw // desktop: clear of the glass panel and the step cards
       const px = Math.min(size.width - hw, Math.max(minX, ((tmp.x + 1) / 2) * size.width))
       const below = cam.hintBelow && s.view !== 'section'
       const py = below ? ((1 - tmp.y) / 2) * size.height + (s.view === 'under' ? 150 : k > 1 ? 30 : 44) : Math.max((s.hintEl.offsetHeight || 34) + 54, ((1 - tmp.y) / 2) * size.height - (k > 1 ? 22 : 46))
-      const qy = iceSec ? Math.max((s.hintEl.offsetHeight || 34) + 54, ((1 - tmp.y) / 2) * size.height) : py
-      s.hintEl.style.transform = `translate(${px.toFixed(1)}px, ${qy.toFixed(1)}px) translate(-50%, ${iceSec ? '-50%' : below ? '0' : '-100%'})`
+      const qy = iceSec ? ((1 - tmp.y) / 2) * size.height + (k > 1 ? 16 : 18) : py // ice: the caption just under the reticle
+      const qx = iceSec ? Math.min(size.width - hw, Math.max(hw, ((tmp.x + 1) / 2) * size.width)) : px // ice: centred on the reticle, kept on screen
+      s.hintEl.style.transform = `translate(${qx.toFixed(1)}px, ${qy.toFixed(1)}px) translate(-50%, ${iceSec ? '0' : below ? '0' : '-100%'})`
       s.hintEl.style.opacity = s.hasDragged ? '0' : '1'
     }
     // fixed 3/4 aerial view like the PL animations; slight parallax from the pointer

@@ -3,7 +3,7 @@
 // reference/app-study/home*.jpg: a dark page, one section per device — "PingLive" (Panoramic / Forward / Down),
 // "PingLive Mini" (all seven of the app's tiles; Jason 2026-10-23: only Live Forward, Live Down, Live Ice Fishing and Live
 // Combo are open, every other tile is frosted) and
-// "Combo" (Live Combo) — rounded dark panels, labels under the
+// Live Combo sits in the Mini's row (2026-10-23; the app has a separate Combo section) — rounded dark panels, labels under the
 // tiles, and the Setting · Home · Map tab bar. The thumbnails are crops of the app's own tiles.
 // Tiles the Lab can show are live. The others are shown under a frosted layer (Jason: 其他的用那种我们也有的雾蒙蒙的一层)
 // and a tap only shows "Available with Accuphy PingLive Mini". Sizes are in cqh of the display, like SonarChrome.
@@ -34,13 +34,13 @@ const SECTIONS = {
     { label: 'Live Panoramic', img: plmPanoramic },
     { mode: 'forward', label: 'Live Forward', img: plmForward },
     { mode: 'down', label: 'Live Down', img: plmDown },
+    { mode: 'combo', label: 'Live Combo', img: plmCombo }, // in the Mini's row, not a separate Combo section (Jason 2026-10-23: 不要单独再放一栏了 这样人家搞不懂)
     { label: 'Down Scan', img: plmDownscan },
     { label: 'Chirp Sonar', img: plmChirp },
     { label: 'Ice Fishing', img: plmIceFishing }, // frosted: Jason 2026-10-23 keeps only Live Ice Fishing, Live Forward, Live Down, Live Combo
     { label: 'Live Ice Fishing', img: plmLiveIce, href: ICE_URL },
   ] },
 }
-const COMBO = { title: 'Combo', tiles: [{ device: 'PLM', mode: 'combo', label: 'Live Combo', img: plmCombo }] }
 
 const BLUE = '#2f8fff'
 function Icon({ name, active }) {
@@ -65,7 +65,6 @@ export default function AppHome({ devices, deviceId, mode, onPick, ice = false }
   // not a link to it
   const sections = devices.map((d) => ({ id: d.id, ...SECTIONS[d.id] })).filter((s) => s.tiles)
     .map((sec) => (ice ? { ...sec, tiles: sec.tiles.map((t) => (t.label === 'Live Ice Fishing' ? { ...t, mode: 'liveice', href: undefined } : t)) } : sec))
-  if (devices.some((d) => d.id === 'PLM')) sections.push({ id: 'PLM', ...COMBO })
   const [toast, setToast] = useState('')
   const toastT = useRef(0)
   useEffect(() => () => clearTimeout(toastT.current), [])

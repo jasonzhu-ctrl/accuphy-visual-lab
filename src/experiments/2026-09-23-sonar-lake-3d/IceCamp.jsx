@@ -89,6 +89,19 @@ export function IceCamp({ state, beamMats, iceMat, T }) {
   const shelter = useMemo(makeShelter, [])
   const sled = useMemo(makeSled, [])
   const aim = useMemo(makeAimRing, [])
+  // the "drill here" cue (2026-10-23): a thin white reticle lying on the ice — four arcs with gaps, the size of a hole seen
+  // from the camp — and a ring that slowly spreads out of it and fades, every 2.6 s. Shown until the first tap.
+  const reticle = useMemo(() => {
+    const g = new THREE.Group()
+    const mat = new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0.9, depthWrite: false, side: THREE.DoubleSide })
+    for (let i = 0; i < 4; i++) g.add(new THREE.Mesh(new THREE.RingGeometry(0.62, 0.7, 24, 1, i * Math.PI / 2 + 0.22, Math.PI / 2 - 0.44).rotateX(-Math.PI / 2), mat))
+    const rip = new THREE.Mesh(new THREE.RingGeometry(0.66, 0.7, 48).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide }))
+    g.add(rip)
+    g.userData.rip = rip
+    g.visible = false
+    g.renderOrder = 3
+    return g
+  }, [])
   const parts = useMemo(() => ({ fishline: kit.getObjectByName('fishline'), jig: kit.getObjectByName('jig'), rig: kit.getObjectByName('rig'), head: kit.getObjectByName('head'), auger: kit.getObjectByName('auger'), park: kit.getObjectByName('auger').position.clone(), lean: kit.getObjectByName('auger').rotation.z }), [kit])
   const s0 = state.current
   // the camp: shelter and sled a few metres from the first hole, the door toward it
@@ -209,6 +222,17 @@ export function IceCamp({ state, beamMats, iceMat, T }) {
     for (let k = fans.length; k < 2; k++) u.uCutBox.value[k].w = 0
     u.uBeamOn.value = s.signal // the ice window over the beam and the live hole's glow (iceSheet.js) go with the same gate
     if (glowRef.current) { glowRef.current.position.set(s.boat.x, APEX_Y + 0.3 + lift, s.boat.z); glowRef.current.intensity = 3 * s.signal }
+    {
+      const a = s.hintAnchor
+      reticle.visible = !!a && s.view === 'section' && !s.hasDragged && d.phase === 'idle'
+      if (reticle.visible) {
+        reticle.position.set(a.x, 0.025, a.z)
+        const t = (performance.now() / 1000) % 2.6, u = Math.min(1, t / 1.6)
+        const rip = reticle.userData.rip
+        rip.scale.setScalar(1 + 0.9 * (1 - (1 - u) * (1 - u)))
+        rip.material.opacity = 0.55 * (1 - u)
+      }
+    }
     // the aim ring under the pointer (on the underside of the sheet in the under-ice view)
     aim.visible = !!s.aiming && !!s.aim
     if (s.aim) aim.position.set(s.aim.x, s.view === 'under' ? -ICE_T - 0.02 : 0.015, s.aim.z)
@@ -225,6 +249,7 @@ export function IceCamp({ state, beamMats, iceMat, T }) {
       <primitive ref={campG} object={shelter} position={[camp.x, 0, camp.z]} rotation-y={camp.yaw} />
       <primitive ref={sledG} object={sled} position={[camp.x - 1.1, 0, camp.z + 2.3]} rotation-y={camp.yaw + 0.5} />
       <primitive object={aim} />
+      <primitive object={reticle} />
       <pointLight ref={lampRef} position={[camp.lamp.x, camp.lamp.y + 0.2, camp.lamp.z]} color="#ffb060" intensity={T.lamp * 7} distance={10} decay={2} />
       <pointLight ref={(l) => { if (l) l.position.set(state.current.boat.x, APEX_Y + 0.3, state.current.boat.z); glowRef.current = l }} color="#7fe6ff" intensity={3} distance={4} decay={2} />
     </group>

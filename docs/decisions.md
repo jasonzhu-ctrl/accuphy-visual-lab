@@ -1889,3 +1889,16 @@ Numbered log. Newest at the bottom.
      - On the ice page on phones the button did nothing (Home was excluded there since #107/#114). It now opens the app
        Home like on the lake pages; Live Ice Fishing, Live Forward, Live Down and Live Combo switch the ice page's view,
        the other Mini tiles stay frosted (#121).
+
+123. **2026-10-23** — **Three fixes from Jason: Combo in the Mini row, the whole Combo Down fan, a designed drill cue**
+     - **Home:** Live Combo sits in the PingLive Mini row (after Live Down); the separate "Combo" section is gone ("不要单独
+       再放一栏了 这样人家搞不懂"). The row: Live Panoramic · Live Forward · Live Down · Live Combo · Down Scan · Chirp
+       Sonar · Ice Fishing · Live Ice Fishing, with only Forward, Down, Combo and Live Ice open (#121).
+     - **Combo:** the Down fan's 3D beam and lit footprint were cropped to the phone panel (`box.xMin = -0.2·wd`), so the
+       lake showed a triangle missing its lower-left corner ("下面的 coverage 左边缺了一个角"). The Down fan in Combo is now
+       drawn whole in the water (both pages); the phone's Combo panel still crops its left side like the app does.
+     - **Drill cue (ice page):** the glass pill with a glowing blue dot read as generic AI UI ("看着太 AI 了"). It is now a thin
+       white reticle lying on the open ice left of the kit — four arcs and a ring that slowly spreads out of it every 2.6 s —
+       with one plain caption under it, "Tap the ice to drill a hole" (sentence case, 13 px, no background). Precedent: the
+       ground reticle of AR placement (Apple AR Quick Look / ARKit, Google Scene Viewer), which marks a spot on a surface
+       instead of floating a button. Hidden after the first tap. The summer page's "Drag the boat" pill is unchanged.

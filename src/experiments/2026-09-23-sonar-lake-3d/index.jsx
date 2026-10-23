@@ -123,7 +123,9 @@ export default function SonarLake3D({ scene: sceneProp }) {
     // PLM Combo: the Down fan reaches its AUTO-depth panel, the Forward fan its 0.7 × range panel (SonarScreen.jsx)
     if (deviceId === 'PLM' && mode === 'combo' && sp[1]) {
       const R = rangeFt * FT, D = depthFt * FT, wd = (D * 2.08) / 2
-      sp[0] = { ...sp[0], R: Math.hypot(0.8 * wd, D) * 1.001, box: { xMin: -0.2 * wd, xMax: 0.8 * wd, yMax: D } }
+      // the Down fan's beam is drawn whole in the lake (Jason 2026-10-23: 三角形不够完整 … 左边缺了一个角 补完整): the app's
+      // Combo panel still crops its left side (the apex sits 20 % in), but the coverage in the water is the full fan
+      sp[0] = { ...sp[0], R: Math.hypot(0.8 * wd, D) * 1.001 }
       sp[1] = { ...sp[1], R: Math.hypot(R, 0.7 * R) * 1.001, box: { xMin: -0.25 * R, xMax: R, yMax: 0.7 * R } }
     }
     if (deviceId === 'PLM' && mode === 'forward' && sp[0]) { const R = rangeFt * FT, D = depthFt * FT; sp[0] = { ...sp[0], R: Math.hypot(R, D) * 1.001, box: { xMin: -0.25 * R, xMax: R, yMax: D } } }
@@ -294,12 +296,13 @@ export default function SonarLake3D({ scene: sceneProp }) {
       </motion.div>
 
       {/* ---- drag hint: follows the boat until the first drag (position set by the render loop) ---- */}
-      <div ref={(el) => { state.current.hintEl = el }} className="ac-hint pointer-events-none absolute left-0 top-0 flex items-center gap-2 px-3.5 py-2" style={{ opacity: 0 }}>
-        {ICE /* a tap, not a drag: a dot with a ripple */
-          ? <svg className="hand" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#028cdf" strokeWidth="2"><circle cx="12" cy="12" r="3" fill="#028cdf" /><circle cx="12" cy="12" r="8" opacity="0.55" /></svg>
-          : <svg className="hand" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#028cdf" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12h18M7 8l-4 4 4 4M17 8l4 4-4 4"/></svg>}
-        <span className="font-brand-head text-[11px] uppercase tracking-wider">{ICE ? 'Tap the ice to drill' : 'Drag the boat'}</span>
-      </div>
+      {ICE
+        ? /* the ice page: a plain caption under the reticle on the ice (IceCamp.jsx) — no pill, no dot (2026-10-23) */
+          <div ref={(el) => { state.current.hintEl = el }} className="pointer-events-none absolute left-0 top-0 whitespace-nowrap" style={{ opacity: 0, transition: 'opacity .6s', color: 'rgba(255,255,255,0.92)', fontSize: 13, fontWeight: 500, letterSpacing: '0.01em', textShadow: '0 1px 2px rgba(0,0,0,0.55), 0 0 12px rgba(0,0,0,0.45)' }}>Tap the ice to drill a hole</div>
+        : <div ref={(el) => { state.current.hintEl = el }} className="ac-hint pointer-events-none absolute left-0 top-0 flex items-center gap-2 px-3.5 py-2" style={{ opacity: 0 }}>
+            <svg className="hand" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#028cdf" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12h18M7 8l-4 4 4 4M17 8l4 4-4 4"/></svg>
+            <span className="font-brand-head text-[11px] uppercase tracking-wider">Drag the boat</span>
+          </div>}
 
       {/* ---- iPhone Pro Max, landscape, turned slightly in 3D (same pose as the GL picture).
            Proportions from the 15/16 Pro Max: body 2.08:1, corner radius ≈ 14 % of the short side,
