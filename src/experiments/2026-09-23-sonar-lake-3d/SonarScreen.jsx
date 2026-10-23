@@ -162,19 +162,22 @@ export default function SonarScreen({ state, rect, lakeMats }) {
         }
         return { black: black / (black + lit), lit, hist: hist.map((h) => +(h / lit).toFixed(3)) }
       }
-      // dev: window.__sonarSnap() — the same flat render as a PNG data URL (for side-by-side files)
-      window.__sonarSnap = () => {
+      // dev: window.__sonarSnap(w, h) — the same flat render as a PNG data URL (for side-by-side files); a bigger
+      // size samples the same picture box more finely (measurements in sonar-style §7.20)
+      window.__sonarSnap = (W = 768, H = 384) => {
         const pos = quad.geometry.attributes.position, aW = quad.geometry.attributes.aW
         const savedP = pos.array.slice(), savedW = aW.array.slice()
         ;[[-1, 1], [1, 1], [-1, -1], [1, -1]].forEach(([x, y], i) => { pos.setXYZ(i, x, y, 0); aW.setX(i, 1) })
         pos.needsUpdate = true; aW.needsUpdate = true
         const gl = window.__sonarGL
-        gl.setRenderTarget(histRT); gl.render(overlay, ortho); gl.setRenderTarget(null)
-        const px = new Uint8Array(768 * 384 * 4); gl.readRenderTargetPixels(histRT, 0, 0, 768, 384, px)
+        const rt = W === 768 && H === 384 ? histRT : new THREE.WebGLRenderTarget(W, H)
+        gl.setRenderTarget(rt); gl.render(overlay, ortho); gl.setRenderTarget(null)
+        const px = new Uint8Array(W * H * 4); gl.readRenderTargetPixels(rt, 0, 0, W, H, px)
+        if (rt !== histRT) rt.dispose()
         pos.array.set(savedP); aW.array.set(savedW); pos.needsUpdate = true; aW.needsUpdate = true
-        const c = document.createElement('canvas'); c.width = 768; c.height = 384
-        const ctx = c.getContext('2d'); const img = ctx.createImageData(768, 384)
-        for (let y = 0; y < 384; y++) img.data.set(px.subarray((383 - y) * 768 * 4, (384 - y) * 768 * 4), y * 768 * 4) // GL rows are bottom-up
+        const c = document.createElement('canvas'); c.width = W; c.height = H
+        const ctx = c.getContext('2d'); const img = ctx.createImageData(W, H)
+        for (let y = 0; y < H; y++) img.data.set(px.subarray((H - 1 - y) * W * 4, (H - y) * W * 4), y * W * 4) // GL rows are bottom-up
         for (let i = 3; i < img.data.length; i += 4) img.data[i] = 255
         ctx.putImageData(img, 0, 0)
         return c.toDataURL('image/png')

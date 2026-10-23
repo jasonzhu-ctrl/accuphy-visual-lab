@@ -110,13 +110,18 @@ export const sonarFragment = /* glsl */ `
     float n = 0.65 * (0.6 * vnoise(nc + o1) + 0.4 * vnoise(nc * 2.3 + o1.yx)) + 0.35 * vnoise(nc + o0);
     n = clamp(0.5 + (n - 0.5) * 2.6, 0.0, 1.0); // the averaged noise sits in 0.3–0.7: back to full contrast
     d2 += (n - 0.5) * 1.3 * smoothstep(0.4, 2.5, d2);                     // ragged rim
-    float tex = mix(0.65 + 0.7 * n, 0.12 + 1.75 * n, smoothstep(0.25, 1.6, d2)); // core ±35 %: grain, never a hole
+    // core ±20 %, rim much more: LiveScope's and the app's marks are smooth spindles inside (#123)
+    float tex = mix(0.8 + 0.4 * n, 0.12 + 1.75 * n, smoothstep(0.25, 1.6, d2));
     // along the body (when it is longer than the spread): the swim bladder (~90 % of the echo) in the front half,
     // weaker head and tail peaks; broadside the flank fills in between, head-on the peaks stand apart
     float prof = max(max(exp(-30.0 * (h - 0.6) * (h - 0.6)), 0.45 * exp(-90.0 * (h - 0.93) * (h - 0.93))),
                      max(0.4 * exp(-60.0 * (h - 0.08) * (h - 0.08)), mix(0.1, 0.55, asp)));
     float body = mix(1.0, prof, smoothstep(0.6, 2.5, length(qb)));
-    float e = exp(-1.5 * d2) * tex * body;
+    // a second, weaker ridge just behind the first on bigger or nearer fish (the far side of the body / the swim bladder;
+    // LiveScope's close marks often show two parallel ridges along the arc)
+    float off = (0.9 * bw + 0.015) / sr;
+    float ridge2 = 0.55 * smoothstep(1.0, 1.6, off) * exp(-1.5 * (tx * tx + (q.y - off) * (q.y - off) / 1.2));
+    float e = max(exp(-1.5 * d2), ridge2) * tex * body;
     // sidelobes: the next beams out along the arc, a few faint stripes fading away
     float sx = tx - 1.5;
     if (lobe > 0.0 && sx > 0.0) {
@@ -225,7 +230,7 @@ export const sonarFragment = /* glsl */ `
     if (abs(a) > uFan[k].y || r > uReach) return 0.0;
     inFan = 1.0;
     float u = 0.5 + 0.5 * tan(a) / uFan[k].z;
-    float acc = 0.0, peak = 0.0, spk = 0.0, edge = 0.0;
+    float acc = 0.0, peak = 0.0, spk = 0.0, spkT = 0.0, edge = 0.0;
     // which thickness rows a pixel samples: the same set for a short run along the ray (0.08° × 0.67 m cells), not
     // a fresh random set per pixel. Per-pixel sets turned big steel faces into salt-and-pepper dust (the wreck at
     // 40 m, Jason 2026-09-25: 这个船的画面和 [app 的] 相差好远 结构和感觉完全不对); coherent sets draw them as the
@@ -233,6 +238,8 @@ export const sonarFragment = /* glsl */ `
     float jit = hash(vec2(floor(aWorld * 700.0), floor(r * 1.5)) + 0.11);
     float sigma = 0.22 + 0.010 * r;
     float tailLen = 0.35 + 0.015 * r;
+    // fibres in a structure's tail: short dashes along the arc, new every ping
+    float fib = 0.4 + 0.9 * vnoise(vec2(aWorld * 55.0, r * 11.0 + fract(floor(uTime * 8.0) * 0.1731) * 97.0));
     for (int j = 0; j < 24; j++) {
       float v = (float(j) + jit) / 24.0;
       float ty = (v * 2.0 - 1.0) * uFan[k].w;
@@ -253,7 +260,12 @@ export const sonarFragment = /* glsl */ `
       acc += (1.2 * pulse + tail + second) * wgt;
       peak = max(peak, pulse * (1.0 - structure));
       edge = max(edge, exp(-dr * dr / (0.16 * sg * sg)) * (1.0 - structure)); // the first return: a thin hot line
-      spk = max(spk, pulse * structure * (1.0 + 0.3 * steel));
+      // timber, rock and pilings ring on behind the face they show the sonar: a hot face line and a fibrous tail along
+      // the ray, ~0.1 × range long (#123: the app's piling at 14 m is a 1.4 m band, LiveScope's trunk at 4.6 m
+      // 0.5 m; before, the engine drew a 0.2 m line). Steel keeps its own calibrated tails (#63).
+      float sTail = dr > 0.0 ? 0.42 * exp(-dr / (0.05 + 0.04 * r)) : 0.0;
+      spk = max(spk, pulse * structure * steel * 1.3);
+      spkT = max(spkT, structure * (1.0 - steel) * max(pulse, sTail * fib));
     }
     // Bottom brightness (Jason 2026-09-25: 画面特别是底部貌似还是太亮 深水也是 … 高亮的部分和桔红色的关系): over a flat
     // bottom every row across the slab lands at one range and the integrated echo added up to a solid white band
@@ -270,7 +282,9 @@ export const sonarFragment = /* glsl */ `
     float capR = smoothstep(6.0, 14.0, r), capD = uCapDepth.z * smoothstep(uCapDepth.x, uCapDepth.y, p.y);
     float accI = acc / 16.0, K = mix(3.0, 0.4, max(capR, capD)); // (4–10 m on range tried: the Mini's calibrated shelf lost its hot edge, 6 → 0.3 % white)
     accI = K * (1.0 - exp(-accI / K));
-    acc = accI + 0.7 * peak + 0.3 * edge * (0.55 + 0.6 * filament) + 0.9 * spk;
+    // non-steel structure as bright as the bottom band (#123: LiveScope trunk and the app's piling peak at LUT 0.89–0.90,
+    // the bottom at 0.87–0.89; the engine's timber was 0.64)
+    acc = accI + 0.7 * peak + 0.3 * edge * (0.55 + 0.6 * filament) + 0.9 * spk + 1.5 * spkT;
     // Bottoms past the cap depth are toned no nearer than 80 % of the range window (#92). With the middle sloping
     // from 30 to 80 ft, Forward (the visitor's fixed range) drew its nearer bottom at 11–22 % white against the old
     // plateau's 8 %; now 7–12 %. Down's AUTO range already puts the bottom at ~80 %, so Down barely changes
@@ -344,6 +358,39 @@ export const sonarFragment = /* glsl */ `
     return mix(r < R0 ? vec3(0.74, 0.76, 0.86) : panel, col, aa);
   }
 
+  // ---- small scatterers in the water column (#123) ----
+  // Bait, plankton and debris: the app's water carries short dim dashes on ~4 % of it (plm-forward-fish-a/c.jpg: ≈ 0.8°
+  // across × 5 cm along the ray, peak LUT ≈ 0.55, 1–2 per m², mostly in the upper few metres), LiveScope's too; the
+  // engine's water was empty. One possible scatterer per 0.55 m cell of the fan plane (world x × depth, so they stay put
+  // when the boat turns the picture), drawn with the fish marks' beam spread but smaller and dimmer, a few blinking out
+  // each ping; only in water (above the bottom under them), thinner with depth.
+  float waterSpecks(vec2 p, float r) {
+    vec2 w = vec2(uApexXZ.x + p.x, uApexDepth + p.y);            // world x, depth below the surface (m)
+    if (w.y > terrainDepth(vec2(w.x, uApexXZ.y)) - 0.25) return 0.0;
+    vec2 rh = p / max(r, 0.3);
+    float st = 0.8 * uBeamHalf * r + 0.012, sr = 0.5 * uPulse;
+    float ping = fract(floor(uTime * 8.0) * 0.0731) * 113.0;
+    const float CELL = 0.55;
+    vec2 c0 = floor(w / CELL);
+    float e = 0.0;
+    for (int i = -1; i <= 1; i++) {
+      for (int j = -1; j <= 1; j++) {
+        vec2 c = c0 + vec2(float(i), float(j));
+        float h = hash(c * 1.37 + 0.71);
+        float dens = 0.07 + 0.28 * (1.0 - smoothstep(2.5, 9.0, c.y * CELL));
+        if (h > dens) continue;
+        vec2 sp = (c + vec2(hash(c + 3.1), hash(c + 7.7))) * CELL;
+        vec2 q = vec2(sp.x - uApexXZ.x, sp.y - uApexDepth) - p;   // screen metres, pixel → speck
+        float qr = dot(q, rh), qt = q.x * rh.y - q.y * rh.x;
+        float d2 = qr * qr / (sr * sr) + qt * qt / (st * st);
+        if (d2 > 6.0) continue;
+        float on = step(0.3, hash(c + ping));                     // ~70 % of pings
+        float amp = (0.2 + 0.26 * hash(c + 11.3) * hash(c + 5.9)) * (1.15 - 0.5 * uNoise);
+        e = max(e, amp * on * exp(-1.5 * d2));
+      }
+    }
+    return e * (1.0 - 0.3 * min(r / uRange, 1.0));
+  }
   void main() {
     vec2 vUv = vUv0;
     // ---- the 2D history pass (Ice Fishing View): shift the record one column left, draw the newest ping at the right edge
@@ -501,6 +548,7 @@ export const sonarFragment = /* glsl */ `
       float near = 1.0 - smoothstep(0.0, 2.4, r);
       echo = max(echo, inAny * near * near * (0.25 + 0.6 * rays) * tex * 0.5);
       echo = max(echo, inAny * floorTex * 0.7);
+      echo = max(echo, inAny * waterSpecks(p, r));
     }
     // the signal gate: the fan keeps its shape but carries no returns (LUT index 0) while the Mini is out of the water,
     // and the picture comes back through the tone window as the signal ramps up (the bottom, the strongest echo, first)
