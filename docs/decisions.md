@@ -1943,3 +1943,21 @@ Numbered log. Newest at the bottom.
        and a lake trout that live far from the hole are brought to 5–13 m from it, 1–3 m off the bottom, clear of
        structure (`winterCamp`) — so every hole has fish, as a good spot has. The summer lake is untouched (no jig).
      - Watched 64 s at the first hole: perch hover, a walleye bite, a lake trout visit; dev hook `window.__jig()`.
+
+128. **2026-10-23** — **Sonar engine: structure drawn as the app draws it — solid columns, hot cores, black shadows**
+     (Jason's ask 2 of 4: "结构物的画面跟真实的声纳的画面差距还是比较远"). References: the PL Forward wreck frames
+     (`reference/app-study/ideal-picture-2-pl-forward-wreck/`) and the 2.0.0 Live Combo pilings
+     (`reference/app-study/2026-10-23/40-live-combo.jpg`): a piling or trunk is a thick column with a white-yellow core,
+     and the bottom band breaks off black behind it and comes back a few metres on.
+     - The Lab drew timber as thin dark-orange strokes (pulse 0.08 m, 22 % dimmer than the bottom) with hatched crowns
+       and no shadow — the bottom ran on brightly behind every trunk.
+     - `sonarShader.js fanEcho` (vertical views): (1) the beam's main lobe across the slab is peaked, not a triangle
+       (`wgt = 0.33 + 1.87·lobe^1.8`, same mean), so what stands on the centreline dominates; (2) rows that met
+       structure in front of a pixel cast a shadow on it — the blocked weight share, fading over ~3.5 m, squared
+       (`shade`), applied to the bottom's integrated echo, first return and edge but not to the structure itself;
+       (3) timber and rock get a 0.3 m pulse (was 0.08), almost full brightness and a little orange smear behind the
+       face; their peak gain 1.15 (was 0.9); steel keeps its #63 calibration (its own `spkS` at 0.9 × 1.3).
+     - Measured (`__sonarHist`, % white, before → after): default PL Forward 11.6 → 11.1; Mini shelf Down 4.4 → 3.3;
+       timber PL Forward 7.7 → 11.9 (target for structure 13–14); timber Mini Forward 1.5 → 3.0; small wreck
+       10.1 → 8.4; big wreck 3.3 → 5.1. The approved bottom/fish scenes are unchanged within noise; the ice views too.
+     - Not done: the app's near-apex clutter rays and its thicker bottom tail (a bottom calibration Jason approved earlier).

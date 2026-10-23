@@ -225,7 +225,7 @@ export const sonarFragment = /* glsl */ `
     if (abs(a) > uFan[k].y || r > uReach) return 0.0;
     inFan = 1.0;
     float u = 0.5 + 0.5 * tan(a) / uFan[k].z;
-    float acc = 0.0, peak = 0.0, spk = 0.0, edge = 0.0;
+    float acc = 0.0, peak = 0.0, spk = 0.0, spkS = 0.0, edge = 0.0;
     // which thickness rows a pixel samples: the same set for a short run along the ray (0.08° × 0.67 m cells), not
     // a fresh random set per pixel. Per-pixel sets turned big steel faces into salt-and-pepper dust (the wreck at
     // 40 m, Jason 2026-09-25: 这个船的画面和 [app 的] 相差好远 结构和感觉完全不对); coherent sets draw them as the
@@ -233,6 +233,13 @@ export const sonarFragment = /* glsl */ `
     float jit = hash(vec2(floor(aWorld * 700.0), floor(r * 1.5)) + 0.11);
     float sigma = 0.22 + 0.010 * r;
     float tailLen = 0.35 + 0.015 * r;
+    // Structure as the app draws it (Jason 2026-10-23: 结构物的画面跟真实的声纳的画面差距还是比较远; references: the PL Forward
+    // wreck frames and the 2.0.0 Live Combo pilings, reference/app-study/2026-10-23/40-live-combo.jpg): a trunk or
+    // piling is a solid column with a hot core, and it throws a BLACK shadow — the bottom band breaks off behind it and
+    // comes back a few metres on. Two things make that: the beam's main lobe is peaked across the slab (the centre
+    // rows carry most of the energy, so a trunk on the centreline blocks most of it), and whatever the rows in front
+    // of a pixel hit as structure casts a shadow on the rows behind — wblk / wsum below, squared like the app's.
+    float wsum = 0.0, wblk = 0.0;
     for (int j = 0; j < 24; j++) {
       float v = (float(j) + jit) / 24.0;
       float ty = (v * 2.0 - 1.0) * uFan[k].w;
@@ -245,16 +252,22 @@ export const sonarFragment = /* glsl */ `
       // ringing inside the hull stay bright, so the app draws a wreck as thick glowing bands with long tails,
       // not a line drawing (Jason 2026-09-25: 结构物的成像不对劲; PL Forward wreck recording, same depth and scale:
       // reference/engine-compare/wreck-compare-*.png)
-      float sg = mix(sigma, mix((0.08 + 0.004 * r) * (1.0 + 1.5 * smoothstep(6.0, 30.0, r)), sigma, steel), structure);
-      float pulse = exp(-dr * dr / (sg * sg)) * (1.0 - 0.22 * structure) * mix(1.0, 0.85 + 0.25 * filament, structure);
-      float tail = dr > 0.0 ? (0.6 + 0.6 * steel) * exp(-dr / (tailLen * (1.0 + 0.5 * steel))) : 0.0;
+      // timber and rock: a solid pulse ~0.3 m long (was 0.08 m — a line drawing), with some orange smear behind the
+      // face; steel keeps its wide bands and long tails (#63)
+      float sg = mix(sigma, mix((0.15 + 0.006 * r) * (1.0 + 1.0 * smoothstep(6.0, 30.0, r)), sigma, steel), structure);
+      float pulse = exp(-dr * dr / (sg * sg)) * (1.0 - 0.06 * structure) * mix(1.0, 0.85 + 0.25 * filament, structure);
+      float tail = dr > 0.0 ? (0.6 + 0.3 * structure + 0.6 * steel) * exp(-dr / (tailLen * (1.0 + 0.4 * structure + 0.5 * steel))) : 0.0;
       float second = 0.10 * exp(-(r - 2.0 * hit) * (r - 2.0 * hit) / (4.0 * sigma * sigma));
-      float wgt = 0.55 + 0.9 * (1.0 - abs(v * 2.0 - 1.0));
+      float lobe = 1.0 - abs(v * 2.0 - 1.0);
+      float wgt = 0.33 + 1.87 * pow(lobe, 1.8); // the main lobe across the slab (same mean as the old triangle)
+      wsum += wgt; wblk += wgt * structure * step(0.35, dr) * exp(-max(dr - 0.35, 0.0) / 3.5); // this row met structure in front of the pixel; the shadow fades over a few metres, as the app's do
       acc += (1.2 * pulse + tail + second) * wgt;
       peak = max(peak, pulse * (1.0 - structure));
       edge = max(edge, exp(-dr * dr / (0.16 * sg * sg)) * (1.0 - structure)); // the first return: a thin hot line
-      spk = max(spk, pulse * structure * (1.0 + 0.3 * steel));
+      spk = max(spk, pulse * structure * (1.0 - steel));
+      spkS = max(spkS, pulse * steel * 1.3); // steel keeps its #63 calibration
     }
+    float shade = pow(1.0 - 0.95 * wblk / max(wsum, 1e-3), 2.2); // the acoustic shadow behind structure
     // Bottom brightness (Jason 2026-09-25: 画面特别是底部貌似还是太亮 深水也是 … 高亮的部分和桔红色的关系): over a flat
     // bottom every row across the slab lands at one range and the integrated echo added up to a solid white band
     // (38–44 % of the lit pixels white in PL scenes; the app's bottom scenes 6–7 %). Past the near range (where TVG
@@ -270,7 +283,7 @@ export const sonarFragment = /* glsl */ `
     float capR = smoothstep(6.0, 14.0, r), capD = uCapDepth.z * smoothstep(uCapDepth.x, uCapDepth.y, p.y);
     float accI = acc / 16.0, K = mix(3.0, 0.4, max(capR, capD)); // (4–10 m on range tried: the Mini's calibrated shelf lost its hot edge, 6 → 0.3 % white)
     accI = K * (1.0 - exp(-accI / K));
-    acc = accI + 0.7 * peak + 0.3 * edge * (0.55 + 0.6 * filament) + 0.9 * spk;
+    acc = (accI + 0.7 * peak + 0.3 * edge * (0.55 + 0.6 * filament)) * shade + 1.15 * spk + 0.9 * spkS; // structure itself is not shaded; timber/rock brighter (hot core), steel as before
     // Bottoms past the cap depth are toned no nearer than 80 % of the range window (#92). With the middle sloping
     // from 30 to 80 ft, Forward (the visitor's fixed range) drew its nearer bottom at 11–22 % white against the old
     // plateau's 8 %; now 7–12 %. Down's AUTO range already puts the bottom at ~80 %, so Down barely changes
