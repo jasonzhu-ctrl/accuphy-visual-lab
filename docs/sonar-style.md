@@ -775,3 +775,13 @@ Map yellow). The Lab's ice page (#94–#116) was built before any real capture e
 4. The Lab's dial ring is white with one coloured wedge; the app's ring shows every depth's colour (white only where
    nothing returns in Live Ice) and a strong red surface-clutter arc at 0–2 m.
 5. The Lab prefills the history (#116); the real view starts empty at the right and grows leftward.
+
+## 9. Structure in the vertical views, after the 2026-10-23 round (decision in docs/decisions.md)
+
+What the app does with a trunk or piling (Live Combo pilings, PL Forward wreck): a **solid column** the width of the
+object plus the pulse, with a **white-yellow core** and ragged filament edges along the ray; a **black acoustic shadow**
+behind it — the bottom band stops right behind the base and fades back in over a few metres; the bottom band itself
+is thick with a long red tail. Crowns and brush are fuzzy orange clumps with bright specks, never hatched lines.
+Engine: peaked main lobe across the slab, per-row shadowing with a 3.5 m fade, a 0.3 m pulse for timber/rock, steel
+unchanged. Tune with `__sonarHist(10)` on the six scenes listed in the decision; structure scenes should land near
+12–14 % white, bottom/fish scenes stay where they were.

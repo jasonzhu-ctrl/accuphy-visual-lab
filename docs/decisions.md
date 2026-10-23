@@ -1902,3 +1902,62 @@ Numbered log. Newest at the bottom.
        with one plain caption under it, "Tap the ice to drill a hole" (sentence case, 13 px, no background). Precedent: the
        ground reticle of AR placement (Apple AR Quick Look / ARKit, Google Scene Viewer), which marks a spot on a surface
        instead of floating a button. Hidden after the first tap. The summer page's "Drag the boat" pill is unchanged.
+
+124. **2026-10-23** — **PLM Combo at long range: the Forward panel's depth meets the water halfway** (Jason: "Range 拉到很高的
+     时候 画面只剩下顶部那一点点"; on option A: "方案 A 会更好一点 但是抬高的再少一点 曲度跟原来保持相近").
+     - The Forward panel's depth axis was always 0.7 × range (the app's proportion), so at 200 ft in 36 ft of water the
+       bottom sat in the top quarter. Now it is `min(0.7·R, √(0.7·R × 1.3·D))` (`comboFwdDepth`, SonarScreen.jsx), the
+       geometric mean of the app's proportion and the water: unchanged up to ~70 ft range in 36 ft of water, and at long
+       range the bottom line rises about half as far as option A did. The 3D curtain (index.jsx) uses the same depth.
+     - Option A (depth = 1.3 × water) and B (cap the range) are in docs/backlog.md for reference.
+
+125. **2026-10-23** — **PLM Combo: the range is AUTO, like the app** (Jason's ask 1 of 4: the Forward part's bottom-vs-range
+     relationship must be easy for a beginner).
+     - The real app's Live Combo has no range control (`reference/app-study/2026-10-23/40-live-combo.jpg`), and the squeeze
+       Jason hit (#124) only ever came from the Lab's desktop slider. Now Combo's range follows the water like Down does:
+       about 3 × the AUTO depth on the range steps, 40–160 ft (`comboAutoRangeFt`); 120 ft at the default spot, 150 ft
+       at the ice hole. The slider is dimmed and the panel says "AUTO · follows the water" (phones never had a Combo range).
+       The Forward panel's depth keeps #124's rule, so the bottom sits mid-panel at every spot.
+     - The beginner's model: Forward = you choose how far ahead; Down and Combo = automatic.
+
+126. **2026-10-23** — **Ice page: every tap on the ice counts; a hop is at most 25 m** (Jason's ask 3: "往冰面的上面再去点
+     它是过不太过去的 … 找哪一个区域最合适").
+     - Cause: a tap near the horizon lands 60–300 m away, past the modelled lake (±58 m); it was clamped to the lake's
+       corner (one 80 m walk in 0.9 s), and the next far tap resolved to the same corner and was dropped as "too close".
+     - Now the destination is capped at `HOP_MAX` 25 m from the current hole in the tapped direction (and ±56 m of the
+       lake); the aim ring shows that real destination while the finger is down; the walk lasts 0.9–2.1 s by distance.
+       The tap area itself is unchanged and right for a new user: any ice behind the cut wall, which is all the ice in
+       view; taps on the water section and the sky do nothing.
+     - Checked: desktop far tap → 25 m hop; phone taps at four heights of the band → 8–16 m hops.
+
+127. **2026-10-23** — **Ice page: fish come to the jig** (Jason's ask 4: "附近的鱼都比较自然 但是很快的能够到这个边上 又自然又快
+     跟鱼饵能够有一些自然的互动").
+     - fish.js: under the ice the jig replaces the boat as the attraction. A fish within its species' reach (perch 9 m,
+       walleye 12 m, lake trout 16 m) may come: on entering, now and then while it stays, and above all when the jig is
+       lifted (a pop calls fish in). It swims straight in (perch 1.6 m/s, walleye 2.4, trout 3.2 — a fish 8 m away is
+       there in 2.5–5 s), stops a body length short, nose to the lure, hovers with the usual jitter, then drifts back —
+       or, with a species chance (walleye 40 %, trout 35 %, perch 25 %), darts the last bit, touches the lure and
+       bolts. Arrivals are paced 3–9 s apart, at most two fish at the jig. The dial, the Live Down fan and the history
+       show the same visits.
+     - A winter population: when a hole opens (the picture is black during the hop) six perch, two walleye, two crappie
+       and a lake trout that live far from the hole are brought to 5–13 m from it, 1–3 m off the bottom, clear of
+       structure (`winterCamp`) — so every hole has fish, as a good spot has. The summer lake is untouched (no jig).
+     - Watched 64 s at the first hole: perch hover, a walleye bite, a lake trout visit; dev hook `window.__jig()`.
+
+128. **2026-10-23** — **Sonar engine: structure drawn as the app draws it — solid columns, hot cores, black shadows**
+     (Jason's ask 2 of 4: "结构物的画面跟真实的声纳的画面差距还是比较远"). References: the PL Forward wreck frames
+     (`reference/app-study/ideal-picture-2-pl-forward-wreck/`) and the 2.0.0 Live Combo pilings
+     (`reference/app-study/2026-10-23/40-live-combo.jpg`): a piling or trunk is a thick column with a white-yellow core,
+     and the bottom band breaks off black behind it and comes back a few metres on.
+     - The Lab drew timber as thin dark-orange strokes (pulse 0.08 m, 22 % dimmer than the bottom) with hatched crowns
+       and no shadow — the bottom ran on brightly behind every trunk.
+     - `sonarShader.js fanEcho` (vertical views): (1) the beam's main lobe across the slab is peaked, not a triangle
+       (`wgt = 0.33 + 1.87·lobe^1.8`, same mean), so what stands on the centreline dominates; (2) rows that met
+       structure in front of a pixel cast a shadow on it — the blocked weight share, fading over ~3.5 m, squared
+       (`shade`), applied to the bottom's integrated echo, first return and edge but not to the structure itself;
+       (3) timber and rock get a 0.3 m pulse (was 0.08), almost full brightness and a little orange smear behind the
+       face; their peak gain 1.15 (was 0.9); steel keeps its #63 calibration (its own `spkS` at 0.9 × 1.3).
+     - Measured (`__sonarHist`, % white, before → after): default PL Forward 11.6 → 11.1; Mini shelf Down 4.4 → 3.3;
+       timber PL Forward 7.7 → 11.9 (target for structure 13–14); timber Mini Forward 1.5 → 3.0; small wreck
+       10.1 → 8.4; big wreck 3.3 → 5.1. The approved bottom/fish scenes are unchanged within noise; the ice views too.
+     - Not done: the app's near-apex clutter rays and its thicker bottom tail (a bottom calibration Jason approved earlier).

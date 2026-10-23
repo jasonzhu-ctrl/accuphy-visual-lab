@@ -129,12 +129,14 @@ export function IceCamp({ state, beamMats, iceMat, T }) {
     if (d.phase === 'idle' && Math.hypot(s.target.x - s.boat.x, s.target.z - s.boat.z) > 0.8) {
       d.phase = 'lift'; d.t = 0; d.opened = false
       d.from = { x: s.boat.x, z: s.boat.z }; d.to = { x: s.target.x, z: s.target.z }
+      const dist = Math.hypot(d.to.x - d.from.x, d.to.z - d.from.z)
+      d.moveT = Math.min(2.4, Math.max(DUR.move, 0.9 + (dist - 8) * 0.07)) // a 25 m hop takes ~2.1 s, not 0.9
     }
     d.t += Math.min(dt, 0.1)
     let lift = 0, drilling = 0
     const { auger, park } = parts
     if (d.phase !== 'idle') {
-      const u = Math.min(1, d.t / DUR[d.phase]), e = ease(u)
+      const u = Math.min(1, d.t / (d.phase === 'move' ? d.moveT || DUR.move : DUR[d.phase])), e = ease(u)
       if (d.phase === 'lift') { lift = e * LIFT; if (u >= 1) { d.phase = 'move'; d.t = 0 } }
       else if (d.phase === 'move') {
         lift = LIFT
@@ -311,13 +313,23 @@ export function IceWalls({ state, iceMat }) {
   )
 }
 
+// How far one hop can go (Jason 2026-10-23: taps up the ice "did not go through" — a tap near the horizon lands 60–300 m
+// away, past the modelled lake, and was clamped to its corner; the next such tap resolved to the same corner and was
+// dropped). Now every tap counts: a far tap walks HOP_MAX in that direction, and the aim ring shows where the hole will be.
+const HOP_MAX = 25
 export function IcePick({ state }) {
-  const clampXZ = (p) => ({ x: THREE.MathUtils.clamp(p.x, -58, 58), z: THREE.MathUtils.clamp(p.z, -58, 58) })
+  const clampXZ = (p) => ({ x: THREE.MathUtils.clamp(p.x, -56, 56), z: THREE.MathUtils.clamp(p.z, -56, 56) })
+  const clampHop = (s, p) => {
+    let dx = p.x - s.boat.x, dz = p.z - s.boat.z
+    const dd = Math.hypot(dx, dz)
+    if (dd > HOP_MAX) { dx *= HOP_MAX / dd; dz *= HOP_MAX / dd }
+    return clampXZ({ x: s.boat.x + dx, z: s.boat.z + dz })
+  }
   // the section view: the ice in front of the wall is cut away, so a tap counts only on the ice behind it (a ray that
   // meets the sheet's plane in front of the wall came through the water column or the empty cut — ignored)
   const onIce = (s, p) => s.view !== 'section' || p.z < s.boat.z + SECTION_CAM.cutZ - 0.4
-  const onDown = (e) => { e.stopPropagation(); const s = state.current; if (!onIce(s, e.point)) { s.aiming = false; s.aim = null; return } s.aiming = true; s.aim = clampXZ(e.point); e.target.setPointerCapture?.(e.pointerId) }
-  const onMove = (e) => { const s = state.current; if (!s.aiming) return; if (!onIce(s, e.point)) { s.aim = null; return } s.aim = clampXZ(e.point) }
+  const onDown = (e) => { e.stopPropagation(); const s = state.current; if (!onIce(s, e.point)) { s.aiming = false; s.aim = null; return } s.aiming = true; s.aim = clampHop(s, e.point); e.target.setPointerCapture?.(e.pointerId) }
+  const onMove = (e) => { const s = state.current; if (!s.aiming) return; if (!onIce(s, e.point)) { s.aim = null; return } s.aim = clampHop(s, e.point) }
   const onUp = () => {
     const s = state.current
     if (!s.aiming) return

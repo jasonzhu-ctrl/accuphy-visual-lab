@@ -271,7 +271,7 @@ the cheapest Android phone class). Phone size was emulated at 360×800.
 - ✅ Direction: the SECTION camera (B), Jason 2026-10-16 night (#101); the surface: black ice with thin wind-swept snow (#108)
 - ⬜ Section view tuning (round 1 done in #102: lens, slab face, soil, marine snow, cards under the panel, camp): still open — the slab edge opening where a hole is near the wall, snow lying on the slab top, the water column's tint, camp details, phone fine-tuning; decide the fate of Top and Under the ice (keep as a switch, or drop)
 
-## PLM Combo at long range (Jason 2026-10-23: Range 拉到很高的时候 画面只剩下顶部那一点点) — PROPOSAL, waiting on Jason
+## PLM Combo at long range (Jason 2026-10-23: Range 拉到很高的时候 画面只剩下顶部那一点点) — ✅ DONE as a softer option A (see decisions)
 - Cause: the Combo Forward panel's depth axis is fixed at 0.7 × range (copied from the one app frame, 16 m range in 4 m of
   water, `SonarScreen.jsx screenLayout`, `index.jsx` Combo box). At 200 ft range in 36 ft of water the panel is 140 ft
   deep, so the bottom and everything on it sit in the top quarter, under the depth readout; the rest is black.
@@ -282,3 +282,12 @@ the cheapest Android phone class). Phone size was emulated at 360×800.
   the default ranges; at long range the bottom and structure grow 2–3× taller. Mock-up checked at 60/100/150/200 ft.
 - Option B: cap the range in Combo at ~100 ft (the slider stops there), keep the app's proportion.
 - Option C: A + B together.
+
+## Jason's four asks, 2026-10-23 evening ("有几个是我需要你持续优化 … 你可以一个一个做")
+1. ✅ (#125) **PLM Combo, Forward part: the bottom-vs-range relationship** must read easily for a beginner ("初学者相对来说比较容易好接受").
+2. ✅ (first round done, see decisions) **Sonar engine: structure** — the picture of structure is still far from the real app's ("结构物的画面跟真实的声纳的画面差距还是比较远").
+   Research against the app recordings first (`sonar-look-tuning` skill, `reference/`), then tune.
+3. ✅ (#126) **Ice page: the tap area** is too limited — taps farther up the ice do not go through ("往冰面的上面再去点 它是过不太过去的").
+   Re-evaluate which area is the most intuitive for a new user.
+4. ✅ (#127) **Ice page: fish and the jig** — nearby fish should come to the jig naturally but quickly, and interact with it
+   ("又自然又快 … 跟鱼饵能够有一些自然的互动").
