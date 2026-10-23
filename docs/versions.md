@@ -21,6 +21,9 @@ the Mini page; `VITE_SCENE=ice` for the ice page → `/ice/` on GitHub Pages sin
 
 | Date | Page | Built from (Lab commit) | Public repo commit | What changed |
 |---|---|---|---|---|
+| 2026-10-23 | **Both** `/` | 1b6cb18 (#104–#123) | 36abbba | All work since the last public build: app controls on phones (#114, #117–#118), fish marks rebuilt (#120), Home with only Live Forward / Live Down / Live Combo / Live Ice Fishing open (#121, Combo in the Mini row #123), Live Ice Fishing opens /ice/, the app's back arrow (#122), the whole Combo Down fan (#123) |
+| 2026-10-23 | **Mini** `/mini/` | 1b6cb18 (#104–#123) | 36abbba | Same build, PingLive Mini only |
+| 2026-10-23 | Private preview | 1b6cb18 (#104–#123) | — | Same as Both |
 | 2026-10-23 | **Ice (trial)** `/ice/` | 765bde6 (#123) | b7e6a59 | Drill cue = a reticle on the ice + plain caption; the Combo Down fan whole; Live Combo in the Mini row of Home |
 | 2026-10-23 | **Ice (trial)** `/ice/` | 14806a5 (#122) | f489616 | The app's solid back arrow; on phones the back button opens Home with the four Mini views |
 | 2026-10-23 | **Ice (trial)** `/ice/` | fcf64a3 (#121) | bfcbc3a | Views Live Ice · Forward · Down · Combo (Ice Fishing no longer offered); includes #120 fish marks |
