@@ -34,6 +34,11 @@ const DEV_TOOLS = import.meta.env.DEV && window.location.search.includes('dev')
 // anywhere in the picture; over a drop-off that counted water hidden behind the shelf edge, 80 ft over 18 ft.)
 const DEPTH_STEPS_M = [6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 22, 25, 30, 35, 40, 45, 50, 60, 70]
 const DEPTH_STEPS_FT = [20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100, 110, 120, 140, 160, 180, 200, 220, 240]
+const RANGE_STEPS_FT = [20, 30, 40, 50, 60, 70, 80, 100, 120, 150, 180, 200, 240]
+// PLM Combo: the range is AUTO, like the app (its Live Combo has no range control at all) — about three times the AUTO
+// depth, on the range steps, 40–160 ft. Jason 2026-10-23: dragging the Lab's slider to 200 ft squeezed the Forward
+// panel's bottom into the top strip; a beginner should never be able to do that, and the picture should just read.
+const comboAutoRangeFt = (depthFt, maxFt) => { const want = Math.min(Math.min(maxFt, 160), Math.max(40, 3 * depthFt)); const steps = RANGE_STEPS_FT.filter((v) => v <= want); return steps[steps.length - 1] ?? 40 }
 // Down view is fully AUTO on both devices (Jason 2026-09-25, PL Down at 145 ft over 61 ft of water: 像这种情况 auto
 // depth就好像没用一样 自动调整了以后有效画面应该在屏幕上会更大). In Down the depth axis IS the range, so the range
 // follows the AUTO depth (bottom at ~80 % of the height) instead of only rising when the bottom would leave the screen
@@ -105,7 +110,8 @@ export default function SonarLake3D({ scene: sceneProp }) {
   const autoDepthOn = autoDepth && mode !== 'panoramic' // Down, Forward and Combo's Down panel
   const downLike = mode === 'down' || mode === 'ice' || mode === 'liveice' // the ice views are the Down fan (+ the flasher): AUTO range too
   // the range everything uses: Down's is the AUTO depth range; Forward and Panoramic use the visitor's range
-  const effRangeFt = downLike ? depthFt : rangeFt
+  const comboAuto = mode === 'combo' // PLM Combo: AUTO range (comboAutoRangeFt)
+  const effRangeFt = downLike ? depthFt : comboAuto ? comboAutoRangeFt(depthFt, maxFt) : rangeFt
   const specs = useMemo(() => {
     const rangeFt = effRangeFt
     const sp = wedgeSpecs(device, mode, rangeFt * FT)
@@ -202,7 +208,6 @@ export default function SonarLake3D({ scene: sceneProp }) {
   }
   const fmt = (ft) => (imperial ? `${Math.round(ft)} ft` : `${(ft * FT).toFixed(1)} m`)
   // phones: the range is changed with the app's own −/+ on the phone screen (Jason 2026-10-03), in steps
-  const RANGE_STEPS_FT = [20, 30, 40, 50, 60, 70, 80, 100, 120, 150, 180, 200, 240]
   const [paused, setPaused] = useState(false)
   const stepDepth = (dir) => { // the app's depth-range −/+ : manual steps, AUTO off
     const steps = (imperial ? DEPTH_STEPS_FT : DEPTH_STEPS_M.map((m) => m / FT)).filter((v) => v <= device.maxDepthFt + 0.01)
@@ -261,9 +266,9 @@ export default function SonarLake3D({ scene: sceneProp }) {
         )}
         <Row label="Range">
           {/* Down: the range is the AUTO depth range, so the slider only shows it */}
-          <input type="range" min={20} max={maxFt} step={5} value={effRangeFt} disabled={downLike} title={downLike ? 'AUTO: follows the water depth' : undefined} onChange={(e) => setRangeFt(+e.target.value)} className="ac-range w-36" style={{ '--fill': `${((effRangeFt - 20) / (maxFt - 20)) * 100}%`, opacity: downLike ? 0.45 : 1 }} />
+          <input type="range" min={20} max={maxFt} step={5} value={effRangeFt} disabled={downLike || comboAuto} title={downLike || comboAuto ? 'AUTO: follows the water depth' : undefined} onChange={(e) => setRangeFt(+e.target.value)} className="ac-range w-36" style={{ '--fill': `${((effRangeFt - 20) / (maxFt - 20)) * 100}%`, opacity: downLike || comboAuto ? 0.45 : 1 }} />
           <button className="ac-value" onClick={() => setImperial((v) => !v)} title="ft / m">{fmt(effRangeFt)}</button>
-          <span className="ac-soft text-[11px]">max {fmt(maxFt)}</span>
+          <span className="ac-soft text-[11px]">{downLike || comboAuto ? 'AUTO · follows the water' : `max ${fmt(maxFt)}`}</span>
         </Row>
         {DEV_TOOLS && deviceId === 'PL' && mode === 'forward' && (
           <Row label="Depth">
@@ -319,7 +324,7 @@ export default function SonarLake3D({ scene: sceneProp }) {
           <div className="ph-band" style={{ ...ring('1.35%'), borderRadius: '6.6% / 13.8%', boxShadow: '16px 26px 44px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.45), inset 0 0 0 2px rgba(0,0,0,0.12)' }} />
           <div style={{ ...ring('1.25%'), inset: '1.35%', borderRadius: '6.1% / 12.7%', background: '#040404' }} />
           <div ref={(el) => { sonarRect.current.el = el }} style={{ position: 'absolute', inset: '2.6%', borderRadius: '5.4% / 11.3%', containerType: 'size', overflow: 'hidden' }}>
-            <SonarChrome layout={layout} deviceId={deviceId} mode={mode} rangeFt={effRangeFt} depthFt={depthFt} imperial={imperial} gain={gain} autoDepth={autoDepth} autoRange={downLike} onRange={phone ? stepRange : undefined} onHome={phone ? () => setHome(true) : undefined} phone={phone} waterTempC={ICE ? 1.6 : 21.8} app={appCtl} onLocked={onLocked} depthRef={(el) => { state.current.depthEl = el }} />
+            <SonarChrome layout={layout} deviceId={deviceId} mode={mode} rangeFt={effRangeFt} depthFt={depthFt} imperial={imperial} gain={gain} autoDepth={autoDepth} autoRange={downLike || comboAuto} onRange={phone ? stepRange : undefined} onHome={phone ? () => setHome(true) : undefined} phone={phone} waterTempC={ICE ? 1.6 : 21.8} app={appCtl} onLocked={onLocked} depthRef={(el) => { state.current.depthEl = el }} />
             {phone && home && <AppHome ice={ICE} devices={SHOWN_DEVICES} deviceId={started ? deviceId : null} mode={started ? mode : null} onPick={(d, m) => { setDeviceId(d); setMode(m); setHome(false); setStarted(true) }} />}
             <div className="ph-glass" />
           </div>

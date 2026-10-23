@@ -1910,3 +1910,12 @@ Numbered log. Newest at the bottom.
        geometric mean of the app's proportion and the water: unchanged up to ~70 ft range in 36 ft of water, and at long
        range the bottom line rises about half as far as option A did. The 3D curtain (index.jsx) uses the same depth.
      - Option A (depth = 1.3 × water) and B (cap the range) are in docs/backlog.md for reference.
+
+125. **2026-10-23** — **PLM Combo: the range is AUTO, like the app** (Jason's ask 1 of 4: the Forward part's bottom-vs-range
+     relationship must be easy for a beginner).
+     - The real app's Live Combo has no range control (`reference/app-study/2026-10-23/40-live-combo.jpg`), and the squeeze
+       Jason hit (#124) only ever came from the Lab's desktop slider. Now Combo's range follows the water like Down does:
+       about 3 × the AUTO depth on the range steps, 40–160 ft (`comboAutoRangeFt`); 120 ft at the default spot, 150 ft
+       at the ice hole. The slider is dimmed and the panel says "AUTO · follows the water" (phones never had a Combo range).
+       The Forward panel's depth keeps #124's rule, so the bottom sits mid-panel at every spot.
+     - The beginner's model: Forward = you choose how far ahead; Down and Combo = automatic.
