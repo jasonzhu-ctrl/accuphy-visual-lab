@@ -107,7 +107,8 @@ repeatable procedures are also project skills in `.claude/skills/` (`sonar-qa`, 
 - **Headless in the cloud container (2026-10-23):** 4 CPUs, 15 GB, SwiftShader only. Three or four Chromium pages
   at once got the container OOM-killed (restart, background servers lost): run at most two. The ice page under the
   virtual clock dies at ~frame 200 on both old and new code; capture it in real time instead (load, wait ~40 s,
-  click a view, wait, snapshot). Never edit a file the dev server serves while a grid runs on it: HMR mixes versions.
+  click a view, wait, snapshot). Never edit ANY repo file while a grid runs on the dev server, docs included: Tailwind 4 scans every file for class
+  names and reloads the page, and the run dies with "Execution context was destroyed" (three grid runs lost this way).
   YouTube is blocked there (www.youtube.com, *.googlevideo.com, i.ytimg.com): video study needs those hosts allowed
   in the environment's network settings, or the Mac.
 - **Build gotchas:** the minifier writes string literals with backticks. Vite rewrites public CSS URLs to

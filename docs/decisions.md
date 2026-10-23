@@ -1864,7 +1864,9 @@ Numbered log. Newest at the bottom.
       of the boat (`/` left, `\` right): they lie along the arc. Panoramic now uses the same model with wider beams.
     - **Dev aid:** `?fishlab` (dev builds only) puts scripted fish in front of and under the default boat: crossing,
       turning in place, hovering, toward/away, a musky, two under the boat, a crappie school.
-    - **Checked:** GRID_LINE
+    - **Checked:** the 6-spot × 6-view grid against the old engine on a second port: every tile within 0.4 points of
+      white except PingLive Mini Forward at the deep spot (3.1 → 1.2 %: an almost black frame whose two fish carry the
+      white share; they are now arc dashes, one facing the beam); bottoms, structure and the lockup unchanged;
       `fish-sim.mjs` 0 violations (lowest gap 0.43 m); build passes; the ice page in real time (headless crashes the
       ice page under the virtual clock in this container, old code too): jig and Ice Fishing history unchanged, an
       ice fish draws as a thin streak. Not yet: fps on a real phone (backlog).
