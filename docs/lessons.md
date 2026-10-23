@@ -15,6 +15,7 @@ repeatable procedures are also project skills in `.claude/skills/` (`sonar-qa`, 
 6. **鱼的动作要先模拟验证。** 模拟船开 30 分钟，逐帧检查每条鱼不穿结构物、不钻湖底、不出水面。
 7. **发给别人看：** 用 GitHub Pages 做公开链接，谁都能打开；Claude 的 Artifact 链接要登录，只适合自己看。"开启公开网页"这一步系统规定必须你亲手点。
 8. **几个对话同时改一个项目：** 决定编号会撞（#69 就撞过），写之前先重新读最新编号，只提交自己改的文件。
+9. **鱼的画面要按声纳成像来画（#120）。** 鱼是"声束眼中的鱼"：沿声波方向很薄、沿弧线方向按固定角度拉长，鱼鳔最亮，侧身亮、正对暗，每次 ping 斑点都变。画成平滑椭圆或游动轨迹就会像"椭圆的球"。
 
 ## 1. Working with Jason
 
@@ -55,6 +56,12 @@ repeatable procedures are also project skills in `.claude/skills/` (`sonar-qa`, 
   a third of the lit pixels sit just under white, so measure every view, not just Down.
 - **Physics limits are answers, not bugs:** the Mini cannot see the bottom closer than ~1.2 × depth ahead; the
   Panoramic flat fan meets a 40 m floor 86 m out. Explain them, then offer a design choice.
+- **Fish are images of a beam, not glowing bodies (#120).** Draw what the beam makes of the body now: thin along the
+  ray, a fixed angle across it, a bright swim-bladder kernel, brightness set by aspect, speckle that changes every
+  ping. A swept path or a smooth Gaussian reads as an "椭圆的球形". Check the orientation rule in Panoramic too: mirror
+  images left and right of the boat mean "along the arc" (§7.13 had misread them as swim paths for a month).
+- **Averaged value noise is low-contrast** (two octaves + a ping blend sit in 0.3–0.7). Under the log tone curve a
+  ±15 % modulation is invisible: stretch it back to 0–1 before using it, or the texture "changes" without showing.
 - **Sampling noise:** per-pixel random row sampling turned big faces into dust; ray-coherent sampling fixed the side
   views (#62). For the Panoramic shadow march, coherent and fixed offsets both looked worse, so per-pixel stays (#67).
 
@@ -97,6 +104,13 @@ repeatable procedures are also project skills in `.claude/skills/` (`sonar-qa`, 
   `requestAnimationFrame` behind a `__step(ms)` virtual clock, and seed `Math.random`; run the old code from a frozen
   copy on a second port. Frames come out byte-identical run to run. Playwright's own `page.clock` hung the screenshots,
   and `waitForFunction` must poll on a timer (`polling: 100`), not on animation frames.
+- **Headless in the cloud container (2026-10-23):** 4 CPUs, 15 GB, SwiftShader only. Three or four Chromium pages
+  at once got the container OOM-killed (restart, background servers lost): run at most two. The ice page under the
+  virtual clock dies at ~frame 200 on both old and new code; capture it in real time instead (load, wait ~40 s,
+  click a view, wait, snapshot). Never edit ANY repo file while a grid runs on the dev server, docs included: Tailwind 4 scans every file for class
+  names and reloads the page, and the run dies with "Execution context was destroyed" (three grid runs lost this way).
+  YouTube is blocked there (www.youtube.com, *.googlevideo.com, i.ytimg.com): video study needs those hosts allowed
+  in the environment's network settings, or the Mac.
 - **Build gotchas:** the minifier writes string literals with backticks. Vite rewrites public CSS URLs to
   `../brand/…`. Both broke naive find-and-replace. `vite build` must pass before any share.
 - **Fonts:** the Lab's local `Eurostile-Heavy.otf` has an unverified web licence. The website moved to the Adobe kit
@@ -118,6 +132,7 @@ repeatable procedures are also project skills in `.claude/skills/` (`sonar-qa`, 
 | Tool | What it does |
 |---|---|
 | `?boat=x,z` · `?bigphone` · `?dev` · `?cam=logo/wreck/boat[:side/bow/stern/top/under]/fish:<sp>[:<i>][:top/side/tq]` · `?wrecklift=m` | Dev URL flags: park the boat, enlarge the phone, tuning rows, cameras (the boat from six angles; a fish from above, the side or three-quarter), lift the wreck |
+| `?fishlab` (dev builds only) | Scripted test fish in front of and under the default boat (#120): crossing the slab, turning in place, hovering, toward/away, a musky, two under the boat, a crappie school — one per state the fish marks must get right |
 | `window.__sonarSnap()` + `POST /__snap?name=` | Save the sonar picture as a PNG in `reference/engine-compare/` (gitignored) |
 | `window.__lakeSnap()` | The 3D view alone as a PNG |
 | `window.__sonarHist(10)` | LUT-index histogram of the lit sonar pixels |

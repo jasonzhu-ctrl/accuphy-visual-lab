@@ -75,29 +75,91 @@ export const sonarFragment = /* glsl */ `
     return linearize(d) * rayLen;
   }
   float sampleTag(int k, vec2 uv) { return (k == 0) ? texture2D(uColor0, uv).a : texture2D(uColor1, uv).a; }
-  vec4 markRow(int i, float row) { return texture2D(uMarks, vec2((float(i) + 0.5) / 64.0, (row + 0.5) / 4.0)); }
+  vec4 markRow(int i, float row) { return texture2D(uMarks, vec2((float(i) + 0.5) / 64.0, (row + 0.5) / 5.0)); }
 
-  // ---- fish: analytic marks ----
+  // ---- fish: analytic marks (sonarMarks.js) ----
+  // What a formed beam makes of one fish (decision #120, after LiveScope and the app's own recordings): every point
+  // of the body a → b (tail → head, screen metres, apex at 0) is smeared by the beam's point spread — thin along the
+  // ray (the pulse, sr), a fixed ANGLE across it (st grows with range). Far fish are needles along the arc, near ones
+  // show their own length and heading. The spindle tapers to points, trails a little in range behind the target, is
+  // brightest at the swim bladder, and is broken up by speckle on the beam grid that changes every ping (the rim much
+  // more than the core: never holes in the middle). Strong targets leak into the neighbouring beams (sidelobes): a
+  // faint ladder along the arc. Returns 0..1 (× the mark's strength outside).
+  float fishDash(vec2 p, vec4 seg, float bw, float seed, float ping, float lobe, float asp) {
+    vec2 a = seg.xy, b = seg.zw, c = 0.5 * (a + b);
+    float rc = max(length(c), 0.3);
+    vec2 rh = c / rc, th = vec2(rh.y, -rh.x);
+    float sr = 0.7 * uPulse + 0.25 * bw, st = uBeamHalf * rc + bw;
+    // into the mark's frame, in units of the spread: x across the ray, y along it
+    vec2 pa = p - a, ba = b - a;
+    vec2 qa = vec2(dot(pa, th) / st, dot(pa, rh) / sr), qb = vec2(dot(ba, th) / st, dot(ba, rh) / sr);
+    float h = clamp(dot(qa, qb) / max(dot(qb, qb), 1e-6), 0.0, 1.0);
+    vec2 q = qa - qb * h;
+    if (q.y * q.y > 16.0 || abs(q.x) > 9.0) return 0.0;
+    float tx = abs(q.x);
+    // range tail behind the target; the spindle narrows toward its ends
+    float qy = q.y / ((q.y > 0.0 ? 1.5 : 1.0) * mix(1.0, 0.6, smoothstep(0.3, 1.5, tx)));
+    float d2 = tx * tx + qy * qy;
+    if (d2 > 7.0 && lobe <= 0.0) return 0.0; // below 1e-4 even with the ragged rim
+    // speckle on the beam grid (angle × range) in cells of the mark's own spread, new every ping, the last ping
+    // still showing a little (persistence)
+    float ang = atan(p.x, p.y), rp = length(p);
+    vec2 nc = vec2(ang * rc / (0.55 * st), rp / (1.1 * sr)) + seed * 17.0;
+    vec2 o1 = vec2(fract(ping * 0.1731) * 97.0, fract(ping * 0.3117) * 89.0);
+    vec2 o0 = vec2(fract((ping - 1.0) * 0.1731) * 97.0, fract((ping - 1.0) * 0.3117) * 89.0);
+    float n = 0.65 * (0.6 * vnoise(nc + o1) + 0.4 * vnoise(nc * 2.3 + o1.yx)) + 0.35 * vnoise(nc + o0);
+    n = clamp(0.5 + (n - 0.5) * 2.6, 0.0, 1.0); // the averaged noise sits in 0.3–0.7: back to full contrast
+    d2 += (n - 0.5) * 1.3 * smoothstep(0.4, 2.5, d2);                     // ragged rim
+    float tex = mix(0.65 + 0.7 * n, 0.12 + 1.75 * n, smoothstep(0.25, 1.6, d2)); // core ±35 %: grain, never a hole
+    // along the body (when it is longer than the spread): the swim bladder (~90 % of the echo) in the front half,
+    // weaker head and tail peaks; broadside the flank fills in between, head-on the peaks stand apart
+    float prof = max(max(exp(-30.0 * (h - 0.6) * (h - 0.6)), 0.45 * exp(-90.0 * (h - 0.93) * (h - 0.93))),
+                     max(0.4 * exp(-60.0 * (h - 0.08) * (h - 0.08)), mix(0.1, 0.55, asp)));
+    float body = mix(1.0, prof, smoothstep(0.6, 2.5, length(qb)));
+    float e = exp(-1.5 * d2) * tex * body;
+    // sidelobes: the next beams out along the arc, a few faint stripes fading away
+    float sx = tx - 1.5;
+    if (lobe > 0.0 && sx > 0.0) {
+      float rung = 0.5 + 0.5 * cos(6.2832 * sx / 1.6);
+      e = max(e, lobe * exp(-1.5 * q.y * q.y) * rung * rung * exp(-sx / 2.2) * (0.6 + 0.8 * n));
+    }
+    return e;
+  }
+  // the old capsule mark (until #120), kept for the ice page's jig
+  float legacyMark(vec2 p, vec4 A, vec4 B, float rr, vec2 rh) {
+    vec2 pa = p - A.xy, ba = A.zw - A.xy;
+    float h = clamp(dot(pa, ba) / max(dot(ba, ba), 1e-6), 0.0, 1.0);
+    vec2 q = pa - ba * h;
+    float qr = dot(q, rh), qt = q.x * rh.y - q.y * rh.x;
+    float sr = 0.6 * B.x + 0.8 * uPulse, st = B.x + rr * 0.004;
+    float d2 = qr * qr / (sr * sr) + qt * qt / (st * st);
+    if (d2 > 14.0) return 0.0;
+    d2 += (vnoise(p * 9.0 + B.w * 37.0) - 0.5) * 0.9 * smoothstep(0.6, 3.0, d2);
+    return B.y * exp(-1.5 * d2) * (0.35 + 0.65 * sin(3.14159 * h));
+  }
   float fishEcho(vec2 p, int k) {
     float e = 0.0;
     float rr = max(length(p), 0.05);
     vec2 rh = p / rr;
+    float ping = floor(uTime * 8.0);
     for (int i = 0; i < 64; i++) {
       if (i >= uMarkCount) break;
       vec4 B = markRow(i, 1.0);
       if (abs(B.z - float(k)) > 0.5) continue;
       vec4 A = markRow(i, 0.0);
+      // quick reject: well clear of the body and its spread
       vec2 pa = p - A.xy, ba = A.zw - A.xy;
-      float h = clamp(dot(pa, ba) / max(dot(ba, ba), 1e-6), 0.0, 1.0);
-      vec2 q = pa - ba * h;
-      float qr = dot(q, rh), qt = q.x * rh.y - q.y * rh.x;
-      float sr = 0.6 * B.x + 0.8 * uPulse, st = B.x + rr * uBeamHalf;   // pulse along the ray (thin), beam footprint across it
-      float d2 = qr * qr / (sr * sr) + qt * qt / (st * st);
-      if (d2 > 14.0) continue;
-      // a slightly ragged rim, never holes in the core (Jason: 中间空了)
-      d2 += (vnoise(p * 9.0 + B.w * 37.0) - 0.5) * 0.9 * smoothstep(0.6, 3.0, d2);
-      float along = 0.35 + 0.65 * sin(3.14159 * h);       // comet/rice grain: brightest mid-way, tapering ends
-      e = max(e, B.y * exp(-1.5 * d2) * along);
+      float reach = length(ba) + 0.5 + B.x + 12.0 * uBeamHalf * rr;
+      if (dot(pa, pa) > reach * reach) continue;
+      vec4 F = markRow(i, 3.0);
+      if (F.x < -0.5) { e = max(e, legacyMark(p, A, B, rr, rh)); continue; }
+      // the whole echo flickers ping to ping: a calm fish is steady, a swimming or turning one swings widely, more so
+      // when it faces the beam (a small, changing target)
+      float fl = hash(vec2(B.w * 91.7, fract(ping * 0.0731) * 113.0));
+      float s = B.y * (1.0 + min(0.7, 0.06 + 0.4 * F.x + 0.25 * (1.0 - F.y)) * (fl - 0.5) * 2.0);
+      float lobe = 0.075 * smoothstep(0.75, 1.3, B.y);
+      e = max(e, s * fishDash(p, A, B.x, B.w, ping, lobe, F.y));
+      e = max(e, B.y * F.w * fishDash(p, markRow(i, 4.0), B.x, B.w + 0.5, ping - 1.0, 0.0, F.y));
     }
     return e;
   }

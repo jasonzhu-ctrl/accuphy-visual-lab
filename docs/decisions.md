@@ -1843,3 +1843,30 @@ Numbered log. Newest at the bottom.
       - public pages and the private preview: leave them for now;
       - lake and ice sharing code: "这个确实要非常注意". Now a rule in `CLAUDE.md`;
       - decision numbers: avoid duplicates from now on (`CLAUDE.md` rule tightened). #102 stays as it is.
+120. **2026-10-23** — **Fish marks rebuilt from the beam's point spread** (Jason: "声纳的画面的部分 … 无论是 PinLife 还是
+    PinLife Mini 都还是不太行，特别是鱼的那个部分，鱼在游动也好啊，它转身也好啊，甚至它不动的时候，有时候是一种椭圆的球形的
+    … 去大量的看 Garmin LiveScope 的视频，去优化你的画面引擎").
+    - **Cause:** since #36 every fish was the smooth capsule of the path it swam in the last 0.7 s, so a swimming fish
+      was a glowing oval along screen x, a hovering or turning one a round blob, and nothing changed ping to ping.
+    - **Research:** `docs/livescope-fish-research.md` (LiveScope / ActiveTarget / MEGA Live specs, fisheries acoustics,
+      angler reports; search excerpts only — the cloud container blocks YouTube, so no video was watched), checked
+      against the app's own frames. The app wins where they differ.
+    - **New model** (`sonar-style.md` §7.19; `sonarMarks.js` computeMarks → `sonarShader.js` fishDash):
+      - the mark is the body now (tail → head), not the swept path; thin along the ray, a fixed angle across it
+        (vertical fans 0.014 rad, Panoramic 0.03 rad): far fish are needles along the arc, near fish show length and
+        heading;
+      - swim-bladder kernel in the front half, weaker head and tail peaks; aspect swing 0.18–1 (was 0.5–1);
+      - speckle on the beam grid that changes every ping (rim hard, core ±35 %, no holes); whole-echo flicker by
+        activity and aspect (calm fish steady); tail beat 2–3.5 Hz; the echo of 0.2 s ago at 0.22 behind a moving
+        fish; a faint sidelobe ladder on strong targets;
+      - the ice page's jig keeps the old capsule (`legacyMark`), so the dial and Live Ice look as tuned.
+    - **Panoramic:** §7.13 read the app's streaks as swim paths. The app's lake frame shows them mirrored left and right
+      of the boat (`/` left, `\` right): they lie along the arc. Panoramic now uses the same model with wider beams.
+    - **Dev aid:** `?fishlab` (dev builds only) puts scripted fish in front of and under the default boat: crossing,
+      turning in place, hovering, toward/away, a musky, two under the boat, a crappie school.
+    - **Checked:** the 6-spot × 6-view grid against the old engine on a second port: every tile within 0.4 points of
+      white except PingLive Mini Forward at the deep spot (3.1 → 1.2 %: an almost black frame whose two fish carry the
+      white share; they are now arc dashes, one facing the beam); bottoms, structure and the lockup unchanged;
+      `fish-sim.mjs` 0 violations (lowest gap 0.43 m); build passes; the ice page in real time (headless crashes the
+      ice page under the virtual clock in this container, old code too): jig and Ice Fishing history unchanged, an
+      ice fish draws as a thin streak. Not yet: fps on a real phone (backlog).

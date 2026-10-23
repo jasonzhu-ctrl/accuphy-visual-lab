@@ -136,6 +136,36 @@ export function makePopulation(bedY, obstacles) {
     // bait school around the test piling (app frame: dozens of small dashes crowding the piling)
     for (let i = 0; i < 40; i++) fish.push({ species: 'smelt', len: 0.16 + rnd() * 0.08, home: [31 + (rnd() - 0.5) * 4, -2.5 - rnd() * 4, 11.5 + (rnd() - 0.5) * 1.2], phase: rnd() * 6.28, radius: 0.3 + rnd() * 0.5, speed: 0.3 + rnd() * 0.3 })
   }
+  // dev: ?fishlab — scripted fish in front of / under the default boat (−6, 4; apex ≈ −3, −0.9, 4.5; 36 ft of water),
+  // one per state the sonar marks must get right (#120): crossing the beam, turning in place, hovering, swimming toward
+  // and away, a big fish, a school. Both vertical views image the fore-aft plane z ≈ 4.5 (the slab is thin in z).
+  // Dev builds only.
+  if (import.meta.env?.DEV && typeof window !== 'undefined' && /fishlab/.test(window.location.search)) {
+    const ax = -3, az = 4.5
+    const S = (species, len, script) => ({ species, len, home: [0, 0, 0], phase: 0, radius: 0, speed: 0, script })
+    const put = (o, x, y, z, h, sp = 0.2) => { o.x = x; o.y = y; o.z = z; o.heading = h; o.pitch = 0; o.speed = sp; return o }
+    fish.push(
+      // Forward: crossing the beam (swims across the slab, broadside to the transducer)
+      S('largemouth', 0.45, (t, o) => { const z = az + 2.4 * Math.sin(0.35 * t); return put(o, ax + 10, -5, z, Math.cos(0.35 * t) > 0 ? -Math.PI / 2 : Math.PI / 2, 0.5) }),
+      // Forward: turning in place (a full turn in 8 s)
+      S('largemouth', 0.45, (t, o) => put(o, ax + 7, -4, az, (t * Math.PI * 2) / 8, 0.15)),
+      // Forward: hovering, oblique to the beam, a slow bob
+      S('walleye', 0.5, (t, o) => put(o, ax + 5, -3 + 0.08 * Math.sin(t * 1.3), az + 0.1, 0.7, 0.05)),
+      // Forward: swimming toward and away along the plane (head-on / tail-on)
+      S('smallmouth', 0.4, (t, o) => { const v = Math.cos(0.3 * t); return put(o, ax + 14 + 3 * Math.sin(0.3 * t), -6.5, az - 0.1, v > 0 ? 0 : Math.PI, 0.9 * Math.abs(v)) }),
+      // Forward: a big fish cruising slowly at an angle
+      S('musky', 1.1, (t, o) => { const a = 0.12 * t; return put(o, ax + 18 + 4 * Math.cos(a), -5.5, az + 1.2 * Math.sin(a), Math.atan2(-1.2 * Math.cos(a), -4 * Math.sin(a)), 0.5) }),
+      // Down: crossing the slab under the boat (in and out of it, broadside to the beam)
+      S('largemouth', 0.45, (t, o) => { const v = Math.cos(0.4 * t); return put(o, ax + 0.2, -6, az + 2.2 * Math.sin(0.4 * t), v > 0 ? -Math.PI / 2 : Math.PI / 2, 0.9 * Math.abs(v)) }),
+      // Down: swimming fore and aft in the slab under the boat (broadside, its whole length in the picture)
+      S('largemouth', 0.45, (t, o) => { const v = Math.cos(0.3 * t); return put(o, ax + 2 * Math.sin(0.3 * t), -8, az + 0.3, v > 0 ? 0 : Math.PI, 0.6 * Math.abs(v)) }),
+    )
+    // a school of crappie between the turning fish and the big one, small loops
+    for (let i = 0; i < 18; i++) {
+      const hx = ax + 12 + (rnd() - 0.5) * 3, hy = -3.5 - rnd() * 1.6, hz = az + (rnd() - 0.5) * 1.4, ph = rnd() * 6.28, r = 0.25 + rnd() * 0.3
+      fish.push(S('crappie', 0.2 + rnd() * 0.06, (t, o) => { const a = ph + 0.5 * t; return put(o, hx + r * Math.cos(a), hy, hz + r * Math.sin(a), -a - Math.PI / 2, 0.15) }))
+    }
+  }
   return fish
 }
 
@@ -237,6 +267,7 @@ function burstPhase(b, t, w) {
   return (b.k - 1) * w * (u / 2 - (b.D / (4 * Math.PI)) * Math.sin((2 * Math.PI * u) / b.D))
 }
 export function fishPose(f, t, out) {
+  if (f.script) return f.script(t, out) // dev ?fishlab
   const w = f.speed
   const a = f.phase + t * w + (f.burst ? burstPhase(f.burst, t, w) : 0)
   const wk = f.burst && t > f.burst.t0 && t < f.burst.t0 + f.burst.D ? 1 + (f.burst.k - 1) * Math.sin((Math.PI * (t - f.burst.t0)) / f.burst.D) ** 2 : 1
