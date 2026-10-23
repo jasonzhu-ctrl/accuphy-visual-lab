@@ -1919,3 +1919,27 @@ Numbered log. Newest at the bottom.
        at the ice hole. The slider is dimmed and the panel says "AUTO · follows the water" (phones never had a Combo range).
        The Forward panel's depth keeps #124's rule, so the bottom sits mid-panel at every spot.
      - The beginner's model: Forward = you choose how far ahead; Down and Combo = automatic.
+
+126. **2026-10-23** — **Ice page: every tap on the ice counts; a hop is at most 25 m** (Jason's ask 3: "往冰面的上面再去点
+     它是过不太过去的 … 找哪一个区域最合适").
+     - Cause: a tap near the horizon lands 60–300 m away, past the modelled lake (±58 m); it was clamped to the lake's
+       corner (one 80 m walk in 0.9 s), and the next far tap resolved to the same corner and was dropped as "too close".
+     - Now the destination is capped at `HOP_MAX` 25 m from the current hole in the tapped direction (and ±56 m of the
+       lake); the aim ring shows that real destination while the finger is down; the walk lasts 0.9–2.1 s by distance.
+       The tap area itself is unchanged and right for a new user: any ice behind the cut wall, which is all the ice in
+       view; taps on the water section and the sky do nothing.
+     - Checked: desktop far tap → 25 m hop; phone taps at four heights of the band → 8–16 m hops.
+
+127. **2026-10-23** — **Ice page: fish come to the jig** (Jason's ask 4: "附近的鱼都比较自然 但是很快的能够到这个边上 又自然又快
+     跟鱼饵能够有一些自然的互动").
+     - fish.js: under the ice the jig replaces the boat as the attraction. A fish within its species' reach (perch 9 m,
+       walleye 12 m, lake trout 16 m) may come: on entering, now and then while it stays, and above all when the jig is
+       lifted (a pop calls fish in). It swims straight in (perch 1.6 m/s, walleye 2.4, trout 3.2 — a fish 8 m away is
+       there in 2.5–5 s), stops a body length short, nose to the lure, hovers with the usual jitter, then drifts back —
+       or, with a species chance (walleye 40 %, trout 35 %, perch 25 %), darts the last bit, touches the lure and
+       bolts. Arrivals are paced 3–9 s apart, at most two fish at the jig. The dial, the Live Down fan and the history
+       show the same visits.
+     - A winter population: when a hole opens (the picture is black during the hop) six perch, two walleye, two crappie
+       and a lake trout that live far from the hole are brought to 5–13 m from it, 1–3 m off the bottom, clear of
+       structure (`winterCamp`) — so every hole has fish, as a good spot has. The summer lake is untouched (no jig).
+     - Watched 64 s at the first hole: perch hover, a walleye bite, a lake trout visit; dev hook `window.__jig()`.

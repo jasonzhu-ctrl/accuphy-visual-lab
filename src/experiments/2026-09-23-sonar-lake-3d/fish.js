@@ -358,18 +358,106 @@ function riseAct(f, t, apex, cfg, k) {
   return makeAct(f, 'rise', t, Math.max(pick(cfg.T1), (len * m) / cfg.speed), pick(cfg.T2), pick(cfg.T3), dx, dy, dz)
 }
 
-export function stepBehaviours(pop, t, dt, apex, circles, bedY) {
+// ---------- the ice page: fish come to the jig (Jason 2026-10-23: 旁边附近的鱼都比较自然 但是很快的能够到这个边上 又自然又快 跟鱼饵能够有一些自然的互动) ----------
+// A fish within r of the jig may come: on entering the zone (pEnter), now and then while it stays (pStay per second), and
+// above all when the jig is lifted (pPop per pop — the lift is what calls fish in). It swims straight in at `speed` (so
+// a fish 8 m away arrives in ~2.5 s), stops a body length short, nose to the lure, hovers there (hold) with the same
+// small jitter as every act, then either drifts back (back) or — with chance `bite` — darts the last bit, touches the
+// lure for a moment and bolts. At most two fish at the jig at once. Perch and crappie are the classic flasher
+// visitors; smelt only look from a distance.
+const JIG = {
+  laketrout:   { r: 16, speed: 3.2, pEnter: 0.8, pStay: 0.05, pPop: 0.35, hold: [1.5, 3.0], back: [4, 7], bite: 0.35, cool: [14, 30] },
+  salmon:      { r: 14, speed: 3.6, pEnter: 0.6, pStay: 0.04, pPop: 0.3, hold: [1.2, 2.5], back: [4, 6], bite: 0.3, cool: [16, 35] },
+  largemouth:  { r: 11, speed: 2.8, pEnter: 0.5, pStay: 0.03, pPop: 0.3, hold: [1.5, 3.0], back: [3, 5], bite: 0.4, cool: [15, 35] },
+  smallmouth:  { r: 11, speed: 2.8, pEnter: 0.5, pStay: 0.03, pPop: 0.3, hold: [1.5, 3.0], back: [3, 5], bite: 0.4, cool: [15, 35] },
+  pike:        { r: 12, speed: 4.0, pEnter: 0.3, pStay: 0.02, pPop: 0.2, hold: [2.0, 4.0], back: [3, 5], bite: 0.5, cool: [30, 60] },
+  walleye:     { r: 12, speed: 2.4, pEnter: 0.7, pStay: 0.05, pPop: 0.4, hold: [2.0, 4.0], back: [4, 7], bite: 0.4, cool: [12, 28] },
+  yellowperch: { r: 9, speed: 1.6, pEnter: 0.7, pStay: 0.05, pPop: 0.4, hold: [3, 6], back: [4, 8], bite: 0.25, cool: [10, 25] },
+  crappie:     { r: 9, speed: 1.5, pEnter: 0.6, pStay: 0.04, pPop: 0.3, hold: [3, 6], back: [4, 8], bite: 0.2, cool: [12, 30] },
+  smelt:       { r: 6, speed: 1.4, pEnter: 0.3, pStay: 0.02, pPop: 0.2, hold: [2, 4], back: [3, 5], bite: 0, cool: [15, 40] },
+}
+const jigMem = { y: null, lastPop: -10, nextOk: 0 } // nextOk: arrivals are paced 3–9 s apart, so the jig is never mobbed
+function jigAct(f, t, jig, cfg, k, pose) {
+  const dx = jig.x - pose.x, dy = jig.y - 0.25 - pose.y, dz = jig.z - pose.z
+  const len = Math.hypot(dx, dy, dz)
+  if (len < 0.3) return null
+  const bite = Math.random() < cfg.bite
+  const stop = bite ? 0.12 : Math.min(1.0, 0.55 + 0.6 * drawnLen(f)) // where it stops: at the lure, or a body length short
+  const m = Math.max(0, len - stop) / len * k
+  const T1 = Math.max(0.9, (len * m) / cfg.speed)
+  const a = makeAct(f, bite ? 'bite' : 'jig', t, T1, bite ? pick([0.3, 0.6]) : pick(cfg.hold), bite ? pick([1.0, 1.6]) : pick(cfg.back), dx * m, dy * m, dz * m)
+  a.h = Math.atan2(-dz, dx) // nose to the lure while it holds
+  return a
+}
+function jigStep(f, t, dt, jig, popNow, atJig, circles, bedY, pose) {
+  const cfg = JIG[f.species]
+  if (!cfg) return false
+  fishPose(f, t, pose)
+  const dd = Math.hypot(pose.x - jig.x, pose.y - jig.y, pose.z - jig.z)
+  const near = dd < cfg.r && pose.y < -1.2
+  const entered = near && !f.nearJig
+  f.nearJig = near
+  const free = !f.act && !(f.until > t)
+  if (!free || !near || atJig >= 2 || t < jigMem.nextOk) return false
+  const p = entered ? cfg.pEnter : popNow ? cfg.pPop * (1 - 0.6 * dd / cfg.r) : cfg.pStay * dt
+  if (Math.random() >= p) return false
+  if (tryAct(f, t, (k) => jigAct(f, t, jig, cfg, k, pose), circles, bedY)) { f.coolNext = pick(cfg.cool); jigMem.nextOk = t + pick([3, 9]) }
+  else f.until = t + 3
+  return true
+}
+
+// The ice page: a winter population round each new hole. When a hole opens (the picture is black during the hop), fish
+// of the ice species that live far away (> 28 m, never in view) are brought to 5–13 m from the hole, 1–3 m off the
+// bottom, clear of structure — so there is always something near the jig, as there is at a good spot. Perch and
+// walleye are the ice-fishing classics; one lake trout cruises wider.
+const WINTER = [['yellowperch', 6], ['walleye', 2], ['crappie', 2], ['laketrout', 1]]
+export function winterCamp(pop, hole, circles, bedY) {
+  let moved = 0
+  for (const [species, n] of WINTER) {
+    let k = 0
+    for (const f of pop) {
+      if (k >= n) break
+      if (f.species !== species || !f.radius || f.act || f.script) continue
+      if (Math.hypot(f.home[0] - hole.x, f.home[2] - hole.z) <= 28) { k++; continue } // already around
+      for (let tries = 0; tries < 14; tries++) {
+        const a = Math.random() * Math.PI * 2, dd = 5 + Math.random() * 8
+        const x = hole.x + Math.cos(a) * dd, z = hole.z + Math.sin(a) * dd
+        const r = species === 'yellowperch' || species === 'crappie' ? 1.5 + Math.random() * 1.5 : 3 + Math.random() * 3
+        const rot = Math.random() * Math.PI * 2
+        const yMin = loopBedTop({ home: [x, 0, z], rot }, bedY, r) + bottomGap(f)
+        const y = Math.max(yMin, bedY(x, z) + bottomGap(f) + 0.6 + Math.random() * 2.0)
+        if (y > -2.5) continue // too shallow under the ice
+        if (circles.some((c) => y + 1 > c.y0 && y - 1 < c.y1 && Math.hypot(c.x - x, c.z - z) < c.r + r + 1.5)) continue
+        f.home = [x, y, z]; f.radius = r; f.rot = rot; f.nearJig = true; f.until = 0
+        moved++; k++
+        break
+      }
+    }
+  }
+  return moved
+}
+
+export function stepBehaviours(pop, t, dt, apex, circles, bedY, jig = null) {
   if (!apex || apex.y === 0) return
   const pose = {}
+  // the jig's lift (a pop) is the call: once per lift, for the next step
+  let popNow = false
+  if (jig) {
+    if (jigMem.y != null && dt > 0 && (jig.y - jigMem.y) / dt > 1.2 && t - jigMem.lastPop > 0.5) { popNow = true; jigMem.lastPop = t }
+    jigMem.y = jig.y
+  } else jigMem.y = null
+  let atJig = 0
+  if (jig) for (const f of pop) if (f.act && (f.act.kind === 'jig' || f.act.kind === 'bite')) atJig++
   for (const f of pop) {
     if (!f.radius) continue // dev test fish stay put
     if (f.act && t > actEnd(f.act)) { f.act = null; f.until = t + (f.coolNext || 0) }
     if (f.burst && t > f.burst.t0 + f.burst.D) { f.phase += burstPhase(f.burst, f.burst.t0 + f.burst.D, f.speed); f.burst = null }
+    if (jig && jigStep(f, t, dt, jig, popNow, atJig, circles, bedY, pose)) { atJig++; continue }
     const cfg = CHASE[f.species]
     if (!cfg) continue // bait only ever flees (set by a bass strike below)
     fishPose(f, t, pose)
     const dH = Math.hypot(pose.x - apex.x, pose.z - apex.z)
-    if (cfg) {
+    if (cfg && !jig) { // the boat-triggered rise (summer): under the ice the jig is the attraction instead
       const near = dH < cfg.r && Math.abs(pose.z - apex.z) < 7 && pose.y < apex.y - 2.5
       const entered = near && !f.near
       f.near = near
@@ -379,6 +467,9 @@ export function stepBehaviours(pop, t, dt, apex, circles, bedY) {
         else f.until = t + 3
         continue
       }
+    }
+    if (cfg) {
+      const free = !f.act && !(f.until > t)
       // salmon: a speed burst now and then (20–50 s apart)
       if (f.species === 'salmon' && !f.burst) {
         if (!f.nextBurst) f.nextBurst = t + pick([5, 40])
@@ -420,6 +511,19 @@ export function stepBehaviours(pop, t, dt, apex, circles, bedY) {
       }
     }
   }
+}
+// dev: make the nearest fish come to the jig now (window.__jig in Scene.jsx)
+export function forceJig(pop, t, jig, circles, bedY) {
+  let best = null, bd = 30
+  const o = {}
+  for (const f of pop) {
+    if (!JIG[f.species] || !f.radius || f.act) continue
+    fishPose(f, t, o)
+    const d = Math.hypot(o.x - jig.x, o.y - jig.y, o.z - jig.z)
+    if (d < bd) { bd = d; best = f }
+  }
+  if (!best) return 'none within 30 m'
+  return tryAct(best, t, (k) => jigAct(best, t, jig, JIG[best.species], k, o), circles, bedY) ? `${best.species} coming (${bd.toFixed(1)} m away)` : 'blocked'
 }
 // dev: force a boat-triggered rise on the nearest fish of a species (window.__chase in Scene.jsx)
 export function forceRise(pop, t, apex, species, circles, bedY) {

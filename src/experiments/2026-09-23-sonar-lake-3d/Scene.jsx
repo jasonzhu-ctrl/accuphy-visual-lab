@@ -5,7 +5,7 @@ import { mergeGeometries as _merge } from 'three/addons/utils/BufferGeometryUtil
 // Extrude geometries are non-indexed, primitives are indexed — normalise first.
 const mergeGeometries = (parts) => _merge(parts.map((g) => (g.index ? g.toNonIndexed() : g)))
 import { HALF, SEG, bedY, fbm, depthAt } from './terrain'
-import { SPECIES, makePopulation, fishPose, stepBehaviours, forceRise, rnd, drawnLen } from './fish'
+import { SPECIES, makePopulation, fishPose, stepBehaviours, forceRise, forceJig, winterCamp, rnd, drawnLen } from './fish'
 import { makeLakeMaterial, setBeamUniforms } from './lakeMaterial'
 import { wedgeGeometry } from '../2026-09-23-beam-shapes-3d/wedge'
 import { makeTallTree, makeBushTree, makeStump, makeLog, makeWeedTuft, makeRock, placeAll } from './vegetation'
@@ -254,13 +254,20 @@ function Fish({ mat, state }) {
   const pop = useMemo(() => makePopulation(bedY, circles), [circles]) // swim loops routed around structure
   if (import.meta.env.DEV) {
     window.__fish = pop // dev: fish population for scene lookups
+    window.__jig = () => state.current.jig ? forceJig(pop, window.__lakeClock?.elapsedTime ?? 0, state.current.jig, circles, bedY) : 'no jig' // dev: the nearest fish comes to the jig now
     window.__chase = (species = 'laketrout') => forceRise(pop, window.__lakeClock?.elapsedTime ?? 0, state.current.apex, species, circles, bedY) // dev: make the nearest fish rise now
   }
   state.current.pop = pop
   // behaviours (fish.js): boat-triggered rises, bass strikes on bait, salmon bursts — before anything reads a pose
+  const campKey = useRef('')
   useFrame(({ clock }, dt) => {
     if (import.meta.env.DEV) window.__lakeClock = clock
-    stepBehaviours(pop, clock.elapsedTime, Math.min(dt, 0.1), state.current.apex, circles, bedY)
+    const s = state.current
+    if (s.jig !== undefined && s.holes && s.holes.length) { // the ice page: a winter population round each new hole (fish.js winterCamp)
+      const live = s.holes[s.holes.length - 1], key = `${live.x.toFixed(1)},${live.z.toFixed(1)}`
+      if (key !== campKey.current) { campKey.current = key; winterCamp(pop, live, circles, bedY) }
+    }
+    stepBehaviours(pop, clock.elapsedTime, Math.min(dt, 0.1), state.current.apex, circles, bedY, state.current.jig || null) // ice page: s.jig (IceCamp) draws fish to the lure
   }, -1)
   const groups = useMemo(() => {
     const by = {}
