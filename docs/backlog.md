@@ -269,3 +269,15 @@ the cheapest Android phone class). Phone size was emulated at 360×800.
 - ⬜ Publish as `/ice/` (`VITE_SCENE=ice`) + `docs/versions.md` — only when Jason says go
 - ✅ Direction: the SECTION camera (B), Jason 2026-10-16 night (#101); the surface: black ice with thin wind-swept snow (#108)
 - ⬜ Section view tuning (round 1 done in #102: lens, slab face, soil, marine snow, cards under the panel, camp): still open — the slab edge opening where a hole is near the wall, snow lying on the slab top, the water column's tint, camp details, phone fine-tuning; decide the fate of Top and Under the ice (keep as a switch, or drop)
+
+## PLM Combo at long range (Jason 2026-10-23: Range 拉到很高的时候 画面只剩下顶部那一点点) — PROPOSAL, waiting on Jason
+- Cause: the Combo Forward panel's depth axis is fixed at 0.7 × range (copied from the one app frame, 16 m range in 4 m of
+  water, `SonarScreen.jsx screenLayout`, `index.jsx` Combo box). At 200 ft range in 36 ft of water the panel is 140 ft
+  deep, so the bottom and everything on it sit in the top quarter, under the depth readout; the rest is black.
+- The real app (2.0.0, `reference/app-study/2026-10-23/40-live-combo.jpg`) uses the same 0.7–0.75 × range proportion
+  and has no range −/+ in its Combo bottom bar; only the Lab's desktop slider reaches 200 ft in Combo.
+- **Option A (recommended):** the Forward panel's depth follows the water, like the single Live Forward view already does
+  (decision of 2026-09-25): depth axis = min(0.7 × range, ~1.2 × the deepest water the beam crosses). Nothing changes at
+  the default ranges; at long range the bottom and structure grow 2–3× taller. Mock-up checked at 60/100/150/200 ft.
+- Option B: cap the range in Combo at ~100 ft (the slider stops there), keep the app's proportion.
+- Option C: A + B together.
