@@ -271,7 +271,7 @@ the cheapest Android phone class). Phone size was emulated at 360×800.
 - ✅ Direction: the SECTION camera (B), Jason 2026-10-16 night (#101); the surface: black ice with thin wind-swept snow (#108)
 - ⬜ Section view tuning (round 1 done in #102: lens, slab face, soil, marine snow, cards under the panel, camp): still open — the slab edge opening where a hole is near the wall, snow lying on the slab top, the water column's tint, camp details, phone fine-tuning; decide the fate of Top and Under the ice (keep as a switch, or drop)
 
-## PLM Combo at long range (Jason 2026-10-23: Range 拉到很高的时候 画面只剩下顶部那一点点) — PROPOSAL, waiting on Jason
+## PLM Combo at long range (Jason 2026-10-23: Range 拉到很高的时候 画面只剩下顶部那一点点) — ✅ DONE as a softer option A (see decisions)
 - Cause: the Combo Forward panel's depth axis is fixed at 0.7 × range (copied from the one app frame, 16 m range in 4 m of
   water, `SonarScreen.jsx screenLayout`, `index.jsx` Combo box). At 200 ft range in 36 ft of water the panel is 140 ft
   deep, so the bottom and everything on it sit in the top quarter, under the depth readout; the rest is black.

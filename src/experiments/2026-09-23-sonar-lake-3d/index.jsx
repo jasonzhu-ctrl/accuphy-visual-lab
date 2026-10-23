@@ -5,7 +5,7 @@ import LakeScene from './Scene'
 import { DEVICES, FT, MODE_LABELS, ICE_MODES } from '../2026-09-23-sonar-beam/devices'
 import { iceParams, ICE_START, VIEWS } from './iceScene'
 import { wedgeSpecs } from '../2026-09-23-beam-shapes-3d/wedge'
-import { phonePose, isPhoneLayout } from './SonarScreen'
+import { phonePose, isPhoneLayout, comboFwdDepth } from './SonarScreen'
 import { COLORMAP_NAMES } from './colormaps'
 import SonarChrome from './SonarChrome'
 import { screenLayout } from './SonarScreen'
@@ -126,7 +126,7 @@ export default function SonarLake3D({ scene: sceneProp }) {
       // the Down fan's beam is drawn whole in the lake (Jason 2026-10-23: 三角形不够完整 … 左边缺了一个角 补完整): the app's
       // Combo panel still crops its left side (the apex sits 20 % in), but the coverage in the water is the full fan
       sp[0] = { ...sp[0], R: Math.hypot(0.8 * wd, D) * 1.001 }
-      sp[1] = { ...sp[1], R: Math.hypot(R, 0.7 * R) * 1.001, box: { xMin: -0.25 * R, xMax: R, yMax: 0.7 * R } }
+      const hF = comboFwdDepth(R, D); sp[1] = { ...sp[1], R: Math.hypot(R, hF) * 1.001, box: { xMin: -0.25 * R, xMax: R, yMax: hF } } // the Forward panel's depth (SonarScreen.jsx)
     }
     if (deviceId === 'PLM' && mode === 'forward' && sp[0]) { const R = rangeFt * FT, D = depthFt * FT; sp[0] = { ...sp[0], R: Math.hypot(R, D) * 1.001, box: { xMin: -0.25 * R, xMax: R, yMax: D } } }
     return sp

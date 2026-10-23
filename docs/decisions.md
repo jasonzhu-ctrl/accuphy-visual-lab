@@ -1902,3 +1902,11 @@ Numbered log. Newest at the bottom.
        with one plain caption under it, "Tap the ice to drill a hole" (sentence case, 13 px, no background). Precedent: the
        ground reticle of AR placement (Apple AR Quick Look / ARKit, Google Scene Viewer), which marks a spot on a surface
        instead of floating a button. Hidden after the first tap. The summer page's "Drag the boat" pill is unchanged.
+
+124. **2026-10-23** — **PLM Combo at long range: the Forward panel's depth meets the water halfway** (Jason: "Range 拉到很高的
+     时候 画面只剩下顶部那一点点"; on option A: "方案 A 会更好一点 但是抬高的再少一点 曲度跟原来保持相近").
+     - The Forward panel's depth axis was always 0.7 × range (the app's proportion), so at 200 ft in 36 ft of water the
+       bottom sat in the top quarter. Now it is `min(0.7·R, √(0.7·R × 1.3·D))` (`comboFwdDepth`, SonarScreen.jsx), the
+       geometric mean of the app's proportion and the water: unchanged up to ~70 ft range in 36 ft of water, and at long
+       range the bottom line rises about half as far as option A did. The 3D curtain (index.jsx) uses the same depth.
+     - Option A (depth = 1.3 × water) and B (cap the range) are in docs/backlog.md for reference.
