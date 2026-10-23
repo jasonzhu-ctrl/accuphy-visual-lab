@@ -238,7 +238,7 @@ export default function SonarScreen({ state, rect, lakeMats }) {
       u.uTopR.value = R; u.uTopCamY.value = 2; u.uTopNearFar.value.set(cam.near, cam.far)
       const sp = specs[0]
       u.uFan.value[0].set(0, (sp.a1 - sp.a0) / 2, Math.tan((sp.a1 - sp.a0) / 2), Math.tan(sp.theta))
-      u.uPulse.value = 0.04; u.uBeamHalf.value = 0.006
+      u.uPulse.value = 0.07; u.uBeamHalf.value = 0.03 // fish (sonarShader fishDash): the flat fan's beams are wider — app: 0.4–1 m streaks along the arc at 5–10 m
     } else {
       specs.forEach((sp, k) => {
         const cam = res.cams[k]
@@ -257,7 +257,7 @@ export default function SonarScreen({ state, rect, lakeMats }) {
         // screen-plane centre angle: the tilt of the fan centre from straight-down
         u.uFan.value[k].set(Math.atan2(c.x, -c.y), half, tanH, tanV)
       })
-      u.uPulse.value = 0.05; u.uBeamHalf.value = 0.004 // the vertical fan's formed beams are fine (app: far fish stay thin dashes)
+      u.uPulse.value = 0.05; u.uBeamHalf.value = 0.014 // app: far fish are 0.3–0.5 m needles along the arc at 11–17 m (sonar-style §6.8)
     }
     gl.setRenderTarget(null)
     lakeMats.forEach((m) => { m.userData.uniforms.uSonarPass.value = 0 })

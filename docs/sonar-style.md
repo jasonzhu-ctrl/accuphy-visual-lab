@@ -254,7 +254,7 @@ Crops in `reference/app-study/fish-near-vs-far/` (PLM Forward, apex top-left,
    ≈ vertical-ish in screen terms only near the top edge; horizontal along the
    fan centre). Rule for the engine: **dash along the arc, never along screen x.**
 
-**Engine mapping** (`sonarShader.js` fishAt/dash): angular blur = constant
+**Engine mapping** (since #120 `sonarShader.js` fishDash, §7.19; before it fishAt/dash): angular blur = constant
 beam angle (not screen metres) added to the fish mask's own angular extent;
 radial thickness = constant pulse; brightness = angular fill of the beam
 (broadside fills it, head-on does not) → near fish show body length and
@@ -611,6 +611,9 @@ transducer blocks the ray.
   ~0.2–0.4 m, so the length is not the body: the app blends consecutive pings
   (persistence ≈ 0.7 s) and a moving fish paints the path it swam. Bright
   yellow-white middle, orange pointed ends. Hovering fish are short.
+  **Corrected 2026-10-23 (#120, §7.19):** the streaks are the flat fan's beam width, not swim paths. In
+  `pl-panoramic-lake-f005.jpg` the groups left of the boat run `/` and those right of it `\` — mirror images about
+  the boat's axis, i.e. along the arc around the transducer. Random swim headings could not do that.
 - **Every fish has a black blotch further out along its ray** — its acoustic
   shadow on the bottom (the ray through the fish continues down and hits the
   bottom later). The app's "random dark patches" are these.
@@ -705,4 +708,34 @@ transducer stays dark. The 3D curtain draws the main slab only.
   blend `smoothstep(0.08, 0.9, coverage)` so sparse brush stays faint.
 - Shadows: accumulated along the ray (`occluded steps / 5`), per-pixel jitter.
 - Weeds are not in the top-down map (they return weak, diffuse echoes).
+
+### 7.19 Fish marks rebuilt from the beam's point spread (2026-10-23, #120, Jason: "鱼在游动也好 … 转身也好 … 不动的时候 … 椭圆的球形")
+**What was wrong:** every fish was the smooth capsule of the path it swam in the last 0.7 s (§7.13). Swimming
+fish became glowing ovals along screen x, a hovering or turning fish shrank to a round blob, and nothing changed
+from ping to ping. Research: `docs/livescope-fish-research.md` (LiveScope / ActiveTarget / MEGA Live, fisheries
+acoustics); checked against the app's own frames (`reference/app-study/fish-near-vs-far/`, `fish-down-near/`,
+`panoramic-lake/`).
+
+**The model (`sonarMarks.js` computeMarks → `sonarShader.js` fishDash):**
+- The mark is the fish's body **now** (tail → head), projected into the view. Along the ray the body is a head-on
+  target, so only ≈ 0.6 of that part shows; across the ray, the whole flank.
+- Each body point is smeared by the beam: **thin along the ray** (sr = 0.7 × pulse + 0.25 × half body depth) and a
+  **fixed angle across it** (st = beam × range + half body depth; vertical fans 0.014 rad, Panoramic 0.03 rad). Far
+  fish become needles along the arc (app: 0.3–0.5 m at 11–17 m, §6.8); near fish show their length and heading.
+  The spindle narrows to points and trails 1.5× further behind the target than in front of it.
+- Along the body: the swim bladder (≈ 90 % of the echo) is the bright kernel in the front half; head and tail are
+  weaker peaks. Broadside the flank fills in between; head-on the peaks stand apart.
+- **Aspect:** broadside returns ~17–20 dB more than head-on. Strength × (0.18 + 0.82 aspect²) in the vertical views
+  (was 0.5 + 0.5 aspect); Panoramic × (0.45 + 0.55 of that).
+- **Ping to ping:** speckle on the beam grid (angle × range, cells the size of the mark's own spread) changes 8× a
+  second, with the last ping still showing a little. It bites the rim hard and the core only lightly (no holes:
+  Jason's 中间空了, §7.8/§7.9). The whole echo flickers by 6–70 %: a calm fish is steady, a swimming or turning
+  one, or one facing the beam, swings widely.
+- Tail beat 2–3.5 Hz (a small wag of the rear half, ±10 % echo). The echo of 0.2 s ago glows at 0.22 behind a moving
+  fish (the app's ping blending). Strong targets leak a faint ladder into the neighbouring beams (sidelobes).
+- The ice page's jig keeps the old capsule (`legacyMark`): the dial and Live Ice were tuned on it.
+
+**Reading the snapshots:** `__sonarSnap()` is 768×384, the same 2:1 as the phone's screen box. The two range
+controls stretch the picture by different amounts (PL Forward at 25 ft range / 45 ft depth: ×3 wider than tall), so
+a near fish under the boat is legitimately a long horizontal streak there.
 
