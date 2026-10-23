@@ -21,6 +21,7 @@ the Mini page; `VITE_SCENE=ice` for the ice page → `/ice/` on GitHub Pages sin
 
 | Date | Page | Built from (Lab commit) | Public repo commit | What changed |
 |---|---|---|---|---|
+| 2026-10-23 | **Ice (trial)** `/ice/` | 765bde6 (#123) | b7e6a59 | Drill cue = a reticle on the ice + plain caption; the Combo Down fan whole; Live Combo in the Mini row of Home |
 | 2026-10-23 | **Ice (trial)** `/ice/` | 14806a5 (#122) | f489616 | The app's solid back arrow; on phones the back button opens Home with the four Mini views |
 | 2026-10-23 | **Ice (trial)** `/ice/` | fcf64a3 (#121) | bfcbc3a | Views Live Ice · Forward · Down · Combo (Ice Fishing no longer offered); includes #120 fish marks |
 | 2026-10-20 | **Ice (trial)** `/ice/` | f09a3b6 | bc757c9 | First public trial link of the ice page (Jason asked for one); unlisted, noindex; same build as the private preview |
