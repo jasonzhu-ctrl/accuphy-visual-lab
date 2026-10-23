@@ -21,6 +21,12 @@ function ticks(from, to, step) {
 
 // a display-only app control: dimmed like a disabled iOS control, no hover state, a tap opens the sign-up gate.
 // Module-level so a re-render between pointer-down and click never swaps the element under the finger.
+// the app's back button is a solid white "reply" arrow — head to the left, the tail curving down to the right
+// (reference/app-study/2026-10-23/21-icefishing-12s.jpg). The text glyph it replaced fell back to a thin system arrow.
+function BackIcon({ size }) {
+  return <svg viewBox="0 0 24 24" aria-hidden="true" style={{ display: 'block', width: size, height: size }}><path fill="currentColor" d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z" /></svg>
+}
+
 function LockedCtl({ onLocked, children, style }) {
   return (
     <span className="ph-ctl" role="button" aria-disabled="true" tabIndex={-1} title="App control — shown for reference"
@@ -125,8 +131,8 @@ export default function SonarChrome({ layout, deviceId, mode, rangeFt, depthFt, 
       <div style={{ position: 'absolute', left: 0, right: 0, bottom: '2.5cqh', height: cq(9) }}>
         {/* the app's back button: on phones it is live and opens the app's Home (view selection) page (Jason 2026-10-16) */}
         {onHome
-          ? <LiveCtl label="Home" onPress={onHome} style={{ position: 'absolute', left: '2.5%', top: '50%', transform: 'translateY(-50%)', fontSize: cq(7), lineHeight: 1 }}>↶</LiveCtl>
-          : <LockedCtl onLocked={onLocked} style={{ position: 'absolute', left: '2.5%', top: '50%', transform: 'translateY(-50%)', fontSize: cq(7), lineHeight: 1 }}>↶</LockedCtl>}
+          ? <LiveCtl label="Home" onPress={onHome} style={{ position: 'absolute', left: '2.5%', top: '50%', transform: 'translateY(-50%)', lineHeight: 0 }}><BackIcon size={cq(7.4)} /></LiveCtl>
+          : <LockedCtl onLocked={onLocked} style={{ position: 'absolute', left: '2.5%', top: '50%', transform: 'translateY(-50%)', lineHeight: 0 }}><BackIcon size={cq(7.4)} /></LockedCtl>}
         {!split && (
           <div style={{ position: 'absolute', left: phone ? '23%' : '19%', top: '50%', transform: 'translate(-50%, -50%)', display: 'flex', alignItems: 'center', gap: gapPM }}>
             {onRange ? <LiveCtl label="Range shorter" disabled={autoRange} onPress={() => onRange(-1)}><Ring>−</Ring></LiveCtl> : <LockedCtl onLocked={onLocked}><Ring>−</Ring></LockedCtl>}

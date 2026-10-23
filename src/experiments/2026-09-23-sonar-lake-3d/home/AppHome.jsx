@@ -60,8 +60,11 @@ function Tab({ label, icon, active }) {
   )
 }
 
-export default function AppHome({ devices, deviceId, mode, onPick }) {
+export default function AppHome({ devices, deviceId, mode, onPick, ice = false }) {
+  // on the ice page the back button opens this Home too (2026-10-23): Live Ice Fishing is a view of this page there,
+  // not a link to it
   const sections = devices.map((d) => ({ id: d.id, ...SECTIONS[d.id] })).filter((s) => s.tiles)
+    .map((sec) => (ice ? { ...sec, tiles: sec.tiles.map((t) => (t.label === 'Live Ice Fishing' ? { ...t, mode: 'liveice', href: undefined } : t)) } : sec))
   if (devices.some((d) => d.id === 'PLM')) sections.push({ id: 'PLM', ...COMBO })
   const [toast, setToast] = useState('')
   const toastT = useRef(0)

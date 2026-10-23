@@ -1881,3 +1881,11 @@ Numbered log. Newest at the bottom.
      - Phone Home on the lake pages: Live Ice Fishing opens the public ice page — share builds now set `VITE_ICE_URL` to
        https://jasonzhu-ctrl.github.io/accuphy-lab-test/ice/ (it was frosted on public builds because no address existed).
        Takes effect on / and /mini/ only when those pages are rebuilt.
+
+122. **2026-10-23** — **Fix: the app's back button** (Jason: "声纳界面上的返回按钮好像是有错的，你看一看").
+     - It was the text glyph ↶, which fell back to a thin system arrow; the real app draws a solid white "reply" arrow
+       (head left, tail curving down-right; `reference/app-study/2026-10-23/21-icefishing-12s.jpg`). Now an inline SVG of
+       that shape, same size on every page (live on phones, dimmed/locked on desktop as before).
+     - On the ice page on phones the button did nothing (Home was excluded there since #107/#114). It now opens the app
+       Home like on the lake pages; Live Ice Fishing, Live Forward, Live Down and Live Combo switch the ice page's view,
+       the other Mini tiles stay frosted (#121).
