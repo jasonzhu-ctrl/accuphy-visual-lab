@@ -21,6 +21,7 @@ the Mini page; `VITE_SCENE=ice` for the ice page → `/ice/` on GitHub Pages sin
 
 | Date | Page | Built from (Lab commit) | Public repo commit | What changed |
 |---|---|---|---|---|
+| 2026-10-23 | **Both**, **Mini**, **Ice (trial)** + both private previews | 6545bdf (#125–#127) | 18173fe | Combo range AUTO like the app; ice: every tap counts (25 m hops), fish come to the jig and bite, a winter population round each hole |
 | 2026-10-23 | **Both**, **Mini**, **Ice (trial)** + both private previews | 49c45f8 (#124) | 7e809c5 | PLM Combo at long range: the Forward panel's depth meets the water halfway, so the bottom stays in view |
 | 2026-10-23 | **Both** `/` | 1b6cb18 (#104–#123) | 36abbba | All work since the last public build: app controls on phones (#114, #117–#118), fish marks rebuilt (#120), Home with only Live Forward / Live Down / Live Combo / Live Ice Fishing open (#121, Combo in the Mini row #123), Live Ice Fishing opens /ice/, the app's back arrow (#122), the whole Combo Down fan (#123) |
 | 2026-10-23 | **Mini** `/mini/` | 1b6cb18 (#104–#123) | 36abbba | Same build, PingLive Mini only |
