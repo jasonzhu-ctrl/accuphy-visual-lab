@@ -1870,3 +1870,14 @@ Numbered log. Newest at the bottom.
       `fish-sim.mjs` 0 violations (lowest gap 0.43 m); build passes; the ice page in real time (headless crashes the
       ice page under the virtual clock in this container, old code too): jig and Ice Fishing history unchanged, an
       ice fish draws as a thin streak. Not yet: fps on a real phone (backlog).
+
+121. **2026-10-23** — **The Mini offers four views only; every other view is frosted** (Jason: "我明确一下 Mini只保留Live ice
+     fishing view, combo view, Live Forward, Live Down 别的全部blur不给access").
+     - Open: **Live Forward, Live Down, Live Combo, Live Ice Fishing.** Frosted with no access: Live Panoramic, Down Scan,
+       Chirp Sonar and **Ice Fishing** (the 2D-history view; the phone Home shows its tile again, frosted, with the app
+       2.0.0 thumbnail, so the Mini row matches the app's seven tiles).
+     - Ice page: the View row is now Live Ice · Forward · Down · Combo (`ICE_MODES`); step 02 opens Live Ice. The engine
+       keeps the 'ice' view, it is just not offered.
+     - Phone Home on the lake pages: Live Ice Fishing opens the public ice page — share builds now set `VITE_ICE_URL` to
+       https://jasonzhu-ctrl.github.io/accuphy-lab-test/ice/ (it was frosted on public builds because no address existed).
+       Takes effect on / and /mini/ only when those pages are rebuilt.

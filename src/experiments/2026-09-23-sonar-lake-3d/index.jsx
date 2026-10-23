@@ -218,7 +218,7 @@ export default function SonarLake3D({ scene: sceneProp }) {
   const [step, setStep] = useState(0)
   const STEPS = ICE ? [
     { n: 1, title: 'The beam under the ice', text: 'The PingLive Mini hangs in the hole and pings straight down. Tap the ice anywhere to drill a new hole — whatever the beam touches lights up.', device: 'PLM', mode: 'liveice', range: 60, boat: ICE_START },
-    { n: 2, title: 'Watch them come in', text: 'The flasher is the dial: the bottom, your bait and every fish that rises, by depth around the ring. The panel beside it draws the same fish as marks.', device: 'PLM', mode: 'ice', range: 60, boat: [-8, -10] },
+    { n: 2, title: 'Watch them come in', text: 'The flasher is the dial: the bottom, your bait and every fish that rises, by depth around the ring. The panel beside it draws the same fish as marks.', device: 'PLM', mode: 'liveice', range: 60, boat: [-8, -10] },
     { n: 3, title: 'Look ahead without drilling', text: 'Forward View turns the beam sideways: fish and structure 60 ft away, under ice you never cut.', device: 'PLM', mode: 'forward', range: 60, boat: [16, 11] },
   ] : [
     { n: 1, title: 'This is the beam', text: 'A thin curtain of sound under the boat. Drag the boat — whatever the curtain touches lights up.', device: 'PL', mode: 'down', range: 80, boat: [-20, 6] },

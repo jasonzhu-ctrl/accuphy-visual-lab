@@ -1,7 +1,8 @@
 // The real app's Home — its view-selection page — drawn inside the phone display (Jason 2026-10-16: 不同的 view
 // option 可以模拟在手机上的 app 的官方版本的选择页面进入吗 … 显示首页选视图 而且应该必须先选才能开始). Layout from
 // reference/app-study/home*.jpg: a dark page, one section per device — "PingLive" (Panoramic / Forward / Down),
-// "PingLive Mini" (six of the app's seven tiles — Jason 2026-10-16 kept only Live Ice Fishing of the two ice views) and
+// "PingLive Mini" (all seven of the app's tiles; Jason 2026-10-23: only Live Forward, Live Down, Live Ice Fishing and Live
+// Combo are open, every other tile is frosted) and
 // "Combo" (Live Combo) — rounded dark panels, labels under the
 // tiles, and the Setting · Home · Map tab bar. The thumbnails are crops of the app's own tiles.
 // Tiles the Lab can show are live. The others are shown under a frosted layer (Jason: 其他的用那种我们也有的雾蒙蒙的一层)
@@ -16,6 +17,7 @@ import plmDown from './plm-down.jpg'
 import plmDownscan from './plm-downscan.jpg'
 import plmChirp from './plm-chirp.jpg'
 import plmLiveIce from './plm-liveice.jpg'
+import plmIceFishing from './plm-icefishing.jpg' // the app 2.0.0 tile (reference/app-study/2026-10-23)
 import plmCombo from './plm-combo.jpg'
 
 // The ice views live on the separate ice page (VITE_SCENE=ice); a tile can open it when the page has an address
@@ -34,6 +36,7 @@ const SECTIONS = {
     { mode: 'down', label: 'Live Down', img: plmDown },
     { label: 'Down Scan', img: plmDownscan },
     { label: 'Chirp Sonar', img: plmChirp },
+    { label: 'Ice Fishing', img: plmIceFishing }, // frosted: Jason 2026-10-23 keeps only Live Ice Fishing, Live Forward, Live Down, Live Combo
     { label: 'Live Ice Fishing', img: plmLiveIce, href: ICE_URL },
   ] },
 }

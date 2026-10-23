@@ -34,8 +34,10 @@ export const MODE_LABELS = {
   ice: 'Ice Fishing View',
   liveice: 'Live Ice View',
 }
-// the view pills of the ice scene (2026-10-16): Live Down is inside Live Ice, so it is not listed twice
-export const ICE_MODES = ['liveice', 'ice', 'forward', 'combo']
+// the view pills of the ice scene. Jason 2026-10-23: the Mini offers only Live Ice Fishing, Live Combo, Live Forward and
+// Live Down ("Mini只保留 Live ice fishing view, combo view, Live Forward, Live Down 别的全部blur不给access") — the 2D
+// Ice Fishing view ('ice') stays in the engine but is not offered
+export const ICE_MODES = ['liveice', 'forward', 'down', 'combo']
 
 // Forward-view tilt rule — CONFIRMED by Jason 2026-09-23 on the PLM Combo View
 // (he tuned the slider to 71°, i.e. the forward fan's leading edge lies on the
