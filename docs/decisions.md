@@ -2293,3 +2293,16 @@ Numbered log. Newest at the bottom.
      - dev knob `window.__sonarTune.k5 = [fibre contrast, bright share, fibre length, —]` (uniform `uTune5`, all 1).
      Checked: six scenes + close-up + the ice page (desktop, phone); `vite build` clean. Not published: the public pages
      stay at the #128 build.
+
+147. **2026-10-24** — **Ragged, fibrous outlines on every object, like the bottom band's edges**
+     (Jason on the #146 sheet: the inside texture is right, but "船的还有石头的外边缘太光滑了, 那个纹理它是一个不规则的, 所以…
+     表面都应该像河的底部一样, 不是光滑的", then "每个物体表面都会有纤维的"). The recording's band has no clean edge: thin
+     tapering streaks along the ray stick out of it, ~10–20 cm above and ~20–30 cm below. Engine (`sonarShader.js`):
+     each thin beam (~4 cm across, two noise octaves multiplied so neighbours differ) lets the structure echo run on past
+     the surface along the ray by its own length, new every ping, tapering (5 taps behind, up to ~0.3 m typical 0.25;
+     3 in front, ~0.1 m), at 0.75 of the echo. Every surface grows them, branches included (only echoes below 0.004 do
+     not). Tried and dropped: one noise octave (a saw-tooth of evenly growing spikes on trunks), fibres on solid returns
+     only (Jason wants them on every object). Levels unchanged (hull p90 513, steel 403; rocks/trees 558 — the extra dim
+     fibre pixels lower the percentile, the cores are as before); interior opacity unchanged. dev knob
+     `window.__sonarTune.k5[3]` = outline fibre length. Checked: six scenes + the ice page (desktop, phone); `vite build`
+     clean. Not published: the public pages stay at the #128 build.

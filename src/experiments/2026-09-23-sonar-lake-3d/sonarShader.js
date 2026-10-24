@@ -47,7 +47,7 @@ export const sonarFragment = /* glsl */ `
   uniform sampler2D uLUT;
   uniform float uGain; uniform float uDynRange; uniform float uContrast; uniform float uNoise; uniform float uGamma;
   uniform vec4 uTune2; // dev only (window.__sonarTune.k2): structure rim level, core level, ring radius, inside threshold — all 1 in production
-  uniform vec4 uTune5; // dev only (window.__sonarTune.k5): structure fibre contrast, bright-streak share, fibre length (×1/), unused — all 1 in production
+  uniform vec4 uTune5; // dev only (window.__sonarTune.k5): structure fibre contrast, bright-streak share, fibre length (×1/), outline fibre length — all 1 in production
   uniform vec4 uTune4; // dev only (window.__sonarTune.k4): structure hides the bottom, inside fill, wood core, rock core — all 1 in production
   uniform vec4 uTune3; // dev only (window.__sonarTune.k3): bottom spread compensation, near-gain floor, structure cap, steel core — all 1 in production
   uniform vec4 uTune; // dev only (window.__sonarTune.k): scales for the band's pulse, tail, peak+edge and integrated body, all 1 in production
@@ -86,6 +86,8 @@ export const sonarFragment = /* glsl */ `
     if (d >= 0.9999) return 1e9;
     return linearize(d) * rayLen;
   }
+  #define EDGE_T0 0.004
+  #define EDGE_T1 0.03
   float sampleEcho(int k, float u, float rn) { return (k == 0) ? texture2D(uEcho0, vec2(u, rn)).r : texture2D(uEcho1, vec2(u, rn)).r; }
   float sampleTag(int k, vec2 uv) { return (k == 0) ? texture2D(uColor0, uv).a : texture2D(uColor1, uv).a; }
   vec4 markRow(int i, float row) { return texture2D(uMarks, vec2((float(i) + 0.5) / 64.0, (row + 0.5) / 5.0)); }
@@ -341,6 +343,22 @@ export const sonarFragment = /* glsl */ `
     float duT = 0.5 * uEchoTex.x; // and half a cell either side across the fan: the cells blend into one smooth stroke (no mosaic)
     for (int i = -2; i <= 2; i++) { float ri = rn + float(i) * dRn; es += exp(-0.9 * float(i * i)) * 0.5 * (sampleEcho(k, u - duT, ri) + sampleEcho(k, u + duT, ri)); }
     es /= 1.87;
+    // A ragged, fibrous outline like the bottom band's (Jason 2026-10-24: 船的还有石头的外边缘太光滑了 … 纹理它是一个不规则的,
+    // 表面都应该像河的底部一样): each thin beam's return runs on past the surface along the ray by its own length, tapering
+    // off — longer behind the target (up to ~0.3 m, the band's lower edge) than in front of it (up to ~0.12 m, its upper
+    // edge); fibres ~4 cm across, a new set every ping
+    // (two octaves multiplied: neighbouring fibres differ, no saw-tooth of evenly growing and shrinking spikes)
+    float fq = aWorld * clamp(11.0 * uRange, 150.0, 400.0);
+    float fl = 1.7 * vnoise(vec2(fq * 1.4 + 17.0, png * 0.71)) * vnoise(vec2(fq * 3.5 + 4.0, png * 1.3)), fl2 = min(fl, 1.2) * 1.5 * uTune5.w; // mean ~0.6
+    float esX = 0.0;
+    for (int i = 1; i <= 5; i++) {
+      float f = float(i) * 0.2;
+      float eb = sampleEcho(k, u, rn - f * (0.05 + 0.32 * fl2) / uFanR[k]);                          // behind, ~0.25 m typical
+      float ef = i <= 3 ? sampleEcho(k, u, rn + f * (0.03 + 0.12 * fl2) * 1.67 / uFanR[k]) : 0.0; // in front, ~0.1 m
+      // every surface grows fibres, branches too (Jason 2026-10-24: 每个物体表面都会有纤维的); only the faintest speckle does not
+      esX = max(esX, (1.0 - 0.85 * f) * max(eb * smoothstep(EDGE_T0, EDGE_T1, eb), ef * smoothstep(EDGE_T0, EDGE_T1, ef)));
+    }
+    es = max(es, 0.75 * esX);
     float body = clamp(solidAcc / max(wsum, 1e-3), 0.0, 1.0);
     spk = (1.0 - exp(-(es + 0.25 * body) * 9.0)) * 0.95 * (0.72 + 0.4 * grainS); // surfaces (splat) + the solid body between them, soft knee; a calmer grain so a rock reads solid, not see-through (Jason 2026-10-24)
     // Core to rim (Jason 2026-09-24: 越靠近中心越亮 有这个逐步亮的过程 · 这种实心结构亮的 清晰的 是更好的; 2026-10-24: 中间最亮, 慢慢
