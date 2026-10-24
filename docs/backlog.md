@@ -51,7 +51,7 @@ it is done. ✅ done · 🔧 in progress · ⬜ open.
 ## 3D lake (Phase 3 polish)
 - ✅ Rocks rebuilt in code as Shield boulders, six shapes; the old dodecahedron shards are gone (decision #133, `rocks.js`)
 - ✅ The drag cue is a thin reticle on the water round the boat with one plain caption, no glass pill (decision #132; Jason picked it from four mock-ups)
-- ⬜ `lakeMaterial.js`: the fine speckle and the bark grooves multiply `albedo` after `base` was computed from it, so no surface texture reaches structure or the bed (found in #131). Fixing it changes the look of all timber and the bed — check with Jason first
+- ✅ `lakeMaterial.js`: the speckle and bark grooves ran after `base` was computed, so no surface texture ever showed; fixed (decision #136)
 - ⬜ Rocks, if Jason wants more: per-instance colour (needs instanceColor in lakeMaterial), lichen/algae bands, a few split boulders
 - 🔧 **Boat + fish plan (2026-10-03):** `docs/boat-fish-plan.md`. Boat decided (#83): a low-key bass boat; no raised
   bow, no Power-Poles; the trolling motor and transducer stay as they are. Fish decided (#85): all species stay, yellow

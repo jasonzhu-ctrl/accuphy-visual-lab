@@ -123,6 +123,8 @@ repeatable procedures are also project skills in `.claude/skills/` (`sonar-qa`, 
   names and reloads the page, and the run dies with "Execution context was destroyed" (three grid runs lost this way).
   YouTube is blocked there (www.youtube.com, *.googlevideo.com, i.ytimg.com): video study needs those hosts allowed
   in the environment's network settings, or the Mac.
+- **Shaders are JS template strings:** a backtick in a GLSL comment ends the string and `vite build` fails with a
+  parser error pointing at the comment (#136). Write `base`, not \`base\`, inside shader code.
 - **Build gotchas:** the minifier writes string literals with backticks. Vite rewrites public CSS URLs to
   `../brand/…`. Both broke naive find-and-replace. `vite build` must pass before any share.
 - **Fonts:** the Lab's local `Eurostile-Heavy.otf` has an unverified web licence. The website moved to the Adobe kit

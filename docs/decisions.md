@@ -2088,3 +2088,12 @@ Numbered log. Newest at the bottom.
        → 0.6 / 5.5 / 44 / 32 / 18; lit share of the hull box 85 % → 71 %; picture black 87 % → 89 %; grain correlation
        25 × 10 in → 34 × 11 in; flicker 37 → 21. The nine calibrated scenes still read right (the steel cargo wreck now
        shows its whole profile). Public pages not rebuilt yet — Jason sees the comparison first.
+
+136. **2026-10-24** — **Lake material: the surface texture finally shows** (Jason, on the bug found in #131: "要修的").
+     - `lakeMaterial.js` multiplied `albedo` by the fine speckle and the bark grooves AFTER `base` had been computed from
+       it, so since 2026-09-24 no surface texture ever reached the bed, the timber or the rocks. The block now runs
+       before `base` (fish excluded, as before).
+     - Look: close up, sand grain on the bed and the rocks, bark grooves on the trunks; from the normal camera the
+       change is subtle. The sonar picture reads only the material tags (alpha), so it is untouched; the ice page's
+       section view and Live Ice are as before.
+     - Lesson: the shader is a JS template string — a backtick inside a GLSL comment ends it (`vite build` failed once).
