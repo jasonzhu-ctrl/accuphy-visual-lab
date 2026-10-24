@@ -2371,3 +2371,17 @@ Numbered log. Newest at the bottom.
      一下合理不合理"): sizes change smoothly (430 → 440 px at 1048 px, cap at ~1650 px), nothing overlaps; the in-phone
      ruler text is 6.4–8.2 px at 440–560 px — small, as in the real app; the fix for that is plan B's 1.3× app controls
      (#84, SonarChrome owner), not a bigger frame. Published 2026-10-24 (versions.md).
+
+152. **2026-10-24** — **Rough and side-sloping bottoms are one filled band again, not a net of lines** (Jason: "底部在某些区域
+     很虚", logged in the backlog by another chat as "thick bottom bands go net-like since #148"; then "你来修"). Cause, found
+     by toggling every #145–#148 piece at his spots (boat 15, −2.2 at 30 ft among rocks; −5.4, −8.2 at 46 ft): not the
+     occlusion, fill or outline arcs, and already there at #147 — the slab is sampled by 24 rows, and since the thin band of
+     #140 each row draws its own thin line; where neighbouring rows meet the bottom further apart than the pulse they
+     separate into crossing lines with dark holes, which #148's arcs made more visible. `sonarShader.js` fanEcho: each
+     bottom row spreads its pulse over the stretch to the previous row's hit (centre halfway, width half the gap, same
+     energy) and its tail is averaged over that stretch (no hard onset line per row); a row on a rock keeps the last
+     bottom hit so the band is filled across it; gaps under 2 cm keep the plain pulse (a flat bottom is unchanged).
+     Measured in the band's core: at the rocky spot black holes 9.5 % → 2.3 %, dark (< ½ median) 16 % → 8 %, CoV 0.50 →
+     0.39; the deep slope 0.2 % → 0.1 % (it had few). Bottom brightness per scene unchanged (p90 within ±5 %); the approved
+     close-up band peak 517 (was 489–517). dev knob `window.__sonarTune.k6[1]` = the gap fill (1; 0 = the old rows).
+     Checked: both spots, six scenes, the ice page (desktop, phone); `vite build` clean. Not published yet.

@@ -8,7 +8,7 @@ it is done. ✅ done · 🔧 in progress · ⬜ open.
   frames at 30 fps): every 1/8 s a mark gets new speckle, its outline swings 168–454 px (2–3×), brightness ±25 %, centre
   jumps up to 10 px — same on #128, #139 and #150, so it dates from #120 (per-ping speckle + ragged rim + `fl` flicker +
   tail wag + 0.2 s ghost). Proposal: blend ping to ping instead of jumping, calmer rim, smaller flicker. Waiting for Jason's go.
-- ⬜ **Thick bottom bands turn into a net with holes since #148 (Jason 2026-10-24: 底部在某些区域很虚).** Deep or
+- ✅ (#152, fixed: the rows' gaps are filled; holes 9.5 % → 2.3 % at the rocky spot) **Thick bottom bands turn into a net with holes since #148 (Jason 2026-10-24: 底部在某些区域很虚).** Deep or
   side-sloping bottom (his spots −5.4, −8.2 at 46 ft and 15, −2.2 at 30 ft with rocks): #128/#139 drew a solid band,
   #148's arc grain leaves dark holes between the arcs there; the thin shallow band is fine. The grain is the LiveScope
   chat's active work — who fixes it is Jason's call.

@@ -47,7 +47,7 @@ export const sonarFragment = /* glsl */ `
   uniform sampler2D uLUT;
   uniform float uGain; uniform float uDynRange; uniform float uContrast; uniform float uNoise; uniform float uGamma;
   uniform vec4 uTune2; // dev only (window.__sonarTune.k2): structure rim level, core level, ring radius, inside threshold — all 1 in production
-  uniform vec4 uTune6; // dev only (window.__sonarTune.k6): steel ceiling, unused ×3 — all 1 in production
+  uniform vec4 uTune6; // dev only (window.__sonarTune.k6): steel ceiling, gap fill between rows, unused ×2 — all 1 in production
   uniform vec4 uTune5; // dev only (window.__sonarTune.k5): structure grain contrast, bright share, arc size scale, outline arc length — all 1 in production
   uniform vec4 uTune4; // dev only (window.__sonarTune.k4): structure hides the bottom, inside fill, wood core, rock core — all 1 in production
   uniform vec4 uTune3; // dev only (window.__sonarTune.k3): bottom spread compensation, near-gain floor, structure cap, steel core — all 1 in production
@@ -286,6 +286,7 @@ export const sonarFragment = /* glsl */ `
     // of a pixel hit as structure casts a shadow on the rows behind — wblk / wsum below, squared like the app's.
     float duB = 0.5 * 0.0105 / (uFan[k].z * cos(a) * cos(a)); // ±0.6° in u
     float wsum = 0.0, wblk = 0.0, bw = 0.0, bh = 0.0, bh2 = 0.0; // bw/bh/bh2: where the rows meet the bottom (its spread across the slab)
+    float prevB = -1.0; // the previous row's bottom hit (−1: none) — the band between neighbouring rows, below
     for (int j = 0; j < 24; j++) {
       float v = (float(j) + jit) / 24.0;
       float ty = (v * 2.0 - 1.0) * uFan[k].w;
@@ -312,8 +313,25 @@ export const sonarFragment = /* glsl */ `
       // face; steel keeps its wide bands and long tails (#63)
       float sg = mix(sigma, mix((0.15 + 0.006 * r) * (1.0 + 1.0 * smoothstep(6.0, 30.0, r)), sigma, steel), structure);
       // the bottom's pulse: a sharp onset (the burst's band rises over 0.5 ft) and a softer back; structure is painted by the echo splat below
-      float pulse = exp(-dr * dr / (sg * sg * (dr < 0.0 ? 0.36 : 1.0))) * (1.0 - structure); // a soft enough onset that the bright fibres poke a few cm above the edge (the burst's feathered top)
-      float tail = dr > 0.0 ? (0.55 + 0.65 * steel) * exp(-dr / (tailLen * (1.0 + 0.5 * steel))) * (1.0 - structure + steel) : 0.0; // the bottom's tail; steel keeps a long tail (#63)
+      // The slab is continuous, the 24 rows are samples of it: where neighbouring rows meet a rough or side-sloping bottom at
+      // ranges further apart than the pulse, each row drew its own thin line and the band became a net of crossing lines
+      // with dark holes (Jason 2026-10-24: 底部在某些区域很虚 — since the thin band of #140, made worse by #148's arcs). Each
+      // row now spreads its pulse over the stretch between its hit and the previous row's (centre halfway, width half
+      // the gap, the same energy), so the band stays one filled body; a flat bottom (no gap) is unchanged.
+      float prevB0 = prevB;
+      float gapB = (prevB > 0.0 && hit < 1e8 && structure < 0.5) ? abs(hit - prevB) : 0.0;
+      gapB *= step(0.02, gapB); // (below a couple of cm: the plain pulse)
+      float drB = (gapB > 0.0) ? r - 0.5 * (hit + prevB) * uTune6.y - hit * (1.0 - uTune6.y) : dr;
+      float sgF2 = sg * sg * (drB < 0.0 ? 0.36 : 1.0), sgE2 = sgF2 + 0.25 * gapB * gapB * uTune6.y;
+      float pulse = sqrt(sgF2 / sgE2) * exp(-drB * drB / sgE2) * (1.0 - structure); // a soft enough onset that the bright fibres poke a few cm above the edge (the burst's feathered top)
+      if (hit < 1e8 && structure < 0.5) prevB = hit; // a row on a rock keeps the last bottom hit: the band is filled across it too
+      float tl = tailLen * (1.0 + 0.5 * steel);
+      float tail = dr > 0.0 ? (0.55 + 0.65 * steel) * exp(-dr / tl) * (1.0 - structure + steel) : 0.0; // the bottom's tail; steel keeps a long tail (#63)
+      if (gapB > 0.0) { // the tail too starts anywhere between the two rows' hits (its average over that stretch): no hard onset line per row
+        float ta = min(hit, prevB0), tb = max(hit, prevB0);
+        float tI = r < ta ? 0.0 : (r < tb ? 1.0 - exp(-(r - ta) / tl) : exp(-(r - tb) / tl) - exp(-(r - ta) / tl));
+        tail = 0.55 * tl / gapB * tI * uTune6.y + tail * (1.0 - uTune6.y);
+      }
       // the far side of what this row hit (back-face strip): a hull's thickness, a trunk's diameter. No far face found
       // (an open mesh, the lakebed lockup) → wood 2.5 m, timber 0.4 m
       float hit2 = sampleDistB(k, vec2(uj, v), rayLen);
