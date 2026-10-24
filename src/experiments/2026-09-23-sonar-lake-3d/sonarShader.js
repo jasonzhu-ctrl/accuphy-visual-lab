@@ -305,11 +305,11 @@ export const sonarFragment = /* glsl */ `
     // structure from the echo splat: every surface the fan sees at this angle and range, all faces, both sides — the real
     // picture of a wooden hull is its whole section (deck line, planking, ribs, far side). A 0.3 m pulse along the
     // range (5 taps), the per-ping grain on top. Steel sums brighter (its amp in lakeMaterial) and keeps its row tail.
-    float rn = r / uFanR[k], dRn = 0.08 / uFanR[k]; // ±0.16 m along the range: the recording's range cells are sharp
+    float rn = r / uFanR[k], dRn = 0.06 / uFanR[k]; // ±0.12 m along the range: the recording's range cells are sharp (Jason: 树的清晰度再提升一点)
     float es = 0.0;
-    for (int i = -2; i <= 2; i++) es += exp(-0.5 * float(i * i)) * sampleEcho(k, u, rn + float(i) * dRn);
-    es /= 3.3;
-    spk = (1.0 - exp(-es * 9.0)) * 0.95 * (0.12 + 1.15 * grainS); // soft knee: a single plank reads orange, the deck line (several faces) yellow-white, never a flat white slab; the grain cuts real pits
+    for (int i = -2; i <= 2; i++) es += exp(-0.9 * float(i * i)) * sampleEcho(k, u, rn + float(i) * dRn);
+    es /= 1.87;
+    spk = (1.0 - exp(-es * 9.0)) * 0.95 * (0.55 + 0.6 * grainS); // soft knee: a single plank reads orange, the deck line (several faces) yellow-white; the speckle itself lives on the object (lakeMaterial), this is only the per-ping shimmer — a strong range grain here banded the trunks (Jason: 一棱一棱)
     // Bottom brightness (Jason 2026-09-25: 画面特别是底部貌似还是太亮 深水也是 … 高亮的部分和桔红色的关系): over a flat
     // bottom every row across the slab lands at one range and the integrated echo added up to a solid white band
     // (38–44 % of the lit pixels white in PL scenes; the app's bottom scenes 6–7 %). Past the near range (where TVG
@@ -421,7 +421,7 @@ export const sonarFragment = /* glsl */ `
       for (int j = -1; j <= 1; j++) {
         vec2 c = c0 + vec2(float(i), float(j));
         float h = hash(c * 1.37 + 0.71);
-        float dens = 0.07 + 0.28 * (1.0 - smoothstep(2.5, 9.0, c.y * CELL));
+        float dens = 0.04 + 0.17 * (1.0 - smoothstep(2.5, 9.0, c.y * CELL)); // 60 % of #129's density (Jason 2026-10-23: 星星点点的噪声稍微减掉一点)
         if (h > dens) continue;
         vec2 sp = (c + vec2(hash(c + 3.1), hash(c + 7.7))) * CELL;
         vec2 q = vec2(sp.x - uApexXZ.x, sp.y - uApexDepth) - p;   // screen metres, pixel → speck
@@ -429,7 +429,7 @@ export const sonarFragment = /* glsl */ `
         float d2 = qr * qr / (sr * sr) + qt * qt / (st * st);
         if (d2 > 6.0) continue;
         float on = step(0.3, hash(c + ping));                     // ~70 % of pings
-        float amp = (0.2 + 0.26 * hash(c + 11.3) * hash(c + 5.9)) * (1.15 - 0.5 * uNoise);
+        float amp = (0.16 + 0.2 * hash(c + 11.3) * hash(c + 5.9)) * (1.15 - 0.5 * uNoise);
         e = max(e, amp * on * exp(-1.5 * d2));
       }
     }

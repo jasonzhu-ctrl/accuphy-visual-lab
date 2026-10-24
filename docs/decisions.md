@@ -2097,3 +2097,15 @@ Numbered log. Newest at the bottom.
        change is subtle. The sonar picture reads only the material tags (alpha), so it is untouched; the ice page's
        section view and Live Ice are as before.
      - Lesson: the shader is a JS template string — a backtick inside a GLSL comment ends it (`vite build` failed once).
+
+137. **2026-10-23** — **Jason's verdict on the echo-splat round, and the fixes** (on the before/after sheets: "新的结构比以前更漂亮"; trees
+     "一棱一棱有断层的感觉 … 清晰度再提升一点点"; fish "更真实一点"; noise "星星点点的噪声稍微减掉一点点"; colour "新的黄色跟老的橘黄色中间
+     取折中").
+     - **Trees:** the stepped look came from the per-ping range grain (0.22 m bands along a trunk) and from low-poly crown
+       facets lit by the facing term. The speckle now lives on the object (12 cm cubes in world space, the same in every
+       direction, `lakeMaterial.js` splat), the facing term is weak (0.78 + 0.22), the per-ping grain is only a shimmer
+       (0.55 + 0.6), and the range pulse is ±0.12 m with sharper taps — trunks are continuous columns with speckle.
+     - **Noise:** the #129 water scatterers at 60 % density and 80 % amplitude.
+     - **Colour:** `accuphy_mid`, the midpoint of the measured app orange and the LiveScope amber, is the default.
+     - Checked on the six comparison scenes (default, shelf fish, bait school, workboat, steel ship, timber) against the
+       public build (#128); public pages still not rebuilt.

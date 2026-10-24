@@ -89,7 +89,7 @@ export default function SonarLake3D({ scene: sceneProp }) {
   const [started, setStarted] = useState(!homeFirst) // a view has been picked (always true on desktop and on the ice page)
   const toastT = useRef(0)
   const [imperial, setImperial] = useState(true)
-  const [colormap, setColormap] = useState('accuphy_orange') // the app 2.0.0 'orange' map, measured on its own recording (2026-10-23); 'garmin_amber' was the LiveScope-measured amber (§7.7)
+  const [colormap, setColormap] = useState('accuphy_mid') // halfway between the app 2.0.0 'orange' map measured on its own recording and the LiveScope amber (Jason 2026-10-23: 折中); 'garmin_amber' was the LiveScope-measured amber (§7.7)
   const [gain, setGain] = useState(Number.isFinite(devNum('gain')) ? devNum('gain') : 0.40) // 40 %: the app's own recordings run at 40–50; the look is the one the old 57 % gave (sonarShader toneIdx)
   const [contrast, setContrast] = useState(Number.isFinite(devNum('contrast')) ? devNum('contrast') : 0.4)    // demo look (sonar-style.md §6.5): floor mostly gone, a trace of noise stays
   const [noise, setNoise] = useState(Number.isFinite(devNum('noise')) ? devNum('noise') : 0.3)          // noise reject (inset cleaner than real use, decision #28): the smaller of the two, used last

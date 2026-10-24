@@ -138,7 +138,7 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
           if (vBad > 0.0 || abs(vSplat.x) > 1.0 || abs(vSplat.y) > 1.0) discard;
           float lobe = pow(1.0 - abs(vSplat.y), 1.6);                       // the beam's main lobe across the slab
           float facing = abs(dot(normalize(vNormal), normalize(cameraPosition - vWorld))); // faces square to the sound return more
-          float g = fract(sin(dot(floor(vWorld * 6.0), vec3(127.1, 311.7, 74.7))) * 43758.5453); // grain fixed to the object
+          float g = fract(sin(dot(floor(vWorld * 8.0), vec3(127.1, 311.7, 74.7))) * 43758.5453); // 12 cm speckle fixed to the object, the same in every direction (no bands along a trunk)
           float amp = 0.14; // timber, rock
         #ifdef WOOD
           amp = 0.12;        // planking: each surface a little weaker, but there are many
@@ -146,7 +146,7 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
         #ifdef STEEL
           amp = 0.22;        // steel rings
         #endif
-          gl_FragColor = vec4(amp * (0.4 + 0.8 * facing) * (0.55 + 0.9 * g) * lobe, 0.0, 0.0, 1.0);
+          gl_FragColor = vec4(amp * (0.78 + 0.22 * facing) * (0.3 + 1.4 * g) * lobe, 0.0, 0.0, 1.0); // facing weak: a low-poly crown must not show its facets as bands (Jason 2026-10-23: 树一棱一棱有断层)
           return;
       #else
           discard;
