@@ -2129,3 +2129,19 @@ Numbered log. Newest at the bottom.
      - **Pending Jason:** switch to the theme-mounted embed (iframe as fallback)? go-ahead for the Lab mount build and
        for the sideways mode? the Taiga-less lean layout? Nothing built; the website project's handoff is unchanged
        until he decides.
+
+139. **2026-10-24** — **Phone flow: Jason's answers on the #138 audit** (Jason: 2D Ice Fishing "不开"; the sign-up gate "你这个
+     层级不要有 … 这个事的安排在 klaviyo 营销漏斗那边的 agent 的决定"; the Live Ice Fishing link "去掉?"; the `view` event "优化").
+     - **2D Ice Fishing stays frosted** (#121 stands).
+     - **No sign-up gate from the phone's controls:** on phones a tap on a display-only app button now does nothing at all
+       (`index.jsx`: `onLocked` is not passed on phones), on the lake and the ice page alike. The desktop gate (#38) is
+       untouched; whether a gate exists at all is the Klaviyo funnel chat's decision, not this chat's.
+     - **The Live Ice Fishing tile on the lake page is frosted** like the other unavailable Mini tiles; the link that wrote
+       a full URL into the hash (`AppHome.jsx`) is gone. On the ice page the tile still opens Live Ice. `VITE_ICE_URL`
+       is no longer read.
+     - **`view` event on real picks only** (`pickView` in `index.jsx`): the Home tile (`source: home`), the desktop panel
+       (`panel`) and a guide step (`step`) send `{ view, device, source }`; nothing is sent for the default view on load.
+       Checked at 390 × 844: load → `ready` only; first pick → `view forward/PL/home`; Home → Live Down → `view down/PLM/home`;
+       ⋯ tap → no dialog; no console errors. The phone hint now reads "Home, range, gain and pause work".
+     - Still pending Jason: the embed switch to a theme-mounted Lab, the sideways real-device mode (#138), the ice page's
+       Home-first / live gain and pause on phones (left to the ice chat).
