@@ -112,7 +112,7 @@ export default function SonarScreen({ state, rect, lakeMats }) {
         uLogoB: { value: logo.B }, uLogoU: { value: logo.U }, uLogoV: { value: logo.V },
         uLogoSdf: { value: makeLogoSdf() }, uLogoMap: { value: new THREE.Vector4(1 / logo.s, LOCKUP_SVG.cx, LOCKUP_SVG.bottom, LOGO_SDF_MAX) },
         uLogoSvg: { value: new THREE.Vector2(LOCKUP_SVG.w, LOCKUP_SVG.h) }, uLogoExt: { value: new THREE.Vector2(LOCKUP.width / 2 + 0.3, LOCKUP_SVG.bottom * logo.s + 0.3) },
-        uLUT: { value: colormapTexture('garmin_amber') }, uGain: { value: 0.57 }, uDynRange: { value: 0.85 }, uContrast: { value: 0.4 }, uNoise: { value: 0.3 }, uGamma: { value: 0.75 }, // calibrated 2026-09-24 against the two confirmed frames (sonar-style.md §6.11)
+        uLUT: { value: colormapTexture('accuphy_orange') }, uGain: { value: 0.40 }, uDynRange: { value: 0.85 }, uContrast: { value: 0.4 }, uNoise: { value: 0.3 }, uGamma: { value: 0.75 }, // the app's orange map and gain scale, measured on its 2.0.0 recording (2026-10-23; before: garmin_amber, calibrated 2026-09-24 against the two confirmed frames, sonar-style.md §6.11)
         // the Mini's ice views (2026-10-16): flasher + Live Down (1) or flasher + 2D history (2); the app draws them in its jet map
         uIce: { value: 0 }, uIceSplit: { value: ICE_SPLIT }, uAspect: { value: 2.08 }, uTicks: { value: 5 }, uLUT2: { value: colormapTexture('jet') },
         uHist: { value: null }, uHistPrev: { value: null }, uHistPass: { value: 0 }, uHistFill: { value: 0 }, uIceAmber: { value: /icelut=amber/.test(window.location.search) ? 1 : 0 },
@@ -147,6 +147,26 @@ export default function SonarScreen({ state, rect, lakeMats }) {
     // distribution can be compared number-for-number with the app's reference frames
     if (import.meta.env.DEV) {
       const histRT = new THREE.WebGLRenderTarget(768, 384)
+      // dev: window.__sonarFlat(w, h) — the sonar picture flat (no phone perspective) as a PNG data URL, for pixel
+      // comparisons with app frames at the same scale (2026-10-23)
+      window.__sonarFlat = (w = 2048, h = 1024) => {
+        const rt = new THREE.WebGLRenderTarget(w, h)
+        const pos = quad.geometry.attributes.position, aW = quad.geometry.attributes.aW
+        const savedP = pos.array.slice(), savedW = aW.array.slice()
+        const corners = [[-1, 1], [1, 1], [-1, -1], [1, -1]]
+        corners.forEach(([x, y], i) => { pos.setXYZ(i, x, y, 0); aW.setX(i, 1) })
+        pos.needsUpdate = true; aW.needsUpdate = true
+        const gl = window.__sonarGL
+        gl.setRenderTarget(rt); gl.render(overlay, ortho); gl.setRenderTarget(null)
+        const px = new Uint8Array(w * h * 4); gl.readRenderTargetPixels(rt, 0, 0, w, h, px); rt.dispose()
+        pos.array.set(savedP); aW.array.set(savedW); pos.needsUpdate = true; aW.needsUpdate = true
+        const c = document.createElement('canvas'); c.width = w; c.height = h
+        const ctx = c.getContext('2d'); const img = ctx.createImageData(w, h)
+        for (let y = 0; y < h; y++) img.data.set(px.subarray((h - 1 - y) * w * 4, (h - y) * w * 4), y * w * 4)
+        for (let i = 3; i < img.data.length; i += 4) img.data[i] = 255
+        ctx.putImageData(img, 0, 0)
+        return c.toDataURL('image/png')
+      }
       window.__sonarHist = (bins = 10) => {
         const pos = quad.geometry.attributes.position, aW = quad.geometry.attributes.aW
         const savedP = pos.array.slice(), savedW = aW.array.slice()
@@ -206,9 +226,10 @@ export default function SonarScreen({ state, rect, lakeMats }) {
     u.uTime.value += dt
     u.uRange.value = s.rangeM
     if (s.colormap !== u.uLUT.name) { u.uLUT.value.dispose?.(); u.uLUT.value = colormapTexture(s.colormap); u.uLUT.name = s.colormap }
-    u.uGain.value = s.gain ?? 0.57
+    u.uGain.value = s.gain ?? 0.40
     u.uContrast.value = s.contrast ?? 0.4
     u.uNoise.value = s.noise ?? 0.3
+    if (import.meta.env.DEV && window.__sonarTune) { const t = window.__sonarTune; if (t.gamma != null) u.uGamma.value = t.gamma; if (t.dyn != null) u.uDynRange.value = t.dyn } // dev: tone-curve knobs for like-for-like fits (2026-10-23)
     u.uFanCount.value = specs.length
     const flat = specs[0] && specs[0].frame.n.y !== 0 // panoramic: thickness normal is vertical
     u.uFlat.value = flat ? 1 : 0

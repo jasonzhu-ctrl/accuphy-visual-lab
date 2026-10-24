@@ -160,3 +160,12 @@ repeatable procedures are also project skills in `.claude/skills/` (`sonar-qa`, 
 Gate with a multiplier uniform defaulting to 1, not by passing [] specs (that pops, and zeroes `uFanCount`, turning the
 fan black instead of "no echo"). In lakeMaterial scale `beam` and `edge` after the rim (`edge = wide - beam`). Beams
 remounts on specKey (AUTO range change mid-hop): find its materials by walking the group each frame.
+
+## Tune the engine against a real recording, like for like (2026-10-23)
+Two app stills of other objects, judged by eye, are not a reference (#128 drew wrecks from pilings). The method that
+works: the app's own recording on a phone over adb (`adb shell screencap` bursts), the picture measured on the
+screen's own scale (px/ft from the rulers) — classes of lit pixels, texture correlation length, ping-to-ping flicker,
+band thickness, the colour ramp — then the SAME scene in the Lab (`?study=wreck&boat=x,z&gain=&contrast=&noise=&depth=`,
+`window.__sonarFlat(w, h)` for the flat picture) compared on the same boxes with `scratchpad/real/stats.py`-style
+numbers, one knob at a time (`window.__sonarTune`). Keep the UI text out of the measured boxes. Ask Jason what the
+unknown blobs are before modelling them.

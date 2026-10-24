@@ -7,7 +7,7 @@ import * as THREE from 'three'
 //   inside ⇔ r=|(u,v)| < R, atan(v,u) ∈ [a0,a1], w ∈ [s0,s1]·u·tan(theta)
 export const MAX_BEAMS = 2
 
-export function makeLakeMaterial({ fish = false, structure = false, steel = false, logo = false } = {}) {
+export function makeLakeMaterial({ fish = false, structure = false, steel = false, wood = false, logo = false } = {}) {
   const uniforms = {
     uSun: { value: new THREE.Vector3(0.4, 0.8, 0.3).normalize() },
     uFogColor: { value: new THREE.Color('#17545f') },
@@ -32,7 +32,7 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
   const mat = new THREE.ShaderMaterial({
     uniforms,
     vertexColors: true,
-    defines: fish ? { FISH: 1 } : logo ? { STRUCTURE: 1, LOGO: 1 } : steel ? { STRUCTURE: 1, STEEL: 1 } : structure ? { STRUCTURE: 1 } : {},
+    defines: fish ? { FISH: 1 } : logo ? { STRUCTURE: 1, LOGO: 1 } : steel ? { STRUCTURE: 1, STEEL: 1 } : wood ? { STRUCTURE: 1, WOOD: 1 } : structure ? { STRUCTURE: 1 } : {},
     vertexShader: /* glsl */ `
       varying vec3 vWorld; varying vec3 vNormal; varying vec3 vColor;
       #ifdef FISH
@@ -214,10 +214,14 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
         fog *= 1.0 - 0.7 * beam; // the beam also cuts through the murk
         vec3 col = mix(lit, uFogColor, clamp(fog, 0.0, 0.92));
         if (uSonarPass < 0.5 && uOutGamma != 1.0) col = pow(max(col, 0.0), vec3(uOutGamma));
-        // sonar pass alpha: 1 = fish, 0.75 = steel (wrecks), 0.5 = other structure (timber, rocks), 0 = bottom
+        // sonar pass alpha: 1 = fish, 0.75 = steel (wrecks), 0.6 = wooden / open structure (a wooden hull: lit right through),
+        // 0.5 = other structure (timber, rocks), 0 = bottom
         float isFish = 0.0;
       #ifdef STRUCTURE
         isFish = 0.5;
+      #endif
+      #ifdef WOOD
+        isFish = 0.6;
       #endif
       #ifdef STEEL
         isFish = 0.75;

@@ -290,7 +290,7 @@ the cheapest Android phone class). Phone size was emulated at 360×800.
 
 ## Jason's four asks, 2026-10-23 evening ("有几个是我需要你持续优化 … 你可以一个一个做")
 1. ✅ (#125) **PLM Combo, Forward part: the bottom-vs-range relationship** must read easily for a beginner ("初学者相对来说比较容易好接受").
-2. ✅ (first round done, see decisions) **Sonar engine: structure** — the picture of structure is still far from the real app's ("结构物的画面跟真实的声纳的画面差距还是比较远").
+2. ✅ (#128 first round; redone like-for-like against the vivo recording, see decisions) **Sonar engine: structure** — the picture of structure is still far from the real app's ("结构物的画面跟真实的声纳的画面差距还是比较远").
    Research against the app recordings first (`sonar-look-tuning` skill, `reference/`), then tune.
 3. ✅ (#126) **Ice page: the tap area** is too limited — taps farther up the ice do not go through ("往冰面的上面再去点 它是过不太过去的").
    Re-evaluate which area is the most intuitive for a new user.

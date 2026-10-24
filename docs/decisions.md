@@ -1979,6 +1979,31 @@ Numbered log. Newest at the bottom.
      - Checked: the 6 × 6 grid against main (#128): all 36 tiles within 0.3 points of white; the ice page in real time:
        jig and Ice Fishing history unchanged, a few faint cyan specks in the Live Ice water; build passes. Panoramic
        untouched.
+130. **2026-10-23** — **The sonar engine is tuned against a real recording, like for like** (Jason: "我要你改的是去看现实的，就是
+     真正的声纳画面，然后基于它去优化我们现在的画面引擎 … 你刚刚做的对不对？" — #128 had tuned structure from two app stills of
+     other objects, by eye; this round follows the method he meant).
+     - **Method.** Jason's vivo phone over adb playing the app 2.0.0's own recording of a wooden wreck on the PingLive
+       Down View (80 ft, gain 40, contrast 47, noise reject 25, orange map); 20-frame bursts; the picture measured on the
+       screen's own scale (28.2 px/ft): hull size, brightness classes, texture correlation, ping-to-ping flicker, the
+       bottom band's thickness, the colour ramp (docs/sonar-style.md §10). Then the Lab renders the SAME scene —
+       `?study=wreck` puts a wooden copy of the workboat (×1.25 ≈ 12 m) beside the boat, `?gain= &contrast= &noise=
+       &depth=` set the knobs, `window.__sonarFlat(w,h)` returns the picture flat as a PNG — and the two pictures are
+       compared pixel-for-pixel on the same boxes until the numbers meet.
+     - **Engine changes.** (1) The app's displayed **orange colour map**, measured from the frames, is the default
+       (`accuphy_orange`; the LiveScope amber stays as an option). (2) **Gain brightens with +** (it dimmed before) and
+       the default label is 40 % like the app's recordings; the look at 40 is the one 57 gave. (3) **Grain, not
+       filaments**: coherent row sets per ~1.2° × 0.67 m that drift smoothly (was 0.08° — hairlines); structure faces are
+       built from grains ~0.6 m across the beam × 0.25 m along it with finer speckle cutting gaps, a fifth re-drawn per
+       ping. (4) A **wood** sonar tag (0.6): a wooden hull is lit right through for ~2 m, its shadow starts 1.6 m behind;
+       timber and rock (0.5) smear 0.5 m and shadow at once; steel (0.75) as #63. The workboat is wood (Jason).
+       (5) The **bottom band**: pulse 0.28 + 0.012 r, tail 0.45 + 0.02 r (was 0.22 + 0.010 r / 0.35 + 0.015 r), soft cap
+       K 0.8 (was 0.4) so the body is orange with a yellow edge as recorded; the noise floor halved.
+     - **Fit** (lit-pixel classes white / yellow / orange / red / dark): recording's hull 2 / 16 / 39 / 25 / 19, ours
+       5 / 19 / 31 / 26 / 20; flicker 29 on 152 vs 37 on 118; grain correlation 34 × 12 in vs 25 × 10 in. Our hull box is
+       55 % lit vs 85 % because the study wreck has less superstructure than the real one — geometry, not engine.
+     - **Open** (Jason to identify on the frame): the speck spray above the stern, the specks above the bow, the bright
+       bow face, the dark cavities, the faint diagonal left of the hull, the trail under the bottom. Public pages not
+       rebuilt: the colour map and gain scale change every picture, Jason sees it first.
 
 131. **2026-10-24** — **Rocks rebuilt: Shield boulders in code, six shapes** (Jason: "场景里面的石头像爆米花一样 … 去网上找实际的
      模型 … 要符合北美的淡水湖里面石头的质地跟形状").
