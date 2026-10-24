@@ -211,11 +211,12 @@ the cheapest Android phone class). Phone size was emulated at 360×800.
   fallback for slow phones. Decided: main action = email for an offer (#45). Next question for
   Jason: the "aha" (what a visitor should feel first). Remind him when he is back on this project.
 
-- ⬜ **Embed: theme-mounted Lab instead of the iframe (research #138, `docs/embed-options.md`) — Jason to decide;** then a `mount(el)` embed entry + stable loader, Vercel CORS headers, CSS scoping, and the #134 handoff revised (no postMessage / window.top / frame-ancestors)
-- ⬜ Phone-mode gaps left after #139: ice page Home-first + live gain/pause on phones (ice chat); sideways real-device mode and the embed switch wait for Jason (#138)
-- ⬜ **Phone landscape "real device mode" (proposed 2026-10-18, #119, build on Jason's go):** a sideways phone shows
-  the sonar full-screen with the app's controls (no phone frame inside the phone) and the lake as a small inset that
-  taps to enlarge; `docs/mobile-phone-layout-plan.md` Phase 4. Today 844×390 is broken (panel and cards cover it).
+- ✅ **Embed: theme-mounted Lab (#142):** `mount(el)` entry, stable loader `embed/lab.js`, CORS/caching in `vercel.json`, events via `Shopify.analytics.publish`; handoff draft `docs/handoffs/2026-10-24-lab-theme-mount.md`
+- ⬜ **Carry the #142 handoff to `accuphy-website/handoffs/`** (a chat on Jason's Mac); then the Vercel deploy (#102) and the theme-copy test
+- ⬜ Phone-mode gaps left after #139: ice page Home-first + live gain/pause on phones, and the ice page held sideways (ice chat; the lake page's #141 mode is lake-only)
+- ✅ **Phone landscape "real device mode" (#141, 2026-10-24):** a sideways phone is the app — Home with the frosted
+  tiles, then the sonar full-screen with the app's controls and the lake as a top-right inset that taps to swap.
+  Lake page only. Still open from Phase 4: quality tiers (dpr / 30 fps cap).
 - ⬜ **iPad layout: on hold (#119).** iPads get the desktop controls today; Jason decides after the phone layout is final.
 
 ## Engineering

@@ -98,3 +98,10 @@
 /* the ⋯ menu inside the phone display */
 /* iOS: repeated taps on the live controls and tiles must not trigger double-tap zoom (phone review, 2026-10-16) */
 .ph-live, .ph-tile, .ph-ctl, .ac-btn { touch-action: manipulation; }
+/* sideways phones (#140): the lake inset over the full-screen sonar (the GL lake is drawn under this transparent button)
+   and the tap target over the small sonar box when the lake is enlarged */
+.ph-lake { position: absolute; aspect-ratio: 16 / 9; padding: 0; border: 0; background: none; cursor: pointer; pointer-events: auto; box-shadow: 0 0 0 1px rgba(255,255,255,0.6), 0 6px 18px rgba(0,0,0,0.45); -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+.ph-lake svg { position: absolute; top: 6px; right: 6px; width: 16px; height: 16px; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.6)); }
+.ph-lake:active { transform: scale(0.97); }
+.lab-land .ac-back { display: none; }
+.ph-lake-back { position: absolute; inset: 0; padding: 0; border: 0; background: none; cursor: pointer; pointer-events: auto; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }

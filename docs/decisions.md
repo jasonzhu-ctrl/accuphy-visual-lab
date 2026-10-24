@@ -2174,7 +2174,39 @@ Numbered log. Newest at the bottom.
     Checked: six comparison scenes (`对比-v3-v5.jpg` sent to Jason), the ice page (desktop + phone) still draws its band
     and dial, `vite build` clean. Not published: the three public pages stay at the #128 build until Jason says so.
 
-141. **2026-10-24** — **Bright cores, orange rims; a flat bottom with fine fibres** (Jason on the #140 sheets: "实心改善的完全不够"
+141. **2026-10-24** — **A sideways phone is the app itself (real device mode)** (Jason: "横屏不要做真机模式了 … 一个小小的手机摁不到的",
+     then "手机横屏还是用以前的方案好了 在屏幕上有磨砂块点击选" — the #119 / Phase 4 plan, not a phone frame inside the phone).
+     - **When:** the window is wider than tall and under 500 px high (`isLandscapePhone`, SonarScreen.jsx), lake page only. The
+       ice page keeps its own layout (its phone work is the ice chat's); desktop, tablets and portrait phones are unchanged.
+     - **What:** no drawn phone, no desktop panel, no step cards. The display fills the screen inside the safe areas and opens
+       on the app's Home with the frosted tiles (#139 rules: PingLive views, the Mini's four live tiles, the rest frosted);
+       a pick starts the sonar full-screen with the app's controls at the app's own size (back → Home, range, depth range,
+       gain, pause live; ⋯ greyed). The lake is a 21 %-wide 16:9 inset top-right (top-left in Combo, where the readout is),
+       drawn by SonarScreen.jsx from closer in round the boat; the wordmark under it is hidden. A tap on the inset swaps:
+       the lake full-screen with the drag cue, the sonar a 34 %-wide box top-right that taps back. A drag on the full-screen
+       sonar never moves the boat behind it. While the sonar is full-screen the full-screen lake is not rendered at all.
+     - **Checked** (headless, 844 × 390 and 932 × 430): Home → Forward View → sonar + inset; gain + works; inset tap → lake big
+       → boat drag moves it → sonar box tap → back; back → Home → Live Combo puts the inset top-left; no console errors.
+       Lake 390 × 844 and 1440 × 900, ice 1440 × 900 and 844 × 390 look as before. The gallery's "← Lab" link is hidden
+       while sideways (dev only; the public build has none).
+     - **Not done:** Phase 4's quality tiers; a device test on a real iPhone (safe areas, the home indicator).
+
+142. **2026-10-24** — **The Lab mounts into the store page itself; the iframe is the fallback** (Jason, on the #138 research:
+     "主题挂载用什么？我不知道 … 你按照最适合的" — Option 3 of `docs/embed-options.md`).
+     - **Lab side, built:** `share/embed.jsx` exports `mount(el)`; `scripts/build-embed.mjs` (+ `vite.embed.config.js`)
+       writes `embed/lab.js` (a stable loader, cached 5 min) and `embed/lab-<hash>.js` (the minified build with its CSS,
+       fonts and logo inside, cached for good) beside the standalone page in `dist-share/pages/`, plus `embed/test.html`;
+       `build-share.mjs`'s `vercel.json` adds CORS and caching for `/embed/`. Same size as the standalone page (2.6 MB).
+     - **Events:** `labEvent` calls `Shopify.analytics.publish('accuphy_lab', { event, ...data })` when the page has it;
+       inside a frame it still posts to the parent (#134's path kept as the fallback).
+     - **No sign-up gate** in the embed build (like the share build; #139: the Klaviyo chat decides the funnel).
+     - **Checked** from a second origin (a stand-in store page loading the loader cross-origin): mounts at 1440×900,
+       390×844 and 844×390; fonts and logo load; `ready` and `view` published; no console errors.
+     - **Handoff draft:** `docs/handoffs/2026-10-24-lab-theme-mount.md` — the section is a `<div>` + module script, the
+       lean layout without the theme's CSS, events published by the Lab. A Mac chat carries it to `accuphy-website`.
+     - **Not done:** the Vercel deployment (#102) and the theme-copy test; nothing published.
+
+143. **2026-10-24** — **Bright cores, orange rims; a flat bottom with fine fibres** (Jason on the #140 sheets: "实心改善的完全不够"
      — targets are brightest in the middle and only the outermost rim turns orange, as he said on 2026-09-24 in the first
      Lab chat: "越靠近中心越亮 有这个逐步亮的过程 … 这种实心结构亮的 清晰的 是更好的"; then on the bottom: "你的那种坑坑洼洼是一高一低
      … 它是一种平整，但是上面有细腻的纹理 … 不行你就抄也可以"). Engine (`sonarShader.js`):
@@ -2192,6 +2224,6 @@ Numbered log. Newest at the bottom.
        +0.58), 2 ft under the edge w0 y29 o57 r13 (real w2 y21 o49 r18), 36 % class change per ping (real 44 %).
      - dev knob `window.__sonarTune.k2 = [rim, core, ring radius, inside threshold]` (uniform `uTune2`, all 1 in production).
      Not done: the study hull still reads hollow in its lower half when zoomed (a lobe floor in the splat was tried and
-     stopped by Jason before it ran); steel keeps the same core level as wood. Checked: six scenes + the ice page (desktop,
+     stopped by Jason before it ran); steel keeps the same core level as wood (a steel channel in the splat was tried in the same stopped step and taken out again). Checked: six scenes + the ice page (desktop,
      phone), `vite build` clean. Not published: the public pages stay at the #128 build.
 

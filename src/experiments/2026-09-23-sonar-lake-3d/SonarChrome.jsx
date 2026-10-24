@@ -43,7 +43,7 @@ function LiveCtl({ onPress, disabled, children, label, style }) {
   )
 }
 
-export default function SonarChrome({ layout, deviceId, mode, rangeFt, depthFt, imperial, gain, depthRef, onLocked, autoDepth = true, autoRange = false, onRange, onHome, phone = false, waterTempC = 21.8, app }) {
+export default function SonarChrome({ layout, deviceId, mode, rangeFt, depthFt, imperial, gain, depthRef, onLocked, autoDepth = true, autoRange = false, onRange, onHome, phone = false, waterTempC = 21.8, app, noMark = false }) {
   // `app` (phones, Jason 2026-10-16: 这些控制都做在手机上 … 模拟真实的 Accuphy Sonar app 里面的功能): the app's own controls are
   // live — gain −/+ (1 % a tap), pause and the depth-range −/+ (manual steps, AUTO off). The ⋯ settings button stays greyed and cannot be opened
   // (Jason 2026-10-17/18: noise reject 这些功能不要加进去 … 把 color map 也去掉). Without `app` they stay display-only (desktop).
@@ -107,8 +107,9 @@ export default function SonarChrome({ layout, deviceId, mode, rangeFt, depthFt, 
         <div className={num} style={{ fontSize: '4.2cqh', marginTop: '3cqh', lineHeight: 1.5 }}>{tempLabel}<br />12.6 V</div>
       </div>)}
 
-      {/* wordmark + resolution tag (top-right) — not in Combo, where the readout sits there */}
-      {!split && (
+      {/* wordmark + resolution tag (top-right) — not in Combo, where the readout sits there; not under a sideways phone's
+          lake inset (noMark, #140), which sits in that corner */}
+      {!split && !noMark && (
         <div style={{ position: 'absolute', ...(iceView ? { left: `${panelX(3)}%`, textAlign: 'left' } : { right: '3%', textAlign: 'right' }), top: '6cqh' }}>
           <img src="/brand/logo/White Accuphy Logo.png" alt="" style={{ height: '4.2cqh', width: 'auto', opacity: 0.55, display: 'inline-block' }} draggable={false} />
           <div className={num} style={{ fontSize: '2.8cqh', fontStyle: 'italic', opacity: 0.45, marginTop: '0.6cqh' }}>1440p (QHD)</div>

@@ -1,4 +1,7 @@
 <!-- decision #138: research only, pending Jason. Written by a research sub-agent of the lake chat, 2026-10-24. -->
+
+> **Adopted 2026-10-24 (#142):** Option 3, the theme-mounted Lab; the iframe stays as the fallback. Lab side built
+> (`scripts/build-embed.mjs`); handoff draft `docs/handoffs/2026-10-24-lab-theme-mount.md`.
 # Putting the Lab on the store's address — the realistic options compared (2026-10-24)
 
 Research only; nothing built, nothing written into the repo. Baseline: decisions #133/#134 and

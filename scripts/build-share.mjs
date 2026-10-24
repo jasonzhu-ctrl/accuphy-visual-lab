@@ -52,10 +52,19 @@ ${page}</head>
 fs.writeFileSync(path.join(outDir, 'pages/robots.txt'), 'User-agent: *\nDisallow: /\n')
 fs.writeFileSync(path.join(outDir, 'pages/.nojekyll'), '')
 // Vercel headers (decision #134): only the store (and Shopify's theme editor) may frame the page; unlisted until launch.
+// The embed build (#142, scripts/build-embed.mjs → embed/) is loaded cross-origin by the store page as a module script,
+// so it needs CORS; its hashed builds are cached for good, the loader only briefly (a release = a new loader).
 // GitHub Pages ignores this file.
-fs.writeFileSync(path.join(outDir, 'pages/vercel.json'), JSON.stringify({ headers: [{ source: '/(.*)', headers: [
-  { key: 'Content-Security-Policy', value: 'frame-ancestors https://shop.accuphy.com https://*.myshopify.com https://admin.shopify.com' },
-  { key: 'X-Robots-Tag', value: 'noindex, nofollow' },
-] }] }, null, 2) + '\n')
+fs.writeFileSync(path.join(outDir, 'pages/vercel.json'), JSON.stringify({ headers: [
+  { source: '/(.*)', headers: [
+    { key: 'Content-Security-Policy', value: 'frame-ancestors https://shop.accuphy.com https://*.myshopify.com https://admin.shopify.com' },
+    { key: 'X-Robots-Tag', value: 'noindex, nofollow' },
+  ] },
+  { source: '/embed/(.*)', headers: [
+    { key: 'Access-Control-Allow-Origin', value: '*' },
+    { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+  ] },
+  { source: '/embed/lab.js', headers: [{ key: 'Cache-Control', value: 'public, max-age=300' }] },
+] }, null, 2) + '\n')
 fs.rmSync(tmp, { recursive: true, force: true })
 console.log(`${path.join(outDir, 'accuphy-lab.html')} [${variant}]: ${(page.length / 1e6).toFixed(2)} MB (logo inlined ${logoCount}×)`)

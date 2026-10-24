@@ -896,7 +896,7 @@ feathered top edge and rare white points. Lab after #140: 1.40 ft, 1.3 / 2.2 / 2
 Lesson: any **max over the slab rows** (the old peak and edge lines) turns a fore-aft slope into a plateau — integrate the
 rows, never take their max.
 
-**Core to rim and the band's texture (decision #141, 2026-10-24):** inside a solid target on the burst the brightness
+**Core to rim and the band's texture (decision #143, 2026-10-24):** inside a solid target on the burst the brightness
 climbs over the outer ~9 in (L 157 → 390) and stays there, with yellow 22 % and white 4 % in the core; red only in the outer
 4 in. The bottom band's edge is flat — the texture is soft fibres along the rays (~3 in × 10–16 in, low contrast) whose tips
 feather the top edge; there are no bumps. Measure with `real/rim.py` and the `band-zoom` crops, never by edge-detector
