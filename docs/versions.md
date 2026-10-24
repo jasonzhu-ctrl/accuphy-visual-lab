@@ -21,6 +21,7 @@ the Mini page; `VITE_SCENE=ice` for the ice page → `/ice/` on GitHub Pages sin
 
 | Date | Page | Built from (Lab commit) | Public repo commit | What changed |
 |---|---|---|---|---|
+| 2026-10-24 | **Both**, **Mini**, **Ice (trial)** + both private previews | 42e630d (#143–#149) | 7560bf5 | The sonar picture tuned like for like against the app's recordings: bright cores with orange rims, one brightness for bottom and structure, solid targets that hide the bottom, whole smooth branches, the app's grain (short arcs across the beam) on the bottom, insides and ragged outlines, big hulls with bright middles; checked on a real phone (vivo fold, Chrome: 60 fps in every view) |
 | 2026-10-23 | **Both**, **Mini**, **Ice (trial)** + both private previews | 84970c3 (#128) | a754b2b | Structure in the sonar drawn like the app: solid hot columns, black shadows behind them, fuzzy crowns |
 | 2026-10-23 | **Both**, **Mini**, **Ice (trial)** + both private previews | 6545bdf (#125–#127) | 18173fe | Combo range AUTO like the app; ice: every tap counts (25 m hops), fish come to the jig and bite, a winter population round each hole |
 | 2026-10-23 | **Both**, **Mini**, **Ice (trial)** + both private previews | 49c45f8 (#124) | 7e809c5 | PLM Combo at long range: the Forward panel's depth meets the water halfway, so the bottom stays in view |

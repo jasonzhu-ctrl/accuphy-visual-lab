@@ -323,8 +323,10 @@ the cheapest Android phone class). Phone size was emulated at 360×800.
   band 64 % vs 43 % class change); rim 0–2 in too bright (app L 174 vs 236); Down band ~25 % thicker than the app's and
   without its white points; Down water column lit 0.79 % vs 0.04 %; Combo / phone Forward white 10–15 % (target 6–10 %);
   the far ice Forward band frays into thin wavy threads; a dotted vertical bar in PL Panoramic at deep / lockup
-- ⬜ fps on a real phone after #145–#147 (4× MSAA echo targets at 512 rows, ~20 more texture taps per pixel); only checked
-  in headless Chrome on the Mac so far — run with the `sonar-page-real-device-perf` method before the public link is rebuilt
+- ✅ fps on a real phone after #145–#149: vivo fold (V2545A, Mali-G1-Ultra MC12, Chrome 152, unfolded, canvas 1067×876): a
+  steady 60 fps in PL Forward / Down / Panoramic and Mini Forward / Down, no black or broken picture (2026-10-24)
+- ⬜ The cheap-device baseline (V10 tablet, 10–24 fps before) after #145–#149: re-measure when the tablet is back
+- ⬜ On the unfolded fold (viewport 711×584) the panel's "Drag the boat to move it" hint overlaps the Range value
 
 ## Handoff to the phone-chrome owner (SonarChrome.jsx): the app's "sonar working" icon (Jason 2026-10-23)
 - ⬜ In the real app's Down views a small "sonar working" icon sits at the top centre of the picture, just under the 0 of the
