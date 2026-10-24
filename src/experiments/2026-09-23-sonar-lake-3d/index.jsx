@@ -199,10 +199,13 @@ export default function SonarLake3D({ scene: sceneProp }) {
   }, [autoDepthOn, device, imperial])
 
 
-  // embed bridge (#134): the store page learns which view the visitor is on
-  useEffect(() => { labEvent('view', { view: mode, device: deviceId }) }, [mode, deviceId])
+  // embed bridge (#134): the store page learns which view the visitor picked — on a real pick only (Home tile, panel
+  // button, guide step), never for the default view on load (#139); `source` says where the pick came from
+  const pickView = (d, m, source) => { setDeviceId(d); setMode(m); labEvent('view', { view: m, device: d, source }) }
 
-  // the app's buttons on the phone are display-only: a tap asks for an email (once per browser)
+  // the app's buttons are display-only: on desktop a tap asks for an email (once per browser); on phones nothing
+  // happens — the Lab itself carries no sign-up gate on the phone (Jason 2026-10-24: 注册门你这个层级不要有; the
+  // sign-up funnel is the Klaviyo chat's decision)
   const onLocked = () => {
     // the friends test build has no sign-up gate (Jason 2026-09-26: 他能直接看 不要邮箱什么的): only the hint
     if (!import.meta.env.VITE_NO_GATE && !isSignedUp()) { setGate(true); return }
@@ -241,7 +244,7 @@ export default function SonarLake3D({ scene: sceneProp }) {
     { n: 3, title: 'Which view, when', text: 'Panoramic scans wide to find fish and structure; Forward to cast at them; Down to fish straight below.', device: 'PL', mode: 'panoramic', range: 70, boat: [-50, 8] }, // on the 5 m shelf, scanning toward the drop-off: the flat fan paints the bottom
   ].map((st) => (ONLY ? { ...st, device: ONLY, mode: st.mode === 'panoramic' ? 'combo' : st.mode, ...(st.mode === 'panoramic' ? { text: 'Combo shows Down and Forward side by side; Forward to cast at fish ahead; Down to fish straight below.' } : {}) } : st))
   const goStep = (i) => {
-    const st = STEPS[i]; setStep(i); setDeviceId(st.device); setMode(st.mode); setRangeFt(st.range)
+    const st = STEPS[i]; setStep(i); pickView(st.device, st.mode, 'step'); setRangeFt(st.range)
     state.current.target.x = st.boat[0]; state.current.target.z = st.boat[1]
     state.current.frameX = st.boat[0] + 14 // phones: re-centre the zoomed-out view on the preset (boat left, beam right)
   }
@@ -262,10 +265,10 @@ export default function SonarLake3D({ scene: sceneProp }) {
         </div>
         <div className="ac-divider" />
         <Row label="Device">
-          <div className="ac-seg">{SHOWN_DEVICES.map((d) => <button key={d.id} className={`ac-btn ${deviceId === d.id ? 'is-active' : ''}`} onClick={() => setDeviceId(d.id)}>{d.name}</button>)}</div>
+          <div className="ac-seg">{SHOWN_DEVICES.map((d) => <button key={d.id} className={`ac-btn ${deviceId === d.id ? 'is-active' : ''}`} onClick={() => pickView(d.id, mode, 'panel')}>{d.name}</button>)}</div>
         </Row>
         <Row label="View">
-          <div className="ac-seg">{modes.map((m) => <button key={m} className={`ac-btn ${mode === m ? 'is-active' : ''}`} onClick={() => setMode(m)}>{MODE_LABELS[m].replace(' View', '')}</button>)}</div>
+          <div className="ac-seg">{modes.map((m) => <button key={m} className={`ac-btn ${mode === m ? 'is-active' : ''}`} onClick={() => pickView(deviceId, m, 'panel')}>{MODE_LABELS[m].replace(' View', '')}</button>)}</div>
         </Row>
         {ICE && (
           <Row label="Camera">
@@ -328,8 +331,8 @@ export default function SonarLake3D({ scene: sceneProp }) {
           <div className="ph-band" style={{ ...ring('1.35%'), borderRadius: '6.6% / 13.8%', boxShadow: '16px 26px 44px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.45), inset 0 0 0 2px rgba(0,0,0,0.12)' }} />
           <div style={{ ...ring('1.25%'), inset: '1.35%', borderRadius: '6.1% / 12.7%', background: '#040404' }} />
           <div ref={(el) => { sonarRect.current.el = el }} style={{ position: 'absolute', inset: '2.6%', borderRadius: '5.4% / 11.3%', containerType: 'size', overflow: 'hidden' }}>
-            <SonarChrome layout={layout} deviceId={deviceId} mode={mode} rangeFt={effRangeFt} depthFt={depthFt} imperial={imperial} gain={gain} autoDepth={autoDepth} autoRange={downLike || comboAuto} onRange={phone ? stepRange : undefined} onHome={phone ? () => setHome(true) : undefined} phone={phone} waterTempC={ICE ? 1.6 : 21.8} app={appCtl} onLocked={onLocked} depthRef={(el) => { state.current.depthEl = el }} />
-            {phone && home && <AppHome ice={ICE} devices={SHOWN_DEVICES} deviceId={started ? deviceId : null} mode={started ? mode : null} onPick={(d, m) => { setDeviceId(d); setMode(m); setHome(false); setStarted(true) }} />}
+            <SonarChrome layout={layout} deviceId={deviceId} mode={mode} rangeFt={effRangeFt} depthFt={depthFt} imperial={imperial} gain={gain} autoDepth={autoDepth} autoRange={downLike || comboAuto} onRange={phone ? stepRange : undefined} onHome={phone ? () => setHome(true) : undefined} phone={phone} waterTempC={ICE ? 1.6 : 21.8} app={appCtl} onLocked={phone ? undefined : onLocked} depthRef={(el) => { state.current.depthEl = el }} />
+            {phone && home && <AppHome ice={ICE} devices={SHOWN_DEVICES} deviceId={started ? deviceId : null} mode={started ? mode : null} onPick={(d, m) => { pickView(d, m, 'home'); setHome(false); setStarted(true) }} />}
             <div className="ph-glass" />
           </div>
           {/* antenna lines in the titanium band (two per long edge, like the Pro Max) */}
@@ -347,7 +350,7 @@ export default function SonarLake3D({ scene: sceneProp }) {
         )}
         {/* after sign-up the app buttons stay display-only: a short hint above the phone instead of the gate */}
         <div role="status" aria-live="polite" className={`ac-hint absolute bottom-full right-0 mb-3 max-sm:mb-16 whitespace-nowrap px-3.5 py-2 text-[12px] font-medium transition-opacity duration-300 ${toast ? 'opacity-100' : 'opacity-0'}`}>
-          {phone ? 'These are the app’s own controls — the range −/+ work.' : 'These are the app’s own controls — use the panel to change the view.'}
+          {phone ? 'These are the app’s own controls — Home, range, gain and pause work.' : 'These are the app’s own controls — use the panel to change the view.'}
         </div>
       </div>
 

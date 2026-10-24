@@ -1,4 +1,4 @@
-# Phone "real device mode": Jason's rules vs the code (audit 2026-10-24, decision #138)
+# Phone "real device mode": Jason's rules vs the code (audit 2026-10-24, decision #138; answers and fixes in #139)
 
 Jason's rules (2026-10-24): on a phone the Lab behaves like the real app. **PingLive:** a Home page where the visitor
 picks a view, enters it, and can go back. **PingLive Mini:** only a few modes are offered (as on the ice page); the other
