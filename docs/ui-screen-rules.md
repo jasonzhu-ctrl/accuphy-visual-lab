@@ -148,7 +148,7 @@ Rules for all classes:
 
 | Item | Rule | Today |
 |---|---|---|
-| Phone frame (desktop-like classes) | `min(42vw, 600px, 83.2vh)`, one rule for lake and ice | ✅ #150 (big-screen option below, waiting for Jason) |
+| Phone frame (desktop-like classes) | `min(42vw, clamp(440px, 34vw, 560px), 83.2vh)`, one rule for lake and ice: 42 % on folds / iPads, 34 % on laptops (≈ 103–117 mm), 560 px at most (24″ ≈ 155 mm, 27″ ≈ 131 mm) | ✅ #151 (Jason chose a compromise below real size) |
 | Phone display (class A) | full width minus 2 × 12 px, aspect 2.08:1, above the home indicator | ✅ |
 | Glass panel | 400 px (D, E); collapsible pill (C); 1.25× (F) | ⬜ C and F |
 | Touch targets on touch screens (`pointer: coarse`) | ≥ 44 × 44 px (Apple HIG 44 pt, Material 48 dp; WCAG 2.2 minimum 24 px) | ✅ class A app controls (#79); ⬜ panel buttons ~25 px and the 4 px range track on iPads and folds |
@@ -156,7 +156,7 @@ Rules for all classes:
 | Hover-only cues | never the only way to find something on touch screens | ✅ |
 | Safe areas | `viewport-fit=cover` + `env(safe-area-inset-*)` on anything at an edge | ✅ meta tag in both HTML files; ✅ class A frame; ⬜ check B on a real iPhone (#141 open item) |
 
-**The fake phone's real size on computer screens (2026-10-24, for Jason to confirm).** A page cannot read a monitor's
+**The fake phone's real size on computer screens (2026-10-24; Jason chose smaller than both columns — #151, see the row above).** A page cannot read a monitor's
 physical size, so the size is a rule in CSS px; this is what it means in millimetres (real iPhone 16 Pro Max turned
 sideways: 163 mm; iPhone 16: 148 mm). "Real-size px" is what true size would take.
 

@@ -337,7 +337,7 @@ export default function SonarLake3D({ scene: sceneProp }) {
            Proportions from the 15/16 Pro Max: body 2.08:1, corner radius ≈ 14 % of the short side,
            thin uniform bezel, Dynamic Island on the left in landscape, volume/action buttons on top,
            power button below; brushed titanium band; faint glass reflection over the display. ---- */}
-      <div ref={(el) => { sonarRect.current.frame = el }} data-hint-avoid className={land ? 'pointer-events-none absolute inset-0' : `pointer-events-none absolute inset-x-3 bottom-[calc(14px+env(safe-area-inset-bottom))] sm:inset-x-auto sm:right-[28px] sm:bottom-[24px] ${BIG_PHONE ? 'sm:w-[min(88vw,1400px)]' : 'sm:w-[min(42vw,600px,83.2vh)]'}`} style={land ? undefined : { aspectRatio: '2.08 / 1' }}>
+      <div ref={(el) => { sonarRect.current.frame = el }} data-hint-avoid className={land ? 'pointer-events-none absolute inset-0' : `pointer-events-none absolute inset-x-3 bottom-[calc(14px+env(safe-area-inset-bottom))] sm:inset-x-auto sm:right-[28px] sm:bottom-[24px] ${BIG_PHONE ? 'sm:w-[min(88vw,1400px)]' : 'sm:w-[min(42vw,clamp(440px,34vw,560px),83.2vh)]'}`} style={land ? undefined : { aspectRatio: '2.08 / 1' }}>
         <div style={{ position: 'relative', width: '100%', height: '100%', transform: land ? undefined : `perspective(${phonePose().perspective}px) rotateY(${phonePose().rotY}deg) rotateX(${phonePose().rotX}deg)` }}>
           {!land && (<>
           {/* side buttons (on the top edge in landscape: action + volume; power on the bottom edge) */}

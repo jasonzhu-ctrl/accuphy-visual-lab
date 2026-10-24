@@ -2357,3 +2357,14 @@ Numbered log. Newest at the bottom.
      - **The drag hint** slides clear of anything marked `data-hint-avoid` (panel, step cards, phone).
      Checked: both pages at 711×584, 1024×768, 1280×800, 1440×900, 1920×1080, 2560×1440 and 390×844: no hint overlap,
      boat and kit visible; `vite build` clean.
+
+151. **2026-10-24** — **The fake phone a little smaller: ~34 % of a laptop screen, 560 px at most** (Jason, on the real-size
+     table in `docs/ui-screen-rules.md` §3: on a MacBook Air 13″, a Windows 15.6″ or a MacBook Pro 14″ the phone felt close
+     to real size and too big — "折中一点"; on 24″ and 27″ monitors a little smaller, "不要占的空间太大 … 但也不要太小").
+     - Rule (both pages, `index.jsx`): `min(42vw, clamp(440px, 34vw, 560px), 83.2vh)` (was #150's `min(42vw, 600px,
+       83.2vh)`). Folds and iPads (≤ 1024 px) keep 42 %; from 1280 px the phone is 34 % of the width; it stops at 560 px.
+     - Measured (CSS px → mm at the screen's density, real iPhone 16 ≈ 148 mm sideways): MacBook Air 13″ 600 → 500 px
+       (136 → 113 mm, 41 → 34 %); MacBook Pro 14″ 600 → 514 (120 → 103 mm); Windows 15.6″ @125 % 600 → 522 (135 → 117 mm);
+       24″ 600 → 560 (166 → 155 mm, 31 → 29 %); 27″ 600 → 560 (140 → 131 mm, 23 → 22 %); 1280 px 538 → 440; 711 and 1024
+       unchanged (299, 430).
+     Checked: lake 711–2560 px and ice 711 / 1470 / 1920; `vite build` clean. Not published yet.
