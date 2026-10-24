@@ -2068,7 +2068,7 @@ Numbered log. Newest at the bottom.
      - **Lab side, next:** an embed build (events module, `100dvh`, Klaviyo keys, `window.top` shop links, Vercel headers
        `frame-ancestors` + `noindex`), then the Vercel deployment when the website project is ready to test.
 
-135. **2026-10-24** — **Lake material: the surface texture finally shows** (Jason, on the bug found in #131: "要修的").
+136. **2026-10-24** — **Lake material: the surface texture finally shows** (Jason, on the bug found in #131: "要修的").
      - `lakeMaterial.js` multiplied `albedo` by the fine speckle and the bark grooves AFTER `base` had been computed from
        it, so since 2026-09-24 no surface texture ever reached the bed, the timber or the rocks. The block now runs
        before `base` (fish excluded, as before).

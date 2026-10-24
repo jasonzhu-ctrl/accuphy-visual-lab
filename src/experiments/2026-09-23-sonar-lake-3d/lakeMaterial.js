@@ -186,7 +186,7 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
           albedo = mix(albedo, vec3(0.95, 0.97, 1.0), st * 0.8);
         }
       #endif
-        // procedural surface texture (#135: this ran after base had been taken from albedo, so it never showed): fine
+        // procedural surface texture (#136: this ran after base had been taken from albedo, so it never showed): fine
         // speckle on everything but fish, and bark grooves on brown (timber) surfaces, following the trunk
       #ifndef FISH
         float tex = 0.9 + 0.2 * fract(sin(dot(floor(vWorld * 9.0), vec3(12.9898, 78.233, 37.719))) * 43758.5453);
