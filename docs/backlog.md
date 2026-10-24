@@ -211,6 +211,8 @@ the cheapest Android phone class). Phone size was emulated at 360×800.
   fallback for slow phones. Decided: main action = email for an offer (#45). Next question for
   Jason: the "aha" (what a visitor should feel first). Remind him when he is back on this project.
 
+- ⬜ **Embed: theme-mounted Lab instead of the iframe (research #138, `docs/embed-options.md`) — Jason to decide;** then a `mount(el)` embed entry + stable loader, Vercel CORS headers, CSS scoping, and the #134 handoff revised (no postMessage / window.top / frame-ancestors)
+- ⬜ Phone-mode gaps from the #138 audit (`docs/phone-mode-audit.md`): ice page Home-first + live gain/pause + ⋯ dead on phones; Live Ice Fishing tile link broken in public builds (`AppHome.jsx:84`); `view` event before any pick / none for the first pick; hint text (`index.jsx:350`); 2D Ice Fishing tile — ask Jason
 - ⬜ **Phone landscape "real device mode" (proposed 2026-10-18, #119, build on Jason's go):** a sideways phone shows
   the sonar full-screen with the app's controls (no phone frame inside the phone) and the lake as a small inset that
   taps to enlarge; `docs/mobile-phone-layout-plan.md` Phase 4. Today 844×390 is broken (panel and cards cover it).

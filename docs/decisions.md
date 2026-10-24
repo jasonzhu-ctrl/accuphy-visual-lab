@@ -2109,3 +2109,23 @@ Numbered log. Newest at the bottom.
      - **Colour:** `accuphy_mid`, the midpoint of the measured app orange and the LiveScope amber, is the default.
      - Checked on the six comparison scenes (default, shelf fish, bait school, workboat, steel ship, timber) against the
        public build (#128); public pages still not rebuilt.
+
+138. **2026-10-24** — **Research: alternatives to the iframe, and the phone-mode rules audited** (Jason: "iframe 啊，乱七八糟这些
+     东西，能不能找别的 option … 落地性更好的", and his rules for the phone "real device mode": PingLive Home → pick a view →
+     back; the Mini offers a few modes, the rest blurred; ⋯ cannot be entered; range on the phone's −/+). Research only.
+     - **Embed options** (`docs/embed-options.md`, from search excerpts — shopify.dev is blocked here, so test before relying):
+       the recommended replacement for the iframe is a **theme-mounted Lab**: the same `/pages/lab` and header-less layout
+       as #134, but the section holds a `<div>` and one `<script type="module">` from Vercel (a stable loader that imports
+       the latest hashed bundle). One document, one origin: Shopify analytics, Web Pixels, Meta and Klaviyo are native,
+       no postMessage, one scroller to lock on iOS, real page text for SEO. Second choice: a custom app's theme app
+       extension (bundle on Shopify's CDN; size limits unverified). The iframe stays as the fallback. App Proxy (raw HTML
+       under `/apps/lab`) loses every store tracker; standalone `lab.accuphy.com` loses Shopify sessions; Hydrogen no.
+       Every option: no Fullscreen API on iPhone or in in-app browsers — only "fill the visible viewport".
+     - **Phone rules** (`docs/phone-mode-audit.md`): all four rules are already built on the lake page in portrait
+       (#107, #110, #114, #118, #121, #122, #125). Gaps: the ice page on phones (no Home first; gain, pause and ⋯ locked
+       or opening the gate); sideways phones (desktop layout takes over — the "real device mode" of #119 is not built);
+       the Live Ice Fishing tile's link is broken in public builds; the embed `view` event fires for the default view
+       before any pick and not for the first real pick. Confirm with Jason whether the 2D "Ice Fishing" view should open.
+     - **Pending Jason:** switch to the theme-mounted embed (iframe as fallback)? go-ahead for the Lab mount build and
+       for the sideways mode? the Taiga-less lean layout? Nothing built; the website project's handoff is unchanged
+       until he decides.
