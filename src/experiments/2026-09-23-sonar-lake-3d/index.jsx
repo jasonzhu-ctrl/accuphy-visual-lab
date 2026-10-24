@@ -5,7 +5,7 @@ import LakeScene from './Scene'
 import { DEVICES, FT, MODE_LABELS, ICE_MODES } from '../2026-09-23-sonar-beam/devices'
 import { iceParams, ICE_START, VIEWS } from './iceScene'
 import { wedgeSpecs } from '../2026-09-23-beam-shapes-3d/wedge'
-import { phonePose, isPhoneLayout, comboFwdDepth } from './SonarScreen'
+import { phonePose, isPhoneLayout, isLandscapePhone, PHONE_POSE_FLAT, comboFwdDepth } from './SonarScreen'
 import { COLORMAP_NAMES } from './colormaps'
 import SonarChrome from './SonarChrome'
 import { screenLayout } from './SonarScreen'
@@ -84,7 +84,7 @@ export default function SonarLake3D({ scene: sceneProp }) {
   const [toast, setToast] = useState(false)
   // Phones (lake scene) open ON the app's Home page and nothing starts until a view is picked (Jason 2026-10-16:
   // 显示首页选视图 而且应该必须先选才能开始): no beam, no sonar picture, no capsules until the first pick.
-  const homeFirst = isPhoneLayout() && !ICE
+  const homeFirst = (isPhoneLayout() || isLandscapePhone()) && !ICE
   const [home, setHome] = useState(homeFirst)      // the app's Home page is open inside the phone display
   const [started, setStarted] = useState(!homeFirst) // a view has been picked (always true on desktop and on the ice page)
   const toastT = useRef(0)
@@ -97,7 +97,24 @@ export default function SonarLake3D({ scene: sceneProp }) {
   useEffect(() => { const id = requestAnimationFrame(() => tick(1)); return () => cancelAnimationFrame(id) }, [])
   // phone layout and phone pose follow the window width (rotate / resize)
   useEffect(() => { const on = () => tick((n) => n + 1); window.addEventListener('resize', on); return () => window.removeEventListener('resize', on) }, [])
-  const phone = isPhoneLayout()
+  // the sonar picture is drawn by the GL canvas into the phone's screen element (lake: the sideways phone's lake inset)
+  const sonarRect = useRef({ el: null, frame: null, lake: null })
+  // a phone held sideways (#140): the phone is the app itself — Home, then the sonar full-screen with the app's controls,
+  // the lake a small inset; a tap on the inset swaps them (lakeBig). The lake page only: the ice page keeps its layout.
+  const land = isLandscapePhone() && !ICE
+  const phone = isPhoneLayout() || land
+  const [lakeBig, setLakeBig] = useState(false)
+  // the display's real aspect when sideways (the screen minus the safe areas); everywhere else the phone frame's 2.08
+  const [landAspect, setLandAspect] = useState(2.08)
+  useEffect(() => {
+    const el = sonarRect.current.el
+    if (!land || !el || typeof ResizeObserver === 'undefined') return
+    const ro = new ResizeObserver(() => { if (el.offsetHeight > 0) setLandAspect(+(el.offsetWidth / el.offsetHeight).toFixed(3)) })
+    ro.observe(el); return () => ro.disconnect()
+  }, [land])
+  const dispAspect = land ? landAspect : 2.08
+  // the gallery's "← Lab" link would sit on the app's depth readout and Home title (dev gallery only; the public build has none)
+  useEffect(() => { document.body.classList.toggle('lab-land', land); return () => document.body.classList.remove('lab-land') }, [land])
 
   const device = DEVICES[deviceId]
   const modes = ICE ? ICE_MODES : device.modes
@@ -147,7 +164,7 @@ export default function SonarLake3D({ scene: sceneProp }) {
   const live = started || !phone
   const liveSpecs = live ? specs : []
   const specKey = `${deviceId}-${mode}-${effRangeFt}-${live ? 1 : 0}`
-  const layout = useMemo(() => screenLayout(deviceId, mode, effRangeFt * FT, 2.08, specs, depthFt * FT), [deviceId, mode, effRangeFt, depthFt, specs]) // display aspect = phone frame aspect
+  const layout = useMemo(() => screenLayout(deviceId, mode, effRangeFt * FT, dispAspect, specs, depthFt * FT), [deviceId, mode, effRangeFt, depthFt, specs, dispAspect]) // display aspect = phone frame aspect (sideways: the screen's)
 
   const b0 = (/boat=(-?[\d.]+),(-?[\d.]+)/.exec(window.location.search) || []).slice(1).map(Number) // dev: ?boat=x,z
   // Phones open on the standing-timber flat (18 ft; bass, walleye and pike 8–15 m ahead), so the 50 m-wide phone view
@@ -177,8 +194,8 @@ export default function SonarLake3D({ scene: sceneProp }) {
   state.current.mode = mode
   state.current.deviceId = deviceId
   state.current.view = view
-  // the sonar picture is drawn by the GL canvas into the phone's screen element
-  const sonarRect = useRef({ el: null, frame: null })
+  state.current.land = land
+  state.current.hintOff = land && !lakeBig // sideways with the sonar full-screen: no drag caption over the sonar
 
   // AUTO depth: deeper at once (the bottom never drops off the screen), shallower only after 1.5 s
   // so the axis does not pump while the boat crosses uneven bottom
@@ -258,7 +275,7 @@ export default function SonarLake3D({ scene: sceneProp }) {
 
       {/* ---- control panel — Apple-style frosted glass over the lake (Jason 2026-09-24) ---- */}
       <motion.div ref={panelRef} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-        className="ac-panel pointer-events-auto absolute flex flex-col gap-3 max-sm:hidden sm:left-4 sm:top-14 sm:w-[400px] sm:p-4">
+        className="ac-panel pointer-events-auto absolute flex flex-col gap-3 max-sm:hidden sm:left-4 sm:top-14 sm:w-[400px] sm:p-4" style={land ? { display: 'none' } : undefined}>
         <div className="flex items-center justify-between px-1 pt-0.5">
           <img src="/brand/logo/White Accuphy Logo.png" alt="Accuphy" className="h-[18px] w-auto drop-shadow-[0_1px_2px_rgba(0,20,30,0.25)]" draggable={false} />
           <span className="ac-title">Lab</span>
@@ -320,8 +337,9 @@ export default function SonarLake3D({ scene: sceneProp }) {
            Proportions from the 15/16 Pro Max: body 2.08:1, corner radius ≈ 14 % of the short side,
            thin uniform bezel, Dynamic Island on the left in landscape, volume/action buttons on top,
            power button below; brushed titanium band; faint glass reflection over the display. ---- */}
-      <div ref={(el) => { sonarRect.current.frame = el }} className={`pointer-events-none absolute inset-x-3 bottom-[calc(14px+env(safe-area-inset-bottom))] sm:inset-x-auto sm:right-[28px] sm:bottom-[24px] ${BIG_PHONE ? 'sm:w-[min(88vw,1400px)]' : 'sm:w-[min(38vw,560px)]'}`} style={{ aspectRatio: '2.08 / 1' }}>
-        <div style={{ position: 'relative', width: '100%', height: '100%', transform: `perspective(${phonePose().perspective}px) rotateY(${phonePose().rotY}deg) rotateX(${phonePose().rotX}deg)` }}>
+      <div ref={(el) => { sonarRect.current.frame = el }} className={land ? 'pointer-events-none absolute inset-0' : `pointer-events-none absolute inset-x-3 bottom-[calc(14px+env(safe-area-inset-bottom))] sm:inset-x-auto sm:right-[28px] sm:bottom-[24px] ${BIG_PHONE ? 'sm:w-[min(88vw,1400px)]' : 'sm:w-[min(38vw,560px)]'}`} style={land ? undefined : { aspectRatio: '2.08 / 1' }}>
+        <div style={{ position: 'relative', width: '100%', height: '100%', transform: land ? undefined : `perspective(${phonePose().perspective}px) rotateY(${phonePose().rotY}deg) rotateX(${phonePose().rotX}deg)` }}>
+          {!land && (<>
           {/* side buttons (on the top edge in landscape: action + volume; power on the bottom edge) */}
           <div className="ph-btn" style={{ left: '14%', top: '-1.2%', width: '2.2%', height: '1.6%' }} />
           <div className="ph-btn" style={{ left: '19.5%', top: '-1.2%', width: '4.6%', height: '1.6%' }} />
@@ -330,17 +348,31 @@ export default function SonarLake3D({ scene: sceneProp }) {
           {/* titanium band (ring), inner black bezel (ring), display hole */}
           <div className="ph-band" style={{ ...ring('1.35%'), borderRadius: '6.6% / 13.8%', boxShadow: '16px 26px 44px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.45), inset 0 0 0 2px rgba(0,0,0,0.12)' }} />
           <div style={{ ...ring('1.25%'), inset: '1.35%', borderRadius: '6.1% / 12.7%', background: '#040404' }} />
-          <div ref={(el) => { sonarRect.current.el = el }} style={{ position: 'absolute', inset: '2.6%', borderRadius: '5.4% / 11.3%', containerType: 'size', overflow: 'hidden' }}>
-            <SonarChrome layout={layout} deviceId={deviceId} mode={mode} rangeFt={effRangeFt} depthFt={depthFt} imperial={imperial} gain={gain} autoDepth={autoDepth} autoRange={downLike || comboAuto} onRange={phone ? stepRange : undefined} onHome={phone ? () => setHome(true) : undefined} phone={phone} waterTempC={ICE ? 1.6 : 21.8} app={appCtl} onLocked={phone ? undefined : onLocked} depthRef={(el) => { state.current.depthEl = el }} />
+          </>)}
+          {/* the display. Sideways phones (#140): the whole screen inside the safe areas (no drawn phone — the visitor's
+              phone is the device), or, with the lake enlarged, a small sonar box top-right that taps back */}
+          <div ref={(el) => { sonarRect.current.el = el }} style={land ? (lakeBig ? { ...LAND_SMALL, height: `${(34 / landAspect).toFixed(2)}vw` } : LAND_FULL) : { position: 'absolute', inset: '2.6%', borderRadius: '5.4% / 11.3%', containerType: 'size', overflow: 'hidden' }}>
+            <SonarChrome layout={layout} deviceId={deviceId} mode={mode} rangeFt={effRangeFt} depthFt={depthFt} imperial={imperial} gain={gain} autoDepth={autoDepth} autoRange={downLike || comboAuto} onRange={phone ? stepRange : undefined} onHome={phone ? () => { setHome(true); setLakeBig(false) } : undefined} phone={phone && !land} noMark={land && !lakeBig && !home && started} waterTempC={ICE ? 1.6 : 21.8} app={appCtl} onLocked={phone ? undefined : onLocked} depthRef={(el) => { state.current.depthEl = el }} />
             {phone && home && <AppHome ice={ICE} devices={SHOWN_DEVICES} deviceId={started ? deviceId : null} mode={started ? mode : null} onPick={(d, m) => { pickView(d, m, 'home'); setHome(false); setStarted(true) }} />}
-            <div className="ph-glass" />
+            {/* sideways: the lake inset (drawn by SonarScreen.jsx into this button's rectangle); a tap swaps lake and sonar.
+                Top-right, clear of the rulers and the depth-range −/+; Combo keeps its readout top-right, so there top-left */}
+            {land && !lakeBig && !home && started && (
+              <button ref={(el) => { sonarRect.current.lake = el }} type="button" className="ph-lake" aria-label="Show the lake" onPointerDown={(e) => e.stopPropagation()} onClick={() => setLakeBig(true)}
+                style={{ top: '5.5cqh', width: '21%', ...(layout.split ? { left: '4.5%' } : { right: '4.5%' }) }}>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M10 20H4v-6M20 4l-6.5 6.5M4 20l6.5-6.5" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+              </button>
+            )}
+            {land && lakeBig && <button type="button" className="ph-lake-back" aria-label="Show the sonar full-screen" onPointerDown={(e) => e.stopPropagation()} onClick={() => setLakeBig(false)} />}
+            {!land && <div className="ph-glass" />}
           </div>
+          {!land && (<>
           {/* antenna lines in the titanium band (two per long edge, like the Pro Max) */}
           {[['16%', 'top'], ['84%', 'top'], ['16%', 'bottom'], ['84%', 'bottom']].map(([l, side]) => (
             <div key={l + side} style={{ position: 'absolute', left: l, [side]: 0, width: '0.35%', height: '1.35%', background: 'rgba(0,0,0,0.55)', boxShadow: '0 0 0 0.5px rgba(255,255,255,0.15)' }} />
           ))}
           {/* Dynamic Island: vertical pill on the left in landscape */}
           <div style={{ position: 'absolute', left: '4.1%', top: '50%', width: '2.4%', height: '20%', transform: 'translateY(-50%)', borderRadius: 999, background: '#000', boxShadow: '0 0 0 1px #0a0a0a' }} />
+          </>)}
         </div>
         {/* phones: the View capsule sits on the phone frame's top edge (Jason 2026-10-03) — the big panel is gone */}
         {false && phone && started && (
@@ -362,7 +394,7 @@ export default function SonarLake3D({ scene: sceneProp }) {
       )}
 
       {/* ---- guide strip ---- */}
-      <div className={ICE ? 'pointer-events-auto absolute hidden flex-col gap-2 md:flex' : 'pointer-events-auto absolute right-[28px] top-4 hidden w-[min(620px,44vw)] items-stretch gap-2.5 md:flex'} style={ICE ? { left: 16, top: cardsTop, width: 400 } : undefined}>
+      <div className={ICE ? 'pointer-events-auto absolute hidden flex-col gap-2 md:flex' : 'pointer-events-auto absolute right-[28px] top-4 hidden w-[min(620px,44vw)] items-stretch gap-2.5 md:flex'} style={ICE ? { left: 16, top: cardsTop, width: 400 } : land ? { display: 'none' } : undefined}>
         {STEPS.map((st, i) => (
           <button key={st.n} onClick={() => goStep(i)} className={`ac-card flex-1 text-left ${ICE ? 'px-3.5 py-2.5' : 'px-3.5 py-3'} ${step === i ? 'is-active' : ''}`}>
             <div className="flex items-center gap-2"><span className="ac-num">0{st.n}</span><span className="ac-label">Step</span></div>
@@ -380,6 +412,10 @@ export default function SonarLake3D({ scene: sceneProp }) {
   )
 }
 
+// sideways phones (#140): the display fills the screen inside the safe areas (pointer events on, so a drag on the sonar
+// never moves the boat hidden behind it); with the lake enlarged it is a small box top-right (its height from the aspect)
+const LAND_FULL = { position: 'absolute', top: 'env(safe-area-inset-top)', right: 'env(safe-area-inset-right)', bottom: 'env(safe-area-inset-bottom)', left: 'env(safe-area-inset-left)', containerType: 'size', overflow: 'hidden', pointerEvents: 'auto' }
+const LAND_SMALL = { position: 'absolute', top: 'calc(env(safe-area-inset-top) + 10px)', right: 'calc(env(safe-area-inset-right) + 10px)', width: '34vw', containerType: 'size', overflow: 'hidden', pointerEvents: 'auto', borderRadius: 4, boxShadow: '0 0 0 1px rgba(255,255,255,0.6), 0 8px 24px rgba(0,0,0,0.45)' }
 // a filled box with a rectangular hole the size of its content box (CSS mask-composite)
 function ring(pad) {
   return { position: 'absolute', inset: 0, padding: pad, WebkitMask: 'linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)', WebkitMaskComposite: 'xor', mask: 'linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0)' }

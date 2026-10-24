@@ -2174,3 +2174,19 @@ Numbered log. Newest at the bottom.
     Checked: six comparison scenes (`对比-v3-v5.jpg` sent to Jason), the ice page (desktop + phone) still draws its band
     and dial, `vite build` clean. Not published: the three public pages stay at the #128 build until Jason says so.
 
+141. **2026-10-24** — **A sideways phone is the app itself (real device mode)** (Jason: "横屏不要做真机模式了 … 一个小小的手机摁不到的",
+     then "手机横屏还是用以前的方案好了 在屏幕上有磨砂块点击选" — the #119 / Phase 4 plan, not a phone frame inside the phone).
+     - **When:** the window is wider than tall and under 500 px high (`isLandscapePhone`, SonarScreen.jsx), lake page only. The
+       ice page keeps its own layout (its phone work is the ice chat's); desktop, tablets and portrait phones are unchanged.
+     - **What:** no drawn phone, no desktop panel, no step cards. The display fills the screen inside the safe areas and opens
+       on the app's Home with the frosted tiles (#139 rules: PingLive views, the Mini's four live tiles, the rest frosted);
+       a pick starts the sonar full-screen with the app's controls at the app's own size (back → Home, range, depth range,
+       gain, pause live; ⋯ greyed). The lake is a 21 %-wide 16:9 inset top-right (top-left in Combo, where the readout is),
+       drawn by SonarScreen.jsx from closer in round the boat; the wordmark under it is hidden. A tap on the inset swaps:
+       the lake full-screen with the drag cue, the sonar a 34 %-wide box top-right that taps back. A drag on the full-screen
+       sonar never moves the boat behind it. While the sonar is full-screen the full-screen lake is not rendered at all.
+     - **Checked** (headless, 844 × 390 and 932 × 430): Home → Forward View → sonar + inset; gain + works; inset tap → lake big
+       → boat drag moves it → sonar box tap → back; back → Home → Live Combo puts the inset top-left; no console errors.
+       Lake 390 × 844 and 1440 × 900, ice 1440 × 900 and 844 × 390 look as before. The gallery's "← Lab" link is hidden
+       while sideways (dev only; the public build has none).
+     - **Not done:** Phase 4's quality tiers; a device test on a real iPhone (safe areas, the home indicator).

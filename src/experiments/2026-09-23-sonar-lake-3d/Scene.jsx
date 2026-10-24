@@ -515,7 +515,7 @@ function Rig({ state, sonarRect, fogMats, cam = LAKE_CAM }) {
       const qy = iceSec ? ((1 - tmp.y) / 2) * size.height + (k > 1 ? 16 : 18) : py // ice: the caption just under the reticle
       const qx = iceSec ? Math.min(size.width - hw, Math.max(hw, ((tmp.x + 1) / 2) * size.width)) : px // ice: centred on the reticle, kept on screen
       s.hintEl.style.transform = `translate(${qx.toFixed(1)}px, ${qy.toFixed(1)}px) translate(-50%, ${iceSec ? '0' : below ? '0' : '-100%'})`
-      s.hintEl.style.opacity = s.hasDragged ? '0' : '1'
+      s.hintEl.style.opacity = s.hasDragged || s.hintOff ? '0' : '1' // hintOff: a sideways phone with the sonar full-screen (#140)
     }
     // fixed 3/4 aerial view like the PL animations; slight parallax from the pointer
     const px = s.parallax.x, py = s.parallax.y
@@ -634,7 +634,7 @@ function Rig({ state, sonarRect, fogMats, cam = LAKE_CAM }) {
     // view from the south (desktop exactly as before); phones: pulled back, re-centred on a step preset's boat
     const fx = k > 1 && s.frameX != null ? s.frameX : cam.T.x
     s.camX = s.camX == null ? fx : s.camX + (fx - s.camX) * Math.min(1, dt * 2.5)
-    const pk = k > 1 ? 0 : 1 // no pointer parallax on phones (a dragging finger would shake the view)
+    const pk = k > 1 || s.land ? 0 : 1 // no pointer parallax on phones (a dragging finger would shake the view), sideways ones too
     look.set(s.camX + px * 2 * pk, cam.T.y, cam.T.z)
     camera.position.set(look.x + cam.D.x * k + px * 2 * pk, cam.T.y + cam.D.y * k + py * 2 * pk, cam.T.z + cam.D.z * k + px * 2 * pk)
     camera.lookAt(look)

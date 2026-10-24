@@ -14,6 +14,11 @@ export const PHONE_POSE = { perspective: 1400, rotY: -16, rotX: 6 }
 // phones (< 640 px wide): nearly flat, so the frame can fill the width (Jason 2026-10-03: 手机能否保留边框 合理安排一下空间)
 export const PHONE_POSE_PHONE = { perspective: 1400, rotY: -4, rotX: 2 }
 export const isPhoneLayout = () => typeof window !== 'undefined' && window.innerWidth < 640
+// a phone held sideways (#140, Jason 2026-10-24: 手机横屏还是用以前的方案好了 在屏幕上有磨砂块点击选): the phone IS the app —
+// no drawn phone, the app's Home with its frosted tiles, then the sonar full-screen with the app's own controls and the
+// lake as a small inset that taps to swap (index.jsx). Lake page only; the ice page keeps its own layout.
+export const isLandscapePhone = () => typeof window !== 'undefined' && window.innerWidth > window.innerHeight && window.innerHeight < 500
+export const PHONE_POSE_FLAT = { perspective: 1400, rotY: 0, rotX: 0 }
 export const ICE_SPLIT = 0.42 // the flasher panel's share of the display width in the ice views
 export const phonePose = () => (isPhoneLayout() ? PHONE_POSE_PHONE : PHONE_POSE)
 
@@ -225,6 +230,7 @@ export default function SonarScreen({ state, rect, lakeMats }) {
 
   const tmpUp = useMemo(() => new THREE.Vector3(), [])
   const tmpColor = useMemo(() => new THREE.Color(), [])
+  const inset = useMemo(() => ({ cam: new THREE.PerspectiveCamera(38, 1.6, 0.5, 400), dir: new THREE.Vector3(), look: new THREE.Vector3(), clear: new THREE.Color() }), [])
   useFrame((root, dt) => {
     const s = state.current
     const specs = s.specs.slice(0, MAX_FANS)
@@ -340,21 +346,44 @@ export default function SonarScreen({ state, rect, lakeMats }) {
     }
     if (s.debugEl) s.debugEl.textContent = `sonar fans ${specs.length} flat ${flat ? 1 : 0} fan0 ${u.uFan.value[0].toArray().map((v) => v.toFixed(2)).join(',')} apex ${s.apex.toArray().map((v) => v.toFixed(1)).join(',')}`
 
-    // 2) main view
+    // 2) main view. A sideways phone with the sonar full-screen (#140): the lake is only the small inset drawn in 4), so
+    // the full-screen lake is not rendered at all — the screen is cleared to black (the safe-area margins stay black)
+    const lakeEl = rect.current.lake, lakeInset = !!lakeEl && lakeEl.offsetWidth > 8
     gl.autoClear = true
-    gl.render(scene, camera)
+    if (lakeInset) {
+      gl.getClearColor(inset.clear); const a = gl.getClearAlpha()
+      gl.setClearColor(0x000000, 1); gl.clear(); gl.setClearColor(inset.clear, a)
+    } else gl.render(scene, camera)
 
     // 3) sonar screen overlay in the bottom-right corner
     // the screen area is a DOM element inside the CSS-3D-transformed phone. Take its
     // LAYOUT rect (offset*, unaffected by transforms) relative to the phone's centre,
     // apply the same rotateX → rotateY → perspective maths as the CSS, and place the
     // quad corners in clip space with per-vertex w for perspective-correct sampling.
+    const cr = gl.domElement.getBoundingClientRect()
+    drawOverlay(cr)
+    // 4) the sideways phone's lake inset: the lake from closer in, round the boat, into the inset's rectangle (#140)
+    if (lakeInset) {
+      const lr = lakeEl.getBoundingClientRect(), x = lr.left - cr.left, y = cr.bottom - lr.bottom
+      const c = inset.cam
+      camera.getWorldDirection(inset.dir) // the main view's direction, so the inset is the same lake seen closer
+      inset.look.set(s.boat.x + 5, -4, s.boat.z)
+      c.position.copy(inset.look).addScaledVector(inset.dir, -30); c.lookAt(inset.look)
+      c.aspect = lr.width / lr.height; c.far = camera.far; c.layers.mask = camera.layers.mask; c.updateProjectionMatrix()
+      gl.setViewport(x, y, lr.width, lr.height); gl.setScissor(x, y, lr.width, lr.height); gl.setScissorTest(true)
+      gl.autoClear = true
+      gl.render(scene, c)
+      gl.setScissorTest(false); gl.setViewport(0, 0, size.width, size.height)
+    }
+  }, 1)
+  function drawOverlay(cr) {
+    const s = state.current
     const el = rect.current.el, frame = rect.current.frame
     if (!el || !frame) return
-    const cr = gl.domElement.getBoundingClientRect(), fr = frame.getBoundingClientRect()
+    const fr = frame.getBoundingClientRect()
     if (fr.width < 8) return
     const cx = fr.left + fr.width / 2, cy = fr.top + fr.height / 2
-    const { perspective: P, rotY, rotX } = phonePose()
+    const { perspective: P, rotY, rotX } = s.land ? PHONE_POSE_FLAT : phonePose()
     const ay = (rotY * Math.PI) / 180, ax = (rotX * Math.PI) / 180
     const corners = [[el.offsetLeft, el.offsetTop], [el.offsetLeft + el.offsetWidth, el.offsetTop], [el.offsetLeft, el.offsetTop + el.offsetHeight], [el.offsetLeft + el.offsetWidth, el.offsetTop + el.offsetHeight]]
     const pos = res.quad.geometry.attributes.position, aW = res.quad.geometry.attributes.aW
@@ -376,6 +405,6 @@ export default function SonarScreen({ state, rect, lakeMats }) {
     gl.setViewport(0, 0, size.width, size.height)
     gl.render(res.overlay, res.ortho)
     gl.autoClear = true
-  }, 1)
+  }
   return null
 }

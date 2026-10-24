@@ -96,6 +96,9 @@ The direction matches `docs/mobile-marketing-plan.md` "Principles for mobile" (#
 
 - **Landscape phone** (aspect > 1, height < 500): the sonar full-screen with the app chrome, and
   the lake as a ~28% inset that taps to expand.
+  **Built (#141, 2026-10-24), lake page only:** Home first with the frosted tiles (Jason: 在屏幕上有磨砂块点击选), then the
+  sonar full-screen inside the safe areas at the app's own control size, the lake a 21 %-wide inset top-right (top-left in
+  Combo) rendered from closer in round the boat; a tap swaps them (lake full-screen, sonar a 34 %-wide box top-right).
 - **Quality tiers:** pick dpr 1–1.5 and a 30 fps cap from the measured frame time; budget GPU
   target ≥ 30 fps (baseline 10–24, `sonar-page-real-device-perf` memory).
 
