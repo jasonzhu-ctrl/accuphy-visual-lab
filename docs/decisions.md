@@ -2367,4 +2367,7 @@ Numbered log. Newest at the bottom.
        (136 → 113 mm, 41 → 34 %); MacBook Pro 14″ 600 → 514 (120 → 103 mm); Windows 15.6″ @125 % 600 → 522 (135 → 117 mm);
        24″ 600 → 560 (166 → 155 mm, 31 → 29 %); 27″ 600 → 560 (140 → 131 mm, 23 → 22 %); 1280 px 538 → 440; 711 and 1024
        unchanged (299, 430).
-     Checked: lake 711–2560 px and ice 711 / 1470 / 1920; `vite build` clean. Not published yet.
+     Checked: lake 711–2560 px and ice 711 / 1470 / 1920; `vite build` clean. Self-review on Jason's request ("你自己再确认
+     一下合理不合理"): sizes change smoothly (430 → 440 px at 1048 px, cap at ~1650 px), nothing overlaps; the in-phone
+     ruler text is 6.4–8.2 px at 440–560 px — small, as in the real app; the fix for that is plan B's 1.3× app controls
+     (#84, SonarChrome owner), not a bigger frame. Published 2026-10-24 (versions.md).
