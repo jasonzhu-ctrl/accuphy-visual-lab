@@ -1,4 +1,4 @@
-// Lake rocks built in code (decision #130). Jason 2026-10-24: "石头像爆米花一样" — the old rock was a DodecahedronGeometry
+// Lake rocks built in code (decision #131). Jason 2026-10-24: "石头像爆米花一样" — the old rock was a DodecahedronGeometry
 // whose shared corners were moved one copy at a time, so every rock fell apart into loose flat-shaded shards.
 // These are the boulders of a Canadian Shield lake: glacially rounded granite and gneiss, often flattened, with a few
 // flat joint faces and rounded edges, smooth skins with fine pitting, a film of algae and silt. Six shapes, each a

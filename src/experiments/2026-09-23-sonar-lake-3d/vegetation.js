@@ -87,7 +87,7 @@ export function makeWeedTuft() {
   }
   return paint(merge(parts), 0.22, 0.42, 0.2, 0.25)
 }
-// rocks: rocks.js (#130). The old makeRock (a dodecahedron with its corner copies moved one at a time) fell apart
+// rocks: rocks.js (#131). The old makeRock (a dodecahedron with its corner copies moved one at a time) fell apart
 // into shards — Jason 2026-10-24: 石头像爆米花一样.
 
 // ---------- placement ----------

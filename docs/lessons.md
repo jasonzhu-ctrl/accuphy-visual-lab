@@ -44,6 +44,10 @@ repeatable procedures are also project skills in `.claude/skills/` (`sonar-qa`, 
   38–44 % white this way.
 - **Tune with temporary knobs, then bake.** Add a uniform fed from `window.__x`, sweep values with `__sonarSnap`
   snapshots of 4–6 scenes, tile them with PIL, pick one, bake the constants, delete the knobs (grep for `TEMP`).
+- **Displacing a non-indexed mesh tears it (#131).** three's polyhedra (Dodecahedron, Icosahedron…) are non-indexed:
+  every corner exists once per triangle. Move the copies by their own random amounts and the skin splits into shards
+  (the "popcorn" rocks). Weld first (`mergeVertices`), displace the unique points, then `computeVertexNormals`. Shape
+  comes from a few operations in order — mass bumps, planar cuts with rounded shoulders, grain — not from noise alone.
 - **Materials matter.** Steel (wrecks) ≠ wood/rock (#63): a separate sonar tag gives steel wide bright bands and
   long tails, while timber stays sharp. A global change broke timber. Check the calibrated scenes after every
   change: the Mini shelf (`?boat=-40,-5`), the default view, the hump, the deep, the wreck, the lockup.
@@ -108,6 +112,10 @@ repeatable procedures are also project skills in `.claude/skills/` (`sonar-qa`, 
   `requestAnimationFrame` behind a `__step(ms)` virtual clock, and seed `Math.random`; run the old code from a frozen
   copy on a second port. Frames come out byte-identical run to run. Playwright's own `page.clock` hung the screenshots,
   and `waitForFunction` must poll on a timer (`polling: 100`), not on animation frames.
+- **The grid's Combo tiles can settle at a different AUTO range** (#131: 21 % vs 17 % white, "depthAxis 70 ft" vs
+  45 ft on one run): the log prints the AUTO depth and range per tile — when a Combo tile differs, compare those two
+  numbers first and re-run that view alone (`VIEWS=Combo node grid.cjs <label> <port> <spots> PLM`) before blaming
+  the change.
 - **Headless in the cloud container (2026-10-23):** 4 CPUs, 15 GB, SwiftShader only. Three or four Chromium pages
   at once got the container OOM-killed (restart, background servers lost): run at most two. The ice page under the
   virtual clock dies at ~frame 200 on both old and new code; capture it in real time instead (load, wait ~40 s,
@@ -136,6 +144,7 @@ repeatable procedures are also project skills in `.claude/skills/` (`sonar-qa`, 
 | Tool | What it does |
 |---|---|
 | `?boat=x,z` · `?bigphone` · `?dev` · `?cam=logo/wreck/boat[:side/bow/stern/top/under]/fish:<sp>[:<i>][:top/side/tq]` · `?wrecklift=m` | Dev URL flags: park the boat, enlarge the phone, tuning rows, cameras (the boat from six angles; a fish from above, the side or three-quarter), lift the wreck |
+| `?cam=rocks[:hump]` (dev builds only) | Circles the island rock pile (or the first rock hump) under water (#131) |
 | `?fishlab` (dev builds only) | Scripted test fish in front of and under the default boat (#120): crossing the slab, turning in place, hovering, toward/away, a musky, two under the boat, a crappie school — one per state the fish marks must get right |
 | `window.__sonarSnap()` + `POST /__snap?name=` | Save the sonar picture as a PNG in `reference/engine-compare/` (gitignored) |
 | `window.__lakeSnap()` | The 3D view alone as a PNG |

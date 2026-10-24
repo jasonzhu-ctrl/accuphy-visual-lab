@@ -70,8 +70,8 @@ function Instanced({ mat, geos, items, layer }) {
 function Structures({ mat }) {
   const geos = useMemo(() => ({
     tall: [0, 1, 2, 3].map(makeTallTree), bush: [0, 1, 2, 3, 4].map(makeBushTree), stump: [makeStump()], log: [makeLog()],
-    // rocks (rocks.js, #130): the six kinds; small ones at 320 triangles, the few big ones (s ≥ 1.2) at 1280
-    weed: [makeWeedTuft()], rock: ROCK_KINDS.map((k) => makeRockGeometry(k, 0, 2)), rockBig: ROCK_KINDS.map((k) => makeRockGeometry(k, 1, 3)),
+    // rocks (rocks.js, #131): the six kinds; small ones at 320 triangles, the few big ones (s ≥ 1.2) at 1280
+    weed: [makeWeedTuft()], rock: ROCK_KINDS.flatMap((k) => [makeRockGeometry(k, 0, 2), makeRockGeometry(k, 2, 2)]), rockBig: ROCK_KINDS.map((k) => makeRockGeometry(k, 1, 3)),
   }), [])
   const items = useMemo(placeAll, [])
   return (
@@ -343,9 +343,41 @@ function Water({ state }) {
 }
 
 // ---------- boat + device + beams ----------
+// a flat ribbon along an arc of the ellipse (a, b), width w, lying in the x–z plane
+function ellipseArc(a, b, w, t0, len, segs) {
+  const pos = [], idx = []
+  for (let i = 0; i <= segs; i++) {
+    const t = t0 + (len * i) / segs, c = Math.cos(t), s = Math.sin(t)
+    const nx = b * c, nz = a * s, nl = Math.hypot(nx, nz)
+    pos.push(a * c - (w / 2) * nx / nl, 0, b * s - (w / 2) * nz / nl, a * c + (w / 2) * nx / nl, 0, b * s + (w / 2) * nz / nl)
+    if (i < segs) idx.push(2 * i, 2 * i + 1, 2 * i + 2, 2 * i + 1, 2 * i + 3, 2 * i + 2)
+  }
+  const g = new THREE.BufferGeometry()
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setIndex(idx)
+  return g
+}
 function Boat({ state, beamMats }) {
   const boat = useMemo(makeBassBoat, [])
   const contact = useMemo(makeWaterContact, [])
+  // the drag cue (#132; the glass pill with its arrow read as generic UI — the ice page's #123 reticle is the language):
+  // a thin white reticle lying on the water round the hull — four arcs of an ellipse with gaps fore, aft and abeam, a
+  // chevron off the bow and the stern, and a ripple that spreads out of it every 2.6 s. Shown until the first drag.
+  const reticle = useMemo(() => {
+    const g = new THREE.Group()
+    const mat = new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0.85, depthWrite: false, side: THREE.DoubleSide })
+    const a = 4.6, b = 2.3, w = 0.11
+    for (let i = 0; i < 4; i++) g.add(new THREE.Mesh(ellipseArc(a, b, w, (i * Math.PI) / 2 + 0.26, Math.PI / 2 - 0.52, 24), mat))
+    for (const sgn of [1, -1]) for (const dz of [1, -1]) { // the chevrons: > off the bow, < off the stern
+      const m = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.01, w), mat)
+      m.position.set(sgn * (a + 0.55) - sgn * 0.148, 0, dz * 0.148); m.rotation.y = (sgn * dz * Math.PI) / 4
+      g.add(m)
+    }
+    const rip = new THREE.Mesh(ellipseArc(a, b, 0.06, 0, Math.PI * 2, 64), new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide }))
+    g.add(rip)
+    g.userData = { rip, mat, fade: 1 }
+    g.position.y = 0.03; g.renderOrder = 3
+    return g
+  }, [])
   const group = useRef(), ride = useRef()
   useFrame(({ clock }, dt) => {
     const s = state.current
@@ -354,6 +386,17 @@ function Boat({ state, beamMats }) {
     group.current.position.set(s.boat.x, 0.02, s.boat.z)
     s.apex.copy(TRANSDUCER_OFFSET).add(group.current.position)
     setBeamUniforms(beamMats, s.specs, s.apex)
+    { // the drag cue: breathes a little, ripples every 2.6 s, fades out after the first drag
+      const r = reticle.userData, tt = clock.elapsedTime
+      r.fade += ((s.hasDragged ? 0 : 1) - r.fade) * Math.min(1, dt * 5)
+      reticle.visible = r.fade > 0.02
+      if (reticle.visible) {
+        const u = Math.min(1, (tt % 2.6) / 1.6), grow = 1 + 0.45 * (1 - (1 - u) * (1 - u))
+        r.mat.opacity = (0.72 + 0.16 * Math.sin(tt * 2.2)) * r.fade
+        r.rip.scale.set(grow, 1, grow)
+        r.rip.material.opacity = 0.5 * (1 - u) * r.fade
+      }
+    }
     // visual only (#88): a gentle bob — heave ±4 cm on the phases of the water's wave shading, roll ±0.9°, pitch ±0.6°.
     // (The water surface itself stays flat: its shader shifts vertices within the plane.) The beam apex above stays
     // where it was, so the sonar picture does not jitter; the foam stays on the water.
@@ -369,6 +412,7 @@ function Boat({ state, beamMats }) {
     <group ref={group} onUpdate={(g) => g.traverse((o) => o.layers.set(SONAR_HIDE_LAYER))}>
       <group ref={ride}><primitive object={boat} /></group>
       <primitive object={contact} />
+      <primitive object={reticle} />
     </group>
   )
 }
@@ -461,12 +505,12 @@ function Rig({ state, sonarRect, fogMats, cam = LAKE_CAM }) {
         s.hintAnchor = s.hintAnchor || { x: 0, z: 0 }
         s.hintAnchor.x = s.boat.x - (k > 1 ? 1.5 : 2.6); s.hintAnchor.z = s.boat.z + (k > 1 ? 3.8 : 2.2)
         tmp.set(s.hintAnchor.x, 0, s.hintAnchor.z).project(camera)
-      } else { s.hintAnchor = null; tmp.set(s.boat.x, 0.6, s.boat.z).project(camera) }
+      } else { s.hintAnchor = null; tmp.set(s.boat.x, 0.05, s.boat.z - 5.3).project(camera) } // the lake: just above the far edge of the water reticle (#132)
       const hw = (s.hintEl.offsetWidth || 160) / 2 + 8
       const minX = iceSec && size.width >= 1024 ? 440 + hw : hw // desktop: clear of the glass panel and the step cards
       const px = Math.min(size.width - hw, Math.max(minX, ((tmp.x + 1) / 2) * size.width))
       const below = cam.hintBelow && s.view !== 'section'
-      const py = below ? ((1 - tmp.y) / 2) * size.height + (s.view === 'under' ? 150 : k > 1 ? 30 : 44) : Math.max((s.hintEl.offsetHeight || 34) + 54, ((1 - tmp.y) / 2) * size.height - (k > 1 ? 22 : 46))
+      const py = below ? ((1 - tmp.y) / 2) * size.height + (s.view === 'under' ? 150 : k > 1 ? 30 : 44) : Math.max((s.hintEl.offsetHeight || 34) + 54, ((1 - tmp.y) / 2) * size.height - (k > 1 ? 6 : 8))
       const qy = iceSec ? ((1 - tmp.y) / 2) * size.height + (k > 1 ? 16 : 18) : py // ice: the caption just under the reticle
       const qx = iceSec ? Math.min(size.width - hw, Math.max(hw, ((tmp.x + 1) / 2) * size.width)) : px // ice: centred on the reticle, kept on screen
       s.hintEl.style.transform = `translate(${qx.toFixed(1)}px, ${qy.toFixed(1)}px) translate(-50%, ${iceSec ? '0' : below ? '0' : '-100%'})`

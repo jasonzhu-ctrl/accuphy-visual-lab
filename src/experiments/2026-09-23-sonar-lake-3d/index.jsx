@@ -301,14 +301,10 @@ export default function SonarLake3D({ scene: sceneProp }) {
         </div>
       </motion.div>
 
-      {/* ---- drag hint: follows the boat until the first drag (position set by the render loop) ---- */}
-      {ICE
-        ? /* the ice page: a plain caption under the reticle on the ice (IceCamp.jsx) — no pill, no dot (2026-10-23) */
-          <div ref={(el) => { state.current.hintEl = el }} className="pointer-events-none absolute left-0 top-0 whitespace-nowrap" style={{ opacity: 0, transition: 'opacity .6s', color: 'rgba(255,255,255,0.92)', fontSize: 13, fontWeight: 500, letterSpacing: '0.01em', textShadow: '0 1px 2px rgba(0,0,0,0.55), 0 0 12px rgba(0,0,0,0.45)' }}>Tap the ice to drill a hole</div>
-        : <div ref={(el) => { state.current.hintEl = el }} className="ac-hint pointer-events-none absolute left-0 top-0 flex items-center gap-2 px-3.5 py-2" style={{ opacity: 0 }}>
-            <svg className="hand" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#028cdf" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12h18M7 8l-4 4 4 4M17 8l4 4-4 4"/></svg>
-            <span className="font-brand-head text-[11px] uppercase tracking-wider">Drag the boat</span>
-          </div>}
+      {/* ---- the cue caption, shown until the first drag / tap (position set by the render loop). The ice page: under the
+           reticle on the ice (IceCamp.jsx, #123); the lake: above the water reticle round the boat (Scene.jsx Boat, #132).
+           Plain text, no glass pill, no dot (Jason 2026-10-23: 看着太 AI 了) ---- */}
+      <div ref={(el) => { state.current.hintEl = el }} className="pointer-events-none absolute left-0 top-0 whitespace-nowrap" style={{ opacity: 0, transition: 'opacity .6s', color: 'rgba(255,255,255,0.92)', fontSize: 13, fontWeight: 500, letterSpacing: '0.01em', textShadow: '0 1px 2px rgba(0,0,0,0.55), 0 0 12px rgba(0,0,0,0.45)' }}>{ICE ? 'Tap the ice to drill a hole' : 'Drag the boat to move it'}</div>
 
       {/* ---- iPhone Pro Max, landscape, turned slightly in 3D (same pose as the GL picture).
            Proportions from the 15/16 Pro Max: body 2.08:1, corner radius ≈ 14 % of the short side,
