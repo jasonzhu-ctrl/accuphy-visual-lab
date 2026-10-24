@@ -257,6 +257,9 @@ the cheapest Android phone class). Phone size was emulated at 360×800.
   Website HQ 2026-10-23 (#204 there): Globo dropped; theme copy 189488890029; `pages/lab` built by 00, not published; Klaviyo public
   key XWcjZ5 filled in `signup.js`, list id pending; shop links = `/products/pinglive-sonar`, `/products/pinglive-mini` with the
   market prefix (CA none or `/fr`, US `/en-us`, AU `/en-au`) — for the future `shop_click` button.
+  Website #208 (Jason, 2026-10-23 evening): the Klaviyo popup STAYS on /pages/lab (not excluded); trigger rules and the
+  funnel are decided later; the "Accuphy Lab sign-ups" list is not created yet, and whether the Lab keeps its own sign-up
+  card is decided then. `signup.js` keeps the public key with `listId: null` (sends nothing) until that decision.
 
 ## Lite section (planning only — decision #48)
 - ⬜ **Do not build until Jason says go.** `docs/lite-section-plan.md`: the original side-view visualizer as a
