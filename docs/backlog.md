@@ -4,6 +4,14 @@ Jason 2026-09-24: "别把之前说过的任务丢了" — every promised task li
 it is done. ✅ done · 🔧 in progress · ⬜ open.
 
 ## Sonar screen (Phase 4)
+- ⬜ **Fish marks tremble (Jason 2026-10-24: 鱼还有不停的颤抖).** Measured at his spot (PLM Forward 90 ft, boat −12.3, 20.4, 45
+  frames at 30 fps): every 1/8 s a mark gets new speckle, its outline swings 168–454 px (2–3×), brightness ±25 %, centre
+  jumps up to 10 px — same on #128, #139 and #150, so it dates from #120 (per-ping speckle + ragged rim + `fl` flicker +
+  tail wag + 0.2 s ghost). Proposal: blend ping to ping instead of jumping, calmer rim, smaller flicker. Waiting for Jason's go.
+- ⬜ **Thick bottom bands turn into a net with holes since #148 (Jason 2026-10-24: 底部在某些区域很虚).** Deep or
+  side-sloping bottom (his spots −5.4, −8.2 at 46 ft and 15, −2.2 at 30 ft with rocks): #128/#139 drew a solid band,
+  #148's arc grain leaves dark holes between the arcs there; the thin shallow band is fine. The grain is the LiveScope
+  chat's active work — who fixes it is Jason's call.
 - ✅ AUTO depth on PL Forward: bottom kept at ~80 % of the screen in deep water; sound reaches the whole picture box; the 3D curtain = that box (decision #38)
 - ✅ AUTO depth follows the depth readout under the boat, like the app, not the deepest bottom in the picture (decision #41)
 - ✅ Shallow water no longer blows out: near-range gain on bottom and structure echoes (decision #42)
