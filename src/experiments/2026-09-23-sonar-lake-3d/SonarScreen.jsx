@@ -85,6 +85,13 @@ export default function SonarScreen({ state, rect, lakeMats }) {
       rt.depthTexture = new THREE.DepthTexture(STRIP_W, STRIP_H, THREE.UnsignedIntType)
       return rt
     })
+    // the far side of structure (2026-10-23, decision #135): the same strips rendered with BACK faces and only structure
+    // writing (lakeMaterial uSonarPass = 2), so each row knows where it leaves a hull or a trunk — the section between
+    // the two is drawn lit-through (wood) or dark (timber, rock) and the shadow starts behind the far face
+    const targetsB = [0, 1].map(() => { const rt = new THREE.WebGLRenderTarget(STRIP_W, STRIP_H, { depthBuffer: true, minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter }); rt.depthTexture = new THREE.DepthTexture(STRIP_W, STRIP_H, THREE.UnsignedIntType); return rt })
+    // the echo splat (pass 3): (angle across the fan × range) per fan, every structure surface added up — sampled by
+    // fanEcho as the structure echo (sonarShader uEcho0/1)
+    const echoRTs = [0, 1].map(() => new THREE.WebGLRenderTarget(STRIP_W, 256, { depthBuffer: false, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter }))
     const cams = [0, 1].map(() => new THREE.PerspectiveCamera(20, 1, 0.3, 150))
     cams.forEach((c) => { c.layers.set(0); c.layers.enable(LAKEBED_LAYER) })
     // Panoramic: top-down orthographic depth map of the structures (trees, rocks, wrecks) around the transducer
@@ -100,6 +107,8 @@ export default function SonarScreen({ state, rect, lakeMats }) {
       vertexShader: sonarVertex, fragmentShader: sonarFragment, depthTest: false, depthWrite: false,
       uniforms: {
         uDepth0: { value: targets[0].depthTexture }, uDepth1: { value: targets[1].depthTexture },
+        uDepthB0: { value: targetsB[0].depthTexture }, uDepthB1: { value: targetsB[1].depthTexture },
+        uEcho0: { value: echoRTs[0].texture }, uEcho1: { value: echoRTs[1].texture }, uFanR: { value: new THREE.Vector2(30, 30) },
         uColor0: { value: targets[0].texture }, uColor1: { value: targets[1].texture },
         uFanCount: { value: 0 }, uFan: { value: [new THREE.Vector4(), new THREE.Vector4()] },
         uNearFar: { value: new THREE.Vector2(0.3, 150) }, uRange: { value: 20 }, uReach: { value: 20 },
@@ -141,7 +150,7 @@ export default function SonarScreen({ state, rect, lakeMats }) {
     quad.frustumCulled = false
     overlay.add(quad)
     const ortho = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1)
-    if (import.meta.env.DEV) window.__sonar = { targets, cams, mat, topRT, marks }
+    if (import.meta.env.DEV) window.__sonar = { targets, targetsB, echoRTs, cams, mat, topRT, marks }
     // dev: window.__sonarHist(bins) — render the sonar picture flat into an offscreen target and
     // return the histogram of LUT index (nearest LUT entry per pixel) so the engine's brightness
     // distribution can be compared number-for-number with the app's reference frames
@@ -209,12 +218,13 @@ export default function SonarScreen({ state, rect, lakeMats }) {
         return c.toDataURL('image/png')
       }
     }
-    return { targets, cams, mat, overlay, quad, ortho, topRT, topCam, bake, marks, hist, histScene, histCur: 0, lastPing: -1 }
+    return { targets, targetsB, echoRTs, cams, mat, overlay, quad, ortho, topRT, topCam, bake, marks, hist, histScene, histCur: 0, lastPing: -1 }
   }, [])
   useEffect(() => { [SONAR_HIDE_LAYER, LAKEBED_LAYER, FISH_LAYER, LOGO_LAYER].forEach((l) => camera.layers.enable(l)) }, [camera])
-  useEffect(() => () => { res.targets.forEach((t) => t.dispose()); res.topRT.dispose(); res.mat.dispose(); res.hist.forEach((t) => t.dispose()) }, [res])
+  useEffect(() => () => { res.targets.forEach((t) => t.dispose()); res.targetsB.forEach((t) => t.dispose()); res.echoRTs.forEach((t) => t.dispose()); res.topRT.dispose(); res.mat.dispose(); res.hist.forEach((t) => t.dispose()) }, [res])
 
   const tmpUp = useMemo(() => new THREE.Vector3(), [])
+  const tmpColor = useMemo(() => new THREE.Color(), [])
   useFrame((root, dt) => {
     const s = state.current
     const specs = s.specs.slice(0, MAX_FANS)
@@ -283,7 +293,21 @@ export default function SonarScreen({ state, rect, lakeMats }) {
         cam.up.copy(tmpUp)
         const c = sp.frame.c
         cam.lookAt(s.apex.x + c.x, s.apex.y + c.y, s.apex.z + c.z)
-        if (wet) { gl.setRenderTarget(res.targets[k]); gl.clear(); gl.render(scene, cam) }
+        if (wet) {
+          gl.setRenderTarget(res.targets[k]); gl.clear(); gl.render(scene, cam)
+          // the far-face strip: back faces, structure only (the first frame compiles the flipped programs once)
+          lakeMats.forEach((m) => { m.userData.side0 ??= m.side; m.side = THREE.BackSide; m.userData.uniforms.uSonarPass.value = 2 })
+          gl.setRenderTarget(res.targetsB[k]); gl.clear(); gl.render(scene, cam)
+          lakeMats.forEach((m) => { m.side = m.userData.side0; m.userData.uniforms.uSonarPass.value = 1 })
+          // the echo splat: both faces, additive, no depth test, clear to black (restore the clear colour after)
+          const cc = gl.getClearColor(tmpColor), ca = gl.getClearAlpha()
+          lakeMats.forEach((m) => { const mu = m.userData.uniforms; if (!mu.uSplat) return; mu.uSplat.value.set(tanH, tanV, sp.R); mu.uSonarPass.value = 3; m.userData.blend0 ??= [m.blending, m.transparent, m.depthTest, m.depthWrite]; m.blending = THREE.AdditiveBlending; m.transparent = true; m.depthTest = false; m.depthWrite = false; m.side = THREE.DoubleSide })
+          const bg = scene.background; scene.background = null // the scene's background colour would fill the echo target (it is additive: it must start black)
+          gl.setRenderTarget(res.echoRTs[k]); gl.setClearColor(0x000000, 1); gl.clear(); gl.render(scene, cam)
+          scene.background = bg; gl.setClearColor(cc, ca)
+          lakeMats.forEach((m) => { const mu = m.userData.uniforms; if (!mu.uSplat) return; const b = m.userData.blend0; m.blending = b[0]; m.transparent = b[1]; m.depthTest = b[2]; m.depthWrite = b[3]; m.side = m.userData.side0; mu.uSonarPass.value = 1 })
+          u.uFanR.value.setComponent(k, sp.R)
+        }
         // screen-plane centre angle: the tilt of the fan centre from straight-down
         u.uFan.value[k].set(Math.atan2(c.x, -c.y), half, tanH, tanV)
       })

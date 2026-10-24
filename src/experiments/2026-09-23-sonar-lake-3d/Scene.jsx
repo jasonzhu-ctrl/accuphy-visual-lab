@@ -683,7 +683,7 @@ export default function LakeScene({ state, sonarRect, paused = false, scene = 'l
     if (ice) for (const k in m) { const u = m[k].userData.uniforms; u.uFogColor.value.set(P.T.water); u.uSun.value.copy(dir(P.T.sun.dir)); u.uRevealGain.value = 2.4; u.uOutGamma.value = 0.8; u.uFogDensity.value *= 2.4 } // dark winter water: the bottom fades to black, the beam cuts through (#99)
     return m
   }, [ice, P])
-  const lakeMats = useMemo(() => [mats.bed, mats.inst, mats.steel, mats.fish, mats.logo], [mats])
+  const lakeMats = useMemo(() => [mats.bed, mats.inst, mats.steel, mats.wood, mats.fish, mats.logo], [mats]) // wood added 2026-10-23: without it the workboat rendered into the sonar passes untagged (alpha 1 = fish/steel)
   const iceMat = useMemo(() => {
     if (!ice) return null
     const m = makeIceMaterial(bakeTerrain())
