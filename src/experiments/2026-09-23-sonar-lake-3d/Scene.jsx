@@ -86,7 +86,7 @@ function Structures({ mat }) {
   )
 }
 
-function Wreck({ mat }) {
+function Wreck({ mat, at }) {
   const geo = useMemo(() => {
     // ~10 m wooden workboat (Jason 2026-09-24: +30 %, shaped after the PL wreck imaging):
     // hull with a raised bow, a boxy cabin with window openings, a short mast; lying tilted on the bottom
@@ -112,7 +112,7 @@ function Wreck({ mat }) {
     g.setAttribute('color', new THREE.BufferAttribute(col, 3))
     return g
   }, [])
-  const { x, z, rot } = SMALL_WRECK
+  const { x, z, rot, scale = 1 } = at || SMALL_WRECK
   // it lay on the flat basin floor; on the #92 slope it follows the bottom (its up axis turned to the bed's normal,
   // averaged over the hull's length), so neither end floats or digs in
   const tilt = useMemo(() => {
@@ -120,7 +120,7 @@ function Wreck({ mat }) {
     return new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), n)
   }, [x, z])
   return (
-    <group position={[x, bedY(x, z) - 0.2, z]} quaternion={tilt}>
+    <group position={[x, bedY(x, z) - 0.2, z]} quaternion={tilt} scale={scale}>
       <mesh geometry={geo} material={mat} rotation={rot} />
     </group>
   )
@@ -623,7 +623,7 @@ export default function LakeScene({ state, sonarRect, paused = false, scene = 'l
     fish.userData.uniforms.uHighlight.value.set('#ffe9a0') // fish light up warm, like a sonar return
     fish.userData.uniforms.uFogDensity.value = 0.006
     fish.side = THREE.DoubleSide // flat fins
-    const m = { bed: makeLakeMaterial(), inst: makeLakeMaterial({ structure: true }), steel: makeLakeMaterial({ steel: true }), logo: makeLakeMaterial({ logo: true }), fish }
+    const m = { bed: makeLakeMaterial(), inst: makeLakeMaterial({ structure: true }), steel: makeLakeMaterial({ steel: true }), wood: makeLakeMaterial({ wood: true }), logo: makeLakeMaterial({ logo: true }), fish }
     if (ice) for (const k in m) { const u = m[k].userData.uniforms; u.uFogColor.value.set(P.T.water); u.uSun.value.copy(dir(P.T.sun.dir)); u.uRevealGain.value = 2.4; u.uOutGamma.value = 0.8; u.uFogDensity.value *= 2.4 } // dark winter water: the bottom fades to black, the beam cuts through (#99)
     return m
   }, [ice, P])
@@ -656,10 +656,13 @@ export default function LakeScene({ state, sonarRect, paused = false, scene = 'l
       <Lakebed mat={mats.bed} />
       <mesh rotation-x={-Math.PI / 2} position-y={-47} onUpdate={(o) => o.layers.set(SONAR_HIDE_LAYER)}><planeGeometry args={[900, 900]} /><meshBasicMaterial color={ice ? P.T.water : '#17545f'} /></mesh>
       <Structures mat={mats.inst} />
-      <Wreck mat={mats.steel} />
+      <Wreck mat={mats.wood} /> {/* the ~10 m workboat is wooden (Jason 2026-10-23: 沉船是木质的) — sonar tag 0.6 */}
       <BigWreck mat={mats.steel} />
       <Logo mat={mats.logo} stoneMat={mats.inst} />
       {import.meta.env.DEV && /fishtest/.test(window.location.search) && <TestPiling mat={mats.inst} />}
+      {/* dev ?study=wreck&boat=x,z: a wooden copy of the workboat (×1.25 ≈ 12 m, like the app's PL Down wreck recording of
+          2026-10-23) lying along the Down plane 2–40 ft to the boat's +x side on the bottom, structure (not steel) tag */}
+      {import.meta.env.DEV && /study=wreck/.test(window.location.search) && (() => { const m = /boat=(-?[\d.]+),(-?[\d.]+)/.exec(window.location.search); const bx = m ? +m[1] : 0, bz = m ? +m[2] : 0; return <Wreck mat={mats.wood} at={{ x: bx + 6.4, z: bz, rot: [0, 0, 0], scale: 1.25 }} /> })()}
       <Fish mat={mats.fish} state={state} />
       {ice ? (<>
         <IceSheet mat={iceMat} state={state} />

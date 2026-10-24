@@ -785,3 +785,43 @@ is thick with a long red tail. Crowns and brush are fuzzy orange clumps with bri
 Engine: peaked main lobe across the slab, per-row shadowing with a 3.5 m fade, a 0.3 m pulse for timber/rock, steel
 unchanged. Tune with `__sonarHist(10)` on the six scenes listed in the decision; structure scenes should land near
 12–14 % white, bottom/fish scenes stay where they were.
+
+## 10. Measured on the app 2.0.0 PL Down recording of a wooden wreck (vivo phone, 2026-10-23)
+
+Source: Jason's vivo (V2545A, 2504×2312) playing `PingLive Lite_Forward View_20260906_16xxxx.sonar` on the PingLive
+**Down View**, 80 ft range, gain 40 %, contrast 47 %, noise reject 25 %, TVG 25 %, colour map **orange**; frames
+`reference/app-study/2026-10-23-vivo/pl-down-d*.jpg` (bursts of 20 at 1 s in the local-only folder
+`reference/vivo-bursts-2026-10-23/`). Jason: the wreck is **wooden**. Scale on screen: 28.2 px/ft horizontally,
+27.75 px/ft vertically (full-resolution PNG); 0 ft at x 1252, 10 ft depth at y 403.
+
+**The wreck.** Hull from ~2 ft to ~38 ft starboard (≈ 11 m long), deck line at 23–25 ft, bottom under it at 33–35 ft
+(≈ 3 m tall). The whole section is **lit through** (85 % of the hull box is lit): planking, ribs, the far side — not a
+face with a shadow behind it. Dark cavities inside are hatches / the cabin, not texture. Brightness classes of the lit
+hull pixels: white 1.8 %, yellow 16 %, orange 39 %, red 25 %, dark red 19 % (mean RGB 171 / 104 / 51). The deck line
+is the hottest part: a broken yellow-white dash line. A vertical luminance profile at 12 ft starboard: nothing above
+22 ft, 85 at 22 ft (deck edge), 168 at 23, 190 at 25 (the deck), 105–160 through the hull (27–33 ft), 50 at 34 ft
+(the gap under the hull), 200 at 35 ft (the bottom), 27–45 at 37–39 ft (the tail), 0 below 40 ft.
+
+**Texture.** Inside the hull the grain's correlation length is ~25 in across the beam (horizontal) and ~10 in along
+the range (vertical): the beam's width smears the grains sideways, the range cell keeps them short. Between two
+frames 1.6 s apart the mean luminance change in the hull is 37 on a mean of 118, and 18 % of the pixels change
+colour class — the picture is re-drawn every ping, but most grains stay.
+
+**The bottom band** (25 ft port, no structure): peak luminance 200 (yellow, not white); the body above 40 % of the
+peak is 1.6 ft thick, the tail above 15 % runs 1.9 ft; lit classes white 2.5 %, yellow 17 %, orange 32 %, red 22 %,
+dark red 27 %. Below the band a faint speckled trail (the second echo) to ~40 ft.
+
+**The colour map.** The displayed "orange" ramp, median RGB per luminance: 28 → 47/21/16, 52 → 96/35/28,
+76 → 147/46/40, 100 → 177/72/43, 124 → 198/102/43, 148 → 212/135/48, 172 → 219/169/59, 196 → 225/205/70,
+220 → 239/227/132, 244 → 252/246/216. It is now `COLORMAPS.accuphy_orange` (default), measured from these frames.
+
+**The field.** 87 % of the picture is black at noise reject 25: no visible floor haze at this gain.
+
+**What changed in the engine from this** (decision #130): the measured colour map; gain that brightens with +
+(40 % = the app's look); coherent cells ~1.2° × 0.67 m that drift (no hairlines); structure faces built from grains
+(0.6 m across × 0.25 m along the ray, a fifth re-drawn per ping); a `wood` sonar tag (0.6) whose mass is lit through
+for ~2 m with the shadow starting 1.6 m behind, while timber/rock (0.5) smear 0.5 m and shadow at once; the bottom
+band's pulse and tail lengthened (0.28 + 0.012 r / 0.45 + 0.02 r) and its soft cap raised (K 0.4 → 0.8) so the body
+is orange; the noise floor halved. Like-for-like fit (`?study=wreck`, the wooden workboat ×1.25 beside the boat at
+the same range / gain / depth): lit hull classes white 4 / yellow 16 / orange 33 / red 26 / dark 21 vs the
+recording's 2 / 16 / 39 / 25 / 19; flicker 31 on 154, 15 % (recording 37 on 118, 18 %).

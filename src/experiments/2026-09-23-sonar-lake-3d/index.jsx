@@ -74,8 +74,11 @@ export default function SonarLake3D({ scene: sceneProp }) {
     return () => { clearTimeout(id); window.removeEventListener('resize', m) }
   }, [ICE, view, mode])
   const [rangeFt, setRangeFt] = useState(80)       // the visitor's own range (slider)
-  const [depthFt, setDepthFt] = useState(70) // depth range (PL Forward; every PLM view) — driven by AUTO below
-  const [autoDepth, setAutoDepth] = useState(true) // off only when the dev Depth slider is touched
+  // dev: ?gain=0.4&contrast=0.47&noise=0.25&depth=80 set the calibration knobs from the URL (like-for-like comparisons
+  // with app recordings, 2026-10-23); production ignores them
+  const devNum = (k) => (import.meta.env.DEV ? +((new RegExp(`[?&]${k}=([\\d.]+)`).exec(window.location.search) || [])[1] || NaN) : NaN)
+  const [depthFt, setDepthFt] = useState(Number.isFinite(devNum('depth')) ? devNum('depth') : 70) // depth range (PL Forward; every PLM view) — driven by AUTO below
+  const [autoDepth, setAutoDepth] = useState(!Number.isFinite(devNum('depth'))) // off only when the dev Depth slider is touched (or ?depth=)
   const [gate, setGate] = useState(false)          // sign-up gate open → the lake and the sonar picture freeze
   const [toast, setToast] = useState(false)
   // Phones (lake scene) open ON the app's Home page and nothing starts until a view is picked (Jason 2026-10-16:
@@ -85,10 +88,10 @@ export default function SonarLake3D({ scene: sceneProp }) {
   const [started, setStarted] = useState(!homeFirst) // a view has been picked (always true on desktop and on the ice page)
   const toastT = useRef(0)
   const [imperial, setImperial] = useState(true)
-  const [colormap, setColormap] = useState('garmin_amber') // LiveScope-measured amber (§7.7); the app's own 'orange' is Moreland_Black_Body
-  const [gain, setGain] = useState(0.57)
-  const [contrast, setContrast] = useState(0.4)    // demo look (sonar-style.md §6.5): floor mostly gone, a trace of noise stays
-  const [noise, setNoise] = useState(0.3)          // noise reject (inset cleaner than real use, decision #28): the smaller of the two, used last
+  const [colormap, setColormap] = useState('accuphy_orange') // the app 2.0.0 'orange' map, measured on its own recording (2026-10-23); 'garmin_amber' was the LiveScope-measured amber (§7.7)
+  const [gain, setGain] = useState(Number.isFinite(devNum('gain')) ? devNum('gain') : 0.40) // 40 %: the app's own recordings run at 40–50; the look is the one the old 57 % gave (sonarShader toneIdx)
+  const [contrast, setContrast] = useState(Number.isFinite(devNum('contrast')) ? devNum('contrast') : 0.4)    // demo look (sonar-style.md §6.5): floor mostly gone, a trace of noise stays
+  const [noise, setNoise] = useState(Number.isFinite(devNum('noise')) ? devNum('noise') : 0.3)          // noise reject (inset cleaner than real use, decision #28): the smaller of the two, used last
   const [, tick] = useState(0)
   useEffect(() => { const id = requestAnimationFrame(() => tick(1)); return () => cancelAnimationFrame(id) }, [])
   // phone layout and phone pose follow the window width (rotate / resize)
