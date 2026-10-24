@@ -4,6 +4,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { submitSignup, isEmail } from './signup'
+import { labEvent } from './embed'
 
 export default function SignupGate({ onDone }) {
   const [email, setEmail] = useState('')
@@ -22,7 +23,7 @@ export default function SignupGate({ onDone }) {
     e.preventDefault()
     if (!isEmail(email)) { setStatus('error'); setError('Please enter a valid email address.'); return }
     setStatus('sending'); setError('')
-    try { await submitSignup({ email }); onDone() } catch (err) { setStatus('error'); setError(err.message || 'Something went wrong — please try again.') }
+    try { await submitSignup({ email }); labEvent('signup', { source: 'gate' }, { once: true }); onDone() } catch (err) { setStatus('error'); setError(err.message || 'Something went wrong — please try again.') }
   }
 
   return (

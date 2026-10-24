@@ -6,8 +6,8 @@
 // the form then subscribes the address to the Klaviyo list through Klaviyo's client-side Subscriptions
 // API (public site key — safe to ship in the page; no private key ever goes into this code).
 export const KLAVIYO = {
-  publicKey: null,  // Klaviyo "Public API key / Site ID" (6 characters), e.g. 'AbC123'
-  listId: null,     // the list id for "Accuphy Lab sign-ups"
+  publicKey: 'XWcjZ5', // Klaviyo "Public API key / Site ID" of the shop's account (website HQ, 2026-10-23; public by design)
+  listId: null,     // the list id for "Accuphy Lab sign-ups" — the Klaviyo project is creating the list; until it is set nothing is sent
   revision: '2026-07-15', // Klaviyo API revision (each is supported ~2 years; bump when Klaviyo retires it)
 }
 

@@ -12,6 +12,7 @@ import { screenLayout } from './SonarScreen'
 import SignupGate from './SignupGate'
 import AppHome from './home/AppHome' // the app's Home (view selection) page inside the phone, phones only (2026-10-16)
 import { isSignedUp } from './signup'
+import { labEvent } from './embed'
 import { depthAt } from './terrain'
 import { panoHalfWidth } from './sonarMarks'
 // dev: ?bigphone makes the phone huge so the sonar picture can be inspected in screenshots
@@ -159,6 +160,7 @@ export default function SonarLake3D({ scene: sceneProp }) {
     frameX: phone && !ICE && b0.length !== 2 ? PHONE_START[0] - 1 : undefined, // phones: boat left, timber right, and the ACCUPHY LAB lockup (x −1…31 at z −52) fully in view (Jason 2026-10-16: 把 Accuphy Lab 露出来)
     parallax: { x: 0, y: 0 }, specs: liveSpecs, specKey,
     closeCam: window.location.search.includes('cam=boat'), wreckCam: /cam=wreck/.test(window.location.search), logoCam: /cam=logo/.test(window.location.search),
+    rocksCam: import.meta.env.DEV && /cam=rocks/.test(window.location.search) ? (/cam=rocks:(\w+)/.exec(window.location.search) || [, 'pile'])[1] : null, // dev aid ?cam=rocks[:hump]
     fishCam: (/cam=fish:(\w+)/.exec(window.location.search) || [])[1],
     fishCamIndex: +((/cam=fish:\w+:(\d+)/.exec(window.location.search) || [])[1] || 0),
     rigCam: import.meta.env.DEV && /rigcam/.test(window.location.search), // ice: the hole kit up close
@@ -196,6 +198,9 @@ export default function SonarLake3D({ scene: sceneProp }) {
     return () => clearInterval(id)
   }, [autoDepthOn, device, imperial])
 
+
+  // embed bridge (#134): the store page learns which view the visitor is on
+  useEffect(() => { labEvent('view', { view: mode, device: deviceId }) }, [mode, deviceId])
 
   // the app's buttons on the phone are display-only: a tap asks for an email (once per browser)
   const onLocked = () => {
@@ -303,14 +308,10 @@ export default function SonarLake3D({ scene: sceneProp }) {
         </div>
       </motion.div>
 
-      {/* ---- drag hint: follows the boat until the first drag (position set by the render loop) ---- */}
-      {ICE
-        ? /* the ice page: a plain caption under the reticle on the ice (IceCamp.jsx) — no pill, no dot (2026-10-23) */
-          <div ref={(el) => { state.current.hintEl = el }} className="pointer-events-none absolute left-0 top-0 whitespace-nowrap" style={{ opacity: 0, transition: 'opacity .6s', color: 'rgba(255,255,255,0.92)', fontSize: 13, fontWeight: 500, letterSpacing: '0.01em', textShadow: '0 1px 2px rgba(0,0,0,0.55), 0 0 12px rgba(0,0,0,0.45)' }}>Tap the ice to drill a hole</div>
-        : <div ref={(el) => { state.current.hintEl = el }} className="ac-hint pointer-events-none absolute left-0 top-0 flex items-center gap-2 px-3.5 py-2" style={{ opacity: 0 }}>
-            <svg className="hand" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#028cdf" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12h18M7 8l-4 4 4 4M17 8l4 4-4 4"/></svg>
-            <span className="font-brand-head text-[11px] uppercase tracking-wider">Drag the boat</span>
-          </div>}
+      {/* ---- the cue caption, shown until the first drag / tap (position set by the render loop). The ice page: under the
+           reticle on the ice (IceCamp.jsx, #123); the lake: above the water reticle round the boat (Scene.jsx Boat, #132).
+           Plain text, no glass pill, no dot (Jason 2026-10-23: 看着太 AI 了) ---- */}
+      <div ref={(el) => { state.current.hintEl = el }} className="pointer-events-none absolute left-0 top-0 whitespace-nowrap" style={{ opacity: 0, transition: 'opacity .6s', color: 'rgba(255,255,255,0.92)', fontSize: 13, fontWeight: 500, letterSpacing: '0.01em', textShadow: '0 1px 2px rgba(0,0,0,0.55), 0 0 12px rgba(0,0,0,0.45)' }}>{ICE ? 'Tap the ice to drill a hole' : 'Drag the boat to move it'}</div>
 
       {/* ---- iPhone Pro Max, landscape, turned slightly in 3D (same pose as the GL picture).
            Proportions from the 15/16 Pro Max: body 2.08:1, corner radius ≈ 14 % of the short side,

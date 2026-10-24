@@ -75,7 +75,7 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
         vec4 wp = m * vec4(pos, 1.0);
         vWorld = wp.xyz;
         vNormal = normalize(mat3(m) * nrm);
-        // sonar pass 3 — the echo splat (2026-10-23, decision #131): every structure surface is drawn where the sonar would
+        // sonar pass 3 — the echo splat (2026-10-23, decision #135): every structure surface is drawn where the sonar would
         // place it, at (angle across the fan, range) instead of in perspective, with additive blending and no depth test,
         // so a hull's near side, deck, ribs and far side all return — the real picture of a wooden wreck (Jason: 船是半透明
         // 的整体). The strips (passes 1 and 2) still give the first and the far hit per row for the bottom and the shadows.

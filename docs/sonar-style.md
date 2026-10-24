@@ -881,8 +881,8 @@ where the side joins those members; below it, probably broken parts. Verdict on 
 还是很糟糕" — the engine draws only the first surface plus random grain, so the hull comes out holey and blobby instead
 of a solid, lit-through section with deck line, ribs and far side.
 
-**Engine, second step (decision #131):** structure is no longer the first depth hit plus grain but an **echo splat** of
-every structure surface into (angle, range) — see decisions.md #131. What to tune against the recording from here: the
+**Engine, second step (decision #135):** structure is no longer the first depth hit plus grain but an **echo splat** of
+every structure surface into (angle, range) — see decisions.md #135. What to tune against the recording from here: the
 grain's correlation across the beam (ours 34 in vs 25), the per-ping flicker (ours 21 vs 37 on a similar mean), the share
 of yellow in a lit face (ours 5 % vs 16 %), and the hull's dark cavities (geometry: the study hull is a solid extrusion
 with a box cabin, the real one an open shell with ribs).

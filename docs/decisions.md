@@ -2005,7 +2005,69 @@ Numbered log. Newest at the bottom.
        bow face, the dark cavities, the faint diagonal left of the hull, the trail under the bottom. Public pages not
        rebuilt: the colour map and gain scale change every picture, Jason sees it first.
 
-131. **2026-10-23** — **The sonar engine draws structure from an echo splat of every surface** (Jason, on the like-for-like
+131. **2026-10-24** — **Rocks rebuilt: Shield boulders in code, six shapes** (Jason: "场景里面的石头像爆米花一样 … 去网上找实际的
+     模型 … 要符合北美的淡水湖里面石头的质地跟形状").
+     - **Cause:** `makeRock` was a `DodecahedronGeometry(0.5, 1)` — non-indexed in three r186, so each corner exists ~6
+       times — and moved every copy by its own random amount: the skin tore into loose flat-shaded shards (gaps up to
+       22 cm on a 1 m rock). Its colour (0.46) was also the lightest thing in the lake, so the beam lifted it to white.
+     - **Models from the web:** every model site (Poly Haven, Sketchfab, Quaternius, Kenney, ambientCG, Smithsonian…) is
+       denied by the environment's network policy; the one reachable mirror (GitHub) has four cartoon Kenney rocks only.
+       Jason chose the code route and asked for polish ("用代码做的这版，继续打磨"); the alternative (allow the Poly Haven
+       domains, use scanned shapes with our material) stays open if he wants scans.
+     - **`rocks.js`:** a welded icosahedron (`mergeVertices`) shaped by an ellipsoid, low-frequency bumps, a lean, 2–7 soft
+       planar joint cuts with rounded shoulders, fine grain and a flattened base; six kinds (rounded pink granite,
+       jointed grey block, gneiss slab, long loaf, dark broken shard, algae-green cobble) with silt-dark bases and
+       lighter/darker patches in the vertex colour, albedo 0.24–0.36. Small rocks at 320 triangles (12 geometries),
+       the few with s ≥ 1.2 at 1280 (6). The unit rock keeps the old envelope (half-extent 0.62, base at −0.4), so
+       `obstacles.js` is unchanged; placement is unchanged except smaller tilts (≤ 0.35 rad, boulders ≤ 0.18; the
+       random sequence is untouched).
+     - **Checked:** layout dump: 0 of 1,207 structures and 0 of 269 fish moved; `fish-sim` 0 violations; the 6 × 6 sonar
+       grid against main (after #130's engine): every tile within 0.5 points of white except the hump (PL Forward 4.5 → 5.9, Mini Forward 1.8 → 3.5, PL Down 0.9 → 1.3: solid rocks echo more); the ice page in real time: jig, bottom and water specks as before; build passes. Dev aid `?cam=rocks[:hump]`
+       circles the island pile (or the first rock hump) under water.
+     - Found, not fixed: in `lakeMaterial.js` the fine speckle and the bark grooves multiply `albedo` after `base` has
+       been computed from it, so no surface texture reaches any structure or the bed (backlog).
+
+132. **2026-10-24** — **The drag cue is a reticle on the water, not a glass pill** (Jason: "drag the boat 这个图标是不是能够去
+     换更加优秀的图标"; he picked option C of four mock-ups).
+     - The lake's "DRAG THE BOAT" pill (glass, blue double arrow, all caps) is replaced by the ice page's language (#123):
+       a thin white reticle lying on the water round the hull — four arcs of an ellipse (4.6 × 2.3 m) with gaps fore,
+       aft and abeam, a chevron off the bow and the stern, a ripple spreading out of it every 2.6 s, a slow breath — and
+       one plain caption above it, "Drag the boat to move it" (sentence case, 13 px, no background). It fades after the
+       first drag. Both pages now share one caption element (`index.jsx`); the reticle lives with the boat (`Scene.jsx
+       Boat`, `ellipseArc`), on the sonar-hidden layer so no sonar camera sees it.
+     - Checked: desktop and 390 × 844: the caption clears the top; the reticle rides with the boat; no console errors.
+
+133. **2026-10-23** — **Feasibility: the phone Lab as a page of the Shopify store** (Jason: "调研一下我们现在的手机版放到我们
+     网站的 Shopify 网站的网页里面 … 可行性如何", then "全部" — all four aspects). Research only, nothing built:
+     `docs/shopify-embed-feasibility.md` (EN + 中文摘要).
+     - **Finding.** #102 (Vercel at `lab.accuphy.com`) rejected a Shopify page because the 2.3 MB WebGL page cannot live
+       inside theme files. It did not weigh the other way: a store page `shop.accuphy.com/pages/lab` with its own
+       header-less template whose body is a full-screen iframe of the Vercel-hosted Lab. That is feasible, keeps #102's
+       hosting, and gives the ads a store address with the store's pixels, analytics and Klaviyo already in place; the
+       theme is touched once and the Lab keeps its own release cycle.
+     - **Numbers.** Lab public page 1.04 MB compressed; an ordinary store page carries 20 external scripts; the store
+       shell on a header-less layout adds an estimated 0.3–0.6 MB. Phone fps is unchanged by the host.
+     - **Pending Jason** (not decided): adopt the store page as the front door beside #102; first market; embed source
+       `lab.accuphy.com` vs the plain Vercel address. Then a handoff to `accuphy-website/handoffs/`.
+     - Also this session: the Three.js case-study review (Perego water diorama, Sael's internet explainer, Majid's
+       procedural animals) stays in the chat only — Jason wanted to discuss the diorama idea first; no document yet.
+
+134. **2026-10-23** — **The store page is the Lab's front door; tracking done the proper Shopify way; Globo is out**
+     (Jason, on #133: "Globo Mega Menu 我们后面是肯定不会用了的，就是你按照最合理的、最有帮助的，包括像 tracking 啊、统计啊 …
+     广告转化啊这些的，都按照我们最好的这个方式去做吧").
+     - **Adopted:** `shop.accuphy.com/pages/lab` (header-less template, full-screen iframe) as the public address; the
+       Lab itself stays on Vercel per #102. Canada first, then `/en-us/pages/lab`. Embed source: the Vercel address at
+       first, `lab.accuphy.com` once the CNAME exists (one setting in the section).
+     - **Tracking design:** the Lab posts `ready`, `first_drag`, `view`, `found_sign`, `signup`, `shop_click` to the
+       parent (`postMessage`, no personal data); the section publishes them as the Shopify customer event
+       `accuphy_lab`; a Custom Pixel forwards to Meta (`signup` → standard `Lead`, the rest `trackCustom`). Sign-up
+       goes to Klaviyo from the Lab's own card (client API, public key); UTMs pass through the iframe URL. Shop links
+       navigate the top window to the market's product page.
+     - **Handoff written:** `accuphy-website/handoffs/2026-10-23-lab-store-page.md` (Shopify side, incl. the note that
+       Globo Mega Menu will no longer be used — the website project records that in its own log).
+     - **Lab side, next:** an embed build (events module, `100dvh`, Klaviyo keys, `window.top` shop links, Vercel headers
+       `frame-ancestors` + `noindex`), then the Vercel deployment when the website project is ready to test.
+135. **2026-10-23** — **The sonar engine draws structure from an echo splat of every surface** (Jason, on the like-for-like
      round #130: "你现在的效果其实还是很糟糕", and his reading of the recording: the wooden hull is a lit-through whole —
      side face solid, deck line on top, ribs and cavities inside, far side visible).
      - The old model drew only the FIRST surface each row met (a depth strip) and faked the rest with random grain, so a

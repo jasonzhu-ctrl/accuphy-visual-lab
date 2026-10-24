@@ -85,7 +85,7 @@ export default function SonarScreen({ state, rect, lakeMats }) {
       rt.depthTexture = new THREE.DepthTexture(STRIP_W, STRIP_H, THREE.UnsignedIntType)
       return rt
     })
-    // the far side of structure (2026-10-23, decision #131): the same strips rendered with BACK faces and only structure
+    // the far side of structure (2026-10-23, decision #135): the same strips rendered with BACK faces and only structure
     // writing (lakeMaterial uSonarPass = 2), so each row knows where it leaves a hull or a trunk — the section between
     // the two is drawn lit-through (wood) or dark (timber, rock) and the shadow starts behind the far face
     const targetsB = [0, 1].map(() => { const rt = new THREE.WebGLRenderTarget(STRIP_W, STRIP_H, { depthBuffer: true, minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter }); rt.depthTexture = new THREE.DepthTexture(STRIP_W, STRIP_H, THREE.UnsignedIntType); return rt })

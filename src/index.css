@@ -59,11 +59,9 @@
 .ac-card .ac-num { font-family: 'Eurostile Heavy', sans-serif; font-size: 11.5px; color: #fff; line-height: 1; display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 50%; background: rgba(255,255,255,0.2); box-shadow: inset 0 0.5px 0 rgba(255,255,255,0.5); }
 .ac-card.is-active .ac-num { background: var(--accuphy-blue); box-shadow: 0 0 0 3px rgba(2,140,223,0.25), 0 4px 12px rgba(2,140,223,0.45); }
 .ac-card .ac-body { color: rgba(255,255,255,0.84); }
-/* drag hint + back link: glass pills */
+/* the toast + back link: glass pills (the drag cue left the pill in #132) */
 .ac-hint { border-radius: 999px; transition: opacity .6s; }
 .ac-back { border-radius: 999px; }
-@keyframes ac-drag { 0% { transform: translateX(-12px); } 50% { transform: translateX(12px); } 100% { transform: translateX(-12px); } }
-.ac-hint .hand { animation: ac-drag 1.6s ease-in-out infinite; }
 
 /* sign-up gate: dimmed, lightly blurred page behind a glass card */
 .ac-gate { background: rgba(3,18,26,0.30); -webkit-backdrop-filter: blur(6px) saturate(115%); backdrop-filter: blur(6px) saturate(115%); }

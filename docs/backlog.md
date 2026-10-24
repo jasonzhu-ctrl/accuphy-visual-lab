@@ -49,6 +49,10 @@ it is done. ✅ done · 🔧 in progress · ⬜ open.
 - ✅ All 11 app colour maps available on the phone screen (amber default); gain slider
 
 ## 3D lake (Phase 3 polish)
+- ✅ Rocks rebuilt in code as Shield boulders, six shapes; the old dodecahedron shards are gone (decision #133, `rocks.js`)
+- ✅ The drag cue is a thin reticle on the water round the boat with one plain caption, no glass pill (decision #132; Jason picked it from four mock-ups)
+- ⬜ `lakeMaterial.js`: the fine speckle and the bark grooves multiply `albedo` after `base` was computed from it, so no surface texture reaches structure or the bed (found in #131). Fixing it changes the look of all timber and the bed — check with Jason first
+- ⬜ Rocks, if Jason wants more: per-instance colour (needs instanceColor in lakeMaterial), lichen/algae bands, a few split boulders
 - 🔧 **Boat + fish plan (2026-10-03):** `docs/boat-fish-plan.md`. Boat decided (#83): a low-key bass boat; no raised
   bow, no Power-Poles; the trolling motor and transducer stay as they are. Fish decided (#85): all species stay, yellow
   perch and northern pike join in phase 3, display size per species (musky 2.2× (#89), the rest 2.6×). Four phases:
@@ -245,6 +249,14 @@ the cheapest Android phone class). Phone size was emulated at 360×800.
 - Lab page location (lab.accuphy.ca vs a store page) · lite section's Shopify test page · Klaviyo list,
   opt-in and keys · Meta Pixel, UTM, "Shop PingLive" button · US phone checkout walk (decision #57).
   The design work for each stays here; the Shopify side is theirs.
+- ⬜ **Store page as the front door (decisions #133–#134, 2026-10-23, adopted):** `shop.accuphy.com/pages/lab` = header-less
+  template + full-screen iframe of the Vercel-hosted Lab (#102 unchanged). Handoff: `accuphy-website/handoffs/2026-10-23-lab-store-page.md`.
+  Lab side to do: embed events module (`ready`, `first_drag`, `view`, `found_sign`, `signup`, `shop_click` via `postMessage`),
+  `100dvh`, Klaviyo keys, `window.top` shop links, `vercel.json` (`frame-ancestors`, `noindex`), Vercel deploy when the
+  website project is ready. Study: `docs/shopify-embed-feasibility.md`.
+  Website HQ 2026-10-23 (#204 there): Globo dropped; theme copy 189488890029; `pages/lab` built by 00, not published; Klaviyo public
+  key XWcjZ5 filled in `signup.js`, list id pending; shop links = `/products/pinglive-sonar`, `/products/pinglive-mini` with the
+  market prefix (CA none or `/fr`, US `/en-us`, AU `/en-au`) — for the future `shop_click` button.
 
 ## Lite section (planning only — decision #48)
 - ⬜ **Do not build until Jason says go.** `docs/lite-section-plan.md`: the original side-view visualizer as a
