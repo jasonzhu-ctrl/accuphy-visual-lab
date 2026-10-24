@@ -126,7 +126,7 @@ export default function SonarScreen({ state, rect, lakeMats }) {
         uLogoB: { value: logo.B }, uLogoU: { value: logo.U }, uLogoV: { value: logo.V },
         uLogoSdf: { value: makeLogoSdf() }, uLogoMap: { value: new THREE.Vector4(1 / logo.s, LOCKUP_SVG.cx, LOCKUP_SVG.bottom, LOGO_SDF_MAX) },
         uLogoSvg: { value: new THREE.Vector2(LOCKUP_SVG.w, LOCKUP_SVG.h) }, uLogoExt: { value: new THREE.Vector2(LOCKUP.width / 2 + 0.3, LOCKUP_SVG.bottom * logo.s + 0.3) },
-        uLUT: { value: colormapTexture('accuphy_mid') }, uGain: { value: 0.40 }, uDynRange: { value: 0.85 }, uContrast: { value: 0.4 }, uNoise: { value: 0.3 }, uGamma: { value: 0.75 }, uTune: { value: new THREE.Vector4(1, 1, 1, 1) }, uTune2: { value: new THREE.Vector4(1, 1, 1, 1) }, // the app's orange map and gain scale, measured on its 2.0.0 recording (2026-10-23; before: garmin_amber, calibrated 2026-09-24 against the two confirmed frames, sonar-style.md §6.11)
+        uLUT: { value: colormapTexture('accuphy_mid') }, uGain: { value: 0.40 }, uDynRange: { value: 0.85 }, uContrast: { value: 0.4 }, uNoise: { value: 0.3 }, uGamma: { value: 0.75 }, uTune: { value: new THREE.Vector4(1, 1, 1, 1) }, uTune2: { value: new THREE.Vector4(1, 1, 1, 1) }, uTune3: { value: new THREE.Vector4(1, 1, 1, 1) }, // the app's orange map and gain scale, measured on its 2.0.0 recording (2026-10-23; before: garmin_amber, calibrated 2026-09-24 against the two confirmed frames, sonar-style.md §6.11)
         // the Mini's ice views (2026-10-16): flasher + Live Down (1) or flasher + 2D history (2); the app draws them in its jet map
         uIce: { value: 0 }, uIceSplit: { value: ICE_SPLIT }, uAspect: { value: 2.08 }, uTicks: { value: 5 }, uLUT2: { value: colormapTexture('jet') },
         uHist: { value: null }, uHistPrev: { value: null }, uHistPass: { value: 0 }, uHistFill: { value: 0 }, uIceAmber: { value: /icelut=amber/.test(window.location.search) ? 1 : 0 },
@@ -245,7 +245,7 @@ export default function SonarScreen({ state, rect, lakeMats }) {
     u.uGain.value = s.gain ?? 0.40
     u.uContrast.value = s.contrast ?? 0.4
     u.uNoise.value = s.noise ?? 0.3
-    if (import.meta.env.DEV && window.__sonarTune) { const t = window.__sonarTune; if (t.gamma != null) u.uGamma.value = t.gamma; if (t.dyn != null) u.uDynRange.value = t.dyn; if (t.k) u.uTune.value.fromArray(t.k); if (t.k2) u.uTune2.value.fromArray(t.k2) } // dev: tone-curve knobs for like-for-like fits (2026-10-23)
+    if (import.meta.env.DEV && window.__sonarTune) { const t = window.__sonarTune; if (t.gamma != null) u.uGamma.value = t.gamma; if (t.dyn != null) u.uDynRange.value = t.dyn; if (t.k) u.uTune.value.fromArray(t.k); if (t.k2) u.uTune2.value.fromArray(t.k2); if (t.k3) u.uTune3.value.fromArray(t.k3) } // dev: tone-curve knobs for like-for-like fits (2026-10-23)
     u.uFanCount.value = specs.length
     const flat = specs[0] && specs[0].frame.n.y !== 0 // panoramic: thickness normal is vertical
     u.uFlat.value = flat ? 1 : 0
@@ -265,7 +265,7 @@ export default function SonarScreen({ state, rect, lakeMats }) {
       u.uApexU.value = lay.apexU
       u.uStreak.value = lay.mottle ? 0 : 1
       u.uReach.value = lay.reach ?? s.rangeM
-      u.uBedGain.value = s.deviceId === 'PLM' ? 0.62 : 1 // PLM near-range gain (sonarShader.js)
+      u.uBedGain.value = s.deviceId === 'PLM' ? 0.95 : 1 // PLM near-range gain (sonarShader.js); 0.62 → 0.95 (2026-10-24): the thin band no longer burns white in shallow water, and 0.62 left the Mini's bottoms faint and thin
       if (s.deviceId === 'PLM') u.uCapDepth.value.set(7.5, 9.5, 0.8); else u.uCapDepth.value.set(5.5, 7.5, 1) // the bottom's soft cap by depth (#91, #92, sonarShader.js)
       s.layout = lay // for the DOM chrome (rulers)
     }

@@ -2227,3 +2227,28 @@ Numbered log. Newest at the bottom.
      stopped by Jason before it ran); steel keeps the same core level as wood (a steel channel in the splat was tried in the same stopped step and taken out again). Checked: six scenes + the ice page (desktop,
      phone), `vite build` clean. Not published: the public pages stay at the #128 build.
 
+144. **2026-10-24** — **One brightness for bottom and structure; thicker Forward bottoms; steel even; fuller branches**
+     (Jason on the #143 sheet: the bottom close-up's colour is right; under the workboat the bottom is too dim and the boat
+     too bright — wood and the bottom are about as dense, so about as bright; in the timber scene the rocks are bright
+     enough but see-through and the bottom "消失了一样"; branches break; the steel wreck is far too bright, it should be even,
+     like the close-up; the Mini Forward bottom is too faint and thin). Measured per scene with three renders (all,
+     bottom only via `k2=[0,0]`, structure only via `k=[0,0,0,0]`; p90 of lit R+G+B): before, the workboat's bottom 325 vs
+     boat 612, steel 653 (white 17 %), timber rocks 694 (white 34 %), Mini Forward bottom 372. After: bottom 420–530 and
+     structure 380–480 in every scene, steel ~380 and even. Engine (`sonarShader.js`, `lakeMaterial.js`, `SonarScreen.jsx`):
+     - **Bottom spread compensation:** the rows' hits on the bottom are tracked across the slab; when they spread over a
+       range (deep or grazing bottoms) the band is scaled back by `sqrt(1 + spread²/pulse²)` (×0.8, at most 3×).
+     - **In-plane beam width ±0.6°:** each row samples the strips a little to either side in the fan plane, so a grazing
+       bottom (Forward, plateaus) is as thick as the beam at its range instead of a hairline; a bottom square to the
+       rays barely changes (close-up band 1.7 ft, peak 509 — was 1.45 ft, 484–501).
+     - **Near gain:** TVG floor 0.32 → 0.55; the Mini's `uBedGain` 0.62 → 0.95 (both were set when the band was a
+       saturating slab; the thin band no longer burns white in shallow water).
+     - **Shadow** behind structure 0.7 → 0.45 (the bottom stays visible behind rocks and trees).
+     - **Structure:** calmer grain inside (`0.72 + 0.4·grainS`, was `0.55 + 0.6·grainS`) so rocks read solid; a soft
+       ceiling `Ks 2.2` after the core level so cores stay yellow, not white; steel gets a lower core level (1.3 vs 2.1)
+       via the steel share the splat now writes to its green channel; the splat's speckle floor 0.3 → 0.55 and a lobe
+       floor 0.3 across the slab (the step stopped on 2026-10-24 before the #143 sheet, now asked for: "树枝结构更完整").
+     - dev knob `window.__sonarTune.k3 = [spread comp, near-gain floor, ceiling, steel core]` (uniform `uTune3`, all 1).
+     Checked: six scenes + the approved close-up + the study hull (core L ~380, yellow 11 %) + the ice page (desktop,
+     phone); `vite build` clean. Still open: branches in the crowns are fuller but still dashed in places (low-poly
+     branch geometry). Not published: the public pages stay at the #128 build.
+

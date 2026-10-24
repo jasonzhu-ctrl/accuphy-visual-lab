@@ -136,7 +136,7 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
         if (uSonarPass > 2.5) { // the echo splat: structure only (the lockup has its own analytic echo)
       #if defined(STRUCTURE) && !defined(LOGO)
           if (vBad > 0.0 || abs(vSplat.x) > 1.0 || abs(vSplat.y) > 1.0) discard;
-          float lobe = pow(1.0 - abs(vSplat.y), 1.6);                       // the beam's main lobe across the slab
+          float lobe = 0.3 + 0.7 * pow(1.0 - abs(vSplat.y), 1.6); // a floor: a branch leaving the slab's centre plane fades, it does not break off (Jason 2026-10-24: 树枝结构更完整)                       // the beam's main lobe across the slab
           float facing = abs(dot(normalize(vNormal), normalize(cameraPosition - vWorld))); // faces square to the sound return more
           float g = fract(sin(dot(floor(vWorld * 8.0), vec3(127.1, 311.7, 74.7))) * 43758.5453); // 12 cm speckle fixed to the object, the same in every direction (no bands along a trunk)
           float amp = 0.14; // timber, rock
@@ -146,7 +146,12 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
         #ifdef STEEL
           amp = 0.22;        // steel rings
         #endif
-          gl_FragColor = vec4(amp * (0.78 + 0.22 * facing) * (0.3 + 1.4 * g) * lobe, 0.0, 0.0, 1.0); // facing weak: a low-poly crown must not show its facets as bands (Jason 2026-10-23: 树一棱一棱有断层)
+          float ev = amp * (0.78 + 0.22 * facing) * (0.55 + 0.9 * g) * lobe; // speckle floor 0.3 → 0.55: a thin branch no longer drops out cell by cell (Jason 2026-10-24: 树枝中间有断掉的点)
+          float steelShare = 0.0;
+        #ifdef STEEL
+          steelShare = 1.0;
+        #endif
+          gl_FragColor = vec4(ev, ev * steelShare, 0.0, 1.0); // g carries the steel share: the sonar gives steel a lower core level // facing weak: a low-poly crown must not show its facets as bands (Jason 2026-10-23: 树一棱一棱有断层)
           return;
       #else
           discard;

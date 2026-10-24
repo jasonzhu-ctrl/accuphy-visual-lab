@@ -47,6 +47,7 @@ export const sonarFragment = /* glsl */ `
   uniform sampler2D uLUT;
   uniform float uGain; uniform float uDynRange; uniform float uContrast; uniform float uNoise; uniform float uGamma;
   uniform vec4 uTune2; // dev only (window.__sonarTune.k2): structure rim level, core level, ring radius, inside threshold — all 1 in production
+  uniform vec4 uTune3; // dev only (window.__sonarTune.k3): bottom spread compensation, near-gain floor, structure cap, steel core — all 1 in production
   uniform vec4 uTune; // dev only (window.__sonarTune.k): scales for the band's pulse, tail, peak+edge and integrated body, all 1 in production
   // fish marks (sonarMarks.js): 64 × 4 float texture
   uniform sampler2D uMarks; uniform int uMarkCount; uniform float uPulse; uniform float uBeamHalf;
@@ -268,19 +269,24 @@ export const sonarFragment = /* glsl */ `
     // comes back a few metres on. Two things make that: the beam's main lobe is peaked across the slab (the centre
     // rows carry most of the energy, so a trunk on the centreline blocks most of it), and whatever the rows in front
     // of a pixel hit as structure casts a shadow on the rows behind — wblk / wsum below, squared like the app's.
-    float wsum = 0.0, wblk = 0.0;
+    float duB = 0.5 * 0.0105 / (uFan[k].z * cos(a) * cos(a)); // ±0.6° in u
+    float wsum = 0.0, wblk = 0.0, bw = 0.0, bh = 0.0, bh2 = 0.0; // bw/bh/bh2: where the rows meet the bottom (its spread across the slab)
     for (int j = 0; j < 24; j++) {
       float v = (float(j) + jit) / 24.0;
       float ty = (v * 2.0 - 1.0) * uFan[k].w;
       float lobe0 = 1.0 - abs(v * 2.0 - 1.0), wgt0 = 0.33 + 1.87 * pow(lobe0, 1.8);
+      // each row looks a little to either side within the fan too: the beam is ~1.2° wide in the fan's own plane, so a
+      // grazing bottom (Forward, a plateau) reads as a band as thick as that beam at its range, not a hairline
+      // (Jason 2026-10-24: 底部太虚了，太薄了，应该厚一点). A bottom square to the rays (Down) hardly changes.
+      float uj = u + duB * (fract(float(j) * 0.618034 + jit * 3.7) * 2.0 - 1.0);
       float rayLen = length(vec3(tan(a), ty, 1.0));
-      float hit = sampleDist(k, vec2(u, v), rayLen);
+      float hit = sampleDist(k, vec2(uj, v), rayLen);
       // (no displacement of the bottom's edge: the burst's edge is flat — its fine texture is the fibres below, not bumps.
       //  Jason 2026-10-24: 你的那种坑坑洼洼是一高一低 … 它是一种平整，但是上面有细腻的纹理)
       float dr = r - hit;
-      float tag = sampleTag(k, vec2(u, v));
+      float tag = sampleTag(k, vec2(uj, v));
       float structure = step(0.25, tag), steel = step(0.62, tag), wood = step(0.55, tag) * (1.0 - steel); // 0.5 timber/rock · 0.6 wood · 0.75 steel
-      float hitS = sampleDist(k, vec2(u, v), rayLen); hit = mix(hit, hitS, structure); dr = r - hit; // structure keeps its exact hit
+      float hitS = sampleDist(k, vec2(uj, v), rayLen); hit = mix(hit, hitS, structure); dr = r - hit; // structure keeps its exact hit
       // timber and rock faces are sharp (real pulse ≈ 0.1 m) and solid; the bottom band is wider with a tail.
       // Steel (wrecks) is by far the strongest reflector: after the log compression its pulse skirts and the
       // ringing inside the hull stay bright, so the app draws a wreck as thick glowing bands with long tails,
@@ -294,7 +300,7 @@ export const sonarFragment = /* glsl */ `
       float tail = dr > 0.0 ? (0.55 + 0.65 * steel) * exp(-dr / (tailLen * (1.0 + 0.5 * steel))) * (1.0 - structure + steel) : 0.0; // the bottom's tail; steel keeps a long tail (#63)
       // the far side of what this row hit (back-face strip): a hull's thickness, a trunk's diameter. No far face found
       // (an open mesh, the lakebed lockup) → wood 2.5 m, timber 0.4 m
-      float hit2 = sampleDistB(k, vec2(u, v), rayLen);
+      float hit2 = sampleDistB(k, vec2(uj, v), rayLen);
       float th = (hit2 > 1e8) ? mix(0.4, 2.5, wood) : clamp(hit2 - hit, 0.15, 6.0);
       // the body between the faces (Jason 2026-10-23: 石头太透明 … 从中间更亮往边上散发; 树和船都很透明): rock and timber are solid —
       // brightest just inside the near face, fading toward the far one; a wooden hull is lit through a little weaker;
@@ -309,13 +315,21 @@ export const sonarFragment = /* glsl */ `
       // under it (the recording's bottom runs lit under the hull), timber and rock shade hard
       float body = 0.0; // (structure is painted by the splat)
       wsum += wgt; wblk += wgt * structure * mix(1.0, 0.3, wood) * smoothstep(th + 0.15, th + 0.6, dr) * exp(-max(dr - th - 0.6, 0.0) / 1.8);
-      acc += (1.45 * uTune.x * pulse + uTune.y * tail + body + second) * wgt; // a yellow core in the band, orange only at its top and bottom edges // the band's profile measured on the burst: peak 0.5 ft under the edge, 75 % width 1.1 ft, 15 % width 2.7 ft, orange body
+      if (hit < 1e8 && structure < 0.5) { bw += wgt; bh += wgt * hit; bh2 += wgt * hit * hit; }
+      acc += (1.15 * uTune.x * pulse + uTune.y * tail + body + second) * wgt; // a yellow core in the band, orange only at its top and bottom edges // the band's profile measured on the burst: peak 0.5 ft under the edge, 75 % width 1.1 ft, 15 % width 2.7 ft, orange body
       peak = max(peak, pulse * (1.0 - structure));
       edge = max(edge, exp(-dr * dr / (0.16 * sg * sg)) * (1.0 - structure)); // the first return: a thin hot line
       // (spk: the structure echo comes from the splat after the loop)
 
     }
-    float shade = pow(1.0 - 0.7 * wblk / max(wsum, 1e-3), 1.6); // a notch behind structure, not a black hole (the recordings' side views barely shade a flat bottom)
+    // The bottom keeps one brightness wherever it is (Jason 2026-10-24: the deep bottom under the workboat and the Forward
+    // bottoms looked faint and thin next to the close-up he approved). When the slab's rows meet the bottom over a spread
+    // of ranges (a deep bottom, a grazing Forward bottom) the same echo energy is smeared over that spread and every pixel
+    // got a fraction of it; scale the band back by sqrt(1 + spread² / pulse²), up to 3×: the band then reads as thick as
+    // its footprint and as bright as the close-up.
+    float bm = bh / max(bw, 1e-3), bs = sqrt(max(bh2 / max(bw, 1e-3) - bm * bm, 0.0));
+    acc *= 1.0 + (min(sqrt(1.0 + bs * bs / (sigma * sigma)), 3.0) - 1.0) * 0.8 * uTune3.x;
+    float shade = pow(1.0 - 0.45 * wblk / max(wsum, 1e-3), 1.6); // a notch behind structure, never a missing bottom (Jason 2026-10-24: 底部是消失了一样)
     // structure from the echo splat: every surface the fan sees at this angle and range, all faces, both sides — the real
     // picture of a wooden hull is its whole section (deck line, planking, ribs, far side). A 0.3 m pulse along the
     // range (5 taps), the per-ping grain on top. Steel sums brighter (its amp in lakeMaterial) and keeps its row tail.
@@ -324,7 +338,7 @@ export const sonarFragment = /* glsl */ `
     for (int i = -2; i <= 2; i++) es += exp(-0.9 * float(i * i)) * sampleEcho(k, u, rn + float(i) * dRn);
     es /= 1.87;
     float body = clamp(solidAcc / max(wsum, 1e-3), 0.0, 1.0);
-    spk = (1.0 - exp(-(es + 0.25 * body) * 9.0)) * 0.95 * (0.55 + 0.6 * grainS); // surfaces (splat) + the solid body between them, soft knee
+    spk = (1.0 - exp(-(es + 0.25 * body) * 9.0)) * 0.95 * (0.72 + 0.4 * grainS); // surfaces (splat) + the solid body between them, soft knee; a calmer grain so a rock reads solid, not see-through (Jason 2026-10-24)
     // Core to rim (Jason 2026-09-24: 越靠近中心越亮 有这个逐步亮的过程 · 这种实心结构亮的 清晰的 是更好的; 2026-10-24: 中间最亮, 慢慢
     // 发散到外面, 最外圈才接近橙色 — for fish, rocks, hulls and the bottom alike). Measured on the burst's hull (rim.py): L 160 in
     // the outer 2 in, 250 at 2–4 in, 360 at 6–9 in, ~390 from 9 in inside with yellow 22 % and white 4 %; red only at the rim.
@@ -342,7 +356,13 @@ export const sonarFragment = /* glsl */ `
         cov += smoothstep(thr, 2.5 * thr, sampleEcho(k, u + o2.x * duR, rn + o2.y / uFanR[k]));
       }
       cov /= 16.0;
-      spk *= mix(0.82 * uTune2.x, 2.1 * uTune2.y, smoothstep(0.45, 0.95, cov)); // fit (study wreck vs burst hull): L 150/250/330/380/405/420, yellow 25 %, white 3 %
+      vec2 eg = (k == 0) ? texture2D(uEcho0, vec2(u, rn)).rg : texture2D(uEcho1, vec2(u, rn)).rg;
+      float steelF = clamp(eg.g / max(eg.r, 1e-3), 0.0, 1.0); // the steel share of the splat (lakeMaterial writes it to g)
+      spk *= mix(0.82 * uTune2.x, mix(2.1, 1.3 * uTune3.w, steelF) * uTune2.y, smoothstep(0.45, 0.95, cov));
+      // a soft ceiling: solid cores sit at the approved bottom close-up's yellow, not white (Jason 2026-10-24: 钢船过亮,
+      // 应该均匀一点; 木船很亮 but wood and the bottom are about as dense, so about as bright)
+      float Ks = 2.2 * uTune3.z; // fit on six scenes: wood and rock cores p90 400–480, as bright as the bottom band; steel 380
+      spk = Ks * (1.0 - exp(-spk / Ks));
     }
     // Bottom brightness (Jason 2026-09-25: 画面特别是底部貌似还是太亮 深水也是 … 高亮的部分和桔红色的关系): over a flat
     // bottom every row across the slab lands at one range and the integrated echo added up to a solid white band
@@ -373,7 +393,7 @@ export const sonarFragment = /* glsl */ `
     // slab and AUTO depth then zooms it (Jason 2026-09-24: 浅水的时候 … 过爆感太强了 可以折中一点). Full gain
     // again from ~11 m (≈ 0.9 at 9 m), so the calibrated deeper pictures barely change; fish marks keep their
     // approved look. 5 m ≈ 0.43: the core just reaches white and keeps its streaks instead of a solid slab.
-    float tvg = mix(0.32, 1.0, smoothstep(3.0, 11.0, r));
+    float tvg = mix(0.55 + 0.2 * (uTune3.y - 1.0), 1.0, smoothstep(3.0, 11.0, r)); // floor 0.32 → 0.55 (2026-10-24): the thin band no longer burns in shallow water; 0.32 left shallow bottoms faint
     // PingLive Mini: its narrow 39° fan meets a shallow bottom at one range across the whole fan, and AUTO depth
     // zooms that band in, so it still burnt to a yellow-white slab (Jason 2026-09-25: PingLive mini是不是在浅水太亮了
     // 和之前pl一样的问题). Extra near gain for PLM only, back to full by 18 m: deep pictures keep their calibration.
