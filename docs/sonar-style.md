@@ -785,3 +785,46 @@ is thick with a long red tail. Crowns and brush are fuzzy orange clumps with bri
 Engine: peaked main lobe across the slab, per-row shadowing with a 3.5 m fade, a 0.3 m pulse for timber/rock, steel
 unchanged. Tune with `__sonarHist(10)` on the six scenes listed in the decision; structure scenes should land near
 12–14 % white, bottom/fish scenes stay where they were.
+
+### 7.20 Fish, structure and noise: what separates them (measured 2026-10-23, #129, Jason: "鱼啊、结构啊跟噪声如何区别 … 纹理 … 总结这种成像的规律")
+Measured, not eyeballed. Every picture is turned back into echo strength through the `garmin_amber` LUT, which was
+measured from LVS34 footage (#33) and matches the app's frames with no unmatched pixels. Every pixel is turned into
+polar coordinates around the transducer, using the frame's own grid (ft, degrees).
+
+Sources:
+- the 8 LVS34 frames and 2 crops in `reference/app-study/livescope-lvs34/`. The cloud container could not reach any
+  website this time, so there is no new footage;
+- the app's `plm-forward-fish-a/c.jpg`;
+- the engine's `__sonarSnap(w, h)` at 100 px/m in both directions.
+
+Script: `scripts/dev/measure/meas.py`.
+
+| | LiveScope (LVS34) | The app (PLM Forward, 18 m) | Engine |
+|---|---|---|---|
+| **Fish** (5–9 m) | 2.4° (0.33 m) across the ray × 0.13 m along it; peak 0.81, mean 0.60 | small marks 0.8° × 5 cm, peak 0.55; bigger fish 2–3° × 0.1–0.15 m, peak 0.75–0.89 | 0.22–0.30 m × 0.11–0.17 m at 5 m, peak 0.7–1.0: right since #120 |
+| **Water noise** | specks 0.5° × 4–5 cm (one resolution cell), peak 0.43; 24–26 % of the water lit at high gain, ~7 % (fish only) with noise reject | ~4 % of the water lit, 1–2 marks per m², mostly in the upper few metres | was empty (0–1.6 % lit); specks since #129 |
+| **Structure** | trunk at 4.6 m: 1.7 ft band, peak 0.89, mean 0.66 | piling at 14 m: a hot face line + fibrous tail, 4.5 ft band, peak 0.90, mean 0.72 | before #128: piling 3.5 ft, peak 0.77; **#128: 4.5 ft, 0.91, mean 0.68** |
+| **Bottom** | lit median 0.67–0.69, top decile 0.89, 5–6 % white | — | median 0.73–0.76, top decile 0.87–0.89: no change needed |
+
+**The rules:**
+- **One beam draws everything.** Every echo is thin along the ray and smeared a fixed angle across it. Noise, fish,
+  structure and bottom texture are all made of dashes along the arc; size, brightness and coherence tell them apart.
+- **Noise:** one resolution cell (≈ 0.5° × 5 cm), dim (peak ≈ 0.4–0.55), scattered, different every ping.
+- **A fish:**
+  - several cells (2–3° × 0.1–0.15 m at 6–9 m), clearly brighter than the noise (+0.3–0.4 on the LUT);
+  - a smooth spindle with one bright kernel, sometimes two parallel ridges (the front of the body and the swim
+    bladder);
+  - it holds its shape from ping to ping and moves as a whole.
+- **Structure:** as bright as the bottom (peak ≈ 0.9), continuous and connected. A hot line on the face toward the
+  transducer and a band behind it about 0.1 × range wide.
+- **Bottom:** the brightest wide band, with a hot first return, fibrous, ~6 % white.
+
+**Engine:** #128 had already brought structure to the app's numbers (above). #129 adds what was still missing:
+- **Water specks** in the vertical views (`waterSpecks`):
+  - at most one per 0.55 m cell of the fan plane, 7–35 % of cells occupied, denser in the top 3–9 m;
+  - only above the bottom, ~70 % shown each ping;
+  - amplitude 0.2–0.46, which lands at LUT 0.35–0.6;
+  - fixed to the lake, so they stay put as the boat turns.
+- **Fish:**
+  - core speckle down to ±20 % (was ±35 %);
+  - a weak second ridge just behind the first on bigger or nearer fish.

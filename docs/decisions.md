@@ -1961,3 +1961,21 @@ Numbered log. Newest at the bottom.
        timber PL Forward 7.7 → 11.9 (target for structure 13–14); timber Mini Forward 1.5 → 3.0; small wreck
        10.1 → 8.4; big wreck 3.3 → 5.1. The approved bottom/fish scenes are unchanged within noise; the ice views too.
      - Not done: the app's near-apex clutter rays and its thicker bottom tail (a bottom calibration Jason approved earlier).
+
+129. **2026-10-23** — **Sonar picture measured against LiveScope and the app: fish vs structure vs noise; water specks;
+     smoother fish** (Jason: "重新去网页上面去看那种 Garmin LiveScope 的录屏的图像 … 理解它的这个成像这些鱼啊、结构啊跟噪声
+     如何区别 … 纹理 … 总结这种成像的规律，然后去优化你的画面引擎").
+     - The cloud container reached no website this time: every host except GitHub and the package registries is denied
+       by the environment's network policy (Jason asked why: it is the environment's "Network access" setting, not a
+       site blocking us). So the study used the 8 LVS34 frames already in `reference/app-study/livescope-lvs34/` and the
+       app's own frames, measured instead of eyeballed: `scripts/dev/measure/meas.py` (LUT index through garmin_amber,
+       polar ft/deg from each frame's grid). The numbers and the rules: `sonar-style.md` §7.20.
+     - Found: fish were already right (#120); structure was dim and thin — fixed meanwhile by #128 (another chat), which
+       the measurement confirms (piling at 14 m: 4.5 ft wide, peak 0.91; the app's 4.5 ft, 0.90); the water column was
+       empty where the app's and LiveScope's carry small dim dashes (~4 % of the water in the app's frames).
+     - Engine: `waterSpecks` in the vertical views (sparse, dim, fixed to the lake, blinking per ping, only above the
+       bottom); fish core speckle ±20 % (was ±35 %) with a weak second ridge behind near or big fish; `__sonarSnap(w, h)`
+       takes a size for even-scale measurement snapshots.
+     - Checked: the 6 × 6 grid against main (#128): all 36 tiles within 0.3 points of white; the ice page in real time:
+       jig and Ice Fishing history unchanged, a few faint cyan specks in the Live Ice water; build passes. Panoramic
+       untouched.
