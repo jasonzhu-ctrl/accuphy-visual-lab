@@ -2146,7 +2146,7 @@ Numbered log. Newest at the bottom.
      - Still pending Jason: the embed switch to a theme-mounted Lab, the sideways real-device mode (#138), the ice page's
        Home-first / live gain and pause on phones (left to the ice chat).
 
-139. **Bottom like the burst; solid bodies (2026-10-23).** Jason on the #137 sheet: the bottom has missing parts and is a
+140. **Bottom like the burst; solid bodies (2026-10-23).** Jason on the #137 sheet: the bottom has missing parts and is a
     straight, too-regular line; the real one has texture and **ping-to-ping movement** (特别的重要); the mirror echo should be
     smaller and fainter; rocks, trees and hulls are transparent, a rock should be brightest in the middle and fade out.
     Measured on the 2.0.0 PL Down burst (20 frames, flat bottom, `reference/vivo-bursts-2026-10-23/pl-down`, scripts in the
