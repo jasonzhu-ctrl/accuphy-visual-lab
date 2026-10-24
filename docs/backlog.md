@@ -311,6 +311,15 @@ the cheapest Android phone class). Phone size was emulated at 360×800.
 4. ✅ (#127) **Ice page: fish and the jig** — nearby fish should come to the jig naturally but quickly, and interact with it
    ("又自然又快 … 跟鱼饵能够有一些自然的互动").
 
+## Jason's look round, 2026-10-24 (vs the app's bottom close-up)
+- ✅ (#143) bright cores fading to orange rims; flat bottom edge with fine fibres
+- ✅ (#144) bottom and structure at one brightness; thicker Forward / Mini bottoms; steel even
+- ✅ (#145) solid targets hide the bottom (no see-through rocks); branches whole, no mosaic; wooden hull halfway back
+- ✅ (#146) fibres inside hulls and rocks like the bottom close-up, opacity kept
+- ✅ (#147) ragged fibrous outlines on every object ("边缘的纤维对了")
+- ⬜ fps on a real phone after #145–#147 (4× MSAA echo targets at 512 rows, ~20 more texture taps per pixel); only checked
+  in headless Chrome on the Mac so far — run with the `sonar-page-real-device-perf` method before the public link is rebuilt
+
 ## Handoff to the phone-chrome owner (SonarChrome.jsx): the app's "sonar working" icon (Jason 2026-10-23)
 - ⬜ In the real app's Down views a small "sonar working" icon sits at the top centre of the picture, just under the 0 of the
   range ruler (partly hidden by it), whenever the sonar runs — Jason identified it on the 2.0.0 recording

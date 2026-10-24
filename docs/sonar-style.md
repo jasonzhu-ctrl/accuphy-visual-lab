@@ -902,3 +902,12 @@ climbs over the outer ~9 in (L 157 → 390) and stays there, with yellow 22 % an
 feather the top edge; there are no bumps. Measure with `real/rim.py` and the `band-zoom` crops, never by edge-detector
 "wobble" alone (it mistook the fibre tips for a moving edge in #140).
 
+**Opacity, texture and outline of solid targets (decisions #145–#147, 2026-10-24, approved by Jason step by step):**
+a solid target is **opaque** — the bottom band behind it does not show through (in the Lab it was added on top and read as
+"transparent"). Its inside carries the **same fibres as the band**: in the band crop of `pl-down-d00` the brightness varies
+with a coefficient of variation of **0.28** (L median 388, p10/p90 236/511, gaps below 0.6 × median 9 %); the Lab's approved
+band 0.22; a "photo-smooth" target 0.12. The fibres run along the ray, ~5–8 cm across and ~0.3–0.6 m long, brighter yellow
+strokes on an orange body, never black gaps (black gaps read as see-through, dark-led texture as leopard spots). The
+**outline is never a clean line**: thin tapering streaks along the ray stick out of every surface, ~10–20 cm on the side
+facing the transducer and ~20–30 cm behind, each beam its own length, new every ping — on hulls, rocks, steel and branches
+alike ("每个物体表面都会有纤维的").
