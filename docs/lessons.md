@@ -60,6 +60,10 @@ repeatable procedures are also project skills in `.claude/skills/` (`sonar-qa`, 
   ray, a fixed angle across it, a bright swim-bladder kernel, brightness set by aspect, speckle that changes every
   ping. A swept path or a smooth Gaussian reads as an "椭圆的球形". Check the orientation rule in Panoramic too: mirror
   images left and right of the boat mean "along the arc" (§7.13 had misread them as swim paths for a month).
+- **Measure the picture in the sonar's own units (#129):** LUT index (through the measured `garmin_amber` map) and polar
+  ft/degrees around the transducer, read off the frame's own grid. Then LiveScope, the app and the engine compare as
+  numbers (a fish is 2–3° × 0.1–0.15 m, noise one cell of 0.5° × 5 cm, structure as bright as the bottom), and a
+  "looks wrong" turns into one knob. `scripts/dev/measure/`.
 - **Averaged value noise is low-contrast** (two octaves + a ping blend sit in 0.3–0.7). Under the log tone curve a
   ±15 % modulation is invisible: stretch it back to 0–1 before using it, or the texture "changes" without showing.
 - **Sampling noise:** per-pixel random row sampling turned big faces into dust; ray-coherent sampling fixed the side
