@@ -47,6 +47,7 @@ export const sonarFragment = /* glsl */ `
   uniform sampler2D uLUT;
   uniform float uGain; uniform float uDynRange; uniform float uContrast; uniform float uNoise; uniform float uGamma;
   uniform vec4 uTune2; // dev only (window.__sonarTune.k2): structure rim level, core level, ring radius, inside threshold — all 1 in production
+  uniform vec4 uTune6; // dev only (window.__sonarTune.k6): steel ceiling, unused ×3 — all 1 in production
   uniform vec4 uTune5; // dev only (window.__sonarTune.k5): structure grain contrast, bright share, arc size scale, outline arc length — all 1 in production
   uniform vec4 uTune4; // dev only (window.__sonarTune.k4): structure hides the bottom, inside fill, wood core, rock core — all 1 in production
   uniform vec4 uTune3; // dev only (window.__sonarTune.k3): bottom spread compensation, near-gain floor, structure cap, steel core — all 1 in production
@@ -396,12 +397,17 @@ export const sonarFragment = /* glsl */ `
       float fill = inner * uTune4.y;
       spk = (1.0 - exp(-(mix(es, max(es, em), fill) + 0.25 * body) * 9.0)) * 0.95 * mix(0.72 + 0.4 * grainS, 0.86 + 0.2 * grainS, fill);
       occ = inner * smoothstep(thr, 2.5 * thr, es);
-      vec3 eg = (k == 0) ? texture2D(uEcho0, vec2(u, rn)).rgb : texture2D(uEcho1, vec2(u, rn)).rgb;
+      vec4 eg = (k == 0) ? texture2D(uEcho0, vec2(u, rn)) : texture2D(uEcho1, vec2(u, rn));
       float steelF = clamp(eg.g / max(eg.r, 1e-3), 0.0, 1.0), woodF = clamp(eg.b / max(eg.r, 1e-3), 0.0, 1.0); // steel and wood shares of the splat (lakeMaterial writes them to g, b)
       // core levels (Jason 2026-10-24: 船这一轮亮度降低的有点过多了, 找上一轮跟这一轮在折中; rock is denser than wood, so rock a
       // little brighter): wooden hull p90 ~515 (was 612, then 417), rocks and timber ~585, steel ~400 — with the fibres below
-      float core = mix(mix(2.45 * uTune4.w, 2.1 * uTune4.z, woodF), 1.08 * uTune3.w, steelF); // rock and timber · wooden hull · steel
+      // steel 1.08 → 1.73 with its higher ceiling and the large-scale light and dark (Jason 2026-10-24: 钢船 … 偏暗, 暗很多; fit on
+      // the recording's Forward wreck: core p50 ~410, p90 555–656, yellow ~30 %, white ≤ 7 %, large-scale CoV 0.25–0.30)
+      float core = mix(mix(2.45 * uTune4.w, 2.1 * uTune4.z, woodF), 1.73 * uTune3.w, steelF); // rock and timber · wooden hull · steel
       spk *= mix(0.82 * uTune2.x, core * uTune2.y, inner);
+      // large-scale light and dark on big hulls (lakeMaterial bigF, carried in a): bright regions ~1–2 m across in the middle
+      // of a large target, as on the recording's wreck (Jason 2026-10-24: 大面积的东西 … 中间一定是有亮的, 不可能那么均匀)
+      spk *= mix(1.0, clamp(2.0 * eg.a / max(eg.r, 1e-3), 0.3, 2.0), inner);
       // a soft ceiling: solid cores sit at the approved bottom close-up's yellow, not white (Jason 2026-10-24: 钢船过亮,
       // 应该均匀一点; 木船很亮 but wood and the bottom are about as dense, so about as bright)
       // The inside carries the same grain as everything else (Jason 2026-10-24: 船跟石头的纹理 … 不是光滑的; the grain rule,
@@ -410,7 +416,7 @@ export const sonarFragment = /* glsl */ `
       float fs = arcGrain(aWorld, r, png);
       float fib = 1.0 + (0.9 * smoothstep(0.3, 0.85, fs) - 0.28) * mix(0.5, 1.0, inner) * 1.3 * uTune5.x; // centred (mean ≈ 1): texture only, the level stays
       spk *= max(fib > 1.0 ? 1.0 + (fib - 1.0) * uTune5.y : fib, 0.35);
-      float Ks = 2.2 * uTune3.z; // the soft ceiling holds the bright fibres at yellow (4.0 without fibres, 2026-10-24)
+      float Ks = 2.2 * mix(1.0, 1.7 * uTune6.x, steelF) * uTune3.z; // the soft ceiling holds the bright fibres at yellow; steel's higher so its bright regions reach yellow-white (Jason 2026-10-24: 钢船 … 偏暗, 太均匀)
       spk = Ks * (1.0 - exp(-spk / Ks));
     }
     // Bottom brightness (Jason 2026-09-25: 画面特别是底部貌似还是太亮 深水也是 … 高亮的部分和桔红色的关系): over a flat

@@ -2322,3 +2322,22 @@ Numbered log. Newest at the bottom.
      575, steel 401; bottoms unchanged; close-up band peak 489 vs 505). Checked: six scenes + the ice page (desktop,
      phone); `vite build` clean. Not done here: ping-to-ping life (app hull |ΔL|/L 0.46), rim brightness, band
      thickness and white/yellow share from the same check. Not published: the public pages stay at the #128 build.
+
+149. **2026-10-24** — **Big hulls get bright middles; the steel wreck no longer dark and even**
+     (Jason on the #148 sheet: the texture is "非常的好"; but the steel wreck in PingLive Forward, before and now, is bad in
+     brightness — a large object's middle must have bright parts, it cannot be that even, and it is much too dark; look
+     at the wreck recordings). Measured (`scratchpad/grain/big.py`: core > 9 in inside the silhouette): the recording's
+     Forward wreck p50 ~410, p90 555–656, p99 705–765, yellow 28–33 %, white 1–7 %, large-scale CoV (6 in low-pass)
+     0.25–0.30, bright regions (> 1.25 × median) 5–18 %; its Down hull similar (p90 ~490, large CoV 0.28–0.33). Lab steel
+     before: p50 341, p90 405, p99 443, yellow 1 %, white 0, large CoV 0.15, no bright regions. Why: many hull surfaces
+     summed at a pixel saturate fanEcho's knee, so any variation inside the splat was flattened. Engine:
+     - `lakeMaterial.js` splat: a ~2 m value noise fixed to the object (`uSplatBig`: steel 1, wood 0.7, timber/rock 0) is
+       written as a factor into the echo target's alpha (now plain ONE/ONE sums in all four channels, cleared to 0);
+       steel also gets a stronger facing term (plates square to the sonar return more).
+     - `sonarShader.js` fanEcho: that factor multiplies the structure echo after the knee, deep inside only; steel's soft
+       ceiling 1.7× and its core level 1.08 → 1.73.
+     - Result: steel p50 403, p90 602, p99 765, yellow 33 %, white 4.6 %, large CoV 0.24, bright regions 21 %, the level
+       rising toward the middle (406 → 422). Wooden hull: same median, large CoV 0.13 → 0.18, p90 517 → 547. Rocks,
+       trees, bottoms and the approved close-up band unchanged; opacity unchanged (core dark ≤ 2.3 %).
+     - dev knobs `window.__sonarTune.k6 = [steel ceiling, —, —, —]`, `window.__sonarTune.kb` = `uSplatBig`.
+     Checked: six scenes + the ice page (desktop, phone); `vite build` clean. Not published (#128 build public).

@@ -29,6 +29,7 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
     uOutGamma: { value: 1.0 },   // ice scene: < 1 brightens the dark water world a little (main view only)
     uBeamGain: { value: 1.0 },   // ice scene: the signal gate (IceCamp.jsx s.signal): the lit footprint fades out while the Mini is out of the water
     uSplat: { value: new THREE.Vector3(1, 1, 30) }, // sonar pass 3 (echo splat): tan(half width), tan(half thickness), range of the fan being drawn
+    uSplatBig: { value: new THREE.Vector4(1, 0.7, 1, 0.5) }, // large-scale light and dark on big targets: steel contrast, wood contrast, steel facing, cells per metre (dev: window.__sonarTune.kb)
   }
   const mat = new THREE.ShaderMaterial({
     uniforms,
@@ -97,6 +98,7 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
       uniform int uBeamCount;
       uniform vec3 uApex[${MAX_BEAMS}]; uniform vec3 uC[${MAX_BEAMS}]; uniform vec3 uH[${MAX_BEAMS}]; uniform vec3 uN[${MAX_BEAMS}];
       uniform vec4 uAng[${MAX_BEAMS}]; uniform vec2 uRT[${MAX_BEAMS}]; uniform vec4 uBox[${MAX_BEAMS}];
+      uniform vec4 uSplatBig;
       uniform float uReveal; uniform vec3 uHighlight; uniform float uSonarPass; uniform float uRevealGain; uniform float uOutGamma; uniform vec2 uClip; uniform float uBeamGain;
       #ifdef FISH
         varying float vPattern; varying vec3 vBelly; varying vec3 vSide; varying vec3 vLocal; varying vec2 vUv;
@@ -152,7 +154,24 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
         #ifdef STEEL
           amp = 0.22;        // steel rings
         #endif
-          float ev = amp * (0.78 + 0.22 * facing) * (0.55 + 0.9 * g) * lobe; // speckle floor 0.3 → 0.55: a thin branch no longer drops out cell by cell (Jason 2026-10-24: 树枝中间有断掉的点)
+          // Large-scale light and dark over a big target (Jason 2026-10-24: 大面积的一个东西 … 中间一定是有亮的, 你不可能那么
+          // 均匀的, 你的偏暗): on the recording's wreck, regions ~1–2 m across are much brighter (5–19 % of the core, large-scale
+          // CoV 0.25–0.33; ours 0.13–0.15) — plates square to the sonar and overlapping parts of the hull. A ~2 m value noise
+          // fixed to the object (centred, the average stays) on hulls, and for steel a stronger facing term.
+          vec3 qb = vWorld * uSplatBig.w, bi = floor(qb), bf = fract(qb); bf = bf * bf * (3.0 - 2.0 * bf);
+          #define HB(o) fract(sin(dot(bi + o, vec3(41.3, 289.1, 157.7))) * 24634.6345)
+          float big = mix(mix(mix(HB(vec3(0.0)), HB(vec3(1.0, 0.0, 0.0)), bf.x), mix(HB(vec3(0.0, 1.0, 0.0)), HB(vec3(1.0, 1.0, 0.0)), bf.x), bf.y),
+                          mix(mix(HB(vec3(0.0, 0.0, 1.0)), HB(vec3(1.0, 0.0, 1.0)), bf.x), mix(HB(vec3(0.0, 1.0, 1.0)), HB(vec3(1.0)), bf.x), bf.y), bf.z);
+          #undef HB
+          float bigK = 0.0, faceW = 0.22; // timber and rock: unchanged
+        #ifdef WOOD
+          bigK = uSplatBig.y;
+        #endif
+        #ifdef STEEL
+          bigK = uSplatBig.x; faceW = 0.22 + 0.4 * uSplatBig.z;
+        #endif
+          float bigF = 1.0 + bigK * (1.3 * smoothstep(0.3, 0.75, big) - 0.6); // centred: the average stays
+          float ev = amp * (1.0 - faceW + faceW * facing) * (0.55 + 0.9 * g) * lobe; // speckle floor 0.3 → 0.55: a thin branch no longer drops out cell by cell (Jason 2026-10-24: 树枝中间有断掉的点)
           float steelShare = 0.0, woodShare = 0.0;
         #ifdef STEEL
           steelShare = 1.0;
@@ -160,7 +179,7 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
         #ifdef WOOD
           woodShare = 1.0;
         #endif
-          gl_FragColor = vec4(ev, ev * steelShare, ev * woodShare, 1.0); // g and b carry the steel and wood shares: each material has its own core level // facing weak: a low-poly crown must not show its facets as bands (Jason 2026-10-23: 树一棱一棱有断层)
+          gl_FragColor = vec4(ev, ev * steelShare, ev * woodShare, 0.5 * ev * bigF); // g and b carry the steel and wood shares: each material has its own core level; a the large-scale factor, applied after fanEcho's knee (inside the splat a summed hull saturates and flattens it) // facing weak: a low-poly crown must not show its facets as bands (Jason 2026-10-23: 树一棱一棱有断层)
           return;
       #else
           discard;
