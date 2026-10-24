@@ -2004,3 +2004,18 @@ Numbered log. Newest at the bottom.
      - **Open** (Jason to identify on the frame): the speck spray above the stern, the specks above the bow, the bright
        bow face, the dark cavities, the faint diagonal left of the hull, the trail under the bottom. Public pages not
        rebuilt: the colour map and gain scale change every picture, Jason sees it first.
+
+131. **2026-10-23** — **Feasibility: the phone Lab as a page of the Shopify store** (Jason: "调研一下我们现在的手机版放到我们
+     网站的 Shopify 网站的网页里面 … 可行性如何", then "全部" — all four aspects). Research only, nothing built:
+     `docs/shopify-embed-feasibility.md` (EN + 中文摘要).
+     - **Finding.** #102 (Vercel at `lab.accuphy.com`) rejected a Shopify page because the 2.3 MB WebGL page cannot live
+       inside theme files. It did not weigh the other way: a store page `shop.accuphy.com/pages/lab` with its own
+       header-less template whose body is a full-screen iframe of the Vercel-hosted Lab. That is feasible, keeps #102's
+       hosting, and gives the ads a store address with the store's pixels, analytics and Klaviyo already in place; the
+       theme is touched once and the Lab keeps its own release cycle.
+     - **Numbers.** Lab public page 1.04 MB compressed; an ordinary store page carries 20 external scripts; the store
+       shell on a header-less layout adds an estimated 0.3–0.6 MB. Phone fps is unchanged by the host.
+     - **Pending Jason** (not decided): adopt the store page as the front door beside #102; first market; embed source
+       `lab.accuphy.com` vs the plain Vercel address. Then a handoff to `accuphy-website/handoffs/`.
+     - Also this session: the Three.js case-study review (Perego water diorama, Sael's internet explainer, Majid's
+       procedural animals) stays in the chat only — Jason wanted to discuss the diorama idea first; no document yet.
