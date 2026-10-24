@@ -22,9 +22,19 @@ know of. Each rule says whether the Lab meets it today (✅) or not (⬜).
      页面高度不能依赖 `100vh`/`dvh`，Meta 内置浏览器里这些单位会出错。
    - **三星浏览器和 Chrome 的"强制深色模式"：** 可能把画面颜色反转，要加一行声明关掉（现在没有）。
    - **显卡掉线：** 手机切后台或内存不够时，画面可能变黑且不会自己恢复，要能自动恢复（现在没有）。
-7. **每次发版要测的组合：** 列了一张表（第 6 节），包括 iPhone 的 Safari 和 Instagram 内置浏览器、安卓 Chrome、
+7. **外部规范怎么说：** 谷歌 Material 3 按宽度分 5 档（600 / 840 / 1200 / 1600），高度分 3 档（480 / 900）；
+   苹果分"紧凑 / 常规"两档（iPhone 竖放是紧凑，iPad 是常规）；微软分 3 档（640 / 1008）。三家都强调：
+   按"程序实际拿到的空间"分类，而不是按屏幕；都有一个"不是手机也不是电脑"的中间档；高度要单独看。
+   我们现在恰恰缺中间档。
+8. **同类网站怎么做：** 汽车配置器、地图、专业三维查看器的共同做法：主体（车、地图、模型）始终在中间，
+   操作放边上；手机上画面在上、选项在下半屏；需要一边操作一边看的，用"可收起的底部面板"
+   （展开时也不挡主体），大屏才改成侧边面板；放不下的按钮收进"更多"。
+9. **浏览器支持：** 按区域大小分类的写法（容器查询）2025 年起所有主流浏览器都支持；
+   `dvh` 这类高度单位支持率约 95%，但在 Facebook 内置浏览器里有问题；关掉强制深色的声明，Chrome 和三星浏览器都认；
+   iPhone 内存不够时可能直接把页面杀掉、不给任何提示，所以除了能自动恢复，还要控制显存占用。
+10. **每次发版要测的组合：** 列了一张表（第 6 节），包括 iPhone 的 Safari 和 Instagram 内置浏览器、安卓 Chrome、
    折叠屏、iPad、笔记本、24 寸和 27 寸屏。
-8. **建议先做的三件事：** ① 中间尺寸的紧凑布局和 44 像素按钮；② 显卡掉线自动恢复 + 关掉强制深色；
+11. **建议先做的三件事（等你决定）：** ① 中间尺寸的紧凑布局和 44 像素按钮；② 显卡掉线自动恢复 + 关掉强制深色；
    ③ 嵌入商店时按区域大小判断屏幕类别。
 
 ---
@@ -46,7 +56,54 @@ What follows from it: the typical first visit is an **iPhone, portrait, inside I
 Every iPhone browser (Safari, Chrome for iPhone, Meta's in-app browser) is WebKit, so WebKit rules are the hard floor.
 Desktop visitors mostly come from search and email and sit at 1366–1920 px wide.
 
+## 1b. What the established design systems say
+
+| System | Width classes | Height classes | Notes |
+|---|---|---|---|
+| **Google Material 3** (Android, also used for the web) | compact < 600 dp · medium 600–839 · expanded 840–1199 · large 1200–1599 · extra-large ≥ 1600 (desktop) | compact < 480 · medium 480–899 · expanded ≥ 900 | the class picks the layout ("canonical layouts"); classes come from the **window**, not the device [M3 window classes] |
+| **Apple** (iOS/iPadOS size classes) | compact or regular per axis | compact or regular | every iPhone in portrait is compact width; iPads are regular; big iPhones turned sideways become regular width; touch targets 44 × 44 pt [Apple size classes] |
+| **Microsoft** (Windows apps) | small < 640 · medium 641–1007 · large ≥ 1008 (effective px) | — | "design for the space available to your app (the app's window), not the screen size" [MS breakpoints] |
+| **Tailwind** (what the Lab's CSS uses) | sm 640 · md 768 · lg 1024 · xl 1280 · 2xl 1536 | — | the Lab uses `sm:` (panel) and `md:` (step cards) today |
+
+The three systems agree on three things the Lab should copy: (1) classes come from the space the app actually gets,
+which for us is the mount box in the store page; (2) there is a middle class (Material medium/expanded 600–1199, Microsoft
+medium 641–1007, Apple regular-width iPad) that is neither phone nor desktop — the Lab has none, which is exactly where the
+fold went wrong; (3) height is its own axis (Material compact height < 480 ≈ our sideways-phone test `height < 500`).
+
+## 1c. How comparable interactive pages lay out
+
+- **The object stays the hero, controls go to the edge.** Mobile-first car configurators (Demodern's smart configurator)
+  keep the car centred with a reduced interface and use step-by-step navigation and card swipes on phones; designs that
+  started on desktop are criticised as cluttered on phones [Demodern smart]; [Magebit configurators].
+- **Phones: picture on top, choices in the bottom half.** The common configurator pattern keeps the visual changes in the
+  top half and the option strip in the bottom half [Dribbble configurator]. The Lab's class A already does this (lake on
+  top, the phone display at the bottom).
+- **A canvas you keep using → a standard (non-modal) sheet.** Material: a standard bottom sheet leaves the rest of the
+  screen usable (the map example: read a place while still panning); the newer expanding sheet starts collapsed and grows
+  on demand; on larger screens the same content moves to a side sheet [M3 bottom sheets]. This is the pattern for the
+  Lab's class C panel: a collapsed pill or bottom sheet that never covers the boat, a side panel only from class D up.
+- **Professional 3D viewers** (Trimble Connect, AVEVA, DELMIA) change the toolbar placement at width breakpoints, hide
+  the tools that do not fit behind a drag or a "more" control, and let side panels collapse with a tap or swipe; one
+  finger pans, two fingers rotate or zoom [Trimble responsive]. The Lab's drag-the-boat is one finger; it should never
+  need two-finger gestures.
+
+## 1d. Browser support for what the rules need
+
+| Feature | Support | Use in the Lab |
+|---|---|---|
+| CSS container queries | Baseline "widely available" since Aug 2025; ~93 % of users already in Nov 2024; Safari 16+, Chrome/Edge 105+, Firefox 110+, Samsung Internet 20+ [container queries] | classes from the mount box (rule in §2) |
+| `dvh`/`svh`/`lvh` units | ~95 % (early 2026) but broken in Facebook's in-app browser (WebKit 255852) | do not rely on them; `fixed inset-0` + `innerHeight` |
+| `color-scheme` meta (opt out of forced dark) | Chrome (Auto Dark Theme opt-out), Samsung Internet 13.2+ [Chrome auto dark]; [Samsung dark mode] | declare `dark` |
+| WebGL2 + MSAA render targets | every current browser we tested (headless Chromium/WebKit, real Mali GPU) | ✅ |
+| `webglcontextlost` / restored | all browsers, but iOS can kill a heavy page for memory with **no** event first (WebKit 300782) [WebKit 300782] | handle the events **and** keep GPU memory low (dpr cap, few large targets) |
+| DevTools phone emulation | does not simulate mobile GPU limits [R3F mobile] | real devices for frame rate and memory |
+
 ## 2. Screen classes
+
+Mapped to the standards above: A = Material compact / Apple compact width; B = compact height (< 480–500); C = Material
+medium–expanded, Microsoft medium, iPad portrait; D–E = Material large / extra-large, Microsoft large; F = a split of
+Material's extra-large that the Lab needs only because its UI is drawn in fixed pixels. The Lab's 640 px edge matches
+Microsoft and Tailwind `sm`; 1024 matches Tailwind `lg` and an iPad turned sideways.
 
 Decide the class from the **Lab's own box** (the element it is mounted in), not from `window`. Standalone, the box is the
 window; mounted in the store page (#142) it is the section. Today every check reads `window.innerWidth/innerHeight`
@@ -157,3 +214,18 @@ targets ≥ 44 px on touch sizes; frame rate on real devices. The `sonar-qa` ski
 - Meta in-app browser behaviour, viewport bug, Apple Pay, autofill: Drive `Market Research/2026-10-23 Which browser opens
   ad and email links (EN).md` (WebKit bug 255852, Krause 2022, Meta help pages) and `docs/embed-options.md`.
 - Touch targets: Apple Human Interface Guidelines (44 pt), Material Design (48 dp), WCAG 2.2 SC 2.5.8 (24 px).
+- [M3 window classes] https://developer.android.com/develop/ui/views/layout/window-size-classes ;
+  https://developer.android.com/develop/ui/compose/layouts/adaptive/window-size-classes
+- [Apple size classes] https://developer.apple.com/videos/play/wwdc2017/812
+- [MS breakpoints] https://learn.microsoft.com/en-us/windows/apps/design/layout/screen-sizes-and-breakpoints-for-responsive-design
+- [Demodern smart] https://www.demodern.de/en/projects/smart-web-configurator
+- [Magebit configurators] https://magebit.com/blogs/designing-user-friendly-product-configurators-for-automotive-merchants
+- [Dribbble configurator] https://dribbble.com/shots/5909186-Configurator-Redesign
+- [M3 bottom sheets] https://material.io/components/sheets-bottom ; https://m1.material.io/components/bottom-sheets.html
+- [Trimble responsive] https://help.trimble.com/en/trimble-connect/trimble-connect/connect-for-browsers-3d-viewer/getting-started-in-the-3d-viewer/responsive-layout
+- [container queries] https://joshwcomeau.com/css/browser-support ; https://educative.io/courses/mastering-the-latest-features-in-css/support-and-future-of-container-queries
+- [Chrome auto dark] https://developer.chrome.com/blog/auto-dark-theme
+- [Samsung dark mode] https://developer.samsung.com/internet/blog/en/2020/12/15/dark-mode-in-samsung-internet
+- [WebKit 300782] https://bugs.webkit.org/show_bug.cgi?id=300782
+- [R3F mobile] https://www.technetexperts.com/react-three-fiber-skinnedmesh-mobile-fix/
+- Not verified (single secondary source): the ~95 % `dvh` figure; the Fold 7 viewport (third-party database).
