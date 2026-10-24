@@ -249,10 +249,11 @@ the cheapest Android phone class). Phone size was emulated at 360×800.
 - Lab page location (lab.accuphy.ca vs a store page) · lite section's Shopify test page · Klaviyo list,
   opt-in and keys · Meta Pixel, UTM, "Shop PingLive" button · US phone checkout walk (decision #57).
   The design work for each stays here; the Shopify side is theirs.
-- ⬜ **Store page as the front door (decision #133, 2026-10-23):** `shop.accuphy.com/pages/lab` = header-less template +
-  full-screen iframe of the Vercel-hosted Lab (#102 unchanged). Waiting for Jason: adopt it · first market · embed source.
-  Then: handoff to `accuphy-website/handoffs/`; here an embed build (no gate, `postMessage` events, `100dvh`, `frame-ancestors`).
-  Study: `docs/shopify-embed-feasibility.md`.
+- ⬜ **Store page as the front door (decisions #133–#134, 2026-10-23, adopted):** `shop.accuphy.com/pages/lab` = header-less
+  template + full-screen iframe of the Vercel-hosted Lab (#102 unchanged). Handoff: `accuphy-website/handoffs/2026-10-23-lab-store-page.md`.
+  Lab side to do: embed events module (`ready`, `first_drag`, `view`, `found_sign`, `signup`, `shop_click` via `postMessage`),
+  `100dvh`, Klaviyo keys, `window.top` shop links, `vercel.json` (`frame-ancestors`, `noindex`), Vercel deploy when the
+  website project is ready. Study: `docs/shopify-embed-feasibility.md`.
 
 ## Lite section (planning only — decision #48)
 - ⬜ **Do not build until Jason says go.** `docs/lite-section-plan.md`: the original side-view visualizer as a

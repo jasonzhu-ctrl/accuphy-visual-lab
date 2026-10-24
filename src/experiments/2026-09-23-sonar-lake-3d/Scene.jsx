@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
+import { labEvent } from './embed'
 import { mergeGeometries as _merge } from 'three/addons/utils/BufferGeometryUtils.js'
 // Extrude geometries are non-indexed, primitives are indexed — normalise first.
 const mergeGeometries = (parts) => _merge(parts.map((g) => (g.index ? g.toNonIndexed() : g)))
@@ -641,7 +642,7 @@ function Rig({ state, sonarRect, fogMats, cam = LAKE_CAM }) {
   return null
 }
 function PickPlane({ state }) {
-  const onDown = (e) => { e.stopPropagation(); state.current.dragging = true; state.current.hasDragged = true; e.target.setPointerCapture?.(e.pointerId); move(e) }
+  const onDown = (e) => { e.stopPropagation(); state.current.dragging = true; state.current.hasDragged = true; labEvent('first_drag', {}, { once: true }); e.target.setPointerCapture?.(e.pointerId); move(e) }
   const move = (e) => {
     const s = state.current
     if (!s.dragging) return
@@ -697,7 +698,7 @@ export default function LakeScene({ state, sonarRect, paused = false, scene = 'l
   const beamMats = useMemo(() => (iceMat ? [...lakeMats, iceMat] : lakeMats), [lakeMats, iceMat]) // the ice shows the beam's reach too
   const bg = ice ? P.T.bg : '#9cc1cf'
   return (
-    <Canvas frameloop={paused ? 'never' : 'always'} dpr={[1, 1.5]} camera={{ fov: 38, near: 0.5, far: 400, position: [-38, 34, 54] }} gl={{ antialias: true, powerPreference: 'high-performance' }} onCreated={({ gl }) => { gl.localClippingEnabled = true }}>
+    <Canvas frameloop={paused ? 'never' : 'always'} dpr={[1, 1.5]} camera={{ fov: 38, near: 0.5, far: 400, position: [-38, 34, 54] }} gl={{ antialias: true, powerPreference: 'high-performance' }} onCreated={({ gl }) => { gl.localClippingEnabled = true; labEvent('ready', {}, { once: true }) }}>
       <color attach="background" args={[bg]} />
       <fog attach="fog" args={ice ? [bg, ICE_FOG.near, ICE_FOG.far] : [bg, 160, 420]} />
       {ice ? (<>

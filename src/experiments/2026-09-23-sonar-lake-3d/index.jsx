@@ -12,6 +12,7 @@ import { screenLayout } from './SonarScreen'
 import SignupGate from './SignupGate'
 import AppHome from './home/AppHome' // the app's Home (view selection) page inside the phone, phones only (2026-10-16)
 import { isSignedUp } from './signup'
+import { labEvent } from './embed'
 import { depthAt } from './terrain'
 import { panoHalfWidth } from './sonarMarks'
 // dev: ?bigphone makes the phone huge so the sonar picture can be inspected in screenshots
@@ -197,6 +198,9 @@ export default function SonarLake3D({ scene: sceneProp }) {
     return () => clearInterval(id)
   }, [autoDepthOn, device, imperial])
 
+
+  // embed bridge (#134): the store page learns which view the visitor is on
+  useEffect(() => { labEvent('view', { view: mode, device: deviceId }) }, [mode, deviceId])
 
   // the app's buttons on the phone are display-only: a tap asks for an email (once per browser)
   const onLocked = () => {

@@ -2051,3 +2051,19 @@ Numbered log. Newest at the bottom.
        `lab.accuphy.com` vs the plain Vercel address. Then a handoff to `accuphy-website/handoffs/`.
      - Also this session: the Three.js case-study review (Perego water diorama, Sael's internet explainer, Majid's
        procedural animals) stays in the chat only — Jason wanted to discuss the diorama idea first; no document yet.
+
+134. **2026-10-23** — **The store page is the Lab's front door; tracking done the proper Shopify way; Globo is out**
+     (Jason, on #133: "Globo Mega Menu 我们后面是肯定不会用了的，就是你按照最合理的、最有帮助的，包括像 tracking 啊、统计啊 …
+     广告转化啊这些的，都按照我们最好的这个方式去做吧").
+     - **Adopted:** `shop.accuphy.com/pages/lab` (header-less template, full-screen iframe) as the public address; the
+       Lab itself stays on Vercel per #102. Canada first, then `/en-us/pages/lab`. Embed source: the Vercel address at
+       first, `lab.accuphy.com` once the CNAME exists (one setting in the section).
+     - **Tracking design:** the Lab posts `ready`, `first_drag`, `view`, `found_sign`, `signup`, `shop_click` to the
+       parent (`postMessage`, no personal data); the section publishes them as the Shopify customer event
+       `accuphy_lab`; a Custom Pixel forwards to Meta (`signup` → standard `Lead`, the rest `trackCustom`). Sign-up
+       goes to Klaviyo from the Lab's own card (client API, public key); UTMs pass through the iframe URL. Shop links
+       navigate the top window to the market's product page.
+     - **Handoff written:** `accuphy-website/handoffs/2026-10-23-lab-store-page.md` (Shopify side, incl. the note that
+       Globo Mega Menu will no longer be used — the website project records that in its own log).
+     - **Lab side, next:** an embed build (events module, `100dvh`, Klaviyo keys, `window.top` shop links, Vercel headers
+       `frame-ancestors` + `noindex`), then the Vercel deployment when the website project is ready to test.

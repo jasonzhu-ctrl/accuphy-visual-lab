@@ -51,5 +51,11 @@ ${page}</head>
 `.replace('</head>\n</html>', '</html>').replace(/(<\/style>\n)(<div id="root">)/, '$1</head>\n<body>\n$2').replace(/<\/html>\n$/, '</body>\n</html>\n'))
 fs.writeFileSync(path.join(outDir, 'pages/robots.txt'), 'User-agent: *\nDisallow: /\n')
 fs.writeFileSync(path.join(outDir, 'pages/.nojekyll'), '')
+// Vercel headers (decision #134): only the store (and Shopify's theme editor) may frame the page; unlisted until launch.
+// GitHub Pages ignores this file.
+fs.writeFileSync(path.join(outDir, 'pages/vercel.json'), JSON.stringify({ headers: [{ source: '/(.*)', headers: [
+  { key: 'Content-Security-Policy', value: 'frame-ancestors https://shop.accuphy.com https://*.myshopify.com https://admin.shopify.com' },
+  { key: 'X-Robots-Tag', value: 'noindex, nofollow' },
+] }] }, null, 2) + '\n')
 fs.rmSync(tmp, { recursive: true, force: true })
 console.log(`${path.join(outDir, 'accuphy-lab.html')} [${variant}]: ${(page.length / 1e6).toFixed(2)} MB (logo inlined ${logoCount}×)`)
