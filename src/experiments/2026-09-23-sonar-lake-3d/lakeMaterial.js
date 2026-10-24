@@ -186,6 +186,15 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
           albedo = mix(albedo, vec3(0.95, 0.97, 1.0), st * 0.8);
         }
       #endif
+        // procedural surface texture (#135: this ran after base had been taken from albedo, so it never showed): fine
+        // speckle on everything but fish, and bark grooves on brown (timber) surfaces, following the trunk
+      #ifndef FISH
+        float tex = 0.9 + 0.2 * fract(sin(dot(floor(vWorld * 9.0), vec3(12.9898, 78.233, 37.719))) * 43758.5453);
+        albedo *= tex;
+        float brown = smoothstep(0.02, 0.08, vColor.r - vColor.b);
+        float groove = fract(sin(dot(floor(vec2(atan(vWorld.z, vWorld.x) * 40.0 + vWorld.x * 3.0, vWorld.y * 1.2)), vec2(12.9898, 78.233))) * 43758.5453);
+        albedo *= 1.0 - brown * 0.28 * groove;
+      #endif
         vec3 base = albedo * (0.28 + 0.42 * hemi + 0.6 * lambert);
         // dim everything under water a little; the beam brings it back
         float beam = 0.0, wide = 0.0;
@@ -193,15 +202,6 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
         beam *= uReveal;
         float edge = clamp(wide - beam, 0.0, 1.0) * uReveal; // thin bright rim where the beam footprint ends
         beam *= uBeamGain; edge *= uBeamGain; // the signal gate (1 on the summer lake): after the rim, so the rim fades too instead of widening
-        // procedural surface texture: fine speckle for sand/bark
-        float tex = 0.9 + 0.2 * fract(sin(dot(floor(vWorld * 9.0), vec3(12.9898, 78.233, 37.719))) * 43758.5453);
-        albedo *= tex;
-      #ifndef FISH
-        // bark: vertical striations on brown (timber) surfaces — grooves follow the trunk
-        float brown = smoothstep(0.02, 0.08, vColor.r - vColor.b);
-        float groove = fract(sin(dot(floor(vec2(atan(vWorld.z, vWorld.x) * 40.0 + vWorld.x * 3.0, vWorld.y * 1.2)), vec2(12.9898, 78.233))) * 43758.5453);
-        albedo *= 1.0 - brown * 0.28 * groove;
-      #endif
         // outside the beam things stay murky; inside they pop (Garmin look)
         vec3 lit = base * (0.72 + 2.3 * beam * uRevealGain) + uHighlight * 0.3 * beam * uRevealGain + uHighlight * 0.9 * edge;
       #ifdef LOGO
