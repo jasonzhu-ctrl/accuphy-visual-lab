@@ -8,3 +8,4 @@ reference/**
 !reference/app-study/**
 dist-share/
 __pycache__/
+dist-embed-tmp/

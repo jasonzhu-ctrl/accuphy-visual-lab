@@ -2190,3 +2190,18 @@ Numbered log. Newest at the bottom.
        Lake 390 × 844 and 1440 × 900, ice 1440 × 900 and 844 × 390 look as before. The gallery's "← Lab" link is hidden
        while sideways (dev only; the public build has none).
      - **Not done:** Phase 4's quality tiers; a device test on a real iPhone (safe areas, the home indicator).
+
+142. **2026-10-24** — **The Lab mounts into the store page itself; the iframe is the fallback** (Jason, on the #138 research:
+     "主题挂载用什么？我不知道 … 你按照最适合的" — Option 3 of `docs/embed-options.md`).
+     - **Lab side, built:** `share/embed.jsx` exports `mount(el)`; `scripts/build-embed.mjs` (+ `vite.embed.config.js`)
+       writes `embed/lab.js` (a stable loader, cached 5 min) and `embed/lab-<hash>.js` (the minified build with its CSS,
+       fonts and logo inside, cached for good) beside the standalone page in `dist-share/pages/`, plus `embed/test.html`;
+       `build-share.mjs`'s `vercel.json` adds CORS and caching for `/embed/`. Same size as the standalone page (2.6 MB).
+     - **Events:** `labEvent` calls `Shopify.analytics.publish('accuphy_lab', { event, ...data })` when the page has it;
+       inside a frame it still posts to the parent (#134's path kept as the fallback).
+     - **No sign-up gate** in the embed build (like the share build; #139: the Klaviyo chat decides the funnel).
+     - **Checked** from a second origin (a stand-in store page loading the loader cross-origin): mounts at 1440×900,
+       390×844 and 844×390; fonts and logo load; `ready` and `view` published; no console errors.
+     - **Handoff draft:** `docs/handoffs/2026-10-24-lab-theme-mount.md` — the section is a `<div>` + module script, the
+       lean layout without the theme's CSS, events published by the Lab. A Mac chat carries it to `accuphy-website`.
+     - **Not done:** the Vercel deployment (#102) and the theme-copy test; nothing published.
