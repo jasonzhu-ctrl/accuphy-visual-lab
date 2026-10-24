@@ -138,7 +138,13 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
           if (vBad > 0.0 || abs(vSplat.x) > 1.0 || abs(vSplat.y) > 1.0) discard;
           float lobe = 0.3 + 0.7 * pow(1.0 - abs(vSplat.y), 1.6); // a floor: a branch leaving the slab's centre plane fades, it does not break off (Jason 2026-10-24: 树枝结构更完整)                       // the beam's main lobe across the slab
           float facing = abs(dot(normalize(vNormal), normalize(cameraPosition - vWorld))); // faces square to the sound return more
-          float g = fract(sin(dot(floor(vWorld * 8.0), vec3(127.1, 311.7, 74.7))) * 43758.5453); // 12 cm speckle fixed to the object, the same in every direction (no bands along a trunk)
+          // 12 cm speckle fixed to the object, the same in every direction (no bands along a trunk); smooth value noise, not
+          // hashed cells: the cells' hard edges drew blocks in crowns and stripes in rocks (Jason 2026-10-24: 马赛克)
+          vec3 q = vWorld * 8.0, qi = floor(q), qf = fract(q); qf = qf * qf * (3.0 - 2.0 * qf);
+          #define H3(o) fract(sin(dot(qi + o, vec3(127.1, 311.7, 74.7))) * 43758.5453)
+          float g = mix(mix(mix(H3(vec3(0.0)), H3(vec3(1.0, 0.0, 0.0)), qf.x), mix(H3(vec3(0.0, 1.0, 0.0)), H3(vec3(1.0, 1.0, 0.0)), qf.x), qf.y),
+                        mix(mix(H3(vec3(0.0, 0.0, 1.0)), H3(vec3(1.0, 0.0, 1.0)), qf.x), mix(H3(vec3(0.0, 1.0, 1.0)), H3(vec3(1.0)), qf.x), qf.y), qf.z);
+          #undef H3
           float amp = 0.14; // timber, rock
         #ifdef WOOD
           amp = 0.12;        // planking: each surface a little weaker, but there are many
@@ -147,11 +153,14 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
           amp = 0.22;        // steel rings
         #endif
           float ev = amp * (0.78 + 0.22 * facing) * (0.55 + 0.9 * g) * lobe; // speckle floor 0.3 → 0.55: a thin branch no longer drops out cell by cell (Jason 2026-10-24: 树枝中间有断掉的点)
-          float steelShare = 0.0;
+          float steelShare = 0.0, woodShare = 0.0;
         #ifdef STEEL
           steelShare = 1.0;
         #endif
-          gl_FragColor = vec4(ev, ev * steelShare, 0.0, 1.0); // g carries the steel share: the sonar gives steel a lower core level // facing weak: a low-poly crown must not show its facets as bands (Jason 2026-10-23: 树一棱一棱有断层)
+        #ifdef WOOD
+          woodShare = 1.0;
+        #endif
+          gl_FragColor = vec4(ev, ev * steelShare, ev * woodShare, 1.0); // g and b carry the steel and wood shares: each material has its own core level // facing weak: a low-poly crown must not show its facets as bands (Jason 2026-10-23: 树一棱一棱有断层)
           return;
       #else
           discard;

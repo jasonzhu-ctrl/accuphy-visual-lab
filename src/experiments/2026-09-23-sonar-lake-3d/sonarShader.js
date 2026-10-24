@@ -25,7 +25,7 @@ export const sonarFragment = /* glsl */ `
   varying vec2 vUv0;
   uniform sampler2D uDepth0; uniform sampler2D uDepth1;
   uniform sampler2D uDepthB0; uniform sampler2D uDepthB1; // the far side of structure (back-face strips)
-  uniform sampler2D uEcho0; uniform sampler2D uEcho1; uniform vec2 uFanR; // the echo splat of every structure surface (angle × range), per fan
+  uniform sampler2D uEcho0; uniform sampler2D uEcho1; uniform vec2 uFanR; uniform vec2 uEchoTex; // the echo splat of every structure surface (angle × range), per fan
   uniform sampler2D uColor0; uniform sampler2D uColor1; // .a = tag: 0.75 steel (wrecks), 0.5 other structure, 0 bottom
   uniform int uFanCount;
   // per fan: x = centre angle from straight-down in the SCREEN plane (rad, +right),
@@ -47,6 +47,7 @@ export const sonarFragment = /* glsl */ `
   uniform sampler2D uLUT;
   uniform float uGain; uniform float uDynRange; uniform float uContrast; uniform float uNoise; uniform float uGamma;
   uniform vec4 uTune2; // dev only (window.__sonarTune.k2): structure rim level, core level, ring radius, inside threshold — all 1 in production
+  uniform vec4 uTune4; // dev only (window.__sonarTune.k4): structure hides the bottom, inside fill, wood core, rock core — all 1 in production
   uniform vec4 uTune3; // dev only (window.__sonarTune.k3): bottom spread compensation, near-gain floor, structure cap, steel core — all 1 in production
   uniform vec4 uTune; // dev only (window.__sonarTune.k): scales for the band's pulse, tail, peak+edge and integrated body, all 1 in production
   // fish marks (sonarMarks.js): 64 × 4 float texture
@@ -278,7 +279,8 @@ export const sonarFragment = /* glsl */ `
       // each row looks a little to either side within the fan too: the beam is ~1.2° wide in the fan's own plane, so a
       // grazing bottom (Forward, a plateau) reads as a band as thick as that beam at its range, not a hairline
       // (Jason 2026-10-24: 底部太虚了，太薄了，应该厚一点). A bottom square to the rays (Down) hardly changes.
-      float uj = u + duB * (fract(float(j) * 0.618034 + jit * 3.7) * 2.0 - 1.0);
+      // (a sine of the drifting row phase, not fract(): fract jumped on the noise's level lines and drew fingerprint loops in the band)
+      float uj = u + duB * sin(6.2832 * (float(j) * 0.618034 + jit));
       float rayLen = length(vec3(tan(a), ty, 1.0));
       float hit = sampleDist(k, vec2(uj, v), rayLen);
       // (no displacement of the bottom's edge: the burst's edge is flat — its fine texture is the fibres below, not bumps.
@@ -335,7 +337,8 @@ export const sonarFragment = /* glsl */ `
     // range (5 taps), the per-ping grain on top. Steel sums brighter (its amp in lakeMaterial) and keeps its row tail.
     float rn = r / uFanR[k], dRn = 0.06 / uFanR[k]; // ±0.12 m along the range: the recording's range cells are sharp (Jason: 树的清晰度再提升一点)
     float es = 0.0;
-    for (int i = -2; i <= 2; i++) es += exp(-0.9 * float(i * i)) * sampleEcho(k, u, rn + float(i) * dRn);
+    float duT = 0.5 * uEchoTex.x; // and half a cell either side across the fan: the cells blend into one smooth stroke (no mosaic)
+    for (int i = -2; i <= 2; i++) { float ri = rn + float(i) * dRn; es += exp(-0.9 * float(i * i)) * 0.5 * (sampleEcho(k, u - duT, ri) + sampleEcho(k, u + duT, ri)); }
     es /= 1.87;
     float body = clamp(solidAcc / max(wsum, 1e-3), 0.0, 1.0);
     spk = (1.0 - exp(-(es + 0.25 * body) * 9.0)) * 0.95 * (0.72 + 0.4 * grainS); // surfaces (splat) + the solid body between them, soft knee; a calmer grain so a rock reads solid, not see-through (Jason 2026-10-24)
@@ -344,24 +347,36 @@ export const sonarFragment = /* glsl */ `
     // the outer 2 in, 250 at 2–4 in, 360 at 6–9 in, ~390 from 9 in inside with yellow 22 % and white 4 %; red only at the rim.
     // How deep inside the silhouette a pixel lies: how many of 16 taps on two rings (0.12 m and 0.25 m in the picture's
     // metres, rotated per pixel and ping) also land on structure. Deep inside → the core level, on the rim → the rim level.
+    float occ = 0.0; // how fully structure covers this pixel: a solid target hides the bottom band behind it
     if (es > 0.002) {
       float duR = 0.5 / (uFan[k].z * cos(a) * cos(a) * max(r, 0.5)); // u per metre across the fan at this range
       float rot = hash(floor(vec2(aWorld * 900.0, r * 30.0)) + png * 0.73) * 6.2832;
-      float thr = 0.012 * uTune2.w, cov = 0.0;
+      float thr = 0.012 * uTune2.w, cov = 0.0, em = 0.0;
       for (int q = 0; q < 8; q++) {
         float an = float(q) * 0.7854 + rot;
         vec2 o = vec2(cos(an), sin(an));
         vec2 o1 = o * 0.12 * uTune2.z, o2 = o * 0.25 * uTune2.z;
-        cov += smoothstep(thr, 2.5 * thr, sampleEcho(k, u + o1.x * duR, rn + o1.y / uFanR[k]));
-        cov += smoothstep(thr, 2.5 * thr, sampleEcho(k, u + o2.x * duR, rn + o2.y / uFanR[k]));
+        float e1 = sampleEcho(k, u + o1.x * duR, rn + o1.y / uFanR[k]), e2 = sampleEcho(k, u + o2.x * duR, rn + o2.y / uFanR[k]);
+        cov += smoothstep(thr, 2.5 * thr, e1) + smoothstep(thr, 2.5 * thr, e2);
+        em += e1 + e2;
       }
-      cov /= 16.0;
-      vec2 eg = (k == 0) ? texture2D(uEcho0, vec2(u, rn)).rg : texture2D(uEcho1, vec2(u, rn)).rg;
-      float steelF = clamp(eg.g / max(eg.r, 1e-3), 0.0, 1.0); // the steel share of the splat (lakeMaterial writes it to g)
-      spk *= mix(0.82 * uTune2.x, mix(2.1, 1.3 * uTune3.w, steelF) * uTune2.y, smoothstep(0.45, 0.95, cov));
+      cov /= 16.0; em /= 16.0;
+      float inner = smoothstep(0.45, 0.95, cov);
+      // Solid, not see-through (Jason 2026-10-24: 石头的密度是高的, 所以它的透明度应该更低 … 实心不光有亮度, 还有透明度): deep
+      // inside the silhouette the gaps between the summed surfaces fill in from their neighbours (never darker), the
+      // grain there is calmer, and the target hides the bottom band behind it (occ, below) instead of the two adding up
+      float fill = inner * uTune4.y;
+      spk = (1.0 - exp(-(mix(es, max(es, em), fill) + 0.25 * body) * 9.0)) * 0.95 * mix(0.72 + 0.4 * grainS, 0.86 + 0.2 * grainS, fill);
+      occ = inner * smoothstep(thr, 2.5 * thr, es);
+      vec3 eg = (k == 0) ? texture2D(uEcho0, vec2(u, rn)).rgb : texture2D(uEcho1, vec2(u, rn)).rgb;
+      float steelF = clamp(eg.g / max(eg.r, 1e-3), 0.0, 1.0), woodF = clamp(eg.b / max(eg.r, 1e-3), 0.0, 1.0); // steel and wood shares of the splat (lakeMaterial writes them to g, b)
+      // core levels (Jason 2026-10-24: 船这一轮亮度降低的有点过多了, 找上一轮跟这一轮在折中; rock is denser than wood, so rock a
+      // little brighter): wooden hull p90 511 (was 612, then 417), rocks and timber 594, steel 380 as before
+      float core = mix(mix(2.1 * uTune4.w, 1.95 * uTune4.z, woodF), 1.15 * uTune3.w, steelF); // rock and timber · wooden hull · steel
+      spk *= mix(0.82 * uTune2.x, core * uTune2.y, inner);
       // a soft ceiling: solid cores sit at the approved bottom close-up's yellow, not white (Jason 2026-10-24: 钢船过亮,
       // 应该均匀一点; 木船很亮 but wood and the bottom are about as dense, so about as bright)
-      float Ks = 2.2 * uTune3.z; // fit on six scenes: wood and rock cores p90 400–480, as bright as the bottom band; steel 380
+      float Ks = 4.0 * uTune3.z; // 2.2 → 4.0 (2026-10-24): 2.2 held the wooden hull and the rocks too low
       spk = Ks * (1.0 - exp(-spk / Ks));
     }
     // Bottom brightness (Jason 2026-09-25: 画面特别是底部貌似还是太亮 深水也是 … 高亮的部分和桔红色的关系): over a flat
@@ -381,7 +396,7 @@ export const sonarFragment = /* glsl */ `
     accI = K * (1.0 - exp(-accI / K));
     // no separate hot line at the first return any more: both the per-row peak and the edge line were a max over the 24 rows,
     // which spread the band into a 2.4 ft plateau (switching them off reproduced the burst's profile: 75 % width 1.1 ft, a tail to 2.7 ft)
-    acc = (uTune.w * accI + uTune.z * 0.1 * edge * (0.55 + 0.6 * filament)) * shade + spk; // structure (the splat) is not shaded by its own shadow
+    acc = (uTune.w * accI + uTune.z * 0.1 * edge * (0.55 + 0.6 * filament)) * shade * (1.0 - 0.92 * occ * uTune4.x) + spk; // structure (the splat) is not shaded by its own shadow, and hides the band behind it
     // Bottoms past the cap depth are toned no nearer than 80 % of the range window (#92). With the middle sloping
     // from 30 to 80 ft, Forward (the visitor's fixed range) drew its nearer bottom at 11–22 % white against the old
     // plateau's 8 %; now 7–12 %. Down's AUTO range already puts the bottom at ~80 %, so Down barely changes

@@ -74,7 +74,7 @@ export const LAKEBED_LAYER = 2
 export const FISH_LAYER = 3
 export const LOGO_LAYER = 4 // the lakebed logo: main view + Panoramic top-down map; the side views draw it analytically
 const TOP_N = 512 // top-down structure map for Panoramic (±range around the transducer)
-const STRIP_W = 1024, STRIP_H = 128 // 128 rows across the 18–20° thickness ≈ 0.15°/row: a 5 cm bait fish at 12 m still lands on a row (was 32 → dotted small fish)
+const STRIP_W = 1024, STRIP_H = 128, ECHO_H = 512 // 128 rows across the 18–20° thickness ≈ 0.15°/row: a 5 cm bait fish at 12 m still lands on a row (was 32 → dotted small fish)
 
 export default function SonarScreen({ state, rect, lakeMats }) {
   const { gl, scene, camera, size } = useThree()
@@ -96,7 +96,9 @@ export default function SonarScreen({ state, rect, lakeMats }) {
     const targetsB = [0, 1].map(() => { const rt = new THREE.WebGLRenderTarget(STRIP_W, STRIP_H, { depthBuffer: true, minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter }); rt.depthTexture = new THREE.DepthTexture(STRIP_W, STRIP_H, THREE.UnsignedIntType); return rt })
     // the echo splat (pass 3): (angle across the fan × range) per fan, every structure surface added up — sampled by
     // fanEcho as the structure echo (sonarShader uEcho0/1)
-    const echoRTs = [0, 1].map(() => new THREE.WebGLRenderTarget(STRIP_W, 256, { depthBuffer: false, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter }))
+    // 512 rows (was 256) and 4× MSAA: a thin branch covers part of a cell, and without coverage each cell came out all or
+    // nothing, so crowns drew as a mosaic of blocks (Jason 2026-10-24: 树枝 … 类似于像马赛克一样的这种, 这是不对的)
+    const echoRTs = [0, 1].map(() => new THREE.WebGLRenderTarget(STRIP_W, ECHO_H, { depthBuffer: false, samples: 4, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter }))
     const cams = [0, 1].map(() => new THREE.PerspectiveCamera(20, 1, 0.3, 150))
     cams.forEach((c) => { c.layers.set(0); c.layers.enable(LAKEBED_LAYER) })
     // Panoramic: top-down orthographic depth map of the structures (trees, rocks, wrecks) around the transducer
@@ -113,7 +115,7 @@ export default function SonarScreen({ state, rect, lakeMats }) {
       uniforms: {
         uDepth0: { value: targets[0].depthTexture }, uDepth1: { value: targets[1].depthTexture },
         uDepthB0: { value: targetsB[0].depthTexture }, uDepthB1: { value: targetsB[1].depthTexture },
-        uEcho0: { value: echoRTs[0].texture }, uEcho1: { value: echoRTs[1].texture }, uFanR: { value: new THREE.Vector2(30, 30) },
+        uEcho0: { value: echoRTs[0].texture }, uEcho1: { value: echoRTs[1].texture }, uEchoTex: { value: new THREE.Vector2(1 / STRIP_W, 1 / ECHO_H) }, uFanR: { value: new THREE.Vector2(30, 30) },
         uColor0: { value: targets[0].texture }, uColor1: { value: targets[1].texture },
         uFanCount: { value: 0 }, uFan: { value: [new THREE.Vector4(), new THREE.Vector4()] },
         uNearFar: { value: new THREE.Vector2(0.3, 150) }, uRange: { value: 20 }, uReach: { value: 20 },
@@ -126,7 +128,7 @@ export default function SonarScreen({ state, rect, lakeMats }) {
         uLogoB: { value: logo.B }, uLogoU: { value: logo.U }, uLogoV: { value: logo.V },
         uLogoSdf: { value: makeLogoSdf() }, uLogoMap: { value: new THREE.Vector4(1 / logo.s, LOCKUP_SVG.cx, LOCKUP_SVG.bottom, LOGO_SDF_MAX) },
         uLogoSvg: { value: new THREE.Vector2(LOCKUP_SVG.w, LOCKUP_SVG.h) }, uLogoExt: { value: new THREE.Vector2(LOCKUP.width / 2 + 0.3, LOCKUP_SVG.bottom * logo.s + 0.3) },
-        uLUT: { value: colormapTexture('accuphy_mid') }, uGain: { value: 0.40 }, uDynRange: { value: 0.85 }, uContrast: { value: 0.4 }, uNoise: { value: 0.3 }, uGamma: { value: 0.75 }, uTune: { value: new THREE.Vector4(1, 1, 1, 1) }, uTune2: { value: new THREE.Vector4(1, 1, 1, 1) }, uTune3: { value: new THREE.Vector4(1, 1, 1, 1) }, // the app's orange map and gain scale, measured on its 2.0.0 recording (2026-10-23; before: garmin_amber, calibrated 2026-09-24 against the two confirmed frames, sonar-style.md §6.11)
+        uLUT: { value: colormapTexture('accuphy_mid') }, uGain: { value: 0.40 }, uDynRange: { value: 0.85 }, uContrast: { value: 0.4 }, uNoise: { value: 0.3 }, uGamma: { value: 0.75 }, uTune: { value: new THREE.Vector4(1, 1, 1, 1) }, uTune2: { value: new THREE.Vector4(1, 1, 1, 1) }, uTune3: { value: new THREE.Vector4(1, 1, 1, 1) }, uTune4: { value: new THREE.Vector4(1, 1, 1, 1) }, // the app's orange map and gain scale, measured on its 2.0.0 recording (2026-10-23; before: garmin_amber, calibrated 2026-09-24 against the two confirmed frames, sonar-style.md §6.11)
         // the Mini's ice views (2026-10-16): flasher + Live Down (1) or flasher + 2D history (2); the app draws them in its jet map
         uIce: { value: 0 }, uIceSplit: { value: ICE_SPLIT }, uAspect: { value: 2.08 }, uTicks: { value: 5 }, uLUT2: { value: colormapTexture('jet') },
         uHist: { value: null }, uHistPrev: { value: null }, uHistPass: { value: 0 }, uHistFill: { value: 0 }, uIceAmber: { value: /icelut=amber/.test(window.location.search) ? 1 : 0 },
@@ -245,7 +247,7 @@ export default function SonarScreen({ state, rect, lakeMats }) {
     u.uGain.value = s.gain ?? 0.40
     u.uContrast.value = s.contrast ?? 0.4
     u.uNoise.value = s.noise ?? 0.3
-    if (import.meta.env.DEV && window.__sonarTune) { const t = window.__sonarTune; if (t.gamma != null) u.uGamma.value = t.gamma; if (t.dyn != null) u.uDynRange.value = t.dyn; if (t.k) u.uTune.value.fromArray(t.k); if (t.k2) u.uTune2.value.fromArray(t.k2); if (t.k3) u.uTune3.value.fromArray(t.k3) } // dev: tone-curve knobs for like-for-like fits (2026-10-23)
+    if (import.meta.env.DEV && window.__sonarTune) { const t = window.__sonarTune; if (t.gamma != null) u.uGamma.value = t.gamma; if (t.dyn != null) u.uDynRange.value = t.dyn; if (t.k) u.uTune.value.fromArray(t.k); if (t.k2) u.uTune2.value.fromArray(t.k2); if (t.k3) u.uTune3.value.fromArray(t.k3); if (t.k4) u.uTune4.value.fromArray(t.k4) } // dev: tone-curve knobs for like-for-like fits (2026-10-23)
     u.uFanCount.value = specs.length
     const flat = specs[0] && specs[0].frame.n.y !== 0 // panoramic: thickness normal is vertical
     u.uFlat.value = flat ? 1 : 0

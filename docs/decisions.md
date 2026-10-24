@@ -2252,3 +2252,25 @@ Numbered log. Newest at the bottom.
      phone); `vite build` clean. Still open: branches in the crowns are fuller but still dashed in places (low-poly
      branch geometry). Not published: the public pages stay at the #128 build.
 
+145. **2026-10-24** — **Solid targets hide the bottom; smooth branches; the boat halfway back**
+     (Jason on the #144 sheet: "船这一轮亮度降低的有点过多了, 找上一轮跟这一轮在折中"; the rocks are still see-through —
+     "石头的密度是高的, 所以它的透明度应该更低 … 实心不光有亮度的, 还有它的透明度"; their brightness dropped too much; branches
+     look "像马赛克一样 … 这是不对的", they should be smooth). Causes found: the bottom band was ADDED on top of a rock (a bright
+     line ran through every rock sitting on the bottom); a thin branch covers part of an echo-splat cell and each cell came
+     out all or nothing (256 rows, no anti-aliasing, a hashed 12 cm speckle with hard cell edges). Engine:
+     - **Occlusion:** where structure fully covers a pixel (the core-to-rim coverage `cov`), the bottom band behind it is
+       hidden (×(1 − 0.92·occ)) instead of added.
+     - **Inside fill:** deep inside the silhouette the gaps between the summed surfaces fill from the mean of the 16 ring
+       taps (never darker) and the grain is calmer there (`0.86 + 0.2·grainS`).
+     - **Smooth splat:** echo targets 1024×512 (was 256 rows) with 4× MSAA; fanEcho samples half a cell either side across
+       the fan; the splat's speckle is smooth 3D value noise instead of hashed cells. Trees now read as whole trunks and
+       branches; rock edges no longer stair-step.
+     - **Per-material core:** the splat writes a wood share to its blue channel; core levels rock/timber 2.1, wooden hull
+       1.95, steel 1.15 (was 1.3), soft ceiling `Ks` 2.2 → 4.0. Measured (p90 of lit R+G+B, structure only): wooden hull
+       512 (v9 612, v10 417 — the midpoint asked for), timber/rocks 595 (v10 446, white 6 %), steel 386 (v10 365),
+       bottoms unchanged; the approved close-up band unchanged (peak 505 vs 509).
+     - **Fix from #144:** the in-plane beam offset used `fract()` of a noise and drew fingerprint loops in the bottom band;
+       now a sine of the row phase (smooth).
+     - dev knob `window.__sonarTune.k4 = [occlusion, inside fill, wood core, rock core]` (uniform `uTune4`, all 1).
+     Checked: six scenes + close-up + the ice page (desktop, phone); `vite build` clean. Not published: the public pages
+     stay at the #128 build.
