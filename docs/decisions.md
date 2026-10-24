@@ -2022,7 +2022,7 @@ Numbered log. Newest at the bottom.
        `obstacles.js` is unchanged; placement is unchanged except smaller tilts (≤ 0.35 rad, boulders ≤ 0.18; the
        random sequence is untouched).
      - **Checked:** layout dump: 0 of 1,207 structures and 0 of 269 fish moved; `fish-sim` 0 violations; the 6 × 6 sonar
-       grid against main: every tile within 0.4 points of white except the hump (PL Forward 9.4 → 10.6, Mini Forward 3.6 → 4.6, PL Down 1.3 → 1.8: solid rocks echo more, toward the 13–14 % structure target); the ice page in real time: jig, bottom and water specks as before; build passes. Dev aid `?cam=rocks[:hump]`
+       grid against main (after #130's engine): every tile within 0.5 points of white except the hump (PL Forward 4.5 → 5.9, Mini Forward 1.8 → 3.5, PL Down 0.9 → 1.3: solid rocks echo more); the ice page in real time: jig, bottom and water specks as before; build passes. Dev aid `?cam=rocks[:hump]`
        circles the island pile (or the first rock hump) under water.
      - Found, not fixed: in `lakeMaterial.js` the fine speckle and the bark grooves multiply `albedo` after `base` has
        been computed from it, so no surface texture reaches any structure or the bed (backlog).
