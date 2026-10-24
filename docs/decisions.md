@@ -2274,3 +2274,22 @@ Numbered log. Newest at the bottom.
      - dev knob `window.__sonarTune.k4 = [occlusion, inside fill, wood core, rock core]` (uniform `uTune4`, all 1).
      Checked: six scenes + close-up + the ice page (desktop, phone); `vite build` clean. Not published: the public pages
      stay at the #128 build.
+
+146. **2026-10-24** — **Fibres inside hulls and rocks, like the bottom close-up; opacity kept**
+     (Jason on the #145 sheet: the transparency is solved well, but "船还有石头他们的纹理你还是得去参考最顶上的这个底部的特写图 …
+     现在你的船跟石头变得很光滑, 简直像拍照片一样, 这个就很不真实" — keep the opacity, fix the texture; everything else is
+     good). Measured texture (coefficient of variation of L deep inside a target): the recording's band 0.28, the approved
+     Lab band 0.22, our rock and hull 0.12, steel 0.07. Engine (`sonarShader.js`):
+     - Inside the structure echo, before the soft ceiling: bright yellow streaks along the ray on the orange body,
+       ~5–8 cm across (angular frequency `clamp(11·range, 150, 400)`, so Forward at 80 ft gets the close-up's strokes, not
+       blobs) and ~0.6 m long, re-drawn every ping; centred so the average level stays; full strength deep inside, half
+       on the rim (branches stay whole); never below 0.35 (gaps stay orange, the target stays solid). Now rock 0.19, hull
+       0.16, steel 0.15.
+     - Tried and dropped: the band's own `tex` (blobs at Forward ranges), dark-gap-led fibres (leopard spots), a
+       metric width (`aWorld·r`: the streaks turned vertical), longer strokes (combed hair).
+     - Levels re-fitted with the fibres: core rock/timber 2.45, wooden hull 2.1, steel 1.08; `Ks` back to 2.2 so the
+       bright fibres stay yellow. Structure p90: hull 517, rocks 585 (white 12 % of the top third), steel 404; bottoms
+       and the approved close-up band unchanged (peak 505). Mini shelf trees 438 (was 474).
+     - dev knob `window.__sonarTune.k5 = [fibre contrast, bright share, fibre length, —]` (uniform `uTune5`, all 1).
+     Checked: six scenes + close-up + the ice page (desktop, phone); `vite build` clean. Not published: the public pages
+     stay at the #128 build.

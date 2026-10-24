@@ -47,6 +47,7 @@ export const sonarFragment = /* glsl */ `
   uniform sampler2D uLUT;
   uniform float uGain; uniform float uDynRange; uniform float uContrast; uniform float uNoise; uniform float uGamma;
   uniform vec4 uTune2; // dev only (window.__sonarTune.k2): structure rim level, core level, ring radius, inside threshold — all 1 in production
+  uniform vec4 uTune5; // dev only (window.__sonarTune.k5): structure fibre contrast, bright-streak share, fibre length (×1/), unused — all 1 in production
   uniform vec4 uTune4; // dev only (window.__sonarTune.k4): structure hides the bottom, inside fill, wood core, rock core — all 1 in production
   uniform vec4 uTune3; // dev only (window.__sonarTune.k3): bottom spread compensation, near-gain floor, structure cap, steel core — all 1 in production
   uniform vec4 uTune; // dev only (window.__sonarTune.k): scales for the band's pulse, tail, peak+edge and integrated body, all 1 in production
@@ -371,12 +372,22 @@ export const sonarFragment = /* glsl */ `
       vec3 eg = (k == 0) ? texture2D(uEcho0, vec2(u, rn)).rgb : texture2D(uEcho1, vec2(u, rn)).rgb;
       float steelF = clamp(eg.g / max(eg.r, 1e-3), 0.0, 1.0), woodF = clamp(eg.b / max(eg.r, 1e-3), 0.0, 1.0); // steel and wood shares of the splat (lakeMaterial writes them to g, b)
       // core levels (Jason 2026-10-24: 船这一轮亮度降低的有点过多了, 找上一轮跟这一轮在折中; rock is denser than wood, so rock a
-      // little brighter): wooden hull p90 511 (was 612, then 417), rocks and timber 594, steel 380 as before
-      float core = mix(mix(2.1 * uTune4.w, 1.95 * uTune4.z, woodF), 1.15 * uTune3.w, steelF); // rock and timber · wooden hull · steel
+      // little brighter): wooden hull p90 ~515 (was 612, then 417), rocks and timber ~585, steel ~400 — with the fibres below
+      float core = mix(mix(2.45 * uTune4.w, 2.1 * uTune4.z, woodF), 1.08 * uTune3.w, steelF); // rock and timber · wooden hull · steel
       spk *= mix(0.82 * uTune2.x, core * uTune2.y, inner);
       // a soft ceiling: solid cores sit at the approved bottom close-up's yellow, not white (Jason 2026-10-24: 钢船过亮,
       // 应该均匀一点; 木船很亮 but wood and the bottom are about as dense, so about as bright)
-      float Ks = 4.0 * uTune3.z; // 2.2 → 4.0 (2026-10-24): 2.2 held the wooden hull and the rocks too low
+      // Fibres like the approved bottom close-up (Jason 2026-10-24: 船跟石头的纹理你还是得去参考最顶上的这个底部的特写图 …
+      // 现在变得很光滑, 简直像拍照片一样, 不真实 — without giving back the opacity): bright yellow streaks along the ray on an
+      // orange body, the close-up's strokes (~5–8 cm across, ~0.6 m long). Angular like the band's tex (constant along a
+      // ray), but scaled with the view's range so a Forward picture at 80 ft gets the same strokes as the close-up instead
+      // of blobs. Full strength deep inside, half on the rim so a branch stays whole; the gaps stay orange (floor 0.35),
+      // never black, so the target stays solid.
+      float fa = clamp(11.0 * uRange, 150.0, 400.0);
+      float fs = 0.65 * vnoise(vec2(aWorld * fa, r * 1.6 * uTune5.z + png * 0.3)) + 0.35 * vnoise(vec2(aWorld * fa * 2.1 + 5.0, r * 3.2 * uTune5.z - png * 0.4));
+      float fib = 1.0 + (0.9 * smoothstep(0.3, 0.85, fs) - 0.28) * mix(0.5, 1.0, inner) * 1.3 * uTune5.x; // centred (mean ≈ 1): texture only, the level stays // long thin bright strokes; core CoV 0.19–0.22 (the close-up band 0.22, the recording 0.28)
+      spk *= max(fib > 1.0 ? 1.0 + (fib - 1.0) * uTune5.y : fib, 0.35);
+      float Ks = 2.2 * uTune3.z; // the soft ceiling holds the bright fibres at yellow (4.0 without fibres, 2026-10-24)
       spk = Ks * (1.0 - exp(-spk / Ks));
     }
     // Bottom brightness (Jason 2026-09-25: 画面特别是底部貌似还是太亮 深水也是 … 高亮的部分和桔红色的关系): over a flat
