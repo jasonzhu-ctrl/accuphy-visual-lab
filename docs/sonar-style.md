@@ -898,7 +898,7 @@ rows, never take their max.
 
 **Core to rim and the band's texture (decision #143, 2026-10-24):** inside a solid target on the burst the brightness
 climbs over the outer ~9 in (L 157 → 390) and stays there, with yellow 22 % and white 4 % in the core; red only in the outer
-4 in. The bottom band's edge is flat — the texture is soft fibres along the rays (~3 in × 10–16 in, low contrast) whose tips
+4 in. The bottom band's edge is flat — the texture is soft fibres along the rays [wrong direction, see the grain rule below: they run across the rays] (~3 in × 10–16 in, low contrast) whose tips
 feather the top edge; there are no bumps. Measure with `real/rim.py` and the `band-zoom` crops, never by edge-detector
 "wobble" alone (it mistook the fibre tips for a moving edge in #140).
 
@@ -906,8 +906,32 @@ feather the top edge; there are no bumps. Measure with `real/rim.py` and the `ba
 a solid target is **opaque** — the bottom band behind it does not show through (in the Lab it was added on top and read as
 "transparent"). Its inside carries the **same fibres as the band**: in the band crop of `pl-down-d00` the brightness varies
 with a coefficient of variation of **0.28** (L median 388, p10/p90 236/511, gaps below 0.6 × median 9 %); the Lab's approved
-band 0.22; a "photo-smooth" target 0.12. The fibres run along the ray, ~5–8 cm across and ~0.3–0.6 m long, brighter yellow
+band 0.22; a "photo-smooth" target 0.12. The fibres run along the ray [wrong — the app's run across it; see the grain rule below], ~5–8 cm across and ~0.3–0.6 m long, brighter yellow
 strokes on an orange body, never black gaps (black gaps read as see-through, dark-led texture as leopard spots). The
-**outline is never a clean line**: thin tapering streaks along the ray stick out of every surface, ~10–20 cm on the side
+**outline is never a clean line**: thin tapering streaks [the ends of the across-ray grains, see below] stick out of every surface, ~10–20 cm on the side
 facing the transducer and ~20–30 cm behind, each beam its own length, new every ping — on hulls, rocks, steel and branches
 alike ("每个物体表面都会有纤维的").
+
+**The grain rule — every return is a short arc across the beam (measured 2026-10-24; corrects #143, #146, #147).**
+Jason: "不是简单的横向短颗粒 … 看真机的颗粒到底是什么, 在不同画面下有什么共性, 规律". Method (`scratchpad/grain/grain.py`):
+the long axis of the >0.5 lobe of the 2-D autocorrelation of each lit 96 px patch, in physical units from the rulers,
+and its angle to the ray from the transducer. Both vivo bursts (PL Down 80 ft, PL Forward 60 ft; 1,782 patches, every
+4th frame):
+- **Direction:** the grain's long axis is **across the ray in 100 % of the patches (median 87–89°)** at every range, on
+  the hull, the bottom band and its tail alike, and with any high-pass scale (80–89°). On screen the arcs therefore tilt
+  with the fan: "\\" on the left of a Down picture, flat under the transducer, "/" on its right, "/" in most of Forward. The
+  same holds by eye in every other view we have: Mini Forward weeds and bottom, Mini Combo band and piling, PL Panoramic
+  fish, Mini Down fish and band (`reference/frames/`), and LiveScope (fish as vertical needles in its Forward view =
+  across its horizontal rays). The fish model (#120) already follows it; structure and the bottom did not.
+- **Size:** fine grain ~6–7 in across × ~2 in along the ray (aspect ~3), grouped into clusters ~10 × 4 in. Across, it grows
+  only slowly with range (6.3 → 7.3 in from 25 to 55 ft in Down; 4.3 → 7.0 in from 25 to 60 ft in Forward: 1.0° → 0.6°);
+  along the ray it stays ~2 in (the pulse).
+- **Composition:** a continuous reflector (the bottom, a deck line, a piling) is these arcs laid side by side and
+  overlapping, so the texture inside a band crosses the band at the angle between the band and the rays — the diagonal
+  "fibres" of the bottom close-up (strokes at 31–45° on screen where the ray runs at 122–135°) are across-ray arcs, not
+  streaks along the ray. A target's ragged outline is made of the same arcs' ends sticking out (above the hull top only
+  ~2.6 in); edges parallel to the rays fray the most, edges square to them stay lumpy but straight.
+- **Life:** the arcs re-form every ping (hull |ΔL|/L 0.46 between frames 1 s apart, 64 % of band pixels change colour
+  class; LiveScope-session check 2026-10-24).
+- **The Lab after #147, same method:** long axis **along the ray (median 1°)**, aspect ~10 (8–14 × 1–1.5 in) — hair, not
+  arcs; hull |ΔL|/L 0.17, band 43 %.

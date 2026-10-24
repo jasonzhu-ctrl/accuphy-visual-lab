@@ -171,3 +171,9 @@ band thickness, the colour ramp — then the SAME scene in the Lab (`?study=wrec
 `window.__sonarFlat(w, h)` for the flat picture) compared on the same boxes with `scratchpad/real/stats.py`-style
 numbers, one knob at a time (`window.__sonarTune`). Keep the UI text out of the measured boxes. Ask Jason what the
 unknown blobs are before modelling them.
+
+## Measure a texture's direction against the ray, never read it off a crop (2026-10-24)
+#143/#146/#147 drew the bottom's, the hulls' and the outlines' fibres along the ray because the close-up's diagonal
+strokes looked like rays; the app's grain runs across the ray in 100 % of 1,782 measured patches (Lab: 1°, app: 88°).
+A diagonal stroke means nothing until its angle to the ray from the transducer is measured (`sonar-style.md` §10, the
+grain rule). The fish (#120) had the right rule all along — check a new texture against the existing models first.
