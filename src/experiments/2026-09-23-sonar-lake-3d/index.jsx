@@ -274,7 +274,7 @@ export default function SonarLake3D({ scene: sceneProp }) {
       </div>
 
       {/* ---- control panel — Apple-style frosted glass over the lake (Jason 2026-09-24) ---- */}
-      <motion.div ref={panelRef} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+      <motion.div ref={panelRef} data-hint-avoid initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
         className="ac-panel pointer-events-auto absolute flex flex-col gap-3 max-sm:hidden sm:left-4 sm:top-14 sm:w-[400px] sm:p-4" style={land ? { display: 'none' } : undefined}>
         <div className="flex items-center justify-between px-1 pt-0.5">
           <img src="/brand/logo/White Accuphy Logo.png" alt="Accuphy" className="h-[18px] w-auto drop-shadow-[0_1px_2px_rgba(0,20,30,0.25)]" draggable={false} />
@@ -337,7 +337,7 @@ export default function SonarLake3D({ scene: sceneProp }) {
            Proportions from the 15/16 Pro Max: body 2.08:1, corner radius ≈ 14 % of the short side,
            thin uniform bezel, Dynamic Island on the left in landscape, volume/action buttons on top,
            power button below; brushed titanium band; faint glass reflection over the display. ---- */}
-      <div ref={(el) => { sonarRect.current.frame = el }} className={land ? 'pointer-events-none absolute inset-0' : `pointer-events-none absolute inset-x-3 bottom-[calc(14px+env(safe-area-inset-bottom))] sm:inset-x-auto sm:right-[28px] sm:bottom-[24px] ${BIG_PHONE ? 'sm:w-[min(88vw,1400px)]' : 'sm:w-[min(38vw,560px)]'}`} style={land ? undefined : { aspectRatio: '2.08 / 1' }}>
+      <div ref={(el) => { sonarRect.current.frame = el }} data-hint-avoid className={land ? 'pointer-events-none absolute inset-0' : `pointer-events-none absolute inset-x-3 bottom-[calc(14px+env(safe-area-inset-bottom))] sm:inset-x-auto sm:right-[28px] sm:bottom-[24px] ${BIG_PHONE ? 'sm:w-[min(88vw,1400px)]' : 'sm:w-[min(38vw,560px)]'}`} style={land ? undefined : { aspectRatio: '2.08 / 1' }}>
         <div style={{ position: 'relative', width: '100%', height: '100%', transform: land ? undefined : `perspective(${phonePose().perspective}px) rotateY(${phonePose().rotY}deg) rotateX(${phonePose().rotX}deg)` }}>
           {!land && (<>
           {/* side buttons (on the top edge in landscape: action + volume; power on the bottom edge) */}
@@ -394,7 +394,7 @@ export default function SonarLake3D({ scene: sceneProp }) {
       )}
 
       {/* ---- guide strip ---- */}
-      <div className={ICE ? 'pointer-events-auto absolute hidden flex-col gap-2 md:flex' : 'pointer-events-auto absolute right-[28px] top-4 hidden w-[min(620px,44vw)] items-stretch gap-2.5 md:flex'} style={ICE ? { left: 16, top: cardsTop, width: 400 } : land ? { display: 'none' } : undefined}>
+      <div data-hint-avoid className={ICE ? 'pointer-events-auto absolute hidden flex-col gap-2 md:flex' : 'pointer-events-auto absolute right-[28px] top-4 hidden w-[min(620px,44vw)] items-stretch gap-2.5 md:flex'} style={ICE ? { left: 16, top: cardsTop, width: 400 } : land ? { display: 'none' } : undefined}>
         {STEPS.map((st, i) => (
           <button key={st.n} onClick={() => goStep(i)} className={`ac-card flex-1 text-left ${ICE ? 'px-3.5 py-2.5' : 'px-3.5 py-3'} ${step === i ? 'is-active' : ''}`}>
             <div className="flex items-center gap-2"><span className="ac-num">0{st.n}</span><span className="ac-label">Step</span></div>

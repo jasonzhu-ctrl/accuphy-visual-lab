@@ -513,8 +513,25 @@ function Rig({ state, sonarRect, fogMats, cam = LAKE_CAM }) {
       const below = cam.hintBelow && s.view !== 'section'
       const py = below ? ((1 - tmp.y) / 2) * size.height + (s.view === 'under' ? 150 : k > 1 ? 30 : 44) : Math.max((s.hintEl.offsetHeight || 34) + 54, ((1 - tmp.y) / 2) * size.height - (k > 1 ? 6 : 8))
       const qy = iceSec ? ((1 - tmp.y) / 2) * size.height + (k > 1 ? 16 : 18) : py // ice: the caption just under the reticle
-      const qx = iceSec ? Math.min(size.width - hw, Math.max(hw, ((tmp.x + 1) / 2) * size.width)) : px // ice: centred on the reticle, kept on screen
-      s.hintEl.style.transform = `translate(${qx.toFixed(1)}px, ${qy.toFixed(1)}px) translate(-50%, ${iceSec ? '0' : below ? '0' : '-100%'})`
+      let qx = iceSec ? Math.min(size.width - hw, Math.max(hw, ((tmp.x + 1) / 2) * size.width)) : px // ice: centred on the reticle, kept on screen
+      // never under the glass panel, the step cards or the phone (2026-10-24, the vivo fold at 711×584: the caption sat on
+      // the panel's Range value): slide it just right of the box it hits, or below it when there is no room on the right
+      const anchorTop = iceSec || below, w = s.hintEl.offsetWidth || 160, h = s.hintEl.offsetHeight || 20
+      let top = anchorTop ? qy : qy - h
+      const base = s.hintEl.offsetParent?.getBoundingClientRect()
+      if (base) {
+        if (!s.hintAvoid || ++s.hintAvoidN > 60) { s.hintAvoid = [...document.querySelectorAll('[data-hint-avoid]')]; s.hintAvoidN = 0 }
+        for (const el of s.hintAvoid) {
+          const r = el.getBoundingClientRect()
+          if (!r.width || r.width * r.height > 0.6 * size.width * size.height) continue // hidden, or full-screen (a sideways phone: the caption is off there anyway)
+          const L = r.left - base.left - 8, R = r.right - base.left + 8, T = r.top - base.top - 8, B = r.bottom - base.top + 8
+          if (qx + w / 2 <= L || qx - w / 2 >= R || top + h <= T || top >= B) continue
+          if (R + w / 2 <= size.width - 8) qx = R + w / 2
+          else top = Math.min(B, size.height - h - 8)
+        }
+      }
+      const qy2 = anchorTop ? top : top + h
+      s.hintEl.style.transform = `translate(${qx.toFixed(1)}px, ${qy2.toFixed(1)}px) translate(-50%, ${anchorTop ? '0' : '-100%'})`
       s.hintEl.style.opacity = s.hasDragged || s.hintOff ? '0' : '1' // hintOff: a sideways phone with the sonar full-screen (#140)
     }
     // fixed 3/4 aerial view like the PL animations; slight parallax from the pointer
