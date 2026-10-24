@@ -2004,3 +2004,35 @@ Numbered log. Newest at the bottom.
      - **Open** (Jason to identify on the frame): the speck spray above the stern, the specks above the bow, the bright
        bow face, the dark cavities, the faint diagonal left of the hull, the trail under the bottom. Public pages not
        rebuilt: the colour map and gain scale change every picture, Jason sees it first.
+
+131. **2026-10-24** — **Rocks rebuilt: Shield boulders in code, six shapes** (Jason: "场景里面的石头像爆米花一样 … 去网上找实际的
+     模型 … 要符合北美的淡水湖里面石头的质地跟形状").
+     - **Cause:** `makeRock` was a `DodecahedronGeometry(0.5, 1)` — non-indexed in three r186, so each corner exists ~6
+       times — and moved every copy by its own random amount: the skin tore into loose flat-shaded shards (gaps up to
+       22 cm on a 1 m rock). Its colour (0.46) was also the lightest thing in the lake, so the beam lifted it to white.
+     - **Models from the web:** every model site (Poly Haven, Sketchfab, Quaternius, Kenney, ambientCG, Smithsonian…) is
+       denied by the environment's network policy; the one reachable mirror (GitHub) has four cartoon Kenney rocks only.
+       Jason chose the code route and asked for polish ("用代码做的这版，继续打磨"); the alternative (allow the Poly Haven
+       domains, use scanned shapes with our material) stays open if he wants scans.
+     - **`rocks.js`:** a welded icosahedron (`mergeVertices`) shaped by an ellipsoid, low-frequency bumps, a lean, 2–7 soft
+       planar joint cuts with rounded shoulders, fine grain and a flattened base; six kinds (rounded pink granite,
+       jointed grey block, gneiss slab, long loaf, dark broken shard, algae-green cobble) with silt-dark bases and
+       lighter/darker patches in the vertex colour, albedo 0.24–0.36. Small rocks at 320 triangles (12 geometries),
+       the few with s ≥ 1.2 at 1280 (6). The unit rock keeps the old envelope (half-extent 0.62, base at −0.4), so
+       `obstacles.js` is unchanged; placement is unchanged except smaller tilts (≤ 0.35 rad, boulders ≤ 0.18; the
+       random sequence is untouched).
+     - **Checked:** layout dump: 0 of 1,207 structures and 0 of 269 fish moved; `fish-sim` 0 violations; the 6 × 6 sonar
+       grid against main (after #130's engine): every tile within 0.5 points of white except the hump (PL Forward 4.5 → 5.9, Mini Forward 1.8 → 3.5, PL Down 0.9 → 1.3: solid rocks echo more); the ice page in real time: jig, bottom and water specks as before; build passes. Dev aid `?cam=rocks[:hump]`
+       circles the island pile (or the first rock hump) under water.
+     - Found, not fixed: in `lakeMaterial.js` the fine speckle and the bark grooves multiply `albedo` after `base` has
+       been computed from it, so no surface texture reaches any structure or the bed (backlog).
+
+132. **2026-10-24** — **The drag cue is a reticle on the water, not a glass pill** (Jason: "drag the boat 这个图标是不是能够去
+     换更加优秀的图标"; he picked option C of four mock-ups).
+     - The lake's "DRAG THE BOAT" pill (glass, blue double arrow, all caps) is replaced by the ice page's language (#123):
+       a thin white reticle lying on the water round the hull — four arcs of an ellipse (4.6 × 2.3 m) with gaps fore,
+       aft and abeam, a chevron off the bow and the stern, a ripple spreading out of it every 2.6 s, a slow breath — and
+       one plain caption above it, "Drag the boat to move it" (sentence case, 13 px, no background). It fades after the
+       first drag. Both pages now share one caption element (`index.jsx`); the reticle lives with the boat (`Scene.jsx
+       Boat`, `ellipseArc`), on the sonar-hidden layer so no sonar camera sees it.
+     - Checked: desktop and 390 × 844: the caption clears the top; the reticle rides with the boat; no console errors.
