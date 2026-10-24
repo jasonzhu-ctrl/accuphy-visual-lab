@@ -121,7 +121,7 @@ export default function SonarScreen({ state, rect, lakeMats }) {
         uLogoB: { value: logo.B }, uLogoU: { value: logo.U }, uLogoV: { value: logo.V },
         uLogoSdf: { value: makeLogoSdf() }, uLogoMap: { value: new THREE.Vector4(1 / logo.s, LOCKUP_SVG.cx, LOCKUP_SVG.bottom, LOGO_SDF_MAX) },
         uLogoSvg: { value: new THREE.Vector2(LOCKUP_SVG.w, LOCKUP_SVG.h) }, uLogoExt: { value: new THREE.Vector2(LOCKUP.width / 2 + 0.3, LOCKUP_SVG.bottom * logo.s + 0.3) },
-        uLUT: { value: colormapTexture('accuphy_mid') }, uGain: { value: 0.40 }, uDynRange: { value: 0.85 }, uContrast: { value: 0.4 }, uNoise: { value: 0.3 }, uGamma: { value: 0.75 }, // the app's orange map and gain scale, measured on its 2.0.0 recording (2026-10-23; before: garmin_amber, calibrated 2026-09-24 against the two confirmed frames, sonar-style.md §6.11)
+        uLUT: { value: colormapTexture('accuphy_mid') }, uGain: { value: 0.40 }, uDynRange: { value: 0.85 }, uContrast: { value: 0.4 }, uNoise: { value: 0.3 }, uGamma: { value: 0.75 }, uTune: { value: new THREE.Vector4(1, 1, 1, 1) }, // the app's orange map and gain scale, measured on its 2.0.0 recording (2026-10-23; before: garmin_amber, calibrated 2026-09-24 against the two confirmed frames, sonar-style.md §6.11)
         // the Mini's ice views (2026-10-16): flasher + Live Down (1) or flasher + 2D history (2); the app draws them in its jet map
         uIce: { value: 0 }, uIceSplit: { value: ICE_SPLIT }, uAspect: { value: 2.08 }, uTicks: { value: 5 }, uLUT2: { value: colormapTexture('jet') },
         uHist: { value: null }, uHistPrev: { value: null }, uHistPass: { value: 0 }, uHistFill: { value: 0 }, uIceAmber: { value: /icelut=amber/.test(window.location.search) ? 1 : 0 },
@@ -239,7 +239,7 @@ export default function SonarScreen({ state, rect, lakeMats }) {
     u.uGain.value = s.gain ?? 0.40
     u.uContrast.value = s.contrast ?? 0.4
     u.uNoise.value = s.noise ?? 0.3
-    if (import.meta.env.DEV && window.__sonarTune) { const t = window.__sonarTune; if (t.gamma != null) u.uGamma.value = t.gamma; if (t.dyn != null) u.uDynRange.value = t.dyn } // dev: tone-curve knobs for like-for-like fits (2026-10-23)
+    if (import.meta.env.DEV && window.__sonarTune) { const t = window.__sonarTune; if (t.gamma != null) u.uGamma.value = t.gamma; if (t.dyn != null) u.uDynRange.value = t.dyn; if (t.k) u.uTune.value.fromArray(t.k) } // dev: tone-curve knobs for like-for-like fits (2026-10-23)
     u.uFanCount.value = specs.length
     const flat = specs[0] && specs[0].frame.n.y !== 0 // panoramic: thickness normal is vertical
     u.uFlat.value = flat ? 1 : 0
