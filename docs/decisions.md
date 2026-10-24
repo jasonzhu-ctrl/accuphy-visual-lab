@@ -2174,3 +2174,24 @@ Numbered log. Newest at the bottom.
     Checked: six comparison scenes (`对比-v3-v5.jpg` sent to Jason), the ice page (desktop + phone) still draws its band
     and dial, `vite build` clean. Not published: the three public pages stay at the #128 build until Jason says so.
 
+141. **2026-10-24** — **Bright cores, orange rims; a flat bottom with fine fibres** (Jason on the #140 sheets: "实心改善的完全不够"
+     — targets are brightest in the middle and only the outermost rim turns orange, as he said on 2026-09-24 in the first
+     Lab chat: "越靠近中心越亮 有这个逐步亮的过程 … 这种实心结构亮的 清晰的 是更好的"; then on the bottom: "你的那种坑坑洼洼是一高一低
+     … 它是一种平整，但是上面有细腻的纹理 … 不行你就抄也可以"). Engine (`sonarShader.js`):
+     - **Core to rim for structure:** after the echo splat, 16 taps on two rings (0.12 m and 0.25 m in the picture's metres,
+       rotated per pixel and ping) tell how deep inside the silhouette a pixel lies; the structure echo is scaled from a
+       rim level (0.82) to a core level (2.1). Measured with `real/rim.py` (brightness and colour class vs inches inside the
+       silhouette) on the burst's wreck: L 157/253/317/360/390/395 from the edge to 18 in, yellow 22 %, white 4 % in the
+       core. Lab study wreck after: 138/233/318/367/395/411, yellow 34–41 %. Before: flat ~265, no yellow, 63 % red.
+     - **Bottom edge flat:** the per-ping and static displacement of the bottom hit from #140 is removed — what #140 read as
+       a 2.5 in "edge wobble" in the burst is the fibres' tips, not the edge moving. The pulse onset is a little softer
+       (near-side gaussian 0.36×) so bright fibres poke a few cm above the edge, like the burst's feathered top.
+     - **Fibres copied from the burst at 4×** (`band-zoom` crops): soft streaks along the ray ~3 in across, 10–16 in long,
+       low contrast (`tex 0.55 + 0.9 · smoothstep(streak)`), drifting every ping; the hashed `grain` (which drew a dotted
+       grid at 4× and the white sparkles) is gone from the streak branch. Band: peak 501/765 at +0.76 ft (real 473 at
+       +0.58), 2 ft under the edge w0 y29 o57 r13 (real w2 y21 o49 r18), 36 % class change per ping (real 44 %).
+     - dev knob `window.__sonarTune.k2 = [rim, core, ring radius, inside threshold]` (uniform `uTune2`, all 1 in production).
+     Not done: the study hull still reads hollow in its lower half when zoomed (a lobe floor in the splat was tried and
+     stopped by Jason before it ran); steel keeps the same core level as wood. Checked: six scenes + the ice page (desktop,
+     phone), `vite build` clean. Not published: the public pages stay at the #128 build.
+

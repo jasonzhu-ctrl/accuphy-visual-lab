@@ -46,6 +46,7 @@ export const sonarFragment = /* glsl */ `
   uniform float uDebug;
   uniform sampler2D uLUT;
   uniform float uGain; uniform float uDynRange; uniform float uContrast; uniform float uNoise; uniform float uGamma;
+  uniform vec4 uTune2; // dev only (window.__sonarTune.k2): structure rim level, core level, ring radius, inside threshold — all 1 in production
   uniform vec4 uTune; // dev only (window.__sonarTune.k): scales for the band's pulse, tail, peak+edge and integrated body, all 1 in production
   // fish marks (sonarMarks.js): 64 × 4 float texture
   uniform sampler2D uMarks; uniform int uMarkCount; uniform float uPulse; uniform float uBeamHalf;
@@ -274,11 +275,8 @@ export const sonarFragment = /* glsl */ `
       float lobe0 = 1.0 - abs(v * 2.0 - 1.0), wgt0 = 0.33 + 1.87 * pow(lobe0, 1.8);
       float rayLen = length(vec3(tan(a), ty, 1.0));
       float hit = sampleDist(k, vec2(u, v), rayLen);
-      // the bottom is not a smooth surface: a static roughness of ±8 cm along the fan and a per-ping wobble of ±20 cm
-      // (the burst's leading edge moves 2.5 in between pings, median; ours moved 0.8),
-      // so the leading edge is slightly irregular and breathes from ping to ping (the recording's edge does)
-      hit += (vnoise(vec2(aWorld * r * 0.7 + 2.0, 3.0)) - 0.5) * 0.16 + (vnoise(vec2(aWorld * r * 2.5 + png * 0.6, png * 0.37 + 9.0)) - 0.5) * 0.26
-           + (vnoise(vec2(aWorld * r * 9.0 + png * 1.7, png * 0.53 + 4.0)) - 0.5) * 0.2;
+      // (no displacement of the bottom's edge: the burst's edge is flat — its fine texture is the fibres below, not bumps.
+      //  Jason 2026-10-24: 你的那种坑坑洼洼是一高一低 … 它是一种平整，但是上面有细腻的纹理)
       float dr = r - hit;
       float tag = sampleTag(k, vec2(u, v));
       float structure = step(0.25, tag), steel = step(0.62, tag), wood = step(0.55, tag) * (1.0 - steel); // 0.5 timber/rock · 0.6 wood · 0.75 steel
@@ -292,7 +290,7 @@ export const sonarFragment = /* glsl */ `
       // face; steel keeps its wide bands and long tails (#63)
       float sg = mix(sigma, mix((0.15 + 0.006 * r) * (1.0 + 1.0 * smoothstep(6.0, 30.0, r)), sigma, steel), structure);
       // the bottom's pulse: a sharp onset (the burst's band rises over 0.5 ft) and a softer back; structure is painted by the echo splat below
-      float pulse = exp(-dr * dr / (sg * sg * (dr < 0.0 ? 0.2 : 1.0))) * (1.0 - structure);
+      float pulse = exp(-dr * dr / (sg * sg * (dr < 0.0 ? 0.36 : 1.0))) * (1.0 - structure); // a soft enough onset that the bright fibres poke a few cm above the edge (the burst's feathered top)
       float tail = dr > 0.0 ? (0.55 + 0.65 * steel) * exp(-dr / (tailLen * (1.0 + 0.5 * steel))) * (1.0 - structure + steel) : 0.0; // the bottom's tail; steel keeps a long tail (#63)
       // the far side of what this row hit (back-face strip): a hull's thickness, a trunk's diameter. No far face found
       // (an open mesh, the lakebed lockup) → wood 2.5 m, timber 0.4 m
@@ -311,7 +309,7 @@ export const sonarFragment = /* glsl */ `
       // under it (the recording's bottom runs lit under the hull), timber and rock shade hard
       float body = 0.0; // (structure is painted by the splat)
       wsum += wgt; wblk += wgt * structure * mix(1.0, 0.3, wood) * smoothstep(th + 0.15, th + 0.6, dr) * exp(-max(dr - th - 0.6, 0.0) / 1.8);
-      acc += (1.3 * uTune.x * pulse + uTune.y * tail + body + second) * wgt; // the band's profile measured on the burst: peak 0.5 ft under the edge, 75 % width 1.1 ft, 15 % width 2.7 ft, orange body
+      acc += (1.45 * uTune.x * pulse + uTune.y * tail + body + second) * wgt; // a yellow core in the band, orange only at its top and bottom edges // the band's profile measured on the burst: peak 0.5 ft under the edge, 75 % width 1.1 ft, 15 % width 2.7 ft, orange body
       peak = max(peak, pulse * (1.0 - structure));
       edge = max(edge, exp(-dr * dr / (0.16 * sg * sg)) * (1.0 - structure)); // the first return: a thin hot line
       // (spk: the structure echo comes from the splat after the loop)
@@ -327,6 +325,25 @@ export const sonarFragment = /* glsl */ `
     es /= 1.87;
     float body = clamp(solidAcc / max(wsum, 1e-3), 0.0, 1.0);
     spk = (1.0 - exp(-(es + 0.25 * body) * 9.0)) * 0.95 * (0.55 + 0.6 * grainS); // surfaces (splat) + the solid body between them, soft knee
+    // Core to rim (Jason 2026-09-24: 越靠近中心越亮 有这个逐步亮的过程 · 这种实心结构亮的 清晰的 是更好的; 2026-10-24: 中间最亮, 慢慢
+    // 发散到外面, 最外圈才接近橙色 — for fish, rocks, hulls and the bottom alike). Measured on the burst's hull (rim.py): L 160 in
+    // the outer 2 in, 250 at 2–4 in, 360 at 6–9 in, ~390 from 9 in inside with yellow 22 % and white 4 %; red only at the rim.
+    // How deep inside the silhouette a pixel lies: how many of 16 taps on two rings (0.12 m and 0.25 m in the picture's
+    // metres, rotated per pixel and ping) also land on structure. Deep inside → the core level, on the rim → the rim level.
+    if (es > 0.002) {
+      float duR = 0.5 / (uFan[k].z * cos(a) * cos(a) * max(r, 0.5)); // u per metre across the fan at this range
+      float rot = hash(floor(vec2(aWorld * 900.0, r * 30.0)) + png * 0.73) * 6.2832;
+      float thr = 0.012 * uTune2.w, cov = 0.0;
+      for (int q = 0; q < 8; q++) {
+        float an = float(q) * 0.7854 + rot;
+        vec2 o = vec2(cos(an), sin(an));
+        vec2 o1 = o * 0.12 * uTune2.z, o2 = o * 0.25 * uTune2.z;
+        cov += smoothstep(thr, 2.5 * thr, sampleEcho(k, u + o1.x * duR, rn + o1.y / uFanR[k]));
+        cov += smoothstep(thr, 2.5 * thr, sampleEcho(k, u + o2.x * duR, rn + o2.y / uFanR[k]));
+      }
+      cov /= 16.0;
+      spk *= mix(0.82 * uTune2.x, 2.1 * uTune2.y, smoothstep(0.45, 0.95, cov)); // fit (study wreck vs burst hull): L 150/250/330/380/405/420, yellow 25 %, white 3 %
+    }
     // Bottom brightness (Jason 2026-09-25: 画面特别是底部貌似还是太亮 深水也是 … 高亮的部分和桔红色的关系): over a flat
     // bottom every row across the slab lands at one range and the integrated echo added up to a solid white band
     // (38–44 % of the lit pixels white in PL scenes; the app's bottom scenes 6–7 %). Past the near range (where TVG
@@ -590,10 +607,12 @@ export const sonarFragment = /* glsl */ `
       }
     } else {
       // ================= Down / Forward / Combo: vertical slab =================
-      float streak = vnoise(vec2(aWorld * 220.0, r * 2.5 + t * 0.37)); // fibres along the ray: ~2 in across, ~0.4 m long (the burst's band is fibrous, feathered on top)
+      // fibres along the ray, copied from the burst's band at 4× (Jason 2026-10-24: 不行你就抄): soft streaks ~3 in across and
+      // 10–16 in long, 4–5 in apart, low contrast so the band keeps one yellow core line, darker gaps between them, no grid, a fresh pattern drifting in every ping
+      float streak = 0.65 * vnoise(vec2(aWorld * 200.0, r * 3.5 + t * 0.3)) + 0.35 * vnoise(vec2(aWorld * 420.0 + 5.0, r * 6.0 - t * 0.4));
       float mottle = vnoise(p * 9.0 + t * 0.5) * 0.7 + vnoise(p * 23.0 - t * 0.3) * 0.5;
       float grain = hash(floor(vec2(aWorld * 600.0, r * 6.0)) + t);
-      float tex = uStreak > 0.5 ? 0.4 + 0.6 * streak + 0.9 * grain * grain * grain : 0.35 + 0.9 * mottle + 0.2 * grain; // grain³: rare white points on a yellow-orange band (real: 2 % white, 21 % yellow)
+      float tex = uStreak > 0.5 ? 0.55 + 0.9 * smoothstep(0.15, 0.9, streak) : 0.35 + 0.9 * mottle + 0.2 * grain; // (the hashed grain drew a dotted grid at 4×; gone from the streak branch)
       float fil = vnoise(vec2(aWorld * 420.0, r * 9.0 + t * 0.13));
       float fil2 = vnoise(vec2(aWorld * 900.0 + 7.0, r * 18.0 - t * 0.1));
       float filament = 0.35 + 0.75 * fil + 0.35 * fil2 * fil;
