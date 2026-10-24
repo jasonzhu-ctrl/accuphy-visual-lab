@@ -886,3 +886,13 @@ every structure surface into (angle, range) — see decisions.md #135. What to t
 grain's correlation across the beam (ours 34 in vs 25), the per-ping flicker (ours 21 vs 37 on a similar mean), the share
 of yellow in a lit face (ours 5 % vs 16 %), and the hull's dark cavities (geometry: the study hull is a solid extrusion
 with a box cabin, the real one an open shell with ribs).
+
+**Bottom band, measured on the same burst (decision #140, 2026-10-23):** 20 frames of the flat bottom left of the wreck
+(x −40…−5 ft): band above 40 % of its peak 1.44 ft and the same at 36 and 50 ft of range; peak LUT 0.62 at 0.5 ft under
+the leading edge; 75 % width 1.1 ft, 15 % width 2.7 ft (a smooth tail, no second hot line); classes in the 2 ft under the
+edge w2 y21 o49 r18 d9; the edge moves 2.5 in between pings (median per column), 6.9 in over the burst, ~4 bumps > 2 in per
+10 ft; 44 % of the band's pixels change colour class from ping to ping. The texture is fibrous along the rays with a
+feathered top edge and rare white points. Lab after #140: 1.40 ft, 1.3 / 2.2 / 2.8 ft, w1 y15 o58 r24 d2, 1.6–2.2 in, 49 %.
+Lesson: any **max over the slab rows** (the old peak and edge lines) turns a fore-aft slope into a plateau — integrate the
+rows, never take their max.
+

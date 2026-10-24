@@ -2146,6 +2146,34 @@ Numbered log. Newest at the bottom.
      - Still pending Jason: the embed switch to a theme-mounted Lab, the sideways real-device mode (#138), the ice page's
        Home-first / live gain and pause on phones (left to the ice chat).
 
+140. **Bottom like the burst; solid bodies (2026-10-23).** Jason on the #137 sheet: the bottom has missing parts and is a
+    straight, too-regular line; the real one has texture and **ping-to-ping movement** (特别的重要); the mirror echo should be
+    smaller and fainter; rocks, trees and hulls are transparent, a rock should be brightest in the middle and fade out.
+    Measured on the 2.0.0 PL Down burst (20 frames, flat bottom, `reference/vivo-bursts-2026-10-23/pl-down`, scripts in the
+    session scratchpad `real/edge2.py`, `real/prof.py`): band above 40 % of peak **1.44 ft** and constant with range, peak
+    LUT 0.62 (yellow-orange) 0.5 ft under the edge, 75 % width 1.1 ft, 15 % width 2.7 ft; the leading edge moves **2.5 in**
+    between pings (median), spans 7 in over the burst, ~4 bumps > 2 in per 10 ft; inside the band 44 % of pixels change
+    colour class per ping; the 2 ft under the edge are w2 y21 o49 r18 d9. Ours before: 3.9 ft thick, a 2.4 ft plateau,
+    0.8 in wobble, y59 o32 (no red tail), no ping change at the edge. Engine changes in `sonarShader.js`:
+    - **pulse and tail fixed in range** (`sigma 0.15 + 0.003 r`, `tailLen 0.28 + 0.008 r`, were 0.28 + 0.012 r / 0.45 + 0.02 r)
+      with a sharp onset (gaussian 0.2× on the near side) — the pulse is a fixed length in time, the band does not thicken
+      with range; the **per-row peak line and the edge line were removed** (`0.4 * peak`, `0.2 * edge` → `0.1 * edge`): both
+      were a *max over the 24 rows*, which spread any bottom that slopes fore-aft into a flat plateau; switching them off
+      reproduced the measured profile at once. Body cap `K` 0.8 → 2.5 under the depth cap, pulse 1.3, tail 0.55.
+    - **irregular, breathing edge:** the bottom hit gets a static roughness (±8 cm, 1.4 m across) and two per-ping terms
+      (±13 cm at 0.4 m, ±10 cm at 0.11 m, new every ping); the band's texture is fibres along the ray (2 in × 0.4 m) with
+      `grain³` sparkles instead of 0.2 m streaks. Result: wobble 1.6–2.2 in, span 6–8 in, flicker 49 % class changes, band
+      1.40 ft, profile 1.3 / 2.2 / 2.8 ft, classes w1 y15 o58 r24 d2 — all within reach of the burst.
+    - **second echo** 0.10 → 0.045 and narrower; **shadow** behind structure a notch, not a hole (`0.95 → 0.7`, exponent 2.2 → 1.6,
+      0.9 m → 0.6 m, fade 3.5 → 1.8 m): the bottom no longer breaks off under trees.
+    - **solid bodies:** a new `solidAcc` term fills the space between the near face (`uDepth`) and the far face (`uDepthB`),
+      brightest just inside the near face and fading toward the far one (wood 0.6×), fed into the splat knee as
+      `0.25 * body`; the splat's own amplitude is unchanged. Rocks, trunks and hulls read as filled masses.
+    - dev knob `window.__sonarTune.k = [pulse, tail, peak/edge, body]` (uniform `uTune`, all 1 in production) for the
+      like-for-like loop; `__sonarTune` is DEV-only as before.
+    Checked: six comparison scenes (`对比-v3-v5.jpg` sent to Jason), the ice page (desktop + phone) still draws its band
+    and dial, `vite build` clean. Not published: the three public pages stay at the #128 build until Jason says so.
+
 141. **2026-10-24** — **A sideways phone is the app itself (real device mode)** (Jason: "横屏不要做真机模式了 … 一个小小的手机摁不到的",
      then "手机横屏还是用以前的方案好了 在屏幕上有磨砂块点击选" — the #119 / Phase 4 plan, not a phone frame inside the phone).
      - **When:** the window is wider than tall and under 500 px high (`isLandscapePhone`, SonarScreen.jsx), lake page only. The
