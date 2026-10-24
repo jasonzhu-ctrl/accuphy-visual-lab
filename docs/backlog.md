@@ -292,3 +292,9 @@ the cheapest Android phone class). Phone size was emulated at 360×800.
    Re-evaluate which area is the most intuitive for a new user.
 4. ✅ (#127) **Ice page: fish and the jig** — nearby fish should come to the jig naturally but quickly, and interact with it
    ("又自然又快 … 跟鱼饵能够有一些自然的互动").
+
+## Handoff to the phone-chrome owner (SonarChrome.jsx): the app's "sonar working" icon (Jason 2026-10-23)
+- ⬜ In the real app's Down views a small "sonar working" icon sits at the top centre of the picture, just under the 0 of the
+  range ruler (partly hidden by it), whenever the sonar runs — Jason identified it on the 2.0.0 recording
+  (`reference/app-study/2026-10-23-vivo/pl-down-d00.jpg`, region ②). The Lab's phone chrome has none. Shape: a small
+  fan/arc glyph a few px wide, the colour-map's orange. Owner: the chat that owns SonarChrome.jsx.

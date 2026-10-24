@@ -867,3 +867,22 @@ band's pulse and tail lengthened (0.28 + 0.012 r / 0.45 + 0.02 r) and its soft c
 is orange; the noise floor halved. Like-for-like fit (`?study=wreck`, the wooden workboat ×1.25 beside the boat at
 the same range / gain / depth): lit hull classes white 4 / yellow 16 / orange 33 / red 26 / dark 21 vs the
 recording's 2 / 16 / 39 / 25 / 19; flicker 31 on 154, 15 % (recording 37 on 118, 18 %).
+
+**Jason's reading of the frame (2026-10-23 evening, the seven marked regions of `pl-down-d00`):**
+① the speck spray above the stern — faint **noise**, not fish. ② the cluster at the very top under the transducer — the
+app's **"sonar working" icon**, drawn by the app at the top centre of the Down view whenever the sonar runs (partly hidden
+by the 0 label), plus one small noise dot. ③ the sparse trail under the bottom band behind the hull — ignore; it may simply
+**fade out downward**, darker the deeper. ④ the bright dense face at the bow — the **hull side lit by the sonar**: solid and
+complete, "very beautiful": a horizontal line along its top (the deck edge), an emptier band under it, then the solid
+lower face — two shapes a viewer tells apart at once. ⑤ the dot at the lower right of the box is **a fish**; the faint line
+on the left is noise. ⑥ **small fish**. ⑦ the dark cavities with bright verticals inside the hull — **the hull's side
+structure**: small vertical members (ribs), interrupted yet clearly part of the boat; the larger lit patch on the left is
+where the side joins those members; below it, probably broken parts. Verdict on the Lab's render of that round: "效果其实
+还是很糟糕" — the engine draws only the first surface plus random grain, so the hull comes out holey and blobby instead
+of a solid, lit-through section with deck line, ribs and far side.
+
+**Engine, second step (decision #131):** structure is no longer the first depth hit plus grain but an **echo splat** of
+every structure surface into (angle, range) — see decisions.md #131. What to tune against the recording from here: the
+grain's correlation across the beam (ours 34 in vs 25), the per-ping flicker (ours 21 vs 37 on a similar mean), the share
+of yellow in a lit face (ours 5 % vs 16 %), and the hull's dark cavities (geometry: the study hull is a solid extrusion
+with a box cabin, the real one an open shell with ribs).

@@ -28,18 +28,20 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
     uClip: { value: new THREE.Vector2(0, 0) }, // ice section view: x = on, y = world z of the cut wall; fragments beyond it are cut away in the main view
     uOutGamma: { value: 1.0 },   // ice scene: < 1 brightens the dark water world a little (main view only)
     uBeamGain: { value: 1.0 },   // ice scene: the signal gate (IceCamp.jsx s.signal): the lit footprint fades out while the Mini is out of the water
+    uSplat: { value: new THREE.Vector3(1, 1, 30) }, // sonar pass 3 (echo splat): tan(half width), tan(half thickness), range of the fan being drawn
   }
   const mat = new THREE.ShaderMaterial({
     uniforms,
     vertexColors: true,
     defines: fish ? { FISH: 1 } : logo ? { STRUCTURE: 1, LOGO: 1 } : steel ? { STRUCTURE: 1, STEEL: 1 } : wood ? { STRUCTURE: 1, WOOD: 1 } : structure ? { STRUCTURE: 1 } : {},
     vertexShader: /* glsl */ `
-      varying vec3 vWorld; varying vec3 vNormal; varying vec3 vColor;
+      varying vec3 vWorld; varying vec3 vNormal; varying vec3 vColor; varying vec3 vSplat; varying float vBad;
+      uniform float uSonarPass; uniform vec3 uSplat;
       #ifdef FISH
         attribute float aPattern; attribute vec3 aBelly; attribute vec3 aSide;
         attribute vec4 aSwim; // per fish, set every frame in Scene.jsx: wave phase, activity, turn bend, wavelength
         varying float vPattern; varying vec3 vBelly; varying vec3 vSide; varying vec3 vLocal; varying vec2 vUv;
-        uniform float uSonarPass; uniform float uFishSonarScale;
+        uniform float uFishSonarScale;
       #endif
       void main() {
         vec3 pos = position, nrm = normal;
@@ -73,12 +75,24 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
         vec4 wp = m * vec4(pos, 1.0);
         vWorld = wp.xyz;
         vNormal = normalize(mat3(m) * nrm);
-        gl_Position = projectionMatrix * viewMatrix * wp;
+        // sonar pass 3 — the echo splat (2026-10-23, decision #131): every structure surface is drawn where the sonar would
+        // place it, at (angle across the fan, range) instead of in perspective, with additive blending and no depth test,
+        // so a hull's near side, deck, ribs and far side all return — the real picture of a wooden wreck (Jason: 船是半透明
+        // 的整体). The strips (passes 1 and 2) still give the first and the far hit per row for the bottom and the shadows.
+        vec4 vp = viewMatrix * wp;
+        float zc = -vp.z;
+        // a vertex at or behind the camera has no (angle, range): flag it, and the fragment discards the whole triangle
+        // (one such vertex would otherwise stretch a triangle across the entire fan and flood the picture)
+        vBad = zc < 0.3 ? 1.0 : 0.0;
+        float zcs = max(zc, 0.3);
+        vSplat = vec3((vp.x / zcs) / uSplat.x, (vp.y / zcs) / uSplat.y, length(vp.xyz));
+        if (uSonarPass > 2.5) gl_Position = vec4(vSplat.x, (vSplat.z / uSplat.z) * 2.0 - 1.0, 0.0, 1.0);
+        else gl_Position = projectionMatrix * viewMatrix * wp;
       }
     `,
     fragmentShader: /* glsl */ `
       precision highp float;
-      varying vec3 vWorld; varying vec3 vNormal; varying vec3 vColor;
+      varying vec3 vWorld; varying vec3 vNormal; varying vec3 vColor; varying vec3 vSplat; varying float vBad;
       uniform vec3 uSun; uniform vec3 uFogColor; uniform float uFogDensity;
       uniform int uBeamCount;
       uniform vec3 uApex[${MAX_BEAMS}]; uniform vec3 uC[${MAX_BEAMS}]; uniform vec3 uH[${MAX_BEAMS}]; uniform vec3 uN[${MAX_BEAMS}];
@@ -119,7 +133,29 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
       }
 
       void main() {
+        if (uSonarPass > 2.5) { // the echo splat: structure only (the lockup has its own analytic echo)
+      #if defined(STRUCTURE) && !defined(LOGO)
+          if (vBad > 0.0 || abs(vSplat.x) > 1.0 || abs(vSplat.y) > 1.0) discard;
+          float lobe = pow(1.0 - abs(vSplat.y), 1.6);                       // the beam's main lobe across the slab
+          float facing = abs(dot(normalize(vNormal), normalize(cameraPosition - vWorld))); // faces square to the sound return more
+          float g = fract(sin(dot(floor(vWorld * 6.0), vec3(127.1, 311.7, 74.7))) * 43758.5453); // grain fixed to the object
+          float amp = 0.14; // timber, rock
+        #ifdef WOOD
+          amp = 0.12;        // planking: each surface a little weaker, but there are many
+        #endif
+        #ifdef STEEL
+          amp = 0.22;        // steel rings
+        #endif
+          gl_FragColor = vec4(amp * (0.4 + 0.8 * facing) * (0.55 + 0.9 * g) * lobe, 0.0, 0.0, 1.0);
+          return;
+      #else
+          discard;
+      #endif
+        }
         if (uClip.x > 0.5 && uSonarPass < 0.5 && vWorld.z > uClip.y) discard; // the section cut (the sonar still sees the whole lake)
+      #ifndef STRUCTURE
+        if (uSonarPass > 1.5) discard; // the far-face pass (back faces, sonarShader uDepthB): only structure has a far side
+      #endif
         vec3 n = normalize(vNormal);
         if (!gl_FrontFacing) n = -n;
         float lambert = max(dot(n, uSun), 0.0);

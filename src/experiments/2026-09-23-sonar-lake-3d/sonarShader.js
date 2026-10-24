@@ -24,6 +24,8 @@ export const sonarFragment = /* glsl */ `
   precision highp float;
   varying vec2 vUv0;
   uniform sampler2D uDepth0; uniform sampler2D uDepth1;
+  uniform sampler2D uDepthB0; uniform sampler2D uDepthB1; // the far side of structure (back-face strips)
+  uniform sampler2D uEcho0; uniform sampler2D uEcho1; uniform vec2 uFanR; // the echo splat of every structure surface (angle × range), per fan
   uniform sampler2D uColor0; uniform sampler2D uColor1; // .a = tag: 0.75 steel (wrecks), 0.5 other structure, 0 bottom
   uniform int uFanCount;
   // per fan: x = centre angle from straight-down in the SCREEN plane (rad, +right),
@@ -74,6 +76,12 @@ export const sonarFragment = /* glsl */ `
     if (d >= 0.9999) return 1e9;
     return linearize(d) * rayLen;
   }
+  float sampleDistB(int k, vec2 uv, float rayLen) {
+    float d = (k == 0) ? texture2D(uDepthB0, uv).r : texture2D(uDepthB1, uv).r;
+    if (d >= 0.9999) return 1e9;
+    return linearize(d) * rayLen;
+  }
+  float sampleEcho(int k, float u, float rn) { return (k == 0) ? texture2D(uEcho0, vec2(u, rn)).r : texture2D(uEcho1, vec2(u, rn)).r; }
   float sampleTag(int k, vec2 uv) { return (k == 0) ? texture2D(uColor0, uv).a : texture2D(uColor1, uv).a; }
   vec4 markRow(int i, float row) { return texture2D(uMarks, vec2((float(i) + 0.5) / 64.0, (row + 0.5) / 5.0)); }
 
@@ -230,7 +238,7 @@ export const sonarFragment = /* glsl */ `
     if (abs(a) > uFan[k].y || r > uReach) return 0.0;
     inFan = 1.0;
     float u = 0.5 + 0.5 * tan(a) / uFan[k].z;
-    float acc = 0.0, peak = 0.0, spk = 0.0, spkS = 0.0, edge = 0.0;
+    float acc = 0.0, peak = 0.0, spk = 0.0, edge = 0.0;
     // which thickness rows a pixel samples: the same set for a short run along the ray (0.08° × 0.67 m cells), not
     // a fresh random set per pixel. Per-pixel sets turned big steel faces into salt-and-pepper dust (the wreck at
     // 40 m, Jason 2026-09-25: 这个船的画面和 [app 的] 相差好远 结构和感觉完全不对); coherent sets draw them as the
@@ -246,10 +254,10 @@ export const sonarFragment = /* glsl */ `
     float png = floor(uTime * 8.0);
     // measured in the recording's hull: grains ~0.6 m ACROSS the beam × 0.25 m along the ray (the beam's width smears
     // across, the range cell is short), and about a fifth of them change between pings
-    float g2 = vnoise(vec2(aWorld * r * 2.0 + png * 0.37, r * 4.5 + png * 1.9));
-    float g3 = vnoise(vec2(aWorld * r * 7.0 + 3.0 + png * 0.9, r * 16.0 - png * 3.1)); // finer speckle riding on them (~0.15 m), new every ping
-    float gh = vnoise(vec2(aWorld * r * 1.0 + 9.0, r * 1.2 + png * 0.23));              // slow holes: patches of the mass stay dark
-    float grainS = (0.12 + 0.95 * smoothstep(0.22, 0.72, g2) * (0.3 + 1.0 * g3)) * mix(0.55, 1.0, smoothstep(0.2, 0.6, gh)); // the fine speckle cuts real gaps into the grains // tops out ~1.3: the recording's hull has few white grains (2 %) // the holes are mild: the recording's hull is 85 % lit, its dark cavities are hatches, not texture
+    float g2 = vnoise(vec2(aWorld * r * 2.0 + png * 0.37, r * 4.5 + png * 1.9));          // grains ~0.6 m across the beam × 0.25 m along the ray
+    float g3 = vnoise(vec2(aWorld * r * 7.0 + 3.0 + png * 0.9, r * 16.0 - png * 3.1));   // finer speckle, new every ping
+    float gh = vnoise(vec2(aWorld * r * 1.0 + 9.0, r * 1.2 + png * 0.23));              // slow patches, a little darker
+    float grainS = (0.3 + 1.0 * pow(0.45 * g2 + 0.55 * g3, 1.2)) * mix(0.8, 1.0, gh); // 0.25..1.3: dense speckle with red pits (the recording's faces are 85 % lit; its dark cavities are geometry)
     // Structure as the app draws it (Jason 2026-10-23: 结构物的画面跟真实的声纳的画面差距还是比较远; references: the PL Forward
     // wreck frames and the 2.0.0 Live Combo pilings, reference/app-study/2026-10-23/40-live-combo.jpg): a trunk or
     // piling is a solid column with a hot core, and it throws a BLACK shadow — the bottom band breaks off behind it and
@@ -260,7 +268,8 @@ export const sonarFragment = /* glsl */ `
     for (int j = 0; j < 24; j++) {
       float v = (float(j) + jit) / 24.0;
       float ty = (v * 2.0 - 1.0) * uFan[k].w;
-      float hit = sampleDist(k, vec2(u, v), length(vec3(tan(a), ty, 1.0)));
+      float rayLen = length(vec3(tan(a), ty, 1.0));
+      float hit = sampleDist(k, vec2(u, v), rayLen);
       float dr = r - hit;
       float tag = sampleTag(k, vec2(u, v));
       float structure = step(0.25, tag), steel = step(0.62, tag), wood = step(0.55, tag) * (1.0 - steel); // 0.5 timber/rock · 0.6 wood · 0.75 steel
@@ -272,25 +281,35 @@ export const sonarFragment = /* glsl */ `
       // timber and rock: a solid pulse ~0.3 m long (was 0.08 m — a line drawing), with some orange smear behind the
       // face; steel keeps its wide bands and long tails (#63)
       float sg = mix(sigma, mix((0.15 + 0.006 * r) * (1.0 + 1.0 * smoothstep(6.0, 30.0, r)), sigma, steel), structure);
-      float pulse = exp(-dr * dr / (sg * sg)) * mix(1.0, 0.3 + 1.1 * grainS, structure); // structure faces are grainy, not smooth: bright grains and dark gaps
-      float tail = dr > 0.0 ? (0.6 + 0.3 * structure + 0.6 * steel) * exp(-dr / (tailLen * (1.0 + 0.4 * structure + 0.5 * steel))) : 0.0;
-      // the open mass behind a wooden or timber face: a hull is lit right through (planking, ribs, the far side — the
-      // recording's hull is 85 % lit over its whole section, dimming toward the far side), and a trunk or piling trails
-      // an orange smear for a metre or two before its shadow starts
-      float body = structure * (1.0 - steel) * step(0.0, dr) * 0.9 * exp(-dr / mix(0.5, 2.2, wood)) * (0.15 + 0.9 * grainS); // a wooden hull is lit through (2.2 m); a trunk only smears half a metre
+      float pulse = exp(-dr * dr / (sg * sg)) * (1.0 - structure); // the bottom's pulse; structure is painted by the echo splat below
+      float tail = dr > 0.0 ? (0.6 + 0.6 * steel) * exp(-dr / (tailLen * (1.0 + 0.5 * steel))) * (1.0 - structure + steel) : 0.0; // the bottom's tail; steel keeps a long tail (#63)
+      // the far side of what this row hit (back-face strip): a hull's thickness, a trunk's diameter. No far face found
+      // (an open mesh, the lakebed lockup) → wood 2.5 m, timber 0.4 m
+      float hit2 = sampleDistB(k, vec2(u, v), rayLen);
+      float th = (hit2 > 1e8) ? mix(0.4, 2.5, wood) : clamp(hit2 - hit, 0.15, 6.0);
+
       float second = 0.10 * exp(-(r - 2.0 * hit) * (r - 2.0 * hit) / (4.0 * sigma * sigma));
       float lobe = 1.0 - abs(v * 2.0 - 1.0);
       float wgt = 0.33 + 1.87 * pow(lobe, 1.8); // the main lobe across the slab (same mean as the old triangle)
-      // the shadow starts ~1.6 m behind a face (the lit mass comes first) and fades over a few metres, as the app's do
-      float sh0 = mix(0.5, 1.6, wood); // the shadow starts half a metre behind a trunk, 1.6 m behind a hull
-      wsum += wgt; wblk += wgt * structure * smoothstep(0.3, sh0, dr) * exp(-max(dr - sh0, 0.0) / 3.5);
+      // the acoustic shadow starts behind the FAR face and fades over a few metres; a wooden hull hardly shades the bottom
+      // under it (the recording's bottom runs lit under the hull), timber and rock shade hard
+      float body = 0.0; // (structure is painted by the splat)
+      wsum += wgt; wblk += wgt * structure * mix(1.0, 0.3, wood) * smoothstep(th + 0.15, th + 0.9, dr) * exp(-max(dr - th - 0.9, 0.0) / 3.5);
       acc += (1.2 * pulse + tail + body + second) * wgt;
       peak = max(peak, pulse * (1.0 - structure));
       edge = max(edge, exp(-dr * dr / (0.16 * sg * sg)) * (1.0 - structure)); // the first return: a thin hot line
-      spk = max(spk, max(pulse * (0.5 + 0.5 * g3), 0.8 * body) * structure * (1.0 - steel)); // the hot edge is broken into dashes, like the recording's deck line
-      spkS = max(spkS, pulse * steel * 1.3); // steel keeps its #63 calibration
+      // (spk: the structure echo comes from the splat after the loop)
+
     }
     float shade = pow(1.0 - 0.95 * wblk / max(wsum, 1e-3), 2.2); // the acoustic shadow behind structure
+    // structure from the echo splat: every surface the fan sees at this angle and range, all faces, both sides — the real
+    // picture of a wooden hull is its whole section (deck line, planking, ribs, far side). A 0.3 m pulse along the
+    // range (5 taps), the per-ping grain on top. Steel sums brighter (its amp in lakeMaterial) and keeps its row tail.
+    float rn = r / uFanR[k], dRn = 0.08 / uFanR[k]; // ±0.16 m along the range: the recording's range cells are sharp
+    float es = 0.0;
+    for (int i = -2; i <= 2; i++) es += exp(-0.5 * float(i * i)) * sampleEcho(k, u, rn + float(i) * dRn);
+    es /= 3.3;
+    spk = (1.0 - exp(-es * 9.0)) * 0.95 * (0.12 + 1.15 * grainS); // soft knee: a single plank reads orange, the deck line (several faces) yellow-white, never a flat white slab; the grain cuts real pits
     // Bottom brightness (Jason 2026-09-25: 画面特别是底部貌似还是太亮 深水也是 … 高亮的部分和桔红色的关系): over a flat
     // bottom every row across the slab lands at one range and the integrated echo added up to a solid white band
     // (38–44 % of the lit pixels white in PL scenes; the app's bottom scenes 6–7 %). Past the near range (where TVG
@@ -306,7 +325,7 @@ export const sonarFragment = /* glsl */ `
     float capR = smoothstep(6.0, 14.0, r), capD = uCapDepth.z * smoothstep(uCapDepth.x, uCapDepth.y, p.y);
     float accI = acc / 16.0, K = mix(3.0, 0.8, max(capR, capD)); // was 0.4: it held the band body at dark red; the 2.0.0 PL Down recording shows an orange body (2026-10-23) // (4–10 m on range tried: the Mini's calibrated shelf lost its hot edge, 6 → 0.3 % white)
     accI = K * (1.0 - exp(-accI / K));
-    acc = (accI + 0.7 * peak + 0.3 * edge * (0.55 + 0.6 * filament)) * shade + 0.8 * spk + 0.9 * spkS; // structure gain 0.8: the recording's hull is 2 % white, 16 % yellow, 39 % orange // structure itself is not shaded; timber/rock brighter (hot core), steel as before
+    acc = (accI + 0.7 * peak + 0.3 * edge * (0.55 + 0.6 * filament)) * shade + spk; // structure (the splat) is not shaded by its own shadow
     // Bottoms past the cap depth are toned no nearer than 80 % of the range window (#92). With the middle sloping
     // from 30 to 80 ft, Forward (the visitor's fixed range) drew its nearer bottom at 11–22 % white against the old
     // plateau's 8 %; now 7–12 %. Down's AUTO range already puts the bottom at ~80 %, so Down barely changes

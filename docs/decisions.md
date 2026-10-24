@@ -2004,3 +2004,25 @@ Numbered log. Newest at the bottom.
      - **Open** (Jason to identify on the frame): the speck spray above the stern, the specks above the bow, the bright
        bow face, the dark cavities, the faint diagonal left of the hull, the trail under the bottom. Public pages not
        rebuilt: the colour map and gain scale change every picture, Jason sees it first.
+
+131. **2026-10-23** — **The sonar engine draws structure from an echo splat of every surface** (Jason, on the like-for-like
+     round #130: "你现在的效果其实还是很糟糕", and his reading of the recording: the wooden hull is a lit-through whole —
+     side face solid, deck line on top, ribs and cavities inside, far side visible).
+     - The old model drew only the FIRST surface each row met (a depth strip) and faked the rest with random grain, so a
+       hull came out as a line drawing or a holey blob. Now a third sonar pass per fan — `uSonarPass = 3` in
+       `lakeMaterial.js` — renders every structure surface at its sonar place, (angle across the fan, range) instead of
+       perspective, both faces, additive blending, no depth test, into an echo texture (`SonarScreen.jsx echoRTs`,
+       1024 × 256 per fan). Each surface adds its amplitude (wood 0.12, timber/rock 0.14, steel 0.22) × how squarely it
+       faces the sound × a grain fixed to the object × the beam's main lobe across the slab. Triangles touching the
+       camera plane are discarded (one such vertex stretched across the whole fan). The scene background is cleared
+       for that pass (it would fill the additive target).
+     - `sonarShader.js fanEcho` samples the echo texture at (u, r) with a ±0.16 m pulse, a soft knee (one plank reads
+       orange, the deck line of several coincident faces yellow-white) and the per-ping grain; rows now paint only the
+       bottom, and keep the far-face strip (`uDepthB`, pass 2) for the shadow, which starts behind the far face — a
+       wooden hull shades the bottom under it only 30 %.
+     - Fix found on the way: `mats.wood` was not in `lakeMats`, so the workboat rendered into every sonar pass untagged
+       (alpha 1 = steel/fish) since #130 — now included.
+     - Like-for-like fit (recording → ours, lit-pixel classes white / yellow / orange / red / dark): hull 2 / 16 / 39 / 25 / 19
+       → 0.6 / 5.5 / 44 / 32 / 18; lit share of the hull box 85 % → 71 %; picture black 87 % → 89 %; grain correlation
+       25 × 10 in → 34 × 11 in; flicker 37 → 21. The nine calibrated scenes still read right (the steel cargo wreck now
+       shows its whole profile). Public pages not rebuilt yet — Jason sees the comparison first.
