@@ -20,6 +20,7 @@ it is done. ✅ done · 🔧 in progress · ⬜ open.
 - ⬜ #120 on a real phone: fps of the new fish shader on the Android baseline (`sonar-page-real-device-perf` memory) and a look on an iPhone; only checked in headless SwiftShader so far
 - ⬜ #120 follow-ups if Jason wants more: per-species looks (walleye hump, musky torpedo, bait sparkle cloud with crisp herded edges), fish fading as they cross the slab is already physical (slab weight) but untested against a recording
 - ⏸ Bake-off with another vendor's AI (Codex / Cursor / Gemini) on a clean copy of the Lab — plan archived in `docs/bakeoff-plan.md`, not started (Jason 2026-10-23: 先存档不做). Do nothing until he says go
+- ✅ Sonar picture measured against LiveScope and the app; water-column specks; fish cores smoother (decision #129, `sonar-style.md` §7.20)
 - ⬜ Study LiveScope video directly: the cloud container blocks YouTube (www.youtube.com, *.googlevideo.com, i.ytimg.com) — allow those hosts in the environment's network settings, or do it on the Mac; watch-list in `docs/livescope-fish-research.md`
 - ✅ Panoramic wreck: the 40 m cargo ship (decision #38) now shows hatches, masts and deck gear from above like the app's 35 m wreck. It lies at ~36 m; moving it shallower stays Jason's call
 - ⬜ Small far fish still show a faint dot grid inside the blob: the 24 sampled thickness rows miss a 4-row-tall bait fish depending on where it sits → fix with a column-reduction pre-pass (per angle column: fish coverage + nearest fish depth over all 128 rows), then one fetch per tap
