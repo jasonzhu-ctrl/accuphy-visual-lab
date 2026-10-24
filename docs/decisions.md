@@ -2341,3 +2341,19 @@ Numbered log. Newest at the bottom.
        trees, bottoms and the approved close-up band unchanged; opacity unchanged (core dark ≤ 2.3 %).
      - dev knobs `window.__sonarTune.k6 = [steel ceiling, —, —, —]`, `window.__sonarTune.kb` = `uSplatBig`.
      Checked: six scenes + the ice page (desktop, phone); `vite build` clean. Not published (#128 build public).
+
+150. **2026-10-24** — **One phone size for the lake and the ice page (#84 applied); the boat clear of the panel on mid screens**
+     (Jason: "电脑这种宽屏的大的屏幕的状态下 … 手机 … 它的大小比例应该是什么样的？之前还有聊过 … 冰钓版跟船钓版标准化一点", and
+     "一起修" for the boat under the panel on the unfolded vivo fold). `index.jsx`, `Scene.jsx`:
+     - **Phone frame `min(42vw, 600px, 83.2vh)`** on both pages (they share the frame): the size Jason approved in #84 on
+       2026-10-03 but never built (the code still had `min(38vw, 560px)`). Measured: 42 % of the width up to 1440 px
+       (600 × 288 at 1440×900), 600 px from there on (31 % at 1920, 23 % at 2560 — about real size on a 24″ monitor);
+       portrait phones unchanged (full width). The rest of plan B (range on the phone, controls 1.3×) stays with the
+       SonarChrome owner.
+     - **Mid screens:** where the glass panel would cover the boat (or, on the ice page, the kit at the hole), the view
+       shifts right just enough — measured from where the boat projects without the shift, at most 0.6 × the panel's
+       width, eased — in the lake view and the ice section / under-ice views. Wide screens keep their framing exactly
+       (1280–2560 px: hint positions unchanged).
+     - **The drag hint** slides clear of anything marked `data-hint-avoid` (panel, step cards, phone).
+     Checked: both pages at 711×584, 1024×768, 1280×800, 1440×900, 1920×1080, 2560×1440 and 390×844: no hint overlap,
+     boat and kit visible; `vite build` clean.

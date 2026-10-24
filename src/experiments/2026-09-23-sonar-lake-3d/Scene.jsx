@@ -488,7 +488,19 @@ function Rig({ state, sonarRect, fogMats, cam = LAKE_CAM }) {
     const bandBottom = k > 1 && fr ? Math.max(size.height * 0.35, Math.min(size.height, fr.getBoundingClientRect().top)) : size.height
     const devCam = s.fishCam || s.logoCam || s.wreckCam || s.closeCam
     const offY = devCam ? 0 : Math.round(size.height / 2 - bandBottom / 2)
-    if (offY > 0) { if (!camera.view?.enabled || camera.view.offsetY !== offY || camera.view.fullWidth !== size.width || camera.view.fullHeight !== size.height) camera.setViewOffset(size.width, size.height, 0, offY, size.width, size.height) }
+    // mid-size screens (an unfolded fold at 711×584, a small tablet): the glass panel top-left covered the boat (on the ice
+    // page the kit at the hole) (2026-10-24). Shift the view right just enough that it stands clear of the panel, measured
+    // from where it projects without the shift; wide screens, where it is already clear, keep their framing exactly
+    const pr = s.panelEl?.getBoundingClientRect()
+    let offX = 0
+    if (!devCam && pr && pr.width && s.boat) {
+      const cur = camera.view?.enabled ? -camera.view.offsetX : 0
+      tmp.set(s.boat.x, 0.5, s.boat.z).project(camera)
+      const bx = ((tmp.x + 1) / 2) * size.width - cur, by = ((1 - tmp.y) / 2) * size.height
+      if (by < pr.bottom + 60) offX = Math.round(Math.min(0.6 * pr.right, Math.max(0, pr.right + 110 - bx)))
+      offX = Math.round(0.85 * (s.offX ?? offX) + 0.15 * offX); if (Math.abs(offX - (s.offX ?? 0)) < 1) offX = s.offX ?? offX; s.offX = offX // settle smoothly, no jitter
+    }
+    if (offY > 0 || offX > 0) { if (!camera.view?.enabled || camera.view.offsetY !== offY || camera.view.offsetX !== -offX || camera.view.fullWidth !== size.width || camera.view.fullHeight !== size.height) camera.setViewOffset(size.width, size.height, -offX, offY, size.width, size.height) }
     else if (camera.view?.enabled) camera.clearViewOffset()
     if (k !== k0.current) { // thin the fog and push the far plane with the camera distance
       k0.current = k
@@ -601,8 +613,8 @@ function Rig({ state, sonarRect, fogMats, cam = LAKE_CAM }) {
       if (s.view === 'section') {
         const fr = sonarRect?.current?.dock || sonarRect?.current?.frame
         const bandBottom = k > 1 && fr ? Math.max(size.height * 0.35, Math.min(size.height, fr.getBoundingClientRect().top)) : size.height
-        const offY = k > 1 ? Math.round(size.height / 2 - bandBottom / 2) : 0
-        if (offY > 0) { if (!camera.view?.enabled || camera.view.offsetY !== offY || camera.view.fullWidth !== size.width || camera.view.fullHeight !== size.height) camera.setViewOffset(size.width, size.height, 0, offY, size.width, size.height) }
+        const offY = k > 1 ? Math.round(size.height / 2 - bandBottom / 2) : 0, offXs = s.offX || 0 // offXs: clear of the glass panel (above)
+        if (offY > 0 || offXs > 0) { if (!camera.view?.enabled || camera.view.offsetY !== offY || camera.view.offsetX !== -offXs || camera.view.fullWidth !== size.width || camera.view.fullHeight !== size.height) camera.setViewOffset(size.width, size.height, -offXs, offY, size.width, size.height) }
         else if (camera.view?.enabled) camera.clearViewOffset()
         // Solve the framing outright (decision #113): dy so the ice line at the hole sits at iceWant, then the smallest
         // zoom ≥ 1 that keeps the bottom under the hole inside bottomMax. Bisection on a probe camera that carries the
@@ -636,7 +648,8 @@ function Rig({ state, sonarRect, fogMats, cam = LAKE_CAM }) {
           s.secZoom = zoom; s.secDy = dy
         }
         zoom = s.secZoom
-      } else if (camera.view?.enabled) camera.clearViewOffset()
+      } else if (s.offX > 0) { if (!camera.view?.enabled || camera.view.offsetX !== -s.offX || camera.view.offsetY !== 0) camera.setViewOffset(size.width, size.height, -s.offX, 0, size.width, size.height) }
+      else if (camera.view?.enabled) camera.clearViewOffset()
       const lk = new THREE.Vector3(s.boat.x + C.look[0], C.look[1] + (s.view === 'section' ? s.secDy : 0), s.boat.z + C.look[2])
       tmp.set(s.boat.x + C.pos[0], C.pos[1], s.boat.z + C.pos[2]).sub(lk).multiplyScalar(zoom).add(lk)
       tmp.x += px * 1.2; tmp.y += py * 0.6

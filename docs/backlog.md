@@ -78,8 +78,8 @@ it is done. ✅ done · 🔧 in progress · ⬜ open.
   `docs/desktop-phone-controls-plan.md`. The desktop counterpart of #78/#79:
   - the panel's Range row goes, and the app's own −/+ on the phone set the range;
   - the app control set scales 1.3× on desktop (range ring ≈ 16 → 23 px);
-  - the phone frame becomes `min(42vw, 600px, 83.2vh)` (≈ 74 % of a real 16 Pro Max on a laptop, ≈ real size
-    on a 24″ monitor; true size would cover 57 % of a laptop screen).
+  - ✅ (#150, 2026-10-24) the phone frame is `min(42vw, 600px, 83.2vh)` on the lake and the ice page (≈ 74 % of a real
+    16 Pro Max on a laptop, ≈ real size on a 24″ monitor); the two items above are still open.
 - ⬜ Optional: the water's wave displacement is applied within the plane (`p.y` of the rotated plane), so the drawn
   surface is flat; only its shading suggests waves. A real vertical wave needs a finer grid near the camera
   (today 10 m cells). Found in #88; harmless as it is.
@@ -329,8 +329,7 @@ the cheapest Android phone class). Phone size was emulated at 360×800.
 - ✅ On the unfolded fold (viewport 711×584) the drag hint sat on the panel's Range value: the hint now slides clear of
   anything marked `data-hint-avoid` (the panel, the step cards, the phone) — checked at 711×584, 1024×768, 1440×900,
   390×844 on the lake and the ice page, zero overlap (2026-10-24)
-- ⬜ At 711×584 (the unfolded fold) the boat itself sits under the glass panel: the camera framing does not leave room for
-  the panel at this size (the hint now stands beside the panel, pointing at a hidden boat)
+- ✅ At 711×584 (the unfolded fold) the boat sat under the glass panel: the view now shifts clear of it on mid screens (#150)
 
 ## Handoff to the phone-chrome owner (SonarChrome.jsx): the app's "sonar working" icon (Jason 2026-10-23)
 - ⬜ In the real app's Down views a small "sonar working" icon sits at the top centre of the picture, just under the 0 of the
