@@ -331,6 +331,13 @@ the cheapest Android phone class). Phone size was emulated at 360×800.
   390×844 on the lake and the ice page, zero overlap (2026-10-24)
 - ✅ At 711×584 (the unfolded fold) the boat sat under the glass panel: the view now shifts clear of it on mid screens (#150)
 
+## UI rules for every screen and browser (research 2026-10-24, `docs/ui-screen-rules.md`) — waiting for Jason's go
+- ⬜ Class C compact layout (folds, iPad portrait, small windows): collapsible panel, cards as a sheet, 44 px touch targets
+- ⬜ WebGL context-loss recovery; `color-scheme: dark` against forced dark modes
+- ⬜ Screen classes from the mount box (container queries / ResizeObserver), before the store mount (#142)
+- ⬜ Height from innerHeight / visualViewport, bottom controls above the safe area; verify on a real iPhone (Safari, Instagram, iOS 26)
+- ⬜ Class F scale-up (≥ 2200 px); low performance tier + loading poster (Phase 4)
+
 ## Handoff to the phone-chrome owner (SonarChrome.jsx): the app's "sonar working" icon (Jason 2026-10-23)
 - ⬜ In the real app's Down views a small "sonar working" icon sits at the top centre of the picture, just under the 0 of the
   range ruler (partly hidden by it), whenever the sonar runs — Jason identified it on the 2.0.0 recording
