@@ -317,6 +317,12 @@ the cheapest Android phone class). Phone size was emulated at 360×800.
 - ✅ (#145) solid targets hide the bottom (no see-through rocks); branches whole, no mosaic; wooden hull halfway back
 - ✅ (#146) fibres inside hulls and rocks like the bottom close-up, opacity kept
 - ✅ (#147) ragged fibrous outlines on every object ("边缘的纤维对了")
+- ✅ (#148) the grain rule: every return is a short arc across the beam — bottom, insides and outlines ("这版纹理做得非常的好")
+- ✅ (#149) big hulls get bright middles; the steel wreck no longer dark and even ("钢船这样对了")
+- ⬜ From the LiveScope session's check (2026-10-24), not yet done: ping-to-ping life (app hull |ΔL|/L 0.46 vs Lab 0.17,
+  band 64 % vs 43 % class change); rim 0–2 in too bright (app L 174 vs 236); Down band ~25 % thicker than the app's and
+  without its white points; Down water column lit 0.79 % vs 0.04 %; Combo / phone Forward white 10–15 % (target 6–10 %);
+  the far ice Forward band frays into thin wavy threads; a dotted vertical bar in PL Panoramic at deep / lockup
 - ⬜ fps on a real phone after #145–#147 (4× MSAA echo targets at 512 rows, ~20 more texture taps per pixel); only checked
   in headless Chrome on the Mac so far — run with the `sonar-page-real-device-perf` method before the public link is rebuilt
 
