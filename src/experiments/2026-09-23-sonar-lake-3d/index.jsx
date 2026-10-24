@@ -156,6 +156,7 @@ export default function SonarLake3D({ scene: sceneProp }) {
     frameX: phone && !ICE && b0.length !== 2 ? PHONE_START[0] - 1 : undefined, // phones: boat left, timber right, and the ACCUPHY LAB lockup (x −1…31 at z −52) fully in view (Jason 2026-10-16: 把 Accuphy Lab 露出来)
     parallax: { x: 0, y: 0 }, specs: liveSpecs, specKey,
     closeCam: window.location.search.includes('cam=boat'), wreckCam: /cam=wreck/.test(window.location.search), logoCam: /cam=logo/.test(window.location.search),
+    rocksCam: import.meta.env.DEV && /cam=rocks/.test(window.location.search) ? (/cam=rocks:(\w+)/.exec(window.location.search) || [, 'pile'])[1] : null, // dev aid ?cam=rocks[:hump]
     fishCam: (/cam=fish:(\w+)/.exec(window.location.search) || [])[1],
     fishCamIndex: +((/cam=fish:\w+:(\d+)/.exec(window.location.search) || [])[1] || 0),
     rigCam: import.meta.env.DEV && /rigcam/.test(window.location.search), // ice: the hole kit up close

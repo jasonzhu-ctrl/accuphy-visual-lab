@@ -4,11 +4,12 @@ import * as THREE from 'three'
 import { mergeGeometries as _merge } from 'three/addons/utils/BufferGeometryUtils.js'
 // Extrude geometries are non-indexed, primitives are indexed — normalise first.
 const mergeGeometries = (parts) => _merge(parts.map((g) => (g.index ? g.toNonIndexed() : g)))
-import { HALF, SEG, bedY, fbm, depthAt } from './terrain'
+import { HALF, SEG, bedY, fbm, depthAt, ROCK_HUMPS } from './terrain'
 import { SPECIES, makePopulation, fishPose, stepBehaviours, forceRise, forceJig, winterCamp, rnd, drawnLen } from './fish'
 import { makeLakeMaterial, setBeamUniforms } from './lakeMaterial'
 import { wedgeGeometry } from '../2026-09-23-beam-shapes-3d/wedge'
-import { makeTallTree, makeBushTree, makeStump, makeLog, makeWeedTuft, makeRock, placeAll } from './vegetation'
+import { makeTallTree, makeBushTree, makeStump, makeLog, makeWeedTuft, placeAll } from './vegetation'
+import { makeRockGeometry, ROCK_KINDS } from './rocks'
 import { makeBassBoat, makeWaterContact, TRANSDUCER_OFFSET } from './boat'
 import { makeFishGeometry } from './fishGeometry'
 import { makeCargoWreck, makeWreckDebris, WRECK_L, BIG_WRECK, SMALL_WRECK } from './wreck'
@@ -69,7 +70,8 @@ function Instanced({ mat, geos, items, layer }) {
 function Structures({ mat }) {
   const geos = useMemo(() => ({
     tall: [0, 1, 2, 3].map(makeTallTree), bush: [0, 1, 2, 3, 4].map(makeBushTree), stump: [makeStump()], log: [makeLog()],
-    weed: [makeWeedTuft()], rock: [0, 1, 2].map(makeRock),
+    // rocks (rocks.js, #130): the six kinds; small ones at 320 triangles, the few big ones (s ≥ 1.2) at 1280
+    weed: [makeWeedTuft()], rock: ROCK_KINDS.map((k) => makeRockGeometry(k, 0, 2)), rockBig: ROCK_KINDS.map((k) => makeRockGeometry(k, 1, 3)),
   }), [])
   const items = useMemo(placeAll, [])
   return (
@@ -81,7 +83,8 @@ function Structures({ mat }) {
       {/* weeds: soft, diffuse returns — left out of Panoramic's top-down structure map (they drew every tuft as a
           bright clump); the side views and the lake still see them (LAKEBED_LAYER is in both) */}
       <Instanced mat={mat} geos={geos.weed} items={items.weed.map((it) => ({ ...it, sx: 0.8, sz: 0.8 }))} layer={LAKEBED_LAYER} />
-      <Instanced mat={mat} geos={geos.rock} items={items.rock} />
+      <Instanced mat={mat} geos={geos.rock} items={items.rock.filter((it) => it.s < 1.2)} />
+      <Instanced mat={mat} geos={geos.rockBig} items={items.rock.filter((it) => it.s >= 1.2)} />
     </group>
   )
 }
@@ -489,6 +492,14 @@ function Rig({ state, sonarRect, fogMats, cam = LAKE_CAM }) {
       const { B } = logoFrame()
       camera.position.set(B.x - 3, B.y + 9, B.z + 35)
       camera.lookAt(B.x, B.y + 2.2, B.z)
+      return
+    }
+    if (s.rocksCam) { // dev aid ?cam=rocks[:hump] — the island rock pile (or the first rock hump) from under water, slowly circling
+      const [cx, cz] = s.rocksCam === 'hump' ? [ROCK_HUMPS[0][0], ROCK_HUMPS[0][1]] : [30, 12]
+      const a = performance.now() / 12000, by = bedY(cx, cz)
+      camera.up.set(0, 1, 0)
+      camera.position.set(cx + Math.cos(a) * 9, by + 3.2, cz + Math.sin(a) * 9)
+      camera.lookAt(cx, by + 0.4, cz)
       return
     }
     if (s.wreckCam) { // dev aid ?cam=wreck — inspect the big wreck

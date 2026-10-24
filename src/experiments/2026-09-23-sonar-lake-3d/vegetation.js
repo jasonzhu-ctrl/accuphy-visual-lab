@@ -87,14 +87,8 @@ export function makeWeedTuft() {
   }
   return paint(merge(parts), 0.22, 0.42, 0.2, 0.25)
 }
-export function makeRock(variant) {
-  setSeed(600 + variant)
-  const g = new THREE.DodecahedronGeometry(0.5, 1)
-  const p = g.attributes.position
-  for (let i = 0; i < p.count; i++) { const k = 0.8 + rnd() * 0.45; p.setXYZ(i, p.getX(i) * k, p.getY(i) * (0.55 + rnd() * 0.3), p.getZ(i) * k) }
-  g.computeVertexNormals()
-  return paint(g, 0.46, 0.44, 0.39, 0.12)
-}
+// rocks: rocks.js (#130). The old makeRock (a dodecahedron with its corner copies moved one at a time) fell apart
+// into shards — Jason 2026-10-24: 石头像爆米花一样.
 
 // ---------- placement ----------
 const smooth = (a, b, t) => { t = Math.min(1, Math.max(0, (t - a) / (b - a))); return t * t * (3 - 2 * t) }
@@ -134,20 +128,20 @@ export function placeAll() {
     const a = rnd() * 6.28, r = Math.pow(rnd(), 0.6) * 11
     const x = 30 + Math.cos(a) * r, z = 12 + Math.sin(a) * r * 0.75
     const s = 0.35 + (1 - r / 11) * 1.4 * rnd() + rnd() * 0.5
-    items.rock.push({ x, z, y: bedY(x, z) + s * 0.22, s, rot: rnd() * 6.28, tilt: rnd() * 0.6 })
+    items.rock.push({ x, z, y: bedY(x, z) + s * 0.22, s, rot: rnd() * 6.28, tilt: rnd() * 0.35 })
   }
   // 3–5 big boulders (2–4 m) anywhere in the play area, and 2–3 small rock humps
   scatter(4, (x, z) => (d(x, z) > 5 && d(x, z) < 30 && Math.hypot(x - 30, z - 12) > 14 ? 0.6 : 0))
-    .forEach(([x, z]) => { const s = 2 + rnd() * 2; items.rock.push({ x, z, y: bedY(x, z) + s * 0.25, s, rot: rnd() * 6.28, tilt: rnd() * 0.3 }) })
+    .forEach(([x, z]) => { const s = 2 + rnd() * 2; items.rock.push({ x, z, y: bedY(x, z) + s * 0.25, s, rot: rnd() * 6.28, tilt: rnd() * 0.18 }) })
   for (const [hx, hz, hr] of ROCK_HUMPS) {
     for (let i = 0; i < 22; i++) {
       const a = rnd() * 6.28, r = Math.pow(rnd(), 0.7) * hr
       const x = hx + Math.cos(a) * r, z = hz + Math.sin(a) * r
       const s = 0.3 + (1 - r / hr) * 0.9 * rnd() + rnd() * 0.3
-      items.rock.push({ x, z, y: bedY(x, z) + s * 0.22, s, rot: rnd() * 6.28, tilt: rnd() * 0.6 })
+      items.rock.push({ x, z, y: bedY(x, z) + s * 0.22, s, rot: rnd() * 6.28, tilt: rnd() * 0.35 })
     }
   }
   scatter(45, (x, z) => (Math.hypot(x - 30, z - 12) < 22 ? 0.3 : 0.0) + (d(x, z) > 8 && d(x, z) < 13 ? 0.15 : 0))
-    .forEach(([x, z]) => { const s = 0.3 + rnd() * 1.1; items.rock.push({ x, z, y: bedY(x, z) + s * 0.2, s, rot: rnd() * 6.28, tilt: rnd() * 0.6 }) })
+    .forEach(([x, z]) => { const s = 0.3 + rnd() * 1.1; items.rock.push({ x, z, y: bedY(x, z) + s * 0.2, s, rot: rnd() * 6.28, tilt: rnd() * 0.35 }) })
   return items
 }
