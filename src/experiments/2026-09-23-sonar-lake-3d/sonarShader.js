@@ -47,7 +47,7 @@ export const sonarFragment = /* glsl */ `
   uniform sampler2D uLUT;
   uniform float uGain; uniform float uDynRange; uniform float uContrast; uniform float uNoise; uniform float uGamma;
   uniform vec4 uTune2; // dev only (window.__sonarTune.k2): structure rim level, core level, ring radius, inside threshold — all 1 in production
-  uniform vec4 uTune5; // dev only (window.__sonarTune.k5): structure fibre contrast, bright-streak share, fibre length (×1/), outline fibre length — all 1 in production
+  uniform vec4 uTune5; // dev only (window.__sonarTune.k5): structure grain contrast, bright share, arc size scale, outline arc length — all 1 in production
   uniform vec4 uTune4; // dev only (window.__sonarTune.k4): structure hides the bottom, inside fill, wood core, rock core — all 1 in production
   uniform vec4 uTune3; // dev only (window.__sonarTune.k3): bottom spread compensation, near-gain floor, structure cap, steel core — all 1 in production
   uniform vec4 uTune; // dev only (window.__sonarTune.k): scales for the band's pulse, tail, peak+edge and integrated body, all 1 in production
@@ -71,6 +71,16 @@ export const sonarFragment = /* glsl */ `
   float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
   float vnoise(vec2 q) { vec2 i = floor(q), f = fract(q); f = f * f * (3.0 - 2.0 * f);
     return mix(mix(hash(i), hash(i + vec2(1, 0)), f.x), mix(hash(i + vec2(0, 1)), hash(i + vec2(1, 1)), f.x), f.y); }
+  // The app's grain (sonar-style.md §10, the grain rule, measured on 1,782 patches of the two vivo bursts, 2026-10-24):
+  // every return is a short arc ACROSS the beam — fine arcs ~6 in across × ~2 in along the ray, grouped in ~10 × 4 in
+  // clusters, about the same at every range — on the bottom, hulls, rocks and trees alike, re-drawn every ping.
+  // s = metres along the arc (uTune5.z: dev size scale, 1 in production)
+  float arcGrain(float aWorld, float r, float png) {
+    float s = aWorld * r / uTune5.z, rr = r / uTune5.z;
+    float c = vnoise(vec2(s * 3.8 + png * 0.53, rr * 9.5 + png * 1.7));
+    float f = vnoise(vec2(s * 6.5 + 4.0 + png * 0.71, rr * 19.0 - png * 2.3));
+    return 0.45 * c + 0.55 * f;
+  }
   float linearize(float d) {
     float n = uNearFar.x, f = uNearFar.y;
     float z = d * 2.0 - 1.0;
@@ -343,20 +353,19 @@ export const sonarFragment = /* glsl */ `
     float duT = 0.5 * uEchoTex.x; // and half a cell either side across the fan: the cells blend into one smooth stroke (no mosaic)
     for (int i = -2; i <= 2; i++) { float ri = rn + float(i) * dRn; es += exp(-0.9 * float(i * i)) * 0.5 * (sampleEcho(k, u - duT, ri) + sampleEcho(k, u + duT, ri)); }
     es /= 1.87;
-    // A ragged, fibrous outline like the bottom band's (Jason 2026-10-24: 船的还有石头的外边缘太光滑了 … 纹理它是一个不规则的,
-    // 表面都应该像河的底部一样): each thin beam's return runs on past the surface along the ray by its own length, tapering
-    // off — longer behind the target (up to ~0.3 m, the band's lower edge) than in front of it (up to ~0.12 m, its upper
-    // edge); fibres ~4 cm across, a new set every ping
-    // (two octaves multiplied: neighbouring fibres differ, no saw-tooth of evenly growing and shrinking spikes)
-    float fq = aWorld * clamp(11.0 * uRange, 150.0, 400.0);
-    float fl = 1.7 * vnoise(vec2(fq * 1.4 + 17.0, png * 0.71)) * vnoise(vec2(fq * 3.5 + 4.0, png * 1.3)), fl2 = min(fl, 1.2) * 1.5 * uTune5.w; // mean ~0.6
+    // A ragged outline made of the arcs themselves (Jason 2026-10-24: 外边缘太光滑 … 每个物体表面都会有纤维的; the grain rule,
+    // §10): each ~2 in slice along the ray lets the structure echo run on SIDEWAYS, across the beam, by its own length —
+    // the ends of across-beam arcs sticking out of a target, ~9 cm typical, up to ~20 cm, new every ping. Along the ray
+    // only the pulse softens the edge (the arcs above a hull top stick out ~2.6 in, measured). Every surface grows
+    // them, branches too; only the faintest speckle does not.
+    float duM = 0.5 / (uFan[k].z * cos(a) * cos(a) * max(r, 0.5)); // u per metre across the fan at this range
+    float fl = 1.7 * vnoise(vec2(r * 19.0 + 17.0, aWorld * r * 1.5 + png * 0.71)) * vnoise(vec2(r * 7.0 + 4.0, png * 1.3));
+    float Lx = 0.03 + 0.15 * min(fl, 1.2) * uTune5.w; // metres
     float esX = 0.0;
-    for (int i = 1; i <= 5; i++) {
-      float f = float(i) * 0.2;
-      float eb = sampleEcho(k, u, rn - f * (0.05 + 0.32 * fl2) / uFanR[k]);                          // behind, ~0.25 m typical
-      float ef = i <= 3 ? sampleEcho(k, u, rn + f * (0.03 + 0.12 * fl2) * 1.67 / uFanR[k]) : 0.0; // in front, ~0.1 m
-      // every surface grows fibres, branches too (Jason 2026-10-24: 每个物体表面都会有纤维的); only the faintest speckle does not
-      esX = max(esX, (1.0 - 0.85 * f) * max(eb * smoothstep(EDGE_T0, EDGE_T1, eb), ef * smoothstep(EDGE_T0, EDGE_T1, ef)));
+    for (int i = 1; i <= 4; i++) {
+      float f = float(i) * 0.25;
+      float el = sampleEcho(k, u - f * Lx * duM, rn), er = sampleEcho(k, u + f * Lx * duM, rn);
+      esX = max(esX, (1.0 - 0.8 * f) * max(el * smoothstep(EDGE_T0, EDGE_T1, el), er * smoothstep(EDGE_T0, EDGE_T1, er)));
     }
     es = max(es, 0.75 * esX);
     float body = clamp(solidAcc / max(wsum, 1e-3), 0.0, 1.0);
@@ -395,15 +404,11 @@ export const sonarFragment = /* glsl */ `
       spk *= mix(0.82 * uTune2.x, core * uTune2.y, inner);
       // a soft ceiling: solid cores sit at the approved bottom close-up's yellow, not white (Jason 2026-10-24: 钢船过亮,
       // 应该均匀一点; 木船很亮 but wood and the bottom are about as dense, so about as bright)
-      // Fibres like the approved bottom close-up (Jason 2026-10-24: 船跟石头的纹理你还是得去参考最顶上的这个底部的特写图 …
-      // 现在变得很光滑, 简直像拍照片一样, 不真实 — without giving back the opacity): bright yellow streaks along the ray on an
-      // orange body, the close-up's strokes (~5–8 cm across, ~0.6 m long). Angular like the band's tex (constant along a
-      // ray), but scaled with the view's range so a Forward picture at 80 ft gets the same strokes as the close-up instead
-      // of blobs. Full strength deep inside, half on the rim so a branch stays whole; the gaps stay orange (floor 0.35),
-      // never black, so the target stays solid.
-      float fa = clamp(11.0 * uRange, 150.0, 400.0);
-      float fs = 0.65 * vnoise(vec2(aWorld * fa, r * 1.6 * uTune5.z + png * 0.3)) + 0.35 * vnoise(vec2(aWorld * fa * 2.1 + 5.0, r * 3.2 * uTune5.z - png * 0.4));
-      float fib = 1.0 + (0.9 * smoothstep(0.3, 0.85, fs) - 0.28) * mix(0.5, 1.0, inner) * 1.3 * uTune5.x; // centred (mean ≈ 1): texture only, the level stays // long thin bright strokes; core CoV 0.19–0.22 (the close-up band 0.22, the recording 0.28)
+      // The inside carries the same grain as everything else (Jason 2026-10-24: 船跟石头的纹理 … 不是光滑的; the grain rule,
+      // §10): across-beam arcs, brighter yellow ones on an orange body. Full strength deep inside, half on the rim; centred
+      // so the level stays; never below 0.35 (gaps stay orange, the target stays solid).
+      float fs = arcGrain(aWorld, r, png);
+      float fib = 1.0 + (0.9 * smoothstep(0.3, 0.85, fs) - 0.28) * mix(0.5, 1.0, inner) * 1.3 * uTune5.x; // centred (mean ≈ 1): texture only, the level stays
       spk *= max(fib > 1.0 ? 1.0 + (fib - 1.0) * uTune5.y : fib, 0.35);
       float Ks = 2.2 * uTune3.z; // the soft ceiling holds the bright fibres at yellow (4.0 without fibres, 2026-10-24)
       spk = Ks * (1.0 - exp(-spk / Ks));
@@ -671,9 +676,9 @@ export const sonarFragment = /* glsl */ `
       }
     } else {
       // ================= Down / Forward / Combo: vertical slab =================
-      // fibres along the ray, copied from the burst's band at 4× (Jason 2026-10-24: 不行你就抄): soft streaks ~3 in across and
-      // 10–16 in long, 4–5 in apart, low contrast so the band keeps one yellow core line, darker gaps between them, no grid, a fresh pattern drifting in every ping
-      float streak = 0.65 * vnoise(vec2(aWorld * 200.0, r * 3.5 + t * 0.3)) + 0.35 * vnoise(vec2(aWorld * 420.0 + 5.0, r * 6.0 - t * 0.4));
+      // the band's grain: the same across-beam arcs as every other return (the grain rule, §10; #143 had drawn fibres along
+      // the ray — the close-up's diagonal strokes are arcs crossing the band), a fresh pattern every ping
+      float streak = arcGrain(aWorld, r, t);
       float mottle = vnoise(p * 9.0 + t * 0.5) * 0.7 + vnoise(p * 23.0 - t * 0.3) * 0.5;
       float grain = hash(floor(vec2(aWorld * 600.0, r * 6.0)) + t);
       float tex = uStreak > 0.5 ? 0.55 + 0.9 * smoothstep(0.15, 0.9, streak) : 0.35 + 0.9 * mottle + 0.2 * grain; // (the hashed grain drew a dotted grid at 4×; gone from the streak branch)

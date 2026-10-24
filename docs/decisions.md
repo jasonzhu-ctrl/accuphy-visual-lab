@@ -2306,3 +2306,19 @@ Numbered log. Newest at the bottom.
      fibre pixels lower the percentile, the cores are as before); interior opacity unchanged. dev knob
      `window.__sonarTune.k5[3]` = outline fibre length. Checked: six scenes + the ice page (desktop, phone); `vite build`
      clean. Not published: the public pages stay at the #128 build.
+
+148. **2026-10-24** — **Every return is a short arc across the beam (the grain rule); replaces the along-ray fibres**
+     (LiveScope session's independent check after #147: the app's grain runs across the ray, the Lab's along it; Jason:
+     "不是简单的横向短颗粒 … 看真机的颗粒 … 共性 … 规律", then "按这个规律重做纹理，实心和亮度保持"). Measured rule
+     (`sonar-style.md` §10, the grain rule, 1,782 patches of both vivo bursts plus every other view by eye): long axis
+     across the ray in 100 % of patches (87–89°), fine arcs ~6 in × 2 in (aspect ~3) in ~10 × 4 in clusters, almost the
+     same at every range; continuous reflectors are these arcs side by side; ragged outlines are their ends. Engine
+     (`sonarShader.js`): one `arcGrain(aWorld, r, ping)` — value noise in metres along the arc × metres along the ray,
+     two octaves, re-drawn every ping — now drives the bottom band's texture (was angular streaks along the ray, #143),
+     the inside of hulls, rocks and trees (#146) and the outline: each ~2 in slice along the ray runs on SIDEWAYS by its
+     own length (~9 cm typical, ≤ 20 cm) instead of along the ray (#147). Measured after, same method: Lab long axis
+     78–86° to the ray (was 1°), 6.4 × 2.2 in (app 6–7 × 2), aspect 3; the close-up band's strokes 39–60° on screen
+     (app 31–45°, Lab before 137–141°). Kept: opacity (interior gaps 0.3–0.9 %), levels (structure p90 hull 517, rocks
+     575, steel 401; bottoms unchanged; close-up band peak 489 vs 505). Checked: six scenes + the ice page (desktop,
+     phone); `vite build` clean. Not done here: ping-to-ping life (app hull |ΔL|/L 0.46), rim brightness, band
+     thickness and white/yellow share from the same check. Not published: the public pages stay at the #128 build.
