@@ -21,6 +21,7 @@ the Mini page; `VITE_SCENE=ice` for the ice page → `/ice/` on GitHub Pages sin
 
 | Date | Page | Built from (Lab commit) | Public repo commit | What changed |
 |---|---|---|---|---|
+| 2026-10-24 | **Both**, **Mini**, **Ice (trial)** + both private previews | ac67cb4 (#152) | 9bb1f38 | Rough and side-sloping bottoms are one filled band again instead of a net of lines with holes (holes 9.5 % → 2.3 % at the rocky spot) |
 | 2026-10-24 | **Both**, **Mini**, **Ice (trial)** + both private previews | 30672a7 (#151) | 90e5c12 | The fake phone a little smaller: 34 % of a laptop screen (≈ 103–117 mm), 560 px at most (24″ ≈ 155 mm, 27″ ≈ 131 mm); folds and iPads unchanged |
 | 2026-10-24 | **Both**, **Mini**, **Ice (trial)** + both private previews | 32ed1df (#150) | adbe0fe | One phone size on every page (#84: min(42vw, 600px, 83.2vh)); on mid screens (an unfolded fold, a small tablet) the boat and the ice kit stand clear of the panel; the drag hint never covers the panel, cards or phone |
 | 2026-10-24 | **Both**, **Mini**, **Ice (trial)** + both private previews | 42e630d (#143–#149) | 7560bf5 | The sonar picture tuned like for like against the app's recordings: bright cores with orange rims, one brightness for bottom and structure, solid targets that hide the bottom, whole smooth branches, the app's grain (short arcs across the beam) on the bottom, insides and ragged outlines, big hulls with bright middles; checked on a real phone (vivo fold, Chrome: 60 fps in every view) |

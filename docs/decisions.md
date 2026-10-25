@@ -2384,4 +2384,5 @@ Numbered log. Newest at the bottom.
      Measured in the band's core: at the rocky spot black holes 9.5 % → 2.3 %, dark (< ½ median) 16 % → 8 %, CoV 0.50 →
      0.39; the deep slope 0.2 % → 0.1 % (it had few). Bottom brightness per scene unchanged (p90 within ±5 %); the approved
      close-up band peak 517 (was 489–517). dev knob `window.__sonarTune.k6[1]` = the gap fill (1; 0 = the old rows).
-     Checked: both spots, six scenes, the ice page (desktop, phone); `vite build` clean. Not published yet.
+     Checked: both spots, six scenes, the ice page (desktop, phone); `vite build` clean. Published 2026-10-24 on Jason's
+     go (versions.md).
