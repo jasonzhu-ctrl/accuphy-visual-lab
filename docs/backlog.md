@@ -4,7 +4,7 @@ Jason 2026-09-24: "别把之前说过的任务丢了" — every promised task li
 it is done. ✅ done · 🔧 in progress · ⬜ open.
 
 ## Sonar screen (Phase 4)
-- ⬜ **Fish marks tremble (Jason 2026-10-24: 鱼还有不停的颤抖).** Measured at his spot (PLM Forward 90 ft, boat −12.3, 20.4, 45
+- 🔧 (#153, on the local test page `#2026-10-24-sonar-fish-echo` — fish from their 3D bodies, smooth ping to ping; waiting for Jason's verdict) **Fish marks tremble (Jason 2026-10-24: 鱼还有不停的颤抖).** Measured at his spot (PLM Forward 90 ft, boat −12.3, 20.4, 45
   frames at 30 fps): every 1/8 s a mark gets new speckle, its outline swings 168–454 px (2–3×), brightness ±25 %, centre
   jumps up to 10 px — same on #128, #139 and #150, so it dates from #120 (per-ping speckle + ragged rim + `fl` flicker +
   tail wag + 0.2 s ghost). Proposal: blend ping to ping instead of jumping, calmer rim, smaller flicker. Waiting for Jason's go.

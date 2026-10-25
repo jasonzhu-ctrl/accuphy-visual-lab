@@ -67,6 +67,7 @@ export const sonarFragment = /* glsl */ `
   // the Mini's ice views (2026-10-16): 1 = Live Ice (flasher + Live Down), 2 = Ice Fishing (flasher + 2D history)
   uniform float uIce; uniform float uIceSplit; uniform float uAspect; uniform float uTicks; uniform sampler2D uLUT2;
   uniform sampler2D uHist; uniform sampler2D uHistPrev; uniform float uHistPass; uniform float uHistFill; uniform float uIceAmber;
+  uniform float uFishMode; // the fish-echo test page (#153); its fish image arrives in uTop (16 textures max)
   uniform float uSignal; // the ice page's signal gate (IceCamp.jsx s.signal): 0 while the Mini is out of the water; always 1 on the summer lake
 
   float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
@@ -155,6 +156,36 @@ export const sonarFragment = /* glsl */ `
       e = max(e, lobe * exp(-1.5 * q.y * q.y) * rung * rung * exp(-sx / 2.2) * (0.6 + 0.8 * n));
     }
     return e;
+  }
+  // ---- the fish-echo test page (#153): the fish as the transducer sees them ----
+  // lakeMaterial pass 4 draws every fish body from the apex into (angle across the fan × range), only the surfaces facing
+  // the sound (far fish: a sliver of back and flank; near and under the boat: the whole body). Here the beam images that:
+  // a fixed ANGLE across the ray (the beam pattern: a point target lights its neighbouring beams with the pattern's weight,
+  // so far fish smear into arcs and near ones keep their silhouette), the pulse and a short tail along it, and a speckle
+  // that drifts from one ping into the next instead of jumping (Jason 2026-10-24: 鱼还有不停的颤抖).
+  float sampleFish(int k, vec2 uv) { return texture2D(uTop, vec2(uv.x, 0.5 * (clamp(uv.y, 0.0, 0.999) + float(k)))).r; } // both fans in one image, fan k in rows k/2 … (k+1)/2
+  float fishImg(int k, float u, float rn, float r, float a) {
+    float duA = 0.5 / (uFan[k].z * cos(a) * cos(a)); // u per radian across the fan
+    float sA = 0.6 * uBeamHalf * duA;                 // the beam pattern's spread (sigma), in u
+    float dR = 1.0 / 256.0; // the fish image's rows (SonarScreen FISH_H): about a pulse long, so the skin the sound sees reads as an echo, not a hairline
+    // the beam pattern as a smooth spindle: the strongest weighted neighbour (a far, thin fish keeps its peak and smears
+    // across) blended with the weighted mean (tapered ends, no stepped edges)
+    float eMax = 0.0, eSum = 0.0, wSum = 0.0;
+    for (int i = -6; i <= 6; i++) {
+      float fi = float(i) * 0.4, uu = u + fi * sA, w = exp(-0.5 * fi * fi);
+      // along the range: the row and its neighbours (a little more behind the target than in front: the echo's tail)
+      float s0 = sampleFish(k, vec2(uu, rn));
+      float s = max(s0, 1.3 * (s0 + 0.55 * sampleFish(k, vec2(uu, rn + dR)) + 0.7 * sampleFish(k, vec2(uu, rn - dR))) / 2.25);
+      eMax = max(eMax, w * s); eSum += w * s; wSum += w;
+    }
+    float e = 0.6 * eMax + 0.4 * min(1.2, 2.5 * eSum / wSum);
+    // speckle by the grain rule (sonar-style §10): across-beam cells ~15 cm × 5 cm along the ray, drifting into the next ping
+    float ping = uTime * 8.0, p0 = floor(ping);
+    vec2 nc = vec2(a * r / 0.15, r / 0.05);
+    float n0 = vnoise(nc + vec2(fract(p0 * 0.1731) * 97.0, fract(p0 * 0.3117) * 89.0));
+    float n1 = vnoise(nc + vec2(fract((p0 + 1.0) * 0.1731) * 97.0, fract((p0 + 1.0) * 0.3117) * 89.0));
+    e *= 0.85 + 0.3 * mix(n0, n1, smoothstep(0.0, 1.0, ping - p0));
+    return 1.2 * (1.0 - exp(-1.8 * e)); // × the near-field 1.4 in fanEcho: cores as bright as the marks they replace (p95 ~170 at 90 ft)
   }
   // the old capsule mark (until #120), kept for the ice page's jig
   float legacyMark(vec2 p, vec4 A, vec4 B, float rr, vec2 rh) {
@@ -473,7 +504,8 @@ export const sonarFragment = /* glsl */ `
     tvg *= mix(uBedGain, 1.0, smoothstep(5.0, 18.0, r));
     // near-field fish 40 % brighter, fading back to normal by 16 m (Jason 2026-09-27: 近场的鱼要亮40%)
     float sMix = clamp(spk * 2.5, 0.0, 1.0); // structure carries its own grain (above), not the radial streaks of the water and the bottom
-    float e = max(acc * atten * mix(tex, 1.0, sMix) * tvg, fishEcho(p, k) * mix(1.4, 1.0, smoothstep(8.0, 16.0, r)));
+    float fe = uFishMode > 0.5 ? fishImg(k, u, rn, r, a) : fishEcho(p, k); // the fish-echo test page: the fish from their bodies (#153)
+    float e = max(acc * atten * mix(tex, 1.0, sMix) * tvg, fe * mix(1.4, 1.0, smoothstep(8.0, 16.0, r)));
     e = max(e, logoEcho(p, k) * atten * (0.7 + 0.55 * (filament - 0.8)) * (0.72 + 0.28 * tex));
     return e;
   }

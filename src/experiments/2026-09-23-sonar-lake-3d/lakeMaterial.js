@@ -23,6 +23,7 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
     uReveal: { value: 1.0 },
     uSonarPass: { value: 0.0 }, // 1 while rendering the sonar depth strips: alpha = fish mask
     uFishSonarScale: { value: 1.0 / 2.6 }, // fish are DRAWN ×2.6 in the lake (fish.js); the sonar sees them at true size (§7.4)
+    uFishEchoSize: { value: 1.0 }, // the fish-echo test page's ?fishsize= (#153)
     uHighlight: { value: new THREE.Color('#7fe6ff') },
     uRevealGain: { value: 1.0 }, // ice scene: a stronger lift inside the beam (the window in the snow must read lit)
     uClip: { value: new THREE.Vector2(0, 0) }, // ice section view: x = on, y = world z of the cut wall; fragments beyond it are cut away in the main view
@@ -42,12 +43,18 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
         attribute float aPattern; attribute vec3 aBelly; attribute vec3 aSide;
         attribute vec4 aSwim; // per fish, set every frame in Scene.jsx: wave phase, activity, turn bend, wavelength
         varying float vPattern; varying vec3 vBelly; varying vec3 vSide; varying vec3 vLocal; varying vec2 vUv;
-        uniform float uFishSonarScale;
+        varying float vLenF; // the fish's length (its instance scale), for the fish-echo pass
+        uniform float uFishSonarScale; uniform float uFishEchoSize;
       #endif
       void main() {
         vec3 pos = position, nrm = normal;
       #ifdef FISH
         vPattern = aPattern; vBelly = aBelly; vSide = aSide; vLocal = position; vUv = uv; // markings stay on the body; uv: body, eye or fin (fishGeometry.js)
+        #ifdef USE_INSTANCING
+          vLenF = length(instanceMatrix[0].xyz) * uFishSonarScale; // the true length (the lake draws fish ×2.6)
+        #else
+          vLenF = 0.4;
+        #endif
         // fish are not rendered in the sonar passes any more (analytic marks, sonarMarks.js)
         // Swimming (decision #86, docs/boat-fish-plan.md §3a): the body bends sideways (local z) with a wave that
         // runs from head to tail. s = 0 at the nose (x = +0.5) → 1 at the tail tip (x ≈ −0.7). Half-amplitude:
@@ -60,6 +67,20 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
         pos.z += aSwim.y * A * sn + aSwim.z * b * b;
         float dzdx = -(aSwim.y * (dA * sn + A * kw * cs) + 2.0 * aSwim.z * b) / 1.2;
         nrm = vec3(normal.x - dzdx * normal.z, normal.y, normal.z);
+        // the fish-echo pass (#153): the true size, not the lake's ×2.6, with the marks' bloom (a big fish's strong echo spills
+        // into the neighbouring cells: a 1.1 m musky ×1.9, a bass ×1.1), never below 0.22 m (a bait fish is a point target the
+        // beam smears into a speck; smaller, it fell between the image's cells), and the test page's ?fishsize= factor
+        // A thin, far fish is thinner across the beam than the gap between the picture's beam samples (sonarShader fishImg: 0.4 σ
+        // apart, σ = 0.6 × 0.014 rad) and fell between them as parallel strokes: its cross-section is made at least that thick.
+        if (uSonarPass > 3.5) {
+          float tl = max(vLenF, 0.01), ls = max(tl * (1.0 + 0.9 * smoothstep(0.3, 1.1, tl)), 0.22) * uFishEchoSize;
+          vec3 ctr = (modelMatrix * vec4(0.0, 0.0, 0.0, 1.0)).xyz;
+          #ifdef USE_INSTANCING
+            ctr = (modelMatrix * instanceMatrix * vec4(0.0, 0.0, 0.0, 1.0)).xyz;
+          #endif
+          pos.yz *= max(1.0, 0.0045 * length(ctr - cameraPosition) / (0.25 * ls));
+          pos *= uFishSonarScale * ls / tl;
+        }
       #endif
         vec3 c = vec3(1.0);
         #ifdef USE_COLOR
@@ -102,6 +123,7 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
       uniform float uReveal; uniform vec3 uHighlight; uniform float uSonarPass; uniform float uRevealGain; uniform float uOutGamma; uniform vec2 uClip; uniform float uBeamGain;
       #ifdef FISH
         varying float vPattern; varying vec3 vBelly; varying vec3 vSide; varying vec3 vLocal; varying vec2 vUv;
+        varying float vLenF;
         float hash3(vec3 p) { return fract(sin(dot(p, vec3(127.1, 311.7, 74.7))) * 43758.5453); }
         float vn1(float x) { float i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f); return mix(hash3(vec3(i, 7.1, 3.3)), hash3(vec3(i + 1.0, 7.1, 3.3)), f); }
         // round spots on a jittered grid (in some cells only): 1 inside a spot, soft edge
@@ -180,6 +202,22 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
           woodShare = 1.0;
         #endif
           gl_FragColor = vec4(ev, ev * steelShare, ev * woodShare, 0.5 * ev * bigF); // g and b carry the steel and wood shares: each material has its own core level; a the large-scale factor, applied after fanEcho's knee (inside the splat a summed hull saturates and flattens it) // facing weak: a low-poly crown must not show its facets as bands (Jason 2026-10-23: 树一棱一棱有断层)
+          return;
+      #elif defined(FISH)
+          // the fish-echo test page (#153, uSonarPass 4, SonarScreen.jsx): the fish as the transducer sees it — like a camera
+          // at the apex, only the surfaces facing the sound return (Jason 2026-10-24: 远的时候能照到的就是鱼背 … 越来越近的时候
+          // 照到它的身体就相对更完整). Drawn at (angle across the fan, range) with MAX blending: each cell keeps its strongest
+          // surface, so the result does not depend on how finely the body is tessellated. Strongest square-on, the swim
+          // bladder's part of the body brightest, fins and eyes weak, bigger fish a little stronger.
+          if (uSonarPass < 3.5 || vBad > 0.0 || abs(vSplat.x) > 1.0 || abs(vSplat.y) > 1.0) discard;
+          float lobeF = 0.3 + 0.7 * pow(1.0 - abs(vSplat.y), 1.6);
+          float faceF = dot(normalize(vNormal), normalize(cameraPosition - vWorld));
+          bool finF = vUv.x < -1.5, eyeF = vUv.x < -0.5 && vUv.x > -1.5;
+          if (finF) faceF = abs(faceF); // a fin is one sheet: either side returns
+          if (faceF <= 0.0) discard;   // the side turned away from the sound (the body hides it)
+          float bladder = exp(-pow((vLocal.x - 0.05) / 0.2, 2.0)); // the swim bladder carries ~90 % of a fish's echo: far fish read as its compact spot (LiveScope: needles 0.1–0.15 m along the ray), near ones still show the body
+          float evF = lobeF * (0.3 + 0.7 * faceF * faceF) * (finF ? 0.25 : eyeF ? 0.35 : 0.32 + 0.9 * bladder) * clamp(0.75 + 1.1 * vLenF, 0.85, 1.6); // small fish keep a visible speck (bait schools), big ones stronger
+          gl_FragColor = vec4(evF, evF, evF, 1.0);
           return;
       #else
           discard;

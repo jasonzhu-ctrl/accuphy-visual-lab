@@ -57,7 +57,9 @@ export const meta = {
   description: '3D lake with real-scale structure and NA fish; PL/PLM beam volumes reveal the bottom; the app screen (computed from the scene) on an iPhone. Drag the boat.',
 }
 
-export default function SonarLake3D({ scene: sceneProp }) {
+// lab="fish": the fish-echo test page (2026-10-24-sonar-fish-echo, #153) — fish drawn from their 3D bodies as the transducer
+// sees them; ?fish=marks there switches back to today's marks for A/B, ?fishsize=1.6 enlarges the sonar fish
+export default function SonarLake3D({ scene: sceneProp, lab }) {
   const scene = sceneProp || SCENE_ENV || (/[?&]scene=ice/.test(window.location.search) ? 'ice' : 'lake')
   const ICE = scene === 'ice'
   const ONLY = ICE ? 'PLM' : ONLY_ENV // on the ice the Mini is the device: the app's ice views are the Mini's
@@ -195,6 +197,8 @@ export default function SonarLake3D({ scene: sceneProp }) {
   state.current.deviceId = deviceId
   state.current.view = view
   state.current.land = land
+  state.current.fishMode = lab === 'fish' && !/[?&]fish=marks/.test(window.location.search) ? 'echo' : 'marks'
+  state.current.fishSize = lab === 'fish' ? +((/[?&]fishsize=([\d.]+)/.exec(window.location.search) || [])[1] || 1) : 1
   state.current.hintOff = land && !lakeBig // sideways with the sonar full-screen: no drag caption over the sonar
 
   // AUTO depth: deeper at once (the bottom never drops off the screen), shallower only after 1.5 s
