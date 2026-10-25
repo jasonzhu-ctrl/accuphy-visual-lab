@@ -2465,3 +2465,22 @@ Numbered log. Newest at the bottom.
      colours now use their own seeded random numbers (the old ones drew on Math.random, which shifted everything after
      them in seeded captures). dev aid `?cam=workboat[:deg]` — the wreck up close from that bearing. Checked: three 3D
      angles, PL Forward, PL Down, Panoramic, the ice page (desktop, phone), `vite build`.
+
+156. **2026-10-25** — **A more real lake from above: the water column tints the bottom, a wind-sea surface reflects the sky**
+     (Jason: "现在水面的效果不够逼真，看着是挺奇怪的，可能跟底部的纹理有关。我需要你把 … 水面 … 去做高级一点的优化"). He was right
+     about the bottom: the bark-groove texture meant for timber (lakeMaterial, "brown surfaces") also matched the sandy
+     lakebed and drew long curved wood-grain stripes over the whole floor, seen through the water; it is now structure
+     only, and the bed gets soft patches a few metres across instead. `lakeMaterial.js` (uAirView, on for the summer lake
+     only): seen from above, a point is dimmed by the water over it — down from the surface and back up toward the eye
+     (0.022/m, a little haze by distance, red absorbed first) — instead of by its distance from the camera, which gave the
+     shallows and the deep basin one even veil: the island and the shelf now read clear and green-gold with their rocks and
+     timber, the slope darkens, the deep floor sinks into the water's colour; the ACCUPHY LAB lockup keeps its old
+     legibility (fog ≤ 0.55) and the wrecks an outline (≤ 0.62); slow light patterns (caustics, ~2 m cells) play on the
+     floor down to ~6 m. `Scene.jsx` Water rewritten: per-pixel waves (one wind, seven directional components 0.4–7 m
+     with deep-water speeds, ~5° rms slope, wandering phases, a little noise), roughness in drifting patches of gust and
+     calm tens of metres across, the sky reflected by Fresnel from a horizon-to-zenith gradient (little near the boat,
+     most toward the far water), sparse sun glints, a thin scattering veil that the ripples modulate near the camera;
+     short waves fade with each pixel's footprint so a phone does not shimmer; the old wake rings kept; the plane is one
+     quad (the vertex waves only slid it within itself). The ice page keeps its look (uAirView 0; the bed lost its
+     stripes there too); the sonar is untouched (colour only, sonar passes skip it). Checked: desktop and phone, the ice
+     page (0 errors), `vite build`.

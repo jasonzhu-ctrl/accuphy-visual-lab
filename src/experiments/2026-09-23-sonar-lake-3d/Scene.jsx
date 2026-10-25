@@ -7,7 +7,7 @@ import { mergeGeometries as _merge } from 'three/addons/utils/BufferGeometryUtil
 const mergeGeometries = (parts) => _merge(parts.map((g) => (g.index ? g.toNonIndexed() : g)))
 import { HALF, SEG, bedY, fbm, depthAt, ROCK_HUMPS } from './terrain'
 import { SPECIES, makePopulation, fishPose, stepBehaviours, forceRise, forceJig, winterCamp, rnd, drawnLen } from './fish'
-import { makeLakeMaterial, setBeamUniforms } from './lakeMaterial'
+import { makeLakeMaterial, setBeamUniforms, LAKE_TIME } from './lakeMaterial'
 import { wedgeGeometry } from '../2026-09-23-beam-shapes-3d/wedge'
 import { makeTallTree, makeBushTree, makeStump, makeLog, makeWeedTuft, placeAll } from './vegetation'
 import { makeRockGeometry, ROCK_KINDS } from './rocks'
@@ -258,55 +258,85 @@ function Fish({ mat, state }) {
 }
 
 // ---------- water surface ----------
+// Jason 2026-10-25: 现在水面的效果不够逼真，看着是挺奇怪的 … 去做高级一点的优化 (#156). The old surface was a teal veil with
+// isotropic value-noise ripples and a uniform glitter — it read as static over the bottom. Now, per pixel: a wind sea of
+// directional waves (one wind, a spread of headings, 0.5–7 m long) plus a little noise, its roughness varying in big
+// patches (cat's paws and calm slicks, tens of metres across, drifting); the sky reflected by Fresnel (little straight
+// down, most toward the far shore) from a horizon-to-zenith gradient; sun glints on the wave facets; a thin scattering
+// veil. What lies below is tinted by its own water column (lakeMaterial uAirView), so the surface mostly adds light.
+// Short waves fade out with the pixel's footprint, so the phone does not shimmer. The vertices stay flat.
 function Water({ state }) {
   const mat = useMemo(() => new THREE.ShaderMaterial({
     transparent: true, depthWrite: false, side: THREE.DoubleSide,
     uniforms: { uTime: { value: 0 }, uSun: { value: new THREE.Vector3(0.4, 0.8, 0.3).normalize() }, uSky: { value: new THREE.Color('#9cc1cf') }, uBoat: { value: new THREE.Vector3(0, 0, 0) }, uWake: { value: 0 } },
     vertexShader: /* glsl */ `
-      uniform float uTime; uniform vec3 uBoat; uniform float uWake; varying vec3 vW; varying vec3 vN;
-      void main() {
-        vec3 p = position;
-        float w = 0.06 * sin(p.x * 0.6 + uTime * 0.9) + 0.05 * sin(p.z * 0.8 - uTime * 0.7) + 0.03 * sin((p.x + p.z) * 1.7 + uTime * 1.6);
-        // wake: rings spreading from the boat while it moves (plane is rotated: local x,y ↔ world x,-z)
-        float dB = length(vec2(p.x - uBoat.x, -p.y - uBoat.z));
-        w += uWake * 0.22 * sin(dB * 2.0 - uTime * 5.0) * exp(-dB / 6.0);
-        p.y += w;
-        float dx = 0.036 * cos(p.x * 0.6 + uTime * 0.9) + 0.051 * cos((p.x + p.z) * 1.7 + uTime * 1.6);
-        float dz = 0.04 * cos(p.z * 0.8 - uTime * 0.7) + 0.051 * cos((p.x + p.z) * 1.7 + uTime * 1.6);
-        vN = normalize(vec3(-dx, 1.0, -dz));
-        vec4 wp = modelMatrix * vec4(p, 1.0); vW = wp.xyz;
-        gl_Position = projectionMatrix * viewMatrix * wp;
-      }
+      varying vec3 vW;
+      void main() { vec4 wp = modelMatrix * vec4(position, 1.0); vW = wp.xyz; gl_Position = projectionMatrix * viewMatrix * wp; }
     `,
     fragmentShader: /* glsl */ `
-      precision highp float; varying vec3 vW; varying vec3 vN; uniform vec3 uSun; uniform vec3 uSky; uniform float uTime;
+      precision highp float; varying vec3 vW; uniform vec3 uSun; uniform vec3 uSky; uniform float uTime; uniform vec3 uBoat; uniform float uWake;
       float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
-      float vnoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
-        return mix(mix(hash(i), hash(i + vec2(1, 0)), f.x), mix(hash(i + vec2(0, 1)), hash(i + vec2(1, 1)), f.x), f.y); }
+      // value noise with its gradient (xy) and value (z)
+      vec3 vnoised(vec2 p) {
+        vec2 i = floor(p), f = fract(p), u = f * f * (3.0 - 2.0 * f), du = 6.0 * f * (1.0 - f);
+        float a = hash(i), b = hash(i + vec2(1, 0)), c = hash(i + vec2(0, 1)), d = hash(i + vec2(1, 1));
+        return vec3(du * vec2(b - a + (a - b - c + d) * u.y, c - a + (a - b - c + d) * u.x), a + (b - a) * u.x + (c - a) * u.y + (a - b - c + d) * u.x * u.y);
+      }
       void main() {
-        // fine ripple detail on top of the big waves
         float t = uTime;
-        float n1 = vnoise(vW.xz * 0.9 + vec2(t * 0.25, -t * 0.2));
-        float n2 = vnoise(vW.xz * 2.7 - vec2(t * 0.4, t * 0.3));
-        vec3 N = normalize(vN + vec3((n1 - 0.5) * 0.35 + (n2 - 0.5) * 0.18, 0.0, (n2 - 0.5) * 0.35 + (n1 - 0.5) * 0.18));
+        vec2 x = vW.xz;
+        float foot = length(fwidth(x)); // metres per pixel here
+        // roughness patches: wind gusts and calm slicks, ~40–80 m, drifting with the wind
+        vec2 wind = normalize(vec2(-0.55, -0.83));
+        float gust = vnoised(x * 0.018 - wind * t * 0.035).z * 0.65 + vnoised(x * 0.05 + 7.3 - wind * t * 0.06).z * 0.35;
+        float rough = 0.4 + 0.9 * smoothstep(0.25, 0.75, gust);
+        // the wind sea: directional waves round the wind, slope summed analytically; each fades once a pixel covers
+        // a third of its wavelength
+        vec2 g = vec2(0.0);
+        float wan = 6.2832 * vnoised(x * 0.045 + 1.3).z; // the phases wander, so the crests are not ruled lines
+        for (int i = 0; i < 7; i++) {
+          float fi = float(i);
+          float lam = 7.0 * pow(0.62, fi);                                   // 7 m … 0.4 m
+          float ang = (hash(vec2(fi, 3.7)) - 0.5) * 1.6;                       // ±46° round the wind
+          vec2 d = mat2(cos(ang), -sin(ang), sin(ang), cos(ang)) * wind;
+          float k = 6.2832 / lam, w = sqrt(9.81 * k);                         // deep-water dispersion
+          float sl = 0.045 * (0.6 + 0.8 * hash(vec2(fi, 9.1)));               // each wave's slope: a light breeze (the sum ~0.1 rms, ~5°)
+          float fade = 1.0 - smoothstep(lam * 0.12, lam * 0.35, foot);
+          g += d * sl * cos(dot(d, x) * k - w * t + fi * 1.7 + wan * (0.6 + 0.35 * fi)) * fade;
+        }
+        vec3 n1 = vnoised(x * 1.3 + wind * t * 0.4), n2 = vnoised(x * 3.1 - vec2(t * 0.5, -t * 0.3));
+        g += n1.xy * 0.035 + n2.xy * 0.02 * (1.0 - smoothstep(0.08, 0.25, foot));
+        g *= rough;
+        // the wake: rings spreading from the boat while it moves
+        vec2 rb = x - uBoat.xz; float dB = length(rb) + 1e-3;
+        g += uWake * 0.35 * cos(dB * 2.0 - t * 5.0) * exp(-dB / 6.0) * rb / dB;
+        vec3 N = normalize(vec3(-g.x, 1.0, -g.y));
         vec3 v = normalize(cameraPosition - vW);
-        float fres = pow(1.0 - max(dot(v, N), 0.0), 3.0);
-        vec3 deep = vec3(0.14, 0.47, 0.56), sky = vec3(0.66, 0.80, 0.88);
-        vec3 h = normalize(uSun + v);
-        float spec = pow(max(dot(N, h), 0.0), 90.0);
-        float glitter = smoothstep(0.55, 0.95, vnoise(vW.xz * 6.0 + vec2(t * 0.6, t * 0.5)));
-        vec3 col = mix(deep, sky, fres * 0.8) + spec * (0.35 + 0.9 * glitter);
-        // a touch of surface texture so it reads as a surface from above
-        col += (n2 - 0.5) * 0.05;
-        float alpha = 0.36 + 0.42 * fres;
+        float cosI = max(dot(v, N), 0.0);
+        float F = 0.02 + 0.98 * pow(1.0 - cosI, 5.0);                          // Schlick, water
+        vec3 R = reflect(-v, N);
+        float el = max(R.y, 0.0);
+        vec3 horizon = mix(uSky, vec3(0.86, 0.9, 0.9), 0.35), zenith = vec3(0.33, 0.55, 0.72);
+        vec3 sky = mix(horizon, zenith, pow(el, 0.6));
+        float sun = pow(max(dot(R, uSun), 0.0), 1200.0) * 2.5 + pow(max(dot(R, uSun), 0.0), 60.0) * 0.06; // glints + a soft sheen
+        vec3 veil = vec3(0.09, 0.33, 0.39);                                    // light scattered back out of the water
+        float s = 0.22 + 0.06 * (gust - 0.5);                                  // a little murkier where it is rough
+        // ripples read near the camera too, where the reflection is weak: facets tilted toward or away from the eye show
+        // a little more or less of the sky and the scattered light (the refraction a real surface adds)
+        float rip = dot(g, normalize(vW.xz - cameraPosition.xz));
+        F = clamp(F * (1.0 + 6.0 * rip), 0.0, 1.0);
+        s *= clamp(1.0 + 2.2 * rip, 0.6, 1.5);
+        float alpha = clamp(F + (1.0 - F) * s, 0.0, 1.0);
+        vec3 col = (sky * F + veil * (1.0 - F) * s) / max(alpha, 1e-3) + vec3(1.0, 0.97, 0.9) * sun;
         float dist = length(vW - cameraPosition);
         float fog = smoothstep(120.0, 420.0, dist);
-        gl_FragColor = vec4(mix(col, uSky, fog), mix(alpha, 1.0, fog));
+        gl_FragColor = vec4(mix(col, uSky, fog), mix(clamp(alpha + sun, 0.0, 1.0), 1.0, fog));
       }
     `,
   }), [])
   useFrame(({ clock }, dt) => {
     mat.uniforms.uTime.value = clock.elapsedTime
+    LAKE_TIME.value = clock.elapsedTime // the light patterns on the shallows (lakeMaterial)
     const s = state.current
     const speed = Math.hypot(s.target.x - s.boat.x, s.target.z - s.boat.z)
     mat.uniforms.uBoat.value.set(s.boat.x, 0, s.boat.z)
@@ -314,7 +344,7 @@ function Water({ state }) {
   })
   return (
     <mesh rotation-x={-Math.PI / 2} material={mat} onUpdate={(o) => o.layers.set(SONAR_HIDE_LAYER)}>
-      <planeGeometry args={[900, 900, 90, 90]} />
+      <planeGeometry args={[900, 900, 1, 1]} />
     </mesh>
   )
 }
@@ -375,7 +405,7 @@ function Boat({ state, beamMats }) {
       }
     }
     // visual only (#88): a gentle bob — heave ±4 cm on the phases of the water's wave shading, roll ±0.9°, pitch ±0.6°.
-    // (The water surface itself stays flat: its shader shifts vertices within the plane.) The beam apex above stays
+    // (The water surface itself stays flat: its waves are per-pixel normals, #156.) The beam apex above stays
     // where it was, so the sonar picture does not jitter; the foam stays on the water.
     const t = clock.elapsedTime, bx = s.boat.x
     ride.current.position.y = 0.026 * Math.sin(t * 0.9 + bx * 0.6) + 0.013 * Math.sin(t * 1.6 + bx * 1.7)
@@ -694,6 +724,7 @@ export default function LakeScene({ state, sonarRect, paused = false, scene = 'l
     fish.side = THREE.DoubleSide // flat fins
     const m = { bed: makeLakeMaterial(), inst: makeLakeMaterial({ structure: true }), steel: makeLakeMaterial({ steel: true }), wood: makeLakeMaterial({ wood: true }), logo: makeLakeMaterial({ logo: true }), fish }
     if (ice) for (const k in m) { const u = m[k].userData.uniforms; u.uFogColor.value.set(P.T.water); u.uSun.value.copy(dir(P.T.sun.dir)); u.uRevealGain.value = 2.4; u.uOutGamma.value = 0.8; u.uFogDensity.value *= 2.4 } // dark winter water: the bottom fades to black, the beam cuts through (#99)
+    else for (const k in m) m[k].userData.uniforms.uAirView.value = 1 // the summer lake: the water column tints what lies under it (lakeMaterial.js, #156)
     return m
   }, [ice, P])
   const lakeMats = useMemo(() => [mats.bed, mats.inst, mats.steel, mats.wood, mats.fish, mats.logo], [mats]) // wood added 2026-10-23: without it the workboat rendered into the sonar passes untagged (alpha 1 = fish/steel)
