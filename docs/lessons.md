@@ -123,6 +123,13 @@ repeatable procedures are also project skills in `.claude/skills/` (`sonar-qa`, 
   names and reloads the page, and the run dies with "Execution context was destroyed" (three grid runs lost this way).
   YouTube is blocked there (www.youtube.com, *.googlevideo.com, i.ytimg.com): video study needs those hosts allowed
   in the environment's network settings, or the Mac.
+- **The sonar picture shader is at 16 textures — the most an iPhone (and many Androids) allow** (#153). A 17th sampler
+  makes three.js reuse a texture unit: no error, but the wrong texture is read (a fish mark vanished in PL Down). Do not
+  add a sampler2D to `sonarShader.js`; pack into an existing texture or borrow an idle slot (the fish-echo test page
+  feeds its fish image through `uTop`, which only Panoramic uses).
+- **Byte-identical checks under the seeded harness:** three.js gives every new texture / render target a random UUID
+  from `Math.random`. Allocating one more target at startup shifts the seeded random stream and moves a fish, so a
+  change that is invisible in a real browser shows up as a pixel diff. Make test-only resources lazily (#153).
 - **Shaders are JS template strings:** a backtick in a GLSL comment ends the string and `vite build` fails with a
   parser error pointing at the comment (#136). Write `base`, not \`base\`, inside shader code.
 - **Build gotchas:** the minifier writes string literals with backticks. Vite rewrites public CSS URLs to

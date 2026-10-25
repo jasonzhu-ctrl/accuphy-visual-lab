@@ -2386,3 +2386,32 @@ Numbered log. Newest at the bottom.
      close-up band peak 517 (was 489–517). dev knob `window.__sonarTune.k6[1]` = the gap fill (1; 0 = the old rows).
      Checked: both spots, six scenes, the ice page (desktop, phone); `vite build` clean. Published 2026-10-24 on Jason's
      go (versions.md).
+
+153. **2026-10-24** — **A test page where the fish are drawn as the transducer sees them** (Jason: "鱼还有不停的颤抖", "有一部分
+     的鱼 … 近的时候还是像一团"; on the cause: "你把这个探头 … 有点类似于像一个相机一样 … 远的时候能照到的就是鱼背 … 越来越近的
+     时候 … 照到它的身体就相对更完整"; then "上面那些都可以尝试，但是弄到本地来开个版本，然后本地先尝试吧").
+     - **Diagnosis (marks, since #120):** a mark is the fish's body projected into the screen plane plus a fixed blur, so its
+       shape depends on the heading, not the distance: a fish crossing the Forward slice collapses to a blob near or far,
+       and the ones swimming toward the boat are dimmed and shortened (×0.6). Every 1/8 s the speckle, the ragged rim and a
+       ±6–70 % flicker are re-drawn: at his spot the outline swings 2–3× and the centre jumps up to 10 px (same on #128).
+     - **The test page** `src/experiments/2026-10-24-sonar-fish-echo` (gallery; `<SonarLake3D lab="fish" />`, like the ice
+       page's wrapper). In the vertical views the 3D fish bodies are drawn from the transducer like a camera
+       (`lakeMaterial.js` pass 4: only the surfaces facing the sound, strongest square-on, the swim-bladder part of the
+       body brightest, fins and eyes weak; true size — the lake draws fish ×2.6 — with the marks' bloom for big fish and a
+       0.22 m floor for bait; MAX-blended into one (angle × range) image, 256 rows per fan, 4× MSAA). `sonarShader.js`
+       fishImg images it: the beam pattern across the ray (0.6 × 0.014 rad), a pulse and short tail along it, a speckle
+       that crossfades from one ping into the next. Far fish come out as smooth arcs across the beam, near and under the
+       boat as fish shapes (a musky at ~60 ft shows its body and tail); a fish turning toward the boat goes compact for a
+       moment. `?fish=marks` shows today's marks for A/B, `?fishsize=1.6` larger sonar fish. Panoramic keeps the marks.
+     - **Measured** at his spot over 45 frames (biggest fish): pixels changing per frame 24 % → 10 %, centre jump ≤ 10.4 →
+       ≤ 0.8 px, brightness swing ±25 % → ±10 %. Cost per frame (PLM Forward): draw calls 188 → 195, triangles 1.45 M →
+       1.59 M (+10 %; Combo twice that), no new download (the fish are built in code).
+     - **Kept off the other pages:** the lake and ice pages run the same code paths with the switch off — byte-identical
+       sonar snapshots against main (PL Down, PLM Forward, PLM Combo); the fish target is allocated only on the test page;
+       the picture shader stays at 16 textures (the fish image borrows `uTop`, idle outside Panoramic — see lessons §4).
+       The ice page loads without errors (desktop, phone).
+     - **The thick-bottom fill** tried here first was dropped: #152 (the other chat, published) fixed the net on main the
+       same way; this page uses it.
+     - **Open:** bait specks draw as two or three short strokes instead of one; far fish a little wider along the ray than
+       the marks' needles; Jason to judge the look (true size vs `?fishsize=1.6`) locally before anything moves to the main
+       page. Local only, not published.
