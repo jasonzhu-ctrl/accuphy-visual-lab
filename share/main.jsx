@@ -4,4 +4,5 @@ import ReactDOM from 'react-dom/client'
 import SonarLake3D from '../src/experiments/2026-09-23-sonar-lake-3d'
 import '../src/index.css'
 
-ReactDOM.createRoot(document.getElementById('root')).render(<SonarLake3D />)
+// VITE_LAB=fish: the fish-echo test page (#153), for a private preview
+ReactDOM.createRoot(document.getElementById('root')).render(<SonarLake3D lab={import.meta.env.VITE_LAB || undefined} />)

@@ -12,6 +12,7 @@ with the source commit it was built from, so anyone can tell which version a lin
 | Private preview | Jason only (claude.ai login) | https://claude.ai/artifact/RnCBYTexY5vcEqJy2hAsN7 |
 | **Ice (trial)** — the ice-fishing page, section camera | anyone with the link, no login | https://jasonzhu-ctrl.github.io/accuphy-lab-test/ice/ |
 | Ice (private preview) | Jason only (claude.ai login) | https://claude.ai/artifact/G5uZM8imcgsQNzoKfPkiMa |
+| Fish echo test (private preview, #153) | Jason only (claude.ai login) | https://claude.ai/artifact/VxxnVnZr8cxQLXw3iizMdD |
 
 Both public pages are unlisted (`noindex`, `robots.txt` Disallow) and have no sign-up gate (#71).
 How to rebuild and publish: the `lab-test-link` skill (`node scripts/build-share.mjs <out>`; `VITE_DEVICES=PLM` for
@@ -21,6 +22,7 @@ the Mini page; `VITE_SCENE=ice` for the ice page → `/ice/` on GitHub Pages sin
 
 | Date | Page | Built from (Lab commit) | Public repo commit | What changed |
 |---|---|---|---|---|
+| 2026-10-25 | Fish echo test (private preview) | 1fa89c1 + switches (#153) | — | First preview of the fish-echo test page: fish drawn from their 3D bodies as the transducer sees them; switches on the page for the current fish and a 1.6× size. `VITE_LAB=fish node scripts/build-share.mjs <out>` |
 | 2026-10-24 | **Both**, **Mini**, **Ice (trial)** + both private previews | ac67cb4 (#152) | 9bb1f38 | Rough and side-sloping bottoms are one filled band again instead of a net of lines with holes (holes 9.5 % → 2.3 % at the rocky spot) |
 | 2026-10-24 | **Both**, **Mini**, **Ice (trial)** + both private previews | 30672a7 (#151) | 90e5c12 | The fake phone a little smaller: 34 % of a laptop screen (≈ 103–117 mm), 560 px at most (24″ ≈ 155 mm, 27″ ≈ 131 mm); folds and iPads unchanged |
 | 2026-10-24 | **Both**, **Mini**, **Ice (trial)** + both private previews | 32ed1df (#150) | adbe0fe | One phone size on every page (#84: min(42vw, 600px, 83.2vh)); on mid screens (an unfolded fold, a small tablet) the boat and the ice kit stand clear of the panel; the drag hint never covers the panel, cards or phone |

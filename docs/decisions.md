@@ -2414,4 +2414,5 @@ Numbered log. Newest at the bottom.
        same way; this page uses it.
      - **Open:** bait specks draw as two or three short strokes instead of one; far fish a little wider along the ray than
        the marks' needles; Jason to judge the look (true size vs `?fishsize=1.6`) locally before anything moves to the main
-       page. Local only, not published.
+       page. Not published; a private preview for Jason (claude.ai login) at https://claude.ai/artifact/VxxnVnZr8cxQLXw3iizMdD
+       with two switches on the page (鱼：现在 / 新画法 · 真实大小 / 放大 1.6 倍), built by `VITE_LAB=fish scripts/build-share.mjs`.
