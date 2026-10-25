@@ -2422,3 +2422,8 @@ Numbered log. Newest at the bottom.
        without fins or tail; the body apart from the swim bladder fades out between 6 and 9 m, so past ~20–30 ft only the
        bladder's compact spot is left and the beam draws it as the old marks' needle, a little hotter (peak-weighted,
        ×1.2) than round 1. True size stays the default.
+     - **Round 3 (Jason 2026-10-25: 纹理的画法 … 更新到这上面来 … 基本上可以作为一个死的规则):** the fish's texture is now the grain
+       rule of #148 — the same `arcGrain` and centred contrast as the bottom, trees, hulls and rocks — crossfaded from ping
+       to ping (a moving target, no trembling). At his spot: pixels changing per frame 16 % (marks 24 %, round 2 10 %), the
+       largest jump ~1 px (marks 10 px). **Standing rule:** every echo in the picture takes its texture from `arcGrain`
+       (short arcs across the beam); a new kind of target adds its level and shape, never its own texture.

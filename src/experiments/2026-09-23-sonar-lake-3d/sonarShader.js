@@ -164,7 +164,7 @@ export const sonarFragment = /* glsl */ `
   // so far fish smear into arcs and near ones keep their silhouette), the pulse and a short tail along it, and a speckle
   // that drifts from one ping into the next instead of jumping (Jason 2026-10-24: 鱼还有不停的颤抖).
   float sampleFish(int k, vec2 uv) { return texture2D(uTop, vec2(uv.x, 0.5 * (clamp(uv.y, 0.0, 0.999) + float(k)))).r; } // both fans in one image, fan k in rows k/2 … (k+1)/2
-  float fishImg(int k, float u, float rn, float r, float a) {
+  float fishImg(int k, float u, float rn, float r, float a, float aWorld) {
     float duA = 0.5 / (uFan[k].z * cos(a) * cos(a)); // u per radian across the fan
     // the beam pattern's spread (sigma), in u — never finer than ~5.5 cm across (Jason 2026-10-25: a near fish is a soft shape,
     // no fins or tail; the beam is ~1° wide, so close in the blur is a few cm, not the 3D model's crisp edge)
@@ -183,12 +183,13 @@ export const sonarFragment = /* glsl */ `
     // far fish lean on the peak (the old marks' bright needle core, Jason 2026-10-25: 远处 … 老版本跟新版本的结合), near ones on the mean
     float farF = smoothstep(6.0, 12.0, r);
     float e = mix(0.6, 0.85, farF) * eMax + mix(0.4, 0.15, farF) * min(1.2, 2.5 * eSum / wSum);
-    // speckle by the grain rule (sonar-style §10): across-beam cells ~15 cm × 5 cm along the ray, drifting into the next ping
+    // the texture is the grain rule, as on the bottom, trees, hulls and rocks (sonar-style §10, #148; Jason 2026-10-25: 纹理
+    // … 基本上可以作为一个死的规则): short arcs ACROSS the beam, ~6 in × 2 in in ~10 × 4 in clusters, the same arcGrain and the
+    // same centred contrast as structure. A fish moves, so its arcs crossfade from one ping into the next instead of
+    // re-forming at once (the trembling, #153); never below 0.35, so a fish is never cut into pieces.
     float ping = uTime * 8.0, p0 = floor(ping);
-    vec2 nc = vec2(a * r / 0.15, r / 0.05);
-    float n0 = vnoise(nc + vec2(fract(p0 * 0.1731) * 97.0, fract(p0 * 0.3117) * 89.0));
-    float n1 = vnoise(nc + vec2(fract((p0 + 1.0) * 0.1731) * 97.0, fract((p0 + 1.0) * 0.3117) * 89.0));
-    e *= 0.85 + 0.3 * mix(n0, n1, smoothstep(0.0, 1.0, ping - p0));
+    float fs = mix(arcGrain(aWorld, r, p0), arcGrain(aWorld, r, p0 + 1.0), smoothstep(0.0, 1.0, ping - p0));
+    e *= max(1.0 + (0.9 * smoothstep(0.3, 0.85, fs) - 0.28) * 1.3 * uTune5.x, 0.35);
     return 1.2 * mix(1.0, 1.2, farF) * (1.0 - exp(-1.8 * e)); // × the near-field 1.4 in fanEcho: cores as bright as the marks they replace; far needles a little hotter, like the old marks
   }
   // the old capsule mark (until #120), kept for the ice page's jig
@@ -508,7 +509,7 @@ export const sonarFragment = /* glsl */ `
     tvg *= mix(uBedGain, 1.0, smoothstep(5.0, 18.0, r));
     // near-field fish 40 % brighter, fading back to normal by 16 m (Jason 2026-09-27: 近场的鱼要亮40%)
     float sMix = clamp(spk * 2.5, 0.0, 1.0); // structure carries its own grain (above), not the radial streaks of the water and the bottom
-    float fe = uFishMode > 0.5 ? fishImg(k, u, rn, r, a) : fishEcho(p, k); // the fish-echo test page: the fish from their bodies (#153)
+    float fe = uFishMode > 0.5 ? fishImg(k, u, rn, r, a, aWorld) : fishEcho(p, k); // the fish-echo test page: the fish from their bodies (#153)
     float e = max(acc * atten * mix(tex, 1.0, sMix) * tvg, fe * mix(1.4, 1.0, smoothstep(8.0, 16.0, r)));
     e = max(e, logoEcho(p, k) * atten * (0.7 + 0.55 * (filament - 0.8)) * (0.72 + 0.28 * tex));
     return e;
