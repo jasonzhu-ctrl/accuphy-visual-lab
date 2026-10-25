@@ -216,7 +216,11 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
           if (finF) faceF = abs(faceF); // a fin is one sheet: either side returns
           if (faceF <= 0.0) discard;   // the side turned away from the sound (the body hides it)
           float bladder = exp(-pow((vLocal.x - 0.05) / 0.2, 2.0)); // the swim bladder carries ~90 % of a fish's echo: far fish read as its compact spot (LiveScope: needles 0.1–0.15 m along the ray), near ones still show the body
-          float evF = lobeF * (0.3 + 0.7 * faceF * faceF) * (finF ? 0.25 : eyeF ? 0.35 : 0.32 + 0.9 * bladder) * clamp(0.75 + 1.1 * vLenF, 0.85, 1.6); // small fish keep a visible speck (bait schools), big ones stronger
+          // Jason 2026-10-25 on the first preview: near fish only as a soft body — "鱼鳍、鱼尾巴都看得出来 … 不可能那么清晰"; past
+          // 20–30 ft no fish shape at all. Fins are thin membranes and hardly return; the rest of the body fades out between
+          // 6 and 9 m, leaving the bladder's compact spot (the beam turns it into the old marks' needle).
+          float bodyF = mix(0.32, 0.05, smoothstep(6.0, 9.0, vSplat.z));
+          float evF = lobeF * (0.3 + 0.7 * faceF * faceF) * (finF ? 0.04 : bodyF + 0.9 * bladder) * clamp(0.75 + 1.1 * vLenF, 0.85, 1.6); // small fish keep a visible speck (bait schools), big ones stronger
           gl_FragColor = vec4(evF, evF, evF, 1.0);
           return;
       #else

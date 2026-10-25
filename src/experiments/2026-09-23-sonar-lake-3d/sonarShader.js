@@ -166,7 +166,9 @@ export const sonarFragment = /* glsl */ `
   float sampleFish(int k, vec2 uv) { return texture2D(uTop, vec2(uv.x, 0.5 * (clamp(uv.y, 0.0, 0.999) + float(k)))).r; } // both fans in one image, fan k in rows k/2 … (k+1)/2
   float fishImg(int k, float u, float rn, float r, float a) {
     float duA = 0.5 / (uFan[k].z * cos(a) * cos(a)); // u per radian across the fan
-    float sA = 0.6 * uBeamHalf * duA;                 // the beam pattern's spread (sigma), in u
+    // the beam pattern's spread (sigma), in u — never finer than ~5.5 cm across (Jason 2026-10-25: a near fish is a soft shape,
+    // no fins or tail; the beam is ~1° wide, so close in the blur is a few cm, not the 3D model's crisp edge)
+    float sA = max(0.6 * uBeamHalf, 0.055 / max(r, 0.5)) * duA;
     float dR = 1.0 / 256.0; // the fish image's rows (SonarScreen FISH_H): about a pulse long, so the skin the sound sees reads as an echo, not a hairline
     // the beam pattern as a smooth spindle: the strongest weighted neighbour (a far, thin fish keeps its peak and smears
     // across) blended with the weighted mean (tapered ends, no stepped edges)
@@ -178,14 +180,16 @@ export const sonarFragment = /* glsl */ `
       float s = max(s0, 1.3 * (s0 + 0.55 * sampleFish(k, vec2(uu, rn + dR)) + 0.7 * sampleFish(k, vec2(uu, rn - dR))) / 2.25);
       eMax = max(eMax, w * s); eSum += w * s; wSum += w;
     }
-    float e = 0.6 * eMax + 0.4 * min(1.2, 2.5 * eSum / wSum);
+    // far fish lean on the peak (the old marks' bright needle core, Jason 2026-10-25: 远处 … 老版本跟新版本的结合), near ones on the mean
+    float farF = smoothstep(6.0, 12.0, r);
+    float e = mix(0.6, 0.85, farF) * eMax + mix(0.4, 0.15, farF) * min(1.2, 2.5 * eSum / wSum);
     // speckle by the grain rule (sonar-style §10): across-beam cells ~15 cm × 5 cm along the ray, drifting into the next ping
     float ping = uTime * 8.0, p0 = floor(ping);
     vec2 nc = vec2(a * r / 0.15, r / 0.05);
     float n0 = vnoise(nc + vec2(fract(p0 * 0.1731) * 97.0, fract(p0 * 0.3117) * 89.0));
     float n1 = vnoise(nc + vec2(fract((p0 + 1.0) * 0.1731) * 97.0, fract((p0 + 1.0) * 0.3117) * 89.0));
     e *= 0.85 + 0.3 * mix(n0, n1, smoothstep(0.0, 1.0, ping - p0));
-    return 1.2 * (1.0 - exp(-1.8 * e)); // × the near-field 1.4 in fanEcho: cores as bright as the marks they replace (p95 ~170 at 90 ft)
+    return 1.2 * mix(1.0, 1.2, farF) * (1.0 - exp(-1.8 * e)); // × the near-field 1.4 in fanEcho: cores as bright as the marks they replace; far needles a little hotter, like the old marks
   }
   // the old capsule mark (until #120), kept for the ice page's jig
   float legacyMark(vec2 p, vec4 A, vec4 B, float rr, vec2 rh) {

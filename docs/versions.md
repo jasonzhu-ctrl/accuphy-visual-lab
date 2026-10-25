@@ -22,6 +22,7 @@ the Mini page; `VITE_SCENE=ice` for the ice page → `/ice/` on GitHub Pages sin
 
 | Date | Page | Built from (Lab commit) | Public repo commit | What changed |
 |---|---|---|---|---|
+| 2026-10-25 | Fish echo test (private preview) | round 2 (#153) | — | Near fish a soft body (no fins or tail), far fish slimmer needles like the old marks, true size by default |
 | 2026-10-25 | Fish echo test (private preview) | 1fa89c1 + switches (#153) | — | First preview of the fish-echo test page: fish drawn from their 3D bodies as the transducer sees them; switches on the page for the current fish and a 1.6× size. `VITE_LAB=fish node scripts/build-share.mjs <out>` |
 | 2026-10-24 | **Both**, **Mini**, **Ice (trial)** + both private previews | ac67cb4 (#152) | 9bb1f38 | Rough and side-sloping bottoms are one filled band again instead of a net of lines with holes (holes 9.5 % → 2.3 % at the rocky spot) |
 | 2026-10-24 | **Both**, **Mini**, **Ice (trial)** + both private previews | 30672a7 (#151) | 90e5c12 | The fake phone a little smaller: 34 % of a laptop screen (≈ 103–117 mm), 560 px at most (24″ ≈ 155 mm, 27″ ≈ 131 mm); folds and iPads unchanged |
