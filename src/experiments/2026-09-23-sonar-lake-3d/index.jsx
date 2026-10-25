@@ -106,6 +106,9 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
   const land = isLandscapePhone() && !ICE
   const phone = isPhoneLayout() || land
   const [lakeBig, setLakeBig] = useState(false)
+  // the fish-echo test page (#153): two switches on the page itself (Jason opens it from a link, not with URL flags)
+  const [fishNew, setFishNew] = useState(!/[?&]fish=marks/.test(window.location.search))
+  const [fishBig, setFishBig] = useState(/[?&]fishsize=1\.6/.test(window.location.search))
   // the display's real aspect when sideways (the screen minus the safe areas); everywhere else the phone frame's 2.08
   const [landAspect, setLandAspect] = useState(2.08)
   useEffect(() => {
@@ -197,8 +200,8 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
   state.current.deviceId = deviceId
   state.current.view = view
   state.current.land = land
-  state.current.fishMode = lab === 'fish' && !/[?&]fish=marks/.test(window.location.search) ? 'echo' : 'marks'
-  state.current.fishSize = lab === 'fish' ? +((/[?&]fishsize=([\d.]+)/.exec(window.location.search) || [])[1] || 1) : 1
+  state.current.fishMode = lab === 'fish' && fishNew ? 'echo' : 'marks'
+  state.current.fishSize = lab === 'fish' && fishBig ? 1.6 : 1
   state.current.hintOff = land && !lakeBig // sideways with the sonar full-screen: no drag caption over the sonar
 
   // AUTO depth: deeper at once (the bottom never drops off the screen), shallower only after 1.5 s
@@ -394,6 +397,22 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
       {false && phone && !ONLY && started && (
         <div className="pointer-events-auto absolute right-3 top-4">
           <div className="ac-seg">{Object.values(DEVICES).map((d) => <button key={d.id} className={`ac-btn ${deviceId === d.id ? 'is-active' : ''}`} onClick={() => setDeviceId(d.id)}>{d.name}</button>)}</div>
+        </div>
+      )}
+
+      {/* ---- the fish-echo test page's switches (#153): top centre on phones, bottom left on wider screens ---- */}
+      {lab === 'fish' && (
+        <div className="pointer-events-auto absolute left-1/2 top-3 z-20 flex -translate-x-1/2 flex-col items-center gap-1.5 sm:bottom-6 sm:left-4 sm:top-auto sm:translate-x-0 sm:items-start" style={{ fontFamily: 'system-ui, sans-serif' }}>
+          <div className="ac-seg">
+            <button className={`ac-btn ${!fishNew ? 'is-active' : ''}`} onClick={() => setFishNew(false)}>鱼：现在</button>
+            <button className={`ac-btn ${fishNew ? 'is-active' : ''}`} onClick={() => setFishNew(true)}>鱼：新画法</button>
+          </div>
+          {fishNew && (
+            <div className="ac-seg">
+              <button className={`ac-btn ${!fishBig ? 'is-active' : ''}`} onClick={() => setFishBig(false)}>真实大小</button>
+              <button className={`ac-btn ${fishBig ? 'is-active' : ''}`} onClick={() => setFishBig(true)}>放大 1.6 倍</button>
+            </div>
+          )}
         </div>
       )}
 
