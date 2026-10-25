@@ -1,10 +1,10 @@
 # Backlog — Sonar Beam Visualizer (kept current every round)
 
-> 状态（2026-10-25 15:40 更新）
-> 阶段：赶 BF 广告 11/2 的落地页 shop.accuphy.com/pages/lab；同时调声纳画面和冰钓页
+> 状态（2026-10-25 16:00 更新）
+> 阶段：赶 BF 广告 11/2 的落地页 shop.accuphy.com/pages/lab（11/2 先用框，BF 后改挂进主题，总管 X-2 已定）；同时调声纳画面和冰钓页
 > 进行中：#153 鱼回波测试页 · 第 3 轮在私密预览里；冰钓页画面 · “冰钓版本视觉效果”
-> 等 Jason：#153 · 新鱼回波看法 · 10-24 起；#154 · Forward AUTO 深度留不留（截图 reference/engine-compare/hq-154-forward-auto-120ft.png）· 10-25 起
-> 卡住：商店页模板 · 网站 02 · `accuphy-website/handoffs/2026-10-23-lab-store-page.md`；域名 .ca/.com 和嵌入方式（iframe / 挂进主题）· 总管 X-2 · `CHIEF Agent/docs/board.md`
+> 等 Jason：#102 · 接 lab.accuphy.com（阿里云加一条 CNAME，改线上，要他说“动”）· 10-25 起；#153 · 新鱼回波看法 · 10-24 起；#154 · Forward AUTO 深度留不留（截图 reference/engine-compare/hq-154-forward-auto-120ft.png）· 10-25 起
+> 卡住：商店页模板 · 网站 02 · `accuphy-website/handoffs/2026-10-23-lab-store-page.md`
 > 本周做完：#102 Lab 上 Vercel · https://accuphy-lab.vercel.app（docs/versions.md）· HQ 自查（三页 200、头信息对、无报错），未经别的聊天核；#150–#156 · `docs/decisions.md` #150–#156 + 各自的提交 · 自称（还没别的聊天核过）
 
 Jason 2026-09-24: "别把之前说过的任务丢了" — every promised task lives here until
@@ -271,7 +271,7 @@ the cheapest Android phone class). Phone size was emulated at 360×800.
   - **Limits:** code that runs in a browser cannot be hidden; obfuscation only slows a reader down.
 
 ## Handed to the website project (decision #69) — tracked in `accuphy-website/docs/backlog.md`
-- Lab page location (lab.accuphy.ca vs a store page) · lite section's Shopify test page · Klaviyo list,
+- Lab page location (~~lab.accuphy.ca~~ 已定 .com（#102）: lab.accuphy.com, behind the store page) · lite section's Shopify test page · Klaviyo list,
   opt-in and keys · Meta Pixel, UTM, "Shop PingLive" button · US phone checkout walk (decision #57).
   The design work for each stays here; the Shopify side is theirs.
 - ⬜ **Store page as the front door (decisions #133–#134, 2026-10-23, adopted):** `shop.accuphy.com/pages/lab` = header-less
