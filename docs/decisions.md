@@ -2492,8 +2492,9 @@ Numbered log. Newest at the bottom.
        `first_drag`, `view`, `signup` (card still closed) and the new `shop_click` (`{ device, placement }`).
      - **Shop button** (`ShopButton.jsx`, `embed.js` `shopUrl` / `openShop`): links per #134 — PingLive
        `/products/pinglive-sonar`, Mini `/products/pinglive-mini`, by the device on screen. No market prefix (Lab HQ's
-       interface note with the website, same day): the store origin comes from `ancestorOrigins[0]`, else the
-       referrer, else `https://shop.accuphy.com`, so the visitor's own market and a myshopify preview both work.
+       interface note with the website, same day): theme-mounted the store origin is the page's own origin; in the
+       iframe it comes from `ancestorOrigins[0]`, else the referrer, else `https://shop.accuphy.com`, so the visitor's
+       own market and a myshopify preview both work.
        `shop_click` carries `{ product, device, placement }`, is sent first, and the navigation waits 150 ms so the
        store page and its pixel get it (verified: without the wait the iframe message was lost). utm_* / fbclid on
        the Lab's own URL are ignored (only passed along when the Lab is opened on its own).

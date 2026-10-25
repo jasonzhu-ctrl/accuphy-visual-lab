@@ -34,6 +34,9 @@ export const PRODUCT = { PL: 'pinglive-sonar', PLM: 'pinglive-mini' }
 
 export function storeOrigin() {
   try {
+    // theme-mounted: the Lab runs on the store's own page, so the page's origin IS the store (the referrer there is
+    // the visitor's previous site — facebook.com, google.com — never the store; Lab HQ 2026-10-25)
+    if (!isEmbedded()) return window.location.origin
     const anc = window.location.ancestorOrigins?.[0]
     if (anc && /^https?:/.test(anc)) return anc
     if (document.referrer) { const o = new URL(document.referrer).origin; if (o !== window.location.origin) return o }
