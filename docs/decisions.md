@@ -2448,3 +2448,20 @@ Numbered log. Newest at the bottom.
      (1 → 0.7). **Open for Jason:** at the phone start the water under the boat is ~20 ft, so AUTO depth (#41: it follows
      the depth readout) shows 25 ft and the deeper bottom behind the island leaves the screen at ~95 ft — like the app,
      as decided; a Forward AUTO that also keeps the bottom ahead on screen would be a new decision.
+
+155. **2026-10-25** — **The small wreck is a real workboat: decks at three levels, a wheelhouse with windows** (Jason: "那一艘
+     小的沉船的模型太简单了，结构过于简单，尺寸我觉得 OK 的，你去把它的结构像窗户啊那些东西都做的完善一点，这样照起来。还有如果说
+     船上面应该是有 … 层不同的层级 … 你去完善"). Same size and place as before (9.8 m × 3.2 m, the wheelhouse roof ~3.6 m above
+     the keel, at 16, −26, tilted as before), now `wreck.js` makeWorkboat() instead of the extruded block in Scene.jsx: a V hull
+     lofted through 41 stations with a rising sheer and rub rails; level 1 the working deck aft inside 0.6 m bulwarks with
+     freeing ports and a transom gate, the fish-hold hatch with its cover knocked half off, a winch drum, a stern gantry
+     with its block; level 2 a raised foredeck with a bow rail, bollards and the anchor winch; the wheelhouse built from
+     wall panels with real openings (three front windows, two or three per side, a side door and a back door), a floor,
+     the helm console and a bench inside; level 3 the roof as an upper deck with an overhang, a rail round it, an upper
+     helm, a ladder up the back, the mast leaning aft with a crosstree and radar dome; skeg, rudder and propeller below.
+     ~3,400 triangles. In the sonar (PL Forward 60 ft, PL Down over it) the block became a boat: the step up to the bow,
+     the wheelhouse, the roof rail, the radar on its mast and the gantry read, with the shadow behind. The window openings
+     themselves do not show at that range — the 20° slab sees through the whole beam at once — the levels do. The vertex
+     colours now use their own seeded random numbers (the old ones drew on Math.random, which shifted everything after
+     them in seeded captures). dev aid `?cam=workboat[:deg]` — the wreck up close from that bearing. Checked: three 3D
+     angles, PL Forward, PL Down, Panoramic, the ice page (desktop, phone), `vite build`.

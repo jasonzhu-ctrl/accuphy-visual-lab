@@ -183,6 +183,7 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
     parallax: { x: 0, y: 0 }, specs: liveSpecs, specKey,
     closeCam: window.location.search.includes('cam=boat'), wreckCam: /cam=wreck/.test(window.location.search), logoCam: /cam=logo/.test(window.location.search),
     rocksCam: import.meta.env.DEV && /cam=rocks/.test(window.location.search) ? (/cam=rocks:(\w+)/.exec(window.location.search) || [, 'pile'])[1] : null, // dev aid ?cam=rocks[:hump]
+    workboatCam: import.meta.env.DEV && /cam=workboat/.test(window.location.search) ? +((/cam=workboat:(-?\d+)/.exec(window.location.search) || [, 30])[1]) : null, // dev aid ?cam=workboat[:deg] — the small wreck from that bearing
     fishCam: (/cam=fish:(\w+)/.exec(window.location.search) || [])[1],
     fishCamIndex: +((/cam=fish:\w+:(\d+)/.exec(window.location.search) || [])[1] || 0),
     rigCam: import.meta.env.DEV && /rigcam/.test(window.location.search), // ice: the hole kit up close

@@ -210,3 +210,139 @@ export function makeWreckDebris() {
   }
   return { parts, items }
 }
+
+// The ~10 m wooden workboat (Jason 2026-09-24: +30 %, shaped after the PL wreck imaging; 2026-10-25: 小的沉船的模型太简单了，
+// 结构过于简单，尺寸 OK … 把它的结构像窗户啊那些东西都做的完善一点 … 船上面应该是有 … 不同的层级). Same size as the old block
+// model (9.8 m × 3.2 m, the wheelhouse roof ~3.6 m above the keel), now built like a small trawler so the sonar has levels
+// to draw: a V hull lofted through stations with a rising sheer, a low working deck aft inside bulwarks with freeing
+// ports, a raised foredeck with a bow rail, a wheelhouse whose walls are real panels with window and door openings (the
+// openings read as dark gaps in the picture), a helm console inside, the roof as an upper deck with a rail, a mast with
+// a radar dome, a ladder, a fish-hold hatch knocked open, a winch, a stern gantry, rudder, skeg and propeller.
+// Local frame as the old one: x = along the boat (bow +x), y = up (keel ≈ −0.2), z = across.
+export const WORKBOAT_L = 9.8
+export function makeWorkboat() {
+  let sd = 9157
+  const rnd = () => (sd = (sd * 9301 + 49297) % 233280) / 233280 // deterministic: the page's Math.random is left alone
+  const L = WORKBOAT_L, parts = []
+  const ss = (a, b, t) => { t = Math.min(1, Math.max(0, (t - a) / (b - a))); return t * t * (3 - 2 * t) }
+  const xOf = (u) => -L / 2 + u * L, uOf = (x) => (x + L / 2) / L
+  // hull lines: half-breadth and height of the sheer (deck edge), the chine and the keel along u (0 transom → 1 stem)
+  const B = (u) => Math.max(0.04, (1.36 + 0.24 * ss(0, 0.32, u)) * (1 - Math.pow(Math.max(0, (u - 0.5) / 0.5), 2.1)))
+  const yS = (u) => 1.72 + 0.5 * Math.pow(ss(0.45, 1, u), 1.4)
+  const Bc = (u) => B(u) * 0.84
+  const yC = (u) => 0.42 + 0.95 * Math.pow(ss(0.55, 1, u), 1.6)
+  const yK = (u) => -0.2 + 1.25 * Math.pow(ss(0.72, 1, u), 2.2)
+  // one station as a closed ring, port sheer → keel → starboard sheer, closed across the deck
+  const ring = (u) => {
+    const x = xOf(u), b = B(u), ys = yS(u), bc = Bc(u), yc = yC(u), yk = yK(u)
+    const half = [[b, ys], [b * 0.985, 0.55 * ys + 0.45 * yc], [bc, yc], [Math.min(0.07, bc * 0.5), yk]]
+    return [...half.map(([z, y]) => [x, y, z]), ...half.slice().reverse().map(([z, y]) => [x, y, -z])]
+  }
+  const pos = []
+  const tri = (a, b, c) => pos.push(...a, ...b, ...c)
+  const N = 40, us = Array.from({ length: N + 1 }, (_, i) => Math.pow(i / N, 0.85)) // a little denser toward the stem
+  const R = us.map(ring), M = R[0].length
+  for (let i = 0; i < N; i++) for (let j = 0; j < M; j++) {
+    const a = R[i][j], b = R[i][(j + 1) % M], c = R[i + 1][(j + 1) % M], d = R[i + 1][j]
+    tri(a, b, c); tri(a, c, d) // outward: the ring runs clockwise seen from astern
+  }
+  const cap = (rg, flip) => { const c = rg.reduce((s, p) => [s[0] + p[0] / M, s[1] + p[1] / M, s[2] + p[2] / M], [0, 0, 0]); for (let j = 0; j < M; j++) flip ? tri(c, rg[(j + 1) % M], rg[j]) : tri(c, rg[j], rg[(j + 1) % M]) }
+  cap(R[0], true); cap(R[N], false) // the transom and the stem
+  const hull = new THREE.BufferGeometry(); hull.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); hull.computeVertexNormals()
+  hull.setAttribute('uv', new THREE.Float32BufferAttribute(new Float32Array((pos.length / 3) * 2), 2)) // (the parts merged with it all carry uvs)
+  parts.push(hull)
+  const box = (sx, sy, sz, x, y, z, rx = 0, ry = 0, rz = 0) => { const g = new THREE.BoxGeometry(sx, sy, sz); g.rotateX(rx).rotateY(ry).rotateZ(rz); g.translate(x, y, z); parts.push(g) }
+  const rod = (a, b, r, seg = 6) => {
+    const va = new THREE.Vector3(...a), vb = new THREE.Vector3(...b), g = new THREE.CylinderGeometry(r, r, va.distanceTo(vb), seg)
+    g.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), vb.clone().sub(va).normalize()))
+    g.translate((va.x + vb.x) / 2, (va.y + vb.y) / 2, (va.z + vb.z) / 2); parts.push(g)
+  }
+  // rub rails along the sheer
+  for (const s of [1, -1]) for (let i = 1; i < N - 1; i += 2) { const u0 = us[i], u1 = us[Math.min(i + 2, N - 1)]; rod([xOf(u0), yS(u0) - 0.08, s * (B(u0) + 0.04)], [xOf(u1), yS(u1) - 0.08, s * (B(u1) + 0.04)], 0.06, 5) }
+  // --- level 1: the working deck aft, inside bulwarks 0.6 m high with freeing ports, a gate in the transom bulwark ---
+  for (const s of [1, -1]) for (let x = -L / 2 + 0.15; x < 1.0; x += 0.75) {
+    if (Math.abs(x + 2.4) < 0.3 || Math.abs(x - 0.3) < 0.3) continue // freeing ports
+    const u = uOf(x + 0.36)
+    box(0.72, 0.6, 0.06, x + 0.36, yS(u) + 0.3, s * (B(u) - 0.03))
+  }
+  for (const s of [1, -1]) box(0.06, 0.6, 0.85, -L / 2 + 0.06, yS(0) + 0.3, s * 0.92) // the transom bulwark either side of the gate
+  // fish-hold hatch: coaming, the cover knocked half off
+  const hx = -2.5, dy = yS(uOf(hx))
+  box(1.3, 0.32, 0.07, hx, dy + 0.16, 0.55); box(1.3, 0.32, 0.07, hx, dy + 0.16, -0.55); box(0.07, 0.32, 1.1, hx + 0.62, dy + 0.16, 0); box(0.07, 0.32, 1.1, hx - 0.62, dy + 0.16, 0)
+  box(1.0, 0.04, 1.0, hx + 0.02, dy + 0.02, 0) // the hold floor seen through the opening
+  box(1.4, 0.08, 1.2, hx - 0.35, dy + 0.42, 0.35, 0.22, 0.3, 0.18)
+  // winch drum on its frame behind the wheelhouse, a stern gantry (A-frame) with its block
+  box(0.12, 0.6, 0.12, -1.55, dy + 0.3, 0.75); box(0.12, 0.6, 0.12, -1.55, dy + 0.3, -0.75)
+  { const g = new THREE.CylinderGeometry(0.28, 0.28, 1.35, 12); g.rotateX(Math.PI / 2); g.translate(-1.55, dy + 0.55, 0); parts.push(g) }
+  for (const s of [1, -1]) rod([-L / 2 + 0.35, yS(0.03), s * 1.25], [-L / 2 + 0.05, yS(0) + 2.2, s * 0.85], 0.07)
+  rod([-L / 2 + 0.05, yS(0) + 2.2, 0.9], [-L / 2 + 0.05, yS(0) + 2.2, -0.9], 0.07)
+  box(0.18, 0.32, 0.12, -L / 2 + 0.05, yS(0) + 1.95, 0)
+  // --- level 2: the raised foredeck: a deck 0.45 m above the sheer over the bow, a bow rail, bollards, anchor winch ---
+  {
+    const x0 = 2.2, x1 = L / 2 - 0.25, n = 14, sh = new THREE.Shape()
+    const pts = Array.from({ length: n + 1 }, (_, i) => { const x = x0 + ((x1 - x0) * i) / n; return [x, B(uOf(x)) - 0.06] })
+    sh.moveTo(pts[0][0], -pts[0][1]); pts.forEach(([x, h]) => sh.lineTo(x, -h)); for (let i = n; i >= 0; i--) sh.lineTo(pts[i][0], pts[i][1]); sh.closePath()
+    const g = new THREE.ExtrudeGeometry(sh, { depth: 0.45, bevelEnabled: false }); g.rotateX(-Math.PI / 2); g.translate(0, yS(uOf(x0)) - 0.02, 0); parts.push(g)
+    const top = yS(uOf(x0)) + 0.43
+    for (const s of [1, -1]) {
+      let prev = null
+      for (let x = x0 + 0.2; x <= x1 - 0.3; x += 0.6) {
+        const z = s * (B(uOf(x)) - 0.14), y = Math.max(top, yS(uOf(x)) + 0.02)
+        rod([x, y, z], [x, y + 0.75, z], 0.025, 5)
+        if (prev) rod([prev[0], prev[1] + 0.75, prev[2]], [x, y + 0.75, z], 0.022, 5)
+        prev = [x, y, z]
+      }
+    }
+    for (const s of [1, -1]) { const g = new THREE.CylinderGeometry(0.1, 0.12, 0.3, 8); g.translate(x0 + 0.7, top + 0.15, s * 0.7); parts.push(g) }
+    box(0.5, 0.35, 0.45, x1 - 1.2, top + 0.17, 0)
+  }
+  // --- the wheelhouse: panel walls with window and door openings, a floor, the helm console inside ---
+  const wx0 = -0.95, wx1 = 1.65, wz = 1.12, wy0 = yS(uOf(0.35)) + 0.02, wy1 = wy0 + 1.75, T = 0.08
+  const winLo = wy0 + 0.95, winHi = wy0 + 1.5
+  box(wx1 - wx0, 0.06, 2 * wz, (wx0 + wx1) / 2, wy0 + 0.03, 0) // floor
+  // a wall with openings: [along0, along1] spans, solid below the sill and above the head, mullions between the openings
+  const wall = (axis, at, a0, a1, openings) => {
+    const put = (p0, p1, y0, y1) => {
+      if (p1 - p0 < 0.01 || y1 - y0 < 0.01) return
+      if (axis === 'x') box(T, y1 - y0, p1 - p0, at, (y0 + y1) / 2, (p0 + p1) / 2); else box(p1 - p0, y1 - y0, T, (p0 + p1) / 2, (y0 + y1) / 2, at)
+    }
+    let p = a0
+    for (const [o0, o1, lo, hi] of openings) { put(p, o0, wy0, wy1); put(o0, o1, wy0, lo); put(o0, o1, hi, wy1); p = o1 }
+    put(p, a1, wy0, wy1)
+  }
+  wall('x', wx1, -wz, wz, [[-0.95, -0.38, winLo, winHi], [-0.28, 0.28, winLo, winHi], [0.38, 0.95, winLo, winHi]]) // front: three windows
+  wall('x', wx0, -wz, wz, [[-0.75, -0.25, winLo, winHi], [0.05, 0.65, wy0 + 0.05, wy0 + 1.6]]) // back: a window and the door
+  wall('z', wz, wx0, wx1, [[-0.7, -0.05, winLo, winHi], [0.2, 0.85, winLo, winHi], [1.05, 1.45, winLo, winHi]]) // port side
+  wall('z', -wz, wx0, wx1, [[-0.75, -0.15, wy0 + 0.05, wy0 + 1.6], [0.2, 0.85, winLo, winHi], [1.05, 1.45, winLo, winHi]]) // starboard: side door + two windows
+  box(0.55, 0.85, 0.95, wx1 - 0.4, wy0 + 0.45, -0.45) // helm console
+  box(0.45, 0.45, 1.6, wx0 + 0.35, wy0 + 0.25, 0.25) // bench aft
+  // --- level 3: the roof as an upper deck: overhanging slab, a rail round it, a small console, the mast and radar ---
+  const ry = wy1 + 0.05
+  box(wx1 - wx0 + 0.35, 0.1, 2 * wz + 0.24, (wx0 + wx1) / 2 + 0.1, ry, 0)
+  {
+    const rx0 = wx0 + 0.05, rx1 = wx1 + 0.15, rz = wz + 0.05, h = 0.85, y = ry + 0.05
+    const post = (x, z) => rod([x, y, z], [x, y + h, z], 0.025, 5)
+    for (let x = rx0; x <= rx1 + 1e-3; x += (rx1 - rx0) / 4) { post(x, rz); post(x, -rz) }
+    for (const z of [-rz / 2, 0, rz / 2]) post(rx1, z)
+    for (const s of [1, -1]) rod([rx0, y + h, s * rz], [rx1, y + h, s * rz], 0.022, 5)
+    rod([rx1, y + h, -rz], [rx1, y + h, rz], 0.022, 5)
+    box(0.4, 0.6, 0.8, rx1 - 0.35, y + 0.3, -0.35) // the upper helm
+    const mb = [wx0 + 0.45, y], mt = [wx0 + 0.75, y + 2.6] // the mast, leaning aft a little after the fall
+    rod([mb[0], mb[1], 0], [mt[0], mt[1], 0], 0.07, 8)
+    rod([mt[0] - 0.05, mt[1] - 0.6, -0.75], [mt[0] - 0.05, mt[1] - 0.6, 0.75], 0.035, 5) // crosstree
+    const dome = new THREE.CylinderGeometry(0.32, 0.36, 0.22, 14); dome.translate(mt[0] - 0.12, mt[1] - 0.25, 0); parts.push(dome)
+    // the ladder up the back of the wheelhouse, beside the door
+    for (const z of [-0.95, -0.6]) rod([wx0 - 0.12, wy0, z], [wx0 - 0.12, y + 0.6, z], 0.025, 5)
+    for (let k = 1; k * 0.32 < y - wy0; k++) rod([wx0 - 0.12, wy0 + k * 0.32, -0.95], [wx0 - 0.12, wy0 + k * 0.32, -0.6], 0.018, 4)
+  }
+  // --- under water: skeg, rudder, propeller ---
+  box(2.2, 0.32, 0.12, -L / 2 + 1.25, -0.12, 0)
+  box(0.08, 0.95, 0.6, -L / 2 - 0.12, 0.2, 0)
+  { const g = new THREE.CylinderGeometry(0.06, 0.06, 0.5, 8); g.rotateZ(Math.PI / 2); g.translate(-L / 2 + 0.25, 0.08, 0); parts.push(g) }
+  for (let i = 0; i < 3; i++) box(0.05, 0.38, 0.16, -L / 2 + 0.06, 0.08, 0, i * 2.094 + 0.4, 0, 0.3)
+  const g = merge(parts)
+  const col = new Float32Array(g.attributes.position.count * 3)
+  for (let i = 0; i < col.length; i += 3) { const k = 0.9 + rnd() * 0.2; col[i] = 0.34 * k; col[i + 1] = 0.28 * k; col[i + 2] = 0.2 * k }
+  g.setAttribute('color', new THREE.BufferAttribute(col, 3))
+  return g
+}
