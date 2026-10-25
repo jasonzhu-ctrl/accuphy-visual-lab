@@ -6,6 +6,9 @@ import * as THREE from 'three'
 //   p = worldPos - apex; u = p·c, v = p·h, w = p·n
 //   inside ⇔ r=|(u,v)| < R, atan(v,u) ∈ [a0,a1], w ∈ [s0,s1]·u·tan(theta)
 export const MAX_BEAMS = 2
+// the summer lake's clock for the light patterns on the shallows (one uniform shared by every lake material; Scene.jsx
+// Water advances it)
+export const LAKE_TIME = { value: 0 }
 
 export function makeLakeMaterial({ fish = false, structure = false, steel = false, wood = false, logo = false } = {}) {
   const uniforms = {
@@ -28,6 +31,8 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
     uRevealGain: { value: 1.0 }, // ice scene: a stronger lift inside the beam (the window in the snow must read lit)
     uClip: { value: new THREE.Vector2(0, 0) }, // ice section view: x = on, y = world z of the cut wall; fragments beyond it are cut away in the main view
     uOutGamma: { value: 1.0 },   // ice scene: < 1 brightens the dark water world a little (main view only)
+    uAirView: { value: 0.0 },    // the summer lake (Scene.jsx): seen from above the water, the water column over each point tints it — shallows clear, deep water dark — and light patterns play on the shallows; 0 (the ice page, any camera under water): fog by distance as before
+    uTime: LAKE_TIME,
     uBeamGain: { value: 1.0 },   // ice scene: the signal gate (IceCamp.jsx s.signal): the lit footprint fades out while the Mini is out of the water
     uSplat: { value: new THREE.Vector3(1, 1, 30) }, // sonar pass 3 (echo splat): tan(half width), tan(half thickness), range of the fan being drawn
     uSplatBig: { value: new THREE.Vector4(1, 0.7, 1, 0.5) }, // large-scale light and dark on big targets: steel contrast, wood contrast, steel facing, cells per metre (dev: window.__sonarTune.kb)
@@ -121,6 +126,17 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
       uniform vec4 uAng[${MAX_BEAMS}]; uniform vec2 uRT[${MAX_BEAMS}]; uniform vec4 uBox[${MAX_BEAMS}];
       uniform vec4 uSplatBig;
       uniform float uReveal; uniform vec3 uHighlight; uniform float uSonarPass; uniform float uRevealGain; uniform float uOutGamma; uniform vec2 uClip; uniform float uBeamGain;
+      uniform float uAirView; uniform float uTime;
+      float lhash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+      float lnoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
+        return mix(mix(lhash(i), lhash(i + vec2(1, 0)), f.x), mix(lhash(i + vec2(0, 1)), lhash(i + vec2(1, 1)), f.x), f.y); }
+      // light patterns on the shallows (caustics): two ridged noise layers drifting across each other draw the bright
+      // net of a sunlit lake floor, cells ~2 m (from the 3D camera finer ones only shimmer)
+      float caustic(vec2 p, float t) {
+        float a = 1.0 - abs(2.0 * lnoise(p * 0.55 + vec2(t * 0.11, t * 0.07)) - 1.0);
+        float b = 1.0 - abs(2.0 * lnoise(p * 0.47 * mat2(0.8, -0.6, 0.6, 0.8) - vec2(t * 0.06, t * 0.12)) - 1.0);
+        return pow(a, 7.0) + pow(b, 7.0) + 2.0 * pow(a * b, 4.0);
+      }
       #ifdef FISH
         varying float vPattern; varying vec3 vBelly; varying vec3 vSide; varying vec3 vLocal; varying vec2 vUv;
         varying float vLenF;
@@ -302,9 +318,18 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
       #ifndef FISH
         float tex = 0.9 + 0.2 * fract(sin(dot(floor(vWorld * 9.0), vec3(12.9898, 78.233, 37.719))) * 43758.5453);
         albedo *= tex;
+      #endif
+      #ifdef STRUCTURE
+        // bark grooves on brown (timber) surfaces, following the trunk. Structure only: on the sandy lakebed, which is brown
+        // too, they drew long curved wood-grain stripes over the whole bottom (Jason 2026-10-25: 水面 … 看着是挺奇怪的，可能跟
+        // 底部的纹理有关)
         float brown = smoothstep(0.02, 0.08, vColor.r - vColor.b);
         float groove = fract(sin(dot(floor(vec2(atan(vWorld.z, vWorld.x) * 40.0 + vWorld.x * 3.0, vWorld.y * 1.2)), vec2(12.9898, 78.233))) * 43758.5453);
         albedo *= 1.0 - brown * 0.28 * groove;
+      #endif
+      #if !defined(FISH) && !defined(STRUCTURE)
+        // the bed: soft patches a few metres across instead of the 2 m vertex-colour blotches alone
+        albedo *= 0.86 + 0.28 * (0.6 * lnoise(vWorld.xz * 0.21 + 3.1) + 0.4 * lnoise(vWorld.xz * 0.63 - 1.7));
       #endif
         vec3 base = albedo * (0.28 + 0.42 * hemi + 0.6 * lambert);
         // dim everything under water a little; the beam brings it back
@@ -322,6 +347,26 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
         // underwater fog by distance from camera
         float dist = length(vWorld - cameraPosition);
         float fog = 1.0 - exp(-dist * uFogDensity);
+        if (uAirView > 0.5 && cameraPosition.y > 0.0 && uSonarPass < 0.5) {
+          // Seen from above (Jason 2026-10-25: 水面的效果不够逼真): what dims a point is the water above it — down from the
+          // surface and back up toward the eye — not the distance to the camera, which gave the shallows and the deep basin
+          // one even veil. Shallows read clear and a little green-gold, the slope darkens, the deep floor sinks into the
+          // water's colour; a little haze by distance stays. The ACCUPHY LAB lockup keeps today's legibility, the wrecks an outline.
+          float dep = max(-vWorld.y, 0.0);
+          float cosV = clamp((cameraPosition.y - vWorld.y) / dist, 0.25, 1.0);
+          float L = dep * (1.0 + 1.0 / cosV);
+          fog = 1.0 - exp(-L * 0.022) * exp(-dist * uFogDensity * 0.35);
+          lit *= exp(-L * vec3(0.03, 0.008, 0.004)); // red goes first
+          // sunlight patterns on the shallows, fading out by ~6 m and on steep or shaded faces
+          float cz = caustic(vWorld.xz, uTime) * exp(-dep / 3.2) * smoothstep(0.3, 0.9, n.y) * lambert;
+          lit += albedo * cz * 0.55;
+        #ifdef LOGO
+          fog = min(fog, 0.55);
+        #endif
+        #if defined(WOOD) || defined(STEEL)
+          fog = min(fog, 0.62); // the two wrecks keep a readable outline from above
+        #endif
+        }
         fog *= 1.0 - 0.7 * beam; // the beam also cuts through the murk
         vec3 col = mix(lit, uFogColor, clamp(fog, 0.0, 0.92));
         if (uSonarPass < 0.5 && uOutGamma != 1.0) col = pow(max(col, 0.0), vec3(uOutGamma));
