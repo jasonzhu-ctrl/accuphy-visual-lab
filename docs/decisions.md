@@ -2484,3 +2484,26 @@ Numbered log. Newest at the bottom.
      quad (the vertex waves only slid it within itself). The ice page keeps its look (uAirView 0; the bed lost its
      stripes there too); the sonar is untouched (colour only, sonar passes skip it). Checked: desktop and phone, the ice
      page (0 errors), `vite build`.
+
+157. **2026-10-25** — **X-6L worker round: event name `accuphy:lab`, the Shop button, the embed build checked** (Lab HQ's
+     work order from CHIEF's X-6L; Jason's D1–D5 of 2026-10-25). Local only — nothing uploaded, nothing on Shopify.
+     - **Event name:** the Shopify customer event is `accuphy:lab` (was `accuphy_lab`; the website project's prefix
+       convention). The iframe message is unchanged: `{ source: 'accuphy-lab', event, data }`. Actions: `ready`,
+       `first_drag`, `view`, `signup` (card still closed) and the new `shop_click` (`{ device, placement }`).
+     - **Shop button** (`ShopButton.jsx`, `embed.js` `shopUrl` / `openShop`): links per #134 — PingLive
+       `/products/pinglive-sonar`, Mini `/products/pinglive-mini`, by the device on screen; Canada
+       `https://shop.accuphy.com/…`, the US market under `/en-us/` (market from `data-market` on the mount element,
+       else `?market=us`, else CA). Opens in the top window; `shop_click` is sent first and the navigation waits
+       150 ms so the store page and its pixel get it (verified: without the wait the iframe message was lost).
+       **UTM rule (HQ):** inside the store (iframe or theme-mounted) the link carries no utm_* — the ad's tags are
+       already on the store visit; opened on its own (lab.accuphy.ca) the visitor's own utm_* pass through, none →
+       `utm_source=accuphy_lab&utm_medium=referral&utm_campaign=bf2026_lab_ca`.
+     - **Placement — two options for Jason, not decided** (`?shopbtn=a|b`, default A; the loser is removed once he
+       picks): **A** a blue pill on the lake, desktop bottom-left, phones top-right; **B** desktop a full-width button
+       at the foot of the control panel, phones a pill docked on the phone frame's top edge. Screenshots (desktop
+       1280×800, phone 375×812, both pages): `docs/2026-10-25-shop-button-options.jpg`.
+     - **Checked:** share build (`accuphy-lab.html` 2.64 MB) and embed build (`embed/lab.js` → `lab-<hash>.js`);
+       `embed/test.html` mounts, `Shopify.analytics.publish` received `ready`, `view`, `shop_click` under `accuphy:lab`;
+       an iframe stand-in received the same three by postMessage; the summer lake and the ice page both show the
+       button at desktop and phone size with no console errors (#94 rule).
+     - **Not done here (HQ / Jason):** the domain lab.accuphy.ca (needs Jason's 动), uploading to Vercel, the Shopify side.
