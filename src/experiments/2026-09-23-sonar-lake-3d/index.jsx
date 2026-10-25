@@ -13,7 +13,7 @@ import SignupGate from './SignupGate'
 import AppHome from './home/AppHome' // the app's Home (view selection) page inside the phone, phones only (2026-10-16)
 import { isSignedUp } from './signup'
 import { labEvent, PRODUCT } from './embed'
-import ShopButton, { SHOP_VARIANT } from './ShopButton' // the one link to the store (X-6L, 2026-10-25); ?shopbtn=a|b picks the placement until Jason chooses
+import ShopButton from './ShopButton' // the one link to the store (X-6L, 2026-10-25; placement B, Jason)
 import { depthAt } from './terrain'
 import { panoHalfWidth } from './sonarMarks'
 // dev: ?bigphone makes the phone huge so the sonar picture can be inspected in screenshots
@@ -335,12 +335,8 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
         <div className="ac-soft hidden px-1 text-[11.5px] leading-snug sm:block">
           {device.name} · {device.beamDeg}° × {device.thickDeg}° beam{ICE ? ', through the ice. Tap the ice to drill a new hole' : '. Drag the boat'} — whatever the beam touches lights up.
         </div>
-        {SHOP_VARIANT === 'b' && <ShopButton deviceId={deviceId} placement="panel" wide />}
+        <ShopButton deviceId={deviceId} placement="panel" wide />
       </motion.div>
-      {/* Shop button, placement A: a pill on the lake — desktop bottom-left, phones top-right (X-6L) */}
-      {SHOP_VARIANT === 'a' && (!phone || (started && !home)) && (
-        <ShopButton deviceId={deviceId} placement={phone ? 'top-right' : 'bottom-left'} className="absolute z-20" style={phone ? { right: 14, top: 'calc(14px + env(safe-area-inset-top))' } : land ? { display: 'none' } : { left: 16, bottom: 24 }} />
-      )}
 
       {/* ---- the cue caption, shown until the first drag / tap (position set by the render loop). The ice page: under the
            reticle on the ice (IceCamp.jsx, #123); the lake: above the water reticle round the boat (Scene.jsx Boat, #132).
@@ -389,8 +385,8 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
           </>)}
         </div>
         {/* phones: the View capsule sits on the phone frame's top edge (Jason 2026-10-03) — the big panel is gone */}
-        {/* Shop button, placement B on phones: docked on the frame's top edge (the dock also feeds the camera's view offset) */}
-        {SHOP_VARIANT === 'b' && phone && !land && started && !home && (
+        {/* Shop button on phones: docked on the frame's top edge (the dock also feeds the camera's view offset) */}
+        {phone && !land && started && !home && (
           <div ref={(el) => { sonarRect.current.dock = el }} className="pointer-events-auto absolute bottom-full left-1/2 mb-3 -translate-x-1/2">
             <ShopButton deviceId={deviceId} placement="frame-top" />
           </div>

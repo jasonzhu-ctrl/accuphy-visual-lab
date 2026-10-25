@@ -1,12 +1,9 @@
 // The "Shop" button (X-6L, 2026-10-25): the one link from the Lab to the store's product page for the device on screen.
 // It opens the product page in the top window (out of the store's iframe) and reports `shop_click` (embed.js).
-// Two placements for Jason to choose from (HQ: 做 2 个方案 … 他选之前别定), switched with ?shopbtn=a|b (default a):
-//   A  a blue pill on the lake — desktop bottom-left, phones top-right
-//   B  desktop: a full-width button at the foot of the control panel; phones: a pill docked on the phone frame's top edge
+// Placement (Jason 2026-10-25 in the Lab HQ chat: "用方案 B 吧"): desktop a full-width button at the foot of the control
+// panel; phones a pill docked on the phone frame's top edge. (Option A, a pill on the lake, was removed.)
 import { DEVICES } from '../2026-09-23-sonar-beam/devices'
 import { openShop } from './embed'
-
-export const SHOP_VARIANT = (() => { try { return new URLSearchParams(window.location.search).get('shopbtn') === 'b' ? 'b' : 'a' } catch { return 'a' } })()
 
 export default function ShopButton({ deviceId, placement, wide = false, className = '', style }) {
   const name = DEVICES[deviceId]?.name || 'PingLive'

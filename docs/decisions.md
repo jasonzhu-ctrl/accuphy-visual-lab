@@ -2502,10 +2502,11 @@ Numbered log. Newest at the bottom.
        **UTM rule (HQ):** inside the store (iframe or theme-mounted) the link carries no utm_* — the ad's tags are
        already on the store visit; opened on its own (lab.accuphy.ca) the visitor's own utm_* pass through, none →
        `utm_source=accuphy_lab&utm_medium=referral&utm_campaign=bf2026_lab_ca`.
-     - **Placement — two options for Jason, not decided** (`?shopbtn=a|b`, default A; the loser is removed once he
-       picks): **A** a blue pill on the lake, desktop bottom-left, phones top-right; **B** desktop a full-width button
-       at the foot of the control panel, phones a pill docked on the phone frame's top edge. Screenshots (desktop
-       1280×800, phone 375×812, both pages): `docs/2026-10-25-shop-button-options.jpg`.
+     - **Placement — Jason chose B** (2026-10-25 in the Lab HQ chat: "用方案 B 吧"): desktop a full-width button at the
+       foot of the control panel, phones a pill docked on the phone frame's top edge. Option A (a blue pill on the
+       lake, desktop bottom-left / phones top-right) and the `?shopbtn` switch were removed the same day. The two
+       options as shown to him: `docs/2026-10-25-shop-button-options.jpg`; the final look:
+       `docs/2026-10-25-shop-button-final.jpg`.
      - **Checked:** share build (`accuphy-lab.html` 2.64 MB) and embed build (`embed/lab.js` → `lab-<hash>.js`);
        `embed/test.html` mounts, `Shopify.analytics.publish` received `ready`, `view`, `shop_click` under `accuphy:lab`;
        an iframe stand-in received the same three by postMessage; the summer lake and the ice page both show the
