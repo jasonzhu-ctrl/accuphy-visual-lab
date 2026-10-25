@@ -1,11 +1,11 @@
 # Backlog — Sonar Beam Visualizer (kept current every round)
 
-> 状态（2026-10-25 22:10 更新）
+> 状态（2026-10-25 22:50 更新）
 > 阶段：X-6L Lab 上线执行，目标 10-30 做完、10-31～11-1 真机测，11/2 广告开投；域名定为 lab.accuphy.ca（Jason，经总管）
 > 进行中：上线后复查 frame-ancestors（网站要在 myshopify 预览和主题编辑器里测，所以留着 *.myshopify.com、admin.shopify.com；网站不再需要时再收紧）；X-6L-2/3/4 · 代码做完，HQ 核过（#157，0f74eb7…4991453），按钮方案 B 已做完，HQ 核过（afc9af3，docs/2026-10-25-shop-button-final.jpg）；等 Jason 说“动”再上传 Vercel；#153 鱼回波 · 私密预览；冰钓页 · “冰钓版本视觉效果”
-> 等 Jason：X-6L-1 · 已说“动”；新版已上 Vercel（50ad8ca），lab.accuphy.ca 已加进 Vercel，等他登录 Hostinger 加 CNAME `lab` → `4d23262254a8e936.vercel-dns-016.com` · 10-25 起；#153 · 新鱼回波看法 · 10-24 起；#154 · Forward AUTO 深度留不留 · 10-25 起
+> 等 Jason：#153 · 新鱼回波看法 · 10-24 起；#154 · Forward AUTO 深度留不留 · 10-25 起
 > 卡住：无（网站在做店铺页 3 个文件和转交代码，交接单 `accuphy-website/handoffs/2026-10-23-lab-store-page.md`）
-> 本周做完：#102 Lab 上 Vercel · https://accuphy-lab.vercel.app（docs/versions.md）· HQ 自查（三页 200、头信息对、无报错），未经别的聊天核；#150–#156 · `docs/decisions.md` #150–#156 + 各自的提交 · 自称（还没别的聊天核过）
+> 本周做完：X-6L Lab 上线 · https://lab.accuphy.ca 新版（按钮 B、accuphy:lab、/embed/）· docs/versions.md · HQ 自查（四个地址 200、头信息对、Vercel 显示配置正确），还没让别的聊天核；#102 Lab 上 Vercel · https://accuphy-lab.vercel.app（docs/versions.md）· HQ 自查（三页 200、头信息对、无报错），未经别的聊天核；#150–#156 · `docs/decisions.md` #150–#156 + 各自的提交 · 自称（还没别的聊天核过）
 
 Jason 2026-09-24: "别把之前说过的任务丢了" — every promised task lives here until
 it is done. ✅ done · 🔧 in progress · ⬜ open.

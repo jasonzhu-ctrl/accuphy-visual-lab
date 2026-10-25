@@ -1,4 +1,4 @@
-状态：OPEN
+状态：DONE
 From：项目总管 | CHIEF Agent（IT/CHIEF Agent）   To：accuphy-visual-lab HQ   创建：2026-10-25   期限：2026-10-30（11/2 广告开投）   编号：X-6L
 
 # Lab 上线执行（方向已定，交给你执行）
@@ -42,11 +42,18 @@ From：项目总管 | CHIEF Agent（IT/CHIEF Agent）   To：accuphy-visual-lab 
 
 ## 证据
 
-（做完填）
+- https://lab.accuphy.ca/ 、/mini/、/ice/、/embed/lab.js 都返回 200；头信息里有 frame-ancestors，也有 X-Robots-Tag noindex（curl，2026-10-25 22:45）。`vercel domains verify lab.accuphy.ca`：configured_correctly。
+- Hostinger 里 accuphy.ca 新加了一条 CNAME：`lab` → `4d23262254a8e936.vercel-dns-016.com`，TTL 3600，其他记录都没动。
+- 代码：Lab 50ad8ca（#157，含 afc9af3、3c89e87）。版本记录：`docs/versions.md`。
 
 ## 结果
 
-（做完填）
+1–4 都做完了，2026-10-25，比 10-30 早。
+- 域名接到 lab.accuphy.ca（Jason 当天在 Lab HQ 说了“动”）。
+- 嵌入版 `/embed/` 已经上线。
+- 事件名和网站对齐了：`accuphy:lab`，带的字段 data 里只有 product，没有 device。
+- “去商店”按钮用 Jason 选的方案 B。和总管商量后改了一处：Lab 在店铺里时，按钮链接不带 UTM，靠 shop_click 事件来记；只有单独打开 Lab 时才带 UTM。
+- frame-ancestors 照网站的要求，保留 myshopify 和 admin.shopify.com。
 
 ## 回报格式
 
