@@ -114,11 +114,15 @@ anyone's memory.
   chats which files you are taking (cross-session message) and free them when done.
 - **Go-ahead:** build only after Jason explicitly says to start ("我没说动不要动"). Plans,
   proposals and options are not approval; offer them, then wait.
-- **Chats as of 2026-09-24:** "网页移动端可行性评估" (mobile and ad landing plan; runs here),
-  "网页section轻量化设计" (lite section plan; runs here), and "Create accuphy-visual-lab repo
-  and scaffold it" (built this repo and the 3D sonar lake Lab page). That last one was
-  started inside an RMA worktree, which the app cannot move; it keeps working on the Lab
-  (Jason's wish) but writes only into this folder and this project's memory, never RMA.
+- **Chats as of 2026-10-25** (three layers, Jason 2026-10-25; rules in
+  `IT/CHIEF Agent/docs/protocol.md`):
+  - "accuphy-visual-lab HQ" — the Lab's lead: keeps `docs/backlog.md` and its status bar,
+    dispatches work, checks what comes back, reports to "项目总管 | CHIEF Agent". Live changes
+    need Jason's "动" said in the HQ chat.
+  - "冰钓版本视觉效果" — the working chat for the sonar picture, the lake and the ice page.
+  - "手机网页端" — the phone web page.
+  - "LiveScope 研究" — the LiveScope reference study (`docs/livescope-study.md`).
+  - "案例工具调研" — research on case studies and tools.
 - **The name:** "visual lab" and "Accuphy Lab" are the same project; Jason dropped "visual"
   because the Lab is more than visuals. The folder keeps its name.
 
