@@ -12,7 +12,7 @@ with the source commit it was built from, so anyone can tell which version a lin
 | Private preview | Jason only (claude.ai login) | https://claude.ai/artifact/RnCBYTexY5vcEqJy2hAsN7 |
 | **Ice (trial)** — the ice-fishing page, section camera | anyone with the link, no login | https://jasonzhu-ctrl.github.io/accuphy-lab-test/ice/ |
 | Ice (private preview) | Jason only (claude.ai login) | https://claude.ai/artifact/G5uZM8imcgsQNzoKfPkiMa |
-| Fish echo test (private preview, #153) | Jason only (claude.ai login) | https://claude.ai/artifact/VxxnVnZr8cxQLXw3iizMdD |
+| Fish echo test (private preview, #153; also the newest lake: #154–#156) | Jason only (claude.ai login) | https://claude.ai/artifact/VxxnVnZr8cxQLXw3iizMdD |
 
 Both public pages are unlisted (`noindex`, `robots.txt` Disallow) and have no sign-up gate (#71).
 How to rebuild and publish: the `lab-test-link` skill (`node scripts/build-share.mjs <out>`; `VITE_DEVICES=PLM` for
@@ -22,6 +22,7 @@ the Mini page; `VITE_SCENE=ice` for the ice page → `/ice/` on GitHub Pages sin
 
 | Date | Page | Built from (Lab commit) | Public repo commit | What changed |
 |---|---|---|---|---|
+| 2026-10-25 | Fish echo test (private preview) | 1c0ba1c (#153 round 3, #154–#156) | — | Fish take the arc grain, crossfaded between pings; the far bottom stays on the screen in Forward past ~60 ft, softer and weaker with distance (#154); the small wreck is a real workboat with decks and a windowed wheelhouse (#155); the lake from above: water column tints the bottom, a wind-sea surface, no wood grain on the lakebed (#156). The public pages are not rebuilt yet |
 | 2026-10-25 | Fish echo test (private preview) | round 2 (#153) | — | Near fish a soft body (no fins or tail), far fish slimmer needles like the old marks, true size by default |
 | 2026-10-25 | Fish echo test (private preview) | 1fa89c1 + switches (#153) | — | First preview of the fish-echo test page: fish drawn from their 3D bodies as the transducer sees them; switches on the page for the current fish and a 1.6× size. `VITE_LAB=fish node scripts/build-share.mjs <out>` |
 | 2026-10-24 | **Both**, **Mini**, **Ice (trial)** + both private previews | ac67cb4 (#152) | 9bb1f38 | Rough and side-sloping bottoms are one filled band again instead of a net of lines with holes (holes 9.5 % → 2.3 % at the rocky spot) |
