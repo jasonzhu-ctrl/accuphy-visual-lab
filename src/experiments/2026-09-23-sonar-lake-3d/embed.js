@@ -24,19 +24,21 @@ export function isEmbedded() {
   try { return window.self !== window.top } catch { return true }
 }
 
-// ---- the "Shop" button (X-6L, 2026-10-25) ----------------------------------------------------------------------
-// Product pages per device (decision #134's links). Canada is the store's default market (no prefix); the United
-// States page lives under /en-us/. The market comes from the mount element (<div id="accuphy-lab" data-market="US">,
-// theme-mounted), else ?market=us on the Lab's own URL (the store section passes its query string through), else CA.
+// ---- the "Shop" button (X-6L, 2026-10-25; Lab HQ's interface note, agreed with the website) ---------------------
+// Product handles per device (decision #134). No market prefix: the store's own domain keeps the visitor's market
+// (handoffs/2026-10-25-lab-page-interface-from-website.md). The store's origin is taken from the page that frames the
+// Lab — ancestorOrigins, else the referrer — and falls back to shop.accuphy.com. The Lab's own URL may carry utm_*,
+// fbclid and such from the ad; they are never read here except to pass along when the Lab is opened on its own.
 const STORE = 'https://shop.accuphy.com'
-const PRODUCT = { PL: '/products/pinglive-sonar', PLM: '/products/pinglive-mini' }
+export const PRODUCT = { PL: 'pinglive-sonar', PLM: 'pinglive-mini' }
 
-export function market() {
+export function storeOrigin() {
   try {
-    const el = document.getElementById('accuphy-lab')
-    const m = (el?.dataset?.market || new URLSearchParams(window.location.search).get('market') || 'CA').toUpperCase()
-    return m === 'US' ? 'US' : 'CA'
-  } catch { return 'CA' }
+    const anc = window.location.ancestorOrigins?.[0]
+    if (anc && /^https?:/.test(anc)) return anc
+    if (document.referrer) { const o = new URL(document.referrer).origin; if (o !== window.location.origin) return o }
+  } catch { /* fall through */ }
+  return STORE
 }
 
 // Inside the store (iframe or theme-mounted) the link carries NO utm_*: the visitor's own ad tags are already on the
@@ -44,11 +46,16 @@ export function market() {
 // Opened on its own (lab.accuphy.ca) the visitor's utm_* are passed along as they are; none → the Lab's own referral tags.
 const DEFAULT_UTM = { utm_source: 'accuphy_lab', utm_medium: 'referral', utm_campaign: 'bf2026_lab_ca' }
 
+export function inStore() {
+  return isEmbedded() || typeof window.Shopify?.analytics?.publish === 'function'
+}
+
 export function shopUrl(deviceId) {
-  const url = new URL((market() === 'US' ? '/en-us' : '') + (PRODUCT[deviceId] || PRODUCT.PLM), STORE)
-  const inStore = isEmbedded() || typeof window.Shopify?.analytics?.publish === 'function'
-  if (!inStore) {
-    const own = [...new URLSearchParams(window.location.search)].filter(([k]) => k.startsWith('utm_'))
+  const product = PRODUCT[deviceId] || PRODUCT.PLM
+  const url = new URL('/products/' + product, inStore() ? storeOrigin() : STORE)
+  if (!inStore()) {
+    let own = []
+    try { own = [...new URLSearchParams(window.location.search)].filter(([k]) => k.startsWith('utm_')) } catch { own = [] }
     for (const [k, v] of own.length ? own : Object.entries(DEFAULT_UTM)) url.searchParams.set(k, v)
   }
   return url.href
@@ -58,7 +65,7 @@ export function shopUrl(deviceId) {
 // moment so the click reaches the store page (postMessage is delivered as a later task) and its pixel before unload.
 export function openShop(deviceId, placement) {
   const href = shopUrl(deviceId)
-  labEvent('shop_click', { device: deviceId, placement })
+  labEvent('shop_click', { product: PRODUCT[deviceId] || PRODUCT.PLM, device: deviceId, placement })
   const go = () => { try { window.top.location.href = href } catch { window.location.href = href } }
   setTimeout(go, 150)
 }
