@@ -1,9 +1,9 @@
 # Backlog — Sonar Beam Visualizer (kept current every round)
 
-> 状态（2026-10-25 13:58 更新）
+> 状态（2026-10-25 15:20 更新）
 > 阶段：赶 BF 广告 11/2 的落地页 shop.accuphy.com/pages/lab；同时调声纳画面和冰钓页
-> 进行中：#153 鱼回波测试页 · 第 3 轮已做，本地看；冰钓页画面 · “冰钓版本视觉效果”在调；商店页 Lab 侧 · 嵌入事件已做，等网站给模板
-> 等 Jason：提醒 23 / #102 · Lab 上 Vercel + lab.accuphy.com，要他在本 HQ 说“动” · 10-16 起；#153 · 新鱼回波看法 · 10-24 起；#154 · Forward AUTO 深度留不留 · 10-25 起
+> 进行中：#102 Lab 上 Vercel · Jason 10-25 在本 HQ 说了“动”，公开测试库已加 vercel.json（accuphy-lab-test 50c49a3）；#153 鱼回波测试页 · 第 3 轮在私密预览里；冰钓页画面 · “冰钓版本视觉效果”
+> 等 Jason：#102 · 打开 Vercel 授权链接点 Allow（连接器没有建项目的权限）· 10-25 起；#153 · 新鱼回波看法 · 10-24 起；#154 · Forward AUTO 深度留不留（截图 reference/engine-compare/hq-154-forward-auto-120ft.png）· 10-25 起
 > 卡住：商店页模板 · 网站 02 · `accuphy-website/handoffs/2026-10-23-lab-store-page.md`；域名 .ca/.com 和嵌入方式（iframe / 挂进主题）· 总管 X-2 · `CHIEF Agent/docs/board.md`
 > 本周做完：#150–#156 · `docs/decisions.md` #150–#156 + 各自的提交 · 自称（还没别的聊天核过）
 
