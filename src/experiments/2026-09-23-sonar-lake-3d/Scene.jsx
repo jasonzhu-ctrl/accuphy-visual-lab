@@ -13,7 +13,7 @@ import { makeTallTree, makeBushTree, makeStump, makeLog, makeWeedTuft, placeAll 
 import { makeRockGeometry, ROCK_KINDS } from './rocks'
 import { makeBassBoat, makeWaterContact, TRANSDUCER_OFFSET } from './boat'
 import { makeFishGeometry } from './fishGeometry'
-import { makeCargoWreck, makeWreckDebris, WRECK_L, BIG_WRECK, SMALL_WRECK } from './wreck'
+import { makeCargoWreck, makeWreckDebris, makeWorkboat, WRECK_L, BIG_WRECK, SMALL_WRECK } from './wreck'
 import { makeLogoGeometry, makePlinthGeometry, logoFrame } from './logo'
 import { buildObstacles, toCircles } from './obstacles'
 import SonarScreen, { SONAR_HIDE_LAYER, LAKEBED_LAYER, FISH_LAYER, LOGO_LAYER } from './SonarScreen'
@@ -91,31 +91,7 @@ function Structures({ mat }) {
 }
 
 function Wreck({ mat, at }) {
-  const geo = useMemo(() => {
-    // ~10 m wooden workboat (Jason 2026-09-24: +30 %, shaped after the PL wreck imaging):
-    // hull with a raised bow, a boxy cabin with window openings, a short mast; lying tilted on the bottom
-    const L = 9.8
-    const shape = new THREE.Shape()
-    shape.moveTo(-L / 2, 0); shape.quadraticCurveTo(-L * 0.48, 1.5, -L * 0.3, 1.55); shape.lineTo(L * 0.36, 1.35)
-    shape.quadraticCurveTo(L * 0.5, 0.8, L / 2, 0); shape.quadraticCurveTo(L * 0.5, -0.8, L * 0.36, -1.35); shape.lineTo(-L * 0.3, -1.55)
-    shape.quadraticCurveTo(-L * 0.48, -1.5, -L / 2, 0)
-    const hull = new THREE.ExtrudeGeometry(shape, { depth: 1.7, bevelEnabled: true, bevelSize: 0.2, bevelThickness: 0.2, bevelSegments: 2 })
-    hull.rotateX(-Math.PI / 2)
-    const bow = new THREE.BoxGeometry(2.2, 0.5, 2.4); bow.translate(L * 0.34, 1.9, 0) // raised foredeck
-    const cabin = new THREE.BoxGeometry(3.6, 1.6, 2.2); cabin.translate(-0.6, 2.5, 0)
-    const roof = new THREE.BoxGeometry(4.0, 0.15, 2.5); roof.translate(-0.6, 3.35, 0)
-    const parts = [hull, bow, cabin, roof]
-    for (let i = 0; i < 3; i++) { // window openings read as dark gaps in the sonar picture
-      const w = new THREE.BoxGeometry(0.7, 0.6, 2.3); w.translate(-1.7 + i * 1.1, 2.7, 0); parts.push(w)
-    }
-    const mast = new THREE.CylinderGeometry(0.06, 0.09, 4.5, 6); mast.translate(0.9, 4.5, 0)
-    parts.push(mast)
-    const g = mergeGeometries(parts)
-    const col = new Float32Array(g.attributes.position.count * 3)
-    for (let i = 0; i < col.length; i += 3) { const k = 0.9 + Math.random() * 0.2; col[i] = 0.34 * k; col[i + 1] = 0.28 * k; col[i + 2] = 0.2 * k }
-    g.setAttribute('color', new THREE.BufferAttribute(col, 3))
-    return g
-  }, [])
+  const geo = useMemo(() => makeWorkboat(), []) // the ~10 m wooden workboat (wreck.js, #155): hull, decks, wheelhouse with windows
   const { x, z, rot, scale = 1 } = at || SMALL_WRECK
   // it lay on the flat basin floor; on the #92 slope it follows the bottom (its up axis turned to the bed's normal,
   // averaged over the hull's length), so neither end floats or digs in
@@ -486,7 +462,7 @@ function Rig({ state, sonarRect, fogMats, cam = LAKE_CAM }) {
     // lake band = the screen above the phone frame on portrait phones (the frame and panel cover the rest)
     const fr = sonarRect?.current?.dock || sonarRect?.current?.frame
     const bandBottom = k > 1 && fr ? Math.max(size.height * 0.35, Math.min(size.height, fr.getBoundingClientRect().top)) : size.height
-    const devCam = s.fishCam || s.logoCam || s.wreckCam || s.closeCam
+    const devCam = s.fishCam || s.logoCam || s.wreckCam || s.closeCam || s.workboatCam != null
     const offY = devCam ? 0 : Math.round(size.height / 2 - bandBottom / 2)
     // mid-size screens (an unfolded fold at 711×584, a small tablet): the glass panel top-left covered the boat (on the ice
     // page the kit at the hole) (2026-10-24). Shift the view right just enough that it stands clear of the panel, measured
@@ -574,6 +550,13 @@ function Rig({ state, sonarRect, fogMats, cam = LAKE_CAM }) {
       camera.up.set(0, 1, 0)
       camera.position.set(cx + Math.cos(a) * 9, by + 3.2, cz + Math.sin(a) * 9)
       camera.lookAt(cx, by + 0.4, cz)
+      return
+    }
+    if (s.workboatCam != null) { // dev aid ?cam=workboat[:deg] — the small wreck up close from that bearing, under water
+      const a = (s.workboatCam * Math.PI) / 180, { x: wx, z: wz } = SMALL_WRECK, by = bedY(wx, wz)
+      camera.up.set(0, 1, 0)
+      camera.position.set(wx + Math.cos(a) * 13, by + 5, wz + Math.sin(a) * 13)
+      camera.lookAt(wx, by + 1.2, wz)
       return
     }
     if (s.wreckCam) { // dev aid ?cam=wreck — inspect the big wreck
