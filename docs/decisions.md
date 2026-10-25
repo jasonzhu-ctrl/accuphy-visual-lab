@@ -2416,3 +2416,9 @@ Numbered log. Newest at the bottom.
        the marks' needles; Jason to judge the look (true size vs `?fishsize=1.6`) locally before anything moves to the main
        page. Not published; a private preview for Jason (claude.ai login) at https://claude.ai/artifact/VxxnVnZr8cxQLXw3iizMdD
        with two switches on the page (鱼：现在 / 新画法 · 真实大小 / 放大 1.6 倍), built by `VITE_LAB=fish scripts/build-share.mjs`.
+     - **Round 2 (Jason 2026-10-25, on the preview: 真实大小; 新画法跟老画法要折中 — near fish "鱼鳍、鱼尾巴都看得出来 … 不可能那么
+       清晰"，大概一个模糊的形状; the trembling fix OK; far fish a mix of old and new; past 20–30 ft no fish shape, no tail):**
+       fins return almost nothing (0.04); the beam blur never goes below ~5.5 cm across, so a near fish is a soft body
+       without fins or tail; the body apart from the swim bladder fades out between 6 and 9 m, so past ~20–30 ft only the
+       bladder's compact spot is left and the beam draws it as the old marks' needle, a little hotter (peak-weighted,
+       ×1.2) than round 1. True size stays the default.
