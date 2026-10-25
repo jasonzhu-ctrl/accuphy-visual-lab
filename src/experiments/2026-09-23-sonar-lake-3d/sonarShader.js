@@ -512,6 +512,29 @@ export const sonarFragment = /* glsl */ `
     float fe = uFishMode > 0.5 ? fishImg(k, u, rn, r, a, aWorld) : fishEcho(p, k); // the fish-echo test page: the fish from their bodies (#153)
     float e = max(acc * atten * mix(tex, 1.0, sMix) * tvg, fe * mix(1.4, 1.0, smoothstep(8.0, 16.0, r)));
     e = max(e, logoEcho(p, k) * atten * (0.7 + 0.55 * (filament - 0.8)) * (0.72 + 0.28 * tex));
+    // The far bottom (Jason 2026-10-25: 超过100 feet … 底基本上还是看得见的，就是慢慢会有点虚，慢慢会变弱 … 现在基本上消失了，
+    // 变成一大群鱼). Past ~60 ft the beam grazes the bottom: the rays skim the weed and the rocks on a hump and hit those
+    // first, and behind a hump the bottom falls into its shadow, so the traced band above broke into bright blobs with
+    // nothing under them (the island ahead of both start spots), then stopped. A real beam is wide at that range and
+    // still draws the bottom there, softer and weaker with distance. So from ~60 ft a band is laid along the real bottom
+    // under each pixel (the baked terrain: every vertical fan lies in the world x-y plane, +x ahead), never brighter
+    // than the traced one where that one is good: thicker and softer with range, fading to about two thirds by 200 ft, to
+    // 70 % of that where the terrain itself hides it, and shaded by structure like the traced band.
+    float wFar = smoothstep(18.0, 32.0, r);
+    if (wFar > 0.0) {
+      float dy = p.y - (terrainDepth(uApexXZ + vec2(p.x, 0.0)) - uApexDepth); // below the real bottom line
+      float on = 0.04 + 0.008 * r, T = 0.15 + 0.012 * r; // the onset softens and the body thickens with range (the beam's width)
+      if (dy > -3.0 * on && dy < 3.0 * T) {
+        float prof = exp(-dy * dy / (dy < 0.0 ? on * on : T * T)); // a soft body ~T deep (an exponential tail sank under the black floor of the tone window: a hairline)
+        float rayC = length(vec2(tan(a), 1.0));
+        float hitC = sampleDist(k, vec2(u, 0.5), rayC), tagC = sampleTag(k, vec2(u, 0.5));
+        float hidden = step(hitC, r - max(0.6, 2.0 * T)) * (1.0 - step(0.25, tagC)); // the centre ray stops on nearer terrain: a hump's shadow
+        float patchF = 0.72 + 0.45 * vnoise(vec2(p.x * 0.4 + 5.0, 0.3)); // slow patches along the bottom, fixed to it
+        float lvl = 0.55 * uTune6.z * mix(1.0, 0.65, smoothstep(30.0, 62.0, r));
+        float eF = lvl * prof * mix(1.0, 0.7 * uTune6.w, hidden) * shade * (1.0 - 0.92 * occ) * atten * tex * patchF * wFar;
+        e = max(e, eF);
+      }
+    }
     return e;
   }
   // the flasher: the echo at one depth straight under the transducer — the Down fan's middle beams (±7°), fish included
