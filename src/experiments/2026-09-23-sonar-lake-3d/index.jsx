@@ -12,7 +12,7 @@ import { screenLayout } from './SonarScreen'
 import SignupGate from './SignupGate'
 import AppHome from './home/AppHome' // the app's Home (view selection) page inside the phone, phones only (2026-10-16)
 import { isSignedUp } from './signup'
-import { labEvent } from './embed'
+import { labEvent, PRODUCT } from './embed'
 import ShopButton, { SHOP_VARIANT } from './ShopButton' // the one link to the store (X-6L, 2026-10-25); ?shopbtn=a|b picks the placement until Jason chooses
 import { depthAt } from './terrain'
 import { panoHalfWidth } from './sonarMarks'
@@ -227,7 +227,7 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
 
   // embed bridge (#134): the store page learns which view the visitor picked — on a real pick only (Home tile, panel
   // button, guide step), never for the default view on load (#139); `source` says where the pick came from
-  const pickView = (d, m, source) => { setDeviceId(d); setMode(m); labEvent('view', { view: m, device: d, source }) }
+  const pickView = (d, m, source) => { setDeviceId(d); setMode(m); labEvent('view', { view: m, product: PRODUCT[d] || PRODUCT.PLM, source }) }
 
   // the app's buttons are display-only: on desktop a tap asks for an email (once per browser); on phones nothing
   // happens — the Lab itself carries no sign-up gate on the phone (Jason 2026-10-24: 注册门你这个层级不要有; the

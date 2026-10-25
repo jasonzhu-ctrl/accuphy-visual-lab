@@ -2489,13 +2489,14 @@ Numbered log. Newest at the bottom.
      work order from CHIEF's X-6L; Jason's D1–D5 of 2026-10-25). Local only — nothing uploaded, nothing on Shopify.
      - **Event name:** the Shopify customer event is `accuphy:lab` (was `accuphy_lab`; the website project's prefix
        convention). The iframe message is unchanged: `{ source: 'accuphy-lab', event, data }`. Actions: `ready`,
-       `first_drag`, `view`, `signup` (card still closed) and the new `shop_click` (`{ device, placement }`).
+       `first_drag`, `view` (`{ view, product, source }`), `signup` (card still closed) and the new `shop_click`
+       (`{ product, placement }`). No `device` field in any event: the website uses that name for phone/desktop.
      - **Shop button** (`ShopButton.jsx`, `embed.js` `shopUrl` / `openShop`): links per #134 — PingLive
        `/products/pinglive-sonar`, Mini `/products/pinglive-mini`, by the device on screen. No market prefix (Lab HQ's
        interface note with the website, same day): theme-mounted the store origin is the page's own origin; in the
        iframe it comes from `ancestorOrigins[0]`, else the referrer, else `https://shop.accuphy.com`, so the visitor's
        own market and a myshopify preview both work.
-       `shop_click` carries `{ product, device, placement }`, is sent first, and the navigation waits 150 ms so the
+       `shop_click` carries `{ product, placement }`, is sent first, and the navigation waits 150 ms so the
        store page and its pixel get it (verified: without the wait the iframe message was lost). utm_* / fbclid on
        the Lab's own URL are ignored (only passed along when the Lab is opened on its own).
        **UTM rule (HQ):** inside the store (iframe or theme-mounted) the link carries no utm_* — the ad's tags are

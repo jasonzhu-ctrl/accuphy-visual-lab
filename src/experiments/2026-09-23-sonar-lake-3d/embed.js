@@ -11,7 +11,7 @@ export function labEvent(event, data = {}, { once = false } = {}) {
   if (once) { if (sent.has(event)) return; sent.add(event) }
   try {
     // theme-mounted (#142): the Lab runs inside the store page itself and publishes the customer event directly —
-    // payload { event, ...data }, e.g. { event: 'view', view: 'forward', device: 'PL', source: 'home' }
+    // payload { event, ...data }, e.g. { event: 'view', view: 'forward', product: 'pinglive-sonar', source: 'home' }
     const publish = window.Shopify?.analytics?.publish
     if (typeof publish === 'function') publish(EVENT_NAME, { event, ...data })
     // the iframe path (#134): the parent page's section publishes it — this message shape is fixed, the section checks it
@@ -68,7 +68,7 @@ export function shopUrl(deviceId) {
 // moment so the click reaches the store page (postMessage is delivered as a later task) and its pixel before unload.
 export function openShop(deviceId, placement) {
   const href = shopUrl(deviceId)
-  labEvent('shop_click', { product: PRODUCT[deviceId] || PRODUCT.PLM, device: deviceId, placement })
+  labEvent('shop_click', { product: PRODUCT[deviceId] || PRODUCT.PLM, placement }) // no `device`: the website uses that field for phone/desktop (Lab HQ 2026-10-25)
   const go = () => { try { window.top.location.href = href } catch { window.location.href = href } }
   setTimeout(go, 150)
 }
