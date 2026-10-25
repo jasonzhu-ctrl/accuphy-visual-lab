@@ -1,10 +1,10 @@
 # Backlog — Sonar Beam Visualizer (kept current every round)
 
-> 状态（2026-10-25 16:40 更新）
-> 阶段：赶 BF 广告 11/2 的落地页 shop.accuphy.com/pages/lab（11/2 先用框，BF 后改挂进主题，总管 X-2 已定）；同时调声纳画面和冰钓页
-> 进行中：#153 鱼回波测试页 · 第 3 轮在私密预览里；冰钓页画面 · “冰钓版本视觉效果”
-> 等 Jason：#153 · 新鱼回波看法 · 10-24 起；#154 · Forward AUTO 深度留不留（截图 reference/engine-compare/hq-154-forward-auto-120ft.png）· 10-25 起
-> 卡住：Lab 域名（.com 归同事管、.ca 归 Jason）· 总管 X-5 重新调查，接 CNAME 暂停 · `handoffs/2026-10-25-lab-domain-tracking.md`（C 块已交）；商店页模板 · 网站 02 · `accuphy-website/handoffs/2026-10-23-lab-store-page.md`
+> 状态（2026-10-25 17:10 更新）
+> 阶段：X-6L Lab 上线执行，目标 10-30 做完、10-31～11-1 真机测，11/2 广告开投；域名定为 lab.accuphy.ca（Jason，经总管）
+> 进行中：X-6L-2/3/4 嵌入版、事件名 `accuphy:lab`、“去商店”按钮 · 派给“手机网页端”，10-29 晚交 HQ 核；#153 鱼回波 · 私密预览；冰钓页 · “冰钓版本视觉效果”
+> 等 Jason：X-6L-1 · 说“动”接 lab.accuphy.ca（Vercel 加域名 + 他登录 Hostinger 加一条记录）· 10-25 起；#153 · 新鱼回波看法 · 10-24 起；#154 · Forward AUTO 深度留不留 · 10-25 起
+> 卡住：无（网站在做店铺页 3 个文件和转交代码，交接单 `accuphy-website/handoffs/2026-10-23-lab-store-page.md`）
 > 本周做完：#102 Lab 上 Vercel · https://accuphy-lab.vercel.app（docs/versions.md）· HQ 自查（三页 200、头信息对、无报错），未经别的聊天核；#150–#156 · `docs/decisions.md` #150–#156 + 各自的提交 · 自称（还没别的聊天核过）
 
 Jason 2026-09-24: "别把之前说过的任务丢了" — every promised task lives here until
