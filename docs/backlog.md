@@ -8,6 +8,13 @@ it is done. ✅ done · 🔧 in progress · ⬜ open.
   frames at 30 fps): every 1/8 s a mark gets new speckle, its outline swings 168–454 px (2–3×), brightness ±25 %, centre
   jumps up to 10 px — same on #128, #139 and #150, so it dates from #120 (per-ping speckle + ragged rim + `fl` flicker +
   tail wag + 0.2 s ghost). Proposal: blend ping to ping instead of jumping, calmer rim, smaller flicker. Waiting for Jason's go.
+- ✅ (#154) **The far bottom vanished in Forward past 100–200 ft and turned into "一大群鱼" (Jason 2026-10-25).** A band along the real
+  bottom now fills in from ~60 ft, softer and weaker with distance. ⬜ **Open for Jason:** at the phone start the bottom
+  behind the island is deeper than the 25 ft AUTO depth (#41: AUTO follows the water under the boat) and leaves the screen
+  at ~95 ft — keep (like the app) or let Forward AUTO keep the bottom ahead on screen?
+- ✅ (#155) **The small wreck was too simple (Jason 2026-10-25).** A real workboat: decks at three levels, a wheelhouse with windows, rails, mast, gantry.
+- ✅ (#156) **The lake surface looked odd (Jason 2026-10-25: 可能跟底部的纹理有关).** Wood-grain stripes on the lakebed removed; the water column
+  tints the bottom (shallows clear, deep dark); a wind-sea surface with sky reflection.
 - ✅ (#152, fixed: the rows' gaps are filled; holes 9.5 % → 2.3 % at the rocky spot) **Thick bottom bands turn into a net with holes since #148 (Jason 2026-10-24: 底部在某些区域很虚).** Deep or
   side-sloping bottom (his spots −5.4, −8.2 at 46 ft and 15, −2.2 at 30 ft with rocks): #128/#139 drew a solid band,
   #148's arc grain leaves dark holes between the arcs there; the thin shallow band is fine. The grain is the LiveScope
