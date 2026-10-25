@@ -2422,3 +2422,29 @@ Numbered log. Newest at the bottom.
        without fins or tail; the body apart from the swim bladder fades out between 6 and 9 m, so past ~20–30 ft only the
        bladder's compact spot is left and the beam draws it as the old marks' needle, a little hotter (peak-weighted,
        ×1.2) than round 1. True size stays the default.
+     - **Round 3 (Jason 2026-10-25: 纹理的画法 … 更新到这上面来 … 基本上可以作为一个死的规则):** the fish's texture is now the grain
+       rule of #148 — the same `arcGrain` and centred contrast as the bottom, trees, hulls and rocks — crossfaded from ping
+       to ping (a moving target, no trembling). At his spot: pixels changing per frame 16 % (marks 24 %, round 2 10 %), the
+       largest jump ~1 px (marks 10 px). **Standing rule:** every echo in the picture takes its texture from `arcGrain`
+       (short arcs across the beam); a new kind of target adds its level and shape, never its own texture.
+
+154. **2026-10-25** — **The far bottom stays on the screen: softer and weaker with distance, never gone** (Jason, on the fake
+     phone: "超过100 feet 120 feet 还是到200 feet 那个底都看不见了 … 实际的情况不是这样的，底基本上还是看得见的，就是慢慢会有点虚，
+     慢慢会变弱，特别是超过了120 feet 以后，在 forward view 下面 … 现在基本上消失了，变成一大群鱼"). Cause, reproduced at both start
+     spots (desktop −6, 4 and phone 16, 11, PL and PLM Forward, 80–200 ft): both look east across the island. Past ~90 ft the
+     beam grazes its top at 6–9°, the rays hit the rock pile and the weed beds before the bottom, so the traced band broke
+     into a row of bright blobs with almost nothing under them ("一大群鱼"); behind the crest the bottom falls into the
+     island's shadow and the picture stopped. Ruled out: the spread compensation's 3× cap (raised to 30×: no change) and
+     the 2 m lakebed mesh (0.5 m: no change). `sonarShader.js` fanEcho: from ~60 ft (r 18 → 32 m ramp) a band is laid
+     along the real bottom under each pixel, read from the baked terrain (every vertical fan lies in the world x-y plane,
+     +x ahead, so it costs one texture read; no new sampler), max'd with the traced band so it only shows where that one
+     is weak: onset soft 0.04 + 0.008 r, body 0.15 + 0.012 r deep (thicker and softer with range — the beam's width),
+     level 0.55 fading to 0.36 by ~200 ft, × 0.7 where the centre ray stops on nearer terrain (a hump's shadow is a
+     weaker bottom, not a missing one — as #146 said for structure), × the structure shade and occlusion, the band's own
+     arc grain and slow patches fixed to the bottom. Now the island top reads as a bottom with rocks and weed on it and
+     the back slope runs on, dimmer, to the edge of the screen. Inside ~60 ft nothing changes: the 6 spots × 6 views grid
+     is identical to the last commit at the default ranges (only PLM Combo at 100–120 ft moves, its far panel); the ice
+     page loads clean on desktop and phone. dev knobs `window.__sonarTune.k6[2]` = level (1), `k6[3]` = the shadow factor
+     (1 → 0.7). **Open for Jason:** at the phone start the water under the boat is ~20 ft, so AUTO depth (#41: it follows
+     the depth readout) shows 25 ft and the deeper bottom behind the island leaves the screen at ~95 ft — like the app,
+     as decided; a Forward AUTO that also keeps the bottom ahead on screen would be a new decision.
