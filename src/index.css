@@ -114,3 +114,4 @@
 .ac-shop:hover { filter: brightness(1.06); transform: translateY(-1px); box-shadow: inset 0 1px 0 rgba(255,255,255,0.32), 0 12px 28px rgba(2,60,100,0.34), 0 1px 3px rgba(2,22,32,0.18); }
 .ac-shop:active { transform: translateY(0); filter: brightness(0.97); }
 .ac-shop-wide { width: 100%; justify-content: center; height: 42px; border-radius: 12px; font-size: 14px; }
+@media (pointer: coarse) { .ac-shop { height: 44px; padding: 0 18px 0 20px; } } /* touch targets ≥ 44 px (docs/ui-screen-rules.md) */

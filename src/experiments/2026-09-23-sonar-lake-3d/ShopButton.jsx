@@ -11,7 +11,7 @@ export const SHOP_VARIANT = (() => { try { return new URLSearchParams(window.loc
 export default function ShopButton({ deviceId, placement, wide = false, className = '', style }) {
   const name = DEVICES[deviceId]?.name || 'PingLive'
   return (
-    <button type="button" className={`ac-shop ${wide ? 'ac-shop-wide' : ''} ${className}`} style={style} aria-label={`Shop ${name}`}
+    <button type="button" data-hint-avoid className={`ac-shop ${wide ? 'ac-shop-wide' : ''} ${className}`} style={style} aria-label={`Shop ${name}`}
       onPointerDown={(e) => e.stopPropagation()} onClick={(e) => { e.stopPropagation(); openShop(deviceId, placement) }}>
       <span>Shop {name}</span>
       <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M3 8h9M8.5 4.5 12 8l-3.5 3.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
