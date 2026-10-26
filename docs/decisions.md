@@ -2752,3 +2752,20 @@ Numbered log. Newest at the bottom.
        are unchanged at 1280×800 / 390×844.
      - **Not done here:** the cheap-phone resolution tier (`dpr` lives in Scene.jsx's `<Canvas>`, the ice chat's file) and
        "fish within 10 s" (depends on the start spot and the Home-first pick) — both noted for the ice chat / HQ.
+
+168. **2026-10-26** — **Black Friday ad clips recorded from the Lab** (Lab HQ's order: item 4 of
+     `handoffs/2026-10-26-bf-funnel-lab-extras.md`).
+     - **What:** 3 clips × 15 s (ice Mini drilling and seeing fish, boat PingLive Panoramic, Mini Live Forward).
+       - Each comes in 9:16 (1080×1920) and 4:5 (1080×1350), clean, English and French, as H.264 MP4: 18 files.
+       - Each also has `.srt` files and the caption source `captions.json`.
+     - **Where:** `reference/ads/2026-11-bf/`, not in git, about 280 MB.
+     - **How:**
+       - The tools are in `scripts/dev/ads/`.
+       - Recording runs on a virtual clock (1/30 s per frame), with real touch events and a finger dot.
+       - The 4:5 frames are made from the 9:16 ones, the picture centred with blurred sides. Recording at 4:5 directly
+         failed, because the page lays out wide there.
+       - Captions are burned in with Instrument Sans; the encoder is AVFoundation, since there is no ffmpeg.
+     - **Open:**
+       - The captions are drafts: EN to Klaviyo HQ, FR to the website HQ.
+       - The fish are small in the ice clip and the Mini Forward clip.
+     - Details and the caption table: `docs/2026-10-26-bf-ad-clips.md`. Not uploaded anywhere.
