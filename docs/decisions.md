@@ -2585,3 +2585,28 @@ Numbered log. Newest at the bottom.
        ≈ −1.5–2 fps during a wake (scaled, not measured: the tablet was not available).
      - Ice page untouched (it has no Water mesh); checked on desktop and phone. Sonar untouched (Water is on the
        sonar-hidden layer). 0 console errors. Local only; not uploaded.
+
+162. **2026-10-26** — **The summer lake reflects a real photographed sky and gets real fine ripples** (Jason in Lab HQ:
+     "湖面用免费的 1 和 2", picks 1 and 2 of `docs/2026-10-26-lake-water-resources.md`; the paid options were declined).
+     - **1, the sky:** a Poly Haven pure-sky photo (CC0). Upper half only, tone-mapped, 1536 × 384 JPEG, 52 kB,
+       sampled equirectangularly along the reflected ray. It replaces #161's noise clouds; the per-vertex cloud pass and
+       the 256² water grid are gone. The sky is turned so its sun stands 0.25 rad right of the default view and drifts
+       ±7° over minutes. The glitter path is drawn from a sun 25° high on that bearing, so it runs up the far water as
+       in option B, whatever the photo's own sun height. The sky sheen was raised (F·1.9 + 0.06) so the clouds read.
+       Default: `kloofendal_48d_partly_cloudy_puresky` (fair-weather cumulus). Alternatives:
+       `evening_road_01_puresky` (golden hour) and `kloofendal_38d_partly_cloudy_puresky` (hazy). Comparison
+       (desktop 1440×900 + phone 390×844): `docs/2026-10-26-lake-sky-options.jpg`. Files: `docs/lake-skies/`.
+       **Open for Jason:** pick the sky.
+     - **2, the ripples:** three.js / jbouny `waternormals.jpg` (MIT, notice kept). 512², 66 kB, two copies drifting at
+       13 m and 4.7 m, calmer where a pixel spans many ripples. It replaces #156's two value-noise ripple layers; the
+       first, stronger try drew diagonal streaks on phones. Glints toned down (sharp ones only up close).
+     - **Licences and sources:** `src/experiments/2026-09-23-sonar-lake-3d/assets/LICENSES.md`.
+     - **Size:** both images are imported with `?inline`. The share build grows 2,652,588 → 2,809,836 bytes
+       (+154 kB, base64 of 118 kB). The ice share build grows the same, because it is the same bundle.
+       `build-share.mjs` now also fails on any image left as a file under `assets/`.
+     - **Frame time:** measured, laptop GPU, headless, vsync off, 2 interleaved runs. It went down: 1920×1200 at rest
+       6.5–6.8 → 6.1–6.2 ms, during a wake 6.9–7.0 → 6.4 ms; 2560×1600 9.2–9.4 → 8.9 ms. Texture reads replaced
+       the noise and the vertex clouds. On the V10 (estimate, not measured): no loss against #161, about −1 fps
+       against #156.
+     - Ice page untouched (no Water mesh; checked desktop + phone). Sonar untouched. 0 console errors. The share build
+       runs. Local only; not uploaded.

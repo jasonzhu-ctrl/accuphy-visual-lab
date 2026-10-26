@@ -21,6 +21,8 @@ import SonarScreen, { SONAR_HIDE_LAYER, LAKEBED_LAYER, FISH_LAYER, LOGO_LAYER } 
 import { IceSky, IceSheet, IceCamp, IceWalls, Snowfall, IcePick, LightShaft, MarineSnow, SectionFaces } from './IceCamp'
 import { makeIceMaterial } from './iceSheet'
 import { bakeTerrain } from './sonarMarks'
+import lakeSkyUrl from './assets/lake-sky.jpg?inline' // the sky mirrored in the summer lake (#162): a CC0 photo, see assets/LICENSES.md
+import rippleMapUrl from './assets/waternormals.jpg?inline' // ripple normals (#162): MIT, see assets/LICENSES.md
 import { iceParams, ICE_CAM_T, ICE_CAM_D, ICE_LAKE_W, ICE_FOG, UNDER_CAM, SECTION_CAM, SECTION_CAM_PHONE, ICE_T, dir } from './iceScene'
 
 // ---------- lakebed ----------
@@ -271,7 +273,25 @@ function Fish({ mat, state }) {
 // trail) instead of the old round rings. Cost (#50: fewer samples, never a plainer look): the clouds are soft, so they
 // are sampled per vertex on a 3.5 m grid and interpolated, not per pixel; the wake is worked out once per frame in a
 // 256² map over the path (≤ 0.3 m a texel) and only looked up by the water; the fine foam grain stays per pixel.
+// Jason 2026-10-26 (#162, docs/2026-10-26-lake-water-resources.md picks 1 + 2, "湖面用免费的 1 和 2"): the reflected sky is
+// a real photographed sky (Poly Haven, CC0; its upper half, 1536 × 384, ~52 kB) instead of the noise clouds, its sun
+// placed ahead of the camera and the glitter path following that sun; the fine ripples near the camera come from a real
+// water normal map (three.js / jbouny, MIT, 512², ~66 kB), two copies drifting at different scales, instead of two value
+// noise layers. Both are inlined into the code (?inline), so the single-file share build carries them.
 const WAKE_N = 16, WAKE_STEP = 1.2, WAKE_KEEP = 8, WAKE_RES = 256 // path points kept for the wake: one every 1.2 m, for 8 s
+// the sky photo: where its sun is in the image (azimuth along the width, found from the HDR's brightest pixel). The sky
+// is turned so its sun stands SUN_AHEAD rad right of the default view direction; the glitter path is drawn from a sun
+// GLITTER_EL high on that bearing, so it runs up the far water as in option B (Jason's pick), whatever the photo's own
+// sun height (a high sun's path would land mid-screen, on the beam). Candidates: docs/lake-skies/ (Jason picks;
+// swap the file and sunAzImg).
+const LAKE_SKY = { sunAzImg: 214.2 } // kloofendal_48d_partly_cloudy_puresky (default; its sun is 48° high)
+const VIEW_AZ = Math.atan2(-0.879, 0.227), SUN_AHEAD = 0.25, GLITTER_EL = 25
+function loadTex(url, repeatT) {
+  const tx = new THREE.TextureLoader().load(url)
+  tx.wrapS = THREE.RepeatWrapping; tx.wrapT = repeatT ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping
+  tx.minFilter = THREE.LinearMipmapLinearFilter; tx.anisotropy = 4
+  return tx
+}
 const WATER_NOISE = /* glsl */ `
       float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
       // value noise with its gradient (xy) and value (z)
@@ -332,28 +352,16 @@ function Water({ state }) {
   useEffect(() => () => { wake.rt.dispose(); wake.mat.dispose() }, [wake])
   const mat = useMemo(() => new THREE.ShaderMaterial({
     transparent: true, depthWrite: false, side: THREE.DoubleSide,
-    uniforms: { uTime: { value: 0 }, uSun: { value: new THREE.Vector3(0.4, 0.8, 0.3).normalize() }, uSky: { value: new THREE.Color('#9cc1cf') },
+    uniforms: { uTime: { value: 0 }, uSky: { value: new THREE.Color('#9cc1cf') },
+      uSkyMap: { value: loadTex(lakeSkyUrl, false) }, uSkyRot: { value: 0 }, uSunP: { value: new THREE.Vector3(0, 1, 0) }, uRipples: { value: loadTex(rippleMapUrl, true) },
       uWakeMap: { value: wake.rt.texture }, uMap: { value: new THREE.Vector4(0, 0, 1, 0) } }, // uMap: centre x, z, size (m), on
     vertexShader: /* glsl */ `
-      uniform float uTime;
-      varying vec3 vW; varying vec2 vCloud;
-      float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
-      float vnoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
-        return mix(mix(hash(i), hash(i + vec2(1, 0)), f.x), mix(hash(i + vec2(0, 1)), hash(i + vec2(1, 1)), f.x), f.y); }
-      float fbm4(vec2 p) { float v = 0.0, a = 0.5; for (int i = 0; i < 4; i++) { v += a * vnoise(p); p = p * 2.03 + 7.1; a *= 0.5; } return v; }
-      void main() {
-        vec4 wp = modelMatrix * vec4(position, 1.0); vW = wp.xyz;
-        // the clouds in the water: a cloud deck 160 m up, seen along the flat surface's mirror ray (soft enough to sample
-        // per vertex). x = cover, y = a second, finer layer for their shading
-        vec3 v = normalize(cameraPosition - wp.xyz), R = reflect(-v, vec3(0.0, 1.0, 0.0));
-        vec2 cp = (wp.xz + R.xz / max(R.y, 0.08) * 160.0) / 140.0 + vec2(-0.55, -0.83) * uTime * 0.01;
-        float cover = smoothstep(0.45, 0.75, fbm4(cp)) * smoothstep(0.02, 0.25, R.y);
-        vCloud = vec2(cover, fbm4(cp * 3.0 + 3.0));
-        gl_Position = projectionMatrix * viewMatrix * wp;
-      }
+      varying vec3 vW;
+      void main() { vec4 wp = modelMatrix * vec4(position, 1.0); vW = wp.xyz; gl_Position = projectionMatrix * viewMatrix * wp; }
     `,
     fragmentShader: /* glsl */ `
-      precision highp float; varying vec3 vW; varying vec2 vCloud; uniform vec3 uSun; uniform vec3 uSky; uniform float uTime;
+      precision highp float; varying vec3 vW; uniform vec3 uSky; uniform float uTime;
+      uniform sampler2D uSkyMap; uniform float uSkyRot; uniform vec3 uSunP; uniform sampler2D uRipples;
       uniform sampler2D uWakeMap; uniform vec4 uMap;
       ${WATER_NOISE}
       void main() {
@@ -378,8 +386,10 @@ function Water({ state }) {
           float fade = 1.0 - smoothstep(lam * 0.12, lam * 0.35, foot);
           g += d * sl * cos(dot(d, x) * k - w * t + fi * 1.7 + wan * (0.6 + 0.35 * fi)) * fade;
         }
-        vec3 n1 = vnoised(x * 1.3 + wind * t * 0.4), n2 = vnoised(x * 3.1 - vec2(t * 0.5, -t * 0.3));
-        g += n1.xy * 0.035 + n2.xy * 0.02 * (1.0 - smoothstep(0.08, 0.25, foot));
+        // the fine ripples: a real water normal map, two copies drifting at different scales (mipmaps calm them far away)
+        vec2 r1 = texture2D(uRipples, mat2(0.8, -0.6, 0.6, 0.8) * x / 13.0 + wind * t * 0.02).xy * 2.0 - 1.0;
+        vec2 r2 = texture2D(uRipples, x / 4.7 + vec2(-t * 0.027, t * 0.019)).xy * 2.0 - 1.0;
+        g += (r1 * 0.035 + r2 * 0.022) * (1.0 - 0.6 * smoothstep(0.03, 0.12, foot)); // calmer where a pixel spans many ripples
         g *= rough;
         // the boat's wake, from the wake map (makeWakeMap); the foam's grain is per pixel
         float foam = 0.0;
@@ -396,19 +406,17 @@ function Water({ state }) {
         float F = 0.02 + 0.98 * pow(1.0 - cosI, 5.0);                          // Schlick, water
         vec3 R = reflect(-v, N);
         float el = max(R.y, 0.0);
-        vec3 horizon = mix(uSky, vec3(0.86, 0.9, 0.9), 0.35), zenith = vec3(0.33, 0.55, 0.72);
-        vec3 sky = mix(horizon, zenith, pow(el, 0.6));
-        // the clouds (sampled per vertex, see above), lit a little unevenly
-        sky = mix(sky, vec3(0.97, 0.98, 0.99) * (0.8 + 0.2 * vCloud.y), vCloud.x * 0.9);
-        // the sun low ahead of the camera: a soft sheen and a glitter path of small blinking points, at most one per 40 cm
-        vec3 sunP = normalize(vec3(0.227, 0.423, -0.879));
-        float sd = max(dot(R, sunP), 0.0);
+        // the sky photo (upper hemisphere, equirectangular: width = azimuth, height = elevation 0 → 90°); explicit
+        // gradients, so the wrap of the azimuth does not draw a seam
+        vec2 suvRaw = vec2((atan(R.z, R.x) + uSkyRot) / 6.2832, asin(clamp(R.y, 0.0, 1.0)) / 1.5708);
+        vec3 sky = textureGrad(uSkyMap, vec2(fract(suvRaw.x), clamp(suvRaw.y, 0.003, 0.997)), dFdx(suvRaw), dFdy(suvRaw)).rgb;
+        // the photo's sun: a soft sheen and a glitter path of small blinking points, at most one per 40 cm
+        float sd = max(dot(R, uSunP), 0.0);
         vec2 sc = floor(x * 2.5), sf = fract(x * 2.5) - 0.5;
         float spark = step(0.8, hash(sc + floor(t * 3.0 + hash(sc) * 3.0))) * (1.0 - smoothstep(0.05, 0.22, length(sf)))
                     * (1.0 - 0.75 * smoothstep(0.06, 0.2, foot)); // where a pixel covers a whole cell (far water, phones) fewer, dimmer points
-        float sun = pow(sd, 140.0) * 2.6 * spark + pow(sd, 40.0) * 0.1 + pow(sd, 8.0) * 0.05
-                  + pow(max(dot(R, uSun), 0.0), 1200.0) * 2.5;                 // and the high sun's own glints on the facets
-        F = F * 1.5 + 0.04;                                                    // the clouded sky's sheen
+        float sun = pow(sd, 140.0) * 2.2 * spark + pow(sd, 40.0) * 0.08 + pow(sd, 8.0) * 0.05 + pow(sd, 2000.0) * 0.8 * (1.0 - smoothstep(0.03, 0.1, foot)); // glitter, sheen, a few sharp glints up close
+        F = F * 1.9 + 0.06;                                                    // the clouded sky's sheen: enough that the photo's clouds read
         vec3 veil = vec3(0.09, 0.33, 0.39);                                    // light scattered back out of the water
         float s = 0.22 + 0.06 * (gust - 0.5);                                  // a little murkier where it is rough
         // ripples read near the camera too, where the reflection is weak: facets tilted toward or away from the eye show
@@ -431,6 +439,11 @@ function Water({ state }) {
     const now = clock.elapsedTime
     mat.uniforms.uTime.value = now
     LAKE_TIME.value = now // the light patterns on the shallows (lakeMaterial)
+    { // the sky drifts a little (±7°, over minutes), its sun with it
+      const az = VIEW_AZ + SUN_AHEAD + 0.12 * Math.sin(now * 0.012), el = THREE.MathUtils.degToRad(GLITTER_EL)
+      mat.uniforms.uSkyRot.value = 2 * Math.PI * (LAKE_SKY.sunAzImg / 360) - az
+      mat.uniforms.uSunP.value.set(Math.cos(el) * Math.cos(az), Math.sin(el), Math.cos(el) * Math.sin(az))
+    }
     const s = state.current
     // the boat's path, newest first: the live position, then a point every WAKE_STEP m, kept WAKE_KEEP s
     if (!trail.length) trail.push({ x: s.boat.x, z: s.boat.z, t: now }, { x: s.boat.x, z: s.boat.z, t: now })
@@ -458,7 +471,7 @@ function Water({ state }) {
   })
   return (
     <mesh rotation-x={-Math.PI / 2} material={mat} onUpdate={(o) => o.layers.set(SONAR_HIDE_LAYER)}>
-      <planeGeometry args={[900, 900, 256, 256]} />
+      <planeGeometry args={[900, 900, 1, 1]} />
     </mesh>
   )
 }

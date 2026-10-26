@@ -24,7 +24,7 @@ const logo = '/brand/logo/White Accuphy Logo.png'
 const logoRe = /(["'`])\/brand\/logo\/White Accuphy Logo\.png\1/g // string literals in the minified code, any quote
 const logoCount = (js.match(logoRe) || []).length
 js = js.replace(logoRe, 'globalThis.__acLogo') // one copy of the image, defined before the app runs
-const left = [...js.matchAll(/["'`](?:\.\.?\/|\/)*brand\/[^"'`]+/g), ...css.matchAll(/url\((?!["']?data:)[^)]+\)/g)].map((m) => m[0]) // any file reference left
+const left = [...js.matchAll(/["'`](?:\.\.?\/|\/)*brand\/[^"'`]+/g), ...js.matchAll(/["'`][^"'`\s]*\/assets\/[^"'`\s]+\.(?:jpe?g|png|webp|hdr)["'`]/g), ...css.matchAll(/url\((?!["']?data:)[^)]+\)/g)].map((m) => m[0]) // any file reference left (an imported image left as a file, e.g. the lake's sky and ripple maps, #162, would be missing)
 if (left.length) throw new Error('unresolved absolute asset paths: ' + left.join(', '))
 // a literal </script> or </style> inside the code would end the inline tag early
 js = js.replace(/<\/script/gi, '<\\/script'); css = css.replace(/<\/style/gi, '<\\/style')
