@@ -29,10 +29,17 @@ if (left.length) throw new Error('unresolved absolute asset paths: ' + left.join
 // a literal </script> or </style> inside the code would end the inline tag early
 js = js.replace(/<\/script/gi, '<\\/script'); css = css.replace(/<\/style/gi, '<\\/style')
 
+// The cover (BF funnel handoff 2026-10-26, item 3): pure HTML/CSS, painted as soon as the file has arrived, long before
+// the 3D is built (docs/2026-10-26-lab-load-time.md: the page lands at ~1.0 s on 4G, the lake at ~3.7 s). index.jsx fades it
+// out after the lake's first frames. The logo is the brand SVG, white.
+const logoSvg = fs.readFileSync(path.join('public', 'brand/logo/Untitled-1.svg'), 'utf8').replace('<svg ', '<svg fill="#fff" aria-label="Accuphy" ').replace('viewBox="0 0 1966.1816 971.3172"', 'viewBox="0 0 1966.1816 485.66"') // the file stacks the logo twice; show the top one
+const cover = `<div id="lab-cover" aria-live="polite"><div class="lab-cover-logo">${logoSvg}</div><div class="lab-cover-text">${variant === 'ice' ? 'Loading the ice' : 'Loading the lake'}…</div><div class="lab-cover-bar"><i></i></div></div>`
+const coverCss = `#lab-cover{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:${variant === 'ice' ? '#1a2335' : '#0f3b44'};color:#fff;font:600 14px/1.3 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;letter-spacing:.02em;transition:opacity .45s}#lab-cover.is-done{opacity:0;pointer-events:none}.lab-cover-logo svg{width:min(44vw,180px);height:auto;display:block;filter:drop-shadow(0 2px 8px rgba(0,0,0,.25))}.lab-cover-text{opacity:.85}.lab-cover-bar{width:min(44vw,180px);height:3px;border-radius:3px;background:rgba(255,255,255,.18);overflow:hidden}.lab-cover-bar i{display:block;height:100%;width:40%;border-radius:3px;background:#0d8fdb;animation:lab-cover-slide 1.4s ease-in-out infinite}@keyframes lab-cover-slide{0%{transform:translateX(-110%)}100%{transform:translateX(260%)}}`
 const page = `<title>${title}</title>
-<style>html,body{height:100%;margin:0;background:#0f3b44;overscroll-behavior:none}#root{height:100%}</style>
+<style>html,body{height:100%;margin:0;background:${variant === 'ice' ? '#1a2335' : '#0f3b44'};overscroll-behavior:none}#root{height:100%}${coverCss}</style>
 <style>${css}</style>
 <div id="root"></div>
+${cover}
 <script>globalThis.__acLogo=${JSON.stringify(dataUri(logo.slice(1), 'image/png'))}</script>
 <script type="module">${js}</script>
 `

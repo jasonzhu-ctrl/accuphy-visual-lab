@@ -17,6 +17,7 @@ export function labEvent(event, data = {}, { once = false } = {}) {
     // the iframe path (#134): the parent page's section publishes it — this message shape is fixed, the section checks it
     else if (window.parent && window.parent !== window) window.parent.postMessage({ source: 'accuphy-lab', event, data }, '*')
   } catch { /* a page that refuses events: nothing to do */ }
+  try { window.dispatchEvent(new CustomEvent('accuphy-lab', { detail: { event, data } })) } catch { /* old browsers */ } // the page itself listens (the cover waits for `ready`)
   if (import.meta.env.DEV) console.debug('[lab event]', event, data)
 }
 

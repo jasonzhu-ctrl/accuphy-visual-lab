@@ -85,6 +85,40 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
   const [depthFt, setDepthFt] = useState(Number.isFinite(devNum('depth')) ? devNum('depth') : 70) // depth range (PL Forward; every PLM view) — driven by AUTO below
   const [autoDepth, setAutoDepth] = useState(!Number.isFinite(devNum('depth'))) // off only when the dev Depth slider is touched (or ?depth=)
   const [gate, setGate] = useState(false)          // sign-up gate open → the lake and the sonar picture freeze
+  // In-app browsers (BF funnel handoff 2026-10-26, item 3). (1) The 3D mounts one frame AFTER the page so the static cover
+  // (#lab-cover, share build) is on screen while the scene builds; the cover fades after the lake's first frames.
+  // (2) A lost WebGL context (Meta's browser drops it when memory is short) shows a tap-to-reload card instead of a frozen
+  // page; a restored context remounts the scene. (3) The page's height follows window.innerHeight, not only 100vh/dvh.
+  const [mount3d, setMount3d] = useState(false)
+  const [glLost, setGlLost] = useState(false)
+  const [glKey, setGlKey] = useState(0)
+  const mainRef = useRef(null)
+  useEffect(() => { let a = requestAnimationFrame(() => { a = requestAnimationFrame(() => setMount3d(true)) }); const t = setTimeout(() => setMount3d(true), 120); return () => { cancelAnimationFrame(a); clearTimeout(t) } }, []) // frames do not run in a background tab: the timeout mounts anyway
+  useEffect(() => {
+    if (!mount3d) return
+    let raf = 0, canvas = null, frames = 0, ready = false, timer = 0
+    const cover = document.getElementById('lab-cover')
+    const onLost = (e) => { e.preventDefault(); setGlLost(true) }
+    const onRestored = () => { setGlLost(false); setGlKey((k) => k + 1) }
+    const onEvent = (e) => { if (e.detail?.event === 'ready') ready = true } // `ready` = the WebGL context exists; the scene
+    window.addEventListener('accuphy-lab', onEvent)                        // then builds in one blocking task, so the next
+    const tick = () => {                                                   // two frames come after the first render
+      if (!canvas) canvas = mainRef.current?.querySelector('canvas')
+      if (canvas && ready && ++frames >= 2) {
+        if (cover) { cover.classList.add('is-done'); setTimeout(() => cover.remove(), 600) }
+        canvas.addEventListener('webglcontextlost', onLost); canvas.addEventListener('webglcontextrestored', onRestored)
+        return
+      }
+      raf = requestAnimationFrame(tick); timer = setTimeout(tick, 400) // the timeout keeps it going in a background tab
+    }
+    tick()
+    return () => { cancelAnimationFrame(raf); clearTimeout(timer); window.removeEventListener('accuphy-lab', onEvent); canvas?.removeEventListener('webglcontextlost', onLost); canvas?.removeEventListener('webglcontextrestored', onRestored) }
+  }, [mount3d, glKey])
+  useEffect(() => {
+    const set = () => document.documentElement.style.setProperty('--lab-h', `${window.innerHeight}px`)
+    set(); window.addEventListener('resize', set); window.addEventListener('orientationchange', set); window.visualViewport?.addEventListener('resize', set)
+    return () => { window.removeEventListener('resize', set); window.removeEventListener('orientationchange', set); window.visualViewport?.removeEventListener('resize', set) }
+  }, [])
   const [toast, setToast] = useState(false)
   // Phones (lake scene) open ON the app's Home page and nothing starts until a view is picked (Jason 2026-10-16:
   // 显示首页选视图 而且应该必须先选才能开始): no beam, no sonar picture, no capsules until the first pick.
@@ -278,10 +312,18 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
 
   return (
     <>
-    <main inert={gate} aria-hidden={gate || undefined} className="font-brand fixed inset-0 select-none overflow-hidden bg-[#9cc1cf] text-white" style={ICE ? { background: iceParams().T.bg } : undefined} onPointerMove={onMove}>
+    <main ref={mainRef} inert={gate} aria-hidden={gate || undefined} className="font-brand fixed inset-x-0 top-0 select-none overflow-hidden bg-[#9cc1cf] text-white" style={{ height: 'var(--lab-h, 100%)', ...(ICE ? { background: iceParams().T.bg } : null) }} onPointerMove={onMove}>
       <div className="absolute inset-0 touch-none">
-        <LakeScene state={state} sonarRect={sonarRect} paused={gate || paused} scene={scene} />
+        {mount3d && !glLost && <LakeScene key={glKey} state={state} sonarRect={sonarRect} paused={gate || paused} scene={scene} />}
       </div>
+      {glLost && (
+        <div role="alert" className="pointer-events-auto absolute inset-0 z-50 flex items-center justify-center p-6" style={{ background: 'rgba(3,18,26,0.55)' }}>
+          <button type="button" className="ac-card px-5 py-4 text-left" onClick={() => window.location.reload()}>
+            <div className="text-[15px] font-semibold">{t('gl_lost_title')}</div>
+            <div className="ac-body mt-1 text-[12.5px]">{t('gl_lost_text')}</div>
+          </button>
+        </div>
+      )}
 
       {/* ---- control panel — Apple-style frosted glass over the lake (Jason 2026-09-24) ---- */}
       <motion.div ref={(el) => { panelRef.current = el; state.current.panelEl = el }} data-hint-avoid initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}

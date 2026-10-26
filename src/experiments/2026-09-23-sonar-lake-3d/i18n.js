@@ -48,6 +48,9 @@ const S = {
   i2_text: { en: 'The flasher is the dial: the bottom, your bait and every fish that rises, by depth around the ring. The panel beside it draws the same fish as marks.', fr: 'Le flasheur, c’est le cadran : le fond, votre appât et chaque poisson qui monte s’affichent selon leur profondeur, tout autour de l’anneau. Le panneau à côté montre les mêmes poissons sous forme d’échos.' },
   i3_title: { en: 'Look ahead without drilling', fr: 'Voir devant sans percer' },
   i3_text: { en: 'Forward View turns the beam sideways: fish and structure out ahead, under ice you never cut.', fr: 'La vue avant tourne le faisceau sur le côté : poissons et structures plus loin devant, sous une glace que vous n’avez jamais percée.' },
+  // the lost-WebGL card (in-app browsers)
+  gl_lost_title: { en: 'The 3D view stopped', fr: 'La vue 3D s’est arrêtée' },
+  gl_lost_text: { en: 'Your browser freed the graphics memory. Tap to reload the lake.', fr: 'Votre navigateur a libéré la mémoire graphique. Touchez pour recharger le lac.' },
   // the Shop button
   shop: { en: 'Shop {name}', fr: 'Achetez le {name}' }, // after the store's own "Achetez maintenant →" (shop.accuphy.com/fr); the arrow is the button's icon
   // the app's Home page inside the phone
