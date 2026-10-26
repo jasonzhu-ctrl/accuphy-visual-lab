@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import * as THREE from 'three'
 import LakeScene from './Scene'
-import { DEVICES, FT, MODE_LABELS, ICE_MODES } from '../2026-09-23-sonar-beam/devices'
+import { DEVICES, FT, ICE_MODES } from '../2026-09-23-sonar-beam/devices'
 import { iceParams, ICE_START, VIEWS } from './iceScene'
 import { wedgeSpecs } from '../2026-09-23-beam-shapes-3d/wedge'
 import { phonePose, isPhoneLayout, isLandscapePhone, PHONE_POSE_FLAT, comboFwdDepth } from './SonarScreen'
@@ -14,6 +14,7 @@ import AppHome from './home/AppHome' // the app's Home (view selection) page ins
 import { isSignedUp } from './signup'
 import { labEvent, PRODUCT } from './embed'
 import ShopButton from './ShopButton' // the one link to the store (X-6L, 2026-10-25; placement B, Jason)
+import { t } from './i18n' // every visitor-visible string, English or French (?lang=fr; X-6L-fr)
 import { depthAt } from './terrain'
 import { panoHalfWidth } from './sonarMarks'
 // dev: ?bigphone makes the phone huge so the sonar picture can be inspected in screenshots
@@ -261,14 +262,14 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
   // the three-step guide (docs/3d-beam-reference.md §3): each step is a preset
   const [step, setStep] = useState(0)
   const STEPS = ICE ? [
-    { n: 1, title: 'The beam under the ice', text: 'The PingLive Mini hangs in the hole and pings straight down. Tap the ice anywhere to drill a new hole — whatever the beam touches lights up.', device: 'PLM', mode: 'liveice', range: 60, boat: ICE_START },
-    { n: 2, title: 'Watch them come in', text: 'The flasher is the dial: the bottom, your bait and every fish that rises, by depth around the ring. The panel beside it draws the same fish as marks.', device: 'PLM', mode: 'liveice', range: 60, boat: [-8, -10] },
-    { n: 3, title: 'Look ahead without drilling', text: 'Forward View turns the beam sideways: fish and structure 60 ft away, under ice you never cut.', device: 'PLM', mode: 'forward', range: 60, boat: [16, 11] },
+    { n: 1, title: t('i1_title'), text: t('i1_text'), device: 'PLM', mode: 'liveice', range: 60, boat: ICE_START },
+    { n: 2, title: t('i2_title'), text: t('i2_text'), device: 'PLM', mode: 'liveice', range: 60, boat: [-8, -10] },
+    { n: 3, title: t('i3_title'), text: t('i3_text'), device: 'PLM', mode: 'forward', range: 60, boat: [16, 11] },
   ] : [
-    { n: 1, title: 'This is the beam', text: 'A thin curtain of sound under the boat. Drag the boat — whatever the curtain touches lights up.', device: 'PL', mode: 'down', range: 80, boat: [-20, 6] },
-    { n: 2, title: 'This is what your phone shows', text: 'The screen is that curtain, seen edge-on: bottom, timber, fish. Forward View aims it ahead of the boat.', device: 'PL', mode: 'forward', range: 60, boat: [16, 11] }, // standing timber + bass 8–15 m ahead on the 7 m flat
-    { n: 3, title: 'Which view, when', text: 'Panoramic scans wide to find fish and structure; Forward to cast at them; Down to fish straight below.', device: 'PL', mode: 'panoramic', range: 70, boat: [-50, 8] }, // on the 5 m shelf, scanning toward the drop-off: the flat fan paints the bottom
-  ].map((st) => (ONLY ? { ...st, device: ONLY, mode: st.mode === 'panoramic' ? 'combo' : st.mode, ...(st.mode === 'panoramic' ? { text: 'Combo shows Down and Forward side by side; Forward to cast at fish ahead; Down to fish straight below.' } : {}) } : st))
+    { n: 1, title: t('s1_title'), text: t('s1_text'), device: 'PL', mode: 'down', range: 80, boat: [-20, 6] },
+    { n: 2, title: t('s2_title'), text: t('s2_text'), device: 'PL', mode: 'forward', range: 60, boat: [16, 11] }, // standing timber + bass 8–15 m ahead on the 7 m flat
+    { n: 3, title: t('s3_title'), text: t('s3_text'), device: 'PL', mode: 'panoramic', range: 70, boat: [-50, 8] }, // on the 5 m shelf, scanning toward the drop-off: the flat fan paints the bottom
+  ].map((st) => (ONLY ? { ...st, device: ONLY, mode: st.mode === 'panoramic' ? 'combo' : st.mode, ...(st.mode === 'panoramic' ? { text: t('s3_text_combo') } : {}) } : st))
   const goStep = (i) => {
     const st = STEPS[i]; setStep(i); pickView(st.device, st.mode, 'step'); setRangeFt(st.range)
     state.current.target.x = st.boat[0]; state.current.target.z = st.boat[1]
@@ -290,22 +291,22 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
           <span className="ac-title">Lab</span>
         </div>
         <div className="ac-divider" />
-        <Row label="Device">
+        <Row label={t('device')}>
           <div className="ac-seg">{SHOWN_DEVICES.map((d) => <button key={d.id} className={`ac-btn ${deviceId === d.id ? 'is-active' : ''}`} onClick={() => pickView(d.id, mode, 'panel')}>{d.name}</button>)}</div>
         </Row>
-        <Row label="View">
-          <div className="ac-seg">{modes.map((m) => <button key={m} className={`ac-btn ${mode === m ? 'is-active' : ''}`} onClick={() => pickView(deviceId, m, 'panel')}>{MODE_LABELS[m].replace(' View', '')}</button>)}</div>
+        <Row label={t('view')}>
+          <div className="ac-seg">{modes.map((m) => <button key={m} className={`ac-btn ${mode === m ? 'is-active' : ''}`} onClick={() => pickView(deviceId, m, 'panel')}>{t('mode_' + m)}</button>)}</div>
         </Row>
         {ICE && (
-          <Row label="Camera">
-            <div className="ac-seg">{VIEWS.map((v) => <button key={v} className={`ac-btn ${view === v ? 'is-active' : ''}`} onClick={() => setView(v)}>{{ top: 'Top', under: 'Under the ice', section: 'Section' }[v]}</button>)}</div>
+          <Row label={t('camera')}>
+            <div className="ac-seg">{VIEWS.map((v) => <button key={v} className={`ac-btn ${view === v ? 'is-active' : ''}`} onClick={() => setView(v)}>{{ top: t('cam_top'), under: t('cam_under'), section: t('cam_section') }[v]}</button>)}</div>
           </Row>
         )}
-        <Row label="Range">
+        <Row label={t('range')}>
           {/* Down: the range is the AUTO depth range, so the slider only shows it */}
           <input type="range" min={20} max={maxFt} step={5} value={effRangeFt} disabled={downLike || comboAuto} title={downLike || comboAuto ? 'AUTO: follows the water depth' : undefined} onChange={(e) => setRangeFt(+e.target.value)} className="ac-range w-36" style={{ '--fill': `${((effRangeFt - 20) / (maxFt - 20)) * 100}%`, opacity: downLike || comboAuto ? 0.45 : 1 }} />
           <button className="ac-value" onClick={() => setImperial((v) => !v)} title="ft / m">{fmt(effRangeFt)}</button>
-          <span className="ac-soft text-[11px]">{downLike || comboAuto ? 'AUTO · follows the water' : `max ${fmt(maxFt)}`}</span>
+          <span className="ac-soft text-[11px]">{downLike || comboAuto ? t('auto_follows') : `${t('max')} ${fmt(maxFt)}`}</span>
         </Row>
         {DEV_TOOLS && deviceId === 'PL' && mode === 'forward' && (
           <Row label="Depth">
@@ -333,7 +334,7 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
         </Row>
         </>)}
         <div className="ac-soft hidden px-1 text-[11.5px] leading-snug sm:block">
-          {device.name} · {device.beamDeg}° × {device.thickDeg}° beam{ICE ? ', through the ice. Tap the ice to drill a new hole' : '. Drag the boat'} — whatever the beam touches lights up.
+          {t(ICE ? 'desc_ice' : 'desc_lake', { device: device.name, beam: `${device.beamDeg}° × ${device.thickDeg}°` })}
         </div>
         <ShopButton deviceId={deviceId} placement="panel" wide />
       </motion.div>
@@ -341,7 +342,7 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
       {/* ---- the cue caption, shown until the first drag / tap (position set by the render loop). The ice page: under the
            reticle on the ice (IceCamp.jsx, #123); the lake: above the water reticle round the boat (Scene.jsx Boat, #132).
            Plain text, no glass pill, no dot (Jason 2026-10-23: 看着太 AI 了) ---- */}
-      <div ref={(el) => { state.current.hintEl = el }} className="pointer-events-none absolute left-0 top-0 whitespace-nowrap" style={{ opacity: 0, transition: 'opacity .6s', color: 'rgba(255,255,255,0.92)', fontSize: 13, fontWeight: 500, letterSpacing: '0.01em', textShadow: '0 1px 2px rgba(0,0,0,0.55), 0 0 12px rgba(0,0,0,0.45)' }}>{ICE ? 'Tap the ice to drill a hole' : 'Drag the boat to move it'}</div>
+      <div ref={(el) => { state.current.hintEl = el }} className="pointer-events-none absolute left-0 top-0 whitespace-nowrap" style={{ opacity: 0, transition: 'opacity .6s', color: 'rgba(255,255,255,0.92)', fontSize: 13, fontWeight: 500, letterSpacing: '0.01em', textShadow: '0 1px 2px rgba(0,0,0,0.55), 0 0 12px rgba(0,0,0,0.45)' }}>{t(ICE ? 'hint_ice' : 'hint_boat')}</div>
 
       {/* ---- iPhone Pro Max, landscape, turned slightly in 3D (same pose as the GL picture).
            Proportions from the 15/16 Pro Max: body 2.08:1, corner radius ≈ 14 % of the short side,
@@ -393,7 +394,7 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
         )}
         {/* after sign-up the app buttons stay display-only: a short hint above the phone instead of the gate */}
         <div role="status" aria-live="polite" className={`ac-hint absolute bottom-full right-0 mb-3 max-sm:mb-16 whitespace-nowrap px-3.5 py-2 text-[12px] font-medium transition-opacity duration-300 ${toast ? 'opacity-100' : 'opacity-0'}`}>
-          {phone ? 'These are the app’s own controls — Home, range, gain and pause work.' : 'These are the app’s own controls — use the panel to change the view.'}
+          {t(phone ? 'toast_phone' : 'toast_desktop')}
         </div>
       </div>
 
@@ -424,7 +425,7 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
       <div data-hint-avoid className={ICE ? 'pointer-events-auto absolute hidden flex-col gap-2 md:flex' : 'pointer-events-auto absolute right-[28px] top-4 hidden w-[min(620px,44vw)] items-stretch gap-2.5 md:flex'} style={ICE ? { left: 16, top: cardsTop, width: 400 } : land ? { display: 'none' } : undefined}>
         {STEPS.map((st, i) => (
           <button key={st.n} onClick={() => goStep(i)} className={`ac-card flex-1 text-left ${ICE ? 'px-3.5 py-2.5' : 'px-3.5 py-3'} ${step === i ? 'is-active' : ''}`}>
-            <div className="flex items-center gap-2"><span className="ac-num">0{st.n}</span><span className="ac-label">Step</span></div>
+            <div className="flex items-center gap-2"><span className="ac-num">0{st.n}</span><span className="ac-label">{t('step')}</span></div>
             <div className="mt-1.5 text-[13.5px] font-semibold leading-tight">{st.title}</div>
             {step === i && <div className="ac-body mt-1.5 text-[11.5px] leading-snug">{st.text}</div>}
           </button>

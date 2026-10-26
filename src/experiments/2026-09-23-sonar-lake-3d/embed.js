@@ -31,6 +31,7 @@ export function isEmbedded() {
 // fbclid and such from the ad; they are never read here except to pass along when the Lab is opened on its own.
 const STORE = 'https://shop.accuphy.com'
 export const PRODUCT = { PL: 'pinglive-sonar', PLM: 'pinglive-mini' }
+const LANG = (() => { try { return new URLSearchParams(window.location.search).get('lang') === 'fr' ? 'fr' : 'en' } catch { return 'en' } })() // ?lang=fr → the store's French pages (/fr/products/…), X-6L-fr
 
 export function storeOrigin() {
   try {
@@ -55,7 +56,7 @@ export function inStore() {
 
 export function shopUrl(deviceId) {
   const product = PRODUCT[deviceId] || PRODUCT.PLM
-  const url = new URL('/products/' + product, inStore() ? storeOrigin() : STORE)
+  const url = new URL((LANG === 'fr' ? '/fr' : '') + '/products/' + product, inStore() ? storeOrigin() : STORE)
   if (!inStore()) {
     let own = []
     try { own = [...new URLSearchParams(window.location.search)].filter(([k]) => k.startsWith('utm_')) } catch { own = [] }
@@ -68,7 +69,7 @@ export function shopUrl(deviceId) {
 // moment so the click reaches the store page (postMessage is delivered as a later task) and its pixel before unload.
 export function openShop(deviceId, placement) {
   const href = shopUrl(deviceId)
-  labEvent('shop_click', { product: PRODUCT[deviceId] || PRODUCT.PLM, placement }) // no `device`: the website uses that field for phone/desktop (Lab HQ 2026-10-25)
+  labEvent('shop_click', { product: PRODUCT[deviceId] || PRODUCT.PLM, placement, lang: LANG }) // no `device`: the website uses that field for phone/desktop (Lab HQ 2026-10-25)
   const go = () => { try { window.top.location.href = href } catch { window.location.href = href } }
   setTimeout(go, 150)
 }

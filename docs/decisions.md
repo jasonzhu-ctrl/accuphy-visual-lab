@@ -2525,3 +2525,22 @@ Numbered log. Newest at the bottom.
      - It is a copy: changes to the Lab's ice page do not flow into it. README (English + Chinese) is the brief for the
        other AI. Checked: no console errors, all presets, cutaway on/off, orbit above and under the ice, ~55 fps on the
        laptop, and a clean build from the unzipped copy.
+
+159. **2026-10-25** — **The Lab in French (`?lang=fr`)** (Lab HQ's work order X-6L-fr; Jason 2026-10-17: 做法语版，魁北克也投;
+     the store's /fr/pages/lab is live with the English Lab in its frame). Local only, nothing uploaded.
+     - **Switch:** only `?lang=fr` on the Lab's own URL (the store's French page adds it to the iframe address); the
+       parent page and the browser language are never read. Default English.
+     - **Strings:** every visitor-visible string moved to `i18n.js` (`t(key, vars)`) — the panel labels and view pills,
+       the description line, the drag / drill cues, the toast, the step cards (lake and ice, incl. the Mini-only
+       combo text), the Shop button ("Magasiner PingLive"), the app Home page's PingLive tiles, tab bar and
+       "available with" toast. Numbers, units, AUTO, 1440p (QHD) stay. The Mini row's own tile names (Live Forward,
+       Down Scan, …) stay as the app prints them: the website glossary marks the app view names "pending T-066".
+       Terms follow `accuphy-website/docs/glossary.csv` (faisceau, portée, vue vers l'avant / vers le bas /
+       panoramique / combinée); the full en / fr table with a confidence column for the website's French reviewer:
+       `docs/2026-10-25-lab-fr-strings.md`.
+     - **Shop link in French:** `/fr/products/…` when `lang=fr` (in the store and standalone); `shop_click` carries
+       `lang`. UTM rules unchanged (#157).
+     - **Checked:** desktop 1280×800 and phone 375×812, summer lake and ice page, French and the English default —
+       nothing overflows (panel 400 px wide, step cards 181 px with the longest French text, the phone pill 216 px),
+       no console errors; the desktop's bottom-left 380×230 is free of the panel (it ends at y = 341 of 800) for the
+       Klaviyo form. Screenshots: `docs/2026-10-25-lab-fr-screens.jpg`.

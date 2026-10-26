@@ -8,6 +8,7 @@
 // Tiles the Lab can show are live. The others are shown under a frosted layer (Jason: 其他的用那种我们也有的雾蒙蒙的一层)
 // and a tap only shows "Available with Accuphy PingLive Mini". Sizes are in cqh of the display, like SonarChrome.
 import { useEffect, useRef, useState } from 'react'
+import { t } from '../i18n' // English / French (?lang=fr). The Mini's own tile names (Live Forward, Down Scan…) stay as the app prints them (glossary: pending T-066)
 import plPanoramic from './pl-panoramic.jpg'
 import plForward from './pl-forward.jpg'
 import plDown from './pl-down.jpg'
@@ -24,9 +25,9 @@ import plmCombo from './plm-combo.jpg'
 
 const SECTIONS = {
   PL: { title: 'PingLive', tiles: [
-    { mode: 'panoramic', label: 'Panoramic View', img: plPanoramic, fan: true },
-    { mode: 'forward', label: 'Forward View', img: plForward, fan: true },
-    { mode: 'down', label: 'Down View', img: plDown, fan: true },
+    { mode: 'panoramic', label: t('tile_panoramic'), img: plPanoramic, fan: true },
+    { mode: 'forward', label: t('tile_forward'), img: plForward, fan: true },
+    { mode: 'down', label: t('tile_down'), img: plDown, fan: true },
   ] },
   PLM: { title: 'PingLive Mini', tiles: [
     { label: 'Live Panoramic', img: plmPanoramic },
@@ -66,7 +67,7 @@ export default function AppHome({ devices, deviceId, mode, onPick, ice = false }
   const [toast, setToast] = useState('')
   const toastT = useRef(0)
   useEffect(() => () => clearTimeout(toastT.current), [])
-  const notAvailable = () => { setToast('Available with Accuphy PingLive Mini'); clearTimeout(toastT.current); toastT.current = setTimeout(() => setToast(''), 2200) }
+  const notAvailable = () => { setToast(t('not_available')); clearTimeout(toastT.current); toastT.current = setTimeout(() => setToast(''), 2200) }
   return (
     <div className="ph-home" role="dialog" aria-label="Home" onPointerDown={(e) => e.stopPropagation()}
       style={{ position: 'absolute', inset: 0, background: '#0a0a0a', color: '#fff', display: 'flex', flexDirection: 'column', fontFamily: 'var(--font-body, "Instrument Sans", system-ui, sans-serif)' }}>
@@ -95,9 +96,9 @@ export default function AppHome({ devices, deviceId, mode, onPick, ice = false }
         ))}
       </div>
       <div style={{ flex: '0 0 17cqh', background: '#161616', borderTop: '0.3cqh solid #262626', display: 'flex', justifyContent: 'space-around', alignItems: 'center' }}>
-        <Tab label="Setting" icon="gear" />
-        <Tab label="Home" icon="home" active />
-        <Tab label="Map" icon="map" />
+        <Tab label={t('tab_setting')} icon="gear" />
+        <Tab label={t('tab_home')} icon="home" active />
+        <Tab label={t('tab_map')} icon="map" />
       </div>
       <div role="status" aria-live="polite" className="ph-toast glass" style={{ opacity: toast ? 1 : 0 }}>{toast}</div>
     </div>
