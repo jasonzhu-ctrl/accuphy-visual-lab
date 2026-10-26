@@ -116,7 +116,7 @@ anyone's memory.
   proposals and options are not approval; offer them, then wait.
 - **Chats as of 2026-10-25** (three layers, Jason 2026-10-25; rules in
   `IT/CHIEF Agent/docs/protocol.md`):
-  - "accuphy-visual-lab HQ" — the Lab's lead: keeps `docs/backlog.md` and its status bar,
+  - "accuphy-visual-lab HQ" (session id `local_1022478a-b63a-4fff-8403-7c58646dab95`; message it by this id, not by name) — the Lab's lead: keeps `docs/backlog.md` and its status bar,
     dispatches work, checks what comes back, reports to "项目总管 | CHIEF Agent". Live changes
     need Jason's "动" said in the HQ chat.
   - "冰钓版本视觉效果" — the working chat for the sonar picture, the lake and the ice page.
