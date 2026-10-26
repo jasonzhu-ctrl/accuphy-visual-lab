@@ -2545,3 +2545,13 @@ Numbered log. Newest at the bottom.
        nothing overflows (panel 400 px wide, step cards 181 px with the longest French text, the phone pill 216 px),
        no console errors; the desktop's bottom-left 380×230 is free of the panel (it ends at y = 341 of 800) for the
        Klaviyo form. Screenshots: `docs/2026-10-25-lab-fr-screens.jpg`.
+     - **2026-10-26, the website's review applied** (`accuphy-website/handoffs/2026-10-26-lab-fr-strings-review.md`,
+       Lab HQ's X-6L-fr round 2): outside the phone the store's wording (Vue avant, vue vers le bas, Faites glisser le
+       bateau, flasheur, arbres immergés, Combinée, "Achetez le PingLive →" after the store's "Achetez maintenant");
+       inside the phone the real app's French (Vue panoramique / Vue avant / Vue inférieure, the Mini row as
+       Panoramique en direct … Pêche sur glace en direct, Paramètres / Accueil / Map, "Disponible avec le PingLive
+       Mini"). Three English fixes against specs.md: the panel's "max 240 ft" hint removed in both languages (specs say
+       230 ft; the app's steps still reach 240, untouched), the ice description reads 39° × 20° (text only, the
+       engine's 18° stays), the ice step 3 drops "60 ft". Checked again at 1280×800 and 375×812 on both pages: the
+       longest tile name "Pêche sur glace en direct" wraps to two lines inside its tile, nothing overflows.
+       Screenshots: `docs/2026-10-26-lab-fr-screens.jpg`.

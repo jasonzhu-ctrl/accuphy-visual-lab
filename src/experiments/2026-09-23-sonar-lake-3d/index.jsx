@@ -306,7 +306,7 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
           {/* Down: the range is the AUTO depth range, so the slider only shows it */}
           <input type="range" min={20} max={maxFt} step={5} value={effRangeFt} disabled={downLike || comboAuto} title={downLike || comboAuto ? 'AUTO: follows the water depth' : undefined} onChange={(e) => setRangeFt(+e.target.value)} className="ac-range w-36" style={{ '--fill': `${((effRangeFt - 20) / (maxFt - 20)) * 100}%`, opacity: downLike || comboAuto ? 0.45 : 1 }} />
           <button className="ac-value" onClick={() => setImperial((v) => !v)} title="ft / m">{fmt(effRangeFt)}</button>
-          <span className="ac-soft text-[11px]">{downLike || comboAuto ? t('auto_follows') : `${t('max')} ${fmt(maxFt)}`}</span>
+          {(downLike || comboAuto) && <span className="ac-soft text-[11px]">{t('auto_follows')}</span>} {/* no "max …" hint (website review 2026-10-26: specs say 230 ft, the app's steps go to 240) */}
         </Row>
         {DEV_TOOLS && deviceId === 'PL' && mode === 'forward' && (
           <Row label="Depth">
@@ -334,7 +334,7 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
         </Row>
         </>)}
         <div className="ac-soft hidden px-1 text-[11.5px] leading-snug sm:block">
-          {t(ICE ? 'desc_ice' : 'desc_lake', { device: device.name, beam: `${device.beamDeg}° × ${device.thickDeg}°` })}
+          {t(ICE ? 'desc_ice' : 'desc_lake', { device: device.name, beam: `${device.beamDeg}° × ${ICE ? 20 : device.thickDeg}°` })} {/* text only: specs say 39° × 20° for the Mini; the engine's 18° stays (Jason 2026-09-23) */}
         </div>
         <ShopButton deviceId={deviceId} placement="panel" wide />
       </motion.div>

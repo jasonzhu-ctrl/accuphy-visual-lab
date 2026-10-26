@@ -8,7 +8,7 @@
 // Tiles the Lab can show are live. The others are shown under a frosted layer (Jason: 其他的用那种我们也有的雾蒙蒙的一层)
 // and a tap only shows "Available with Accuphy PingLive Mini". Sizes are in cqh of the display, like SonarChrome.
 import { useEffect, useRef, useState } from 'react'
-import { t } from '../i18n' // English / French (?lang=fr). The Mini's own tile names (Live Forward, Down Scan…) stay as the app prints them (glossary: pending T-066)
+import { t } from '../i18n' // English / French (?lang=fr); the French is the real app's own (website review 2026-10-26)
 import plPanoramic from './pl-panoramic.jpg'
 import plForward from './pl-forward.jpg'
 import plDown from './pl-down.jpg'
@@ -30,14 +30,14 @@ const SECTIONS = {
     { mode: 'down', label: t('tile_down'), img: plDown, fan: true },
   ] },
   PLM: { title: 'PingLive Mini', tiles: [
-    { label: 'Live Panoramic', img: plmPanoramic },
-    { mode: 'forward', label: 'Live Forward', img: plmForward },
-    { mode: 'down', label: 'Live Down', img: plmDown },
-    { mode: 'combo', label: 'Live Combo', img: plmCombo }, // in the Mini's row, not a separate Combo section (Jason 2026-10-23: 不要单独再放一栏了 这样人家搞不懂)
-    { label: 'Down Scan', img: plmDownscan },
-    { label: 'Chirp Sonar', img: plmChirp },
-    { label: 'Ice Fishing', img: plmIceFishing }, // frosted: Jason 2026-10-23 keeps only Live Ice Fishing, Live Forward, Live Down, Live Combo
-    { label: 'Live Ice Fishing', img: plmLiveIce }, // frosted on the lake page (its link to the ice page never worked in public builds; Jason 2026-10-24: 去掉); a view on the ice page
+    { label: t('tile_live_panoramic'), img: plmPanoramic },
+    { mode: 'forward', label: t('tile_live_forward'), img: plmForward },
+    { mode: 'down', label: t('tile_live_down'), img: plmDown },
+    { mode: 'combo', label: t('tile_live_combo'), img: plmCombo }, // in the Mini's row, not a separate Combo section (Jason 2026-10-23: 不要单独再放一栏了 这样人家搞不懂)
+    { label: t('tile_downscan'), img: plmDownscan },
+    { label: t('tile_chirp'), img: plmChirp },
+    { label: t('tile_ice'), img: plmIceFishing }, // frosted: Jason 2026-10-23 keeps only Live Ice Fishing, Live Forward, Live Down, Live Combo
+    { id: 'liveice', label: t('tile_live_ice'), img: plmLiveIce }, // frosted on the lake page (its link to the ice page never worked in public builds; Jason 2026-10-24: 去掉); a view on the ice page
   ] },
 }
 
@@ -63,7 +63,7 @@ export default function AppHome({ devices, deviceId, mode, onPick, ice = false }
   // on the ice page the back button opens this Home too (2026-10-23): Live Ice Fishing is a view of this page there,
   // not a link to it
   const sections = devices.map((d) => ({ id: d.id, ...SECTIONS[d.id] })).filter((s) => s.tiles)
-    .map((sec) => (ice ? { ...sec, tiles: sec.tiles.map((t) => (t.label === 'Live Ice Fishing' ? { ...t, mode: 'liveice' } : t)) } : sec))
+    .map((sec) => (ice ? { ...sec, tiles: sec.tiles.map((tile) => (tile.id === 'liveice' ? { ...tile, mode: 'liveice' } : tile)) } : sec))
   const [toast, setToast] = useState('')
   const toastT = useRef(0)
   useEffect(() => () => clearTimeout(toastT.current), [])
