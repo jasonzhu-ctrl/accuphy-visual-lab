@@ -2,7 +2,8 @@
 // URL switches to French — the store's French page puts it on the iframe address; nothing is read from the parent page
 // or the browser. Default English. Terms follow accuphy-website/docs/glossary.csv (fr column); PingLive, PingLive Mini,
 // Down Scan and CHIRP are never translated. Every string a visitor can see lives here; numbers and units stay as they are.
-// Words the glossary does not have are listed for review in docs/2026-10-25-lab-fr-strings.md.
+// Wording already on shop.accuphy.com/fr is copied (Vue vers le bas, Vue avant, Vue panoramique, Affichage combiné, Faisceau,
+// Portée, Accueil, Achetez maintenant); the rest is listed for the website's French review in docs/2026-10-25-lab-fr-strings.md.
 export const LANG = (() => { try { return new URLSearchParams(window.location.search).get('lang') === 'fr' ? 'fr' : 'en' } catch { return 'en' } })()
 
 const S = {
@@ -21,7 +22,7 @@ const S = {
   mode_down: { en: 'Down', fr: 'Bas' },
   mode_forward: { en: 'Forward', fr: 'Avant' },
   mode_panoramic: { en: 'Panoramic', fr: 'Panoramique' },
-  mode_combo: { en: 'Combo', fr: 'Combo' },
+  mode_combo: { en: 'Combo', fr: 'Combiné' }, // store: "Affichage combiné" / "Vue combinée"
   mode_liveice: { en: 'Live Ice', fr: 'Live Ice' },
   mode_ice: { en: 'Ice Fishing', fr: 'Pêche sur glace' },
   // the one-line description under the panel: "{device} · {beam} beam. Drag the boat — …"
@@ -48,7 +49,7 @@ const S = {
   i3_title: { en: 'Look ahead without drilling', fr: 'Voir devant sans percer' },
   i3_text: { en: 'Forward View turns the beam sideways: fish and structure 60 ft away, under ice you never cut.', fr: 'La vue vers l’avant tourne le faisceau sur le côté : poissons et structures à 60 pi, sous une glace que vous n’avez jamais percée.' },
   // the Shop button
-  shop: { en: 'Shop {name}', fr: 'Magasiner {name}' },
+  shop: { en: 'Shop {name}', fr: 'Acheter {name}' }, // the store's own button is "Achetez maintenant →" (shop.accuphy.com/fr); HQ: copy the store's wording
   // the app's Home page inside the phone
   tile_panoramic: { en: 'Panoramic View', fr: 'Vue panoramique' },
   tile_forward: { en: 'Forward View', fr: 'Vue vers l’avant' },

@@ -2532,11 +2532,12 @@ Numbered log. Newest at the bottom.
        parent page and the browser language are never read. Default English.
      - **Strings:** every visitor-visible string moved to `i18n.js` (`t(key, vars)`) — the panel labels and view pills,
        the description line, the drag / drill cues, the toast, the step cards (lake and ice, incl. the Mini-only
-       combo text), the Shop button ("Magasiner PingLive"), the app Home page's PingLive tiles, tab bar and
+       combo text), the Shop button ("Acheter PingLive", after the store's "Achetez maintenant →"), the app Home page's PingLive tiles, tab bar and
        "available with" toast. Numbers, units, AUTO, 1440p (QHD) stay. The Mini row's own tile names (Live Forward,
        Down Scan, …) stay as the app prints them: the website glossary marks the app view names "pending T-066".
-       Terms follow `accuphy-website/docs/glossary.csv` (faisceau, portée, vue vers l'avant / vers le bas /
-       panoramique / combinée); the full en / fr table with a confidence column for the website's French reviewer:
+       Wording already live on shop.accuphy.com/fr is copied (Vue vers le bas, Vue avant, Vue panoramique, Affichage
+       combiné, Faisceau, Portée, Accueil); the rest follows `accuphy-website/docs/glossary.csv`. The website HQ
+       reviews the French (website #198); the full en / fr table with a confidence column for the website's French reviewer:
        `docs/2026-10-25-lab-fr-strings.md`.
      - **Shop link in French:** `/fr/products/…` when `lang=fr` (in the store and standalone); `shop_click` carries
        `lang`. UTM rules unchanged (#157).

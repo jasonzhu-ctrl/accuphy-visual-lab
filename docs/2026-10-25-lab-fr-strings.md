@@ -4,20 +4,25 @@
 `src/experiments/2026-09-23-sonar-lake-3d/i18n.js`。术语按 `IT/accuphy-website/docs/glossary.csv` 的 fr 列；
 PingLive、PingLive Mini、Down Scan、CHIRP、AUTO、数字和单位不翻。
 
-**请会法文的人核的是“把握”列不是“高”的行。** 魁北克用法：按钮用 Magasiner（不用 Acheter）。
+核的规矩（Lab HQ 2026-10-25，网站决定 #198）：店铺线上已核过的法文照抄，其余按 glossary 和大品牌用法。
+**店铺 shop.accuphy.com/fr 上现成的说法（2026-10-25 查，产品页 /fr/products/pinglive-mini、/fr/products/pinglive-sonar、首页 /fr）：**
+Vue vers le bas · Vue avant（对比表里也写 Vue vers l’avant）· Vue panoramique · Affichage combiné / Vue combinée · Vue traditionnelle ·
+Balayage vers le bas（= Down Scan）· Faisceau 135° / large faisceau de 78° · Portée · Modes d’affichage / Options d’affichage ·
+导航 Accueil · 首页按钮 Achetez maintenant → · 产品页按钮 Ajouter au panier · Aide & Support。
+“出处”列写了“店铺”的就是照抄；**请核“把握”列不是“高”的行。**
 
 | 位置 | en | fr | 出处 / 把握 |
 |---|---|---|---|
 | 面板 | Device | Appareil | 高 |
 | 面板 | View | Vue | 高（glossary view modes = modes d'affichage，这里是单个标签） |
 | 面板（冰钓） | Camera | Caméra | 高 |
-| 面板 | Range | Portée | glossary（portée）· 高 |
+| 面板 | Range | Portée | 店铺（Portée de 21,3 m）· 高 |
 | 面板 | AUTO · follows the water | AUTO · suit la profondeur | 中 |
 | 面板 | max 240 ft | max. 240 ft | 高 |
-| 视图胶囊 | Down / Forward / Panoramic / Combo | Bas / Avant / Panoramique / Combo | glossary 的 vue vers le bas / vue vers l'avant / vue panoramique / vue combinée 的短写 · 中（胶囊放不下全称） |
+| 视图胶囊 | Down / Forward / Panoramic / Combo | Bas / Avant / Panoramique / Combiné | 店铺 Vue vers le bas / Vue avant / Vue panoramique / Affichage combiné 的短写（胶囊放不下全称）· 中高 |
 | 视图胶囊（冰钓） | Live Ice | Live Ice | app 自己的功能名，不翻（glossary app-view-names 待 T-066）· 中 |
 | 相机胶囊（冰钓） | Top / Under the ice / Section | Dessus / Sous la glace / Coupe | 中 |
-| 面板说明 | PingLive · 135° × 20° beam. Drag the boat — whatever the beam touches lights up. | PingLive · faisceau de 135° × 20°. Déplacez le bateau : tout ce que le faisceau touche s’allume. | glossary faisceau · 中高 |
+| 面板说明 | PingLive · 135° × 20° beam. Drag the boat — whatever the beam touches lights up. | PingLive · faisceau de 135° × 20°. Déplacez le bateau : tout ce que le faisceau touche s’allume. | faisceau 照店铺（large faisceau de 78°）；后半句自译 · 中高 |
 | 面板说明（冰钓） | …beam, through the ice. Tap the ice to drill a new hole — … | …faisceau de 39° × 18°, à travers la glace. Touchez la glace pour percer un nouveau trou : … | 中高 |
 | 拖船提示 | Drag the boat to move it | Glissez le bateau pour le déplacer | 中高 |
 | 冰钓提示 | Tap the ice to drill a hole | Touchez la glace pour percer un trou | 中高 |
@@ -37,10 +42,10 @@ PingLive、PingLive Mini、Down Scan、CHIRP、AUTO、数字和单位不翻。
 | 冰钓步骤 2 | The flasher is the dial: the bottom, your bait and every fish that rises, by depth around the ring. The panel beside it draws the same fish as marks. | Le cadran, c’est le flasher : le fond, votre appât et chaque poisson qui monte, par profondeur autour de l’anneau. Le panneau à côté dessine les mêmes poissons en marques. | 中低（flasher 在魁北克是否直接用英文词要核） |
 | 冰钓步骤 3 | Look ahead without drilling | Voir devant sans percer | 中 |
 | 冰钓步骤 3 | Forward View turns the beam sideways: fish and structure 60 ft away, under ice you never cut. | La vue vers l’avant tourne le faisceau sur le côté : poissons et structures à 60 pi, sous une glace que vous n’avez jamais percée. | 中（60 ft → 60 pi） |
-| 去商店按钮 | Shop PingLive / Shop PingLive Mini | Magasiner PingLive / Magasiner PingLive Mini | 高（魁北克） |
-| App 首页格子（PingLive） | Panoramic View / Forward View / Down View | Vue panoramique / Vue vers l’avant / Vue vers le bas | glossary · 高 |
-| App 首页格子（Mini） | Live Panoramic, Live Forward, Live Down, Live Combo, Down Scan, Chirp Sonar, Ice Fishing, Live Ice Fishing | 未翻（照 app 原样） | glossary app-view-names 标“pending T-066”、registered-feature-names = en。**网站 T-066 定了再改** |
-| App 首页标签栏 | Setting / Home / Map | Réglages / Accueil / Carte | 中高（真 app 的法文版怎么写要核） |
+| 去商店按钮 | Shop PingLive / Shop PingLive Mini | Acheter PingLive / Acheter PingLive Mini | 店铺首页按钮是 Achetez maintenant →，这里带产品名所以用不定式 Acheter；若要完全照抄就改成 Achetez maintenant → · 中高 |
+| App 首页格子（PingLive） | Panoramic View / Forward View / Down View | Vue panoramique / Vue vers l’avant / Vue vers le bas | 店铺 + glossary · 高 |
+| App 首页格子（Mini） | Live Panoramic, Live Forward, Live Down, Live Combo, Down Scan, Chirp Sonar, Ice Fishing, Live Ice Fishing | 未翻（照 app 原样） | glossary app-view-names 标“pending T-066”、registered-feature-names = en。店铺产品页对应写法：Vue combinée · Vue vers le bas · Vue vers l’avant · Vue traditionnelle · Balayage vers le bas。**网站 T-066 定了再改** |
+| App 首页标签栏 | Setting / Home / Map | Réglages / Accueil / Carte | Accueil 照店铺导航；Réglages / Carte 自译 · 中高（真 app 的法文版怎么写要核） |
 | App 首页弹窗 | Available with Accuphy PingLive Mini | Offert avec le Accuphy PingLive Mini | 中 |
 | 手机框里的 App 字样 | AUTO、1440p (QHD)、ft、°C、V、% | 不翻 | 和 app 一样 |
 
