@@ -2,8 +2,8 @@
 
 > 状态（2026-10-26 更新）
 > 阶段：X-6L Lab 上线执行，目标 10-30 做完、10-31～11-1 真机测，11/2 广告开投；域名定为 lab.accuphy.ca（Jason，经总管）
-> 进行中：湖面波纹 · Jason 10-26“差别不大 但是水面波纹还是很糟糕”（天空定 A）· “冰钓版本视觉效果”对照真实湖面航拍重做波纹；湖面接免费的天空照片 + 水波法线图 · 做完（30c17d0，#162，只在本地，+154 kB，许可证在 assets/LICENSES.md），HQ 看过；湖面 B+C · 做完（e9505ae，#161，只在本地），HQ 看过对比图；真机帧率还没测（平板不在）；拖船提示停船后重新出现 · 做完（250016d，#160，只在本地），跟下一次上传一起上线；X-6L-fr Lab 法文版（?lang=fr）· 代码做完，HQ 核过（bfc43d6，#159）· 网站已核字表（eddba1a5），“手机网页端”照改，10-27 晚交 HQ 核，再请 Jason 说“动”上传；上线后复查 frame-ancestors（网站要在 myshopify 预览和主题编辑器里测，所以留着 *.myshopify.com、admin.shopify.com；网站不再需要时再收紧）；X-6L-2/3/4 · 代码做完，HQ 核过（#157，0f74eb7…4991453），按钮方案 B 已做完，HQ 核过（afc9af3，docs/2026-10-25-shop-button-final.jpg）；等 Jason 说“动”再上传 Vercel；#153 鱼回波 · 私密预览；冰钓页 · “冰钓版本视觉效果”
-> 等 Jason：C 的船尾浪和 #91 去掉的“三条射线浪”要分清）· 10-26 起；做不做法文版（网站可以在框网址上加 ?lang=fr）· 10-26 起；#153 · 新鱼回波看法 · 10-24 起；#154 · Forward AUTO 深度留不留 · 10-25 起
+> 进行中：湖面波纹 · 第 2 版做完（544316a，#163，只在本地）：斜纹没了，但比真实湖面暗、糊、没层次（HQ 看法）；湖面接免费的天空照片 + 水波法线图 · 做完（30c17d0，#162，只在本地，+154 kB，许可证在 assets/LICENSES.md），HQ 看过；湖面 B+C · 做完（e9505ae，#161，只在本地），HQ 看过对比图；真机帧率还没测（平板不在）；拖船提示停船后重新出现 · 做完（250016d，#160，只在本地），跟下一次上传一起上线；X-6L-fr Lab 法文版（?lang=fr）· 代码做完，HQ 核过（bfc43d6，#159）· 网站已核字表（eddba1a5），“手机网页端”照改，10-27 晚交 HQ 核，再请 Jason 说“动”上传；上线后复查 frame-ancestors（网站要在 myshopify 预览和主题编辑器里测，所以留着 *.myshopify.com、admin.shopify.com；网站不再需要时再收紧）；X-6L-2/3/4 · 代码做完，HQ 核过（#157，0f74eb7…4991453），按钮方案 B 已做完，HQ 核过（afc9af3，docs/2026-10-25-shop-button-final.jpg）；等 Jason 说“动”再上传 Vercel；#153 鱼回波 · 私密预览；冰钓页 · “冰钓版本视觉效果”
+> 等 Jason：湖面波纹第 2 版的看法（docs/2026-10-26-lake-ripples-desktop.jpg）· 10-26 起；C 的船尾浪和 #91 去掉的“三条射线浪”要分清）· 10-26 起；做不做法文版（网站可以在框网址上加 ?lang=fr）· 10-26 起；#153 · 新鱼回波看法 · 10-24 起；#154 · Forward AUTO 深度留不留 · 10-25 起
 > 卡住：无（网站在做店铺页 3 个文件和转交代码，交接单 `accuphy-website/handoffs/2026-10-23-lab-store-page.md`）
 > 本周做完：X-6L Lab 上线 · https://lab.accuphy.ca 新版（按钮 B、accuphy:lab、/embed/）· docs/versions.md · HQ 自查（四个地址 200、头信息对、Vercel 显示配置正确），网站 HQ 也核过；网站预览里的框已经换成 lab.accuphy.ca；#102 Lab 上 Vercel · https://accuphy-lab.vercel.app（docs/versions.md）· HQ 自查（三页 200、头信息对、无报错），未经别的聊天核；#150–#156 · `docs/decisions.md` #150–#156 + 各自的提交 · 自称（还没别的聊天核过）
 
