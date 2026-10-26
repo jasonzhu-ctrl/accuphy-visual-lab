@@ -2677,3 +2677,37 @@ Numbered log. Newest at the bottom.
        MIT, WebGL2 + three.js spectral FFT ocean). It does not repeat at any scale. **Open for Jason:** whether to
        port its spectrum + FFT (lake settings, 128–256², phone-light) into our Water.
      - Local only; not uploaded.
+
+165. **2026-10-26** — **The lake's waves come from a real wind-sea spectrum (FFT), after ABYSSAL** (Jason in this chat:
+     "动，把 ABYSSAL 的做法接进湖面，先在本地做手机也能跑的轻量版").
+     - **What:** `lakeFFT.js`, adapted from ABYSSAL (squall01337/abyssal-ocean, MIT; the notice is in
+       `assets/LICENSES.md`).
+       - The spectrum is JONSWAP + TMA + Donelan–Banner spreading, Tessendorf h0 and its time evolution, butterfly FFT,
+         for a lake: wind 4.2 m/s, fetch 3 km, depth 18 m.
+       - Only the slopes are kept (∂h/∂x + i·∂h/∂z as one complex field), so one RGBA FFT carries two cascades.
+       - Three cascades with unrelated tiles (131 / 23.7 / 5.3 m), so nothing repeats at any scale.
+       - Each cascade fades once its texels shrink below a few pixels; mipmaps do the rest. The water reads the slopes
+         instead of #156–#164's hand-made wave sums, crests and ripple map.
+       - Gust lanes and cat's paws still modulate them softly (0.6–1.4).
+       - Gain 0.7 (1.0 read choppy from 60 m; dev aid `?fftgain=`).
+       - Kept unchanged: the sky photo, Fresnel, glints, glitter path and fog. The wake is lowered to 0.8, so its
+         regular bars do not stand out.
+       - `waternormals.jpg` was deleted.
+     - **Desktop / phone:**
+       - Desktop: 256², all three cascades, every frame.
+       - Phones (coarse pointer or ≤ 820 px): 128², only cascades A + B, every other frame.
+       - Dev aid: `?fftn=64|128|256|512`.
+       - Float render targets if `EXT_color_buffer_float` is there, else half float.
+     - **Frame time (#50):** headless laptop GPU, vsync off, interleaved against #164.
+       - 390×844 @3× (phone path): 1.98 → 2.12 ms at rest (+7 %), 2.20 → 2.24 ms during a wake.
+       - 1920×1200: 6.04–6.08 → 6.78–7.22 ms (+12–18 %).
+       - 2560×1600: 8.6 → 9.5–9.7 ms (+11 %).
+       - The FFT is a fixed cost, not tied to the screen size. On the V10 expect roughly −0.5 fps, an estimate only.
+         **Measure on the V10 before this ships.**
+     - **Comparison:** #163 / #164 / #165 / references (ABYSSAL looking down, a dark lake, Accuphy's animation,
+       Viljamaanjärvi) in `docs/2026-10-26-lake-fft-desktop.jpg` and `-phone.jpg`.
+     - **Share build:** 2,812,245 → 2,729,144 bytes (the ripple map is gone). It runs with 0 console errors on desktop
+       and phone.
+     - **Ice page (#94):** untouched; it has no Water mesh, so no FFT runs there (checked desktop + phone).
+     - **Other checks:** the wake is checked; 0 console errors.
+     - Local only; not uploaded.

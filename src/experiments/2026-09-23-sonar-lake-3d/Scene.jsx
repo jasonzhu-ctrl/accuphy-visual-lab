@@ -22,7 +22,7 @@ import { IceSky, IceSheet, IceCamp, IceWalls, Snowfall, IcePick, LightShaft, Mar
 import { makeIceMaterial } from './iceSheet'
 import { bakeTerrain } from './sonarMarks'
 import lakeSkyUrl from './assets/lake-sky.jpg?inline' // the sky mirrored in the summer lake (#162): a CC0 photo, see assets/LICENSES.md
-import rippleMapUrl from './assets/waternormals.jpg?inline' // ripple normals (#162): MIT, see assets/LICENSES.md
+import { makeLakeFFT, FFT_L } from './lakeFFT' // the waves: a wind-sea spectrum by FFT (#165, after ABYSSAL, MIT, see assets/LICENSES.md)
 import { iceParams, ICE_CAM_T, ICE_CAM_D, ICE_LAKE_W, ICE_FOG, UNDER_CAM, SECTION_CAM, SECTION_CAM_PHONE, ICE_T, dir } from './iceScene'
 
 // ---------- lakebed ----------
@@ -278,6 +278,9 @@ function Fish({ mat, state }) {
 // placed ahead of the camera and the glitter path following that sun; the fine ripples near the camera come from a real
 // water normal map (three.js / jbouny, MIT, 512², ~66 kB), two copies drifting at different scales, instead of two value
 // noise layers. Both are inlined into the code (?inline), so the single-file share build carries them.
+// #163–#164 reworked the ripples against drone photos and dark deep-water references, but hand-made wave sums always
+// showed their few shapes again. Jason 2026-10-26 (#165, "动，把 ABYSSAL 的做法接进湖面"): the waves now come from a real
+// wind-sea spectrum summed by an FFT every frame (lakeFFT.js, after ABYSSAL, MIT); the ripple normal map is gone.
 const WAKE_N = 16, WAKE_STEP = 1.2, WAKE_KEEP = 8, WAKE_RES = 256 // path points kept for the wake: one every 1.2 m, for 8 s
 // the sky photo: where its sun is in the image (azimuth along the width, found from the HDR's brightest pixel). The sky
 // is turned so its sun stands SUN_AHEAD rad right of the default view direction; the glitter path is drawn from a sun
@@ -350,10 +353,14 @@ function makeWakeMap() {
 function Water({ state }) {
   const wake = useMemo(makeWakeMap, [])
   useEffect(() => () => { wake.rt.dispose(); wake.mat.dispose() }, [wake])
+  const gl = useThree((st) => st.gl)
+  const fft = useMemo(() => makeLakeFFT(gl), [gl])
+  useEffect(() => () => fft.dispose(), [fft])
   const mat = useMemo(() => new THREE.ShaderMaterial({
     transparent: true, depthWrite: false, side: THREE.DoubleSide,
     uniforms: { uTime: { value: 0 }, uSky: { value: new THREE.Color('#9cc1cf') },
-      uSkyMap: { value: loadTex(lakeSkyUrl, false) }, uSkyRot: { value: 0 }, uSunP: { value: new THREE.Vector3(0, 1, 0) }, uRipples: { value: loadTex(rippleMapUrl, true) },
+      uSkyMap: { value: loadTex(lakeSkyUrl, false) }, uSkyRot: { value: 0 }, uSunP: { value: new THREE.Vector3(0, 1, 0) },
+      uFft0: { value: fft.tex[0] }, uFft1: { value: fft.tex[1] }, uFftL: { value: new THREE.Vector3(...FFT_L) }, uFftN: { value: fft.n }, uFftC: { value: fft.fine }, uFftGain: { value: import.meta.env.DEV ? +((/fftgain=([\d.]+)/.exec(window.location.search) || [])[1] || 0.7) : 0.7 }, // 0.7 of the spectrum's slope (1.0 read choppy from 60 m); dev: ?fftgain=
       uWakeMap: { value: wake.rt.texture }, uMap: { value: new THREE.Vector4(0, 0, 1, 0) } }, // uMap: centre x, z, size (m), on
     vertexShader: /* glsl */ `
       varying vec3 vW;
@@ -361,68 +368,33 @@ function Water({ state }) {
     `,
     fragmentShader: /* glsl */ `
       precision highp float; varying vec3 vW; uniform vec3 uSky; uniform float uTime;
-      uniform sampler2D uSkyMap; uniform float uSkyRot; uniform vec3 uSunP; uniform sampler2D uRipples;
+      uniform sampler2D uSkyMap; uniform float uSkyRot; uniform vec3 uSunP;
+      uniform sampler2D uFft0, uFft1; uniform vec3 uFftL; uniform float uFftN, uFftGain, uFftC;
       uniform sampler2D uWakeMap; uniform vec4 uMap;
       ${WATER_NOISE}
       void main() {
         float t = uTime;
         vec2 x = vW.xz;
         float foot = length(fwidth(x)); // metres per pixel here
-        // how rough the water is here (#163, from drone photos of real lakes, docs/2026-10-26-lake-ripples.md): a lake in a
-        // light breeze is mostly glassy, with wind lanes (~40–80 m) and inside them cat's paws, gust patches 8–25 m across
-        // that run downwind and change shape; only those carry the fine ripples. Not one even texture over everything.
+        // the waves: a real wind-sea spectrum, summed by an FFT every frame (#165, lakeFFT.js, after ABYSSAL, MIT). Three
+        // cascades of unrelated tile sizes, so nothing repeats; each fades once its texels shrink below a few pixels, so far
+        // water turns into a sheen instead of a grain (the mipmaps do the rest)
+        vec4 sAB = texture2D(uFft0, x / uFftL.x);
+        vec2 sB = texture2D(uFft0, x / uFftL.y).zw, sC = texture2D(uFft1, x / uFftL.z).xy;
+        float tB = uFftL.y / uFftN, tC = uFftL.z / uFftN;                       // metres per texel
+        vec2 g = sAB.xy + sB * (1.0 - smoothstep(tB * 2.0, tB * 8.0, foot)) + sC * uFftC * (1.0 - smoothstep(tC * 2.0, tC * 8.0, foot));
+        // gusts: a lake's breeze is never even. Wind lanes (~40–80 m) and cat's paws (8–25 m, running downwind) make the
+        // sea a little rougher or calmer in soft patches (#163/#164), on top of the spectrum's own variety
         vec2 wind = normalize(vec2(-0.55, -0.83));
         float gust = vnoised(x * 0.018 - wind * t * 0.035).z * 0.65 + vnoised(x * 0.05 + 7.3 - wind * t * 0.06).z * 0.35;
-        float lane = smoothstep(0.3, 0.66, gust);                              // 0 a calm slick … 1 a wind lane
-        vec2 pq = x - wind * t * 0.8;                                           // the paws run downwind, ~1 m/s
-        float paw = smoothstep(0.46, 0.74, vnoised(pq * 0.075 + 2.1).z * 0.7 + vnoised(x * 0.2 - wind * t * 0.35 + 5.7).z * 0.3);
-        float rough = 0.35 + 0.3 * lane + 0.4 * paw;                           // #164: softer than #163's slicks, so it never mottles
-        // the wind sea: a few low directional waves round the wind, slope summed analytically, each faded once a pixel
-        // covers a third of its wavelength; low, so far off a gentle swell only stretches the sky's reflection
-        vec2 g = vec2(0.0);
-        float wan = 6.2832 * vnoised(x * 0.045 + 1.3).z; // the phases wander, so the crests are not ruled lines
-        for (int i = 0; i < 4; i++) {
-          float fi = float(i);
-          float lam = 7.0 * pow(0.62, fi);                                   // 7 m … 1.7 m (shorter ones drew a ruled grain over the whole lake)
-          float ang = (hash(vec2(fi, 3.7)) - 0.5) * 2.4;                       // ±69° round the wind: no single grain
-          vec2 d = mat2(cos(ang), -sin(ang), sin(ang), cos(ang)) * wind;
-          float k = 6.2832 / lam, w = sqrt(9.81 * k);                         // deep-water dispersion
-          float sl = 0.03 * (0.6 + 0.8 * hash(vec2(fi, 9.1)));                // each wave's slope
-          float fade = 1.0 - smoothstep(lam * 0.12, lam * 0.35, foot);
-          g += d * sl * cos(dot(d, x) * k - w * t + fi * 1.7 + wan * (0.6 + 0.35 * fi)) * fade;
-        }
-        // the ripples a breeze raises (0.6–1.6 m, ~5 to the boat's length): short crests across the wind, bent into
-        // crescents by a warp and each living only in small groups, so they read as the photos' scattered ripples, never
-        // as ruled lines; they fade with the pixel's footprint, so far water turns to a sheen, never to a fine grain.
-        // Skipped where the water is glassy or too far to show them.
-        float nearR = 1.0 - smoothstep(0.35, 0.9, foot);
-        if (rough * nearR > 0.04) {
-          vec2 cq = x + 1.4 * vec2(vnoised(x * 0.32 + 2.7).z, vnoised(x * 0.32 + 8.3).z);
-          // a soft irregular undulation from the water normal map (#162): one copy, 22 m, read a little blurred (its
-          // fine grit read as stone) through the same warp, so its repeat never lines up
-          vec2 r1 = texture2D(uRipples, mat2(0.8, -0.6, 0.6, 0.8) * cq / 22.0 + wind * t * 0.02, 1.5).xy * 2.0 - 1.0;
-          g += r1 * 0.25 * nearR;
-          // the groups: one noise serves two wavelengths (one lives where the other does not)
-          float gA = vnoised(x * 0.75 - wind * t * 0.4).z, gB = vnoised(x * 1.25 + 7.1 - wind * t * 0.4).z;
-          for (int i = 0; i < 4; i++) {
-            float fi = float(i);
-            float lam = 1.6 * pow(0.72, fi);                                   // 1.6 … 0.6 m
-            float ang = (hash(vec2(fi, 5.3)) - 0.5) * 1.3;                       // ±37° round the wind
-            vec2 d = mat2(cos(ang), -sin(ang), sin(ang), cos(ang)) * wind;
-            float k = 6.2832 / lam, w = sqrt(9.81 * k + 7.4e-5 * k * k * k);          // gravity + surface tension
-            float n = i < 2 ? gA : gB; n = (i == 1 || i == 3) ? 1.0 - n : n;
-            float grp = smoothstep(0.15, 0.9, n);                              // short-crested: patches a few crests long
-            float fade = 1.0 - smoothstep(lam * 0.15, lam * 0.45, foot);
-            g += d * 0.07 * cos(dot(d, cq) * k - w * t + fi * 2.3) * grp * fade * nearR;
-          }
-        }
-        g *= rough;
+        float paw = smoothstep(0.46, 0.74, vnoised((x - wind * t * 0.8) * 0.075 + 2.1).z);
+        g *= uFftGain * (0.6 + 0.45 * smoothstep(0.3, 0.66, gust) + 0.35 * paw);
         // the boat's wake, from the wake map (makeWakeMap); the foam's grain is per pixel
         float foam = 0.0;
         vec2 wu = (x - uMap.xy) / uMap.z + 0.5;
         if (uMap.w > 0.5 && wu.x > 0.0 && wu.y > 0.0 && wu.x < 1.0 && wu.y < 1.0) {
           vec4 W = texture2D(uWakeMap, wu);
-          g += W.xy * 1.2; // as strong as before #164 lowered the ripples' shading below (6 → 5)
+          g += W.xy * 0.8; // #165: lower than before, so the wake's regular bars do not stand out of the spectrum's random sea
           float churn = vnoised(x * 2.2 + t * 0.3).z * 0.6 + vnoised(x * 5.0 - t * 0.5).z * 0.4;
           foam = smoothstep(0.45, 0.8, churn + 0.3 * W.z) * W.z * 0.8 + W.w * (0.5 + 0.5 * churn); // the trail, and white tops on the arms' crests
         }
@@ -463,11 +435,12 @@ function Water({ state }) {
         gl_FragColor = vec4(mix(col, uSky, fog), mix(clamp(alpha + sun, 0.0, 1.0), 1.0, fog));
       }
     `,
-  }), [])
+  }), [fft])
   const trail = useMemo(() => [], [])
   useFrame(({ clock, gl }) => {
     const now = clock.elapsedTime
     mat.uniforms.uTime.value = now
+    fft.step(now)
     LAKE_TIME.value = now // the light patterns on the shallows (lakeMaterial)
     { // the sky drifts a little (±7°, over minutes), its sun with it
       const az = VIEW_AZ + SUN_AHEAD + 0.12 * Math.sin(now * 0.012), el = THREE.MathUtils.degToRad(GLITTER_EL)

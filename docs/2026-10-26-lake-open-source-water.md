@@ -1,8 +1,8 @@
 # Lake water — open-source water code on GitHub (2026-10-26)
 
 Jason, 2026-10-26, in this chat, after round 3 (#164): "你要不还是去网上找找模型吧，也不要仅限于那种买模型的网站，可以看看
-GitHub 什么的，或者是这种大家做 AI 做出来的这种，开源的、commercial 使用不需要付钱的这种。" Research only. Nothing has been
-wired into the Lab.
+GitHub 什么的，或者是这种大家做 AI 做出来的这种，开源的、commercial 使用不需要付钱的这种。" Research first; Jason then said
+"动", and ABYSSAL's approach was built in as decision #165 (`lakeFFT.js`, comparison `docs/2026-10-26-lake-fft-desktop.jpg`).
 
 **Conditions:**
 - The licence allows free commercial use: MIT, BSD, Apache or CC0. No licence = not usable.
@@ -55,4 +55,4 @@ Estimate only; not measured.
   它用真实的风浪统计算出成千上万个小波浪叠在一起，所以怎么看都**不会重复**。往下看是深蓝绿色、细碎自然的波纹，正是你说的那种。
 - 其他几个要么只能用新的 WebGPU（要重做声纳，不行），要么没有许可证，要么效果不如它。
 - 它原版很吃显卡（给海洋用的）。湖面只需要它的一小部分，可以做成手机也能跑的轻量版。真机速度要测了才知道。
-- 还没接进代码，等你说"动"。
+- 你说"动"之后已经接进来了（#165），本地，没上传。

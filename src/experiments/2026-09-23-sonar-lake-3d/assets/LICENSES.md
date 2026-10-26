@@ -1,7 +1,7 @@
-# Third-party images in this folder
+# Third-party material in this folder
 
-Both are inlined into the page's code (`?inline` imports in `Scene.jsx`), so they ship in every build, including the
-single-file share build. Decision #162.
+The image is inlined into the page's code (`?inline` import in `Scene.jsx`), so it ships in every build, including the
+single-file share build (decision #162). The waves' code is adapted from an MIT project (#165).
 
 ## lake-sky.jpg — the sky mirrored in the summer lake
 
@@ -16,36 +16,40 @@ single-file share build. Decision #162.
   - `evening_road_01_puresky` (Jarod Guest, Sergej Majboroda);
   - `kloofendal_38d_partly_cloudy_puresky` (Greg Zaal, Jarod Guest).
 
-## waternormals.jpg — the fine ripples on the summer lake
+## lakeFFT.js — the lake's waves (code, not an image)
 
-- **Source:** `examples/textures/waternormals.jpg` in three.js
-  (https://github.com/mrdoob/three.js/blob/dev/examples/textures/waternormals.jpg). It was imported into three.js in 2014
-  from Jérémy Bouny's Ocean shader (https://github.com/jbouny/ocean).
-- **Licence:** MIT. Both projects are MIT; neither gives the image a separate licence. The notice is reproduced
-  below, as the MIT licence requires.
-- **What we did:** resized it from 1024² to 512². JPEG quality 88, 66 kB.
+- **Source:** adapted from ABYSSAL by Sacha (@squall01337), https://github.com/squall01337/abyssal-ocean (read
+  2026-10-26). Taken: the wind-sea spectrum (JONSWAP + TMA + Donelan–Banner spreading), the Tessendorf h0 and its time
+  evolution, and the butterfly-texture inverse FFT. Cut down to surface slopes only, for a lake. Decision #165.
+- **Licence:** MIT. The notice:
 
 ```
-The MIT License (MIT)
+MIT License
 
-Copyright (c) 2013 Jérémy Bouny
+Copyright (c) 2026 Sacha (@squall01337)
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
-the Software, and to permit persons to whom the Software is furnished to do so,
-subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
 The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 ```
+
+## Removed
+
+- `waternormals.jpg` (three.js / jbouny, MIT) was used from #162 to #164 for fine ripples. The FFT replaced it in #165, and
+  the file was deleted.
 
 three.js: Copyright © 2010–2026 three.js authors, MIT licence (https://github.com/mrdoob/three.js/blob/dev/LICENSE).
