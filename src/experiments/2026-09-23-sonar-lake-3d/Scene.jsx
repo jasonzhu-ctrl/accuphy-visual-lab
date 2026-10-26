@@ -368,7 +368,8 @@ function Boat({ state, beamMats }) {
   const contact = useMemo(makeWaterContact, [])
   // the drag cue (#132; the glass pill with its arrow read as generic UI — the ice page's #123 reticle is the language):
   // a thin white reticle lying on the water round the hull — four arcs of an ellipse with gaps fore, aft and abeam, a
-  // chevron off the bow and the stern, and a ripple that spreads out of it every 2.6 s. Shown until the first drag.
+  // chevron off the bow and the stern, and a ripple that spreads out of it every 2.6 s. Hidden while the boat is dragged
+  // or still moving; back ~1.2 s after it has come to rest (Jason 2026-10-26: 船停下来之后，这个东西就可以出现).
   const reticle = useMemo(() => {
     const g = new THREE.Group()
     const mat = new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0.85, depthWrite: false, side: THREE.DoubleSide })
@@ -393,9 +394,13 @@ function Boat({ state, beamMats }) {
     group.current.position.set(s.boat.x, 0.02, s.boat.z)
     s.apex.copy(TRANSDUCER_OFFSET).add(group.current.position)
     setBeamUniforms(beamMats, s.specs, s.apex)
-    { // the drag cue: breathes a little, ripples every 2.6 s, fades out after the first drag
+    { // the drag cue: breathes a little, ripples every 2.6 s; out during a drag, back once the boat has settled.
+      // s.cueHide also gates the caption (Rig); the ice page leaves it unset and keeps its own rule (hidden after the first tap)
+      const moving = s.dragging || Math.hypot(s.target.x - s.boat.x, s.target.z - s.boat.z) * 4 > 0.25 // m/s, as `speed` below
+      s.stillT = moving ? 0 : (s.stillT ?? 0) + Math.min(dt, 0.1)
+      s.cueHide = !!s.hasDragged && s.stillT < 1.2
       const r = reticle.userData, tt = clock.elapsedTime
-      r.fade += ((s.hasDragged ? 0 : 1) - r.fade) * Math.min(1, dt * 5)
+      r.fade += ((s.cueHide ? 0 : 1) - r.fade) * Math.min(1, dt * (s.cueHide ? 5 : 2.5)) // out quickly, back gently
       reticle.visible = r.fade > 0.02
       if (reticle.visible) {
         const u = Math.min(1, (tt % 2.6) / 1.6), grow = 1 + 0.45 * (1 - (1 - u) * (1 - u))
@@ -550,7 +555,7 @@ function Rig({ state, sonarRect, fogMats, cam = LAKE_CAM }) {
       }
       const qy2 = anchorTop ? top : top + h
       s.hintEl.style.transform = `translate(${qx.toFixed(1)}px, ${qy2.toFixed(1)}px) translate(-50%, ${anchorTop ? '0' : '-100%'})`
-      s.hintEl.style.opacity = s.hasDragged || s.hintOff ? '0' : '1' // hintOff: a sideways phone with the sonar full-screen (#140)
+      s.hintEl.style.opacity = (s.cueHide ?? s.hasDragged) || s.hintOff ? '0' : '1' // cueHide: the lake, back after the boat stops (Boat); the ice page: gone after the first tap. hintOff: a sideways phone with the sonar full-screen (#140)
     }
     // fixed 3/4 aerial view like the PL animations; slight parallax from the pointer
     const px = s.parallax.x, py = s.parallax.y

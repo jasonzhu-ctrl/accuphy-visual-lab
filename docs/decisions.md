@@ -2555,3 +2555,12 @@ Numbered log. Newest at the bottom.
        engine's 18° stays), the ice step 3 drops "60 ft". Checked again at 1280×800 and 375×812 on both pages: the
        longest tile name "Pêche sur glace en direct" wraps to two lines inside its tile, nothing overflows.
        Screenshots: `docs/2026-10-26-lab-fr-screens.jpg`.
+
+160. **2026-10-26** — **The boat's drag cue comes back once the boat has stopped** (Jason via Lab HQ: "船的那个 drag 的这个标签，好像动过之后就不行了，它就消失了 … 船停下来之后，这个东西就可以出现").
+     - Summer lake: the reticle round the hull and the caption "Drag the boat to move it" hide while the boat is dragged
+       or still moving (> 0.25 m/s) and fade back in ~1.2 s after it has settled (about 2.5–3 s after release); the next
+       drag hides them again. `s.cueHide` (Boat in Scene.jsx) drives both. `first_drag` still fires once.
+     - Ice page unchanged: its reticle and caption stay gone after the first tap (`s.cueHide` is unset there, the caption
+       falls back to `hasDragged`).
+     - Checked locally: desktop 800×600 and phone 375×812 — caption opacity 1 → 0 within 0.5 s of the drag, back to 1 at
+       ~2.8 s; ice page hint still gone after a tap; no console errors. Not uploaded.
