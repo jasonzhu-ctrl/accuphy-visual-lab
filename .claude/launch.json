@@ -1,6 +1,7 @@
 {
   "version": "0.0.1",
   "configurations": [
-    { "name": "lab", "runtimeExecutable": "npm", "runtimeArgs": ["run", "dev"], "port": 5173 }
+    { "name": "lab", "runtimeExecutable": "npm", "runtimeArgs": ["run", "dev"], "port": 5173 },
+    { "name": "ice-environment", "runtimeExecutable": "npm", "runtimeArgs": ["--prefix", "exports/ice-environment", "run", "dev"], "port": 5180 }
   ]
 }

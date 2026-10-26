@@ -2512,3 +2512,16 @@ Numbered log. Newest at the bottom.
        an iframe stand-in received the same three by postMessage; the summer lake and the ice page both show the
        button at desktop and phone size with no console errors (#94 rule).
      - **Not done here (HQ / Jason):** the domain lab.accuphy.ca (needs Jason's 动), uploading to Vercel, the Shopify side.
+
+158. **2026-10-25** — **The ice environment as a standalone package for other projects** (Jason: "冰钓版本的整体环境但是不带声纳啊打洞啊探照啊的部分的 能不能给我一个包裹 我要给其他ai做别的项目用"; format chosen: a runnable small project).
+     - `exports/ice-environment/` (and `exports/ice-environment.zip`, 96 kB, no node_modules): Vite + React 19 + three r186
+       + R3F 9, `npm install && npm run dev` → port 5180 (`.claude/launch.json` entry `ice-environment`). One component,
+       `<IceEnvironment time look cutaway focus lift background />`, plus a demo with an orbit camera and a preset panel.
+     - Kept: sky dome, ice sheet with snow relief, snowfall and marine snow, shelter + sled + lamp, lakebed, timber,
+       weeds, rocks, both wrecks, swimming fish (gathered near the camp), the cutaway faces; the three times and looks.
+     - Removed: sonar engine and screen, the Mini and pole rig, auger and drilling, hole hopping, beams and the beam
+       window, holes and their light shaft, the cut-away pool, the lakebed logo. `lakeMaterial.js` and `iceMaterial.js`
+       are cleaned copies (no sonar passes, no beam uniforms); `fish.js` without the dev test fish.
+     - It is a copy: changes to the Lab's ice page do not flow into it. README (English + Chinese) is the brief for the
+       other AI. Checked: no console errors, all presets, cutaway on/off, orbit above and under the ice, ~55 fps on the
+       laptop, and a clean build from the unzipped copy.
