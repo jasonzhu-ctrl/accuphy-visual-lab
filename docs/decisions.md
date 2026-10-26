@@ -2770,3 +2770,20 @@ Numbered log. Newest at the bottom.
        - The captions are drafts: EN to Klaviyo HQ, FR to the website HQ.
        - The fish are small in the ice clip and the Mini Forward clip.
      - Details and the caption table: `docs/2026-10-26-bf-ad-clips.md`. Not uploaded anywhere.
+
+169. **2026-10-26** — **"Send to a friend" and the App badges — two placements for Jason, off until he picks** (BF funnel
+     handoff items 1–2, dispatched by Lab HQ: 先出 2 个样子给 Jason 看，不直接定). Local only; nothing shows without
+     `?extras=a|b`.
+     - **Share** (`ShareButton.jsx`): the system share sheet where it exists (`navigator.share`); otherwise a small menu
+       with WhatsApp, text message and "Copy link" (Facebook's Android browser). What goes out is the store page
+       `shop.accuphy.com/pages/lab?ref=share` (`/fr/…` in French) with a short line, never the Lab's own address;
+       each send reports `share` with `{ channel }` (system / whatsapp / sms / copy). No reward wording.
+     - **Badges** (`AppBadges.jsx`, `badges/`): the official black App Store (en, fr-CA SVG) and Google Play (en, fr-CA PNG)
+       badges, linking to the store's own app pages (App Store id6743123048, Play com.accuphy.sonar). Google Play carries
+       `referrer=utm_source=accuphy-lab&utm_medium=referral`; the App Store link is plain until the provider token
+       arrives. A tap reports `app_badge` with `{ store }`.
+     - **Placements:** **A** desktop: a row under the Shop button in the panel (share + badges); phones: the share icon beside
+       the Shop pill on the frame's top edge, the badges top-left. **B** desktop: a glass strip under the step cards' row,
+       right; phones: a strip across the top (share icon + badges). Both checked at 1280×800 and 375×812, the fallback
+       menu too; no console errors. Screenshots: `docs/2026-10-26-share-badges-options.jpg`. The loser is removed once
+       Jason picks; the strings are in `i18n.js` (en / fr, the French still to be reviewed by the website HQ).

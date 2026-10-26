@@ -34,6 +34,7 @@ export function isEmbedded() {
 const STORE = 'https://shop.accuphy.com'
 export const PRODUCT = { PL: 'pinglive-sonar', PLM: 'pinglive-mini' }
 const LANG = (() => { try { return new URLSearchParams(window.location.search).get('lang') === 'fr' ? 'fr' : 'en' } catch { return 'en' } })() // ?lang=fr → the store's French pages (/fr/products/…), X-6L-fr
+export const LANG_PATH = LANG === 'fr' ? '/fr' : ''
 
 export function storeOrigin() {
   try {

@@ -15,6 +15,10 @@ import { isSignedUp } from './signup'
 import { labEvent, PRODUCT, sentEvents } from './embed'
 import ShopButton from './ShopButton' // the one link to the store (X-6L, 2026-10-25; placement B, Jason)
 import { t } from './i18n' // every visitor-visible string, English or French (?lang=fr; X-6L-fr)
+import ShareButton from './ShareButton'
+import AppBadges from './AppBadges'
+// BF funnel items 1–2 (handoff 2026-10-26): two placements for Jason to pick (HQ: 先出 2 个样子，不直接定); off until he does
+const EXTRAS = (() => { try { const v = new URLSearchParams(window.location.search).get('extras'); return v === 'a' || v === 'b' ? v : null } catch { return null } })()
 import { depthAt } from './terrain'
 import { panoHalfWidth } from './sonarMarks'
 // dev: ?bigphone makes the phone huge so the sonar picture can be inspected in screenshots
@@ -59,8 +63,9 @@ export const meta = {
   description: '3D lake with real-scale structure and NA fish; PL/PLM beam volumes reveal the bottom; the app screen (computed from the scene) on an iPhone. Drag the boat.',
 }
 
-// lab="fish": the fish-echo test page (2026-10-24-sonar-fish-echo, #153) — fish drawn from their 3D bodies as the transducer
-// sees them; ?fish=marks there switches back to today's marks for A/B, ?fishsize=1.6 enlarges the sonar fish
+// lab="fish": the fish-echo test page (2026-10-24-sonar-fish-echo, #153). Since #169 every page draws the fish from their
+// 3D bodies as the transducer sees them (#153 round 3, true size); dev only: ?fish=marks shows the old #120 marks for A/B,
+// ?fishsize=1.6 enlarges the sonar fish, and the test page shows its two switches
 export default function SonarLake3D({ scene: sceneProp, lab }) {
   const scene = sceneProp || SCENE_ENV || (/[?&]scene=ice/.test(window.location.search) ? 'ice' : 'lake')
   const ICE = scene === 'ice'
@@ -144,8 +149,8 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
   const phone = isPhoneLayout() || land
   const [lakeBig, setLakeBig] = useState(false)
   // the fish-echo test page (#153): two switches on the page itself (Jason opens it from a link, not with URL flags)
-  const [fishNew, setFishNew] = useState(!/[?&]fish=marks/.test(window.location.search))
-  const [fishBig, setFishBig] = useState(/[?&]fishsize=1\.6/.test(window.location.search))
+  const [fishNew, setFishNew] = useState(!(import.meta.env.DEV && /[?&]fish=marks/.test(window.location.search)))
+  const [fishBig, setFishBig] = useState(import.meta.env.DEV && /[?&]fishsize=1\.6/.test(window.location.search))
   // the display's real aspect when sideways (the screen minus the safe areas); everywhere else the phone frame's 2.08
   const [landAspect, setLandAspect] = useState(2.08)
   useEffect(() => {
@@ -238,8 +243,8 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
   state.current.deviceId = deviceId
   state.current.view = view
   state.current.land = land
-  state.current.fishMode = lab === 'fish' && fishNew ? 'echo' : 'marks'
-  state.current.fishSize = lab === 'fish' && fishBig ? 1.6 : 1
+  state.current.fishMode = fishNew ? 'echo' : 'marks' // #169 (Jason 2026-10-26: 把第 3 轮这一版的鱼搬进正式页面); Panoramic keeps the marks (SonarScreen)
+  state.current.fishSize = fishBig ? 1.6 : 1
   state.current.hintOff = land && !lakeBig // sideways with the sonar full-screen: no drag caption over the sonar
 
   // AUTO depth: deeper at once (the bottom never drops off the screen), shallower only after 1.5 s
@@ -317,6 +322,7 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
       <div className="absolute inset-0 touch-none">
         {mount3d && !glLost && <LakeScene key={glKey} state={state} sonarRect={sonarRect} paused={gate || paused} scene={scene} />}
       </div>
+      {EXTRAS === 'a' && phone && !land && started && !home && <AppBadges height={28} className="absolute z-20" style={{ left: 12, top: 'calc(12px + env(safe-area-inset-top))' }} />}
       {glLost && (
         <div role="alert" className="pointer-events-auto absolute inset-0 z-50 flex items-center justify-center p-6" style={{ background: 'rgba(3,18,26,0.55)' }}>
           <button type="button" className="ac-card px-5 py-4 text-left" onClick={() => window.location.reload()}>
@@ -380,7 +386,15 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
           {t(ICE ? 'desc_ice' : 'desc_lake', { device: device.name, beam: `${device.beamDeg}° × ${ICE ? 20 : device.thickDeg}°` })} {/* text only: specs say 39° × 20° for the Mini; the engine's 18° stays (Jason 2026-09-23) */}
         </div>
         <ShopButton deviceId={deviceId} placement="panel" wide />
+        {EXTRAS === 'a' && <div className="flex items-center justify-between gap-2 pt-1"><ShareButton /><AppBadges height={30} /></div>}
       </motion.div>
+      {/* B: a glass strip top-right (desktop: under the step cards' row; phones: under the safe area) with share + badges */}
+      {EXTRAS === 'b' && (!phone || (started && !home)) && !land && (
+        <div data-hint-avoid className="ac-hint pointer-events-auto absolute z-20 flex items-center gap-2 px-2 py-1.5 opacity-100" style={phone ? { left: 12, right: 12, top: 'calc(12px + env(safe-area-inset-top))', justifyContent: 'space-between' } : { right: 28, top: 204 }}>
+          <ShareButton compact={phone} />
+          <AppBadges height={phone ? 30 : 32} />
+        </div>
+      )}
 
       {/* ---- the cue caption, shown until the first drag / tap (position set by the render loop). The ice page: under the
            reticle on the ice (IceCamp.jsx, #123); the lake: above the water reticle round the boat (Scene.jsx Boat, #132).
@@ -431,8 +445,9 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
         {/* phones: the View capsule sits on the phone frame's top edge (Jason 2026-10-03) — the big panel is gone */}
         {/* Shop button on phones: docked on the frame's top edge (the dock also feeds the camera's view offset) */}
         {phone && !land && started && !home && (
-          <div ref={(el) => { sonarRect.current.dock = el }} className="pointer-events-auto absolute bottom-full left-1/2 mb-3 -translate-x-1/2">
+          <div ref={(el) => { sonarRect.current.dock = el }} className="pointer-events-auto absolute bottom-full left-1/2 mb-3 flex -translate-x-1/2 items-center gap-2">
             <ShopButton deviceId={deviceId} placement="frame-top" />
+            {EXTRAS === 'a' && <ShareButton compact />}
           </div>
         )}
         {/* after sign-up the app buttons stay display-only: a short hint above the phone instead of the gate */}
@@ -448,8 +463,8 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
         </div>
       )}
 
-      {/* ---- the fish-echo test page's switches (#153): top centre on phones, bottom left on wider screens ---- */}
-      {lab === 'fish' && (
+      {/* ---- the fish-echo test page's switches (#153; dev only since #169): top centre on phones, bottom left on wider screens ---- */}
+      {lab === 'fish' && import.meta.env.DEV && (
         <div className="pointer-events-auto absolute left-1/2 top-3 z-20 flex -translate-x-1/2 flex-col items-center gap-1.5 sm:bottom-6 sm:left-4 sm:top-auto sm:translate-x-0 sm:items-start" style={{ fontFamily: 'system-ui, sans-serif' }}>
           <div className="ac-seg">
             <button className={`ac-btn ${!fishNew ? 'is-active' : ''}`} onClick={() => setFishNew(false)}>鱼：现在</button>

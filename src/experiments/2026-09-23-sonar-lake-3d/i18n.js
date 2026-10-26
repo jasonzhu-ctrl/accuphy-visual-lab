@@ -51,6 +51,12 @@ const S = {
   // the lost-WebGL card (in-app browsers)
   gl_lost_title: { en: 'The 3D view stopped', fr: 'La vue 3D s’est arrêtée' },
   gl_lost_text: { en: 'Your browser freed the graphics memory. Tap to reload the lake.', fr: 'Votre navigateur a libéré la mémoire graphique. Touchez pour recharger le lac.' },
+  // "Send to a friend" (BF funnel item 1)
+  share: { en: 'Send to a friend', fr: 'Envoyer à un ami' },
+  share_text: { en: 'Try the Accuphy Lab — drag a boat and watch the live sonar light up.', fr: 'Essayez l’Accuphy Lab : déplacez un bateau et regardez le sondeur live s’allumer.' },
+  share_sms: { en: 'Text message', fr: 'Message texte' },
+  share_copy: { en: 'Copy link', fr: 'Copier le lien' },
+  share_copied: { en: 'Link copied', fr: 'Lien copié' },
   // the Shop button
   shop: { en: 'Shop {name}', fr: 'Achetez le {name}' }, // after the store's own "Achetez maintenant →" (shop.accuphy.com/fr); the arrow is the button's icon
   // the app's Home page inside the phone
