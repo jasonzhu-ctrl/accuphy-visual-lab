@@ -338,6 +338,12 @@ export function IcePick({ state }) {
     if (Math.hypot(s.aim.x - s.boat.x, s.aim.z - s.boat.z) < 1.0) return
     s.target.x = s.aim.x; s.target.z = s.aim.z; s.hasDragged = true
   }
+  // R3F never passes a pointercancel on to the mesh, so a cancelled touch (iOS) left the aim ring up: drop the aim then
+  useEffect(() => {
+    const drop = () => { const s = state.current; s.aiming = false; s.aim = null }
+    window.addEventListener('pointercancel', drop); window.addEventListener('touchcancel', drop)
+    return () => { window.removeEventListener('pointercancel', drop); window.removeEventListener('touchcancel', drop) }
+  }, [state])
   return (
     <mesh rotation-x={-Math.PI / 2} position-y={0.02} onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={onUp}>
       <planeGeometry args={[HALF * 2, HALF * 2]} />

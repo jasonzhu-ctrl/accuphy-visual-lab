@@ -2711,3 +2711,26 @@ Numbered log. Newest at the bottom.
      - **Ice page (#94):** untouched; it has no Water mesh, so no FFT runs there (checked desktop + phone).
      - **Other checks:** the wake is checked; 0 console errors.
      - Local only; not uploaded.
+
+166. **2026-10-26** — **iPhone fixes: the drag cue survives a cancelled touch; a real-looking wake** (Jason on his iPhone,
+     via Lab HQ's LAB-iphone-fix: "船划过的地方的波纹看着还是非常奇怪。还有就是 drag the boat 那个标签 … 在船动过一次以后，它就不出现了").
+     Details, frames, frame times and credits: `docs/2026-10-26-lake-wake.md`.
+     - **Drag cue (#160 did not work on touch):**
+       - React Three Fiber never passes a `pointercancel` on to a mesh, and iOS cancels touches readily. After a
+         cancel, `dragging` stayed `true` for good.
+       - `PickPlane` now ends a drag on any window pointerup / pointercancel / touchend / touchcancel, on blur and on a
+         hidden page. The ice page's `IcePick` drops its aim on a cancel.
+       - Reproduced and fixed with real touch input in Chromium; checked in WebKit with pointer events.
+       - A real-iPhone check is still owed.
+     - **Wake:**
+       - The ladder of bars, the white beads and the transverse bars are gone.
+       - It now follows drone photos of small boats (`docs/2026-10-26-lake-wake-refs.jpg`): a calm slick lane; thin
+         arms of fine curved crests (~0.9 m) with a sharp outer edge at 19.5°; ragged white water only at the stern.
+       - Everything scales with the speed of the path and is short: the arms about 10 m, gone about 2 s after a stop.
+       - The wake map is 384² over the newest 26 m of path (≤ 0.12 m a texel).
+       - Comparison: `docs/2026-10-26-lake-wake.jpg`.
+     - **Frame time (#50):** no measurable change on the phone path or on desktop (laptop GPU, headless).
+     - **Ice page (#94):** a tap still drills; it has no wake.
+     - **Open, Jason's call:** the hull never turns, because the beams are fixed to its heading, so it is often dragged
+       backwards or sideways. Option (a) is to turn the boat and the beams together; option (b) is to leave it.
+     - Local only; not uploaded.

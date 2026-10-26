@@ -281,7 +281,7 @@ function Fish({ mat, state }) {
 // #163–#164 reworked the ripples against drone photos and dark deep-water references, but hand-made wave sums always
 // showed their few shapes again. Jason 2026-10-26 (#165, "动，把 ABYSSAL 的做法接进湖面"): the waves now come from a real
 // wind-sea spectrum summed by an FFT every frame (lakeFFT.js, after ABYSSAL, MIT); the ripple normal map is gone.
-const WAKE_N = 16, WAKE_STEP = 1.2, WAKE_KEEP = 8, WAKE_RES = 256 // path points kept for the wake: one every 1.2 m, for 8 s
+const WAKE_N = 16, WAKE_STEP = 1.2, WAKE_KEEP = 8, WAKE_RES = 384, WAKE_REACH = 26 // path points kept for the wake: one every 1.2 m, for 8 s; the map covers the newest 26 m
 // the sky photo: where its sun is in the image (azimuth along the width, found from the HDR's brightest pixel). The sky
 // is turned so its sun stands SUN_AHEAD rad right of the default view direction; the glitter path is drawn from a sun
 // GLITTER_EL high on that bearing, so it runs up the far water as in option B (Jason's pick), whatever the photo's own
@@ -304,9 +304,13 @@ const WATER_NOISE = /* glsl */ `
         return vec3(du * vec2(b - a + (a - b - c + d) * u.y, c - a + (a - b - c + d) * u.x), a + (b - a) * u.x + (c - a) * u.y + (a - b - c + d) * u.x * u.y);
       }`
 // The wake map: for each texel, the nearest point of the boat's path (uTrail: x, z, distance along the path from the
-// boat, age in s; newest first) → the wake's slope (rg) and two foam envelopes (b: the trail down the middle, a: white
-// tops on the arms' crests). Divergent waves: short crests set obliquely along two arms at ±19.5° behind the hull,
-// broken up, never a ruled line (#91: the old three straight streaks were removed); transverse waves behind the stern.
+// boat, age in s; newest first) → the wake's slope (rg), the churned trail behind the stern (b) and the slick (a).
+// Jason 2026-10-26 on his iPhone ("船划过的地方的波纹看着还是非常奇怪"): the old arms read as a ladder of even bars with a
+// string of white beads on them, and transverse bars behind the stern. Now, after drone photos of small boats on calm
+// lakes (docs/2026-10-26-lake-wake-refs.jpg): a calm lane where the hull and prop flattened the ripples (the slick, what
+// reads first from above); two thin arms whose fine crests (~0.9 m) feather in from a sharp outer edge at 19.5°; white
+// water only in a short ragged trail at the stern. All of it in proportion to the speed the path was laid at, and short:
+// the arms ~10 m, gone ~2 s after the boat stops; the slick ~4 s.
 function makeWakeMap() {
   const rt = new THREE.WebGLRenderTarget(WAKE_RES, WAKE_RES, { type: THREE.HalfFloatType, depthBuffer: false, magFilter: THREE.LinearFilter, minFilter: THREE.LinearFilter })
   const mat = new THREE.ShaderMaterial({
@@ -318,7 +322,7 @@ function makeWakeMap() {
       void main() {
         float t = uTime;
         vec2 x = uMap.xy + (vUv - 0.5) * uMap.z;
-        float bestD = 1e3, bestS = 0.0, bestA = 99.0, bestEnd = 0.0; vec2 bestQ = x;
+        float bestD = 1e3, bestS = 0.0, bestA = 99.0, bestEnd = 0.0, bestV = 0.0; vec2 bestQ = x, bestT = vec2(1.0, 0.0);
         for (int i = 0; i < ${WAKE_N - 1}; i++) {
           vec4 a = uTrail[i], b = uTrail[i + 1];
           if (b.w > 20.0) break;
@@ -326,22 +330,28 @@ function makeWakeMap() {
           if (L2 < 1e-4) continue;
           float h0 = dot(x - a.xy, ab) / L2, h = clamp(h0, 0.0, 1.0); vec2 q = a.xy + ab * h; float d = length(x - q);
           bool last = i == ${WAKE_N - 2} || uTrail[i + 2 < ${WAKE_N} ? i + 2 : ${WAKE_N - 1}].w > 20.0;
-          if (d < bestD) { bestD = d; bestS = mix(a.z, b.z, h); bestA = mix(a.w, b.w, h); bestQ = q; bestEnd = last ? max(0.0, h0 - 1.0) * sqrt(L2) : 0.0; }
+          if (d < bestD) { bestD = d; bestS = mix(a.z, b.z, h); bestA = mix(a.w, b.w, h); bestQ = q; bestT = ab / sqrt(L2);
+            bestV = (b.z - a.z) / max(b.w - a.w, 0.05);                         // m/s the boat ran this stretch at
+            bestEnd = last ? max(0.0, h0 - 1.0) * sqrt(L2) : 0.0; }
         }
-        float live = exp(-bestA / 4.5) * smoothstep(0.0, 1.5, bestS) * exp(-bestEnd / 1.5); // nothing round the far end of the path
+        float spd = smoothstep(0.4, 3.0, bestV);                               // a slow nudge leaves next to nothing
+        float tail = smoothstep(0.0, 1.2, bestS) * exp(-bestEnd / 1.2);        // nothing ahead of the hull or round the far end
         vec2 side = (x - bestQ) / max(bestD, 1e-3);
-        float armD = 1.1 + 0.354 * bestS, armW = 0.7 + 0.1 * bestS;            // the arm's band widens as it spreads
-        float arm = exp(-pow((bestD - armD) / armW, 2.0)) * live * exp(-bestS / 24.0);
-        float ph = 4.2 * (0.8 * bestS + 0.6 * bestD) - t * 2.6 + 1.8 * vnoised(x * 0.35 + 9.0).z; // crests ~35° to the path: a row of short feathers, not evenly spaced
-        float brk = smoothstep(0.25, 0.65, vnoised(x * 0.9 + 3.1).z);            // broken, so the arm never reads as one line
-        float crest = sin(ph) * (0.35 + 0.65 * brk);
-        vec2 cdir = normalize(side * 0.6 + vec2(-side.y, side.x) * 0.8);
-        vec2 g = cdir * arm * crest * 0.6;
-        float trans = exp(-pow(bestD / (1.2 + 0.25 * bestS), 2.0)) * live * exp(-bestS / 20.0); // transverse waves behind the stern
-        g += side * trans * 0.1 * sin(bestS * 1.6 - t * 3.0);
-        float foamW = exp(-pow(bestD / (0.8 + 0.05 * bestS), 2.0)) * exp(-bestA / 3.5) * smoothstep(0.0, 1.0, bestS) * exp(-bestS / 22.0) * exp(-bestEnd / 1.5);
+        // the slick: a calm lane about the boat's beam, widening slowly
+        float slick = exp(-pow(bestD / (1.3 + 0.08 * bestS), 2.0)) * exp(-bestA / 3.0) * exp(-bestS / 18.0) * tail * (0.35 + 0.65 * spd);
+        // the arms: a sharp outer edge on the 19.5° line, the crests dying away inward (as behind a real hull)
+        float u = bestD - (0.9 + 0.354 * bestS);
+        float env = u > 0.0 ? exp(-u * u / 0.12) : exp(u / (0.8 + 0.1 * bestS));
+        float arm = env * spd * exp(-bestA / 2.0) * exp(-bestS / 8.0) * smoothstep(0.5, 2.5, bestS) * exp(-bestEnd / 1.2);
+        // fine crests, ~0.9 m. Their waves run back and out at 35° to the path on the outer edge and turn square to it
+        // toward the middle, so each crest curves from the edge in and forward, a feather, not a rung; slow noise bends them
+        float ang = mix(1.45, 0.62, smoothstep(0.0, 1.0, bestD / (0.9 + 0.354 * bestS)));
+        vec2 kd = normalize(bestT * cos(ang) + side * sin(ang));
+        float ph = 7.0 * (cos(ang) * bestS + sin(ang) * bestD) - t * 1.6 + 1.2 * vnoised(x * 0.22 + 9.0).z;
+        vec2 g = kd * cos(ph) * arm * 0.85;
+        float foamW = exp(-pow(bestD / (0.8 + 0.1 * bestS), 2.0)) * exp(-bestA / 1.8) * exp(-bestS / 7.0) * smoothstep(0.0, 0.6, bestS) * exp(-bestEnd / 1.2) * spd;
         float edge = smoothstep(0.5, 0.45, max(abs(vUv.x - 0.5), abs(vUv.y - 0.5)));  // fade at the map's border
-        gl_FragColor = vec4(g, foamW, 0.95 * arm * smoothstep(0.25, 0.85, crest) * exp(-bestS / 24.0)) * edge;
+        gl_FragColor = vec4(g, foamW, slick) * edge;
       }
     `,
   })
@@ -394,9 +404,9 @@ function Water({ state }) {
         vec2 wu = (x - uMap.xy) / uMap.z + 0.5;
         if (uMap.w > 0.5 && wu.x > 0.0 && wu.y > 0.0 && wu.x < 1.0 && wu.y < 1.0) {
           vec4 W = texture2D(uWakeMap, wu);
-          g += W.xy * 0.8; // #165: lower than before, so the wake's regular bars do not stand out of the spectrum's random sea
+          g = g * (1.0 - 0.75 * W.w) + W.xy;                                  // the slick calms the sea, then the arms
           float churn = vnoised(x * 2.2 + t * 0.3).z * 0.6 + vnoised(x * 5.0 - t * 0.5).z * 0.4;
-          foam = smoothstep(0.45, 0.8, churn + 0.3 * W.z) * W.z * 0.8 + W.w * (0.5 + 0.5 * churn); // the trail, and white tops on the arms' crests
+          foam = smoothstep(0.45, 0.8, churn + 0.3 * W.z) * W.z * 0.8;          // ragged white water at the stern only
         }
         vec3 N = normalize(vec3(-g.x, 1.0, -g.y));
         vec3 v = normalize(cameraPosition - vW);
@@ -428,6 +438,8 @@ function Water({ state }) {
         // photos): thin and sparse, so the ripples read through light, not through a busy mottle
         float glint = smoothstep(0.05, 0.1, rip) * (1.0 - smoothstep(0.2, 0.6, foot));
         col += sky * glint * 0.13; alpha += glint * 0.05;
+        // the slick reads from above as a smoother, slightly brighter lane: the sky is mirrored evenly there (drone photos)
+        if (uMap.w > 0.5 && wu.x > 0.0 && wu.y > 0.0 && wu.x < 1.0 && wu.y < 1.0) { float sl = texture2D(uWakeMap, wu).w; col = mix(col, sky * 0.55 + veil * 0.45, sl * 0.18); }
         foam = clamp(foam, 0.0, 1.0);
         col = mix(col, vec3(0.93, 0.96, 0.97), foam * 0.85); alpha = max(alpha, foam * 0.9);
         float dist = length(vW - cameraPosition);
@@ -460,12 +472,13 @@ function Water({ state }) {
       if (!p) { u[i].set(0, 0, 0, 99); continue }
       if (i > 0) cum += Math.hypot(p.x - trail[i - 1].x, p.z - trail[i - 1].z)
       u[i].set(p.x, p.z, cum, i === 0 ? 0 : now - p.t)
-      x0 = Math.min(x0, p.x); z0 = Math.min(z0, p.z); x1 = Math.max(x1, p.x); z1 = Math.max(z1, p.z)
+      if (cum <= WAKE_REACH || i < 2) { x0 = Math.min(x0, p.x); z0 = Math.min(z0, p.z); x1 = Math.max(x1, p.x); z1 = Math.max(z1, p.z) }
     }
-    // the map covers the path and the arms' reach round it (they have faded by ~30 m behind the boat); no path, no map
+    // the map covers the newest WAKE_REACH m of the path and the arms' reach round it (all has faded by then); no path, no map.
+    // At most 44 m across: ≤ 0.12 m a texel, fine enough for the arms' 0.9 m crests
     const on = cum > 0.3 && now - trail[trail.length - 1].t < WAKE_KEEP + 1 ? 1 : 0, M = mat.uniforms.uMap.value
     if (on) {
-      const m = 2.0 + 0.4 * Math.min(cum, 32), size = Math.min(80, Math.max(12, x1 - x0 + 2 * m, z1 - z0 + 2 * m))
+      const m = 2.0 + 0.36 * Math.min(cum, WAKE_REACH), size = Math.min(44, Math.max(12, x1 - x0 + 2 * m, z1 - z0 + 2 * m))
       M.set((x0 + x1) / 2, (z0 + z1) / 2, size, 1)
       wake.mat.uniforms.uMap.value.copy(M); wake.mat.uniforms.uTime.value = now
       const prev = gl.getRenderTarget()
@@ -828,6 +841,17 @@ function PickPlane({ state }) {
     s.target.z = THREE.MathUtils.clamp(e.point.z, -58, 58)
   }
   const onUp = () => { state.current.dragging = false }
+  // R3F never passes a pointercancel on to the mesh (it only clears hover), and iOS cancels touches readily: the drag
+  // then never ended and the cue never came back (Jason's iPhone, 2026-10-26). So any lift, cancel or lost page ends it.
+  useEffect(() => {
+    const end = () => { state.current.dragging = false }
+    const tEnd = (e) => { if (!e.touches.length) end() }
+    const hide = () => { if (document.hidden) end() }
+    const on = [['pointerup', end], ['pointercancel', end], ['touchend', tEnd], ['touchcancel', tEnd], ['blur', end]]
+    for (const [n, f] of on) window.addEventListener(n, f, { passive: true })
+    document.addEventListener('visibilitychange', hide)
+    return () => { for (const [n, f] of on) window.removeEventListener(n, f); document.removeEventListener('visibilitychange', hide) }
+  }, [state])
   return (
     <mesh rotation-x={-Math.PI / 2} position-y={0.02} onPointerDown={onDown} onPointerMove={move} onPointerUp={onUp} onPointerCancel={onUp}>
       <planeGeometry args={[HALF * 2, HALF * 2]} />
