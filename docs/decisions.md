@@ -2734,3 +2734,21 @@ Numbered log. Newest at the bottom.
      - **Open, Jason's call:** the hull never turns, because the beams are fixed to its heading, so it is often dragged
        backwards or sideways. Option (a) is to turn the boat and the beams together; option (b) is to leave it.
      - Local only; not uploaded.
+
+167. **2026-10-26** — **In-app browsers: a static cover first, a lost-WebGL card, the page height from innerHeight** (Klaviyo HQ's
+     BF funnel handoff `handoffs/2026-10-26-bf-funnel-lab-extras.md` item 3, dispatched by Lab HQ; follows the load study
+     `docs/2026-10-26-lab-load-time.md`). Local only.
+     - **Cover:** the share build writes a pure HTML/CSS cover into the page (`#lab-cover`: lake-blue, the brand SVG logo,
+       "Loading the lake…" / "Loading the ice…", a sliding bar). It paints as soon as the file lands (first paint 0.64 s on
+       the 4G simulation, before the 2.7 MB has finished) and fades 0.3 s after the lake's first frame. The 3D now mounts one
+       frame after the page (a 120 ms timeout as fallback for background tabs); the fade waits for the `ready` event plus
+       two frames, because frames cannot run during the scene-build task. `labEvent` also dispatches a window event
+       `accuphy-lab` for this. The first 3D frame itself is unchanged (≈3.7 s on 4G; the real fix is proposal C of the study).
+     - **Lost WebGL context** (Meta's browser drops it under memory pressure): `webglcontextlost` is caught, a card
+       "The 3D view stopped — tap to reload the lake" (fr too) replaces the frozen canvas; `webglcontextrestored` remounts
+       the scene. Verified with `WEBGL_lose_context`: card shown, canvas back after restore.
+     - **Height:** `<main>` is `height: var(--lab-h)` from `window.innerHeight` (resize / orientationchange /
+       visualViewport), not only the viewport units that collapse inside Facebook's browser. The desktop and both pages
+       are unchanged at 1280×800 / 390×844.
+     - **Not done here:** the cheap-phone resolution tier (`dpr` lives in Scene.jsx's `<Canvas>`, the ice chat's file) and
+       "fish within 10 s" (depends on the start spot and the Home-first pick) — both noted for the ice chat / HQ.

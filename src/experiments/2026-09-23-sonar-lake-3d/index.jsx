@@ -12,7 +12,7 @@ import { screenLayout } from './SonarScreen'
 import SignupGate from './SignupGate'
 import AppHome from './home/AppHome' // the app's Home (view selection) page inside the phone, phones only (2026-10-16)
 import { isSignedUp } from './signup'
-import { labEvent, PRODUCT } from './embed'
+import { labEvent, PRODUCT, sentEvents } from './embed'
 import ShopButton from './ShopButton' // the one link to the store (X-6L, 2026-10-25; placement B, Jason)
 import { t } from './i18n' // every visitor-visible string, English or French (?lang=fr; X-6L-fr)
 import { depthAt } from './terrain'
@@ -104,6 +104,7 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
     window.addEventListener('accuphy-lab', onEvent)                        // then builds in one blocking task, so the next
     const tick = () => {                                                   // two frames come after the first render
       if (!canvas) canvas = mainRef.current?.querySelector('canvas')
+      if (!ready && sentEvents.has('ready')) ready = true // `ready` can fire before this listener exists (R3F's onCreated timing)
       if (canvas && ready && ++frames >= 2) {
         if (cover) { cover.classList.add('is-done'); setTimeout(() => cover.remove(), 600) }
         canvas.addEventListener('webglcontextlost', onLost); canvas.addEventListener('webglcontextrestored', onRestored)

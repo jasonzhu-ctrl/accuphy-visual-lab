@@ -6,6 +6,7 @@
 // Without a parent window (the Lab opened on its own) nothing is sent.
 export const EVENT_NAME = 'accuphy:lab'
 const sent = new Set()
+export const sentEvents = sent // the page checks whether `ready` already went out (it may fire before a listener exists)
 
 export function labEvent(event, data = {}, { once = false } = {}) {
   if (once) { if (sent.has(event)) return; sent.add(event) }
