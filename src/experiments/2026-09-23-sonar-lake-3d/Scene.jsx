@@ -265,23 +265,97 @@ function Fish({ mat, state }) {
 // down, most toward the far shore) from a horizon-to-zenith gradient; sun glints on the wave facets; a thin scattering
 // veil. What lies below is tinted by its own water column (lakeMaterial uAirView), so the surface mostly adds light.
 // Short waves fade out with the pixel's footprint, so the phone does not shimmer. The vertices stay flat.
-function Water({ state }) {
-  const mat = useMemo(() => new THREE.ShaderMaterial({
-    transparent: true, depthWrite: false, side: THREE.DoubleSide,
-    uniforms: { uTime: { value: 0 }, uSun: { value: new THREE.Vector3(0.4, 0.8, 0.3).normalize() }, uSky: { value: new THREE.Color('#9cc1cf') }, uBoat: { value: new THREE.Vector3(0, 0, 0) }, uWake: { value: 0 } },
-    vertexShader: /* glsl */ `
-      varying vec3 vW;
-      void main() { vec4 wp = modelMatrix * vec4(position, 1.0); vW = wp.xyz; gl_Position = projectionMatrix * viewMatrix * wp; }
-    `,
-    fragmentShader: /* glsl */ `
-      precision highp float; varying vec3 vW; uniform vec3 uSun; uniform vec3 uSky; uniform float uTime; uniform vec3 uBoat; uniform float uWake;
+// Jason 2026-10-26 (#161, options B + C of docs/2026-10-26-lake-surface-options.md): fair-weather clouds drift across the
+// reflected sky and the sun stands low ahead of the camera, so a path of small blinking sparkles runs up the far water;
+// and the boat leaves a real wake along its path (Kelvin arms of short oblique crests at ±19.5°, transverse waves, a foam
+// trail) instead of the old round rings. Cost (#50: fewer samples, never a plainer look): the clouds are soft, so they
+// are sampled per vertex on a 3.5 m grid and interpolated, not per pixel; the wake is worked out once per frame in a
+// 256² map over the path (≤ 0.3 m a texel) and only looked up by the water; the fine foam grain stays per pixel.
+const WAKE_N = 16, WAKE_STEP = 1.2, WAKE_KEEP = 8, WAKE_RES = 256 // path points kept for the wake: one every 1.2 m, for 8 s
+const WATER_NOISE = /* glsl */ `
       float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
       // value noise with its gradient (xy) and value (z)
       vec3 vnoised(vec2 p) {
         vec2 i = floor(p), f = fract(p), u = f * f * (3.0 - 2.0 * f), du = 6.0 * f * (1.0 - f);
         float a = hash(i), b = hash(i + vec2(1, 0)), c = hash(i + vec2(0, 1)), d = hash(i + vec2(1, 1));
         return vec3(du * vec2(b - a + (a - b - c + d) * u.y, c - a + (a - b - c + d) * u.x), a + (b - a) * u.x + (c - a) * u.y + (a - b - c + d) * u.x * u.y);
+      }`
+// The wake map: for each texel, the nearest point of the boat's path (uTrail: x, z, distance along the path from the
+// boat, age in s; newest first) → the wake's slope (rg) and two foam envelopes (b: the trail down the middle, a: white
+// tops on the arms' crests). Divergent waves: short crests set obliquely along two arms at ±19.5° behind the hull,
+// broken up, never a ruled line (#91: the old three straight streaks were removed); transverse waves behind the stern.
+function makeWakeMap() {
+  const rt = new THREE.WebGLRenderTarget(WAKE_RES, WAKE_RES, { type: THREE.HalfFloatType, depthBuffer: false, magFilter: THREE.LinearFilter, minFilter: THREE.LinearFilter })
+  const mat = new THREE.ShaderMaterial({
+    uniforms: { uTime: { value: 0 }, uTrail: { value: Array.from({ length: WAKE_N }, () => new THREE.Vector4(0, 0, 0, 99)) }, uMap: { value: new THREE.Vector4(0, 0, 1, 0) } },
+    vertexShader: /* glsl */ `varying vec2 vUv; void main() { vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }`,
+    fragmentShader: /* glsl */ `
+      precision highp float; varying vec2 vUv; uniform float uTime; uniform vec4 uTrail[${WAKE_N}]; uniform vec4 uMap;
+      ${WATER_NOISE}
+      void main() {
+        float t = uTime;
+        vec2 x = uMap.xy + (vUv - 0.5) * uMap.z;
+        float bestD = 1e3, bestS = 0.0, bestA = 99.0, bestEnd = 0.0; vec2 bestQ = x;
+        for (int i = 0; i < ${WAKE_N - 1}; i++) {
+          vec4 a = uTrail[i], b = uTrail[i + 1];
+          if (b.w > 20.0) break;
+          vec2 ab = b.xy - a.xy; float L2 = dot(ab, ab);
+          if (L2 < 1e-4) continue;
+          float h0 = dot(x - a.xy, ab) / L2, h = clamp(h0, 0.0, 1.0); vec2 q = a.xy + ab * h; float d = length(x - q);
+          bool last = i == ${WAKE_N - 2} || uTrail[i + 2 < ${WAKE_N} ? i + 2 : ${WAKE_N - 1}].w > 20.0;
+          if (d < bestD) { bestD = d; bestS = mix(a.z, b.z, h); bestA = mix(a.w, b.w, h); bestQ = q; bestEnd = last ? max(0.0, h0 - 1.0) * sqrt(L2) : 0.0; }
+        }
+        float live = exp(-bestA / 4.5) * smoothstep(0.0, 1.5, bestS) * exp(-bestEnd / 1.5); // nothing round the far end of the path
+        vec2 side = (x - bestQ) / max(bestD, 1e-3);
+        float armD = 1.1 + 0.354 * bestS, armW = 0.7 + 0.1 * bestS;            // the arm's band widens as it spreads
+        float arm = exp(-pow((bestD - armD) / armW, 2.0)) * live * exp(-bestS / 24.0);
+        float ph = 4.2 * (0.8 * bestS + 0.6 * bestD) - t * 2.6 + 1.8 * vnoised(x * 0.35 + 9.0).z; // crests ~35° to the path: a row of short feathers, not evenly spaced
+        float brk = smoothstep(0.25, 0.65, vnoised(x * 0.9 + 3.1).z);            // broken, so the arm never reads as one line
+        float crest = sin(ph) * (0.35 + 0.65 * brk);
+        vec2 cdir = normalize(side * 0.6 + vec2(-side.y, side.x) * 0.8);
+        vec2 g = cdir * arm * crest * 0.6;
+        float trans = exp(-pow(bestD / (1.2 + 0.25 * bestS), 2.0)) * live * exp(-bestS / 20.0); // transverse waves behind the stern
+        g += side * trans * 0.1 * sin(bestS * 1.6 - t * 3.0);
+        float foamW = exp(-pow(bestD / (0.8 + 0.05 * bestS), 2.0)) * exp(-bestA / 3.5) * smoothstep(0.0, 1.0, bestS) * exp(-bestS / 22.0) * exp(-bestEnd / 1.5);
+        float edge = smoothstep(0.5, 0.45, max(abs(vUv.x - 0.5), abs(vUv.y - 0.5)));  // fade at the map's border
+        gl_FragColor = vec4(g, foamW, 0.95 * arm * smoothstep(0.25, 0.85, crest) * exp(-bestS / 24.0)) * edge;
       }
+    `,
+  })
+  const scene = new THREE.Scene(), cam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1)
+  const quad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), mat); quad.frustumCulled = false
+  scene.add(quad)
+  return { rt, mat, scene, cam }
+}
+function Water({ state }) {
+  const wake = useMemo(makeWakeMap, [])
+  useEffect(() => () => { wake.rt.dispose(); wake.mat.dispose() }, [wake])
+  const mat = useMemo(() => new THREE.ShaderMaterial({
+    transparent: true, depthWrite: false, side: THREE.DoubleSide,
+    uniforms: { uTime: { value: 0 }, uSun: { value: new THREE.Vector3(0.4, 0.8, 0.3).normalize() }, uSky: { value: new THREE.Color('#9cc1cf') },
+      uWakeMap: { value: wake.rt.texture }, uMap: { value: new THREE.Vector4(0, 0, 1, 0) } }, // uMap: centre x, z, size (m), on
+    vertexShader: /* glsl */ `
+      uniform float uTime;
+      varying vec3 vW; varying vec2 vCloud;
+      float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+      float vnoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
+        return mix(mix(hash(i), hash(i + vec2(1, 0)), f.x), mix(hash(i + vec2(0, 1)), hash(i + vec2(1, 1)), f.x), f.y); }
+      float fbm4(vec2 p) { float v = 0.0, a = 0.5; for (int i = 0; i < 4; i++) { v += a * vnoise(p); p = p * 2.03 + 7.1; a *= 0.5; } return v; }
+      void main() {
+        vec4 wp = modelMatrix * vec4(position, 1.0); vW = wp.xyz;
+        // the clouds in the water: a cloud deck 160 m up, seen along the flat surface's mirror ray (soft enough to sample
+        // per vertex). x = cover, y = a second, finer layer for their shading
+        vec3 v = normalize(cameraPosition - wp.xyz), R = reflect(-v, vec3(0.0, 1.0, 0.0));
+        vec2 cp = (wp.xz + R.xz / max(R.y, 0.08) * 160.0) / 140.0 + vec2(-0.55, -0.83) * uTime * 0.01;
+        float cover = smoothstep(0.45, 0.75, fbm4(cp)) * smoothstep(0.02, 0.25, R.y);
+        vCloud = vec2(cover, fbm4(cp * 3.0 + 3.0));
+        gl_Position = projectionMatrix * viewMatrix * wp;
+      }
+    `,
+    fragmentShader: /* glsl */ `
+      precision highp float; varying vec3 vW; varying vec2 vCloud; uniform vec3 uSun; uniform vec3 uSky; uniform float uTime;
+      uniform sampler2D uWakeMap; uniform vec4 uMap;
+      ${WATER_NOISE}
       void main() {
         float t = uTime;
         vec2 x = vW.xz;
@@ -307,9 +381,15 @@ function Water({ state }) {
         vec3 n1 = vnoised(x * 1.3 + wind * t * 0.4), n2 = vnoised(x * 3.1 - vec2(t * 0.5, -t * 0.3));
         g += n1.xy * 0.035 + n2.xy * 0.02 * (1.0 - smoothstep(0.08, 0.25, foot));
         g *= rough;
-        // the wake: rings spreading from the boat while it moves
-        vec2 rb = x - uBoat.xz; float dB = length(rb) + 1e-3;
-        g += uWake * 0.35 * cos(dB * 2.0 - t * 5.0) * exp(-dB / 6.0) * rb / dB;
+        // the boat's wake, from the wake map (makeWakeMap); the foam's grain is per pixel
+        float foam = 0.0;
+        vec2 wu = (x - uMap.xy) / uMap.z + 0.5;
+        if (uMap.w > 0.5 && wu.x > 0.0 && wu.y > 0.0 && wu.x < 1.0 && wu.y < 1.0) {
+          vec4 W = texture2D(uWakeMap, wu);
+          g += W.xy;
+          float churn = vnoised(x * 2.2 + t * 0.3).z * 0.6 + vnoised(x * 5.0 - t * 0.5).z * 0.4;
+          foam = smoothstep(0.45, 0.8, churn + 0.3 * W.z) * W.z * 0.8 + W.w * (0.5 + 0.5 * churn); // the trail, and white tops on the arms' crests
+        }
         vec3 N = normalize(vec3(-g.x, 1.0, -g.y));
         vec3 v = normalize(cameraPosition - vW);
         float cosI = max(dot(v, N), 0.0);
@@ -318,7 +398,17 @@ function Water({ state }) {
         float el = max(R.y, 0.0);
         vec3 horizon = mix(uSky, vec3(0.86, 0.9, 0.9), 0.35), zenith = vec3(0.33, 0.55, 0.72);
         vec3 sky = mix(horizon, zenith, pow(el, 0.6));
-        float sun = pow(max(dot(R, uSun), 0.0), 1200.0) * 2.5 + pow(max(dot(R, uSun), 0.0), 60.0) * 0.06; // glints + a soft sheen
+        // the clouds (sampled per vertex, see above), lit a little unevenly
+        sky = mix(sky, vec3(0.97, 0.98, 0.99) * (0.8 + 0.2 * vCloud.y), vCloud.x * 0.9);
+        // the sun low ahead of the camera: a soft sheen and a glitter path of small blinking points, at most one per 40 cm
+        vec3 sunP = normalize(vec3(0.227, 0.423, -0.879));
+        float sd = max(dot(R, sunP), 0.0);
+        vec2 sc = floor(x * 2.5), sf = fract(x * 2.5) - 0.5;
+        float spark = step(0.8, hash(sc + floor(t * 3.0 + hash(sc) * 3.0))) * (1.0 - smoothstep(0.05, 0.22, length(sf)))
+                    * (1.0 - 0.75 * smoothstep(0.06, 0.2, foot)); // where a pixel covers a whole cell (far water, phones) fewer, dimmer points
+        float sun = pow(sd, 140.0) * 2.6 * spark + pow(sd, 40.0) * 0.1 + pow(sd, 8.0) * 0.05
+                  + pow(max(dot(R, uSun), 0.0), 1200.0) * 2.5;                 // and the high sun's own glints on the facets
+        F = F * 1.5 + 0.04;                                                    // the clouded sky's sheen
         vec3 veil = vec3(0.09, 0.33, 0.39);                                    // light scattered back out of the water
         float s = 0.22 + 0.06 * (gust - 0.5);                                  // a little murkier where it is rough
         // ripples read near the camera too, where the reflection is weak: facets tilted toward or away from the eye show
@@ -328,23 +418,47 @@ function Water({ state }) {
         s *= clamp(1.0 + 2.2 * rip, 0.6, 1.5);
         float alpha = clamp(F + (1.0 - F) * s, 0.0, 1.0);
         vec3 col = (sky * F + veil * (1.0 - F) * s) / max(alpha, 1e-3) + vec3(1.0, 0.97, 0.9) * sun;
+        foam = clamp(foam, 0.0, 1.0);
+        col = mix(col, vec3(0.93, 0.96, 0.97), foam * 0.85); alpha = max(alpha, foam * 0.9);
         float dist = length(vW - cameraPosition);
         float fog = smoothstep(120.0, 420.0, dist);
         gl_FragColor = vec4(mix(col, uSky, fog), mix(clamp(alpha + sun, 0.0, 1.0), 1.0, fog));
       }
     `,
   }), [])
-  useFrame(({ clock }, dt) => {
-    mat.uniforms.uTime.value = clock.elapsedTime
-    LAKE_TIME.value = clock.elapsedTime // the light patterns on the shallows (lakeMaterial)
+  const trail = useMemo(() => [], [])
+  useFrame(({ clock, gl }) => {
+    const now = clock.elapsedTime
+    mat.uniforms.uTime.value = now
+    LAKE_TIME.value = now // the light patterns on the shallows (lakeMaterial)
     const s = state.current
-    const speed = Math.hypot(s.target.x - s.boat.x, s.target.z - s.boat.z)
-    mat.uniforms.uBoat.value.set(s.boat.x, 0, s.boat.z)
-    mat.uniforms.uWake.value += (Math.min(1, speed / 3) - mat.uniforms.uWake.value) * Math.min(1, dt * 3)
+    // the boat's path, newest first: the live position, then a point every WAKE_STEP m, kept WAKE_KEEP s
+    if (!trail.length) trail.push({ x: s.boat.x, z: s.boat.z, t: now }, { x: s.boat.x, z: s.boat.z, t: now })
+    trail[0] = { x: s.boat.x, z: s.boat.z, t: now }
+    if (Math.hypot(trail[0].x - trail[1].x, trail[0].z - trail[1].z) > WAKE_STEP) trail.splice(1, 0, { x: s.boat.x, z: s.boat.z, t: now })
+    while (trail.length > WAKE_N || (trail.length > 2 && now - trail[trail.length - 1].t > WAKE_KEEP)) trail.pop()
+    const u = wake.mat.uniforms.uTrail.value
+    let cum = 0, x0 = 1e4, z0 = 1e4, x1 = -1e4, z1 = -1e4
+    for (let i = 0; i < WAKE_N; i++) {
+      const p = trail[i]
+      if (!p) { u[i].set(0, 0, 0, 99); continue }
+      if (i > 0) cum += Math.hypot(p.x - trail[i - 1].x, p.z - trail[i - 1].z)
+      u[i].set(p.x, p.z, cum, i === 0 ? 0 : now - p.t)
+      x0 = Math.min(x0, p.x); z0 = Math.min(z0, p.z); x1 = Math.max(x1, p.x); z1 = Math.max(z1, p.z)
+    }
+    // the map covers the path and the arms' reach round it (they have faded by ~30 m behind the boat); no path, no map
+    const on = cum > 0.3 && now - trail[trail.length - 1].t < WAKE_KEEP + 1 ? 1 : 0, M = mat.uniforms.uMap.value
+    if (on) {
+      const m = 2.0 + 0.4 * Math.min(cum, 32), size = Math.min(80, Math.max(12, x1 - x0 + 2 * m, z1 - z0 + 2 * m))
+      M.set((x0 + x1) / 2, (z0 + z1) / 2, size, 1)
+      wake.mat.uniforms.uMap.value.copy(M); wake.mat.uniforms.uTime.value = now
+      const prev = gl.getRenderTarget()
+      gl.setRenderTarget(wake.rt); gl.render(wake.scene, wake.cam); gl.setRenderTarget(prev)
+    } else M.w = 0
   })
   return (
     <mesh rotation-x={-Math.PI / 2} material={mat} onUpdate={(o) => o.layers.set(SONAR_HIDE_LAYER)}>
-      <planeGeometry args={[900, 900, 1, 1]} />
+      <planeGeometry args={[900, 900, 256, 256]} />
     </mesh>
   )
 }

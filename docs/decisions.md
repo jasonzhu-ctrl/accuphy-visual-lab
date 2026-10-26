@@ -2564,3 +2564,24 @@ Numbered log. Newest at the bottom.
        falls back to `hasDragged`).
      - Checked locally: desktop 800×600 and phone 375×812 — caption opacity 1 → 0 within 0.5 s of the drag, back to 1 at
        ~2.8 s; ice page hint still gone after a tap; no console errors. Not uploaded.
+
+161. **2026-10-26** — **The summer lake gets clouds in the water, a sun glitter path and a real wake** (Jason in Lab HQ, on
+     `docs/2026-10-26-lake-surface-options.md`: "b的湖面和c结合").
+     - **B:** fair-weather clouds drift across the reflected sky (a cloud deck 160 m up, seen along the mirror ray); the
+       sun stands low ahead of the camera, so a path of small soft sparkles blinks up the far water. Where a pixel covers
+       a whole 40 cm sparkle cell (far water, phones) the points thin out and dim, so phones do not get a field of white
+       dots. The high sun's own glints stay.
+     - **C:** the boat's path is kept (16 points, one every 1.2 m, 8 s). Behind it: two Kelvin arms at ±19.5° made of short
+       oblique crests with white tops, not evenly spaced and broken up by noise, so they never read as straight dark
+       lines (#91); transverse waves behind the stern; a churned foam trail down the middle. Everything fades in ~5–8 s.
+       The old round rings are gone. Comparison: `docs/2026-10-26-lake-bc-result.jpg` (live rings / the option-C
+       prototype's two dark lines / the final feathers).
+     - **Cost (#50, fewer samples, never a plainer look):** the clouds are sampled per vertex on a 3.5 m grid (the
+       water plane is now 256 × 256), not per pixel. The wake is worked out once per frame into a 256² half-float map
+       over the path (≤ 0.3 m a texel), only while a wake is alive; the water just looks it up and adds the foam's fine
+       grain. Laptop GPU, headless Chromium, vsync off, 2 runs each: at rest 4.8 → 5.1 ms (1920×1200) and
+       7.5 → 7.9 ms (2560×1600); during a wake 4.9 → 5.4–5.9 ms and 7.6 → 8.3–8.8 ms. That is +4–8 % at rest and
+       +10–15 % for the ~8 s after a drag. On the V10 baseline (~15 fps, GPU-bound) that is ≈ −1 fps at rest and
+       ≈ −1.5–2 fps during a wake (scaled, not measured: the tablet was not available).
+     - Ice page untouched (it has no Water mesh); checked on desktop and phone. Sonar untouched (Water is on the
+       sonar-hidden layer). 0 console errors. Local only; not uploaded.
