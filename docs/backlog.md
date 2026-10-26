@@ -7,6 +7,12 @@
 > 卡住：无（网站在做店铺页 3 个文件和转交代码，交接单 `accuphy-website/handoffs/2026-10-23-lab-store-page.md`）
 > 本周做完：X-6L Lab 上线 · https://lab.accuphy.ca 新版（按钮 B、accuphy:lab、/embed/）· docs/versions.md · HQ 自查（四个地址 200、头信息对、Vercel 显示配置正确），网站 HQ 也核过；网站预览里的框已经换成 lab.accuphy.ca；#102 Lab 上 Vercel · https://accuphy-lab.vercel.app（docs/versions.md）· HQ 自查（三页 200、头信息对、无报错），未经别的聊天核；#150–#156 · `docs/decisions.md` #150–#156 + 各自的提交 · 自称（还没别的聊天核过）
 
+> **手机网页端 → HQ 的回报（2026-10-26，消息发不出去，按 HQ 说的写在这里）：**
+> - `X-6L-fr 第 2 轮 | 网站核的 A–D 全部搬进代码，7ffb475，#159 补了"网站核过"一段 | docs/2026-10-26-lab-fr-screens.jpg，docs/2026-10-25-lab-fr-strings.md 每行标了出处；max 提示 en/fr 都删，冰钓 39° × 20° 只改文字，60 ft 去掉；"Pêche sur glace en direct" 折两行不出格，无报错 | 需要：Jason 说"动"后 HQ 上传，再请网站 03 看 /fr/pages/lab`
+> - `LAB-load | 量完、写完、没改代码 | docs/2026-10-26-lab-load-time.md：两个链接一样快（4G 下载约 1.0 s）；首页 1.45 s、湖面第一帧 3.7–4.1 s，中间主线程冻 2.1–2.4 s（地形噪声、three.js 同步查着色器、logo 贴图、鱼/船/FFT）；1.05 MB 里代码 0.49、字体 0.31、logo 0.12、缩略图 0.19 | 需要：定 11/2 前做 A（封面）+B（下载减半）还是 11/2 后连 C 一起；A 的分帧和 C 要动 Scene.jsx`
+> - `BF-3 Meta 内置浏览器 | 封面 + WebGL 掉线卡片 + innerHeight 高度，693f1e8，#167 | docs/2026-10-26-lab-cover.jpg；4G 模拟封面 0.64 s 出现、第一帧后 0.3 s 淡出；WEBGL_lose_context 实测卡片出现、恢复后重挂 | 提醒：HQ 的 914c570 把我暂存中的 4 个文件一起提交了（半成品，现已补全），请只 add 自己的文件；没做：便宜手机降 dpr（Scene.jsx，冰钓聊天）和"10 秒看到鱼"，请另派。接下来做分享按钮、App 徽章的两个样子`
+> - 给冰钓聊天：index.jsx / AppHome.jsx / ShopButton.jsx / embed.js / i18n.js 已释放；冰钓页的步骤卡、提示、相机胶囊文字现在走 i18n.js 的 t()，以后改文字请改 i18n.js 的 en/fr 两条。
+
 Jason 2026-09-24: "别把之前说过的任务丢了" — every promised task lives here until
 it is done. ✅ done · 🔧 in progress · ⬜ open.
 
