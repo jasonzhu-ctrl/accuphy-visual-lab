@@ -2731,8 +2731,9 @@ Numbered log. Newest at the bottom.
        - Comparison: `docs/2026-10-26-lake-wake.jpg`.
      - **Frame time (#50):** no measurable change on the phone path or on desktop (laptop GPU, headless).
      - **Ice page (#94):** a tap still drills; it has no wake.
-     - **Open, Jason's call:** the hull never turns, because the beams are fixed to its heading, so it is often dragged
-       backwards or sideways. Option (a) is to turn the boat and the beams together; option (b) is to leave it.
+     - **Hull heading — decided, not to be raised again:** the hull never turns, because the beams are fixed to its
+       heading, so it is often dragged backwards or sideways. Jason 2026-10-26, via Lab HQ: "不做". The bow and the beams
+       keep their fixed direction.
      - Local only; not uploaded.
 
 167. **2026-10-26** — **In-app browsers: a static cover first, a lost-WebGL card, the page height from innerHeight** (Klaviyo HQ's

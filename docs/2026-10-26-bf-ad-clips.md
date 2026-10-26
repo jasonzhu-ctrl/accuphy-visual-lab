@@ -87,7 +87,7 @@ French uses the page's own terms where they exist: "Faites glisser le bateau", "
 - **Ice timing:** the clip opens with a fish already lit. The tap at 1 s starts a drill, and the sonar is blank for
   about 3 s while the kit drills. That is how the page works.
 - **4:5 framing:** the 4:5 frames keep the whole 9:16 picture at 70 % width with blurred sides, not a true 4:5 layout.
-- **Boat direction:** the drags go bow-first (to the right), because the hull does not turn (#166's open question).
+- **Boat direction:** the drags go bow-first (to the right), because the hull does not turn (#166; Jason: not to be changed).
 - **CTA:** "Try it free in your browser: Accuphy Lab" is a placeholder. The final call to action and the link are
   Klaviyo HQ's; the clips carry no BF offer and no price.
 - **Not checked:** how Meta crops or overlays these in the Reels / feed preview.
