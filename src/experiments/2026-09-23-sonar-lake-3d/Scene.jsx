@@ -368,35 +368,61 @@ function Water({ state }) {
         float t = uTime;
         vec2 x = vW.xz;
         float foot = length(fwidth(x)); // metres per pixel here
-        // roughness patches: wind gusts and calm slicks, ~40–80 m, drifting with the wind
+        // how rough the water is here (#163, from drone photos of real lakes, docs/2026-10-26-lake-ripples.md): a lake in a
+        // light breeze is mostly glassy, with wind lanes (~40–80 m) and inside them cat's paws, gust patches 8–25 m across
+        // that run downwind and change shape; only those carry the fine ripples. Not one even texture over everything.
         vec2 wind = normalize(vec2(-0.55, -0.83));
         float gust = vnoised(x * 0.018 - wind * t * 0.035).z * 0.65 + vnoised(x * 0.05 + 7.3 - wind * t * 0.06).z * 0.35;
-        float rough = 0.4 + 0.9 * smoothstep(0.25, 0.75, gust);
-        // the wind sea: directional waves round the wind, slope summed analytically; each fades once a pixel covers
-        // a third of its wavelength
+        float lane = smoothstep(0.3, 0.66, gust);                              // 0 a calm slick … 1 a wind lane
+        vec2 pq = x - wind * t * 0.8;                                           // the paws run downwind, ~1 m/s
+        float paw = smoothstep(0.46, 0.74, vnoised(pq * 0.075 + 2.1).z * 0.7 + vnoised(x * 0.2 - wind * t * 0.35 + 5.7).z * 0.3);
+        float rough = 0.06 + 0.32 * lane + 0.9 * paw * (0.4 + 0.6 * lane);
+        // the wind sea: a few low directional waves round the wind, slope summed analytically, each faded once a pixel
+        // covers a third of its wavelength; low, so far off a gentle swell only stretches the sky's reflection
         vec2 g = vec2(0.0);
         float wan = 6.2832 * vnoised(x * 0.045 + 1.3).z; // the phases wander, so the crests are not ruled lines
-        for (int i = 0; i < 7; i++) {
+        for (int i = 0; i < 4; i++) {
           float fi = float(i);
-          float lam = 7.0 * pow(0.62, fi);                                   // 7 m … 0.4 m
-          float ang = (hash(vec2(fi, 3.7)) - 0.5) * 1.6;                       // ±46° round the wind
+          float lam = 7.0 * pow(0.62, fi);                                   // 7 m … 1.7 m (shorter ones drew a ruled grain over the whole lake)
+          float ang = (hash(vec2(fi, 3.7)) - 0.5) * 2.4;                       // ±69° round the wind: no single grain
           vec2 d = mat2(cos(ang), -sin(ang), sin(ang), cos(ang)) * wind;
           float k = 6.2832 / lam, w = sqrt(9.81 * k);                         // deep-water dispersion
-          float sl = 0.045 * (0.6 + 0.8 * hash(vec2(fi, 9.1)));               // each wave's slope: a light breeze (the sum ~0.1 rms, ~5°)
+          float sl = 0.03 * (0.6 + 0.8 * hash(vec2(fi, 9.1)));                // each wave's slope
           float fade = 1.0 - smoothstep(lam * 0.12, lam * 0.35, foot);
           g += d * sl * cos(dot(d, x) * k - w * t + fi * 1.7 + wan * (0.6 + 0.35 * fi)) * fade;
         }
-        // the fine ripples: a real water normal map, two copies drifting at different scales (mipmaps calm them far away)
-        vec2 r1 = texture2D(uRipples, mat2(0.8, -0.6, 0.6, 0.8) * x / 13.0 + wind * t * 0.02).xy * 2.0 - 1.0;
-        vec2 r2 = texture2D(uRipples, x / 4.7 + vec2(-t * 0.027, t * 0.019)).xy * 2.0 - 1.0;
-        g += (r1 * 0.035 + r2 * 0.022) * (1.0 - 0.6 * smoothstep(0.03, 0.12, foot)); // calmer where a pixel spans many ripples
+        // the ripples a breeze raises (0.6–1.6 m, ~5 to the boat's length): short crests across the wind, bent into
+        // crescents by a warp and each living only in small groups, so they read as the photos' scattered ripples, never
+        // as ruled lines; they fade with the pixel's footprint, so far water turns to a sheen, never to a fine grain.
+        // Skipped where the water is glassy or too far to show them.
+        float nearR = 1.0 - smoothstep(0.35, 0.9, foot);
+        if (rough * nearR > 0.04) {
+          vec2 cq = x + 1.4 * vec2(vnoised(x * 0.32 + 2.7).z, vnoised(x * 0.32 + 8.3).z);
+          // a soft irregular undulation from the water normal map (#162): one copy, 22 m, read a little blurred (its
+          // fine grit read as stone) through the same warp, so its repeat never lines up
+          vec2 r1 = texture2D(uRipples, mat2(0.8, -0.6, 0.6, 0.8) * cq / 22.0 + wind * t * 0.02, 1.5).xy * 2.0 - 1.0;
+          g += r1 * 0.25 * nearR;
+          // the groups: one noise serves two wavelengths (one lives where the other does not)
+          float gA = vnoised(x * 0.75 - wind * t * 0.4).z, gB = vnoised(x * 1.25 + 7.1 - wind * t * 0.4).z;
+          for (int i = 0; i < 4; i++) {
+            float fi = float(i);
+            float lam = 1.6 * pow(0.72, fi);                                   // 1.6 … 0.6 m
+            float ang = (hash(vec2(fi, 5.3)) - 0.5) * 1.3;                       // ±37° round the wind
+            vec2 d = mat2(cos(ang), -sin(ang), sin(ang), cos(ang)) * wind;
+            float k = 6.2832 / lam, w = sqrt(9.81 * k + 7.4e-5 * k * k * k);          // gravity + surface tension
+            float n = i < 2 ? gA : gB; n = (i == 1 || i == 3) ? 1.0 - n : n;
+            float grp = smoothstep(0.35, 0.85, n);                              // short-crested: patches a few crests long
+            float fade = 1.0 - smoothstep(lam * 0.15, lam * 0.45, foot);
+            g += d * 0.11 * cos(dot(d, cq) * k - w * t + fi * 2.3) * grp * fade * nearR;
+          }
+        }
         g *= rough;
         // the boat's wake, from the wake map (makeWakeMap); the foam's grain is per pixel
         float foam = 0.0;
         vec2 wu = (x - uMap.xy) / uMap.z + 0.5;
         if (uMap.w > 0.5 && wu.x > 0.0 && wu.y > 0.0 && wu.x < 1.0 && wu.y < 1.0) {
           vec4 W = texture2D(uWakeMap, wu);
-          g += W.xy;
+          g += W.xy * 0.67; // as strong as before #163 raised the ripples' shading below (6 → 9)
           float churn = vnoised(x * 2.2 + t * 0.3).z * 0.6 + vnoised(x * 5.0 - t * 0.5).z * 0.4;
           foam = smoothstep(0.45, 0.8, churn + 0.3 * W.z) * W.z * 0.8 + W.w * (0.5 + 0.5 * churn); // the trail, and white tops on the arms' crests
         }
@@ -422,8 +448,8 @@ function Water({ state }) {
         // ripples read near the camera too, where the reflection is weak: facets tilted toward or away from the eye show
         // a little more or less of the sky and the scattered light (the refraction a real surface adds)
         float rip = dot(g, normalize(vW.xz - cameraPosition.xz));
-        F = clamp(F * (1.0 + 6.0 * rip), 0.0, 1.0);
-        s *= clamp(1.0 + 2.2 * rip, 0.6, 1.5);
+        F = clamp(F * (1.0 + 9.0 * rip), 0.0, 1.0);
+        s *= clamp(1.0 + 3.0 * rip, 0.55, 1.6);
         float alpha = clamp(F + (1.0 - F) * s, 0.0, 1.0);
         vec3 col = (sky * F + veil * (1.0 - F) * s) / max(alpha, 1e-3) + vec3(1.0, 0.97, 0.9) * sun;
         foam = clamp(foam, 0.0, 1.0);

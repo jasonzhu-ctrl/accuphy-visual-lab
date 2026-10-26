@@ -2610,3 +2610,37 @@ Numbered log. Newest at the bottom.
        against #156.
      - Ice page untouched (no Water mesh; checked desktop + phone). Sonar untouched. 0 console errors. The share build
        runs. Local only; not uploaded.
+
+163. **2026-10-26** — **The summer lake's ripples follow drone photos of real lakes** (Jason in Lab HQ, after the sky
+     comparison: "差别不大 但是水面波纹还是很糟糕"; sky A of #162 stays). Write-up, references and their credits:
+     `docs/2026-10-26-lake-ripples.md`. Comparison now / after / real: `docs/2026-10-26-lake-ripples-desktop.jpg`,
+     `docs/2026-10-26-lake-ripples-phone.jpg`.
+     - **References:** five free-licence photos from Wikimedia Commons (four Ontario lakes: Rice Lake ×2, Lake 239
+       IISD-ELA, Huntsville; plus Ritzensee). They show a mostly glassy lake with wind lanes and cat's paws, breeze
+       ripples of 0.5–1.5 m as scattered crescents, and far water as a smooth sheen.
+     - **What #162 got wrong:** one even fine diagonal grain over the whole lake ("scratches / cloth"); the ripple map
+       visibly tiling (4.7 m, 13 m); the 0.4–1 m members of the wind sea drawing ruled hatching (a render with the
+       water hidden proved it was the water, not the lakebed); no scale to the boat; far water still grainy.
+     - **Now:**
+       - Roughness in patches. Calm slicks are ~6 %, almost a mirror. Wind lanes (40–80 m) are ~⅓. Cat's paws (8–25 m)
+         run downwind at ~1 m/s and change shape; inside a lane they reach full roughness.
+       - Breeze ripples are drawn as short crests, 0.6–1.6 m (about ⅕ of the boat). Four wavelengths, ±37° round the
+         wind, gravity + surface-tension speeds. A warp bends them into crescents, and each lives only in small groups.
+       - Every ripple fades with the pixel's footprint, so far water turns to a sheen. Beyond ~0.9 m a pixel the crest
+         code is skipped.
+       - The wind sea keeps only 7 → 1.7 m at slope 0.03, spread ±69°.
+       - `waternormals.jpg` stays only as a faint 22 m undulation, read 1.5 mip levels blurred (its grit read as stone)
+         through the same warp; the 4.7 m copy is gone.
+       - The facet-to-eye shading is raised: sheen 6 → 9, scattered light 2.2 → 3.0. The wake is scaled by 0.67, so it
+         looks as before.
+     - **Frame time (#50):** laptop GPU, headless, vsync off, two interleaved runs against #162.
+       - The first version cost +0.6–0.9 ms at 1920×1200 (+10–15 %). It now shares the warp and the group noises, so
+         it costs nothing measurable:
+         - 1920×1200: 6.1–6.7 → 6.1–6.2 ms at rest; 6.5 → 6.5 ms during a wake.
+         - 2560×1600: 8.7–9.4 → 8.7–9.6 ms.
+         - 390×844 @3×: 1.93–1.98 → 1.94 ms.
+       - Estimate for the V10 (not measured; the tablet was not here): no change against #162.
+     - **Share build:** 2,809,836 → 2,812,245 bytes (shader text only).
+     - **Ice page (#94):** untouched. It has no Water mesh; checked on desktop + phone.
+     - **Other checks:** the wake after a drag is checked; 0 console errors.
+     - Local only; not uploaded.
