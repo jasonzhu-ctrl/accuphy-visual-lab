@@ -2644,3 +2644,36 @@ Numbered log. Newest at the bottom.
      - **Ice page (#94):** untouched. It has no Water mesh; checked on desktop + phone.
      - **Other checks:** the wake after a drag is checked; 0 console errors.
      - Local only; not uploaded.
+
+164. **2026-10-26** — **Lake ripples round 3: dark deep-water references, a softer 3D look** (Jason in Lab HQ, on #163:
+     the references should be dark deep lakes like ours. "#162 looks like a pattern copied", and #163 is fine for real
+     life "但是可能在我们这个3D 出来的这个场景里面可能还是不太自然").
+     - **Reference board:** `docs/2026-10-26-lake-dark-water-refs.jpg`, 10 images.
+       - Six free-licence aerials of dark deep lakes from Wikimedia Commons: Ahmasjärvi ×2 (CC0), Viljamaanjärvi,
+         Bisajärvi, Moose Cove Lake NS, Fiskträsk.
+       - Accuphy's own PingLive Forward/Down animations.
+       - The three.js ocean example (MIT).
+       - three.js `Water.js` at our camera, as a counter-example (it reads as grey stone).
+       - Common traits: deep blue-teal, the surface read mostly through a smooth near-dark/far-bright Fresnel sheen,
+         few and small highlights, ripples barely resolved from this height, far water merging into the haze.
+     - **Version 3:**
+       - Roughness evened out (0.35 + 0.3·lane + 0.4·paw instead of near-mirror slicks), so it never mottles.
+       - Breeze crests lower (0.11 → 0.07) and their groups softer.
+       - Ripple shading lowered: sheen 9 → 5, scattered light 3.0 → 1.6.
+       - Stronger Fresnel gradient (F·2.6 + 0.03).
+       - A slightly bluer veil (0.07, 0.29, 0.40).
+       - New: thin sparse sky glints on the ripples' backs (`glint`, up to 0.13 of the sky).
+       - Wake rescaled 1.2, so it looks as before.
+     - **Comparison #162 / #163 / v3 / references:** `docs/2026-10-26-lake-ripples-r3-desktop.jpg`, `-phone.jpg`.
+       An honest read: v3 is bluer and calmer than #163, but at full-screen size the step is modest.
+     - **Frame time (#50):** headless laptop GPU, vsync off, interleaved against #163; no measurable change.
+       - 390×844 @3×: 1.95 → 1.96–2.01 ms.
+       - 1920×1200: 6.14–6.34 → 6.19 ms.
+       - V10 estimate: unchanged.
+     - **Ice page (#94):** untouched (checked desktop + phone).
+     - **Other checks:** the wake after a drag is checked; 0 console errors.
+     - **Then Jason (in this chat):** look on GitHub for open-source water, free for commercial use.
+       `docs/2026-10-26-lake-open-source-water.md` + `.jpg`: the best fit is **ABYSSAL** (squall01337/abyssal-ocean,
+       MIT, WebGL2 + three.js spectral FFT ocean). It does not repeat at any scale. **Open for Jason:** whether to
+       port its spectrum + FFT (lake settings, 128–256², phone-light) into our Water.
+     - Local only; not uploaded.

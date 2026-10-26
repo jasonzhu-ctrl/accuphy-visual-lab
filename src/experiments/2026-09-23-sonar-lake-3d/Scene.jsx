@@ -376,7 +376,7 @@ function Water({ state }) {
         float lane = smoothstep(0.3, 0.66, gust);                              // 0 a calm slick … 1 a wind lane
         vec2 pq = x - wind * t * 0.8;                                           // the paws run downwind, ~1 m/s
         float paw = smoothstep(0.46, 0.74, vnoised(pq * 0.075 + 2.1).z * 0.7 + vnoised(x * 0.2 - wind * t * 0.35 + 5.7).z * 0.3);
-        float rough = 0.06 + 0.32 * lane + 0.9 * paw * (0.4 + 0.6 * lane);
+        float rough = 0.35 + 0.3 * lane + 0.4 * paw;                           // #164: softer than #163's slicks, so it never mottles
         // the wind sea: a few low directional waves round the wind, slope summed analytically, each faded once a pixel
         // covers a third of its wavelength; low, so far off a gentle swell only stretches the sky's reflection
         vec2 g = vec2(0.0);
@@ -411,9 +411,9 @@ function Water({ state }) {
             vec2 d = mat2(cos(ang), -sin(ang), sin(ang), cos(ang)) * wind;
             float k = 6.2832 / lam, w = sqrt(9.81 * k + 7.4e-5 * k * k * k);          // gravity + surface tension
             float n = i < 2 ? gA : gB; n = (i == 1 || i == 3) ? 1.0 - n : n;
-            float grp = smoothstep(0.35, 0.85, n);                              // short-crested: patches a few crests long
+            float grp = smoothstep(0.15, 0.9, n);                              // short-crested: patches a few crests long
             float fade = 1.0 - smoothstep(lam * 0.15, lam * 0.45, foot);
-            g += d * 0.11 * cos(dot(d, cq) * k - w * t + fi * 2.3) * grp * fade * nearR;
+            g += d * 0.07 * cos(dot(d, cq) * k - w * t + fi * 2.3) * grp * fade * nearR;
           }
         }
         g *= rough;
@@ -422,7 +422,7 @@ function Water({ state }) {
         vec2 wu = (x - uMap.xy) / uMap.z + 0.5;
         if (uMap.w > 0.5 && wu.x > 0.0 && wu.y > 0.0 && wu.x < 1.0 && wu.y < 1.0) {
           vec4 W = texture2D(uWakeMap, wu);
-          g += W.xy * 0.67; // as strong as before #163 raised the ripples' shading below (6 → 9)
+          g += W.xy * 1.2; // as strong as before #164 lowered the ripples' shading below (6 → 5)
           float churn = vnoised(x * 2.2 + t * 0.3).z * 0.6 + vnoised(x * 5.0 - t * 0.5).z * 0.4;
           foam = smoothstep(0.45, 0.8, churn + 0.3 * W.z) * W.z * 0.8 + W.w * (0.5 + 0.5 * churn); // the trail, and white tops on the arms' crests
         }
@@ -442,16 +442,20 @@ function Water({ state }) {
         float spark = step(0.8, hash(sc + floor(t * 3.0 + hash(sc) * 3.0))) * (1.0 - smoothstep(0.05, 0.22, length(sf)))
                     * (1.0 - 0.75 * smoothstep(0.06, 0.2, foot)); // where a pixel covers a whole cell (far water, phones) fewer, dimmer points
         float sun = pow(sd, 140.0) * 2.2 * spark + pow(sd, 40.0) * 0.08 + pow(sd, 8.0) * 0.05 + pow(sd, 2000.0) * 0.8 * (1.0 - smoothstep(0.03, 0.1, foot)); // glitter, sheen, a few sharp glints up close
-        F = F * 1.9 + 0.06;                                                    // the clouded sky's sheen: enough that the photo's clouds read
-        vec3 veil = vec3(0.09, 0.33, 0.39);                                    // light scattered back out of the water
+        F = F * 2.6 + 0.03;                                                    // the clouded sky's sheen: enough that the photo's clouds read
+        vec3 veil = vec3(0.07, 0.29, 0.40);                                    // light scattered back out of the water
         float s = 0.22 + 0.06 * (gust - 0.5);                                  // a little murkier where it is rough
         // ripples read near the camera too, where the reflection is weak: facets tilted toward or away from the eye show
         // a little more or less of the sky and the scattered light (the refraction a real surface adds)
         float rip = dot(g, normalize(vW.xz - cameraPosition.xz));
-        F = clamp(F * (1.0 + 9.0 * rip), 0.0, 1.0);
-        s *= clamp(1.0 + 3.0 * rip, 0.55, 1.6);
+        F = clamp(F * (1.0 + 5.0 * rip), 0.0, 1.0);
+        s *= clamp(1.0 + 1.6 * rip, 0.7, 1.35);
         float alpha = clamp(F + (1.0 - F) * s, 0.0, 1.0);
         vec3 col = (sky * F + veil * (1.0 - F) * s) / max(alpha, 1e-3) + vec3(1.0, 0.97, 0.9) * sun;
+        // crisp sky glints on the ripples' backs (#164, Accuphy's own PingLive animations and the dark-lake
+        // photos): thin and sparse, so the ripples read through light, not through a busy mottle
+        float glint = smoothstep(0.05, 0.1, rip) * (1.0 - smoothstep(0.2, 0.6, foot));
+        col += sky * glint * 0.13; alpha += glint * 0.05;
         foam = clamp(foam, 0.0, 1.0);
         col = mix(col, vec3(0.93, 0.96, 0.97), foam * 0.85); alpha = max(alpha, foam * 0.9);
         float dist = length(vW - cameraPosition);
