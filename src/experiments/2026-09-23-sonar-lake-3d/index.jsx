@@ -63,7 +63,7 @@ export const meta = {
   description: '3D lake with real-scale structure and NA fish; PL/PLM beam volumes reveal the bottom; the app screen (computed from the scene) on an iPhone. Drag the boat.',
 }
 
-// lab="fish": the fish-echo test page (2026-10-24-sonar-fish-echo, #153). Since #169 every page draws the fish from their
+// lab="fish": the fish-echo test page (2026-10-24-sonar-fish-echo, #153). Since #170 every page draws the fish from their
 // 3D bodies as the transducer sees them (#153 round 3, true size); dev only: ?fish=marks shows the old #120 marks for A/B,
 // ?fishsize=1.6 enlarges the sonar fish, and the test page shows its two switches
 export default function SonarLake3D({ scene: sceneProp, lab }) {
@@ -243,7 +243,7 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
   state.current.deviceId = deviceId
   state.current.view = view
   state.current.land = land
-  state.current.fishMode = fishNew ? 'echo' : 'marks' // #169 (Jason 2026-10-26: 把第 3 轮这一版的鱼搬进正式页面); Panoramic keeps the marks (SonarScreen)
+  state.current.fishMode = fishNew ? 'echo' : 'marks' // #170 (Jason 2026-10-26: 把第 3 轮这一版的鱼搬进正式页面); Panoramic keeps the marks (SonarScreen)
   state.current.fishSize = fishBig ? 1.6 : 1
   state.current.hintOff = land && !lakeBig // sideways with the sonar full-screen: no drag caption over the sonar
 
@@ -463,7 +463,7 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
         </div>
       )}
 
-      {/* ---- the fish-echo test page's switches (#153; dev only since #169): top centre on phones, bottom left on wider screens ---- */}
+      {/* ---- the fish-echo test page's switches (#153; dev only since #170): top centre on phones, bottom left on wider screens ---- */}
       {lab === 'fish' && import.meta.env.DEV && (
         <div className="pointer-events-auto absolute left-1/2 top-3 z-20 flex -translate-x-1/2 flex-col items-center gap-1.5 sm:bottom-6 sm:left-4 sm:top-auto sm:translate-x-0 sm:items-start" style={{ fontFamily: 'system-ui, sans-serif' }}>
           <div className="ac-seg">

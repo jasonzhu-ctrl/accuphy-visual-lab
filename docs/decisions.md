@@ -2787,3 +2787,37 @@ Numbered log. Newest at the bottom.
        right; phones: a strip across the top (share icon + badges). Both checked at 1280×800 and 375×812, the fallback
        menu too; no console errors. Screenshots: `docs/2026-10-26-share-badges-options.jpg`. The loser is removed once
        Jason picks; the strings are in `i18n.js` (en / fr, the French still to be reviewed by the website HQ).
+
+170. **2026-10-26** — **The #153 round-3 fish on the live lake and ice pages** (Jason in Lab HQ: "对，把第 3 轮这一版的鱼搬进正式页面").
+     - **What:**
+       - Every page now draws the fish as the transducer sees them: `fishMode = 'echo'`, true size `fishSize = 1`, the
+         `arcGrain` texture crossfaded between pings (#153 round 3, 86e565c).
+       - The #120 marks are gone from the vertical views. Panoramic keeps the marks, as in #153 (`flat` in SonarScreen).
+       - The ice page's flasher and Live Ice views are checked and fine.
+       - Dev only: `?fish=marks` (A/B against the old marks), `?fishsize=1.6`, and the test page's two switches. In a
+         production build there are no switches and no flags.
+     - **Bookkeeping:** the code change went into the other chat's commit 0d5385b, because we share one working copy;
+       its comments said #169. This commit relabels them #170.
+     - **Trembling at Jason's spot** (PLM Forward 90 ft, boat −12.3, 20.4; 45 consecutive frames at exactly 1/30 s,
+       virtual clock; fish region of the flat picture):
+       - Pixels changing per frame: marks 24 % (the same as #153's marks figure) → echo 4 %. #153 round 3 reported 16 %
+         with its own method; this method gives lower numbers.
+       - One fish followed through all 44 steps: the centre moves 1.6 px median, 2.4 px max per frame (its own swimming
+         included; marks 1.4 / 2.7 px). Its brightness swings ±5 % median, ±10 % max (marks up to ±192 %).
+       - Nothing from #154–#166 (far lakebed, FFT surface, wake) interferes.
+     - **Comparison:** `docs/2026-10-26-fish-old-new.jpg` (desktop, phone, and the fish up close).
+     - **Cost (#50):**
+       - Phone 390×844 @3, dev server, interleaved, 2 runs each:
+         - PLM Live Forward 3.94–4.24 → 3.98–4.22 ms.
+         - Live Combo 4.44–4.84 → 4.55–4.85 ms.
+         - PL Forward 3.91–4.15 → 4.25–4.36 ms (+0.2–0.3 ms).
+       - #153's counts still hold: triangles about +10 % in a vertical view and twice that in Combo; no download.
+       - Not measured on the V10.
+     - **sonar-qa:**
+       - Build passes. The float textures are Nearest-filtered (sonarMarks, the FFT butterfly) or half float + Linear.
+       - fish-sim over 15 min: 0 violations, lowest gap 0.43 m.
+       - Grid against `?fish=marks`: lake 6 spots × 6 views, ice 3 spots × Live Ice / Forward / Down / Combo.
+         - Old and new differ only in the fish.
+         - Mini Forward at the deep spot is black in both, as physics says.
+       - 0 console errors on desktop and phone.
+     - Local; not uploaded.

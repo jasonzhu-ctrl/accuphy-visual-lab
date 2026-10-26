@@ -274,7 +274,7 @@ export default function SonarScreen({ state, rect, lakeMats }) {
       s.layout = lay // for the DOM chrome (rulers)
     }
 
-    // the fish-echo test page (#153, index.jsx lab="fish"): fish from their 3D bodies in the vertical views
+    // fish from their 3D bodies in the vertical views (#153 round 3; every page since #170, index.jsx fishMode)
     const fishEcho = s.fishMode === 'echo' && !flat
     // its target is made on first use only (the lake and ice pages never allocate it): the fish bodies drawn from the apex
     // into (angle × range), MAX-blended, 4× MSAA like the structure splat. ONE target for both fans (fan k in rows k/2 …
