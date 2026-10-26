@@ -270,6 +270,8 @@ the cheapest Android phone class). Phone size was emulated at 360×800.
     before sharing more widely.
   - **Limits:** code that runs in a browser cannot be hidden; obfuscation only slows a reader down.
 
+- ⬜ **BF 后：“去商店”按钮按市场路径跳（2026-10-26）。** 网站已在 /fr、/fr-benelux、/fr-fr、/fr-lu 的框网址上带 `lang=fr`（网站 #220）；Lab 在框里只读得到店铺主域，所以欧洲法语页也跳 /fr/products/…。办法：网站在框网址上加 `shop_prefix=/fr-fr` 之类，Lab 照着拼。11/2 只投加拿大，不急。
+
 ## Handed to the website project (decision #69) — tracked in `accuphy-website/docs/backlog.md`
 - Lab page location (~~lab.accuphy.ca~~ 已定 .com（#102）: lab.accuphy.com, behind the store page) · lite section's Shopify test page · Klaviyo list,
   opt-in and keys · Meta Pixel, UTM, "Shop PingLive" button · US phone checkout walk (decision #57).
