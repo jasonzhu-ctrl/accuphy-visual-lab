@@ -37,7 +37,6 @@ but is published nowhere and is redundant since #170.
 | **Mini** — PingLive Mini only | anyone with the link, no login | https://jasonzhu-ctrl.github.io/accuphy-lab-test/mini/ |
 | **Lab (ad landing, #102 / X-6L)** — Both `/`, Mini `/mini/`, Ice `/ice/`, theme loader `/embed/lab.js`; only the store may frame it | anyone with the link, no login; `noindex` | **https://lab.accuphy.ca/** (same as https://accuphy-lab.vercel.app/) |
 | **Ice (trial)** — the ice-fishing page, section camera | anyone with the link, no login | https://jasonzhu-ctrl.github.io/accuphy-lab-test/ice/ |
-| Fish echo test (private preview, #153; also the newest lake: #154–#156) | Jason only (claude.ai login) | https://claude.ai/artifact/VxxnVnZr8cxQLXw3iizMdD |
 
 Both public pages are unlisted (`noindex`, `robots.txt` Disallow) and have no sign-up gate (#71).
 How to rebuild and publish: the `lab-test-link` skill (`node scripts/build-share.mjs <out>`; `VITE_DEVICES=PLM` for
