@@ -58,8 +58,14 @@ export function depthAt(x, z) {
   const along = alongDeep(x, z)
   const ramp = smooth(-32, 40, along) * smooth(-30, -6, x) * smooth(10, 34, hr)
   d = d + (DEEP_M - d) * Math.max(smooth(3, 40, along), ramp)
+  // the deep hole (#172; Jason 2026-10-26 for the ad: "深水那一拍 jig 从船上掉到 100 ft"): a bowl to ~110 ft in the
+  // north-west of the deep floor (~70 ft there), clear of the lockup (x −1…31 at z −52), both wrecks and the ice camp;
+  // its outline wanders a little so it reads as a natural hole, its walls ~25°
+  const hq = Math.hypot(x - DEEP_HOLE.x, z - DEEP_HOLE.z) + 3 * (fbm(x * 0.08 + 21, z * 0.08 + 5) - 0.5)
+  d = d + (DEEP_HOLE.depth - d) * (1 - smooth(DEEP_HOLE.r0, DEEP_HOLE.r1, hq))
   return humpsAndRim(x, z, d, DEEP_M)
 }
+export const DEEP_HOLE = { x: -22, z: -45, r0: 4, r1: 16, depth: 33.5 } // 33.5 m = 110 ft
 // The depth the timber, bushes and rocks were laid out against: the lake before #91 (40 m floor, 17 m middle, 7 m
 // island). Placement weights only (vegetation.js): the seeded rejection sampling would otherwise reshuffle the whole
 // layout whenever a depth crosses a placement band (#64, #91, #92). Heights still follow the real bottom (bedY).

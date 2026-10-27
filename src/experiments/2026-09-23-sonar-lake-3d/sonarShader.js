@@ -200,7 +200,10 @@ export const sonarFragment = /* glsl */ `
     float h = clamp(dot(pa, ba) / max(dot(ba, ba), 1e-6), 0.0, 1.0);
     vec2 q = pa - ba * h;
     float qr = dot(q, rh), qt = q.x * rh.y - q.y * rh.x;
-    float sr = 0.6 * B.x + 0.8 * uPulse, st = B.x + rr * 0.004;
+    // (the jig): deep, the beam smears it across to about its own width (~0.7° each side), so the lake's jig at 90–100 ft
+    // reads as a short dash, not a speck (#172); the ice page's jig (10–15 m) is as before
+    float dj = smoothstep(12.0, 26.0, rr);
+    float sr = 0.6 * B.x + 0.8 * uPulse + 0.12 * dj, st = B.x + rr * (0.004 + 0.016 * dj);
     float d2 = qr * qr / (sr * sr) + qt * qt / (st * st);
     if (d2 > 14.0) return 0.0;
     d2 += (vnoise(p * 9.0 + B.w * 37.0) - 0.5) * 0.9 * smoothstep(0.6, 3.0, d2);

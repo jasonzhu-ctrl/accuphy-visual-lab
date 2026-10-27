@@ -177,7 +177,8 @@ export function computeMarks({ jig, pop, t, specs, apex, flat, bake, rangeM }, m
       // a 4 cm spoon is far below a range cell: the app paints it as a short dash ~ a beam wide and a cell or two tall,
       // so the mark gets a minimum size (hw 8 cm, 15 cm tall) plus the trail of its last pop
       const y0 = Math.min(-(jig.yPrev - apex.y), Y - 0.15)
-      cand.push({ a: [X, y0, X, Y], g: null, hw: 0.08, s: JIG_S, fan: k, seed: 0.37, sh: 0, legacy: 1, aspect: 1 })
+      const deep = Math.min(1, Math.max(0, (Math.hypot(X, Y) - 13) / 14)) // a lead head is a strong target: deep it still reads (#172)
+      cand.push({ a: [X, y0, X, Y], g: null, hw: 0.08, s: JIG_S * (1 + 1.2 * deep), fan: k, seed: 0.37, sh: 0, legacy: 1, aspect: 1 })
     })
   }
   cand.sort((a, b) => b.s - a.s)

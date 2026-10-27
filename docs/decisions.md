@@ -2865,3 +2865,39 @@ Numbered log. Newest at the bottom.
        - With the new fish, the marks now carry only the jig (`computeMarks` gets no fish), and `fanEcho` draws them on
          top of the fish image.
        - Checked on the ice page, Live Ice: the jig mark and the dial's lines are back, matching `?fish=marks`.
+
+172. **2026-10-26** — **A 110 ft hole in the lake, and a jig dropped from the boat** (Lab HQ's LAB-ad-v3, Jason: "做，深水那一拍
+     jig 从船上掉到 100 ft"; brief at the end of `docs/2026-10-26-ad-v2-pinglive-brief.md`).
+     - **The hole (`terrain.js` `DEEP_HOLE`):**
+       - A bowl to 33.5 m (110 ft) at (−22, −45), north-west of the deep floor (~70 ft there).
+       - Its floor is ~8 m across; the walls are ~25° and rise to the floor around by r ≈ 16 m, with a wandering outline.
+       - It is clear of the lockup (x −1…31 at z −52), both wrecks and the ice camp. The ice start stays at 37.6 ft and the
+         camp at 32.7 ft.
+       - Before it, the lake's deepest point was 79 ft.
+     - **The lake's jig (`Scene.jsx` `LakeJig`):**
+       - A rod over the starboard side, a line, and a chartreuse 1–1.5 oz jig head with a pearl soft plastic, drawn ~3×
+         life size.
+       - It sinks at 0.42 m/s (≈1.4 ft/s), is worked in small hops 0.8 m off the bottom, and is reeled up (3 m/s) as soon as
+         the boat moves.
+       - It reaches the sonar like the ice jig: `s.jig` → the jig mark in Down and Forward.
+       - The fish ignore it on the lake unless `s.jigFish` is set (no exaggerated strikes, as asked).
+       - Deep, its mark widens to about a beam's width (~1° each side) and is brighter, so at 90–100 ft it reads as a dash.
+         The ice page's jig (10–15 m) is unchanged.
+       - Triggers: `s.jigDrop` for recordings, or `?jig` on the page (the jig goes down whenever the boat has rested
+         ~1.5 s).
+       - **Open, Jason's call:** what visitors get to drop it (a button, auto when the boat stops over deep water, or
+         nothing).
+     - **Ad v3 stills** (`docs/2026-10-26-ad-v3-stills.jpg`; originals in `reference/ads/2026-11-bf/v3/stills/`):
+       - The opening: a low side view, with the beam glowing in the water and fish in it.
+       - The 135° landing: the whole coverage block in the lake from the side.
+       - The jig at 100 ft, in two versions:
+         - PingLive Down: the hole as a U on the phone, 109.9 ft read-out, the jig a small dash.
+         - Mini Live Down: the narrower fan, so the jig reads ~4× larger.
+       - Dev-only recording knobs: `camOverride.noLogo` hides the lakebed lockup.
+     - **QA (#94):**
+       - Lake grid (6 spots × 6 views) and ice grid (3 × 4) against this morning's run.
+         - Only the lockup spot changed (the hole now shows west of the lockup, which still reads), plus a little at the
+           deep spot.
+         - Ice unchanged (≤ 2.3 mean difference, noise).
+       - 0 console errors.
+     - Not uploaded. HQ puts the lake page on the friends' link (with `?jig` to see the drop) for Jason.
