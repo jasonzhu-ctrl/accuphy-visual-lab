@@ -42,6 +42,7 @@ export const sonarFragment = /* glsl */ `
   uniform float uFlat;        // 1 = Panoramic (plan view)
   uniform float uPano;        // 1 = Panoramic as a sound picture (the pano test page, #171): the vertical-view pipeline, fan laid flat
   uniform float uPanoTilt;    // its strip camera's depression (rad); the rows span uPanoTilt ± atan(tanV) below the horizon
+  uniform vec4 uPanoK;        // Panoramic tuning (#178): x hard targets' level (rock, steel), y the field's floor where shadows fall, z hard targets' ceiling
   uniform float uBedGain;     // extra near-range gain for the bottom + structure echo (PLM 0.62, PL 1)
   uniform vec3 uCapDepth;     // the bottom's soft cap by depth below the transducer: from x to y metres, up to strength z
   uniform float uStreak;      // 1 = radial streak texture, 0 = mottled speckle (PLM Down)
@@ -175,7 +176,15 @@ export const sonarFragment = /* glsl */ `
     // the beam pattern as a smooth spindle: the strongest weighted neighbour (a far, thin fish keeps its peak and smears
     // across) blended with the weighted mean (tapered ends, no stepped edges)
     float eMax = 0.0, eSum = 0.0, wSum = 0.0;
-    for (int i = -6; i <= 6; i++) {
+    if (uPano > 0.5) {
+      // the flat fan (#178): its beam is wider (uBeamHalf 0.03), so 0.4 σ between taps was ~3 texels of the fish image and
+      // a fish only a texel or two wide came out as a comb of copies across the beam (stripes through every dash). Twice
+      // the taps at half the spacing, one row each (25 reads, fewer than below): one smooth dash
+      for (int i = -12; i <= 12; i++) {
+        float fi = float(i) * 0.2, w = exp(-0.5 * fi * fi), s = sampleFish(k, vec2(u + fi * sA, rn));
+        eMax = max(eMax, w * s); eSum += w * s; wSum += w;
+      }
+    } else for (int i = -6; i <= 6; i++) {
       float fi = float(i) * 0.4, uu = u + fi * sA, w = exp(-0.5 * fi * fi);
       // along the range: the row and its neighbours (a little more behind the target than in front: the echo's tail)
       float s0 = sampleFish(k, vec2(uu, rn));
@@ -332,7 +341,8 @@ export const sonarFragment = /* glsl */ `
     // comes back a few metres on. Two things make that: the beam's main lobe is peaked across the slab (the centre
     // rows carry most of the energy, so a trunk on the centreline blocks most of it), and whatever the rows in front
     // of a pixel hit as structure casts a shadow on the rows behind — wblk / wsum below, squared like the app's.
-    float duB = 0.5 * 0.0105 / (uFan[k].z * cos(a) * cos(a)); // ±0.6° in u
+    float duB = (uPano > 0.5 ? 1.25 : 0.5) * 0.0105 / (uFan[k].z * cos(a) * cos(a)); // ±0.6° in u; Panoramic ±1.5°: the flat fan's beams are wider (§7.13), so a shadow's sides are soft, not cut (#178)
+    float strN = 0.0, rockN = 0.0; // Panoramic: the rows meeting structure near this range, and how many of those met rock
     float wsum = 0.0, wblk = 0.0, bw = 0.0, bh = 0.0, bh2 = 0.0; // bw/bh/bh2: where the rows meet the bottom (its spread across the slab)
     float prevB = -1.0; // the previous row's bottom hit (−1: none) — the band between neighbouring rows, below
     for (int j = 0; j < 24; j++) {
@@ -352,6 +362,7 @@ export const sonarFragment = /* glsl */ `
       float tag = sampleTag(k, vec2(uj, v));
       float structure = step(0.25, tag), steel = step(0.62, tag), wood = step(0.55, tag) * (1.0 - steel); // 0.5 timber/rock · 0.6 wood · 0.75 steel
       float hitS = sampleDist(k, vec2(uj, v), rayLen); hit = mix(hit, hitS, structure); dr = r - hit; // structure keeps its exact hit
+      if (uPano > 0.5) { float nh = wgt0 * structure * step(-0.4, dr) * (1.0 - step(2.0, dr)); strN += nh; rockN += nh * (1.0 - step(0.48, tag)); } // rocks are tagged 0.45 (lakeMaterial ROCK)
       // timber and rock faces are sharp (real pulse ≈ 0.1 m) and solid; the bottom band is wider with a tail.
       // Steel (wrecks) is by far the strongest reflector: after the log compression its pulse skirts and the
       // ringing inside the hull stay bright, so the app draws a wreck as thick glowing bands with long tails,
@@ -374,7 +385,7 @@ export const sonarFragment = /* glsl */ `
       // Panoramic (#171): the fan skims the bottom, so neighbouring rows meet it metres apart; the bottom between them is
       // lit too (the slab is continuous): each row covers its whole stretch at full level instead of spreading its pulse
       float pulse = sqrt(sgF2 / sgE2) * exp(-drB * drB / sgE2) * (1.0 - structure);
-      if (uPano > 0.5 && gapB > 0.0) { float lo = min(hit, prevB0), hi = max(hit, prevB0); pulse = smoothstep(lo - 1.5 * sg, lo + 0.5 * sg, r) * (1.0 - smoothstep(hi - 0.5 * sg, hi + 1.5 * sg, r)) * (1.0 - structure); } // a flat-topped stretch, no seams between rows // a soft enough onset that the bright fibres poke a few cm above the edge (the burst's feathered top)
+      if (uPano > 0.5 && gapB > 0.0) { float lo = min(hit, prevB0), hi = max(hit, prevB0); pulse = smoothstep(lo - sg, lo + sg, r) * (1.0 - smoothstep(hi - sg, hi + sg, r)) * (1.0 - structure); } // a flat-topped stretch, no seams between rows: neighbouring stretches meet with matching edges that add up to 1 (#178: the old offset edges overlapped into a bright line at every row's hit, and the lines followed the bottom's contours across the fan — wavy rings the app does not have)
       if (hit < 1e8 && structure < 0.5) prevB = hit; // a row on a rock keeps the last bottom hit: the band is filled across it too
       float tl = tailLen * (1.0 + 0.5 * steel);
       float tail = dr > 0.0 ? (0.55 + 0.65 * steel) * exp(-dr / tl) * (1.0 - structure + steel) : 0.0; // the bottom's tail; steel keeps a long tail (#63)
@@ -393,7 +404,7 @@ export const sonarFragment = /* glsl */ `
       float insideB = step(0.0, dr) * (1.0 - step(th, dr));
       solidAcc += wgt0 * insideB * structure * mix(1.0, 0.6, wood) * exp(-dr / max(0.5 * th, 0.15)) * (0.65 + 0.5 * grainS);
 
-      float second = 0.045 * exp(-(r - 2.0 * hit) * (r - 2.0 * hit) / (2.5 * sigma * sigma)); // the second echo under the bottom: small and faint (Jason 2026-10-23)
+      float second = 0.045 * exp(-(r - 2.0 * hit) * (r - 2.0 * hit) / (2.5 * sigma * sigma)) * (1.0 - uPano); // the second echo under the bottom: small and faint (Jason 2026-10-23) (Panoramic: none — every row's own copy drew a ring along the bottom's contours, #178)
       float wgt = wgt0; // the main lobe across the slab (same mean as the old triangle; Panoramic: by depression)
       // the acoustic shadow starts behind the FAR face and fades over a few metres; a wooden hull hardly shades the bottom
       // under it (the recording's bottom runs lit under the hull), timber and rock shade hard
@@ -402,7 +413,7 @@ export const sonarFragment = /* glsl */ `
       if (hit < 1e8 && structure < 0.5) { bw += wgt; bh += wgt * hit; bh2 += wgt * hit * hit; }
       acc += (1.15 * uTune.x * pulse + uTune.y * tail + body + second) * wgt; // a yellow core in the band, orange only at its top and bottom edges // the band's profile measured on the burst: peak 0.5 ft under the edge, 75 % width 1.1 ft, 15 % width 2.7 ft, orange body
       peak = max(peak, pulse * (1.0 - structure));
-      edge = max(edge, exp(-dr * dr / (0.16 * sg * sg)) * (1.0 - structure)); // the first return: a thin hot line
+      edge = max(edge, exp(-dr * dr / (0.16 * sg * sg)) * (1.0 - structure) * (1.0 - uPano)); // the first return: a thin hot line (Panoramic: the rows tile one field, no line per row, #178)
       // (spk: the structure echo comes from the splat after the loop)
 
     }
@@ -445,6 +456,9 @@ export const sonarFragment = /* glsl */ `
     // How deep inside the silhouette a pixel lies: how many of 16 taps on two rings (0.12 m and 0.25 m in the picture's
     // metres, rotated per pixel and ping) also land on structure. Deep inside → the core level, on the rim → the rim level.
     float occ = 0.0; // how fully structure covers this pixel: a solid target hides the bottom band behind it
+    // Panoramic (#178, Jason: 石头的部分应该更亮 因为石头的echosound反射比较强): rock and steel are hard reflectors — in the app a hard
+    // target is the brightest thing in the fan, yellow to white; timber stays the soft patch of #171
+    float hardF = uPano > 0.5 ? rockN / max(strN, 1e-3) : 0.0;
     if (es > 0.002) {
       float duR = 0.5 / (uFan[k].z * cos(a) * cos(a) * max(r, 0.5)); // u per metre across the fan at this range
       float rot = hash(floor(vec2(aWorld * 900.0, r * 30.0)) + png * 0.73) * 6.2832;
@@ -467,6 +481,7 @@ export const sonarFragment = /* glsl */ `
       occ = inner * smoothstep(thr, 2.5 * thr, es);
       vec4 eg = (k == 0) ? texture2D(uEcho0, vec2(u, rn)) : texture2D(uEcho1, vec2(u, rn));
       float steelF = clamp(eg.g / max(eg.r, 1e-3), 0.0, 1.0), woodF = clamp(eg.b / max(eg.r, 1e-3), 0.0, 1.0); // steel and wood shares of the splat (lakeMaterial writes them to g, b)
+      if (uPano > 0.5) hardF = max(hardF, steelF);
       // core levels (Jason 2026-10-24: 船这一轮亮度降低的有点过多了, 找上一轮跟这一轮在折中; rock is denser than wood, so rock a
       // little brighter): wooden hull p90 ~515 (was 612, then 417), rocks and timber ~585, steel ~400 — with the fibres below
       // steel 1.08 → 1.73 with its higher ceiling and the large-scale light and dark (Jason 2026-10-24: 钢船 … 偏暗, 暗很多; fit on
@@ -484,7 +499,7 @@ export const sonarFragment = /* glsl */ `
       float fs = arcGrain(aWorld, r, png);
       float fib = 1.0 + (0.9 * smoothstep(0.3, 0.85, fs) - 0.28) * mix(0.5, 1.0, inner) * 1.3 * uTune5.x; // centred (mean ≈ 1): texture only, the level stays
       spk *= max(fib > 1.0 ? 1.0 + (fib - 1.0) * uTune5.y : fib, 0.35);
-      float Ks = 2.2 * mix(1.0, 1.7 * uTune6.x, steelF) * uTune3.z; // the soft ceiling holds the bright fibres at yellow; steel's higher so its bright regions reach yellow-white (Jason 2026-10-24: 钢船 … 偏暗, 太均匀)
+      float Ks = 2.2 * mix(1.0, 1.7 * uTune6.x, steelF) * uTune3.z * mix(1.0, uPanoK.z, hardF); // the soft ceiling holds the bright fibres at yellow; steel's higher so its bright regions reach yellow-white (Jason 2026-10-24: 钢船 … 偏暗, 太均匀)
       spk = Ks * (1.0 - exp(-spk / Ks));
     }
     // Bottom brightness (Jason 2026-09-25: 画面特别是底部貌似还是太亮 深水也是 … 高亮的部分和桔红色的关系): over a flat
@@ -505,7 +520,7 @@ export const sonarFragment = /* glsl */ `
     accI = K * (1.0 - exp(-accI / K));
     // no separate hot line at the first return any more: both the per-row peak and the edge line were a max over the 24 rows,
     // which spread the band into a 2.4 ft plateau (switching them off reproduced the burst's profile: 75 % width 1.1 ft, a tail to 2.7 ft)
-    acc = (uTune.w * accI + uTune.z * 0.1 * edge * (0.55 + 0.6 * filament)) * shade * (1.0 - 0.92 * occ * uTune4.x) + spk * (uPano > 0.5 ? 0.35 : 1.0); // (Panoramic: a target seen from above across a 60° slab sums far more surface than a vertical slice — toned to a soft patch, #171) structure (the splat) is not shaded by its own shadow, and hides the band behind it
+    acc = (uTune.w * accI + uTune.z * 0.1 * edge * (0.55 + 0.6 * filament)) * shade * (1.0 - 0.92 * occ * uTune4.x) + spk * (uPano > 0.5 ? mix(0.35, uPanoK.x, hardF) : 1.0); // (Panoramic: a target seen from above across a 60° slab sums far more surface than a vertical slice — toned to a soft patch, #171) structure (the splat) is not shaded by its own shadow, and hides the band behind it
     // Bottoms past the cap depth are toned no nearer than 80 % of the range window (#92). With the middle sloping
     // from 30 to 80 ft, Forward (the visitor's fixed range) drew its nearer bottom at 11–22 % white against the old
     // plateau's 8 %; now 7–12 %. Down's AUTO range already puts the bottom at ~80 %, so Down barely changes
@@ -551,6 +566,19 @@ export const sonarFragment = /* glsl */ `
         float eF = lvl * prof * mix(1.0, 0.7 * uTune6.w, hidden) * shade * (1.0 - 0.92 * occ) * atten * tex * patchF * wFar;
         e = max(e, eF);
       }
+    }
+    // Panoramic (#178, Jason: 画面还是有不少黑掉的地方): the app's fan is one even field, 0 % black inside it (sonar-style §7.12).
+    // Behind a rock, a trunk or the island the whole slab can be blocked (every row hits it) and the traced picture had
+    // nothing there: hard black lanes. Wherever this slant range reaches the bottom, a floor of the same grain holds a darker
+    // crimson: shadows soften to it and fade back as the rows over the top land, never black. Where the slant range is
+    // shorter than the water under the ground point the sound has not reached the bottom yet: dark, as in the app.
+    if (uPano > 0.5) {
+      vec2 dw = vec2(p.y, p.x) / max(r, 1e-3); // the bearing in world (x, z): the flat fan looks along +x, starboard +z
+      float D = terrainDepth(uApexXZ) - uApexDepth, h = sqrt(max(r * r - D * D, 0.0));
+      for (int i = 0; i < 2; i++) { D = terrainDepth(uApexXZ + dw * h) - uApexDepth; h = sqrt(max(r * r - D * D, 0.0)); }
+      float reach = smoothstep(0.0, 0.8, r - D) * step(0.1, D); // (D ≤ 0: dry land, no echo)
+      float cov = max(min(panoLobe(atan(D, max(h, 1e-3))) / 0.8, 1.0), uPanoK.w); // the lobe; steep under the boat a weaker return
+      e = max(e, uPanoK.y * cov * reach * shade * (1.0 - 0.92 * occ) * atten * tex * sqrt(tvg)); // (half the near-range gain cut: the app's near field is darker, not black)
     }
     return e;
   }

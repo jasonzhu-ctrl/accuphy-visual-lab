@@ -10,7 +10,7 @@ export const MAX_BEAMS = 2
 // Water advances it)
 export const LAKE_TIME = { value: 0 }
 
-export function makeLakeMaterial({ fish = false, structure = false, steel = false, wood = false, logo = false } = {}) {
+export function makeLakeMaterial({ fish = false, structure = false, steel = false, wood = false, logo = false, rock = false } = {}) {
   const uniforms = {
     uSun: { value: new THREE.Vector3(0.4, 0.8, 0.3).normalize() },
     uFogColor: { value: new THREE.Color('#17545f') },
@@ -42,7 +42,7 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
   const mat = new THREE.ShaderMaterial({
     uniforms,
     vertexColors: true,
-    defines: fish ? { FISH: 1 } : logo ? { STRUCTURE: 1, LOGO: 1 } : steel ? { STRUCTURE: 1, STEEL: 1 } : wood ? { STRUCTURE: 1, WOOD: 1 } : structure ? { STRUCTURE: 1 } : {},
+    defines: fish ? { FISH: 1 } : logo ? { STRUCTURE: 1, LOGO: 1 } : steel ? { STRUCTURE: 1, STEEL: 1 } : wood ? { STRUCTURE: 1, WOOD: 1 } : rock ? { STRUCTURE: 1, ROCK: 1 } : structure ? { STRUCTURE: 1 } : {},
     vertexShader: /* glsl */ `
       varying vec3 vWorld; varying vec3 vNormal; varying vec3 vColor; varying vec3 vSplat; varying float vBad;
       uniform float uSonarPass; uniform vec3 uSplat;
@@ -399,10 +399,14 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
         vec3 col = mix(lit, uFogColor, clamp(fog, 0.0, 0.92));
         if (uSonarPass < 0.5 && uOutGamma != 1.0) col = pow(max(col, 0.0), vec3(uOutGamma));
         // sonar pass alpha: 1 = fish, 0.75 = steel (wrecks), 0.6 = wooden / open structure (a wooden hull: lit right through),
-        // 0.5 = other structure (timber, rocks), 0 = bottom
+        // 0.5 = other structure (timber), 0.45 = rocks, 0 = bottom. Rocks read as timber everywhere (both pass step(0.25) and
+        // stay under 0.55); only Panoramic tells them apart: hard rock is a strong reflector (#178)
         float isFish = 0.0;
       #ifdef STRUCTURE
         isFish = 0.5;
+      #endif
+      #ifdef ROCK
+        isFish = 0.45;
       #endif
       #ifdef WOOD
         isFish = 0.6;

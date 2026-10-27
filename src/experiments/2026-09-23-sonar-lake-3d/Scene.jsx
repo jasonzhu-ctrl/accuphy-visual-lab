@@ -70,7 +70,7 @@ function Instanced({ mat, geos, items, layer }) {
   }, [buckets])
   return geos.map((g, k) => <instancedMesh key={k} ref={(el) => { refs.current[k] = el }} args={[g, mat, Math.max(1, buckets[k].length)]} frustumCulled={false} onUpdate={(o) => { if (layer != null) o.layers.set(layer) }} />)
 }
-function Structures({ mat }) {
+function Structures({ mat, rockMat = mat }) {
   const geos = useMemo(() => ({
     tall: [0, 1, 2, 3].map(makeTallTree), bush: [0, 1, 2, 3, 4].map(makeBushTree), stump: [makeStump()], log: [makeLog()],
     // rocks (rocks.js, #131): the six kinds; small ones at 320 triangles, the few big ones (s ≥ 1.2) at 1280
@@ -86,8 +86,8 @@ function Structures({ mat }) {
       {/* weeds: soft, diffuse returns — left out of Panoramic's top-down structure map (they drew every tuft as a
           bright clump); the side views and the lake still see them (LAKEBED_LAYER is in both) */}
       <Instanced mat={mat} geos={geos.weed} items={items.weed.map((it) => ({ ...it, sx: 0.8, sz: 0.8 }))} layer={LAKEBED_LAYER} />
-      <Instanced mat={mat} geos={geos.rock} items={items.rock.filter((it) => it.s < 1.2)} />
-      <Instanced mat={mat} geos={geos.rockBig} items={items.rock.filter((it) => it.s >= 1.2)} />
+      <Instanced mat={rockMat} geos={geos.rock} items={items.rock.filter((it) => it.s < 1.2)} />
+      <Instanced mat={rockMat} geos={geos.rockBig} items={items.rock.filter((it) => it.s >= 1.2)} />
     </group>
   )
 }
@@ -814,12 +814,12 @@ export default function LakeScene({ state, sonarRect, paused = false, scene = 'l
     fish.userData.uniforms.uHighlight.value.set('#ffe9a0') // fish light up warm, like a sonar return
     fish.userData.uniforms.uFogDensity.value = 0.006
     fish.side = THREE.DoubleSide // flat fins
-    const m = { bed: makeLakeMaterial(), inst: makeLakeMaterial({ structure: true }), steel: makeLakeMaterial({ steel: true }), wood: makeLakeMaterial({ wood: true }), logo: makeLakeMaterial({ logo: true }), fish }
+    const m = { bed: makeLakeMaterial(), inst: makeLakeMaterial({ structure: true }), rock: makeLakeMaterial({ rock: true }), steel: makeLakeMaterial({ steel: true }), wood: makeLakeMaterial({ wood: true }), logo: makeLakeMaterial({ logo: true }), fish }
     if (ice) for (const k in m) { const u = m[k].userData.uniforms; u.uFogColor.value.set(P.T.water); u.uSun.value.copy(dir(P.T.sun.dir)); u.uRevealGain.value = 2.4; u.uOutGamma.value = 0.8; u.uFogDensity.value *= 2.4 } // dark winter water: the bottom fades to black, the beam cuts through (#99)
     else for (const k in m) m[k].userData.uniforms.uAirView.value = 1 // the summer lake: the water column tints what lies under it (lakeMaterial.js, #156)
     return m
   }, [ice, P])
-  const lakeMats = useMemo(() => [mats.bed, mats.inst, mats.steel, mats.wood, mats.fish, mats.logo], [mats]) // wood added 2026-10-23: without it the workboat rendered into the sonar passes untagged (alpha 1 = fish/steel)
+  const lakeMats = useMemo(() => [mats.bed, mats.inst, mats.rock, mats.steel, mats.wood, mats.fish, mats.logo], [mats]) // wood added 2026-10-23: without it the workboat rendered into the sonar passes untagged (alpha 1 = fish/steel)
   const iceMat = useMemo(() => {
     if (!ice) return null
     const m = makeIceMaterial(bakeTerrain())
@@ -847,7 +847,7 @@ export default function LakeScene({ state, sonarRect, paused = false, scene = 'l
       </>)}
       <Lakebed mat={mats.bed} />
       <mesh rotation-x={-Math.PI / 2} position-y={-47} onUpdate={(o) => o.layers.set(SONAR_HIDE_LAYER)}><planeGeometry args={[900, 900]} /><meshBasicMaterial color={ice ? P.T.water : '#17545f'} /></mesh>
-      <Structures mat={mats.inst} />
+      <Structures mat={mats.inst} rockMat={mats.rock} />
       <Wreck mat={mats.wood} /> {/* the ~10 m workboat is wooden (Jason 2026-10-23: 沉船是木质的) — sonar tag 0.6 */}
       <BigWreck mat={mats.steel} />
       <Logo mat={mats.logo} stoneMat={mats.inst} />

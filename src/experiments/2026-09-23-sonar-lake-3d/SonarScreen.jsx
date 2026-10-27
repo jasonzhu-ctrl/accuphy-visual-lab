@@ -139,7 +139,7 @@ export default function SonarScreen({ state, rect, lakeMats }) {
         uHist: { value: null }, uHistPrev: { value: null }, uHistPass: { value: 0 }, uHistFill: { value: 0 }, uIceAmber: { value: /icelut=amber/.test(window.location.search) ? 1 : 0 },
         uSignal: { value: 1 }, // the ice page's signal gate (IceCamp.jsx s.signal); 1 on the summer lake
         uFishMode: { value: 0 }, // the fish-echo test page only (#153)
-        uPano: { value: 0 }, uPanoTilt: { value: PANO_TILT }, // Panoramic as a sound picture (pano test page, #171)
+        uPano: { value: 0 }, uPanoTilt: { value: PANO_TILT }, uPanoK: { value: new THREE.Vector4(0.75, 0.15, 1.3, 0.75) }, // Panoramic as a sound picture (pano test page, #171)
       },
     })
     // the 2D history (Ice Fishing View): 384 pings × 256 depth cells, ping-ponged — each ping shifts the record one
@@ -254,7 +254,7 @@ export default function SonarScreen({ state, rect, lakeMats }) {
     u.uGain.value = s.gain ?? 0.40
     u.uContrast.value = s.contrast ?? 0.4
     u.uNoise.value = s.noise ?? 0.3
-    if (import.meta.env.DEV && window.__sonarTune) { const t = window.__sonarTune; if (t.gamma != null) u.uGamma.value = t.gamma; if (t.dyn != null) u.uDynRange.value = t.dyn; if (t.k) u.uTune.value.fromArray(t.k); if (t.k2) u.uTune2.value.fromArray(t.k2); if (t.k3) u.uTune3.value.fromArray(t.k3); if (t.k4) u.uTune4.value.fromArray(t.k4); if (t.k5) u.uTune5.value.fromArray(t.k5); if (t.k6) u.uTune6.value.fromArray(t.k6); if (t.kb) lakeMats.forEach((m) => m.userData.uniforms.uSplatBig?.value.fromArray(t.kb)) } // dev: tone-curve knobs for like-for-like fits (2026-10-23)
+    if (import.meta.env.DEV && window.__sonarTune) { const t = window.__sonarTune; if (t.gamma != null) u.uGamma.value = t.gamma; if (t.dyn != null) u.uDynRange.value = t.dyn; if (t.k) u.uTune.value.fromArray(t.k); if (t.k2) u.uTune2.value.fromArray(t.k2); if (t.k3) u.uTune3.value.fromArray(t.k3); if (t.k4) u.uTune4.value.fromArray(t.k4); if (t.k5) u.uTune5.value.fromArray(t.k5); if (t.k6) u.uTune6.value.fromArray(t.k6); if (t.kp) u.uPanoK.value.fromArray(t.kp); if (t.kb) lakeMats.forEach((m) => m.userData.uniforms.uSplatBig?.value.fromArray(t.kb)) } // dev: tone-curve knobs for like-for-like fits (2026-10-23)
     u.uFanCount.value = specs.length
     const flat = specs[0] && specs[0].frame.n.y !== 0 // panoramic: thickness normal is vertical
     u.uFlat.value = flat ? 1 : 0

@@ -3061,6 +3061,40 @@ Numbered log. Newest at the bottom.
      - **Order:** tune on `/pano/` first. Once Jason OKs the look, the sound picture becomes the only Panoramic on every
        page and the plan-view code is deleted in the same change.
      - Owner: 冰钓版本视觉效果 (#176).
+     - **Tuned, round 1 (2026-10-27, `/pano/` only):** sheet `docs/2026-10-27-pano-tune-r1.jpg` (phone before / after,
+       the same spot flat, the shelf, and the app's 14 m lake and 62 m wreck frames).
+       - **What differed from the app** (frames `reference/frames/pinglive_pano_*`, sonar-style §7.12):
+         - The app's fan is one even crimson field with soft mottle and radial streaks; black only outside the fan and
+           close in where the sound has not reached the bottom. Ours had hard black lanes behind every rock and stump:
+           at the island the rocks block the whole 5°–65° slab, so no row reached the bottom behind them.
+         - Ours had wavy rings across the field (the bottom's contours): each row added a hot edge line, a second
+           echo, and its stretch edges overlapped into a bright line at every row's hit. The app has none.
+         - Hard targets in the app are the brightest thing in the fan (yellow to white). Ours toned all structure to
+           ×0.35 (#171), so rocks were dull orange discs.
+         - Fish in the app are smooth yellow dashes with an orange halo. Ours had stripes through every dash: the
+           across-beam blur's taps were ~3 texels apart, so a thin fish was copied into a comb.
+       - **Changed (all behind `uPano`, the Panoramic sound picture only):**
+         - A floor under the traced picture wherever the slant range reaches the bottom (the baked terrain along the
+           bearing): shadows fall to a darker crimson and fade back, never black. Under the boat, where the slant range
+           is shorter than the water, it stays dark. Steep under the boat the floor is 75 % of the field, and only half
+           the near-range gain cut applies.
+         - The rows tile one field: matching stretch edges, no per-row edge line, no second echo.
+         - The flat fan's beam is ±1.5° across (was ±0.6°), so shadow sides are soft.
+         - Rocks have their own sonar tag (0.45; lakeMaterial `ROCK`, Scene `mats.rock`). Everywhere else it reads
+           exactly like timber's 0.5. In Panoramic, rock and steel are drawn at ×0.75 with a higher ceiling (×1.3),
+           yellow-white. Timber stays the soft patch.
+         - Fish: 25 taps at 0.2 σ, one row each, in place of 13 × 3 reads. Smooth dashes, and fewer reads.
+         - Knobs: `uPanoK` = (0.75 hard level, 0.15 floor, 1.3 hard ceiling, 0.75 steep floor). Dev:
+           `window.__sonarTune.kp`.
+       - **Checks:**
+         - Black share of the flat picture (outside the fan and the water column included): timber flat 35 → 24 %,
+           hump 31 → 23 %, shelf 23 → 22 %, start (−6, 4) 53 → 46 %.
+         - Lake 6×6 grid and ice grid against 689a258 (#94): the same picture. Lit shares are equal and the
+           differences are only moving fish and per-ping grain. 0 errors.
+         - Phone 390×844 @3: 2.07–2.08 → 2.07–2.14 ms per frame (the same).
+         - Desktop 1440×900 checked. Not measured on the V10.
+       - **Next:** HQ checks the sheet, then Jason looks on `/pano/`. After his OK (step 5 of the dispatch): the sound
+         picture becomes the only Panoramic and the plan-view code is deleted.
 179. **2026-10-27** — **A chat of its own for ad videos** (Jason in Lab HQ: "做广告视频你来开个新的挂着的窗口 单独制作视频 把配置
      skill 等等好的资源都配置上 视频制作专门让他做").
      - **New chat "广告视频制作"**, started from Lab HQ as its side session. It makes the ad stills and films only.
