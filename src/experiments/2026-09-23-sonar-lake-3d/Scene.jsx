@@ -14,12 +14,12 @@ import { makeFishGeometry } from './fishGeometry'
 import { makeCargoWreck, makeWreckDebris, WRECK_L, BIG_WRECK, SMALL_WRECK } from './wreck'
 import { makeLogoGeometry, makePlinthGeometry, logoFrame } from './logo'
 import { buildObstacles, toCircles } from './obstacles'
-import SonarScreen, { SONAR_HIDE_LAYER, LAKEBED_LAYER, FISH_LAYER, LOGO_LAYER } from './SonarScreen'
+import SonarScreen, { SONAR_HIDE_LAYER, LAKEBED_LAYER, FISH_LAYER, LOGO_LAYER, isPhoneLayout } from './SonarScreen'
 // the ice scene (Jason 2026-10-16): the same lake frozen over — iceScene.js has the story and the presets
 import { IceSky, IceSheet, IceCamp, IceWalls, Snowfall, IcePick, LightShaft, MarineSnow, SectionFaces } from './IceCamp'
 import { makeIceMaterial } from './iceSheet'
 import { bakeTerrain } from './sonarMarks'
-import { iceParams, ICE_CAM_T, ICE_CAM_D, ICE_LAKE_W, ICE_FOG, UNDER_CAM, SECTION_CAM, SECTION_CAM_PHONE, ICE_T, dir } from './iceScene'
+import { iceParams, ICE_CAM_T, ICE_CAM_D, ICE_LAKE_W, ICE_FOG, UNDER_CAM, SECTION_CAM, SECTION_CAM_PHONE, SECTION_CAM_PHONE_LOW, SECTION_FRAME, HOP_CAM, ICE_HINT_AT, ICE_T, dir } from './iceScene'
 
 // ---------- lakebed ----------
 function Lakebed({ mat }) {
@@ -418,21 +418,89 @@ const BOAT_CAMS = { // camera offset from the boat, look-at offset from the boat
   side: [[0.4, 1.7, 10.5], [0, 0.15, 0]], bow: [[8.5, 2.6, 6], [0, 0.1, 0]], stern: [[-8.5, 2.4, -5.5], [0, 0.2, 0]],
   top: [[0.01, 13.5, 0], [0, 0, 0]], under: [[5.5, -2.6, 5.5], [0, -0.2, 0]],
 }
+// k (the phone pull-back of the top view) is measured with the top view's own fov, never with the live camera's: the
+// section rigs carry other fovs, and k from the live fov flipped the rig every frame on 3:4 screens (P03/M13)
+const BASE_FOV = 38
+const kOf = (cam, fov, aspect) => Math.max(1, cam.W / (2 * Math.tan(THREE.MathUtils.degToRad(fov / 2)) * aspect * cam.D.length()))
+const NO_PARALLAX = typeof window !== 'undefined' && /[?&]shot=/.test(window.location.search) // review screenshots: the ice cameras ignore the pointer
+const ICE_PICKS = iceParams(), PHONECAM_B = ICE_PICKS.phoneCam === 'b', DESKFRAME_B = ICE_PICKS.deskFrame === 'b' // Jason's two open framing picks (M05, M21)
+const smooth = (u) => u * u * (3 - 2 * u)
+const unsmooth = (p) => 0.5 - Math.sin(Math.asin(1 - 2 * p) / 3) // inverse of smooth: the kit's progress back to the move's time
+const clamp01 = (x) => Math.min(1, Math.max(0, x))
+const _a = new THREE.Vector3(), _b = new THREE.Vector3(), _p = new THREE.Vector3()
+// Solve the section framing for a hole at (hx, hz) outright (decision #113): dy (the look height) so the ice line at the
+// hole sits at iceWant of the band, then the smallest zoom in F.zoom that keeps the bottom (under the hole, or at the
+// lit arc's near lip) inside bottomMax — and, for deskB, the cone's near-right corner clear of the phone mock. Bisection
+// on a probe camera that carries the live projection (fov + view offset).
+function solveSection(probe, C, F, hx, hz, D, H, bandBottom, X) {
+  const place = (dy, zoom) => {
+    _a.set(hx + C.look[0], C.look[1] + dy, hz + C.look[2])
+    _b.set(hx + C.pos[0], C.pos[1], hz + C.pos[2]).sub(_a).multiplyScalar(zoom).add(_a)
+    probe.position.copy(_b); probe.up.set(0, 1, 0); probe.lookAt(_a); probe.updateMatrixWorld(true)
+  }
+  const fracY = (x, y, z) => ((1 - _p.set(x, y, z).project(probe).y) / 2) * H / bandBottom // 0 = band top, 1 = band bottom
+  const lipZ = F.at === 'lip' ? hz + D * Math.tan(X.theta) : hz
+  const solveDy = (zoom, iceWant) => { // frac(0) grows with dy (look higher → the scene slides down)
+    let lo = -14, hi = 16
+    for (let i = 0; i < 16; i++) { const mid = (lo + hi) / 2; place(mid, zoom); if (fracY(hx, 0, hz) < iceWant) lo = mid; else hi = mid }
+    return (lo + hi) / 2
+  }
+  const fits = (bottomMax) => {
+    if (fracY(hx, -D, lipZ) > bottomMax) return false
+    if (F.clearPhone && X.phoneLeft < 1 && X.halfWide > 0) { // the lit arc's right end must not run under the phone mock
+      _p.set(hx + D * Math.tan(X.halfWide), -D, lipZ).project(probe)
+      if ((1 - _p.y) / 2 > X.phoneTop && (_p.x + 1) / 2 > X.phoneLeft - F.clearPhone) return false
+    }
+    return true
+  }
+  const one = (iceWant, bottomMax) => {
+    const [z0, z1] = F.zoom
+    let zoom = z0, dy = solveDy(z0, iceWant)
+    place(dy, z0)
+    if (!fits(bottomMax)) { // too deep for the band: back off along the line of sight until the bottom fits
+      let lo = z0, hi = z1
+      for (let i = 0; i < 14; i++) { const mid = (lo + hi) / 2; place(solveDy(mid, iceWant), mid); if (!fits(bottomMax)) lo = mid; else hi = mid }
+      zoom = hi; dy = solveDy(zoom, iceWant)
+    }
+    return { dy, zoom }
+  }
+  if (!F.steps) return one(F.iceWant, F.bottomMax)
+  // phoneB: keep a sliver of sky — the horizon (a point 1 km out along the view, on the ice) at least F.sky below the band top
+  const sky = (r) => {
+    place(r.dy, r.zoom)
+    _a.set(hx + C.look[0], 0, hz + C.look[2]).sub(_b).setY(0).normalize().multiplyScalar(1000).add(_b).setY(0)
+    return fracY(_a.x, 0, _a.z)
+  }
+  let first = null
+  for (const [w, b] of F.steps) { const r = one(w, b); first ??= r; if (sky(r) >= F.sky) return r }
+  return first
+}
 function Rig({ state, sonarRect, fogMats, cam = LAKE_CAM }) {
   const { camera, size, scene } = useThree()
   const tmp = useMemo(() => new THREE.Vector3(), [])
   const look = useMemo(() => new THREE.Vector3(), [])
+  const lk = useMemo(() => new THREE.Vector3(), [])
+  const probe = useMemo(() => new THREE.PerspectiveCamera(), [])
   const k0 = useRef(0)
+  const sol = useRef({ key: '', list: [] }) // per-hole section solves for the current layout
+  if (import.meta.env.DEV) window.__rigCamera = camera // dev: camera checks from the shot tool
   useFrame(({ clock }, dt) => {
     const s = state.current
     const aspect = size.width / size.height
-    const tanV = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2))
-    const k = Math.max(1, cam.W / (2 * tanV * aspect * cam.D.length())) // 1 on desktop and landscape tablets
+    const secLike = s.view === 'under' || s.view === 'section' // the ice page's own cameras
+    const phoneRig = isPhoneLayout() // the DOM's own test (the full-width app frame under the band): picks the section rig
+    s.phoneCam = phoneRig
+    const C = s.view === 'under' ? UNDER_CAM : phoneRig ? (PHONECAM_B ? SECTION_CAM_PHONE_LOW : SECTION_CAM_PHONE) : SECTION_CAM
+    const fovNow = secLike ? C.fov ?? 38 : BASE_FOV
+    const k = kOf(cam, fovNow, aspect) // fog / far plane; stable because the rig no longer depends on it
+    const bandPhone = secLike ? phoneRig : k > 1 // top view: as before (k from fov 38)
     // lake band = the screen above the phone frame on portrait phones (the frame and panel cover the rest)
-    const fr = sonarRect?.current?.dock || sonarRect?.current?.frame
-    const bandBottom = k > 1 && fr ? Math.max(size.height * 0.35, Math.min(size.height, fr.getBoundingClientRect().top)) : size.height
+    const fr = sonarRect?.current?.frame
+    const frR = fr && bandPhone ? fr.getBoundingClientRect() : null
+    let bandBottom = frR ? Math.max(size.height * 0.35, Math.min(size.height, frR.top)) : size.height
+    if (secLike) bandBottom = Math.round(bandBottom / 4) * 4 // sub-pixel moves of the frame must not re-solve
     const devCam = s.fishCam || s.logoCam || s.wreckCam || s.closeCam
-    const offY = devCam ? 0 : Math.round(size.height / 2 - bandBottom / 2)
+    const offY = devCam || s.view === 'under' ? 0 : Math.round(size.height / 2 - bandBottom / 2)
     if (offY > 0) { if (!camera.view?.enabled || camera.view.offsetY !== offY || camera.view.fullWidth !== size.width || camera.view.fullHeight !== size.height) camera.setViewOffset(size.width, size.height, 0, offY, size.width, size.height) }
     else if (camera.view?.enabled) camera.clearViewOffset()
     if (k !== k0.current) { // thin the fog and push the far plane with the camera distance
@@ -441,15 +509,32 @@ function Rig({ state, sonarRect, fogMats, cam = LAKE_CAM }) {
       if (scene.fog) { scene.fog.near = cam.FOG.near * k; scene.fog.far = cam.FOG.far * k }
       camera.far = cam.FOG.cam * k; camera.updateProjectionMatrix()
     }
-    // drag hint follows the boat until the first drag, kept inside the screen
+    const d = s.drill, hop = !!(d && d.phase && d.phase !== 'idle' && d.from && d.to)
+    // drag hint follows the boat until the first drag, kept inside the screen; writes only when it moved
     if (s.hintEl) {
-      tmp.set(s.boat.x, 0.6, s.boat.z).project(camera)
-      const hw = (s.hintEl.offsetWidth || 160) / 2 + 8
-      const px = Math.min(size.width - hw, Math.max(hw, ((tmp.x + 1) / 2) * size.width))
-      const below = cam.hintBelow && s.view !== 'section'
-      const py = below ? ((1 - tmp.y) / 2) * size.height + (s.view === 'under' ? 150 : k > 1 ? 30 : 44) : Math.max((s.hintEl.offsetHeight || 34) + 54, ((1 - tmp.y) / 2) * size.height - (k > 1 ? 22 : 46))
-      s.hintEl.style.transform = `translate(${px.toFixed(1)}px, ${py.toFixed(1)}px) translate(-50%, ${below ? '0' : '-100%'})`
-      s.hintEl.style.opacity = s.hasDragged ? '0' : '1'
+      const off = s.hasDragged || hop
+      if (off) { if (s.hintOp !== '0') { s.hintEl.style.opacity = s.hintOp = '0' } }
+      else {
+        const hw = (s.hintEl.offsetWidth || 160) / 2 + 8
+        const deskSec = cam === ICE_CAM && s.view === 'section' && !phoneRig
+        let px, py, below = false
+        if (deskSec) { // desktop section: on open ice right of the shelter, behind the wall, clear of the panel (M12)
+          tmp.set(s.boat.x + ICE_HINT_AT[0], ICE_HINT_AT[1], s.boat.z + ICE_HINT_AT[2]).project(camera)
+          px = Math.min(size.width - hw, Math.max((s.avoidRight || 0) + hw + 12, ((tmp.x + 1) / 2) * size.width))
+          py = Math.max((s.hintEl.offsetHeight || 34) + 54, ((1 - tmp.y) / 2) * size.height - 10)
+        } else {
+          tmp.set(s.boat.x, 0.6, s.boat.z).project(camera)
+          const ph = secLike ? phoneRig : k > 1
+          px = Math.min(size.width - hw, Math.max(hw, ((tmp.x + 1) / 2) * size.width))
+          below = cam.hintBelow && s.view !== 'section'
+          py = below ? ((1 - tmp.y) / 2) * size.height + (s.view === 'under' ? 150 : ph ? 30 : 44) : Math.max((s.hintEl.offsetHeight || 34) + 54, ((1 - tmp.y) / 2) * size.height - (ph ? 22 : 46))
+        }
+        if (s.hintOp !== '1' || s.hintBelow !== below || Math.abs(px - s.hintX) + Math.abs(py - s.hintY) > 0.5) {
+          s.hintX = px; s.hintY = py; s.hintBelow = below
+          s.hintEl.style.transform = `translate(${px.toFixed(1)}px, ${py.toFixed(1)}px) translate(-50%, ${below ? '0' : '-100%'})`
+          if (s.hintOp !== '1') s.hintEl.style.opacity = s.hintOp = '1'
+        }
+      }
     }
     // fixed 3/4 aerial view like the PL animations; slight parallax from the pointer
     const px = s.parallax.x, py = s.parallax.y
@@ -496,62 +581,76 @@ function Rig({ state, sonarRect, fogMats, cam = LAKE_CAM }) {
       if (camera.fov !== 38) { camera.fov = 38; camera.updateProjectionMatrix() }
       return
     }
-    // the ice page's other two cameras (docs/ice-relationship-study.md A and B): offsets from the live hole, smooth follow
-    if (s.view === 'under' || s.view === 'section') {
-      const C = s.view === 'under' ? UNDER_CAM : (k > 1 ? SECTION_CAM_PHONE : SECTION_CAM) // k > 1: the portrait-phone layout
-      const e = Math.min(1, dt * 2.5)
-      const fov = C.fov ?? 38
-      if (camera.fov !== fov) { camera.fov = fov; camera.updateProjectionMatrix() }
-      // the section fits what matters into the band above the app frame (phones) or the window (desktop): the ice line at
-      // the hole and the lake bottom under it. The camera backs off along its line of sight until the bottom fits, and
-      // comes back in when it can (Jason 2026-10-16: 手机版水下的画面会挡住 是不是应该拉远一点).
-      // On phones the band is centred in the camera (view offset), like the top view does for the lake.
-      let zoom = 1
-      if (s.view === 'section') {
-        const fr = sonarRect?.current?.dock || sonarRect?.current?.frame
-        const bandBottom = k > 1 && fr ? Math.max(size.height * 0.35, Math.min(size.height, fr.getBoundingClientRect().top)) : size.height
-        const offY = k > 1 ? Math.round(size.height / 2 - bandBottom / 2) : 0
-        if (offY > 0) { if (!camera.view?.enabled || camera.view.offsetY !== offY || camera.view.fullWidth !== size.width || camera.view.fullHeight !== size.height) camera.setViewOffset(size.width, size.height, 0, offY, size.width, size.height) }
-        else if (camera.view?.enabled) camera.clearViewOffset()
-        // Solve the framing outright (decision #113): dy so the ice line at the hole sits at iceWant, then the smallest
-        // zoom ≥ 1 that keeps the bottom under the hole inside bottomMax. Bisection on a probe camera that carries the
-        // real projection (fov + view offset); cached while nothing that matters moved. The old nudge-per-frame
-        // controller converged slowly, jumped on the first (long) frames and settled at different zooms per browser.
-        const D = depthAt(s.boat.x, s.boat.z)
-        const iceWant = k > 1 ? 0.26 : 0.45, bottomMax = k > 1 ? 0.8 : 0.9 // phones: the band is short, keep room under the lit bottom
-        const key = [s.boat.x.toFixed(2), s.boat.z.toFixed(2), D.toFixed(2), size.width, size.height, Math.round(bandBottom), camera.fov, k > 1].join('|')
-        if (s.secKey !== key) {
-          s.secKey = key
-          const probe = camera.clone() // same fov and view offset as the live camera
-          const lookT = new THREE.Vector3(), posT = new THREE.Vector3(), pt = new THREE.Vector3()
-          const place = (dy, zoom) => {
-            lookT.set(s.boat.x + C.look[0], C.look[1] + dy, s.boat.z + C.look[2])
-            posT.set(s.boat.x + C.pos[0], C.pos[1], s.boat.z + C.pos[2]).sub(lookT).multiplyScalar(zoom).add(lookT)
-            probe.position.copy(posT); probe.up.set(0, 1, 0); probe.lookAt(lookT); probe.updateMatrixWorld(true)
-          }
-          const frac = (y) => ((1 - pt.set(s.boat.x, y, s.boat.z).project(probe).y) / 2) * size.height / bandBottom // 0 = band top, 1 = band bottom
-          const solveDy = (zoom) => { // frac(0) grows with dy (look higher → the scene slides down)
-            let lo = -14, hi = 16
-            for (let i = 0; i < 16; i++) { const mid = (lo + hi) / 2; place(mid, zoom); if (frac(0) < iceWant) lo = mid; else hi = mid }
-            return (lo + hi) / 2
-          }
-          let zoom = 1, dy = solveDy(1)
-          place(dy, 1)
-          if (frac(-D) > bottomMax) { // too deep for the band: back off along the line of sight until the bottom fits
-            let lo = 1, hi = 3.2
-            for (let i = 0; i < 14; i++) { const mid = (lo + hi) / 2; place(solveDy(mid), mid); if (frac(-D) > bottomMax) lo = mid; else hi = mid }
-            zoom = hi; dy = solveDy(zoom)
-          }
-          s.secZoom = zoom; s.secDy = dy
+    // the ice page's other two cameras (docs/ice-relationship-study.md A and B): offsets from the live hole
+    if (secLike) {
+      if (phoneRig && !(frR && frR.height > 0)) return // the phone frame has not laid out yet: do not frame against a guess
+      if (camera.fov !== fovNow) { camera.fov = fovNow; camera.updateProjectionMatrix() }
+      const sec = s.view === 'section'
+      // The hole-hop is one designed move (M09): the look anchor holds on the old hole through the lift, then follows the
+      // kit on the move's own curve (never more than lead metres behind it) and arrives on the new hole as the auger
+      // starts; the framing blends from the old hole's solve to the new one's on the same curve. Nothing re-solves on
+      // the terrain under the walking kit.
+      let ax = s.boat.x, az = s.boat.z, wa = 1
+      if (hop) {
+        const fx = d.from.x, fz = d.from.z, tx = d.to.x - fx, tz = d.to.z - fz, L2 = tx * tx + tz * tz
+        if (s.hopFrom !== d.from) { s.hopFrom = d.from; d.moveDur = HOP_CAM.moveDur(Math.sqrt(L2)) } // IceCamp may read it (P05)
+        if (d.phase === 'lift') wa = 0
+        else if (d.phase === 'move') {
+          const p = L2 > 1e-6 ? clamp01(((s.boat.x - fx) * tx + (s.boat.z - fz) * tz) / L2) : 1
+          wa = smooth(clamp01((unsmooth(p) - 0.2) / 0.8))
         }
-        zoom = s.secZoom
+        ax = fx + tx * wa; az = fz + tz * wa
+        const lead = phoneRig ? HOP_CAM.lead.phone : HOP_CAM.lead.desk
+        const lx = s.boat.x - ax, lz = s.boat.z - az, ll = Math.hypot(lx, lz)
+        if (ll > lead) { ax = s.boat.x - (lx * lead) / ll; az = s.boat.z - (lz * lead) / ll }
+        wa = L2 > 1e-6 ? clamp01(((ax - fx) * tx + (az - fz) * tz) / L2) : 1
+      }
+      // the section fits what matters into the band above the app frame (phones) or the window (desktop): the ice line at
+      // the hole and the lake bottom under it (Jason 2026-10-16: 手机版水下的画面会挡住 是不是应该拉远一点). On phones
+      // the band is centred in the camera (view offset), like the top view does for the lake.
+      let zoom = 1, dy = 0
+      let layoutChanged = false
+      if (sec) {
+        const F = phoneRig ? (PHONECAM_B ? SECTION_FRAME.phoneB : SECTION_FRAME.phone) : DESKFRAME_B ? SECTION_FRAME.deskB : SECTION_FRAME.desk
+        const lip = F.at === 'lip' || F.clearPhone
+        const down = lip ? (s.specs || []).find((sp) => sp?.frame?.c && Math.abs(Math.atan2(sp.frame.c.x, -sp.frame.c.y)) < 0.3) : null
+        const pr = F.clearPhone && fr ? (fr.firstElementChild || fr).getBoundingClientRect() : null // the mock as drawn (it is turned in 3D)
+        const X = { theta: down?.theta ?? THREE.MathUtils.degToRad(9), halfWide: down ? (down.a1 - down.a0) / 2 : 0, phoneLeft: pr ? pr.left / size.width : 1, phoneTop: pr ? pr.top / size.height : 1 }
+        const key = [size.width, size.height, bandBottom, camera.fov, phoneRig, PHONECAM_B, DESKFRAME_B, offY, lip ? `${X.theta.toFixed(3)},${X.halfWide.toFixed(3)},${X.phoneLeft.toFixed(3)},${X.phoneTop.toFixed(3)}` : ''].join('|')
+        if (sol.current.key !== key) { layoutChanged = sol.current.key !== ''; sol.current.key = key; sol.current.list.length = 0 }
+        const at = (hx, hz) => {
+          const list = sol.current.list
+          for (const r of list) if (Math.abs(r.x - hx) < 1e-3 && Math.abs(r.z - hz) < 1e-3) return r
+          probe.copy(camera) // same fov and view offset as the live camera
+          const r = solveSection(probe, C, F, hx, hz, depthAt(hx, hz), size.height, bandBottom, X)
+          r.x = hx; r.z = hz
+          list.push(r); if (list.length > 6) list.shift()
+          return r
+        }
+        if (hop && wa < 1) {
+          const r0 = at(d.from.x, d.from.z), r1 = at(d.to.x, d.to.z)
+          dy = r0.dy + (r1.dy - r0.dy) * wa; zoom = Math.exp(Math.log(r0.zoom) + (Math.log(r1.zoom) - Math.log(r0.zoom)) * wa)
+        } else { const r = at(hop ? d.to.x : s.boat.x, hop ? d.to.z : s.boat.z); dy = r.dy; zoom = r.zoom }
+        s.secZoom = zoom; s.secDy = dy; s.secKey = key
       } else if (camera.view?.enabled) camera.clearViewOffset()
-      const lk = new THREE.Vector3(s.boat.x + C.look[0], C.look[1] + (s.view === 'section' ? s.secDy : 0), s.boat.z + C.look[2])
-      tmp.set(s.boat.x + C.pos[0], C.pos[1], s.boat.z + C.pos[2]).sub(lk).multiplyScalar(zoom).add(lk)
-      tmp.x += px * 1.2; tmp.y += py * 0.6
-      if (!s.camP) { s.camP = tmp.clone(); s.camL = lk.clone() }
-      s.camP.lerp(tmp, e)
-      s.camL.lerp(lk, e)
+      // phones: look a little higher while the Mini is up, so the raised pole stays inside the short band
+      const liftT = hop && sec && phoneRig && d.phase !== 'drop' ? HOP_CAM.liftLook : 0
+      s.hopLook = (s.hopLook || 0) + (liftT - (s.hopLook || 0)) * (1 - Math.exp(-dt / 0.25))
+      lk.set(ax + C.look[0], C.look[1] + dy + s.hopLook, az + C.look[2])
+      tmp.set(ax + C.pos[0], C.pos[1], az + C.pos[2]).sub(lk).multiplyScalar(zoom).add(lk)
+      // pointer parallax: desktop only (a finger on a phone would slide the view and leave it there), eased on its own
+      const pk = phoneRig || NO_PARALLAX ? 0 : 1, pe = 1 - Math.exp(-dt / 0.4)
+      s.secPar ||= { x: 0, y: 0 }
+      s.secPar.x += (px * 1.2 * pk - s.secPar.x) * pe; s.secPar.y += (py * 0.6 * pk - s.secPar.y) * pe
+      tmp.x += s.secPar.x; tmp.y += s.secPar.y
+      // the camera rides the target exactly; only jumps (a view switch) ease out, frame-rate independent, no overshoot.
+      // A layout change (rotation, resize, the frame laying out) snaps.
+      if (!s.camP || layoutChanged) { s.camP = tmp.clone(); s.camL = lk.clone(); s.camTP = tmp.clone(); s.camTL = lk.clone() }
+      else {
+        const kd = Math.exp(-Math.min(dt, 0.1) / HOP_CAM.ease)
+        s.camP.sub(s.camTP).multiplyScalar(kd).add(tmp); s.camTP.copy(tmp)
+        s.camL.sub(s.camTL).multiplyScalar(kd).add(lk); s.camTL.copy(lk)
+      }
       camera.up.set(0, 1, 0); camera.position.copy(s.camP); camera.lookAt(s.camL)
       return
     }

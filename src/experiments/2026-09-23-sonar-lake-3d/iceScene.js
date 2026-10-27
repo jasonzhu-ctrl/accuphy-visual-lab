@@ -70,12 +70,37 @@ export const SECTION_CAM = { pos: [-3, 7, 26], look: [2, -2.65, 0], cutZ: 6.5, s
 // phones (portrait, the app frame covers the lower half): closer, looking further down, so the ice band, the slab and the
 // cone with the lit bottom all sit in the band above the frame
 export const SECTION_CAM_PHONE = { pos: [-1, 8, 22], look: [1.5, -6.5, 0], cutZ: 6.5, slab: 0.8, fov: 50 } // cutZ: the wall, this far in front of the hole; slab: the ice edge as drawn (0.5 m real, a little taller to read from 25 m)
+// M05 (Jason's choice, ?phonecam=b): a lower, wider phone camera — a sliver of sky with the far shore above the ice, the
+// cone smaller and centred; the ice behind the wall turns to a dusk mirror at this angle (Fresnel at ~10°). Default: the
+// high camera above. cutZ/slab are not read from the phone presets (SECTION_CAM's are the ones used).
+export const SECTION_CAM_PHONE_LOW = { pos: [-1, 3.5, 22], look: [0.5, -3.0, 0], cutZ: 6.5, slab: 0.8, fov: 56 }
+// What the section camera fits into its band (decision #113, Scene.jsx Rig). iceWant: the ice line at the hole, as a share
+// of the band from its top; bottomMax: the lake bottom — under the hole (at: 'hole') or at the lit arc's near lip
+// (at: 'lip', the Down fan is ~18° thick, so its near edge is D·tan 9° closer and projects lower) — must stay above it;
+// zoom: how far the camera may come in / back off along its line of sight (1 = the preset's distance).
+//   desk / phone: today's framing (the defaults). deskB (?deskframe=b, M21): ice line higher (the slab seam leaves the
+//   centre line), measured at the lip, may come closer than the preset, and keeps the cone's near-right corner clear of
+//   the phone mock. phoneB (?phonecam=b): the low camera's targets; keeps ≥ 5 % sky by stepping the ice line up to
+//   0.28 (and the lip down to 0.92) before it gives the sky up; zoom capped at 1.9.
+export const SECTION_FRAME = {
+  desk:   { iceWant: 0.45, bottomMax: 0.9, at: 'hole', zoom: [1, 3.2] },
+  phone:  { iceWant: 0.26, bottomMax: 0.8, at: 'hole', zoom: [1, 3.2] },
+  deskB:  { iceWant: 0.40, bottomMax: 0.88, at: 'lip', zoom: [0.75, 3.2], clearPhone: 0.03 },
+  phoneB: { iceWant: 0.34, bottomMax: 0.88, at: 'lip', zoom: [1, 1.9], sky: 0.05, steps: [[0.34, 0.88], [0.32, 0.89], [0.30, 0.90], [0.28, 0.92]] },
+}
+// The hole-hop camera (M09): during the walk the look anchor holds on the old hole, then follows the kit on the move's own
+// curve, never more than lead metres behind it, and blends from the old hole's framing to the new one's.
+export const HOP_CAM = { lead: { desk: 6, phone: 3 }, liftLook: 0.8, ease: 0.35, moveDur: (len) => Math.min(1.6, Math.max(0.9, 0.9 + 0.035 * len)) }
+// The desktop hint (M12): a spot of open ice right of the shelter, behind the wall, clear of the panel.
+export const ICE_HINT_AT = [13, 0, -4]
 export function iceParams() {
   const q = typeof window !== 'undefined' ? window.location.search : ''
   const time = (/[?&]time=(dusk|day|night)/.exec(q) || [])[1] || 'dusk'
   const look = (/[?&]look=(snow|mixed|glass)/.exec(q) || [])[1] || 'glass' // Jason 2026-10-16: 图像关系我偏好最后一个 (the black ice)
   const view = (/[?&]view=(top|under|section)/.exec(q) || [])[1] || 'section' // Jason 2026-10-16: 我觉得是 b (the section)
-  return { time, look, view, T: TIMES[time], L: LOOKS[look] }
+  const phoneCam = /[?&]phonecam=b/.test(q) ? 'b' : 'a' // M05, Jason's pick (a = today's high camera)
+  const deskFrame = /[?&]deskframe=b/.test(q) ? 'b' : 'a' // M21, Jason's pick (a = today's framing)
+  return { time, look, view, phoneCam, deskFrame, T: TIMES[time], L: LOOKS[look] }
 }
 
 export const col = (hex) => new THREE.Color(hex)
