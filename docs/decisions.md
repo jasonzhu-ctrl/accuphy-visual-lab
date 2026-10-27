@@ -3120,3 +3120,22 @@ Numbered log. Newest at the bottom.
      - **Boundary:** it never changes the lake or the sonar (#176). New hooks, cameras or fish go through
        "冰钓版本视觉效果". From now on 冰钓 no longer makes ad stills or films.
      - Rule added to `CLAUDE.md` (chat list, skills line).
+180. **2026-10-27** — **Load plan B done: the page's download halved** (Jason in Lab HQ: "没问题" to doing it before 11/2;
+     plan `docs/2026-10-26-lab-load-time.md` 三 改法 B, items 1–3; item 4, splitting the ice code, is the lake's and stays open).
+     - **Fonts:** Instrument Sans and Eurostile Heavy subset to woff2 (`public/brand/fonts/*.woff2`, 36 + 18 KB; were 193 + 201 + 44 KB
+       of ttf/otf): Latin, Latin-1, Œ, – — ‘ ’ “ ” • … ← ↑ → ↓ − ≈ ≥ ⋯; the weight axis 400–700 kept, the width axis pinned
+       at 100. The italic face is dropped — the rulers' italic numbers are synthesised. `src/index.css` points at the subsets;
+       the full fonts stay for the ad scripts (`scripts/dev/ads/`).
+     - **Logo:** `public/brand/logo/accuphy-white.svg` (2 KB; the white lockup from `Untitled-1.svg`, cropped) replaces the 147 KB
+       PNG in both builds (`__acLogo`) and on the cover. The source files still name the PNG, so the dev server shows it; the
+       lake's files were not touched (#176).
+     - **Home thumbnails:** the 11 tiles are files in `pages/home/<name>-<hash>.jpg`, fetched only when the Home shows (never on
+       desktop), `loading="lazy"`; `vite.share.config.js` inlines every other image as before. `scripts/build-share.mjs` rewrites
+       Vite's `new URL(…, import.meta.url)` to `./home/…`, copies the files, caches them for good in `vercel.json`, and throws if
+       any other file reference is left. The one-file `accuphy-lab.html` (private Artifact preview) still inlines them.
+     - **Measured** (headless Chrome 156, 390×844, 4G 9 Mbps / 60 ms + 4× CPU, gzip, 3 runs each, medians; before = 9a222aa):
+       download 1122 → 624 KB; page received 1.17 → 0.63 s; cover painted 0.46 → 0.14 s; Home shown 1.47 → 0.90 s; lake's first
+       frame 4.34 → 3.67 s. The 2.6–2.9 s freeze before the first frame is unchanged (plan C). Share build `[both]`: pages
+       1.88 MB + 151 KB thumbnails (was 2.79 MB); ice `[ice]` and the embed build pass; embed `lab-4a3ed08481.js` 2.08 MB.
+     - **Checked:** dev and built pages, lake and ice, English and `?lang=fr` — accents, ° × − →, the synthesised italic rulers; all
+       11 thumbnails load, 0 broken images, 0 console errors. Not yet on any link: HQ rebuilds (`docs/versions.md`).

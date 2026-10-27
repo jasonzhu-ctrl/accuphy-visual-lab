@@ -12,6 +12,9 @@ with the source commit it was built from, so anyone can tell which version a lin
   `dpl_KWPGDeTYyZE8u3PL1EmCebnn9Lhe`, the embed build `lab-e35c0a69c4.js`. Jason said 动 in Lab HQ.
 - **Old private previews** VxxnVnZr8cxQLXw3iizMdD (1c0ba1c), RnCBYTexY5vcEqJy2hAsN7 and G5uZM8imcgsQNzoKfPkiMa (ac67cb4)
   are old snapshots, not updated. Waiting for Jason: delete them or leave them.
+- **Page layout since #180 (2026-10-27, load plan B):** a share build is no longer one file — `pages/index.html` plus
+  `pages/home/<name>-<hash>.jpg` (the 11 app Home thumbnails, fetched only when the Home shows). Upload the `pages/` folder
+  whole. Only the private Artifact preview `accuphy-lab.html` still inlines everything. Fonts are woff2 subsets, the logo an SVG.
 
 ## Pages
 

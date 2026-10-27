@@ -138,3 +138,20 @@ ice chat); **B** halve the download (font subsets as woff2, the SVG logo, thumbn
 download 1.0 s → 0.5 s; **C** (after 11/2) precomputed terrain table, `checkShaderErrors` off + `compileAsync` warm-up behind
 the cover, prebaked logo texture → first frame ≈ 2.0 s; re-measure on the V10 and Jason's iPhone. Not worth it: changing host,
 splitting three.js into its own file, lowering quality.
+
+## 五、改法 B 做完（2026-10-27，手机网页端，决定 #180）
+
+字体子集 woff2（0.31 MB → 54 KB，斜体去掉用假斜体）、logo 换 2 KB SVG、11 张首页缩略图改成 `pages/home/` 旁边的文件（首页显示时才下载，电脑永远不下）。
+第 4 项（拆冰钓代码）归湖景（#176），没做。
+
+同一套 4G 模拟（gzip，3 次取中位数，之前 = 9a222aa）：
+
+| | 之前 | 之后 |
+|---|---|---|
+| 下载 | 1122 KB | 624 KB |
+| 页面到手 | 1.17 s | 0.63 s |
+| 封面出现 | 0.46 s | 0.14 s |
+| 首页出现 | 1.47 s | 0.90 s |
+| 湖面第一帧 | 4.34 s | 3.67 s |
+
+第一帧前的冻屏（2.6–2.9 s）没变，那是改法 C 的事。
