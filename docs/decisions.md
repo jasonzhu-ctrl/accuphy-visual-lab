@@ -3061,3 +3061,12 @@ Numbered log. Newest at the bottom.
      - **Order:** tune on `/pano/` first. Once Jason OKs the look, the sound picture becomes the only Panoramic on every
        page and the plan-view code is deleted in the same change.
      - Owner: 冰钓版本视觉效果 (#176).
+179. **2026-10-27** — **A chat of its own for ad videos** (Jason in Lab HQ: "做广告视频你来开个新的挂着的窗口 单独制作视频 把配置
+     skill 等等好的资源都配置上 视频制作专门让他做").
+     - **New chat "广告视频制作"**, started from Lab HQ as its side session. It makes the ad stills and films only.
+     - **Skill:** `.claude/skills/ad-video/SKILL.md` covers its scope, the approval chain (stills → HQ → Jason → film), the
+       claims and brand rules (Creative Cloud Eurostile only), the recording and encoding pipeline in
+       `scripts/dev/ads/`, the formats and where v3 stands.
+     - **Boundary:** it never changes the lake or the sonar (#176). New hooks, cameras or fish go through
+       "冰钓版本视觉效果". From now on 冰钓 no longer makes ad stills or films.
+     - Rule added to `CLAUDE.md` (chat list, skills line).

@@ -63,7 +63,7 @@ no TypeScript. No backend, no database — front-end only.
 Small, clear edits (a colour, a label, moving one object): just do them and check the one affected view — no need to
 read `docs/lessons.md` or run a skill. Read `docs/lessons.md` only for bigger work on the sonar picture, terrain, fish
 or sharing. Repeatable procedures are project skills: `sonar-qa` (full QA pass), `sonar-look-tuning` (changing the
-picture), `lab-test-link` (updating the public test link). Node checks live in `scripts/dev/`.
+picture), `lab-test-link` (updating the public test link), `ad-video` (ad stills and films). Node checks live in `scripts/dev/`.
 
 ## Vocabulary
 
@@ -124,6 +124,8 @@ anyone's memory.
     need Jason's "动" said in the HQ chat.
   - "冰钓版本视觉效果" — the working chat for the sonar picture, the lake and the ice page.
   - "手机网页端" — the phone web page.
+  - "广告视频制作" (#179, Jason 2026-10-27) — makes the ad stills and films only, with the `ad-video` skill. It never
+    changes the lake or the sonar; it asks "冰钓版本视觉效果" for those.
   - "LiveScope 研究" — the LiveScope reference study (`docs/livescope-study.md`).
   - "案例工具调研" — research on case studies and tools.
 - **The name:** "visual lab" and "Accuphy Lab" are the same project; Jason dropped "visual"
