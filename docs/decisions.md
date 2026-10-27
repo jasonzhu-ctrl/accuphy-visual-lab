@@ -3104,3 +3104,5 @@ Numbered log. Newest at the bottom.
      - **Boundary:** it never changes the lake or the sonar (#176). New hooks, cameras or fish go through
        "冰钓版本视觉效果". From now on 冰钓 no longer makes ad stills or films.
      - Rule added to `CLAUDE.md` (chat list, skills line).
+     - **Jason's OK (2026-10-27, Lab HQ):** "全景可以了，新画法替换所有页面，旧的删掉". Round 1 (e5a512c) is the look. Step 5
+       goes ahead: the sound picture becomes the only Panoramic, and the plan-view code and the `/pano/` test page are removed.
