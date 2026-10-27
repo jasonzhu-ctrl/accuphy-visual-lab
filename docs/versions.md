@@ -5,9 +5,9 @@ with the source commit it was built from, so anyone can tell which version a lin
 
 ## Current lake (one version, #176)
 
-- **Friends' test links** `/`, `/mini/`, `/ice/`, `/pano/`: all built from **c9f900b** (2026-10-27). That build has the
-  round wake rings (#175), fish round 3 (#173) and no lake jig (#174). `/jig/` is retired and forwards to `/`. Test-link
-  repo commit f297eab.
+- **Friends' test links** `/`, `/mini/`, `/ice/`, `/pano/`: all built from **1abeedf** (2026-10-27). That build has the
+  round wake rings (#175), fish round 3 (#173), no lake jig (#174), three lake trout in the 110 ft hole (#174) and far
+  fish held steady at long range (#177). `/jig/` is retired and forwards to `/`. Test-link repo commit b642a6d.
 - **lab.accuphy.ca:** still 50ad8ca (10-25). It follows c9f900b only when Jason says 动.
 - **Old private previews** VxxnVnZr8cxQLXw3iizMdD (1c0ba1c), RnCBYTexY5vcEqJy2hAsN7 and G5uZM8imcgsQNzoKfPkiMa (ac67cb4)
   are old snapshots, not updated. Waiting for Jason: delete them or leave them.
@@ -74,5 +74,6 @@ the Mini page; `VITE_SCENE=ice` for the ice page → `/ice/` on GitHub Pages sin
 | 2026-10-27 | Public test page `/jig/` | 218e483 | 0f4439e | Lake with the 110 ft hole and the jig drop from the boat (`?jig`, best with `?boat=-22.9,-47.2`) (#172) |
 | 2026-10-27 | Public test page `/jig/` | 557f1b2 | 7191adc | Fish schools spread out (#173) on top of the hole and jig (#172) |
 | 2026-10-27 | Public test page `/jig/` | 58ea10f | 2418a2d | Fish spread round 2 at Jason's screenshot spot and the phone start (#173) |
+| 2026-10-27 | **All test links** `/`, `/mini/`, `/ice/`, `/pano/` | 1abeedf | b642a6d | Far fish steady and middle-sized at long range (#177); three deep lake trout in the hole (#174) |
 | 2026-10-27 | **All test links** `/`, `/mini/`, `/ice/`, `/pano/` | c9f900b | f297eab | One build for every link (#176): round wake rings (#175), fish round 3, no lake jig; `/jig/` retired, forwards to `/` |
 | 2026-10-27 | Public test page `/jig/` | a3abfc4 | 06630db | Fish round 3: density between rounds 1 and 2, bass drawn 1.5× (#173) |
