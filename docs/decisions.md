@@ -3048,3 +3048,16 @@ Numbered log. Newest at the bottom.
        - Lake 6 × 6 and ice 3 × 4 grids: 0 errors. The ice ranges are below 30 m of reach, so its picture does not change
          (#94).
      - Panoramic is untouched: the stretch is off in the flat fan (`uPanoLobe.x`), which waits for Jason's pick (#176).
+178. **2026-10-27** — **Panoramic: the sound picture wins; next, tune it against the app's recordings** (Jason in Lab HQ, on his
+     iPhone with `/pano/` at 1abeedf, screenshot `docs/2026-10-27-jason-pano-iphone.jpg`: "逻辑对了 但是要继续优化画面 石头的部分应该
+     更亮 因为石头的echosound反射比较强 画面还是有不少黑掉的地方 去学习做完学习的真机录屏的画面").
+     - **Logic chosen:** Panoramic is drawn as a sound picture (#171), not the plan-view photo. The plan view goes. This
+       closes the Panoramic pick from the one-version plan (#176).
+     - **Tuning asked for:**
+       - Rocks brighter: hard rock returns a strong echo, so a boulder reads as a bright patch, not a dull orange blob.
+       - Fewer black areas: the fan still has large dark patches and wedges where the app's fan is filled.
+       - The reference is the real app: `reference/recordings/pinglive/6089.MP4` and `3257.MP4` (14–16 m lake), the blue
+         62 m wreck `86789ab9-….MP4`, frames in `reference/frames/pinglive_pano_*`, and `docs/2026-10-26-panoramic-refs.jpg`.
+     - **Order:** tune on `/pano/` first. Once Jason OKs the look, the sound picture becomes the only Panoramic on every
+       page and the plan-view code is deleted in the same change.
+     - Owner: 冰钓版本视觉效果 (#176).
