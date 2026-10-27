@@ -6,6 +6,7 @@
 import * as THREE from 'three'
 import { MAX_BEAMS } from './lakeMaterial'
 import { MAX_HOLES, WIND } from './iceScene'
+import { SHORE_GLSL } from './iceSky'
 
 // ---- GLSL shared with other ice shaders (the slab face in IceCamp.jsx imports these, so its snow cap and the sheet's
 //      snow cannot drift apart). Plain strings, no backticks inside. ----
@@ -56,7 +57,11 @@ export const SNOW_GLSL = /* glsl */ `
 `
 
 export function makeIceMaterial(terrain) {
+  // ?far=black — the far ice goes deep blue-black outside the beam (water absorbs the bottom below a few metres; the
+  // mirror never outshines the sky it reflects). Jason's choice, not decided (M16); default = the see-through glass.
+  const farBlack = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('far') === 'black'
   const uniforms = {
+    uFar: { value: farBlack ? 1 : 0 },
     uTime: { value: 0 },
     uSun: { value: new THREE.Vector3(-0.62, 0.22, -0.35).normalize() }, uSunColor: { value: new THREE.Color('#ffb48c') }, uSunI: { value: 0.75 },
     uSkyZenith: { value: new THREE.Color('#17213a') }, uSkyHorizon: { value: new THREE.Color('#6b6f8e') }, uAmbient: { value: 0.85 },
@@ -125,7 +130,7 @@ export function makeIceMaterial(terrain) {
       uniform float uTime; uniform vec3 uSun; uniform vec3 uSunColor; uniform float uSunI;
       uniform vec3 uSkyZenith; uniform vec3 uSkyHorizon; uniform float uAmbient;
       uniform vec3 uFogColor; uniform float uFogDensity; uniform vec3 uWater;
-      uniform float uCover; uniform float uClear; uniform float uWindow;
+      uniform float uCover; uniform float uClear; uniform float uWindow; uniform float uFar;
       uniform vec4 uHoles[MAXH]; uniform int uHoleCount; uniform float uBeamOn;
       uniform vec4 uLamp; uniform vec3 uLampColor;
       uniform sampler2D uTerrain; uniform float uTerrainHalf; uniform vec2 uWind; uniform vec3 uHighlight; uniform vec3 uGlow; uniform vec3 uGlowDir; uniform vec2 uClip;
@@ -181,6 +186,21 @@ export function makeIceMaterial(terrain) {
         float az = max(dot(normalize(vec3(d.x, 0.0, d.z)), uGlowDir), 0.0);
         sk = mix(sk, uGlow, pow(az, 5.0) * exp(-max(el, 0.0) * 9.0) * 0.9);
         return el < 0.0 ? mix(uFogColor, uSkyHorizon, exp(el * 40.0)) : sk;
+      }
+      ${SHORE_GLSL}
+      // the sky as the ice mirrors it, with the far shore (M16): the treeline stands ~1.5 km off, so a ray reflected
+      // from a point hd metres out meets it lower — the dark band and the cabins' streaks appear on the far ice
+      vec3 skyMirror(vec3 d, float hd) {
+        vec3 sk = skyAt(d);
+        if (d.y >= 0.0) {
+          float ang = atan(d.x, d.z);
+          float el = d.y * max(1.0 - hd / 1500.0, 0.0);
+          float tops = shoreTops(ang);
+          float shore = 1.0 - smoothstep(tops - 0.0012, tops + 0.0012, el);
+          sk = mix(sk, shoreTree(el, tops, uSkyHorizon), shore);
+          sk += vec3(1.0, 0.72, 0.38) * shoreCabin(ang, el, 0.35) * shore * 1.2;
+        }
+        return sk;
       }
       // Real black ice (reference photos 2026-10-16: Unsplash 'frozen lake ice cracks', Waider's Norwegian lakes): long,
       // nearly straight refrozen cracks tens of metres long, a few bright and wide with a frosty halo, many hairlines, each
@@ -291,7 +311,8 @@ export function makeIceMaterial(terrain) {
         float F = 0.02 + 0.98 * pow(1.0 - cosT, 5.0);        // Fresnel: a window straight down, a mirror toward the horizon
         F = 0.045 + F;                                       // and a faint skin of sky everywhere, so the sheet reads as a surface over the dark water (#99)
         float fres = F;
-        vec3 reflSky = skyAt(reflect(-V, Nn));
+        float hd = length(vWorld.xz - cameraPosition.xz);
+        vec3 reflSky = skyMirror(reflect(-V, Nn), hd);
         vec3 Hh = normalize(uSun + V);
         float specSun = pow(max(dot(Nn, Hh), 0.0), 180.0) * uSunI;
         // At this scale (the camera 45 m off, 40 m of lake across the screen) a crack is a hairline a millimetre wide:
@@ -315,13 +336,23 @@ export function makeIceMaterial(terrain) {
         vec3 Lv = uLamp.xyz - vWorld; float dlm = max(length(Lv), 0.1); vec3 Hl = normalize(Lv / dlm + V);
         float lampF = uLamp.w / (1.0 + dlm * dlm * 0.015);
         float specL = (pow(max(dot(Nn, Hl), 0.0), 320.0) * 3.0 + pow(max(dot(Nn, Hl), 0.0), 24.0) * 0.12) * lampF; // the lit door, mirrored in the ice (#106)
-        vec3 iceCol = vec3(0.004, 0.012, 0.02) + reflSky * F * 1.5 * (0.8 + 0.4 * polish) + uSunColor * specSun * 0.6 + uLampColor * specL;
+        // the mirror: as tuned (see-through glass), or (?far=black) energy-conserving — the ice never returns more than the sky
+        vec3 mirror = uFar > 0.5 ? reflSky * min(F * (1.1 + 0.4 * polish), 0.92) : reflSky * F * 1.5 * (0.8 + 0.4 * polish);
+        vec3 iceCol = vec3(0.004, 0.012, 0.02) + mirror + uSunColor * specSun * 0.6 + uLampColor * specL;
         iceCol = mix(iceCol, milkyLit, milky * 0.7);
         iceCol += whiteLit * halo * 0.5;
         iceCol = mix(iceCol, whiteLit, white);
         // toward the horizon the sheet closes up: the sky's mirror wins over what lies under it (#103)
         float graze = pow(1.0 - cosT, 2.0);
         float iceAlpha = clamp(mix(0.5, 0.26, uClear) + F * 1.4 + graze * 0.55 + milky * 0.6 + white * 0.7 + halo * 0.3 + specL * 0.5, 0.0, 1.0);
+        if (uFar > 0.5) {
+          // black ice (?far=black): winter water hides the bottom below 2–3 m, so outside the beam the sheet closes up
+          // into a dark mirror; the beam window keeps about a quarter of the bed, and a ring 3–8 m round the hole stays
+          // see-through so the hole still leads to water
+          float absorb = (1.0 - exp(-terrainDepth(P) * 0.35)) * (1.0 - 0.75 * win) * smoothstep(3.0, 8.0, distance(P, uCutC));
+          iceAlpha = max(iceAlpha, absorb * 0.92);
+          iceCol += uWater * 0.12 * absorb;
+        }
         // ---- put it together ----
         // a 1 cm dusting is not a sheet of paint: how much snow hides the ice depends on how thick it lies (fresh snow
         // e-folds light in well under a centimetre — 0.5 cm 0.55, 1 cm 0.8, 2 cm 0.96), so dark ice shows through the thin edges (M32)
@@ -374,7 +405,9 @@ export function makeIceMaterial(terrain) {
         // distance fog
         float dist = length(vWorld - cameraPosition);
         float fog = 1.0 - exp(-dist * uFogDensity);
-        col = mix(col, uFogColor, fog); alpha = mix(alpha, 1.0, fog);
+        // (?far=black) the far sheet fades into its own reflected sky, so the treeline band survives the haze
+        vec3 fogCol = uFar > 0.5 ? mix(uFogColor, skyMirror(reflect(-V, vec3(0.0, 1.0, 0.0)), hd), 0.6) : uFogColor;
+        col = mix(col, fogCol, fog); alpha = mix(alpha, 1.0, fog);
         gl_FragColor = vec4(pow(max(col, 0.0), vec3(1.0 / 2.2)), alpha); // linear → sRGB, like the built-in materials
       }
     `,

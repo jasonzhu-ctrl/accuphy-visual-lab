@@ -3,6 +3,27 @@
 // colour, so the far ice fades into it without a seam. Centred on the camera every frame (Scene.jsx).
 import * as THREE from 'three'
 
+// The far shore (#109), shared with the ice sheet's mirror (iceSheet.js) so the reflected treeline and cabin lights
+// sit exactly under the dome's (same noise, same seeds, cell 28). ang = atan(d.x, d.z), el = elevation (rad).
+// Self-contained (its own hash), plain string, no backticks inside.
+export const SHORE_GLSL = /* glsl */ `
+  float shHash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+  float shNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
+    return mix(mix(shHash(i), shHash(i + vec2(1, 0)), f.x), mix(shHash(i + vec2(0, 1)), shHash(i + vec2(1, 1)), f.x), f.y); }
+  // the spruce tops' elevation along the horizon
+  float shoreTops(float ang) { return 0.006 + 0.011 * shNoise(vec2(ang * 60.0, 1.0)) + 0.004 * shNoise(vec2(ang * 260.0, 3.0)); }
+  // the trees, hazed toward the tops
+  vec3 shoreTree(float el, float tops, vec3 horizon) { return mix(vec3(0.015, 0.025, 0.035), horizon, 0.35 + 0.4 * smoothstep(0.0, tops, el)); }
+  // a few lit cabin windows among the trees; stretch < 1 draws them taller (a mirror on slightly uneven ice smears
+  // a light into a short vertical streak)
+  float shoreCabin(float ang, float el, float stretch) {
+    float cellA = floor(ang * 28.0);
+    float lit = step(0.9, shHash(vec2(cellA, 9.0)));
+    vec2 lp = vec2((fract(ang * 28.0) - 0.5 - (shHash(vec2(cellA, 4.0)) - 0.5) * 0.5) / 28.0, (el - 0.0035) * stretch);
+    return lit * (1.0 - smoothstep(0.0, 0.0022, length(lp)));
+  }
+`
+
 export function makeSkyDome(radius = 1000) {
   const uniforms = {
     uTime: { value: 0 },
@@ -20,6 +41,7 @@ export function makeSkyDome(radius = 1000) {
       float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
       float vnoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
         return mix(mix(hash(i), hash(i + vec2(1, 0)), f.x), mix(hash(i + vec2(0, 1)), hash(i + vec2(1, 1)), f.x), f.y); }
+      ${SHORE_GLSL}
       float fbm(vec2 p) { return 0.5 * vnoise(p) + 0.25 * vnoise(p * 2.03 + 1.7) + 0.125 * vnoise(p * 4.1 + 3.1) + 0.0625 * vnoise(p * 8.3 + 5.3); }
       void main() {
         vec3 d = normalize(vDir);
@@ -48,15 +70,10 @@ export function makeSkyDome(radius = 1000) {
         }
         // the far shore (#109): a dark spruce line just above the horizon, hazed, with a few cabin lights among the trees
         float ang2 = atan(d.x, d.z);
-        float tops = 0.006 + 0.011 * vnoise(vec2(ang2 * 60.0, 1.0)) + 0.004 * vnoise(vec2(ang2 * 260.0, 3.0));
+        float tops = shoreTops(ang2);
         float shore = (1.0 - smoothstep(tops - 0.0012, tops + 0.0012, el)) * step(0.0, el);
-        vec3 treeCol = mix(vec3(0.015, 0.025, 0.035), uHorizon, 0.35 + 0.4 * smoothstep(0.0, tops, el)); // hazed toward the tops
-        sky = mix(sky, treeCol, shore);
-        float cellA = floor(ang2 * 28.0);
-        float lit = step(0.9, hash(vec2(cellA, 9.0)));
-        vec2 lp = vec2((fract(ang2 * 28.0) - 0.5 - (hash(vec2(cellA, 4.0)) - 0.5) * 0.5) / 28.0, el - 0.0035);
-        float cabin = lit * (1.0 - smoothstep(0.0, 0.0022, length(lp))) * shore;
-        sky += vec3(1.0, 0.72, 0.38) * cabin * 1.6;
+        sky = mix(sky, shoreTree(el, tops, uHorizon), shore);
+        sky += vec3(1.0, 0.72, 0.38) * shoreCabin(ang2, el, 1.0) * shore * 1.6;
         vec3 col = el < 0.0 ? mix(uBelow, uHorizon, smoothstep(-0.05, 0.0, el) * 0.0 + exp(el * 40.0)) : sky;
         gl_FragColor = vec4(pow(max(col, 0.0), vec3(1.0 / 2.2)), 1.0);
       }
