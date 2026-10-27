@@ -1,9 +1,11 @@
 @import "tailwindcss";
 
 /* Accuphy brand (from WORK/ACCUPHY/branding): Instrument Sans for UI, Eurostile Heavy for headings */
-@font-face { font-family: 'Instrument Sans'; src: url('/brand/fonts/InstrumentSans-Variable.ttf') format('truetype'); font-weight: 400 700; font-style: normal; font-display: swap; }
-@font-face { font-family: 'Instrument Sans'; src: url('/brand/fonts/InstrumentSans-Italic-Variable.ttf') format('truetype'); font-weight: 400 700; font-style: italic; font-display: swap; }
-@font-face { font-family: 'Eurostile Heavy'; src: url('/brand/fonts/Eurostile-Heavy.otf') format('opentype'); font-weight: 800; font-display: swap; }
+/* Subset woff2 (load plan B, 2026-10-27, docs/2026-10-26-lab-load-time.md): Latin + Latin-1 + the Lab's symbols (° × − → ’ … •), the weight axis
+   400–700 kept, the width axis pinned at 100. The italic face is gone — the rulers' italic numbers are synthesised (font-synthesis default).
+   The full fonts stay in public/brand/fonts/ for the ad scripts. */
+@font-face { font-family: 'Instrument Sans'; src: url('/brand/fonts/InstrumentSans-Variable.woff2') format('woff2'); font-weight: 400 700; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Eurostile Heavy'; src: url('/brand/fonts/Eurostile-Heavy.woff2') format('woff2'); font-weight: 800; font-display: swap; }
 
 :root { --accuphy-blue: #0d8fdb; --accuphy-ink: #111214; }
 .font-brand { font-family: 'Instrument Sans', system-ui, sans-serif; }

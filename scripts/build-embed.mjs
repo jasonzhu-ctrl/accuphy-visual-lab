@@ -17,8 +17,8 @@ await build({ configFile: 'vite.embed.config.js', logLevel: 'warn', build: { out
 
 let js = fs.readFileSync(path.join(tmp, 'lab-app.js'), 'utf8'), css = fs.readFileSync(path.join(tmp, 'lab-app.css'), 'utf8')
 const dataUri = (file, mime) => `data:${mime};base64,${fs.readFileSync(path.join('public', file)).toString('base64')}`
-// the same inlining as the share build: fonts in the CSS, the white logo as one shared data URI
-css = css.replace(/url\(["']?(?:\.\.?\/|\/)+(brand\/fonts\/[^"')]+)["']?\)/g, (_, f) => `url(${dataUri(decodeURIComponent(f), f.endsWith('.otf') ? 'font/otf' : 'font/ttf')})`)
+// the same inlining as the share build: fonts in the CSS, the white logo (the brand SVG, 4 KB; was the 147 KB PNG until load plan B, 2026-10-27) as one shared data URI
+css = css.replace(/url\(["']?(?:\.\.?\/|\/)+(brand\/fonts\/[^"')]+)["']?\)/g, (_, f) => `url(${dataUri(decodeURIComponent(f), f.endsWith('.woff2') ? 'font/woff2' : f.endsWith('.otf') ? 'font/otf' : 'font/ttf')})`)
 js = js.replace(/(["'`])\/brand\/logo\/White Accuphy Logo\.png\1/g, 'globalThis.__acLogo')
 js = (await minify('lab-app.js', js, { compress: true, mangle: true })).code // library mode keeps the ES output's whitespace
 const left = [...js.matchAll(/["'`](?:\.\.?\/|\/)*brand\/[^"'`]+/g), ...css.matchAll(/url\((?!["']?data:)[^)]+\)/g)].map((m) => m[0])
@@ -26,7 +26,7 @@ if (left.length) throw new Error('unresolved asset paths: ' + left.join(', '))
 
 const head = `// Accuphy Lab — embed build (decision #142). Loaded by embed/lab.js; do not link this file directly.
 if (!document.getElementById('accuphy-lab-css')) { const s = document.createElement('style'); s.id = 'accuphy-lab-css'; s.textContent = ${JSON.stringify(css)}; document.head.appendChild(s) }
-globalThis.__acLogo ??= ${JSON.stringify(dataUri('brand/logo/White Accuphy Logo.png', 'image/png'))};
+globalThis.__acLogo ??= ${JSON.stringify(dataUri('brand/logo/accuphy-white.svg', 'image/svg+xml'))};
 `
 const app = head + js
 const hash = crypto.createHash('sha256').update(app).digest('hex').slice(0, 10)

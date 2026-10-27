@@ -9,6 +9,7 @@
 // and a tap only shows "Available with Accuphy PingLive Mini". Sizes are in cqh of the display, like SonarChrome.
 import { useEffect, useRef, useState } from 'react'
 import { t } from '../i18n' // English / French (?lang=fr); the French is the real app's own (website review 2026-10-26)
+// the thumbnails are files beside the page, not inlined (load plan B, 2026-10-27): fetched only when the Home page is shown — never on desktop
 import plPanoramic from './pl-panoramic.jpg'
 import plForward from './pl-forward.jpg'
 import plDown from './pl-down.jpg'
@@ -84,7 +85,7 @@ export default function AppHome({ devices, deviceId, mode, onPick, ice = false }
                 return (
                   <button key={t.label} type="button" className={`ph-tile ${live ? '' : 'is-off'}`} onClick={onClick} aria-label={t.label} aria-current={active || undefined} aria-disabled={live ? undefined : 'true'} style={{ flex: '0 0 44cqh', textAlign: 'center' }}>
                     <span style={{ position: 'relative', display: 'block', borderRadius: t.fan ? 0 : '1.8cqh', overflow: 'hidden', boxShadow: active && !t.fan ? `0 0 0 0.6cqh ${BLUE}` : 'none' }}>
-                      <img src={t.img} alt="" draggable={false} style={{ display: 'block', width: '100%', height: '22cqh', objectFit: t.fan ? 'contain' : 'cover' }} />
+                      <img src={t.img} alt="" draggable={false} loading="lazy" decoding="async" style={{ display: 'block', width: '100%', height: '22cqh', objectFit: t.fan ? 'contain' : 'cover' }} />
                       {!live && <span className="ph-frost" aria-hidden="true" />}
                     </span>
                     <div style={{ fontSize: '4cqh', fontWeight: 500, marginTop: '1.8cqh', color: active ? BLUE : live ? '#fff' : 'rgba(255,255,255,0.55)' }}>{t.label}</div>
