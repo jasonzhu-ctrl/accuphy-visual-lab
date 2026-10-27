@@ -97,6 +97,11 @@ export function makePopulation(bedY, obstacles) {
   add('yellowperch', -30, 28, 1.0, 8, 9) // (-32, 16) → off the crappie and the shelf's z ≈ 5 line (#173)
   add('yellowperch', -31, -13, 1.4, 8, 9) // (-24, -8) → onto the shelf: it sat on top of the crappie school (#173)
   addOne('pike', -52, 9, 1.4, 0.62); addOne('pike', -40, -3, 1.6, 0.8); addOne('pike', -30, 22, 1.4, 0.55); addOne('pike', 34, 25, 1.8, 0.86)
+  // the 110 ft hole (#172): three lake trout holding at ~92–100 ft, where they sit in deep summer water (#174: the ad's
+  // deep-water beat shows fish at ~100 ft on the phone). Appended last, so no earlier fish moves.
+  // Small loops (2–2.5 m) keep them over the flat floor; a wider one would climb the bowl's wall and be lifted.
+  addOne('laketrout', -21, -46.5, 4.0, 0.82); addOne('laketrout', -24, -45.5, 5.5, 0.72); addOne('laketrout', -18.5, -47.5, 3.2, 0.88)
+  fish.slice(-3).forEach((f, i) => { f.radius = [2.2, 1.8, 2.5][i] })
   // Spread bass, musky and salmon through the water column — some deep, some shallow (Jason 2026-09-24:
   // 水层分散一点 有深有浅). Only the depth changes (x/z stay), from a per-fish hash so no rnd() calls shift.
   fish.forEach((f, i) => {

@@ -2972,6 +2972,24 @@ Numbered log. Newest at the bottom.
          range, so on the ice page it changes nothing.
        - Checked: the lake grid (6 × 6) and the ice grid (3 × 4) against the commit before show only swimming-fish
          differences; 0 errors.
+     - **Done (the deep-water still, PingLive only):** `docs/2026-10-27-ad-v3-deep-still.jpg`.
+       - PingLive **Forward**: it reads better than Down here.
+         - The phone shows the whole bowl of the hole (the floor dropping in, timber on the near wall, rising again) and
+           three fish holding inside at ~90 ft.
+         - The read-out says 101.5 ft; range 80 ft.
+         - In Down at 140 ft depth range, the fish were two small dots.
+       - The boat sits 10 m west of the hole's centre (−32, −47.2). The camera is m4 moved back and right, so the whole
+         beam shows above the phone and the boat sits under the caption, not behind it.
+       - Caption "Serious deep water ready.", no big number.
+       - **Fish added (no deep fish were near the hole; the deepest was a chinook at 51 ft):** three lake trout in the
+         hole at 92, 97 and 99 ft (`fish.js`, appended last, so no other fish moves).
+         - They swim on small loops (≤ 2.5 m), so they stay over the flat floor instead of being lifted off the bowl's
+           walls.
+         - They may rise to a resting boat like the other trout.
+       - Checked:
+         - fish-sim over 15 min: 0 violations, lowest gap 0.41 m.
+         - Lake 6 × 6 and ice 3 × 4 grids: 0 errors.
+       - Tools: `scripts/dev/ads/v3/v3deep.mjs` replaces `v3jig.mjs`; `stills3.mjs` drops the jig and Mini entries.
 175. **2026-10-27** — **The boat's wake: the round rings (#156) replace the Kelvin wake (#166)** (Jason in Lab HQ: "开始前我再次确认下
      船四周的水波纹我要环形的哪个版本 我觉得更好"; he first said it in the cloud chat 电脑端完整版 on preview VxxnVnZr8cxQLXw3iizMdD).
      - **Chosen:** the rings that spread out from the hull while the boat moves (#156, `Scene.jsx` Water shader at 7ae1edd:
