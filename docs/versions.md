@@ -14,7 +14,7 @@ but is published nowhere and is redundant since #170.
 | shop.accuphy.com/pages/lab and /fr/pages/lab | customers | an iframe of lab.accuphy.ca/ (not `/embed/`) | 283ecb9, one step behind |
 | lab.accuphy.ca = accuphy-lab.vercel.app (one deployment) | anyone with the link | `/`, `/mini/`, `/ice/`, `/embed/` | 283ecb9, one step behind (no #180, #181) |
 | Friends' test link jasonzhu-ctrl.github.io/accuphy-lab-test | friends, Jason | `/`, `/mini/`, `/ice/`; `/jig/`, `/pano/` forward to `/` | **9ed9341, newest** |
-| claude.ai private previews RnCBYTexY5vcEqJy2hAsN7, VxxnVnZr8cxQLXw3iizMdD (fish test), G5uZM8imcgsQNzoKfPkiMa (ice), 4GdHHYZKTHgYyEzjV12RmW (09-25) | Jason only | one page each | old (09-25 to 10-25) |
+| claude.ai private previews | — | **none**: the four old ones (RnCB, VxxnV fish test, G5uZ ice, 4GdHH) were deleted 2026-10-27 at Jason's word ("如果是现在项目需要的话留一个就行了"; the test link does the job) | — |
 | The v3 ad film | Meta, from 11/2 | recorded | lake 1abeedf (before #178; its shots show no Panoramic sonar) |
 
 ## Current lake (one version, #176)
@@ -24,8 +24,7 @@ but is published nowhere and is redundant since #170.
   110 ft hole (#174), far fish held steady (#177) and the Panoramic sound picture as the only Panoramic (#178).
   `/jig/` and `/pano/` are retired and forward to `/`. Test-link repo b29fe54; Vercel deployment
   `dpl_KWPGDeTYyZE8u3PL1EmCebnn9Lhe`, the embed build `lab-e35c0a69c4.js`. Jason said 动 in Lab HQ.
-- **Old private previews** VxxnVnZr8cxQLXw3iizMdD (1c0ba1c), RnCBYTexY5vcEqJy2hAsN7 and G5uZM8imcgsQNzoKfPkiMa (ac67cb4)
-  are old snapshots, not updated. Waiting for Jason: delete them or leave them.
+- **Old private previews:** all deleted 2026-10-27 (Jason).
 - **Page layout since #180 (2026-10-27, load plan B):** a share build is no longer one file — `pages/index.html` plus
   `pages/home/<name>-<hash>.jpg` (the 11 app Home thumbnails, fetched only when the Home shows). Upload the `pages/` folder
   whole. Only the private Artifact preview `accuphy-lab.html` still inlines everything. Fonts are woff2 subsets, the logo an SVG.
@@ -36,10 +35,8 @@ but is published nowhere and is redundant since #170.
 |---|---|---|
 | **Both** — PingLive + PingLive Mini | anyone with the link, no login | https://jasonzhu-ctrl.github.io/accuphy-lab-test/ |
 | **Mini** — PingLive Mini only | anyone with the link, no login | https://jasonzhu-ctrl.github.io/accuphy-lab-test/mini/ |
-| Private preview | Jason only (claude.ai login) | https://claude.ai/artifact/RnCBYTexY5vcEqJy2hAsN7 |
 | **Lab (ad landing, #102 / X-6L)** — Both `/`, Mini `/mini/`, Ice `/ice/`, theme loader `/embed/lab.js`; only the store may frame it | anyone with the link, no login; `noindex` | **https://lab.accuphy.ca/** (same as https://accuphy-lab.vercel.app/) |
 | **Ice (trial)** — the ice-fishing page, section camera | anyone with the link, no login | https://jasonzhu-ctrl.github.io/accuphy-lab-test/ice/ |
-| Ice (private preview) | Jason only (claude.ai login) | https://claude.ai/artifact/G5uZM8imcgsQNzoKfPkiMa |
 | Fish echo test (private preview, #153; also the newest lake: #154–#156) | Jason only (claude.ai login) | https://claude.ai/artifact/VxxnVnZr8cxQLXw3iizMdD |
 
 Both public pages are unlisted (`noindex`, `robots.txt` Disallow) and have no sign-up gate (#71).

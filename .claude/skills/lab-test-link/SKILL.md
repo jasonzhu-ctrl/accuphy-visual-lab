@@ -1,6 +1,6 @@
 ---
 name: lab-test-link
-description: Rebuild and update the public Accuphy Lab test link (https://jasonzhu-ctrl.github.io/accuphy-lab-test/) and the private claude.ai Artifact after the sonar lake page changes — use when Jason wants friends to see the latest version or says the shared link is out of date or broken.
+description: Rebuild and update the public Accuphy Lab test link (https://jasonzhu-ctrl.github.io/accuphy-lab-test/) after the sonar lake page changes — use when Jason wants friends to see the latest version or says the shared link is out of date or broken.
 ---
 
 # Updating the shared test link
@@ -14,7 +14,8 @@ description: Rebuild and update the public Accuphy Lab test link (https://jasonz
    (`document.fonts`), no network requests for `brand/`, views render, no console errors. Stop the server after.
 4. GitHub Pages: clone or reuse `jasonzhu-ctrl/accuphy-lab-test`, copy `pages/*`, commit, `git push` (the keychain
    login works; `gh` is not installed). Poll the live URL until its md5 matches the build.
-5. Artifact (private, needs a Claude login): republish the same file to https://claude.ai/artifact/RnCBYTexY5vcEqJy2hAsN7.
+5. No private claude.ai preview any more: Jason had the four old ones deleted on 2026-10-27 ("留一个就行了" — the test
+   link does the job). Rebuild every page from one commit (#176) and log it in `docs/versions.md`.
 6. Never create a new public surface (new repo, Pages site, public share) without Jason's explicit yes in chat; the
    safety check may still require him to click it himself — give him the exact clicks once.
 7. Tell Jason what changed and ask a friend on an iPad/iPhone to confirm when Safari matters.
