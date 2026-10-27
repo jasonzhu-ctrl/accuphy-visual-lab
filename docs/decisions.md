@@ -3095,6 +3095,8 @@ Numbered log. Newest at the bottom.
          - Desktop 1440×900 checked. Not measured on the V10.
        - **Next:** HQ checks the sheet, then Jason looks on `/pano/`. After his OK (step 5 of the dispatch): the sound
          picture becomes the only Panoramic and the plan-view code is deleted.
+     - **Jason's OK (2026-10-27, Lab HQ):** "全景可以了，新画法替换所有页面，旧的删掉". Round 1 (e5a512c) is the look. Step 5
+       goes ahead: the sound picture becomes the only Panoramic, and the plan-view code and the `/pano/` test page are removed.
 179. **2026-10-27** — **A chat of its own for ad videos** (Jason in Lab HQ: "做广告视频你来开个新的挂着的窗口 单独制作视频 把配置
      skill 等等好的资源都配置上 视频制作专门让他做").
      - **New chat "广告视频制作"**, started from Lab HQ as its side session. It makes the ad stills and films only.
@@ -3104,5 +3106,3 @@ Numbered log. Newest at the bottom.
      - **Boundary:** it never changes the lake or the sonar (#176). New hooks, cameras or fish go through
        "冰钓版本视觉效果". From now on 冰钓 no longer makes ad stills or films.
      - Rule added to `CLAUDE.md` (chat list, skills line).
-     - **Jason's OK (2026-10-27, Lab HQ):** "全景可以了，新画法替换所有页面，旧的删掉". Round 1 (e5a512c) is the look. Step 5
-       goes ahead: the sound picture becomes the only Panoramic, and the plan-view code and the `/pano/` test page are removed.
