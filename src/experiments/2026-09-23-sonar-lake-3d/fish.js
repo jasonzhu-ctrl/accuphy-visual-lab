@@ -12,8 +12,8 @@ export const drawnLen = (f) => f.len * (SPECIES[f.species].scale ?? FISH_DISPLAY
 // · 7 bright silver lateral stripe · 8 broken, irregular dark vertical bars (musky) · 9 rows of pale bean-shaped spots
 // (northern pike) · 10 dark bars tapering down a yellow side, orange lower fins (yellow perch).
 export const SPECIES = {
-  largemouth: { name: 'Largemouth bass', len: [0.38, 0.55], body: 'bass',     back: '#2f4a1f', side: '#6f8f3f', belly: '#e9e7cc', pattern: 4 }, // green, black lateral band
-  smallmouth: { name: 'Smallmouth bass', len: [0.33, 0.45], body: 'bass',     back: '#4a3d1c', side: '#8a6d34', belly: '#dccfa5', pattern: 1 }, // bronze-brown, vertical bars
+  largemouth: { name: 'Largemouth bass', len: [0.38, 0.55], body: 'bass',     back: '#2f4a1f', side: '#6f8f3f', belly: '#e9e7cc', pattern: 4, scale: 1.5 * FISH_DISPLAY_SCALE }, // green, black lateral band; drawn 1.5× (Jason, #173)
+  smallmouth: { name: 'Smallmouth bass', len: [0.33, 0.45], body: 'bass',     back: '#4a3d1c', side: '#8a6d34', belly: '#dccfa5', pattern: 1, scale: 1.5 * FISH_DISPLAY_SCALE }, // bronze-brown, vertical bars; drawn 1.5× (#173)
   walleye:    { name: 'Walleye',         len: [0.45, 0.70], body: 'walleye',  back: '#55582a', side: '#c49a3c', belly: '#f4efd8', pattern: 5 }, // golden-brass, dark saddles, glassy eye, white tail tip
   crappie:    { name: 'Crappie',         len: [0.25, 0.35], body: 'panfish',  back: '#4f5d5a', side: '#aab4b4', belly: '#f1f4f4', pattern: 3 }, // silver, dark mottling
   smelt:      { name: 'Smelt',           len: [0.12, 0.20], body: 'bait',     back: '#6a8a84', side: '#c7d6d8', belly: '#f4f8f8', pattern: 7 }, // translucent olive back, silver stripe
@@ -52,24 +52,25 @@ export function makePopulation(bedY, obstacles) {
     fish.push({ species, len, home: [x, y, z], phase: ph, rot: (ph * 3.7) % (Math.PI * 2), radius: 4 + rnd() * 4, speed: 0.08 + rnd() * 0.06 })
   }
   // bass hold on timber (shelf edge x≈-18) and the rock hump (30,12)
-  add('largemouth', -16, 4, 1.2, 4, 16) // spread 10 → 16 m (#173)
-  add('largemouth', 28, 10, 1.5, 3, 16) // 8 → 16 m, smallmouth 10 → 16 m (#173: Jason's screenshot at the phone start had 8–9 fish
-  add('smallmouth', 31, 14, 1.0, 4, 16)  // within 14 m of the transducer)
+  add('largemouth', -16, 4, 1.2, 4, 12) // spread 10 → 12 m (#173)
+  add('largemouth', 28, 10, 1.5, 3, 12) // 8 → 12 m, smallmouth 10 → 12 m (#173: Jason's screenshot at the phone start had 8–9 fish
+  add('smallmouth', 31, 14, 1.0, 4, 12)  // within 14 m of the transducer; round 2's 16 m was too few, round 3 lands between)
   // walleye along the drop-off, tight to the bottom
   add('walleye', -8, -10, 0.6, 3, 14)
   add('walleye', -6, 18, 0.6, 3, 12)
   // crappie: two loose schools suspended near timber. Spread 5 → 13 m (#173, Jason 2026-10-27: "截图的位置鱼太多了，需要现实得
   // 分散一些" — 12–14 fish in 5 m read as one clump in the beam); same counts and the same draws, so no other fish moves
   // (Jason's own screenshot, docs/2026-10-27-jason-fish-crowd.jpg: a Forward beam from the shelf edge crossed the whole
-  // first school) — each school is now two loose groups apart; the draws stay in the same order
-  add('crappie', -14, -9, 4.0, 7, 12); add('crappie', -6, 13, 4.0, 7, 12)
-  add('crappie', -21, 15, 3.5, 6, 12); add('crappie', -27, 4, 3.5, 6, 12)
+  // first school) — each school is now two loose groups apart; the draws stay in the same order. Round 3 (Jason: "这样又太
+  // 少了"): spread 12 → 9 m and the first group back to (−14, −4), between round 1 and round 2
+  add('crappie', -14, -4, 4.0, 7, 9); add('crappie', -6, 13, 4.0, 7, 9)
+  add('crappie', -21, 15, 3.5, 6, 9); add('crappie', -27, 4, 3.5, 6, 9)
   // shelf bait for the Panoramic step (the app's lake frames are full of small dashes in 1–6 m of water)
   add('smelt', -46, 12, 2.5, 40, 7)
   add('crappie', -52, -8, 2.0, 8, 11) // (-54, 4) → off the perch line (#173)
   add('smelt', -58, 14, 2.0, 25, 6)
   add('smelt', -38, 2, 3.0, 30, 6)
-  add('crappie', -46, 20, 1.5, 6, 12); add('crappie', -38, -6, 1.5, 6, 12) // one school of 12 → two groups (#173)
+  add('crappie', -46, 20, 1.5, 6, 9); add('crappie', -38, -6, 1.5, 6, 9) // one school of 12 → two groups, 9 m each (#173)
   add('largemouth', -35, 9, 1.0, 4, 10)
   // smelt: two tight bait balls in open water
   add('smelt', 10, -6, 7.0, 60, 4)
@@ -89,12 +90,12 @@ export function makePopulation(bedY, obstacles) {
     .forEach(([x, z, off]) => addOne('salmon', x, z, off, 0.7 + rnd() * 0.3))
   // phase 3 (Jason #85/#89): more walleye along the drop-off, yellow perch schools on the weedy shelf and the timber
   // edge, northern pike cruising the weed edges. Appended after everyone else, so no earlier fish moves.
-  add('walleye', -14, 2, 0.6, 4, 18) // 12 → 18 m (#173)
+  add('walleye', -14, 2, 0.6, 4, 14) // 12 → 14 m (#173)
   add('walleye', 4, -20, 0.8, 3, 12)
   add('walleye', 10, 24, 0.7, 3, 16) // (14, 20) spread 10 → (10, 24) 16 m: off the phone start (#173)
-  add('yellowperch', -46, 4, 1.2, 9, 12) // spread 6–7 → 12 m (#173)
-  add('yellowperch', -30, 28, 1.0, 8, 12) // (-32, 16) → off the crappie and the shelf's z ≈ 5 line (#173)
-  add('yellowperch', -31, -13, 1.4, 8, 12) // (-24, -8) → onto the shelf: it sat on top of the crappie school (#173)
+  add('yellowperch', -46, 4, 1.2, 9, 9) // spread 6–7 → 9 m (#173)
+  add('yellowperch', -30, 28, 1.0, 8, 9) // (-32, 16) → off the crappie and the shelf's z ≈ 5 line (#173)
+  add('yellowperch', -31, -13, 1.4, 8, 9) // (-24, -8) → onto the shelf: it sat on top of the crappie school (#173)
   addOne('pike', -52, 9, 1.4, 0.62); addOne('pike', -40, -3, 1.6, 0.8); addOne('pike', -30, 22, 1.4, 0.55); addOne('pike', 34, 25, 1.8, 0.86)
   // Spread bass, musky and salmon through the water column — some deep, some shallow (Jason 2026-09-24:
   // 水层分散一点 有深有浅). Only the depth changes (x/z stay), from a per-fish hash so no rnd() calls shift.

@@ -2931,6 +2931,28 @@ Numbered log. Newest at the bottom.
        - A 24 m Forward line through the fish-rich west half still meets up to ~12, spread along its length.
        - fish-sim: 0 violations. Ice grid unchanged, 0 errors.
        - Before and after: `docs/2026-10-27-fish-spread.jpg`.
+     - **Round 3** (Jason in Lab HQ on /jig/: "这样又太少了 另外鲈鱼的体型可以大1.5倍吗"):
+       - **Density lands between round 1 and round 2.**
+         - Crappie groups and perch schools spread 12 → 9 m; the first crappie group moved from (−14, −9) back to (−14, −4).
+         - Shelf largemouth 16 → 12 m, walleye at (−14, 2) 18 → 14 m, the bass at the phone start 16 → 12 m.
+         - Same counts and the same draws.
+       - **Measured over 60 s of swimming, smelt not counted:**
+         - Jason's Forward line: 2.7 (round 1) / 1.1 (round 2) → 1.8 on average, 0–4.
+           - The 3D view shows about twice that: the snapshot has 3 in the beam.
+         - Phone start within 14 m: 7.6 / 5.5 → 6.2.
+         - Busiest 8 m cell: 12 / 7 → 8.
+       - **Bass drawn 1.5× bigger** (largemouth and smallmouth): `scale: 1.5 × FISH_DISPLAY_SCALE`, like the musky.
+         - The true `len` is unchanged.
+         - The sonar echo comes from the drawn bodies (#153), so it grows with them. The test bass in Down and Forward
+           (`?fishtest`) show longer arcs.
+         - Bottom clearance and structure clearance follow `drawnLen`.
+       - **Checked:**
+         - fish-sim over 15 min: 0 violations, lowest gap 0.41 m.
+         - Ice grid (3 × 4) against round 2: only fish-sized differences.
+         - Lake grid (6 × 6): clean.
+         - Phone look at the lake and /ice/.
+         - 0 errors.
+       - Before and after: `docs/2026-10-27-fish-round3.jpg`.
 174. **2026-10-27** — **Ad v3: PingLive first, the 110 ft hole stays, no jig drop** (Jason in Lab HQ, answering the three
      open questions from #172: "both, but we're making just pinglive for now to be very good and as an strategic example
      for the rest after it. keep it, let's remove the drop a jig part on video and live page").
