@@ -1,0 +1,54 @@
+# The lake: the one standard version (canon)
+
+Jason, 2026-10-27: the lake scene (boat and lake), its effects, the sonar picture and the imaging logic behind it exist as
+**one version only**. The ice scene is separate but runs on the same engine (#94). Decision #176.
+
+- **Owner:** the chat "冰钓版本视觉效果" is the only chat that changes the lake scene or the sonar imaging. Other chats
+  (Lab HQ, 手机网页端, 电脑端完整版, ad work) send it what they need. They never edit the lake folder themselves.
+- **This list is the canon.** One line per element, with the decision behind it. A change to the lake updates its line in the
+  same commit. An element marked **OPEN** waits for Jason.
+- **Every link is built from one commit.** `docs/versions.md` holds one "current lake" line. lab.accuphy.ca follows that
+  commit only when Jason says 动 in Lab HQ.
+- Code: `src/experiments/2026-09-23-sonar-lake-3d/`. Test pages are one-line wrappers. They add no lake code of their own.
+
+## Lake scene
+
+| Element | Canon | Decisions |
+|---|---|---|
+| Water surface | FFT wind-sea spectrum, ABYSSAL look | #165 (after #162–#164) |
+| Sky in the water | real photographed sky, sun glitter path, clouds | #161, #162 |
+| Boat wake | **round rings** spreading from the hull while it moves; the Kelvin V wake goes | #175 (replaces #166's wake) |
+| Drag cue | reticle on the water, ripple every 2.6 s, back once the boat stops | #132, #160, #166 |
+| Water column from above | tints the bottom with depth | #156 |
+| Terrain | deep floor 24 m (79 ft); a 110 ft hole at (−22, −45) | #64, #172, #174 |
+| Rocks | Shield boulders, six shapes | #131 |
+| Wrecks | small wreck = workboat with three decks and a wheelhouse | #155 |
+| Fish | bodies by species, spread realistically; bass drawn larger | #170, #173 (round 3 in progress) |
+| Lake jig | **none** on the summer lake | #174 |
+
+## Sonar imaging
+
+| Element | Canon | Decisions |
+|---|---|---|
+| Echo texture | every return is a short arc across the beam (`arcGrain`) | #148 |
+| Structure | echo splat of every surface; bright cores, orange rims, solid targets hide the bottom | #135, #143–#147, #149 |
+| Bottom | one filled band; far bottom softer and weaker, never gone | #140, #152, #154 |
+| Fish in the sonar | drawn from the fish bodies, as the transducer hears them | #153, #170 |
+| Panoramic | **OPEN:** the plan view (live pages) or the sound picture (`/pano/`). Jason compares on his phone. The loser is deleted | #171 |
+| Forward AUTO depth | **OPEN** | #154 |
+| Mini views | four views, the rest frosted; Combo range AUTO | #121, #124, #125 |
+
+## Known second copies (to remove)
+
+- **Panoramic:** two drawings behind `panoMode`. One goes after Jason's pick.
+- **Old fish marks (#120):** kept only for the ice page's jig. That is the ice scene, so it may stay, but only on the ice
+  path.
+- **Kelvin wake (#166):** removed when the round rings go in (#175).
+- **Lake jig (#172):** removed by #174.
+
+## 中文摘要（给 Jason）
+
+- 湖景和声纳成像只有一个标准版，就是这张清单。只有冰钓聊天能改湖和声纳，别的聊天要改就告诉它。
+- 已定：风浪水面、真实天空倒影、**圆形水纹**、110 ft 深坑、新鱼、夏天湖面不放 jig。
+- 还等你定：全景用哪种画法（手机对比 /pano/），Forward 的 AUTO 深度留不留。
+- 所有链接都从同一次提交打包；lab.accuphy.ca 要你说“动”才跟上。

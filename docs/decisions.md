@@ -2955,3 +2955,15 @@ Numbered log. Newest at the bottom.
      - Of the three picks the one-version plan waits on (`docs/2026-10-27-lake-one-version.md`), two are now made: the wake
        (this) and the 110 ft hole (#174). Panoramic still waits for Jason's phone compare.
      - Not built yet: it goes in as part of the one-version work, after Jason says to start.
+176. **2026-10-27** — **One version of the lake: started** (Jason in Lab HQ: "开始做，湖景统一成一个版本，圆形水纹一起换上"; plan in
+     `docs/2026-10-27-lake-one-version.md`).
+     - **Owner:** only "冰钓版本视觉效果" changes the lake scene and the sonar imaging (ice included, #94). Rule added to
+       `CLAUDE.md`.
+     - **Canon:** `docs/lake-canon.md`, drafted by Lab HQ from the decisions. The owner corrects it and keeps it current.
+     - **Build order for the owner:** fish round 3 (#173), then remove the lake jig (#174), then the round wake rings
+       (#175), then the ad's deep-water still. After that, Lab HQ rebuilds every test link from one commit.
+     - **Links:** `/`, `/mini/` and `/ice/` are rebuilt from that commit. `/jig/` is retired. `/pano/` stays, rebuilt from
+       the same commit, until Jason's Panoramic pick. The three old private previews get the same build.
+       lab.accuphy.ca only on 动.
+     - **Housekeeping done:** the five 10-17 agent worktrees and `wip/ice-camera` are removed. Their commits and
+       uncommitted work are saved first as tags `archive/2026-10-1*-*` on GitHub. The case-study worktree stays.

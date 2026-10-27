@@ -105,6 +105,8 @@ anyone's memory.
 - **Decision numbers:** re-read the last number in `docs/decisions.md` right before appending, and again
   after `git fetch` just before the commit (renumber if another chat took it meanwhile). Two chats wrote #69
   twice and #102 twice (Jason 2026-10-18: 以后注意避免).
+- **One lake, one owner (#176, Jason 2026-10-27):** only "冰钓版本视觉效果" changes the lake scene and the sonar imaging
+  (ice included). Other chats send it what they need. The canon is `docs/lake-canon.md`; every link is built from one commit.
 - **Lake and ice share code (#94):** the ice page lives in the lake folder. Any change there for the ice page is
   checked on the summer lake (desktop and phone, a sonar-qa grid against the last commit) before it is merged, and
   any lake change is checked on the ice page (Jason 2026-10-18: 这个确实要非常注意).
