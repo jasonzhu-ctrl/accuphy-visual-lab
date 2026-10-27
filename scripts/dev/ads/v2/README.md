@@ -21,3 +21,7 @@ Round 2 (HQ's review, 2026-10-26):
     (`window.__camera`, dev) into `pano-g.json` and drawn in brand blue by `overlay2.html`.
   - Forward at 230 ft from low behind the boat, with no wedge drawn (`adBeam`) and the far end lit
     (`adFlash` = [4.5, 36, 62]: amount, from, to in metres; lakeMaterial `uFarFlash`, dev).
+- **230 ft, round 3:** `v2fwd.mjs` with `DEPTH=60`. Forward's depth axis follows AUTO (≈ 25 ft on the shelf), so the
+  deep middle fell below it and the beam's lit path broke in two; at 60 ft it runs unbroken.
+  - Camera g sits low behind the boat (horizon at ~236 px, inside the top safe zone); the text block starts at 340 px.
+  - `adFlash` = [2.6, 36, 62] lifts the far end on top of the continuous beam.
