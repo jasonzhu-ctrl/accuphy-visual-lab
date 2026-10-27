@@ -58,16 +58,17 @@ export function makePopulation(bedY, obstacles) {
   // walleye along the drop-off, tight to the bottom
   add('walleye', -8, -10, 0.6, 3, 14)
   add('walleye', -6, 18, 0.6, 3, 12)
-  // crappie: two loose schools suspended near timber
-  add('crappie', -15, -2, 4.0, 14, 5)
-  add('crappie', -20, 12, 3.5, 12, 5)
+  // crappie: two loose schools suspended near timber. Spread 5 → 13 m (#173, Jason 2026-10-27: "截图的位置鱼太多了，需要现实得
+  // 分散一些" — 12–14 fish in 5 m read as one clump in the beam); same counts and the same draws, so no other fish moves
+  add('crappie', -15, -2, 4.0, 14, 13)
+  add('crappie', -20, 12, 3.5, 12, 13)
   // shelf bait for the Panoramic step (the app's lake frames are full of small dashes in 1–6 m of water)
   add('smelt', -46, 12, 2.5, 40, 7)
-  add('crappie', -54, 4, 2.0, 8, 5)
+  add('crappie', -54, 4, 2.0, 8, 11)
   add('smelt', -58, 14, 2.0, 25, 6)
   add('smelt', -38, 2, 3.0, 30, 6)
-  add('crappie', -40, 16, 1.5, 12, 6)
-  add('largemouth', -35, 9, 1.0, 4, 6)
+  add('crappie', -40, 16, 1.5, 12, 13)
+  add('largemouth', -35, 9, 1.0, 4, 10)
   // smelt: two tight bait balls in open water
   add('smelt', 10, -6, 7.0, 60, 4)
   add('smelt', 20, 26, 6.0, 50, 4)
@@ -89,9 +90,9 @@ export function makePopulation(bedY, obstacles) {
   add('walleye', -14, 2, 0.6, 4, 12)
   add('walleye', 4, -20, 0.8, 3, 12)
   add('walleye', 14, 20, 0.7, 3, 10)
-  add('yellowperch', -46, 4, 1.2, 9, 7)
-  add('yellowperch', -32, 16, 1.0, 8, 6)
-  add('yellowperch', -24, -8, 1.4, 8, 6)
+  add('yellowperch', -46, 4, 1.2, 9, 12) // spread 6–7 → 12 m (#173)
+  add('yellowperch', -32, 16, 1.0, 8, 12)
+  add('yellowperch', -31, -13, 1.4, 8, 12) // (-24, -8) → onto the shelf: it sat on top of the crappie school (#173)
   addOne('pike', -52, 9, 1.4, 0.62); addOne('pike', -40, -3, 1.6, 0.8); addOne('pike', -30, 22, 1.4, 0.55); addOne('pike', 34, 25, 1.8, 0.86)
   // Spread bass, musky and salmon through the water column — some deep, some shallow (Jason 2026-09-24:
   // 水层分散一点 有深有浅). Only the depth changes (x/z stay), from a per-fish hash so no rnd() calls shift.

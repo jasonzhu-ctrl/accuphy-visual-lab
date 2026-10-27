@@ -2901,3 +2901,20 @@ Numbered log. Newest at the bottom.
          - Ice unchanged (≤ 2.3 mean difference, noise).
        - 0 console errors.
      - Not uploaded. HQ puts the lake page on the friends' link (with `?jig` to see the drop) for Jason.
+
+173. **2026-10-27** — **The crappie and perch schools spread out** (Jason via Lab HQ, LAB-fish-spread: "截图的位置鱼太多了，需要现实得
+     分散一些").
+     - **Why the clump:** not the deep hole and not the jig. Around the hole there are only 1 lake trout and 4 chinook
+       within 30 m; one chinook now and then rises to the resting boat.
+       - The dense spots were the crappie schools: 12–14 fish placed within 5 m, suspended near the timber.
+       - At (−20, −4), a yellow perch school sat on top of one of them.
+       - Busiest 8 m cell: 13 fish. A wide beam (Panoramic) lights a whole school at once, so it reads as a clump.
+     - **Change (`fish.js`):**
+       - Crappie spread 5 → 13 m (5 → 11 m for the 8-fish school); yellow perch 6–7 → 12 m; the shelf bass 6 → 10 m.
+       - The perch school at (−24, −8) moved to (−31, −13) on the shelf.
+       - Same counts and the same random draws, so every other fish is exactly where it was. Busiest cell now 8.
+     - **Checked:**
+       - fish-sim over 15 min: 0 violations, lowest gap 0.43 m.
+       - Ice grid (3 × 4) unchanged against the last run; 0 errors.
+       - Before and after in Panoramic: `docs/2026-10-27-fish-spread.jpg`.
+     - Local; not uploaded. HQ puts it on the test link for Jason.
