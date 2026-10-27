@@ -61,3 +61,4 @@ the Mini page; `VITE_SCENE=ice` for the ice page → `/ice/` on GitHub Pages sin
 | 2026-10-04 | Private preview | 340e98d | — | Private preview updated (#92) |
 | 2026-10-26 | Public test page `/pano/` | 8b6bb50 | bb6d431 | Panoramic sound-picture test page with an old/new switch, for Jason's phone compare (#171) |
 | 2026-10-26 | Public test page `/pano/` | 2d48393 | f18c7fb | Pano test page opens on PingLive Panoramic with the new picture on (#171) |
+| 2026-10-26 | Public test page `/ice/` | e436506 | a972985 | Ice page rebuilt: the jig's sonar mark and the dial's lines are back (#170 had dropped them) |
