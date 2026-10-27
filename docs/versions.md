@@ -59,3 +59,4 @@ the Mini page; `VITE_SCENE=ice` for the ice page → `/ice/` on GitHub Pages sin
 | 2026-09-26 | Both | 6e9f422 | afa4e06 | Fix: sonar picture black in Safari (#73) |
 | 2026-09-26 | Both | 3150b66 | 8dad017 | First public test page (#72) |
 | 2026-10-04 | Private preview | 340e98d | — | Private preview updated (#92) |
+| 2026-10-26 | Public test page `/pano/` | 8b6bb50 | bb6d431 | Panoramic sound-picture test page with an old/new switch, for Jason's phone compare (#171) |
