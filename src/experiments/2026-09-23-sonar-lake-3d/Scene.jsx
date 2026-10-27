@@ -506,6 +506,10 @@ function ellipseArc(a, b, w, t0, len, segs) {
   g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setIndex(idx)
   return g
 }
+// dev (ads, BF ad v2): s.fanOpen in (0, 1) narrows every fan about its centre line, so a recording can sweep a fan open
+const fanned = (s) => (import.meta.env.DEV && s.fanOpen != null && s.fanOpen < 1
+  ? s.specs.map((sp) => { const m = (sp.a0 + sp.a1) / 2, h = ((sp.a1 - sp.a0) / 2) * Math.max(0.01, s.fanOpen); return { ...sp, a0: m - h, a1: m + h } })
+  : s.specs)
 function Boat({ state, beamMats }) {
   const boat = useMemo(makeBassBoat, [])
   const contact = useMemo(makeWaterContact, [])
@@ -536,7 +540,7 @@ function Boat({ state, beamMats }) {
     s.boat.z += (s.target.z - s.boat.z) * Math.min(1, dt * 4)
     group.current.position.set(s.boat.x, 0.02, s.boat.z)
     s.apex.copy(TRANSDUCER_OFFSET).add(group.current.position)
-    setBeamUniforms(beamMats, s.specs, s.apex)
+    setBeamUniforms(beamMats, fanned(s), s.apex)
     { // the drag cue: breathes a little, ripples every 2.6 s; out during a drag, back once the boat has settled.
       // s.cueHide also gates the caption (Rig); the ice page leaves it unset and keeps its own rule (hidden after the first tap)
       const moving = s.dragging || Math.hypot(s.target.x - s.boat.x, s.target.z - s.boat.z) * 4 > 0.25 // m/s, as `speed` below
@@ -544,7 +548,7 @@ function Boat({ state, beamMats }) {
       s.cueHide = !!s.hasDragged && s.stillT < 1.2
       const r = reticle.userData, tt = clock.elapsedTime
       r.fade += ((s.cueHide ? 0 : 1) - r.fade) * Math.min(1, dt * (s.cueHide ? 5 : 2.5)) // out quickly, back gently
-      reticle.visible = r.fade > 0.02
+      reticle.visible = r.fade > 0.02 && !(import.meta.env.DEV && s.adClean) // dev (ads): no drag cue in a recording
       if (reticle.visible) {
         const u = Math.min(1, (tt % 2.6) / 1.6), grow = 1 + 0.45 * (1 - (1 - u) * (1 - u))
         r.mat.opacity = (0.72 + 0.16 * Math.sin(tt * 2.2)) * r.fade
@@ -581,9 +585,20 @@ function Beams({ state, ice = false }) {
   useEffect(() => () => meshes.forEach((m) => { m.g.dispose(); m.e.dispose() }), [meshes]) // AUTO depth rebuilds the PL Forward curtain
   const clip = useMemo(() => [new THREE.Plane(new THREE.Vector3(0, 0, -1), 1e5)], []) // the ice section view cuts the curtain at the wall
   const sig0 = state.current.signal ?? 1 // a remount mid-hop (AUTO range → specKey) starts at the current gate, not at full opacity
+  const fan0 = useRef()
   useFrame(() => {
     const s = state.current
     group.current.position.copy(s.apex)
+    if (import.meta.env.DEV && s.fanOpen !== fan0.current) { // dev (ads): the wedges follow s.fanOpen (see fanned)
+      fan0.current = s.fanOpen
+      const sp = fanned(s)
+      group.current.children.forEach((g, i) => {
+        if (!sp[i]) return
+        const geo = wedgeGeometry(sp[i])
+        g.children[0].geometry.dispose(); g.children[0].geometry = geo
+        g.children[1].geometry.dispose(); g.children[1].geometry = new THREE.EdgesGeometry(geo, 25)
+      })
+    }
     clip[0].constant = ice && s.view === 'section' ? s.boat.z + SECTION_CAM.cutZ : 1e5
     // the ice signal gate (IceCamp.jsx s.signal; undefined on the summer lake → 1): the wedge goes out with the Mini.
     // The materials are found by walking the group every frame, so a keyed remount (specKey) can never leave stale refs
@@ -634,6 +649,13 @@ function Rig({ state, sonarRect, fogMats, cam = LAKE_CAM }) {
   const k0 = useRef(0)
   useFrame(({ clock }, dt) => {
     const s = state.current
+    if (import.meta.env.DEV && s.camOverride) { // dev (ads, BF ad v2): the camera set from outside — { pos, look, fov }
+      const o = s.camOverride
+      if (camera.view?.enabled) camera.clearViewOffset()
+      if (camera.fov !== (o.fov ?? 38)) { camera.fov = o.fov ?? 38; camera.updateProjectionMatrix() }
+      camera.up.set(0, 1, 0); camera.position.set(...o.pos); camera.lookAt(...o.look)
+      return
+    }
     const aspect = size.width / size.height
     const tanV = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2))
     const k = Math.max(1, cam.W / (2 * tanV * aspect * cam.D.length())) // 1 on desktop and landscape tablets

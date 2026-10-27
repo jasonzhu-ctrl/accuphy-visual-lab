@@ -1,0 +1,45 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+  @font-face { font-family: 'Eurostile Heavy'; src: url('fonts/Eurostile-Heavy.otf') format('opentype'); font-weight: 800; }
+  @font-face { font-family: 'Instrument Sans'; src: url('fonts/InstrumentSans-Variable.ttf') format('truetype'); font-weight: 400 700; }
+  html, body { margin: 0; background: #000; }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; }
+  #bg { position: absolute; inset: 0; width: 1080px; height: 1920px; }
+  #grad { position: absolute; left: 0; top: 0; width: 1080px; height: 1100px; opacity: 0;
+    background: linear-gradient(180deg, rgba(2,8,14,.62) 0%, rgba(2,8,14,.38) 55%, rgba(2,8,14,0) 100%); }
+  /* the small wordmark: top left, inside the 250 px top safe zone's edge, from the first frame */
+  #mark { position: absolute; left: 64px; top: 262px; width: 190px; opacity: .9; filter: drop-shadow(0 2px 8px rgba(0,0,0,.5)); }
+  #block { position: absolute; left: 64px; width: 952px; color: #fff; }
+  .num { font-family: 'Eurostile Heavy'; font-size: 230px; line-height: .9; letter-spacing: -.005em; white-space: nowrap; text-shadow: 0 4px 30px rgba(0,0,0,.45); }
+  .num .unit { font-size: .46em; margin-left: .08em; vertical-align: .62em; letter-spacing: .02em; }
+  .rule { margin-top: 20px; height: 6px; background: #028CDF; border-radius: 3px; box-shadow: 0 0 20px rgba(2,140,223,.6); }
+  .line { margin-top: 30px; font-family: 'Instrument Sans'; font-weight: 600; font-size: 54px; line-height: 1.18; letter-spacing: -.005em;
+    text-shadow: 0 2px 14px rgba(0,0,0,.55); max-width: 900px; }
+  .hidden { display: none }
+</style></head>
+<body>
+<div id="stage">
+  <img id="bg">
+  <div id="grad"></div>
+  <img id="mark" src="logo.png">
+  <div id="block">
+    <div class="num" id="num"><span id="n"></span><span class="unit" id="unit"></span></div>
+    <div class="rule" id="rule"></div>
+    <div class="line" id="line"></div>
+  </div>
+</div>
+<script>
+  // a still: { bg, top, grad, num, unit, line, ruleW }
+  window.setStill = (c) => {
+    const $ = (id) => document.getElementById(id)
+    $('bg').src = c.bg; $('grad').style.opacity = c.grad ? 1 : 0
+    $('block').style.top = c.top + 'px'
+    $('num').classList.toggle('hidden', !c.num); $('rule').classList.toggle('hidden', !c.num)
+    $('n').textContent = c.num || ''; $('unit').textContent = c.unit || ''
+    $('line').textContent = c.line || ''; $('line').style.marginTop = c.num ? '30px' : '0'
+    $('rule').style.width = c.num ? `${$('num').getBoundingClientRect().width * (c.ruleW ?? 1)}px` : '0'
+    return new Promise((r) => { const im = $('bg'); if (im.complete && im.naturalWidth) r(); else im.onload = r })
+  }
+</script>
+</body></html>
