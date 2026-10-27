@@ -10,3 +10,14 @@ Brief: `docs/2026-10-26-ad-v2-pinglive-brief.md`. Stills board: `docs/2026-10-26
 - `overlay2.html` + `stills.mjs <dir> <out>`: the type over a background. Eurostile Heavy number, brand-blue rule, one
   Instrument Sans line, the small wordmark top left at y 262. Run them with the fonts in `<dir>/fonts` and the logo as
   `<dir>/logo.png`.
+
+Round 2 (HQ's review, 2026-10-26):
+- **Type:** Eurostile Heavy comes from the company's Creative Cloud activation: `local('Eurostile Heavy')` in
+  `overlay2.html`. No font file is read; Creative Cloud must be running.
+- **0 s:** `v2s0c.mjs` renders PL Forward on the shelf (−40, −5) at 50 ft. The still is the portrait crop x 1520,
+  rows 120–880 of the 2600×1250 flat, so the trees and the bottom fill ~70 %, with one fish right of centre.
+- **135° and 230 ft:** `v2bg3.mjs`.
+  - Panoramic at 50 ft from high behind the boat. The fan's outline on the water is projected from the 3D camera
+    (`window.__camera`, dev) into `pano-g.json` and drawn in brand blue by `overlay2.html`.
+  - Forward at 230 ft from low behind the boat, with no wedge drawn (`adBeam`) and the far end lit
+    (`adFlash` = [4.5, 36, 62]: amount, from, to in metres; lakeMaterial `uFarFlash`, dev).

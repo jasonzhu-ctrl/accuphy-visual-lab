@@ -541,6 +541,7 @@ function Boat({ state, beamMats }) {
     group.current.position.set(s.boat.x, 0.02, s.boat.z)
     s.apex.copy(TRANSDUCER_OFFSET).add(group.current.position)
     setBeamUniforms(beamMats, fanned(s), s.apex)
+    if (import.meta.env.DEV) { const f = s.adFlash || [0, 30, 60]; for (const m of beamMats) m.userData.uniforms.uFarFlash?.value.set(f[0], f[1], f[2]) } // dev (ads): [amount, from, to]
     { // the drag cue: breathes a little, ripples every 2.6 s; out during a drag, back once the boat has settled.
       // s.cueHide also gates the caption (Rig); the ice page leaves it unset and keeps its own rule (hidden after the first tap)
       const moving = s.dragging || Math.hypot(s.target.x - s.boat.x, s.target.z - s.boat.z) * 4 > 0.25 // m/s, as `speed` below
@@ -607,6 +608,7 @@ function Beams({ state, ice = false }) {
     group.current.traverse((o) => {
       if (!o.material) return
       o.material.opacity = (o.isLineSegments ? (ice ? 0.75 : 0.6) : (ice ? 0.2 : 0.11)) * sig
+      if (import.meta.env.DEV && s.adBeam) o.material.opacity = o.isLineSegments ? s.adBeam.line : s.adBeam.face // dev (ads): the wedge's outline and faces
     })
   })
   return (
@@ -649,6 +651,7 @@ function Rig({ state, sonarRect, fogMats, cam = LAKE_CAM }) {
   const k0 = useRef(0)
   useFrame(({ clock }, dt) => {
     const s = state.current
+    if (import.meta.env.DEV) window.__camera = camera // dev (ads): to project lake points onto the screen for overlays
     if (import.meta.env.DEV && s.camOverride) { // dev (ads, BF ad v2): the camera set from outside — { pos, look, fov }
       const o = s.camOverride
       if (camera.view?.enabled) camera.clearViewOffset()

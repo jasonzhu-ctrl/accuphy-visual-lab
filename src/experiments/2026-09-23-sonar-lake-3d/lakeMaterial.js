@@ -33,6 +33,7 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
     uOutGamma: { value: 1.0 },   // ice scene: < 1 brightens the dark water world a little (main view only)
     uAirView: { value: 0.0 },    // the summer lake (Scene.jsx): seen from above the water, the water column over each point tints it — shallows clear, deep water dark — and light patterns play on the shallows; 0 (the ice page, any camera under water): fog by distance as before
     uTime: LAKE_TIME,
+    uFarFlash: { value: new THREE.Vector3(0, 30, 60) }, // dev (ads): a lift of the beam's far part — amount, from, to (metres from the apex); 0 = off
     uBeamGain: { value: 1.0 },   // ice scene: the signal gate (IceCamp.jsx s.signal): the lit footprint fades out while the Mini is out of the water
     uPanoLobe: { value: new THREE.Vector2(0, 0.61) }, // Panoramic as a sound picture (#171): x = on, y = the strip camera's depression (rad); the fish pass weights by the flat fan's lobe
     uSplat: { value: new THREE.Vector3(1, 1, 30) }, // sonar pass 3 (echo splat): tan(half width), tan(half thickness), range of the fan being drawn
@@ -126,7 +127,7 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
       uniform vec3 uApex[${MAX_BEAMS}]; uniform vec3 uC[${MAX_BEAMS}]; uniform vec3 uH[${MAX_BEAMS}]; uniform vec3 uN[${MAX_BEAMS}];
       uniform vec4 uAng[${MAX_BEAMS}]; uniform vec2 uRT[${MAX_BEAMS}]; uniform vec4 uBox[${MAX_BEAMS}];
       uniform vec4 uSplatBig; uniform vec2 uPanoLobe; uniform vec3 uSplat;
-      uniform float uReveal; uniform vec3 uHighlight; uniform float uSonarPass; uniform float uRevealGain; uniform float uOutGamma; uniform vec2 uClip; uniform float uBeamGain;
+      uniform float uReveal; uniform vec3 uHighlight; uniform float uSonarPass; uniform float uRevealGain; uniform float uOutGamma; uniform vec2 uClip; uniform float uBeamGain; uniform vec3 uFarFlash;
       uniform float uAirView; uniform float uTime;
       float lhash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
       float lnoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
@@ -345,6 +346,7 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
         beam *= uBeamGain; edge *= uBeamGain; // the signal gate (1 on the summer lake): after the rim, so the rim fades too instead of widening
         // outside the beam things stay murky; inside they pop (Garmin look)
         vec3 lit = base * (0.72 + 2.3 * beam * uRevealGain) + uHighlight * 0.3 * beam * uRevealGain + uHighlight * 0.9 * edge;
+        if (uFarFlash.x > 0.0) lit += (base * 2.4 + uHighlight * 0.25) * beam * uFarFlash.x * smoothstep(uFarFlash.y, uFarFlash.z, distance(vWorld, uApex[0])); // dev (ads): the far targets light up
       #ifdef LOGO
         // the brand mark keeps Accuphy blue: a gentler beam lift, no cyan wash (the ×3 lift clipped it to cyan)
         lit = base * (0.95 + 0.85 * beam) + uHighlight * 0.06 * beam + uHighlight * 0.5 * edge;
