@@ -5,7 +5,7 @@ with the source commit it was built from, so anyone can tell which version a lin
 
 ## Current lake (one version, #176)
 
-- **lab.accuphy.ca and the friends' test links** `/`, `/mini/`, `/ice/` (+ `/embed/` on Vercel): all built from **283ecb9**
+- **Friends' test links** `/`, `/mini/`, `/ice/`: built from **9ed9341** (adds #180 load plan B and #181). **lab.accuphy.ca** (+ `/embed/`): still **283ecb9**, follows on Jason's 动. Before that, both were built from **283ecb9**
   (2026-10-27). That build has the round wake rings (#175), fish round 3 (#173), no lake jig and three lake trout in the
   110 ft hole (#174), far fish held steady (#177) and the Panoramic sound picture as the only Panoramic (#178).
   `/jig/` and `/pano/` are retired and forward to `/`. Test-link repo b29fe54; Vercel deployment
@@ -78,6 +78,7 @@ the Mini page; `VITE_SCENE=ice` for the ice page → `/ice/` on GitHub Pages sin
 | 2026-10-27 | Public test page `/jig/` | 218e483 | 0f4439e | Lake with the 110 ft hole and the jig drop from the boat (`?jig`, best with `?boat=-22.9,-47.2`) (#172) |
 | 2026-10-27 | Public test page `/jig/` | 557f1b2 | 7191adc | Fish schools spread out (#173) on top of the hole and jig (#172) |
 | 2026-10-27 | Public test page `/jig/` | 58ea10f | 2418a2d | Fish spread round 2 at Jason's screenshot spot and the phone start (#173) |
+| 2026-10-27 | **All test links** `/`, `/mini/`, `/ice/` | 9ed9341 | ccac583 | Download halved (#180: woff2 subsets, SVG logo, Home thumbnails as files in `home/` beside each page); PingLive Mini Forward without the depth readout (#181). Each page folder now carries its own `home/`. All 11 thumbnails load on the phone layout; 0 errors. lab.accuphy.ca still 283ecb9 |
 | 2026-10-27 | **Vercel** `accuphy-lab` → **lab.accuphy.ca** `/`, `/mini/`, `/ice/`, `/embed/` | 283ecb9 | — | Jason said 动 in Lab HQ. Built from a clean checkout of 283ecb9: the three share pages (byte-identical to the test links) + `build-embed.mjs` (`lab-e35c0a69c4.js`) + `vercel.json`; deployed with the Vercel CLI (`deploy --prod --scope accuphy`). Checked: all paths 200, md5 match, CSP frame-ancestors and noindex, `/embed/` CORS, the embed stand-in mounts, 0 console errors. Replaces 50ad8ca |
 | 2026-10-27 | **All test links** `/`, `/mini/`, `/ice/` | 283ecb9 | b29fe54 | The sound picture is the only Panoramic (#178); `/pano/` retired, forwards to `/` |
 | 2026-10-27 | **All test links** `/`, `/mini/`, `/ice/`, `/pano/` | e5a512c | 08d8f83 | Panoramic sound picture tuned against the app, round 1 (#178): rocks bright, no black lanes or rings, smooth fish dashes |
