@@ -45,6 +45,10 @@ const boatAt = async () => page.evaluate(() => { const r = window.__sonarState.h
 let track = [], calls = []
 if (clip === 'boat' || clip === 'mini') {
   await tapEl(clip === 'boat' ? 'Panoramic View' : 'Live Forward'); await page.waitForTimeout(2500)
+  // a shorter range so the fish read larger on the small phone screen (their true size is unchanged, #170): 80 → 60 ft
+  // Panoramic, 80 → 50 ft Live Forward
+  for (let k = 0; k < (clip === 'boat' ? 2 : 3); k++) { await tapEl('Range shorter'); await page.waitForTimeout(300) }
+  await page.waitForTimeout(2000)
   await page.evaluate(() => { if (window.__sonarState?.hintEl) window.__sonarState.hintEl.style.visibility = 'hidden' })
   const [bx, by] = await boatAt()
   const p1 = [bx + W * 0.12, by], p2 = [p1[0] + W * 0.09, p1[1] - H * 0.015] // short drags, bow first (the hull points +x)

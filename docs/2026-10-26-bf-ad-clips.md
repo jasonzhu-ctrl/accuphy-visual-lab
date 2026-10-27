@@ -54,42 +54,51 @@ traffic entry for Meta / YouTube, test budget CAD 2,000, 11/2–11/15, Canada on
     to re-record.
   - `playwright-core` is not a repo dependency.
 
-## Captions (drafts)
+## Captions (final, 2026-10-26)
 
-The English goes to Klaviyo HQ for the final wording. The French goes to the website HQ for checking (site #198). The
-French uses the page's own terms where they exist: "Faites glisser le bateau", "Touchez la glace pour percer un trou",
-"avant en direct".
+- **English:** Klaviyo HQ's final wording (`IT/Marketing/Klaviyo/Campaigns/2026-11 Black Friday/2026-10-26 广告字幕 定稿.md`).
+- **French:** the website HQ's final table (`handoffs/2026-10-26-bf-ad-captions-fr-review.md`). It is burned with a
+  no-break space (U+00A0) before the colon and curly apostrophes ’. U+202F is missing from Instrument Sans, so it is
+  not used.
+- "Simulated demo / Démo simulée" is not added; that waits for Jason.
 
 | Clip | s | EN | FR |
 |---|---|---|---|
 | ice | 0–2.4 | Tap the ice to drill a hole. | Touchez la glace pour percer un trou. |
-| | 2.4–5 | PingLive Mini drops down the hole. | Le PingLive Mini descend dans le trou. |
-| | 5–8.5 | See the fish under the ice, live. | Voyez les poissons sous la glace, en direct. |
-| | 8.5–12 | Watch them come to your lure. | Regardez-les venir à votre leurre. |
-| | 12–15 | Try it free in your browser: Accuphy Lab | Essayez-le gratuitement dans votre navigateur : Accuphy Lab |
+|  | 2.4–5 | PingLive Mini drops down the hole. | Le PingLive Mini descend dans le trou. |
+|  | 5–8.5 | See the fish under the ice, live. | Voyez les poissons sous la glace, en direct. |
+|  | 8.5–12 | Watch them come to your lure. | Regardez-les venir à votre leurre. |
+|  | 12–15 | Play the free sonar demo: Accuphy Lab | Essayez la démo de sonar gratuite : Accuphy Lab |
 | boat | 0–2.5 | Drag the boat. Watch the sonar. | Faites glisser le bateau. Regardez le sonar. |
-| | 2.5–6 | PingLive Panoramic View: a wide live picture. | PingLive, vue panoramique : une image large, en direct. |
-| | 6–9.5 | Timber, bottom and fish, in real time. | Arbres, fond et poissons, en temps réel. |
-| | 9.5–12 | Fish light up as the beam finds them. | Les poissons s'allument quand le faisceau les touche. |
-| | 12–15 | Try it free in your browser: Accuphy Lab | Essayez-le gratuitement dans votre navigateur : Accuphy Lab |
-| mini | 0–2.5 | Drag the boat. The beam looks ahead. | Faites glisser le bateau. Le faisceau regarde devant. |
-| | 2.5–6 | PingLive Mini, Live Forward. | PingLive Mini, avant en direct. |
-| | 6–9.5 | See the trees and cover before you get there. | Voyez les arbres et les abris avant d'y arriver. |
-| | 9.5–12 | Find the spot. Then cast. | Trouvez le bon coin. Puis lancez. |
-| | 12–15 | Try it free in your browser: Accuphy Lab | Essayez-le gratuitement dans votre navigateur : Accuphy Lab |
+|  | 2.5–6 | PingLive in panoramic view: a wide, live picture. | PingLive en vue panoramique : une image large, en direct. |
+|  | 6–9.5 | Timber, bottom and fish, in real time. | Arbres immergés, fond et poissons, en temps réel. |
+|  | 9.5–12 | Fish light up as the beam finds them. | Les poissons s’allument quand le faisceau les touche. |
+|  | 12–15 | Play the free sonar demo: Accuphy Lab | Essayez la démo de sonar gratuite : Accuphy Lab |
+| mini | 0–2.5 | Drag the boat. The beam looks ahead. | Faites glisser le bateau. Le faisceau pointe vers l’avant. |
+|  | 2.5–6 | PingLive Mini in forward view. | PingLive Mini en vue avant. |
+|  | 6–9.5 | See the trees and cover before you get there. | Voyez les arbres immergés et les structures avant d’y arriver. |
+|  | 9.5–12 | Find the spot. Then cast. | Trouvez le bon coin. Puis lancez. |
+|  | 12–15 | Play the free sonar demo: Accuphy Lab | Essayez la démo de sonar gratuite : Accuphy Lab |
+
+## Re-recorded 2026-10-26 with the #170 fish
+
+All 18 files were recorded again after the #153 round-3 fish went onto the live pages (#170), then burned with the
+final captions.
+
+To make the fish read larger without changing their true size, the boat clips shorten the sonar range on the phone
+screen ("Range shorter"): Panoramic 80 → 60 ft, Live Forward 80 → 50 ft.
 
 ## Known weak points (for HQ / Jason to judge)
 
 - **Small fish:**
-  - Ice: the fish on the sonar are small marks (a perch, a smelt). Real, but not very loud.
-  - Mini Live Forward: trees read strongly, fish only faintly.
+  - Ice: the fish on the sonar are small (a perch, a lake trout at the end). Real, but not very loud.
+  - Mini Live Forward (50 ft): the trees and cover read big, fish only now and then.
   - A fix would need a staged school of fish. That is a Lab change, not done.
 - **Ice timing:** the clip opens with a fish already lit. The tap at 1 s starts a drill, and the sonar is blank for
   about 3 s while the kit drills. That is how the page works.
 - **4:5 framing:** the 4:5 frames keep the whole 9:16 picture at 70 % width with blurred sides, not a true 4:5 layout.
 - **Boat direction:** the drags go bow-first (to the right), because the hull does not turn (#166; Jason: not to be changed).
-- **CTA:** "Try it free in your browser: Accuphy Lab" is a placeholder. The final call to action and the link are
-  Klaviyo HQ's; the clips carry no BF offer and no price.
+- **CTA:** "Play the free sonar demo: Accuphy Lab" (final). The clips carry no BF offer and no price.
 - **Not checked:** how Meta crops or overlays these in the Reels / feed preview.
 
 ## 中文摘要（给 Jason）
