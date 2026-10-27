@@ -13,9 +13,9 @@ await p.evaluate(() => { const s = window.__sonarState; s.dragging = true; s.has
 // (1) opening: low, from the side (south, +z), the boat on the water, the Forward beam glowing below with fish in it
 await click('PingLive'); await click('Forward'); await p.waitForTimeout(1500)
 await p.evaluate(() => window.__chase('largemouth'))
-for (const [k, c] of Object.entries({ f: { pos: [0, 9, 28], look: [24, -6, 8], fov: 44, noLogo: true } })) { await cam(c); await save('open-' + k) }
+for (const [k, c] of Object.entries({})) { await cam(c); await save('open-' + k) }
 // (2) 135° landing: Panoramic 80 ft, the whole block in the lake from the side
 await click('Panoramic'); await p.waitForTimeout(1500)
 await p.evaluate(() => { window.__sonarState.adBeam = { line: 0.5, face: 0.16 } })
-for (const [k, c] of Object.entries({ s3: { pos: [19, 36, 66], look: [23, -4, 6], fov: 46, noLogo: true } })) { await cam(c); await save('pano-' + k) }
+for (const [k, c] of Object.entries({ s8: { pos: [22, 80, 92], look: [27, -10, 0], fov: 48, noLogo: true } })) { await cam(c); await save('pano-' + k) }
 await b.close()

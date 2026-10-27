@@ -12,7 +12,7 @@ await p.evaluate(() => {
   if (s.hintEl) s.hintEl.style.visibility = 'hidden'
   s.jigDrop = { y0: -29.2 }
 })
-const cams = { c: { pos: [-40, 14, -30], look: [-21, -1, -46], fov: 46, noLogo: true }, d: { pos: [-42, 16, -28], look: [-21, 1, -47], fov: 48, noLogo: true } }
+const cams = JSON.parse(process.env.CAMS)
 for (const [k, c] of Object.entries(cams)) {
   await p.evaluate((c) => { const s = window.__sonarState; s.camOverride = c; s.jigYw = -29.2; s.jigTrail = -29.0 }, c)
   for (let i = 0; i < 40; i++) { await p.waitForTimeout(100); if ((await p.evaluate(() => window.__sonarState.jigYw)) <= -30.4) break }
