@@ -65,3 +65,4 @@ the Mini page; `VITE_SCENE=ice` for the ice page → `/ice/` on GitHub Pages sin
 | 2026-10-27 | Public test page `/jig/` | 218e483 | 0f4439e | Lake with the 110 ft hole and the jig drop from the boat (`?jig`, best with `?boat=-22.9,-47.2`) (#172) |
 | 2026-10-27 | Public test page `/jig/` | 557f1b2 | 7191adc | Fish schools spread out (#173) on top of the hole and jig (#172) |
 | 2026-10-27 | Public test page `/jig/` | 58ea10f | 2418a2d | Fish spread round 2 at Jason's screenshot spot and the phone start (#173) |
+| 2026-10-27 | Public test page `/jig/` | a3abfc4 | 06630db | Fish round 3: density between rounds 1 and 2, bass drawn 1.5× (#173) |
