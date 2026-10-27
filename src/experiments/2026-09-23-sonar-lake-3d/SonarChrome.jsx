@@ -72,6 +72,9 @@ export default function SonarChrome({ layout, deviceId, mode, rangeFt, depthFt, 
   const left = ticks(leftBox.y0 / unit, (leftBox.y0 + leftBox.h) / unit, lStep).filter((v) => v > 0)
   const mini = deviceId === 'PLM'
   const showDepthRange = !mini && mode === 'forward'
+  // PLM Live Forward has no depth readout, only the temperature and the voltage top-left where the depth would be
+  // (reference/app-study/plm-forward-fish-a.jpg; Jason 2026-10-27: PingLive Mini 的 forward 是不显示深度的)
+  const miniFwd = mini && mode === 'forward' && !split
   const label = (v) => `${Math.abs(Math.round(v * 100) / 100)}`
   // the Mini's ice views (reference/product-images/PingLive Mini Views.png): the flasher dial fills the left iceSplit of
   // the display — depth labels round its ring, the big readout in its centre; the right panel keeps the depth ruler, the
@@ -102,9 +105,9 @@ export default function SonarChrome({ layout, deviceId, mode, rangeFt, depthFt, 
         <div ref={depthRef} className={num} style={{ position: 'absolute', left: `${ringCx}cqw`, top: `${ringCy}cqh`, transform: 'translate(-50%, -50%)', fontSize: '9cqh', fontWeight: 700, lineHeight: 1, letterSpacing: '-0.02em', color: '#1b1e2a', whiteSpace: 'nowrap' }}>— —</div>
         <div className={num} style={{ position: 'absolute', top: '6cqh', right: '4.5%', textAlign: 'right', fontSize: '4.2cqh', lineHeight: 1.5 }}>{tempLabel}<br />12.6 V</div>
       </>) : (
-      <div style={{ position: 'absolute', top: '11cqh', ...(split ? { right: '5%', textAlign: 'left' } : { left: '4%' }) }}>
-        <div ref={depthRef} className={num} style={{ fontSize: '12cqh', fontWeight: 600, lineHeight: 1, letterSpacing: '-0.01em' }}>— —</div>
-        <div className={num} style={{ fontSize: '4.2cqh', marginTop: '3cqh', lineHeight: 1.5 }}>{tempLabel}<br />12.6 V</div>
+      <div style={{ position: 'absolute', top: miniFwd ? '8.5cqh' : '11cqh', ...(split ? { right: '5%', textAlign: 'left' } : { left: '4%' }) }}>
+        {!miniFwd && <div ref={depthRef} className={num} style={{ fontSize: '12cqh', fontWeight: 600, lineHeight: 1, letterSpacing: '-0.01em' }}>— —</div>}
+        <div className={num} style={{ fontSize: '4.2cqh', marginTop: miniFwd ? 0 : '3cqh', lineHeight: 1.5 }}>{tempLabel}<br />12.6 V</div>
       </div>)}
 
       {/* wordmark + resolution tag (top-right) — not in Combo, where the readout sits there; not under a sideways phone's

@@ -3139,3 +3139,16 @@ Numbered log. Newest at the bottom.
        1.88 MB + 151 KB thumbnails (was 2.79 MB); ice `[ice]` and the embed build pass; embed `lab-4a3ed08481.js` 2.08 MB.
      - **Checked:** dev and built pages, lake and ice, English and `?lang=fr` — accents, ° × − →, the synthesised italic rulers; all
        11 thumbnails load, 0 broken images, 0 console errors. Not yet on any link: HQ rebuilds (`docs/versions.md`).
+181. **2026-10-27** — **PingLive Mini Forward shows no depth readout** (Jason in Lab HQ: "PingLive Mini的forward是不显示深度的").
+     - **The app** (`reference/app-study/plm-forward-fish-a.jpg`, `docs/app-chrome.md` §6): Live Forward shows only the water
+       temperature and the voltage top-left, where the big depth would be. Live Down shows depth, temperature and voltage
+       top-left; Live Combo shows them top-right; Live Ice and Ice Fishing put the depth in the dial, with temperature and
+       voltage top-right (`reference/app-study/2026-10-23/`).
+     - **Changed** (`SonarChrome.jsx` `miniFwd`): in Mini Forward the big readout is gone and the temperature and voltage
+       move up into its place. This applies on the lake page and the ice page, desktop and phone. Down, Combo, Live Ice and
+       PingLive's own views are unchanged. Ours already matched the app in those views.
+     - **Still different, not built (noted for HQ):**
+       - Mini Forward has no `1.0x` zoom control with ˄ ˅ on the right edge.
+       - In Combo the app keeps the ACCUPHY wordmark above the readout at top right; ours drops the wordmark there.
+     - **Checks:** before/after sheet `docs/2026-10-27-plm-forward-no-depth.jpg` (lake desktop, ice desktop, phone 390×844,
+       the app frame). 0 console errors on both pages.
