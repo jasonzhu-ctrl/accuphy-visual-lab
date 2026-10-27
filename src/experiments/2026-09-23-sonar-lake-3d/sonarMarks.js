@@ -1,11 +1,10 @@
 // CPU side of the sonar picture (docs/sonar-style.md §7.13):
-//  - a baked terrain depth texture, used by the Panoramic plan-view renderer (and a Float32 copy for
-//    CPU lookups, e.g. where a fish's acoustic shadow lands on the bottom);
-//  - fish MARKS drawn analytically instead of sampled from the depth strips. Every fish in the beam
-//    becomes a segment in screen metres: its body as the sonar sees it NOW (not the path it swam), which
-//    the shader turns into the image a formed beam makes of it (sonarShader.js fishEcho, decision #120):
-//      Panoramic (plan view): the body seen from above, plus its shadow on the bottom further out along the ray;
-//      Down / Forward (vertical plane): the body projected into the plane (a fish crossing the plane is a point).
+//  - a baked terrain depth texture (Panoramic's floor, #178, and the far bottom of the vertical views);
+//  - fish MARKS drawn analytically: since #170 only the ice page's jig and the dev aid ?fish=marks (vertical views; the
+//    fish are drawn from their bodies, #153). Every fish in the beam becomes a segment in screen metres: its body as the
+//    sonar sees it NOW (not the path it swam), which the shader turns into the image a formed beam makes of it
+//    (sonarShader.js fishEcho, decision #120): the body projected into the vertical plane (a fish crossing it is a point).
+//    (Panoramic's plan-view marks went with the plan view, #178.)
 //    Along the ray only the swim bladder's depth shows, across it the whole flank; the shader smears both by the
 //    beam (a fixed angle) and the pulse, so far fish become needles along the arc and near ones show their body.
 import * as THREE from 'three'
@@ -20,13 +19,12 @@ const TERRAIN_N = 512
 
 export function bakeTerrain() {
   const N = TERRAIN_N, H = HALF
-  const f32 = new Float32Array(N * N), h16 = new Uint16Array(N * N)
+  const h16 = new Uint16Array(N * N)
   for (let j = 0; j < N; j++) {
     const z = -H + ((j + 0.5) * 2 * H) / N
     for (let i = 0; i < N; i++) {
       const x = -H + ((i + 0.5) * 2 * H) / N
       const v = depthAt(x, z)
-      f32[j * N + i] = v
       h16[j * N + i] = THREE.DataUtils.toHalfFloat(v)
     }
   }
@@ -35,16 +33,7 @@ export function bakeTerrain() {
   tex.minFilter = tex.magFilter = THREE.LinearFilter
   tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping
   tex.needsUpdate = true
-  return { f32, tex, N, H }
-}
-
-export function terrainCPU(b, x, z) {
-  const { N, H, f32 } = b
-  const fx = ((x + H) / (2 * H)) * N - 0.5, fz = ((z + H) / (2 * H)) * N - 0.5
-  const i0 = Math.max(0, Math.min(N - 2, Math.floor(fx))), j0 = Math.max(0, Math.min(N - 2, Math.floor(fz)))
-  const tx = Math.min(1, Math.max(0, fx - i0)), tz = Math.min(1, Math.max(0, fz - j0))
-  const a = f32[j0 * N + i0], c = f32[j0 * N + i0 + 1], d = f32[(j0 + 1) * N + i0], e = f32[(j0 + 1) * N + i0 + 1]
-  return (a * (1 - tx) + c * tx) * (1 - tz) + (d * (1 - tx) + e * tx) * tz
+  return { tex, N, H }
 }
 
 export function makeMarksTexture() {
@@ -56,15 +45,6 @@ export function makeMarksTexture() {
 }
 
 const smooth = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t) }
-// Panoramic coverage vs depression angle (rad): the flat fan is installed 5° down and 20° thick, so it covers
-// 5°–25° below the transducer (soft edges 2°–6° and 23°–28°). Only what lies in that slab — the same slab the
-// 3D curtain draws — shows on the screen (Jason 2026-09-24: 没有在探测的coverage里的东西是不会显示的). The old
-// response kept ~50 % out to 60° and let deep things the curtain never reaches (the wreck) show.
-// Plus a sidelobe below the slab (Jason 2026-09-24: 要的 但是要好 — the app's lake recordings show bottom close to the
-// boat): ≈ 0.8 of the main response from 25° down, fading out by 60°, so the bottom continues toward the boat a
-// little darker and only the patch right under the transducer stays dark. The 3D curtain still draws the main slab.
-export const PANO_SIDELOBE = 0.8
-export const panoLobe = (g) => smooth(0.035, 0.105, g) * (1 - smooth(0.4, 0.49, g)) + PANO_SIDELOBE * smooth(0.4, 0.49, g) * (1 - smooth(0.62, 1.05, g))
 
 const pose = {}, pose0 = {}
 const cand = []
@@ -88,15 +68,14 @@ function bodySeg(cx, cy, ex, ey, L, wag) {
 // fan, seed); 2 = shadow blotch (cx, cy, half-axis along the ray, half-axis across); 3 = (activity 0..1, or -1 for
 // the legacy capsule; aspect; hasShadow; ghost strength); 4 = the ghost: the body 0.2 s ago (tail x, y, head x, y).
 const JIG_S = (() => { const m = typeof window !== 'undefined' && /jigs=([\d.]+)/.exec(window.location.search); return m ? +m[1] : 0.6 })() // dev aid ?jigs=
-export function computeMarks({ jig, pop, t, specs, apex, flat, bake, rangeM }, marks) {
+export function computeMarks({ jig, pop, t, specs, apex, flat, rangeM }, marks) {
   cand.length = 0
   if (!pop || !specs.length) return 0
-  const zt = -apex.y // transducer depth below the surface
   for (const f of pop) {
     const o = fishPose(f, t, pose)
     const dx = o.x - apex.x, dy = o.y - apex.y, dz = o.z - apex.z
     const rl = Math.hypot(dx, dy, dz)
-    if (rl < 0.3 || rl > rangeM * (flat ? 1.45 : 1.05)) continue // Panoramic's picture runs to its corners (≈ 1.37 R)
+    if (flat || rl < 0.3 || rl > rangeM * 1.05) continue // (Panoramic draws its fish from their bodies, #178)
     const o0 = fishPose(f, t - GHOST_DT, pose0)
     // big fish bloom: a strong echo spills into neighbouring beams and range cells, so a big fish paints a
     // mark larger than its body (Jason 2026-09-24: 下面有一条大鱼 … 声纳上面显示也要再大一点). Bait and
@@ -120,49 +99,18 @@ export function computeMarks({ jig, pop, t, specs, apex, flat, bake, rangeM }, m
     const wag = 0.1 * L * (0.3 + 0.7 * Math.min(1, (o.speed || 0) / 0.5)) * beat
     const flex = 0.9 + 0.1 * beat
     const bw = 0.11 * L + 0.01 // half the body's depth
-    if (flat) {
-      const d = Math.hypot(dx, dz)
-      if (dx > rangeM * 1.01 || Math.abs(dz) > panoHalfWidth * rangeM) continue // outside the picture (and the curtain)
-      const bearing = Math.atan2(dz, dx)
-      const half = (specs[0].a1 - specs[0].a0) / 2
-      if (Math.abs(bearing) > half + 0.04) continue
-      const zf = -o.y
-      const lobe = panoLobe(Math.atan2(zf - zt, d))
-      if (lobe < 0.04) continue
-      // plan view: screen x = starboard (+z), screen y = forward (+x) — the body seen from above
-      const m = { a: bodySeg(dz, dx, bz, bx, L, wag), g: bodySeg(o0.z - apex.z, o0.x - apex.x, bz0, bx0, L, 0), hw: bw, s: Math.min(1.5, 1.8 * size * lobe * (0.45 + 0.55 * aGain) * flex * (0.55 + 0.45 * seed)), fan: 0, seed, aspect, act, sh: 0, legacy: 0 }
-      // shadow: the ray transducer → fish continues down and meets the bottom at plan distance s;
-      // central projection from the transducer scales the silhouette by k = s / d
-      const rx = dx / d, rz = dz / d
-      for (let s = d + 0.25; s < Math.min(d * 5, rangeM * 1.4); s += 0.3) {
-        const rayDepth = zt + ((zf - zt) * s) / d
-        if (rayDepth >= terrainCPU(bake, apex.x + rx * s, apex.z + rz * s)) {
-          // only the current body casts the shadow: a rounded blotch at the body's image on the bottom
-          // (central projection from the transducer, scale k), longer along the ray (the fish's height)
-          const k = s / d, rhx = dz / d, rhy = dx / d
-          const tang = Math.abs(bz * rhy - bx * rhx) * L / 2               // body half-extent across the ray
-          m.sx0 = dz * k; m.sy0 = dx * k                                   // blotch centre (screen metres)
-          m.sx1 = Math.min(1.6, (0.15 + 0.3 * L) * k + 0.15)               // half-axis along the ray
-          m.sy1 = Math.min(1.0, (tang + 0.06) * k + 0.04)                  // half-axis across the ray
-          m.sh = 1
-          break
-        }
-      }
-      cand.push(m)
-    } else {
-      const X = dx, Y = -dy // vertical plane: screen x = forward (+x), screen y = depth below the apex
-      specs.forEach((sp, k) => {
-        const centre = Math.atan2(sp.frame.c.x, -sp.frame.c.y), half = (sp.a1 - sp.a0) / 2
-        if (Math.abs(Math.atan2(X, Y) - centre) > half + 0.03) return
-        const u = X * sp.frame.c.x - Y * sp.frame.c.y // distance along the fan centre
-        const halfThick = Math.max(0.08, u * Math.tan(sp.theta))
-        const q = dz / halfThick
-        if (Math.abs(q) > 1.25) return
-        const wz = Math.exp(-0.8 * q * q * q * q) // beam pattern across the slab: flat inside, falling off at the edges
-        // the body's axis in the plane: x forward, y down
-        cand.push({ a: bodySeg(X, Y, bx, -by, L, wag), g: bodySeg(o0.x - apex.x, -(o0.y - apex.y), bx0, -by0, L, 0), hw: bw, s: Math.min(1.5, 2.1 * size * wz * aGain * flex * (0.7 + 0.3 * seed)), fan: k, seed, aspect, act, sh: 0, legacy: 0 })
-      })
-    }
+    const X = dx, Y = -dy // vertical plane: screen x = forward (+x), screen y = depth below the apex
+    specs.forEach((sp, k) => {
+      const centre = Math.atan2(sp.frame.c.x, -sp.frame.c.y), half = (sp.a1 - sp.a0) / 2
+      if (Math.abs(Math.atan2(X, Y) - centre) > half + 0.03) return
+      const u = X * sp.frame.c.x - Y * sp.frame.c.y // distance along the fan centre
+      const halfThick = Math.max(0.08, u * Math.tan(sp.theta))
+      const q = dz / halfThick
+      if (Math.abs(q) > 1.25) return
+      const wz = Math.exp(-0.8 * q * q * q * q) // beam pattern across the slab: flat inside, falling off at the edges
+      // the body's axis in the plane: x forward, y down
+      cand.push({ a: bodySeg(X, Y, bx, -by, L, wag), g: bodySeg(o0.x - apex.x, -(o0.y - apex.y), bx0, -by0, L, 0), hw: bw, s: Math.min(1.5, 2.1 * size * wz * aGain * flex * (0.7 + 0.3 * seed)), fan: k, seed, aspect, act, sh: 0, legacy: 0 })
+    })
   }
   // the ice page's jig (IceCamp s.jig): a small, faint mark like a little baitfish, with a short trail as it pops and
   // falls — on jet it lands in the cyan-green, never the red of the bottom (tuned by eye against the dial). It keeps

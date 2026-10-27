@@ -11,8 +11,8 @@ description: Method for changing how the Accuphy Lab sonar picture looks (bright
    of the same kind). If the scene cannot match (e.g. 40 m vs 10 m), say how much of the gap is physics.
 3. **Measure first.** `__sonarHist(10)` on the affected scene AND the calibrated ones (Mini shelf `?boat=-40,-5`,
    default view, a structure scene). Targets: bottom/fish ~6–7 % white, orange-weighted; structure ~13–14 % white.
-4. **Find the mechanism, not a fudge.** Read the relevant shader branch (`sonarShader.js`: vertical slab loop or the
-   Panoramic plan-view branch). Past root causes: narrow pulses drew wrecks as line drawings (#63), summed rows burnt
+4. **Find the mechanism, not a fudge.** Read the relevant shader branch (`sonarShader.js`: the slab loop in `fanEcho`,
+   which Panoramic shares with the fan laid flat — its own knobs are `uPanoK`, #178). Past root causes: narrow pulses drew wrecks as line drawings (#63), summed rows burnt
    flat bottoms white (#66), the footprint's highest tap lit rings round rocks (#67), per-pixel row sampling
    made dust (#62).
 5. **Temporary knobs.** Add a uniform fed from `window.__…` (mark it `TEMP`), sweep 3–5 settings, snapshot each scene,

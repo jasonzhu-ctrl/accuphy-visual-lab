@@ -597,6 +597,8 @@ same shape, one bin brighter; black inside the fan 0. Shelf bait schools were
 added to the lake so the Panoramic step shows dashes.
 
 ### 7.13 Panoramic rebuilt as a plan-view photograph (2026-09-24, Jason: "鱼和结构的形状包括沉船的 pano 和你做的完全不是一回事")
+**Superseded (#171, #178, 2026-10-27):** Panoramic is drawn as a sound picture (the vertical views' pipeline with the fan
+laid flat); the plan-view engine below is deleted. The app observations below still hold.
 The earlier Panoramic was still built like a side view (depth strips along a
 slab), so it could never produce what the app shows. Studied frame by frame:
 `pinglive/6089.MP4` (lake, 14 m, 32 frames), `3257.MP4`, the sunk-boat clip

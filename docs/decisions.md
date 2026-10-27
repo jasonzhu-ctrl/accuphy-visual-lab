@@ -3097,6 +3097,20 @@ Numbered log. Newest at the bottom.
          picture becomes the only Panoramic and the plan-view code is deleted.
      - **Jason's OK (2026-10-27, Lab HQ):** "全景可以了，新画法替换所有页面，旧的删掉". Round 1 (e5a512c) is the look. Step 5
        goes ahead: the sound picture becomes the only Panoramic, and the plan-view code and the `/pano/` test page are removed.
+     - **Done (2026-10-27, step 5; Jason in Lab HQ: "全景可以了，新画法替换所有页面，旧的删掉"):** the tuned sound picture
+       (e5a512c) is the only Panoramic on every page and in the share builds. The Mini has no Panoramic of its own (Live
+       Panoramic is frosted).
+       - **Deleted:** the plan-view branch of `sonarShader.js` (`topDepth`, `fishShadow`), `topRT` / `topCam` / `TOP_N`
+         and the `uTop*` uniforms (the fish image now has its own `uFishTex`), `panoMode`, `uPano` (Panoramic is simply
+         `uFlat`), the plan-view marks and `terrainCPU` in `sonarMarks.js`, the page's 全景：现在 / 声音的图 switch and
+         `?pano=old`, the test page `2026-10-26-sonar-pano-echo`, and `VITE_LAB=pano` in `scripts/build-share.mjs`.
+       - **Checks against e5a512c:**
+         - Lake 6×6 grid: Down, Forward and the Mini views match the lake page; the PingLive Panoramic tiles match
+           `/pano/` (equal lit shares at all six spots). One first run had the view switched mid-run; the rerun matched.
+         - Ice grid (#94): the same picture. 0 errors everywhere.
+         - Phone 390×844 @3, Panoramic: 2.18–2.21 ms per frame. `/pano/` at e5a512c was 2.15–2.21 ms; the lake page's
+           old plan view was 1.60–1.67 ms, so the live Panoramic costs about +0.55 ms. Not measured on the V10.
+         - Share build `[both]` 2.79 MB.
 179. **2026-10-27** — **A chat of its own for ad videos** (Jason in Lab HQ: "做广告视频你来开个新的挂着的窗口 单独制作视频 把配置
      skill 等等好的资源都配置上 视频制作专门让他做").
      - **New chat "广告视频制作"**, started from Lab HQ as its side session. It makes the ad stills and films only.

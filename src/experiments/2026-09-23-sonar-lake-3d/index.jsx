@@ -72,7 +72,7 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
   const ONLY = ICE ? 'PLM' : ONLY_ENV // on the ice the Mini is the device: the app's ice views are the Mini's
   const SHOWN_DEVICES = ONLY ? [DEVICES[ONLY]] : Object.values(DEVICES)
   const [deviceId, setDeviceId] = useState(ONLY || 'PL')
-  const [mode, setMode] = useState(ICE ? 'liveice' : lab === 'pano' ? 'panoramic' : 'forward') // the Panoramic test page (#171) opens on Panoramic
+  const [mode, setMode] = useState(ICE ? 'liveice' : 'forward')
   const [view, setView] = useState(ICE ? iceParams().view : 'top') // ice page cameras: top / under the ice / section (docs/ice-relationship-study.md)
   // the ice page: the step cards stack under the control panel, so the ice band across the top stays open for taps
   const panelRef = useRef(null)
@@ -128,7 +128,7 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
   const [toast, setToast] = useState(false)
   // Phones (lake scene) open ON the app's Home page and nothing starts until a view is picked (Jason 2026-10-16:
   // 显示首页选视图 而且应该必须先选才能开始): no beam, no sonar picture, no capsules until the first pick.
-  const homeFirst = (isPhoneLayout() || isLandscapePhone()) && !ICE && lab !== 'pano' // (the Panoramic test page goes straight to its view)
+  const homeFirst = (isPhoneLayout() || isLandscapePhone()) && !ICE
   const [home, setHome] = useState(homeFirst)      // the app's Home page is open inside the phone display
   const [started, setStarted] = useState(!homeFirst) // a view has been picked (always true on desktop and on the ice page)
   const toastT = useRef(0)
@@ -151,9 +151,6 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
   // the fish-echo test page (#153): two switches on the page itself (Jason opens it from a link, not with URL flags)
   const [fishNew, setFishNew] = useState(!(import.meta.env.DEV && /[?&]fish=marks/.test(window.location.search)))
   const [fishBig, setFishBig] = useState(import.meta.env.DEV && /[?&]fishsize=1\.6/.test(window.location.search))
-  // the Panoramic test page (#171, Jason 2026-10-26: 全景用方案 A：重做成声音的图，先做测试页我手机上对比): a switch between
-  // today's plan-view Panoramic and the sound picture; ?pano=old opens on today's
-  const [panoNew, setPanoNew] = useState(!/[?&]pano=old/.test(window.location.search))
   // the display's real aspect when sideways (the screen minus the safe areas); everywhere else the phone frame's 2.08
   const [landAspect, setLandAspect] = useState(2.08)
   useEffect(() => {
@@ -246,9 +243,8 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
   state.current.deviceId = deviceId
   state.current.view = view
   state.current.land = land
-  state.current.fishMode = fishNew ? 'echo' : 'marks' // #170 (Jason 2026-10-26: 把第 3 轮这一版的鱼搬进正式页面); Panoramic keeps the marks (SonarScreen)
+  state.current.fishMode = fishNew ? 'echo' : 'marks' // #170 (Jason 2026-10-26: 把第 3 轮这一版的鱼搬进正式页面); Panoramic always draws them from their bodies (SonarScreen)
   state.current.fishSize = fishBig ? 1.6 : 1
-  state.current.panoMode = lab === 'pano' && panoNew ? 'echo' : 'plan' // #171: the pano test page only; the live pages keep the plan view
   state.current.hintOff = land && !lakeBig // sideways with the sonar full-screen: no drag caption over the sonar
 
   // AUTO depth: deeper at once (the bottom never drops off the screen), shallower only after 1.5 s
@@ -480,15 +476,6 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
               <button className={`ac-btn ${fishBig ? 'is-active' : ''}`} onClick={() => setFishBig(true)}>放大 1.6 倍</button>
             </div>
           )}
-        </div>
-      )}
-      {/* ---- the Panoramic test page's switch (#171): top centre on phones, bottom left on wider screens ---- */}
-      {lab === 'pano' && (
-        <div className="pointer-events-auto absolute left-1/2 top-3 z-20 flex -translate-x-1/2 flex-col items-center gap-1.5 sm:bottom-6 sm:left-4 sm:top-auto sm:translate-x-0 sm:items-start" style={{ fontFamily: 'system-ui, sans-serif' }}>
-          <div className="ac-seg">
-            <button className={`ac-btn ${!panoNew ? 'is-active' : ''}`} onClick={() => setPanoNew(false)}>全景：现在</button>
-            <button className={`ac-btn ${panoNew ? 'is-active' : ''}`} onClick={() => setPanoNew(true)}>全景：声音的图</button>
-          </div>
         </div>
       )}
 

@@ -34,13 +34,13 @@ Jason, 2026-10-27: the lake scene (boat and lake), its effects, the sonar pictur
 | Structure | echo splat of every surface; bright cores, orange rims, solid targets hide the bottom | #135, #143–#147, #149 |
 | Bottom | one filled band; far bottom softer and weaker, never gone | #140, #152, #154 |
 | Fish in the sonar | drawn from the fish bodies, as the transducer hears them; far fish at long range held at a steady middle size | #153, #170, #177 |
-| Panoramic | **the sound picture** (Jason 10-27). Being tuned on `/pano/` (brighter rocks, fewer black areas, after the app recordings); then it replaces the plan view everywhere and the plan view is deleted | #171, #178 |
+| Panoramic | **the sound picture**, the only one (Jason 10-27): the vertical views' pipeline with the fan laid flat. Hot rocks, soft dark-crimson shadows instead of black lanes, no rings, fish as smooth dashes (`uPanoK`). The plan view and `/pano/` are deleted | #171, #178 |
 | Forward AUTO depth | **OPEN** | #154 |
 | Mini views | four views, the rest frosted; Combo range AUTO | #121, #124, #125 |
 
 ## Known second copies (to remove)
 
-- **Panoramic:** two drawings behind `panoMode`. One goes after Jason's pick.
+- **Panoramic:** done. The plan view (`panoMode`, `topRT`, its marks and shadows) is deleted (#178).
 - **Old fish marks (#120):** kept only for the ice page's jig. That is the ice scene, so it may stay, but only on the ice
   path.
 - **Kelvin wake (#166):** removed with its wake map (#175).
@@ -49,6 +49,6 @@ Jason, 2026-10-27: the lake scene (boat and lake), its effects, the sonar pictur
 ## 中文摘要（给 Jason）
 
 - 湖景和声纳成像只有一个标准版，就是这张清单。只有冰钓聊天能改湖和声纳，别的聊天要改就告诉它。
-- 已定：风浪水面、真实天空倒影、**圆形水纹**、110 ft 深坑、新鱼、夏天湖面不放 jig。
-- 还等你定：全景用哪种画法（手机对比 /pano/），Forward 的 AUTO 深度留不留。
+- 已定：风浪水面、真实天空倒影、**圆形水纹**、110 ft 深坑、新鱼、夏天湖面不放 jig、**全景用声音的图**（旧画法已删）。
+- 还等你定：Forward 的 AUTO 深度留不留。
 - 所有链接都从同一次提交打包；lab.accuphy.ca 要你说“动”才跟上。

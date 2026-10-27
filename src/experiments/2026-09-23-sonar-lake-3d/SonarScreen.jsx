@@ -65,17 +65,15 @@ export function screenLayout(deviceId, mode, R, aspect, specs, depthM) {
 }
 
 // Takes over the frame loop (priority 1): renders a depth strip per fan from the transducer (Down /
-// Forward) or a top-down depth map (Panoramic), then the main view, then the sonar screen as an
+// Forward, and Panoramic with its fan laid flat, #171/#178), then the main view, then the sonar screen as an
 // overlay quad. Layers: 1 = water, beams, boat (never seen by the sonar); 2 = lakebed (seen by the
-// vertical sonar cameras, not by the top-down map — the bottom comes from the baked terrain there);
-// 3 = fish (never in the sonar passes: fish are drawn analytically, sonarMarks.js).
+// sonar cameras); 3 = fish (drawn from their bodies into the fish image, pass 4, #153).
 export const SONAR_HIDE_LAYER = 1
 export const LAKEBED_LAYER = 2
 export const FISH_LAYER = 3
-export const LOGO_LAYER = 4 // the lakebed logo: main view + Panoramic top-down map; the side views draw it analytically
-const TOP_N = 512 // top-down structure map for Panoramic (±range around the transducer)
-const FISH_H = 256 // the fish-echo test page's fish image, rows per fan (#153): about a pulse per row at 30 m (sonarShader fishImg)
-// Panoramic as a sound picture (the pano test page, #171): the strip camera looks PANO_TILT below the horizon and covers
+export const LOGO_LAYER = 4 // the lakebed logo: main view + Panoramic's strips (seen as structure); the side views draw it analytically
+const FISH_H = 256 // the fish image, rows per fan (#153): about a pulse per row at 30 m (sonarShader fishImg)
+// Panoramic as a sound picture (#171, the only Panoramic since #178): the strip camera looks PANO_TILT below the horizon and covers
 // ±PANO_HALF, i.e. 5°–65° — the 5°–25° slab plus the sidelobe that finds the bottom from the boat outward (sonar-style
 // §7.12); the rows are weighted by depression in the shader (rowWeight). The sound reaches the screen corners (1.45 × range).
 const PANO_TILT = THREE.MathUtils.degToRad(35), PANO_HALF = THREE.MathUtils.degToRad(30), PANO_REACH = 1.45
@@ -106,12 +104,6 @@ export default function SonarScreen({ state, rect, lakeMats }) {
     const echoRTs = [0, 1].map(() => new THREE.WebGLRenderTarget(STRIP_W, ECHO_H, { depthBuffer: false, samples: 4, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter }))
     const cams = [0, 1].map(() => new THREE.PerspectiveCamera(20, 1, 0.3, 150))
     cams.forEach((c) => { c.layers.set(0); c.layers.enable(LAKEBED_LAYER) })
-    // Panoramic: top-down orthographic depth map of the structures (trees, rocks, wrecks) around the transducer
-    const topRT = new THREE.WebGLRenderTarget(TOP_N, TOP_N, { depthBuffer: true, minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter })
-    topRT.depthTexture = new THREE.DepthTexture(TOP_N, TOP_N, THREE.FloatType)
-    const topCam = new THREE.OrthographicCamera(-10, 10, 10, -10, 0.1, 70)
-    topCam.layers.set(0); topCam.layers.enable(LOGO_LAYER)
-    topCam.up.set(1, 0, 0) // image up = forward (+x), image right = starboard (+z)
     const bake = bakeTerrain()
     const marks = makeMarksTexture()
     const logo = logoFrame()
@@ -128,7 +120,7 @@ export default function SonarScreen({ state, rect, lakeMats }) {
         uTime: { value: 0 }, uFlat: { value: 0 }, uBedGain: { value: 1 }, uCapDepth: { value: new THREE.Vector3(5.5, 7.5, 1) }, uStreak: { value: 1 }, uDebug: { value: window.location.search.includes('sonardebug') ? 1 : 0 },
         uMarks: { value: marks.tex }, uMarkCount: { value: 0 }, uPulse: { value: 0.05 }, uBeamHalf: { value: 0.012 },
         uTerrain: { value: bake.tex }, uTerrainHalf: { value: bake.H },
-        uTop: { value: topRT.depthTexture }, uTopR: { value: 10 }, uTopCamY: { value: 2 }, uTopNearFar: { value: new THREE.Vector2(0.1, 70) },
+        uFishTex: { value: null }, // the fish image (fishRT, made on first use)
         uApexXZ: { value: new THREE.Vector2() }, uApexDepth: { value: 0.9 },
         uLogoB: { value: logo.B }, uLogoU: { value: logo.U }, uLogoV: { value: logo.V },
         uLogoSdf: { value: makeLogoSdf() }, uLogoMap: { value: new THREE.Vector4(1 / logo.s, LOCKUP_SVG.cx, LOCKUP_SVG.bottom, LOGO_SDF_MAX) },
@@ -138,8 +130,8 @@ export default function SonarScreen({ state, rect, lakeMats }) {
         uIce: { value: 0 }, uIceSplit: { value: ICE_SPLIT }, uAspect: { value: 2.08 }, uTicks: { value: 5 }, uLUT2: { value: colormapTexture('jet') },
         uHist: { value: null }, uHistPrev: { value: null }, uHistPass: { value: 0 }, uHistFill: { value: 0 }, uIceAmber: { value: /icelut=amber/.test(window.location.search) ? 1 : 0 },
         uSignal: { value: 1 }, // the ice page's signal gate (IceCamp.jsx s.signal); 1 on the summer lake
-        uFishMode: { value: 0 }, // the fish-echo test page only (#153)
-        uPano: { value: 0 }, uPanoTilt: { value: PANO_TILT }, uPanoK: { value: new THREE.Vector4(0.75, 0.15, 1.3, 0.75) }, // Panoramic as a sound picture (pano test page, #171)
+        uFishMode: { value: 0 }, // fish from their bodies (#153; every page since #170)
+        uPanoTilt: { value: PANO_TILT }, uPanoK: { value: new THREE.Vector4(0.75, 0.15, 1.3, 0.75) }, // Panoramic: the strip camera's tilt, and its tuning (#178: hard targets, the field's floor, their ceiling, the floor steep under the boat)
       },
     })
     // the 2D history (Ice Fishing View): 384 pings × 256 depth cells, ping-ponged — each ping shifts the record one
@@ -164,7 +156,7 @@ export default function SonarScreen({ state, rect, lakeMats }) {
     quad.frustumCulled = false
     overlay.add(quad)
     const ortho = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1)
-    if (import.meta.env.DEV) window.__sonar = { targets, targetsB, echoRTs, cams, mat, topRT, marks }
+    if (import.meta.env.DEV) window.__sonar = { targets, targetsB, echoRTs, cams, mat, marks }
     // dev: window.__sonarHist(bins) — render the sonar picture flat into an offscreen target and
     // return the histogram of LUT index (nearest LUT entry per pixel) so the engine's brightness
     // distribution can be compared number-for-number with the app's reference frames
@@ -232,10 +224,10 @@ export default function SonarScreen({ state, rect, lakeMats }) {
         return c.toDataURL('image/png')
       }
     }
-    return { targets, targetsB, echoRTs, fishRT: null, cams, mat, overlay, quad, ortho, topRT, topCam, bake, marks, hist, histScene, histCur: 0, lastPing: -1 }
+    return { targets, targetsB, echoRTs, fishRT: null, cams, mat, overlay, quad, ortho, bake, marks, hist, histScene, histCur: 0, lastPing: -1 }
   }, [])
   useEffect(() => { [SONAR_HIDE_LAYER, LAKEBED_LAYER, FISH_LAYER, LOGO_LAYER].forEach((l) => camera.layers.enable(l)) }, [camera])
-  useEffect(() => () => { res.targets.forEach((t) => t.dispose()); res.targetsB.forEach((t) => t.dispose()); res.echoRTs.forEach((t) => t.dispose()); res.topRT.dispose(); res.mat.dispose(); res.hist.forEach((t) => t.dispose()) }, [res])
+  useEffect(() => () => { res.targets.forEach((t) => t.dispose()); res.targetsB.forEach((t) => t.dispose()); res.echoRTs.forEach((t) => t.dispose()); res.fishRT?.dispose(); res.mat.dispose(); res.hist.forEach((t) => t.dispose()) }, [res])
 
   const tmpUp = useMemo(() => new THREE.Vector3(), [])
   const tmpColor = useMemo(() => new THREE.Color(), [])
@@ -274,108 +266,91 @@ export default function SonarScreen({ state, rect, lakeMats }) {
       u.uApexU.value = lay.apexU
       u.uStreak.value = lay.mottle ? 0 : 1
       u.uReach.value = lay.reach ?? s.rangeM
-      if (flat && s.panoMode === 'echo') u.uReach.value = PANO_REACH * s.rangeM // the data runs out to the screen corners
+      if (flat) u.uReach.value = PANO_REACH * s.rangeM // the data runs out to the screen corners
       u.uBedGain.value = s.deviceId === 'PLM' ? 0.95 : 1 // PLM near-range gain (sonarShader.js); 0.62 → 0.95 (2026-10-24): the thin band no longer burns white in shallow water, and 0.62 left the Mini's bottoms faint and thin
       if (s.deviceId === 'PLM') u.uCapDepth.value.set(7.5, 9.5, 0.8); else u.uCapDepth.value.set(5.5, 7.5, 1) // the bottom's soft cap by depth (#91, #92, sonarShader.js)
       s.layout = lay // for the DOM chrome (rulers)
     }
 
-    // fish from their 3D bodies in the vertical views (#153 round 3; every page since #170, index.jsx fishMode)
-    // Panoramic as a sound picture (the pano test page, #171): the vertical views' pipeline with the fan laid flat — what
-    // the beam's thickness hits per bearing and range, arcGrain, the #153 fish; shadows and coverage follow from the rays
-    const panoEcho = flat && s.panoMode === 'echo'
-    u.uPano.value = panoEcho ? 1 : 0
-    const fishEcho = (s.fishMode === 'echo' && !flat) || panoEcho
-    // its target is made on first use only (the lake and ice pages never allocate it): the fish bodies drawn from the apex
-    // into (angle × range), MAX-blended, 4× MSAA like the structure splat. ONE target for both fans (fan k in rows k/2 …
-    // (k+1)/2), sampled through uTop: the picture shader already uses 16 textures, the most an iPhone allows, and uTop
-    // (Panoramic's top-down map) is idle in the vertical views
+    // fish from their 3D bodies (#153 round 3; every page since #170, index.jsx fishMode; ?fish=marks keeps the old marks in
+    // the vertical views). Panoramic is a sound picture (#171, the only one since #178): the vertical views' pipeline with
+    // the fan laid flat — what the beam's thickness hits per bearing and range, arcGrain, the #153 fish; shadows and
+    // coverage follow from the rays
+    const fishEcho = s.fishMode === 'echo' || flat
+    // its target is made on first use: the fish bodies drawn from the apex into (angle × range), MAX-blended, 4× MSAA like
+    // the structure splat. ONE target for both fans (fan k in rows k/2 … (k+1)/2): the picture shader already uses 16
+    // textures, the most an iPhone allows
     if (fishEcho && !res.fishRT) res.fishRT = new THREE.WebGLRenderTarget(STRIP_W, 2 * FISH_H, { depthBuffer: false, samples: 4, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter })
     u.uFishMode.value = fishEcho ? 1 : 0
-    u.uTop.value = fishEcho ? res.fishRT.texture : res.topRT.depthTexture // the fish image borrows Panoramic's idle texture slot
+    u.uFishTex.value = fishEcho ? res.fishRT.texture : null
     // 1) sonar passes (materials flag the pass so alpha = structure tag)
     lakeMats.forEach((m) => { m.userData.uniforms.uSonarPass.value = 1 })
-    if (flat && !panoEcho) {
-      // Panoramic: one top-down depth map of the structures around the transducer (plan-view photograph)
-      const R = s.rangeM * 1.02, cam = res.topCam
-      cam.left = -R; cam.right = R; cam.top = R; cam.bottom = -R
-      cam.near = 0.1; cam.far = 70
-      cam.position.set(s.apex.x, 2, s.apex.z)
-      cam.lookAt(s.apex.x, -60, s.apex.z)
+    specs.forEach((sp, k) => {
+      const cam = res.cams[k]
+      const half = (sp.a1 - sp.a0) / 2
+      const thickHalf = flat ? PANO_HALF : Math.abs(sp.s1 - sp.s0) === 2 ? sp.theta : sp.theta / 2
+      const tanH = Math.tan(half), tanV = Math.tan(thickHalf)
+      cam.fov = THREE.MathUtils.radToDeg(thickHalf) * 2
+      cam.aspect = tanH / tanV
       cam.updateProjectionMatrix()
-      if (wet) { gl.setRenderTarget(res.topRT); gl.clear(); gl.render(scene, cam) }
-      u.uTopR.value = R; u.uTopCamY.value = 2; u.uTopNearFar.value.set(cam.near, cam.far)
-      const sp = specs[0]
-      u.uFan.value[0].set(0, (sp.a1 - sp.a0) / 2, Math.tan((sp.a1 - sp.a0) / 2), Math.tan(sp.theta))
-      u.uPulse.value = 0.07; u.uBeamHalf.value = 0.03 // fish (sonarShader fishDash): the flat fan's beams are wider — app: 0.4–1 m streaks along the arc at 5–10 m
-    } else {
-      specs.forEach((sp, k) => {
-        const cam = res.cams[k]
-        const half = (sp.a1 - sp.a0) / 2
-        const thickHalf = panoEcho ? PANO_HALF : Math.abs(sp.s1 - sp.s0) === 2 ? sp.theta : sp.theta / 2
-        const tanH = Math.tan(half), tanV = Math.tan(thickHalf)
-        cam.fov = THREE.MathUtils.radToDeg(thickHalf) * 2
-        cam.aspect = tanH / tanV
-        cam.updateProjectionMatrix()
-        cam.position.copy(s.apex)
-        const c = sp.frame.c
-        cam.layers.set(0); cam.layers.enable(LAKEBED_LAYER)
-        if (panoEcho) {
-          // the flat fan: look along its heading, PANO_TILT down; world up keeps NDC +x = starboard = the screen's right
-          cam.up.set(0, 1, 0)
-          const hl = Math.hypot(c.x, c.z) || 1, ct = Math.cos(PANO_TILT), st = Math.sin(PANO_TILT)
-          cam.lookAt(s.apex.x + (c.x / hl) * ct, s.apex.y - st, s.apex.z + (c.z / hl) * ct)
-          cam.layers.enable(LOGO_LAYER) // the lakebed lockup is seen as structure here (the side views draw it analytically)
-        } else {
-          tmpUp.copy(sp.frame.n).negate() // so NDC +x = +wide angle (see docs)
-          cam.up.copy(tmpUp)
-          cam.lookAt(s.apex.x + c.x, s.apex.y + c.y, s.apex.z + c.z)
+      cam.position.copy(s.apex)
+      const c = sp.frame.c
+      cam.layers.set(0); cam.layers.enable(LAKEBED_LAYER)
+      if (flat) {
+        // the flat fan: look along its heading, PANO_TILT down; world up keeps NDC +x = starboard = the screen's right
+        cam.up.set(0, 1, 0)
+        const hl = Math.hypot(c.x, c.z) || 1, ct = Math.cos(PANO_TILT), st = Math.sin(PANO_TILT)
+        cam.lookAt(s.apex.x + (c.x / hl) * ct, s.apex.y - st, s.apex.z + (c.z / hl) * ct)
+        cam.layers.enable(LOGO_LAYER) // the lakebed lockup is seen as structure here (the side views draw it analytically)
+      } else {
+        tmpUp.copy(sp.frame.n).negate() // so NDC +x = +wide angle (see docs)
+        cam.up.copy(tmpUp)
+        cam.lookAt(s.apex.x + c.x, s.apex.y + c.y, s.apex.z + c.z)
+      }
+      const R = flat ? PANO_REACH * s.rangeM : sp.R
+      if (wet) {
+        gl.setRenderTarget(res.targets[k]); gl.clear(); gl.render(scene, cam)
+        // the far-face strip: back faces, structure only (the first frame compiles the flipped programs once)
+        lakeMats.forEach((m) => { m.userData.side0 ??= m.side; m.side = THREE.BackSide; m.userData.uniforms.uSonarPass.value = 2 })
+        gl.setRenderTarget(res.targetsB[k]); gl.clear(); gl.render(scene, cam)
+        lakeMats.forEach((m) => { m.side = m.userData.side0; m.userData.uniforms.uSonarPass.value = 1 })
+        // the echo splat: both faces, additive, no depth test, clear to black (restore the clear colour after)
+        const cc = gl.getClearColor(tmpColor), ca = gl.getClearAlpha()
+        lakeMats.forEach((m) => { const mu = m.userData.uniforms; if (!mu.uSplat) return; mu.uSplat.value.set(tanH, tanV, R); mu.uSonarPass.value = 3; m.userData.blend0 ??= [m.blending, m.transparent, m.depthTest, m.depthWrite]; m.blending = THREE.CustomBlending; m.blendSrc = m.blendSrcAlpha = THREE.OneFactor; m.blendDst = m.blendDstAlpha = THREE.OneFactor; m.blendEquation = m.blendEquationAlpha = THREE.AddEquation; m.transparent = true; m.depthTest = false; m.depthWrite = false; m.side = THREE.DoubleSide })
+        const bg = scene.background; scene.background = null // the scene's background colour would fill the echo target (it is additive: it must start black)
+        gl.setRenderTarget(res.echoRTs[k]); gl.setClearColor(0x000000, 0); gl.clear(); gl.render(scene, cam) // plain sums in all four channels (rgb echo and material shares, a the large-scale factor), cleared to zero
+        scene.background = bg; gl.setClearColor(cc, ca)
+        lakeMats.forEach((m) => { const mu = m.userData.uniforms; if (!mu.uSplat) return; const b = m.userData.blend0; m.blending = b[0]; m.transparent = b[1]; m.depthTest = b[2]; m.depthWrite = b[3]; m.side = m.userData.side0; mu.uSonarPass.value = 1 })
+        // the fish-echo test page (#153): the fish bodies as the transducer sees them (lakeMaterial pass 4), MAX-blended
+        if (fishEcho) {
+          const fm = lakeMats.find((m) => m.defines && m.defines.FISH), mu = fm.userData.uniforms
+          const b0 = [fm.blending, fm.transparent, fm.depthTest, fm.depthWrite, fm.blendEquation, fm.blendSrc, fm.blendDst, fm.blendEquationAlpha, fm.blendSrcAlpha, fm.blendDstAlpha]
+          fm.blending = THREE.CustomBlending; fm.blendEquation = fm.blendEquationAlpha = THREE.MaxEquation; fm.blendSrc = fm.blendDst = fm.blendSrcAlpha = fm.blendDstAlpha = THREE.OneFactor
+          fm.transparent = true; fm.depthTest = false; fm.depthWrite = false
+          mu.uSplat.value.set(tanH, tanV, R); mu.uSonarPass.value = 4; mu.uFishEchoSize.value = s.fishSize || 1
+          mu.uPanoLobe.value.set(flat ? 1 : 0, PANO_TILT)
+          const mask = cam.layers.mask; cam.layers.set(FISH_LAYER)
+          const bgF = scene.background; scene.background = null
+          const fr = res.fishRT; fr.viewport.set(0, k * FISH_H, STRIP_W, FISH_H); fr.scissor.copy(fr.viewport); fr.scissorTest = true // this fan's half
+          gl.setRenderTarget(fr); gl.setClearColor(0x000000, 0); gl.clear(); gl.render(scene, cam)
+          fr.scissorTest = false
+          scene.background = bgF; gl.setClearColor(cc, ca); cam.layers.mask = mask
+          ;[fm.blending, fm.transparent, fm.depthTest, fm.depthWrite, fm.blendEquation, fm.blendSrc, fm.blendDst, fm.blendEquationAlpha, fm.blendSrcAlpha, fm.blendDstAlpha] = b0
+          mu.uSonarPass.value = 1
         }
-        const R = panoEcho ? PANO_REACH * s.rangeM : sp.R
-        if (wet) {
-          gl.setRenderTarget(res.targets[k]); gl.clear(); gl.render(scene, cam)
-          // the far-face strip: back faces, structure only (the first frame compiles the flipped programs once)
-          lakeMats.forEach((m) => { m.userData.side0 ??= m.side; m.side = THREE.BackSide; m.userData.uniforms.uSonarPass.value = 2 })
-          gl.setRenderTarget(res.targetsB[k]); gl.clear(); gl.render(scene, cam)
-          lakeMats.forEach((m) => { m.side = m.userData.side0; m.userData.uniforms.uSonarPass.value = 1 })
-          // the echo splat: both faces, additive, no depth test, clear to black (restore the clear colour after)
-          const cc = gl.getClearColor(tmpColor), ca = gl.getClearAlpha()
-          lakeMats.forEach((m) => { const mu = m.userData.uniforms; if (!mu.uSplat) return; mu.uSplat.value.set(tanH, tanV, R); mu.uSonarPass.value = 3; m.userData.blend0 ??= [m.blending, m.transparent, m.depthTest, m.depthWrite]; m.blending = THREE.CustomBlending; m.blendSrc = m.blendSrcAlpha = THREE.OneFactor; m.blendDst = m.blendDstAlpha = THREE.OneFactor; m.blendEquation = m.blendEquationAlpha = THREE.AddEquation; m.transparent = true; m.depthTest = false; m.depthWrite = false; m.side = THREE.DoubleSide })
-          const bg = scene.background; scene.background = null // the scene's background colour would fill the echo target (it is additive: it must start black)
-          gl.setRenderTarget(res.echoRTs[k]); gl.setClearColor(0x000000, 0); gl.clear(); gl.render(scene, cam) // plain sums in all four channels (rgb echo and material shares, a the large-scale factor), cleared to zero
-          scene.background = bg; gl.setClearColor(cc, ca)
-          lakeMats.forEach((m) => { const mu = m.userData.uniforms; if (!mu.uSplat) return; const b = m.userData.blend0; m.blending = b[0]; m.transparent = b[1]; m.depthTest = b[2]; m.depthWrite = b[3]; m.side = m.userData.side0; mu.uSonarPass.value = 1 })
-          // the fish-echo test page (#153): the fish bodies as the transducer sees them (lakeMaterial pass 4), MAX-blended
-          if (fishEcho) {
-            const fm = lakeMats.find((m) => m.defines && m.defines.FISH), mu = fm.userData.uniforms
-            const b0 = [fm.blending, fm.transparent, fm.depthTest, fm.depthWrite, fm.blendEquation, fm.blendSrc, fm.blendDst, fm.blendEquationAlpha, fm.blendSrcAlpha, fm.blendDstAlpha]
-            fm.blending = THREE.CustomBlending; fm.blendEquation = fm.blendEquationAlpha = THREE.MaxEquation; fm.blendSrc = fm.blendDst = fm.blendSrcAlpha = fm.blendDstAlpha = THREE.OneFactor
-            fm.transparent = true; fm.depthTest = false; fm.depthWrite = false
-            mu.uSplat.value.set(tanH, tanV, R); mu.uSonarPass.value = 4; mu.uFishEchoSize.value = s.fishSize || 1
-            mu.uPanoLobe.value.set(panoEcho ? 1 : 0, PANO_TILT)
-            const mask = cam.layers.mask; cam.layers.set(FISH_LAYER)
-            const bgF = scene.background; scene.background = null
-            const fr = res.fishRT; fr.viewport.set(0, k * FISH_H, STRIP_W, FISH_H); fr.scissor.copy(fr.viewport); fr.scissorTest = true // this fan's half
-            gl.setRenderTarget(fr); gl.setClearColor(0x000000, 0); gl.clear(); gl.render(scene, cam)
-            fr.scissorTest = false
-            scene.background = bgF; gl.setClearColor(cc, ca); cam.layers.mask = mask
-            ;[fm.blending, fm.transparent, fm.depthTest, fm.depthWrite, fm.blendEquation, fm.blendSrc, fm.blendDst, fm.blendEquationAlpha, fm.blendSrcAlpha, fm.blendDstAlpha] = b0
-            mu.uSonarPass.value = 1
-          }
-          u.uFanR.value.setComponent(k, R)
-        }
-        // screen-plane centre angle: the tilt of the fan centre from straight-down
-        u.uFan.value[k].set(panoEcho ? 0 : Math.atan2(c.x, -c.y), half, tanH, tanV) // Panoramic: the fan's centre is straight up the screen
-      })
-      u.uPulse.value = 0.05; u.uBeamHalf.value = 0.014
-      if (panoEcho) { u.uPulse.value = 0.07; u.uBeamHalf.value = 0.03 } // the flat fan's beams are wider (app: 0.4–1 m streaks along the arc at 5–10 m, §7.13) // app: far fish are 0.3–0.5 m needles along the arc at 11–17 m (sonar-style §6.8)
-    }
+        u.uFanR.value.setComponent(k, R)
+      }
+      // screen-plane centre angle: the tilt of the fan centre from straight-down
+      u.uFan.value[k].set(flat ? 0 : Math.atan2(c.x, -c.y), half, tanH, tanV) // Panoramic: the fan's centre is straight up the screen
+    })
+    u.uPulse.value = 0.05; u.uBeamHalf.value = 0.014
+    if (flat) { u.uPulse.value = 0.07; u.uBeamHalf.value = 0.03 } // the flat fan's beams are wider (app: 0.4–1 m streaks along the arc at 5–10 m, §7.13) // app: far fish are 0.3–0.5 m needles along the arc at 11–17 m (sonar-style §6.8)
     gl.setRenderTarget(null)
     lakeMats.forEach((m) => { m.userData.uniforms.uSonarPass.value = 0 })
     u.uApexXZ.value.set(s.apex.x, s.apex.z); u.uApexDepth.value = -s.apex.y
     // fish marks: every fish in the beam, projected into the view (sonarMarks.js). With the fish drawn from their bodies
     // (fishEcho, #170) only the ice page's jig is a mark — #170 had dropped it from the ice sonar and the dial
-    u.uMarkCount.value = computeMarks({ jig: s.jig, pop: fishEcho ? [] : s.pop, t: root.clock.elapsedTime, specs: sig < 0.6 ? [] : specs, apex: s.apex, flat, bake: res.bake, rangeM: flat ? s.rangeM : u.uReach.value }, res.marks)
+    u.uMarkCount.value = computeMarks({ jig: s.jig, pop: fishEcho ? [] : s.pop, t: root.clock.elapsedTime, specs: sig < 0.6 ? [] : specs, apex: s.apex, flat, rangeM: flat ? s.rangeM : u.uReach.value }, res.marks)
     // the 2D history: one new column per ping (8 a second), after the depth strips and the marks are current
     if (lay.ice === 2) {
       const now = root.clock.elapsedTime
