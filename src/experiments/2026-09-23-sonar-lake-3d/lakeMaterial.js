@@ -51,7 +51,7 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
         attribute vec4 aSwim; // per fish, set every frame in Scene.jsx: wave phase, activity, turn bend, wavelength
         varying float vPattern; varying vec3 vBelly; varying vec3 vSide; varying vec3 vLocal; varying vec2 vUv;
         varying float vLenF; // the fish's length (its instance scale), for the fish-echo pass
-        uniform float uFishSonarScale; uniform float uFishEchoSize;
+        uniform float uFishSonarScale; uniform float uFishEchoSize; uniform vec2 uPanoLobe;
       #endif
       void main() {
         vec3 pos = position, nrm = normal;
@@ -121,7 +121,7 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
         // 2026-10-27: 中距离的鱼 … 会变得很闪也变小). Along the ray the body is made at least 5 rows deep about its centre (only
         // the half facing the sound returns, so ~2.5 rows show: 0.5 m at 160 ft); per fish the frame-to-frame swing fell from
         // 65 % to 34 %. It fades in from 30 to 45 m of reach (~100–150 ft), so the 80 ft default and nearer keep their picture.
-        if (uSonarPass > 3.5) {
+        if (uSonarPass > 3.5 && uPanoLobe.x < 0.5) { // not the flat fan: Panoramic waits for Jason's pick (#176)
           #ifdef USE_INSTANCING
             mat4 mi = modelMatrix * instanceMatrix;
           #else

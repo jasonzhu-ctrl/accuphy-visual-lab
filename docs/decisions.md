@@ -3047,5 +3047,4 @@ Numbered log. Newest at the bottom.
        - 80 ft is unchanged; at 150–230 ft far fish show as small steady marks instead of flickering specks.
        - Lake 6 × 6 and ice 3 × 4 grids: 0 errors. The ice ranges are below 30 m of reach, so its picture does not change
          (#94).
-     - Panoramic is untouched (the flat fan's fish image is the same pass, but this only acts on long reaches; /pano/
-       waits for Jason anyway).
+     - Panoramic is untouched: the stretch is off in the flat fan (`uPanoLobe.x`), which waits for Jason's pick (#176).
