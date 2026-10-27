@@ -72,7 +72,7 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
   const ONLY = ICE ? 'PLM' : ONLY_ENV // on the ice the Mini is the device: the app's ice views are the Mini's
   const SHOWN_DEVICES = ONLY ? [DEVICES[ONLY]] : Object.values(DEVICES)
   const [deviceId, setDeviceId] = useState(ONLY || 'PL')
-  const [mode, setMode] = useState(ICE ? 'liveice' : 'forward')
+  const [mode, setMode] = useState(ICE ? 'liveice' : lab === 'pano' ? 'panoramic' : 'forward') // the Panoramic test page (#171) opens on Panoramic
   const [view, setView] = useState(ICE ? iceParams().view : 'top') // ice page cameras: top / under the ice / section (docs/ice-relationship-study.md)
   // the ice page: the step cards stack under the control panel, so the ice band across the top stays open for taps
   const panelRef = useRef(null)
@@ -128,7 +128,7 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
   const [toast, setToast] = useState(false)
   // Phones (lake scene) open ON the app's Home page and nothing starts until a view is picked (Jason 2026-10-16:
   // 显示首页选视图 而且应该必须先选才能开始): no beam, no sonar picture, no capsules until the first pick.
-  const homeFirst = (isPhoneLayout() || isLandscapePhone()) && !ICE
+  const homeFirst = (isPhoneLayout() || isLandscapePhone()) && !ICE && lab !== 'pano' // (the Panoramic test page goes straight to its view)
   const [home, setHome] = useState(homeFirst)      // the app's Home page is open inside the phone display
   const [started, setStarted] = useState(!homeFirst) // a view has been picked (always true on desktop and on the ice page)
   const toastT = useRef(0)
