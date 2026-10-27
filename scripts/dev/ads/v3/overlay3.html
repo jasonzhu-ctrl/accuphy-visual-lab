@@ -1,0 +1,85 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<!-- BF ad v3 film: the type layer per frame (README.md, "Type timing at a glance"). From ../v2/overlay2.html. comp3.mjs calls
+     setFrame({ bg, t, fan, lines }) for every frame and screenshots the stage. -->
+<style>
+  @font-face { font-family: 'Eurostile Heavy'; src: local('Eurostile Heavy'), local('Eurostile-Hea'); font-weight: 800; } /* Creative Cloud activation; no font file is read */
+  @font-face { font-family: 'Instrument Sans'; src: url('fonts/InstrumentSans-Variable.ttf') format('truetype'); font-weight: 400 700; }
+  html, body { margin: 0; background: #000; }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: #000; }
+  #bg { position: absolute; left: -12px; top: -12px; width: 1104px; height: 1944px; } /* 12 px bleed, so the end card's blur has no dark rim */
+  #grad { position: absolute; left: 0; top: 0; width: 1080px; height: 1100px;
+    background: linear-gradient(180deg, rgba(2,8,14,.62) 0%, rgba(2,8,14,.38) 55%, rgba(2,8,14,0) 100%); }
+  #mark { position: absolute; left: 64px; top: 262px; width: 250px; filter: drop-shadow(0 2px 8px rgba(0,0,0,.5)); }
+  #block { position: absolute; left: 64px; width: 952px; color: #fff; }
+  .num { font-family: 'Eurostile Heavy'; font-size: 230px; line-height: .9; letter-spacing: -.005em; white-space: nowrap; text-shadow: 0 4px 30px rgba(0,0,0,.45); }
+  .num .unit { font-size: .46em; margin-left: .08em; vertical-align: .62em; letter-spacing: .02em; }
+  .rule { margin-top: 20px; height: 6px; background: #028CDF; border-radius: 3px; box-shadow: 0 0 20px rgba(2,140,223,.6); }
+  .line { margin-top: 30px; font-family: 'Instrument Sans'; font-weight: 600; font-size: 70px; line-height: 1.15; letter-spacing: -.005em;
+    text-shadow: 0 2px 14px rgba(0,0,0,.55); max-width: 900px; text-wrap: balance; }
+  #end { position: absolute; left: 0; top: 0; width: 1080px; text-align: center; color: #fff; }
+  #bigmark { position: absolute; left: 180px; top: 640px; width: 720px; filter: drop-shadow(0 4px 24px rgba(0,0,0,.5)); }
+  #endrule { position: absolute; left: 540px; top: 830px; height: 6px; background: #028CDF; border-radius: 3px; box-shadow: 0 0 20px rgba(2,140,223,.6); }
+  .e1 { position: absolute; left: 0; width: 1080px; top: 880px; font-family: 'Instrument Sans'; font-weight: 600; font-size: 70px; line-height: 1.15; }
+  .e2 { position: absolute; left: 0; width: 1080px; top: 985px; font-family: 'Eurostile Heavy'; font-size: 120px; line-height: 1; letter-spacing: .01em; }
+  .hidden { display: none }
+</style></head>
+<body>
+<div id="stage">
+  <img id="bg">
+  <div id="grad"></div>
+  <svg id="fan" width="1080" height="1920" style="position:absolute;left:0;top:0;overflow:visible"><defs><filter id="glow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><path id="fanp" d="" fill="rgba(2,140,223,0.10)" stroke="#028CDF" stroke-width="5" stroke-linejoin="round" filter="url(#glow)"/></svg>
+  <img id="mark" src="logo.png">
+  <div id="block">
+    <div class="num" id="num"><span id="n"></span><span class="unit" id="unit">°</span></div>
+    <div class="rule" id="rule"></div>
+    <div class="line" id="line"></div>
+  </div>
+  <div id="end"><img id="bigmark" src="logo.png"><div id="endrule"></div><div class="e1" id="e1"></div><div class="e2" id="e2"></div></div>
+</div>
+<script>
+  const clamp = (u) => Math.min(1, Math.max(0, u)), span = (t, a, b) => clamp((t - a) / (b - a))
+  const ease = (u) => 1 - (1 - u) ** 3
+  const $ = (id) => document.getElementById(id)
+  let numW = 0
+  // lines: { open, pano, deep, end1, end2 } (English placeholders until Klaviyo HQ finals them; end1/end2 are final)
+  // type: false = the clean version (no type, no end card)
+  window.setFrame = ({ bg, t, fan, lines, type = true }) => {
+    $('bg').src = bg
+    const show = (el, o, dy = 0) => { el.style.opacity = o; el.style.transform = `translateY(${(1 - o) * dy}px)` }
+    const endK = type ? ease(span(t, 11.5, 12.0)) : 0 // the end card darkens and blurs the picture
+    $('bg').style.filter = endK ? `brightness(${1 - 0.75 * endK}) blur(${6 * endK}px)` : 'none'
+    $('grad').style.opacity = type && t < 11.5 ? 1 : type ? 1 - endK : 0
+    $('mark').style.opacity = type ? 0.9 * (1 - span(t, 11.5, 11.8)) : 0
+    // the beat's block: shot 1 / 3 a line at 380; shot 2 the number, rule and line at 340
+    const beat = t < 3 ? 'open' : t < 7.5 ? 'pano' : t < 11.5 ? 'deep' : 'end'
+    const blk = $('block'); blk.style.display = type && beat !== 'end' ? '' : 'none'
+    blk.style.top = (beat === 'pano' ? 340 : 380) + 'px'
+    const isPano = beat === 'pano'
+    $('num').classList.toggle('hidden', !isPano); $('rule').classList.toggle('hidden', !isPano)
+    $('line').style.marginTop = isPano ? '30px' : '0'
+    $('line').textContent = lines[beat] || ''
+    if (isPano) {
+      const open = fan ? fan.open : 1
+      $('n').textContent = String(Math.round(135 * open)) // lands on the frame the fan is widest (brief rule 4)
+      if (!numW) { $('n').textContent = '135'; numW = $('num').getBoundingClientRect().width; $('n').textContent = String(Math.round(135 * open)) }
+      show($('num'), span(t, 3.1, 3.3))
+      $('rule').style.width = `${numW * ease(span(t, 3.15, 4.6))}px`
+      show($('line'), ease(span(t, 4.6, 5.0)), 24)
+    } else show($('line'), ease(span(t, beat === 'open' ? 0.3 : 8.0, beat === 'open' ? 0.8 : 8.5)), 24)
+    // the 135° outline on the water, from the top; it fades as the camera comes down to the side
+    const fo = type && isPano && fan ? 1 - span(t, 4.9, 5.3) : 0
+    $('fanp').setAttribute('d', fo > 0 ? 'M' + [fan.apex, ...fan.arc].map((q) => q.join(',')).join(' L') + ' Z' : '')
+    $('fan').style.opacity = fo
+    // the end card
+    $('end').style.display = type && beat === 'end' ? '' : 'none'
+    if (beat === 'end') {
+      const m = ease(span(t, 11.8, 12.3)); $('bigmark').style.opacity = m; $('bigmark').style.transform = `scale(${0.96 + 0.04 * m})`
+      const r = ease(span(t, 12.1, 12.6)) * 720; $('endrule').style.width = r + 'px'; $('endrule').style.marginLeft = -r / 2 + 'px'
+      $('e1').textContent = lines.end1; $('e2').textContent = lines.end2
+      show($('e1'), ease(span(t, 12.4, 12.8)), 20); show($('e2'), ease(span(t, 12.6, 13.0)), 20)
+    }
+    return new Promise((r) => { const im = $('bg'); if (im.complete && im.naturalWidth && im.src.endsWith(bg)) r(); else { im.onload = r; im.onerror = r } })
+  }
+</script>
+</body></html>

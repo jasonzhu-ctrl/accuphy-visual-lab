@@ -35,7 +35,7 @@ Owner since 2026-10-27: the ad video chat "广告视频制作" (#179).
 - **Re-render check:** the deep-water still re-rendered from `v3deep.mjs` + `grade.py` + `stills3.mjs` matches the board
   (mean difference 0.68/255, same 101.5 ft read-out). The 135° background from `v3a.mjs` matches too (4.9/255, water only).
 
-## The 15 s film: shot plan (not rendered; waits for Jason's nod on the stills)
+## The 15 s film: shot plan (Jason nodded the stills 2026-10-27: "三张定格可以，做 15 秒成片")
 
 15 s at 30 fps = 450 frames, 1080×1920, silent (brief rule 10). Hard cuts between shots. Each shot is its own recording
 pass on the virtual clock of `../rec.mjs`. Frames from the passes are joined, graded with `grade.py`, and get the type layer
@@ -66,13 +66,15 @@ Every boat move goes bow-first (+x): the hull does not turn (#166).
 - **Pass `pano`:** same context as Shot 1, Panoramic, 80 ft, `adBeam {line .5, face .16}`, `noLogo`.
 - **3.0–4.6 s, straight down:**
   - Camera `T` looks straight down (pitch about −88°) on the fan, about 125 m up, fov 48.
-  - The fan sits in the lower half of the frame (its centre near y 1150), clear of the type block (340–760).
-  - Starting value: `pos [27, 125, -4]`, look `[27, -10, -10]`. The first test frame fine-tunes it.
+  - The fan sits in the lower half of the frame, clear of the type block (340–760).
+  - `T` = `pos [31, 125, 3.2]`, look `[31, -10, -2.8]`: the open block fills x 332–754, y 810–1594 (rendered).
 - **The fan opens:**
   - `fanOpen` runs 0.02 → 1 over 3.15–4.6 s, ease-out cubic.
   - The number is `round(135 × fanOpen)`, so `135°` lands on the exact frame the fan is widest (brief rule 4).
-  - A brand-blue outline (#028CDF, 5 px, glow) is drawn on the water. Each frame it is projected through `window.__camera`
-    from the apex, ±67.5° × `fanOpen`, out to the range (the projection of `../v2/v2bg3.mjs`, per frame).
+  - A brand-blue outline (#028CDF, 5 px, glow) traces the coverage block. The block is the 135° fan clipped to the
+    phone's screen box, so it has a flat far end, not an arc. Each frame, `film3.mjs` builds the block with the lake's own
+    `wedgeGeometry` (narrowed by `fanOpen` as Scene.jsx does; read-only), projects it through `window.__camera` and takes
+    the hull. A round 135° arc was tried first and bulged past the block.
   - The blue rule under the number draws out with it.
 - **4.9–6.9 s, the pull-down:**
   - The camera swings from `T` down to the south side and lands on `s8`: `pos [22, 80, 92]`, look `[27, -10, 0]`, fov 48.
@@ -124,22 +126,36 @@ Every boat move goes bow-first (+x): the hull does not turn (#166).
 - The first three lines are placeholders until Klaviyo HQ finals them. French goes to the website HQ.
 - The end line is already final: Klaviyo HQ's BF caption, "Play the free sonar demo: Accuphy Lab" (#168).
 
-### Build (after the nod)
+### Build
 
-- **New files in this folder:**
-  - `film3.mjs <pass> <out> [port]` records the passes `open`, `pano` and `deep` on the virtual clock. Per frame it also
-    writes JSON with the projected fan and the depth read-out.
-  - `overlay3.html` is `overlay2.html` with `setFrame(t, data)` for the animated type and the end card.
-  - `comp3.mjs` grades each frame and puts the type on it.
-- **First a 10 fps preview of each shot for HQ, then the 30 fps film:**
-  - `reference/ads/2026-11-bf/v3/pinglive-916-en.mp4` (`frames2mp4`, ~10 Mbit/s).
-  - `pinglive-45-en.mp4` from `../to45.py`. In 4:5 the type shrinks to 70 %: the number ~162 px, the line ~49 px.
-  - A clean version without type, so the French version only needs a new type pass.
-- **Record from one committed lake state:** the commit in `docs/versions.md` ("current lake"), today 1abeedf. Use a
-  separate checkout of that commit, not the shared working copy. On 2026-10-27, the shared copy had uncommitted lake
-  changes from "冰钓版本视觉效果" while the stills were re-rendered (they still matched).
+Run copies of the scripts from the scratchpad (see Toolchain). The "ad-lake" preview server serves
+`reference/ads/lake-checkout/` (git-ignored): `git archive 1abeedf | tar -x -C reference/ads/lake-checkout`, with
+`node_modules` linked to the repo's. It runs on port 5190.
 
-### Not checked yet
+1. `node film3.mjs open|pano|deep <dir>/<pass> 5190 [fps]`: records the three passes. Frames are named by the 30 fps
+   frame number, so a 10 fps preview and the final line up. Each pass writes `frames.json` (the block's outline,
+   `fanOpen`, the read-out, the boat).
+2. `python3 grade.py <dir>/<pass> <comp>/bg` for each pass. Put `overlay3.html`, `fonts/`, `logo.png` and the pano pass's
+   `frames.json` as `pano.json` in `<comp>`.
+3. `node comp3.mjs <comp> <final>`: the type, per frame. Add `clean` for the version without type. `LINES='{…}'` gives
+   the French version.
+4. `frames2mp4 <final> <out.mp4> [fps] [bitrate]`, and `../to45.py` for 4:5.
+5. `python3 sheet3.py <final> <sheet.jpg> <frames> [--reels]`: a contact sheet, optionally with the Reels safe zones.
 
-- How Meta's Reels overlay sits on the phone read-out (~y 1480, just above the bottom 400 px).
-- The top-down camera `T`: the starting value is computed, not rendered.
+**10 fps preview (2026-10-27):** `reference/ads/2026-11-bf/v3/preview/preview10-{open,pano,deep,end,all}.mp4`. Sheets:
+`docs/2026-10-27-ad-v3-film-preview-sheet.jpg` and `docs/2026-10-27-ad-v3-film-reels-zones.jpg`.
+
+- The read-out climbs 58.8 → 101.5 ft over 7.5–9.5 s.
+- `__chase('laketrout')` at ~100 ft answers 'blocked', so it is left out; the trout swim on their own.
+
+**Reels safe zones** (14 % top, 35 % bottom, 6 % sides, as third-party checkers quote Meta's Reels ad specs; Meta's own
+page was not reached): y 269 / 1248, x 65 / 1015.
+
+- All the type is inside.
+- The small wordmark (y 262) reaches 7 px into the top zone.
+- In the deep-water shot the whole phone, read-out included (~y 1480), sits in the bottom zone, where Reels puts the
+  caption and the CTA.
+- The open 135° block from the top reaches y 1594, so its lower fifth is in the bottom zone too.
+
+**Still to make (after HQ's check):** the 30 fps `pinglive-916-en.mp4`, the 4:5 `pinglive-45-en.mp4` and the clean
+`pinglive-916-clean.mp4`, in `reference/ads/2026-11-bf/v3/`.
