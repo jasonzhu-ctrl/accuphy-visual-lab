@@ -521,7 +521,8 @@ export const sonarFragment = /* glsl */ `
     tvg *= mix(uBedGain, 1.0, smoothstep(5.0, 18.0, r));
     // near-field fish 40 % brighter, fading back to normal by 16 m (Jason 2026-09-27: 近场的鱼要亮40%)
     float sMix = clamp(spk * 2.5, 0.0, 1.0); // structure carries its own grain (above), not the radial streaks of the water and the bottom
-    float fe = uFishMode > 0.5 ? fishImg(k, u, rn, r, a, aWorld) : fishEcho(p, k); // the fish-echo test page: the fish from their bodies (#153)
+    // the fish from their bodies (#153); with them the marks carry only the ice page's jig (SonarScreen), still drawn as its mark
+    float fe = uFishMode > 0.5 ? max(fishImg(k, u, rn, r, a, aWorld), fishEcho(p, k)) : fishEcho(p, k);
     if (uPano > 0.5) fe *= 2.4; // Panoramic (#171): fish are the picture in the app's lake frames — bright yellow dashes over the crimson field (§7.12)
     float e = max(acc * atten * mix(tex, 1.0, sMix) * tvg, fe * mix(1.4, 1.0, smoothstep(8.0, 16.0, r)));
     if (uPano < 0.5) e = max(e, logoEcho(p, k) * atten * (0.7 + 0.55 * (filament - 0.8)) * (0.72 + 0.28 * tex));

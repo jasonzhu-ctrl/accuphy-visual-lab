@@ -2858,3 +2858,10 @@ Numbered log. Newest at the bottom.
        - The timber flat's rocks read as soft orange patches.
        - The near field is black inside depth/sin 65°.
      - Local; not uploaded. HQ puts the test page on the friends' test link for Jason's phone.
+     - **Fix (2026-10-26, found while checking the lure question for ad v3):**
+       - #170 had dropped the ice page's jig from the sonar. The jig is an analytic mark, and with the fish drawn from
+         their bodies the marks were not drawn at all, so the Live Down fan lost the jig and the flasher dial lost its
+         jig and fish lines.
+       - With the new fish, the marks now carry only the jig (`computeMarks` gets no fish), and `fanEcho` draws them on
+         top of the fish image.
+       - Checked on the ice page, Live Ice: the jig mark and the dial's lines are back, matching `?fish=marks`.
