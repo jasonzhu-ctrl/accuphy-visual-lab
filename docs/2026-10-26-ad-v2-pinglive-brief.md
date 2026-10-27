@@ -21,14 +21,19 @@ Lab HQ 写给“冰钓版本视觉效果”。目标：一条能放进 Reels / S
 
 | 时间 | 画面 | 大数字 / 人话（英文，Klaviyo 定稿前是占位） |
 |---|---|---|
-| 0–2.5 | 声纳全屏，Panoramic，黑底橙鱼。0.5 秒一条鱼亮起。左上小字标。 | 无数字。一句人话淡入：`This is what's under your boat.` |
+| 0–2.5 | 声纳全屏，**Forward**（不用 Panoramic：Jason 10-26 定了全景按方案 A 重做，广告不等它），黑底橙鱼和树。0.5 秒一条鱼亮起。左上小字标。 | 无数字。一句人话淡入：`This is what's under your boat.` |
 | 2.5–6 | 硬切到湖面，镜头从高处慢慢推近船，扇形扫开。135° 落定时扇形最宽。 | **135°** / `See the whole bay in one look.` |
 | 6–9.5 | 点一下换 Forward（可以露一次手指），船往深处开，前方树和鱼亮起。230 ft 落定时远处的目标正好亮。 | **230 FT** / `See what's ahead before you cast.` |
-| 9.5–12 | 切回声纳全屏，Forward 画面，鱼游进来。 | **3** VIEWS / `Panoramic · Forward · Down` |
+| 9.5–12 | 切回声纳全屏，**Down** 画面（开场已经用过 Forward），鱼游进来。 | **3** VIEWS / `Panoramic · Forward · Down` |
 | 12–15 | 画面压暗，大 Accuphy 字标，蓝线。 | `Play the free sonar demo` / `Accuphy Lab`（Klaviyo 定稿的片尾） |
 
 - 数字出处：135° × 20° 波束、70 m（230 ft）淡水最大量程，`accuphy-website/docs/specs.md`。
 - 人话这几句是占位，HQ 会送 Klaviyo HQ 定稿、网站 HQ 核法文；先按占位做样片。
+
+## 2026-10-26 改动（Jason 定全景方案 A 之后）
+
+- 广告里不出现全景的声纳画面（它要重做）。湖面上的 135° 扇形那一拍不受影响，那是 3D 湖上的扇形，不是声纳屏。
+- 顺序：先交 3 张定格（这个在做），再做全景方案 A 的测试页；15 秒成片等 Jason 点头定格以后再出。
 
 ## 技术提示
 
