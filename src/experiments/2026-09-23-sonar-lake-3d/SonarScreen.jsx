@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { MAX_FANS, sonarVertex, sonarFragment } from './sonarShader'
-import { colormapTexture } from './colormaps'
+import { colormapTexture, COLORMAPS } from './colormaps'
 import { depthAt } from './terrain'
 import { bakeTerrain, makeMarksTexture, computeMarks } from './sonarMarks'
 import { logoFrame, makeLogoSdf, LOGO_SDF_MAX, LOCKUP, LOCKUP_SVG } from './logo'
@@ -16,6 +16,22 @@ export const PHONE_POSE_PHONE = { perspective: 1400, rotY: -4, rotX: 2 }
 export const isPhoneLayout = () => typeof window !== 'undefined' && window.innerWidth < 640
 export const ICE_SPLIT = 0.42 // the flasher panel's share of the display width in the ice views
 export const phonePose = () => (isPhoneLayout() ? PHONE_POSE_PHONE : PHONE_POSE)
+
+// The ice page's colour map (M26, 2026-10-17). The real app has ONE Color Map setting for every view; which one the
+// ice page shows is Jason's choice, so it is a URL switch for now: ?icemap=jet|orange|red (the app's classic, orange and
+// red maps; any colormaps.js name also works, and ?icelut= is read the same way). Without it the page keeps its
+// earlier look: the two ice views in jet, Forward/Combo in the page's map (the Lab amber).
+const ICE_MAP_ALIAS = { jet: 'jet', classic: 'jet', orange: 'garmin_amber', amber: 'garmin_amber', red: 'accuphy_red' }
+function iceMapParam() {
+  if (typeof window === 'undefined') return null
+  const q = new URLSearchParams(window.location.search), v = q.get('icemap') || q.get('icelut')
+  if (!v) return null
+  return ICE_MAP_ALIAS[v] || (COLORMAPS[v] ? v : null)
+}
+// jet's empty water on the ice page: the app's field is a bright blue (home-plm-row.jpg), not jet's navy index 0; the
+// fan and the history get this LUT-index floor (+ speckle, a few cyan specks), never the dial ring. ?icefloor=<idx|0>
+const JET_FLOOR = 0.11
+const jetFloorParam = () => { const m = /icefloor=([\d.]+)/.exec(typeof window === 'undefined' ? '' : window.location.search); return m ? +m[1] : JET_FLOOR }
 
 // How the app frames each view (measured on the tablet 2026-09-24, docs/app-chrome.md §2/§6).
 // A box is {x0, y0, w, h} in metres with the apex at (0,0) and y growing with depth;
@@ -90,6 +106,8 @@ export default function SonarScreen({ state, rect, lakeMats }) {
     const bake = bakeTerrain()
     const marks = makeMarksTexture()
     const logo = logoFrame()
+    const luts = {} // one 8-bit texture per colour map, made once (the ice page swaps maps by view in its default look)
+    const lut = (name) => luts[name] || (luts[name] = colormapTexture(name))
     const mat = new THREE.ShaderMaterial({
       vertexShader: sonarVertex, fragmentShader: sonarFragment, depthTest: false, depthWrite: false,
       uniforms: {
@@ -106,16 +124,21 @@ export default function SonarScreen({ state, rect, lakeMats }) {
         uLogoB: { value: logo.B }, uLogoU: { value: logo.U }, uLogoV: { value: logo.V },
         uLogoSdf: { value: makeLogoSdf() }, uLogoMap: { value: new THREE.Vector4(1 / logo.s, LOCKUP_SVG.cx, LOCKUP_SVG.bottom, LOGO_SDF_MAX) },
         uLogoSvg: { value: new THREE.Vector2(LOCKUP_SVG.w, LOCKUP_SVG.h) }, uLogoExt: { value: new THREE.Vector2(LOCKUP.width / 2 + 0.3, LOCKUP_SVG.bottom * logo.s + 0.3) },
-        uLUT: { value: colormapTexture('garmin_amber') }, uGain: { value: 0.57 }, uDynRange: { value: 0.85 }, uContrast: { value: 0.4 }, uNoise: { value: 0.3 }, uGamma: { value: 0.75 }, // calibrated 2026-09-24 against the two confirmed frames (sonar-style.md §6.11)
+        uLUT: { value: lut('garmin_amber') }, uGain: { value: 0.57 }, uDynRange: { value: 0.85 }, uContrast: { value: 0.4 }, uNoise: { value: 0.3 }, uGamma: { value: 0.75 }, // calibrated 2026-09-24 against the two confirmed frames (sonar-style.md §6.11)
         // the Mini's ice views (2026-10-16): flasher + Live Down (1) or flasher + 2D history (2); the app draws them in its jet map
-        uIce: { value: 0 }, uIceSplit: { value: ICE_SPLIT }, uAspect: { value: 2.08 }, uTicks: { value: 5 }, uLUT2: { value: colormapTexture('jet') },
-        uHist: { value: null }, uHistPrev: { value: null }, uHistPass: { value: 0 }, uIceAmber: { value: /icelut=amber/.test(window.location.search) ? 1 : 0 },
+        uIce: { value: 0 }, uIceSplit: { value: ICE_SPLIT }, uAspect: { value: 2.08 }, uTicks: { value: 5 },
+        uHist: { value: null }, uHistPrev: { value: null }, uHistPass: { value: 0 },
+        uHistFill: { value: 0 }, uHistPrevRange: { value: 20 }, uHistBot: { value: 5 },
+        // the ice page only (SonarScreen sets them from the scene; 0 on the summer lake, so its picture is unchanged)
+        uIdxFloor: { value: 0 }, uDialMin: { value: 0 }, uIceCeiling: { value: 0 },
         uSignal: { value: 1 }, // the ice page's signal gate (IceCamp.jsx s.signal); 1 on the summer lake
       },
     })
     // the 2D history (Ice Fishing View): 384 pings × 256 depth cells, ping-ponged — each ping shifts the record one
-    // column left and draws the newest column at the right edge (sonarShader.js, uHistPass)
-    const hist = [0, 1].map(() => new THREE.WebGLRenderTarget(384, 256, { depthBuffer: false, minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter }))
+    // column left and draws the newest column at the right edge (sonarShader.js, uHistPass). LINEAR (8-bit, Safari-safe):
+    // the copy samples texel centres, so nothing blurs while the range holds; an AUTO range step resamples once
+    // instead of re-quantising, and the panel reads soft like the app's
+    const hist = [0, 1].map(() => new THREE.WebGLRenderTarget(384, 256, { depthBuffer: false, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, type: THREE.UnsignedByteType }))
     const histGeo = new THREE.BufferGeometry()
     histGeo.setAttribute('position', new THREE.Float32BufferAttribute(new Float32Array([-1, 1, 0, 1, 1, 0, -1, -1, 0, 1, -1, 0]), 3))
     histGeo.setAttribute('uv', new THREE.Float32BufferAttribute(new Float32Array([0, 1, 1, 1, 0, 0, 1, 0]), 2))
@@ -180,10 +203,18 @@ export default function SonarScreen({ state, rect, lakeMats }) {
         return c.toDataURL('image/png')
       }
     }
-    return { targets, cams, mat, overlay, quad, ortho, topRT, topCam, bake, marks, hist, histScene, histCur: 0, lastPing: -1 }
+    return { targets, cams, mat, overlay, quad, ortho, topRT, topCam, bake, marks, hist, histScene, histCur: 0, lastPing: -1, histFilled: false, histRange: 0, luts, lut, iceMap: iceMapParam(), jetFloor: jetFloorParam() }
   }, [])
   useEffect(() => { [SONAR_HIDE_LAYER, LAKEBED_LAYER, FISH_LAYER, LOGO_LAYER].forEach((l) => camera.layers.enable(l)) }, [camera])
-  useEffect(() => () => { res.targets.forEach((t) => t.dispose()); res.topRT.dispose(); res.mat.dispose(); res.hist.forEach((t) => t.dispose()) }, [res])
+  useEffect(() => () => { res.targets.forEach((t) => t.dispose()); res.topRT.dispose(); res.mat.dispose(); res.hist.forEach((t) => t.dispose()); Object.values(res.luts).forEach((t) => t.dispose()) }, [res])
+  // a lost WebGL context (iOS Safari on a tab switch): three.js rebuilds everything on restore and re-uploads the data
+  // textures, but the two history targets come back empty, so the record is pre-filled again
+  useEffect(() => {
+    const el = gl.domElement
+    const onRestore = () => { res.histFilled = false; res.lastPing = -1; res.histRange = 0 }
+    el.addEventListener('webglcontextrestored', onRestore)
+    return () => el.removeEventListener('webglcontextrestored', onRestore)
+  }, [gl, res])
 
   const tmpUp = useMemo(() => new THREE.Vector3(), [])
   useFrame((root, dt) => {
@@ -196,7 +227,6 @@ export default function SonarScreen({ state, rect, lakeMats }) {
     u.uSignal.value = sig
     u.uTime.value += dt
     u.uRange.value = s.rangeM
-    if (s.colormap !== u.uLUT.name) { u.uLUT.value.dispose?.(); u.uLUT.value = colormapTexture(s.colormap); u.uLUT.name = s.colormap }
     u.uGain.value = s.gain ?? 0.57
     u.uContrast.value = s.contrast ?? 0.4
     u.uNoise.value = s.noise ?? 0.3
@@ -223,6 +253,15 @@ export default function SonarScreen({ state, rect, lakeMats }) {
       if (s.deviceId === 'PLM') u.uCapDepth.value.set(7.5, 9.5, 0.8); else u.uCapDepth.value.set(5.5, 7.5, 1) // the bottom's soft cap by depth (#91, #92, sonarShader.js)
       s.layout = lay // for the DOM chrome (rulers)
     }
+    // one colour map. The ice page (IceCamp keeps s.holes / s.signal; the summer lake never has them): ?icemap= for every
+    // view, or by default the ice views in jet and Forward/Combo in the page's map; jet's blue field and the dial's band
+    // floor and the ice-ceiling clutter only there
+    const iceScene = s.holes !== undefined || s.signal !== undefined
+    const map = iceScene ? res.iceMap ?? (lay.ice ? 'jet' : s.colormap) : s.colormap
+    u.uLUT.value = res.lut(map)
+    u.uIdxFloor.value = iceScene && map === 'jet' ? res.jetFloor : 0
+    u.uDialMin.value = iceScene && map !== 'jet' ? 0.3 : 0
+    u.uIceCeiling.value = iceScene ? 1 : 0
 
     // 1) sonar passes (materials flag the pass so alpha = structure tag)
     lakeMats.forEach((m) => { m.userData.uniforms.uSonarPass.value = 1 })
@@ -264,16 +303,24 @@ export default function SonarScreen({ state, rect, lakeMats }) {
     u.uApexXZ.value.set(s.apex.x, s.apex.z); u.uApexDepth.value = -s.apex.y
     // fish marks: every fish in the beam, projected into the view (sonarMarks.js)
     u.uMarkCount.value = computeMarks({ pop: s.pop, t: root.clock.elapsedTime, specs: sig < 0.6 ? [] : specs, apex: s.apex, flat, bake: res.bake, rangeM: flat ? s.rangeM : u.uReach.value }, res.marks)
-    // the 2D history: one new column per ping (8 a second), after the depth strips and the marks are current
-    if (lay.ice === 2) {
+    // the 2D history: one new column per ping (8 a second), after the depth strips and the marks are current. It records
+    // in both ice views (switching Live Ice → Ice Fishing shows the minutes already spent), and the first time the Mini is
+    // in the water with the strips current (and after a context restore) ONE draw pre-fills the last 48 s, without the
+    // fish now in the beam (they would be 48 s streaks). Never after a hop: the dark gap is the hop's honest record.
+    if ((lay.ice || 0) >= 1) {
       const now = root.clock.elapsedTime
-      if (now - res.lastPing >= 0.125) {
+      const fillNow = !res.histFilled && specs.length > 0 && sig > 0.99 && !s.noSignal && s.apex.y !== 0
+      if (fillNow || now - res.lastPing >= 0.125) {
         res.lastPing = now
         const cur = res.histCur, prev = 1 - cur
         u.uHistPass.value = 1; u.uHistPrev.value = res.hist[prev].texture
+        u.uHistPrevRange.value = res.histRange || s.rangeM
+        const marks = u.uMarkCount.value
+        if (fillNow) { u.uHistFill.value = 1; u.uMarkCount.value = 0; u.uHistBot.value = Math.max(0.5, depthAt(s.apex.x, s.apex.z) + s.apex.y); res.histFilled = true }
         gl.setRenderTarget(res.hist[cur]); gl.render(res.histScene, res.ortho); gl.setRenderTarget(null)
+        u.uHistFill.value = 0; u.uMarkCount.value = marks
         u.uHistPass.value = 0; u.uHist.value = res.hist[cur].texture
-        res.histCur = prev
+        res.histCur = prev; res.histRange = s.rangeM
       }
     }
     // the app's depth readout: water depth under the transducer, in the user's unit

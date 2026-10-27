@@ -57,11 +57,22 @@ export const sonarFragment = /* glsl */ `
   uniform vec2 uLogoSvg;       // SVG width, height covered by the texture
   uniform vec2 uLogoExt;       // half-width, height of the lockup in metres (quick reject)
   // the Mini's ice views (2026-10-16): 1 = Live Ice (flasher + Live Down), 2 = Ice Fishing (flasher + 2D history)
-  uniform float uIce; uniform float uIceSplit; uniform float uAspect; uniform float uTicks; uniform sampler2D uLUT2;
-  uniform sampler2D uHist; uniform sampler2D uHistPrev; uniform float uHistPass; uniform float uIceAmber;
+  uniform float uIce; uniform float uIceSplit; uniform float uAspect; uniform float uTicks;
+  uniform sampler2D uHist; uniform sampler2D uHistPrev; uniform float uHistPass;
+  uniform float uHistFill;      // 1 = write the whole 2D history at once (a plausible last 48 s), once per mount / context restore
+  uniform float uHistPrevRange; // the range the old record was drawn at: the copy rescales it when AUTO steps the range
+  uniform float uHistBot;       // the bottom's depth below the transducer (m), for the pre-roll's few faint marks
+  // one colour map for the whole picture (uLUT; the app has one Color Map setting). The ice page only (0 elsewhere):
+  uniform float uIdxFloor;      // jet's empty-water field: LUT index floor in the fan and the history (the app's bright blue)
+  uniform float uDialMin;       // the dial's band colour never below this index (dark-based maps would smudge the white ring)
+  uniform float uIceCeiling;    // 1 = near-field clutter from the ice underside along a horizontal upper fan edge (Forward)
+  const float CEIL_W = 0.12;    // its wedge below the edge (rad, ~6 deg: the app's near-apex rays, plm-forward-fish-a.jpg)
+  const float CEIL_PEAK = 0.60; // its echo at the apex: yellow-orange there, dark flecks by ~3 m, never above the bottom band
   uniform float uSignal; // the ice page's signal gate (IceCamp.jsx s.signal): 0 while the Mini is out of the water; always 1 on the summer lake
 
   float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+  // sine-free hash (Hoskins): no diagonal streaks on integer lattices like (ping, row) — the ice page's new terms use it
+  float hash12(vec2 p) { vec3 p3 = fract(vec3(p.xyx) * 0.1031); p3 += dot(p3, p3.yzx + 33.33); return fract((p3.x + p3.y) * p3.z); }
   float vnoise(vec2 q) { vec2 i = floor(q), f = fract(q); f = f * f * (3.0 - 2.0 * f);
     return mix(mix(hash(i), hash(i + vec2(1, 0)), f.x), mix(hash(i + vec2(0, 1)), hash(i + vec2(1, 1)), f.x), f.y); }
   float linearize(float d) {
@@ -252,9 +263,14 @@ export const sonarFragment = /* glsl */ `
     float idx = echo > 0.0005 ? clamp((lv - lo) / (hi - lo), 0.0, 1.0) : 0.0;
     return pow(idx, uGamma);
   }
-  vec3 lut2(float idx) { return texture2D(uLUT2, vec2(idx * (255.0 / 256.0) + 0.5 / 256.0, 0.5)).rgb; }
+  vec3 pal(float idx) { return texture2D(uLUT, vec2(idx * (255.0 / 256.0) + 0.5 / 256.0, 0.5)).rgb; }
+  // jet's empty-water field (ice page): a floor with a little speckle and a few cyan specks (h, h2: hashes 0..1)
+  float idxFloor(float h, float h2) {
+    if (uIdxFloor <= 0.0) return 0.0;
+    return h2 > 0.985 ? 0.35 + 0.15 * fract(h2 * 67.0) : uIdxFloor + 0.05 * h;
+  }
   // the flasher dial (the Mini's Ice Fishing views): depth runs clockwise from the top round a white ring; the
-  // returns paint the ring in the app's jet colours; the pale centre disc carries the DOM depth readout
+  // returns paint the ring in the page's colour map; the pale centre disc carries the DOM depth readout
   vec3 flasherPixel(vec2 uv) {
     vec2 q = vec2(uv.x * uAspect, uv.y);
     vec2 c = vec2(uIceSplit * uAspect * 0.5, 0.53); // a little above centre: the app's bottom bar runs under the dial
@@ -270,7 +286,7 @@ export const sonarFragment = /* glsl */ `
     float on = smoothstep(0.05, 0.16, idx);
     // the band fades at the ring's edges, like a lamp seen through a slot
     float across = smoothstep(R0, R0 + 0.025, r) * (1.0 - smoothstep(R1 - 0.025, R1, r));
-    vec3 col = mix(ring, lut2(idx), on * (0.75 + 0.25 * across));
+    vec3 col = mix(ring, pal(max(idx, uDialMin)), on * (0.75 + 0.25 * across));
     // tick marks on the inner edge, one per major division
     float seg = th * uTicks / 6.2831853;
     float tf = abs(fract(seg + 0.5) - 0.5) * 6.2831853 / uTicks * r;
@@ -287,11 +303,41 @@ export const sonarFragment = /* glsl */ `
     // ---- the 2D history pass (Ice Fishing View): shift the record one column left, draw the newest ping at the right edge
     if (uHistPass > 0.5) {
       float W = 384.0;
-      if (vUv.x < 1.0 - 1.0 / W) { gl_FragColor = texture2D(uHistPrev, vUv + vec2(1.0 / W, 0.0)); return; }
-      float depth = (1.0 - vUv.y) * uRange;
-      float n = hash(vec2(floor(uTime * 8.0), floor(vUv.y * 256.0)));
-      float floorN = max(0.0, 0.06 + 0.16 * n - 0.22 * uNoise) * 0.7 * (uFanCount > 0 ? 1.0 : 0.0) * uSignal; // no signal: the record scrolls a dark gap
-      gl_FragColor = vec4(toneIdx(max(flasherEcho(depth), floorN)), 0.0, 0.0, 1.0); return;
+      float col = floor(vUv.x * W), row = floor(vUv.y * 256.0);
+      bool fill = uHistFill > 0.5;
+      if (!fill && col < W - 1.0) {
+        // shift left one ping; when AUTO stepped the range, the old columns move onto the new depth axis (below the old
+        // range nothing was recorded: the empty field, so jet's blue floor on the ice page)
+        float y0 = 1.0 - (1.0 - vUv.y) * uRange / uHistPrevRange;
+        float e0 = idxFloor(hash12(vec2(col, row) + 0.37), 0.0);
+        gl_FragColor = y0 < 0.0 ? vec4(e0, 0.0, 0.0, 1.0) : texture2D(uHistPrev, vec2(vUv.x + 1.0 / W, y0)); return;
+      }
+      // the pre-roll: every column is its own ping of the last 48 s (its own speckle), the bottom band breathing a
+      // little in position (slow, +-1.5 rows, straight again by the live edge) and strength; no fish but a few faint marks
+      float back = fill ? W - 1.0 - col : 0.0;
+      float ping = floor(uTime * 8.0) - back;
+      float depth = (1.0 - vUv.y) * uRange, g = 1.0, mk = 0.0;
+      if (fill) {
+        float h1 = hash(vec2(col, 7.13)), h2 = hash(vec2(col, 3.71));
+        float wob = ((vnoise(vec2(col / 37.0, 1.3)) - 0.5) * 2.0 + (h1 - 0.5)) * smoothstep(0.0, 40.0, back);
+        depth -= wob * uRange / 256.0;
+        g = 0.85 + 0.15 * (0.5 * h2 + 0.5 * vnoise(vec2(col / 23.0, 5.1)));
+        for (int m = 0; m < 2; m++) {
+          float fm = float(m);
+          float c0 = W * (0.12 + 0.3 * fm + 0.25 * hash(vec2(fm, 1.7))), len = 12.0 + 18.0 * hash(vec2(fm, 2.9));
+          float x = (col - c0) / len;
+          if (x < 0.0 || x > 1.0) continue;
+          float dm = uHistBot * (0.4 + 0.35 * hash(vec2(fm, 4.3))) + 0.25 * sin(x * 3.14159 + fm);
+          float dz = (depth - dm) / 0.1;
+          mk = max(mk, 0.2 * sin(x * 3.14159) * exp(-dz * dz));
+        }
+      }
+      float n = hash(vec2(ping, row));
+      float gate = (uFanCount > 0 ? 1.0 : 0.0) * uSignal; // no signal: the record scrolls a dark gap
+      float floorN = max(0.0, 0.06 + 0.16 * n - 0.22 * uNoise) * 0.7 * gate;
+      float idx = toneIdx(max(max(flasherEcho(depth) * g, mk * gate), floorN));
+      idx = max(idx, idxFloor(hash12(vec2(ping, row) + 0.37), hash12(vec2(row, ping) * 1.37 + 5.1)) * gate);
+      gl_FragColor = vec4(idx, 0.0, 0.0, 1.0); return;
     }
     // ---- the ice views: the flasher on the left, the Live Down fan or the 2D history on the right
     if (uIce > 0.5) {
@@ -299,8 +345,8 @@ export const sonarFragment = /* glsl */ `
       if (vUv.x < uIceSplit + 0.006) { gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0); return; }
       vUv.x = (vUv.x - uIceSplit - 0.006) / (1.0 - uIceSplit - 0.006);
       if (uIce > 1.5) {
-        if (vUv.x > 0.965) { gl_FragColor = vec4(lut2(vUv.y), 1.0); return; } // the colour bar at the edge
-        gl_FragColor = vec4(lut2(texture2D(uHist, vec2(vUv.x / 0.965, vUv.y)).r), 1.0); return;
+        if (vUv.x > 0.965) { gl_FragColor = vec4(pal(vUv.y), 1.0); return; } // the colour bar at the edge
+        gl_FragColor = vec4(pal(texture2D(uHist, vec2(vUv.x / 0.965, vUv.y)).r), 1.0); return;
       }
     }
     float vyDown = 1.0 - vUv.y;
@@ -318,7 +364,7 @@ export const sonarFragment = /* glsl */ `
     vec2 p = box.xy + vec2(vUv.x, vy) * box.zw; // metres; apex (0,0)
     float r = length(p);
     float aWorld = atan(p.x, p.y);
-    float echo = 0.0, inAny = 0.0;
+    float echo = 0.0, inAny = 0.0, fl = 0.0;
     float t = floor(uTime * 8.0);   // "pings": speckle changes 8× a second
     float rays = vnoise(vec2(aWorld * 22.0 + 3.1, 0.5));
 
@@ -428,7 +474,17 @@ export const sonarFragment = /* glsl */ `
         float e = fanEcho(k, p, r, aWorld, tex, filament, inF);
         inAny = max(inAny, inF);
         echo = max(echo, e);
+        // ice page, Forward: the fan's upper edge runs flat just under the ice; its underside returns a dotted near-field
+        // streak along that edge for the first few metres (the app's surface rays at the apex, sonar-style.md 6.2)
+        if (uIceCeiling > 0.5 && uFan[k].x + uFan[k].y >= 1.55 && inF > 0.0) {
+          float dEdge = (uFan[k].x + uFan[k].y) - aWorld;
+          float ceilW = exp(-dEdge * dEdge / (CEIL_W * CEIL_W));
+          float env = mix(CEIL_PEAK, 0.08, smoothstep(0.3, 3.2, r)) * (1.0 - smoothstep(2.2, 3.6, r));
+          float dots = step(0.45, hash12(floor(vec2(aWorld * 25.0, r * 4.0)) + floor(uTime * 2.0) * vec2(1.7, 3.1)));
+          echo = max(echo, ceilW * env * (0.45 + 0.55 * dots) * tex);
+        }
       }
+      fl = idxFloor(grain, hash12(floor(p * 12.0) + t * vec2(1.37, 2.11)));
       float near = 1.0 - smoothstep(0.0, 2.4, r);
       echo = max(echo, inAny * near * near * (0.25 + 0.6 * rays) * tex * 0.5);
       echo = max(echo, inAny * floorTex * 0.7);
@@ -438,11 +494,9 @@ export const sonarFragment = /* glsl */ `
     echo *= uSignal;
 
     if (uDebug > 0.5) { float d = texture2D(uDepth0, vUv).r; gl_FragColor = vec4(vec3(d >= 0.9999 ? 0.0 : 1.0 - linearize(d) / 60.0), 1.0); return; }
-    float idx = toneIdx(echo) * inAny;
-    // the ice views draw their Live Down panel in the same jet map as the dial (the app's ice views, home-plm-row.jpg);
-    // ?icelut=amber keeps the Lab's amber there instead (for Jason to compare)
-    vec3 col = (uIce > 0.5 && uIceAmber < 0.5) ? lut2(idx) : texture2D(uLUT, vec2(idx * (255.0 / 256.0) + 0.5 / 256.0, 0.5)).rgb;
-    col *= inAny;
+    float idx = max(toneIdx(echo), fl * uSignal) * inAny;
+    // one colour map for fan, dial and history (SonarScreen.jsx picks it; the ice page: ?icemap=)
+    vec3 col = pal(idx) * inAny;
     gl_FragColor = vec4(col, 1.0);
   }
 `
