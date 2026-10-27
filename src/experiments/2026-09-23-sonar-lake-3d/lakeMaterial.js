@@ -34,6 +34,7 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
     uAirView: { value: 0.0 },    // the summer lake (Scene.jsx): seen from above the water, the water column over each point tints it — shallows clear, deep water dark — and light patterns play on the shallows; 0 (the ice page, any camera under water): fog by distance as before
     uTime: LAKE_TIME,
     uBeamGain: { value: 1.0 },   // ice scene: the signal gate (IceCamp.jsx s.signal): the lit footprint fades out while the Mini is out of the water
+    uPanoLobe: { value: new THREE.Vector2(0, 0.61) }, // Panoramic as a sound picture (#171): x = on, y = the strip camera's depression (rad); the fish pass weights by the flat fan's lobe
     uSplat: { value: new THREE.Vector3(1, 1, 30) }, // sonar pass 3 (echo splat): tan(half width), tan(half thickness), range of the fan being drawn
     uSplatBig: { value: new THREE.Vector4(1, 0.7, 1, 0.5) }, // large-scale light and dark on big targets: steel contrast, wood contrast, steel facing, cells per metre (dev: window.__sonarTune.kb)
   }
@@ -124,7 +125,7 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
       uniform int uBeamCount;
       uniform vec3 uApex[${MAX_BEAMS}]; uniform vec3 uC[${MAX_BEAMS}]; uniform vec3 uH[${MAX_BEAMS}]; uniform vec3 uN[${MAX_BEAMS}];
       uniform vec4 uAng[${MAX_BEAMS}]; uniform vec2 uRT[${MAX_BEAMS}]; uniform vec4 uBox[${MAX_BEAMS}];
-      uniform vec4 uSplatBig;
+      uniform vec4 uSplatBig; uniform vec2 uPanoLobe; uniform vec3 uSplat;
       uniform float uReveal; uniform vec3 uHighlight; uniform float uSonarPass; uniform float uRevealGain; uniform float uOutGamma; uniform vec2 uClip; uniform float uBeamGain;
       uniform float uAirView; uniform float uTime;
       float lhash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
@@ -227,6 +228,10 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
           // bladder's part of the body brightest, fins and eyes weak, bigger fish a little stronger.
           if (uSonarPass < 3.5 || vBad > 0.0 || abs(vSplat.x) > 1.0 || abs(vSplat.y) > 1.0) discard;
           float lobeF = 0.3 + 0.7 * pow(1.0 - abs(vSplat.y), 1.6);
+          if (uPanoLobe.x > 0.5) { // the flat fan (#171): 5°–25° below the horizon, a weaker sidelobe to ~60° (sonarShader panoLobe)
+            float g = uPanoLobe.y - atan(vSplat.y * uSplat.y);
+            lobeF = smoothstep(0.035, 0.105, g) * (1.0 - smoothstep(0.4, 0.49, g)) + 0.8 * smoothstep(0.4, 0.49, g) * (1.0 - smoothstep(0.62, 1.05, g));
+          }
           float faceF = dot(normalize(vNormal), normalize(cameraPosition - vWorld));
           bool finF = vUv.x < -1.5, eyeF = vUv.x < -0.5 && vUv.x > -1.5;
           if (finF) faceF = abs(faceF); // a fin is one sheet: either side returns

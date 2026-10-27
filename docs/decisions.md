@@ -2821,3 +2821,40 @@ Numbered log. Newest at the bottom.
          - Mini Forward at the deep spot is black in both, as physics says.
        - 0 console errors on desktop and phone.
      - Local; not uploaded.
+
+171. **2026-10-26** — **Panoramic as a sound picture, on a test page** (Jason in this chat: "panoramic view 在手机上面的显示效果非常的
+     糟糕 … 我觉得是画面逻辑的根源问题"; research `docs/2026-10-26-panoramic-rethink.md`; then, via Lab HQ: "全景用方案 A：重做成
+     声音的图，先做测试页我手机上对比").
+     - **The root:**
+       - Panoramic was a plan-view photograph of the 3D models (§7.13): a top-down depth map, geometric shadows, analytic
+         fish marks. That gave the circles, balls, hard black spokes and grain Jason saw on the phone.
+       - The vertical views were already drawn as what the transducer hears.
+     - **Now (test page only):** Panoramic runs through the vertical views' pipeline with the fan laid flat.
+       - The strip camera looks 35° below the horizon and covers ±30°, i.e. 5°–65°: the 5°–25° slab plus the sidelobe
+         that finds the bottom from the boat outward (§7.12).
+       - The rows are weighted by depression (`rowWeight`, `panoLobe`), and so are the #153 fish (lakeMaterial
+         `uPanoLobe`).
+       - The bottom is continuous between rows, a flat-topped stretch per row, because a grazing fan meets the bottom
+         metres apart from row to row.
+       - The field is calm: the arcs much softer, over slow patches. Structure is toned to a soft patch (×0.35) and fish
+         are brighter (×2.4). The data runs to the screen corners (1.45 × range).
+       - Shadows and coverage come out of the rays themselves: soft lanes behind rocks, darker near the boat until the
+         beam reaches the bottom.
+       - The lakebed lockup is seen as structure by the strips.
+     - **Where:**
+       - Test page `src/experiments/2026-10-26-sonar-pano-echo` (`lab="pano"`), with a switch on the page (全景：现在 /
+         全景：声音的图); `?pano=old` opens on today's.
+       - Share build: `VITE_LAB=pano node scripts/build-share.mjs`.
+       - The lake and ice pages are unchanged (`uPano` = 0, `uPanoLobe.x` = 0: the same arithmetic as before).
+     - **Comparison:** `docs/2026-10-26-panoramic-sound-picture.jpg`: timber flat, shelf, phone, and the app's lake frame.
+       Field index histogram at the timber flat: 0.16 / 0.38 / 0.24 / 0.08 in the first four bins (the app: 0.01 / 0.70 /
+       0.24 / 0.04; today's: 0.22 / 0.58 / 0.13 / 0.01).
+     - **Cost (#50):**
+       - Phone 390×844 @3, dev server, interleaved, 3 runs: 3.10–3.52 → 3.86–4.27 ms (+0.75 ms, about +21 %), the same
+         as Forward, which it now is.
+       - Not measured on the V10.
+     - **Open for Jason's look:**
+       - Fewer fish dashes than today's enlarged marks.
+       - The timber flat's rocks read as soft orange patches.
+       - The near field is black inside depth/sin 65°.
+     - Local; not uploaded. HQ puts the test page on the friends' test link for Jason's phone.
