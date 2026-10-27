@@ -2931,3 +2931,16 @@ Numbered log. Newest at the bottom.
        - A 24 m Forward line through the fish-rich west half still meets up to ~12, spread along its length.
        - fish-sim: 0 violations. Ice grid unchanged, 0 errors.
        - Before and after: `docs/2026-10-27-fish-spread.jpg`.
+174. **2026-10-27** — **Ad v3: PingLive first, the 110 ft hole stays, no jig drop** (Jason in Lab HQ, answering the three
+     open questions from #172: "both, but we're making just pinglive for now to be very good and as an strategic example
+     for the rest after it. keep it, let's remove the drop a jig part on video and live page").
+     - **Product:** both PingLive and Mini get the ad in the end. Only the PingLive version is made now, and it is made
+       very well, because it is the template for the Mini, ice, 4:5 and French versions that follow.
+     - **The hole:** the 110 ft hole (`DEEP_HOLE`, #172) stays in the lake.
+     - **The jig drop is removed:**
+       - From the ad: the deep-water beat shows deep water and fish at ~100 ft on the phone, with the real depth
+         read-out and no jig. Caption stays "Serious deep water ready."
+       - From the lake page: the summer-lake jig (`LakeJig`, the `?jig` trigger, `s.jigDrop`) comes out, so visitors
+         never get a drop and there is no question of a button.
+       - The ice page's jig (#127) is not touched.
+     - The "how do visitors drop a jig" question from #172 is closed by this.
