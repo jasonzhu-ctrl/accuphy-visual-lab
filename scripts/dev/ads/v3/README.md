@@ -58,7 +58,7 @@ Every boat move goes bow-first (+x): the hull does not turn (#166).
 - **Boat:** target x 16 → 18.5 over 0.2–3.0 s. The beam glides over the timber flat.
 - **Fish:** `__chase('largemouth')` at 0.3 s, so a fish rises in the beam by ~0.8 s.
 - **Type:**
-  - The small wordmark is top left (y 262) from frame 0.
+  - The small wordmark is top left (y 280, inside the Reels top zone; HQ 10-27) from frame 0.
   - `This is what's under your boat.` fades and slides up 24 px at 0.3–0.8 s, block top 380, gradient on.
 
 ### Shot 2: 135°, 3.0–7.5 s (frames 90–224): the hero move
@@ -67,7 +67,8 @@ Every boat move goes bow-first (+x): the hull does not turn (#166).
 - **3.0–4.6 s, straight down:**
   - Camera `T` looks straight down (pitch about −88°) on the fan, about 125 m up, fov 48.
   - The fan sits in the lower half of the frame, clear of the type block (340–760).
-  - `T` = `pos [31, 125, 3.2]`, look `[31, -10, -2.8]`: the open block fills x 332–754, y 810–1594 (rendered).
+  - `T` = `pos [31, 201, 11.4]`, look `[31, -10, 5.4]`: the open block fills x 412–671, y 780–1266. That is clear of all the
+    type (it ends at 764) and of the Reels bottom zone but 18 px (HQ 10-27 asked for ~700–1240).
 - **The fan opens:**
   - `fanOpen` runs 0.02 → 1 over 3.15–4.6 s, ease-out cubic.
   - The number is `round(135 × fanOpen)`, so `135°` lands on the exact frame the fan is widest (brief rule 4).
@@ -76,14 +77,19 @@ Every boat move goes bow-first (+x): the hull does not turn (#166).
     `wedgeGeometry` (narrowed by `fanOpen` as Scene.jsx does; read-only), projects it through `window.__camera` and takes
     the hull. A round 135° arc was tried first and bulged past the block.
   - The blue rule under the number draws out with it.
-- **4.9–6.9 s, the pull-down:**
-  - The camera swings from `T` down to the south side and lands on `s8`: `pos [22, 80, 92]`, look `[27, -10, 0]`, fov 48.
-  - It is an orbit, not a straight line. The offset direction from the look point is slerped, the radius and the look point
-    are lerped, with smootherstep easing (slow start, fast middle, soft landing).
+- **4.9–7.1 s, the pull-down** (HQ 10-27: bigger and lower):
+  - The camera swings from `T` down past `s8`'s height and lands on `s8`: `pos [22, 80, 92]`, look `[27, -10, 0]`, fov 48.
+  - It moves in spherical coordinates about the look point, eased with smootherstep over the whole move.
+    - The elevation falls to 26° at 60 % of the move (`LOW_EL`). At 16° the water mirrored the sky and hid the block.
+    - The distance closes to 92 m at 50 % (`LOW_R`).
+    - The azimuth drifts 30° west, behind the boat, and back (`SWING_AZ`).
+    - The look point rises 15 m and back (`LOOK_LIFT`), so the block rides under the type.
+  - In the low part, the block passes big across the frame, seen along the beam from behind the boat. It then rises into
+    the board's frame. Its top edge touches y 681 for one frame (5.6 s); the board's own landing frame sits at 732.
   - The whole coverage block comes up out of the water and reads in the lake (Jason: "从上往下看作为起点，再挪下来到侧边").
   - The blue outline fades out over 4.9–5.3 s. From the side, the 3D wedge's own outline carries the coverage.
   - `__chase('largemouth')` at 5.6 s, so something moves inside the block as it lands.
-- **6.9–7.5 s:** hold on `s8` (the board's 135° still).
+- **7.1–7.5 s:** hold on `s8` (the board's 135° still).
 - **Type:**
   - `135°` and the rule sit at block top 340 from 3.15 s.
   - `See the whole bay in one look.` fades in at 4.6–5.0 s, after the number lands.
@@ -98,15 +104,22 @@ Every boat move goes bow-first (+x): the hull does not turn (#166).
     −36 → 75.7 ft, −32 → 101.5 ft).
   - The lake trout at 92–99 ft come onto the phone's sonar.
   - The depth is told only by the app's own read-out, with no big number (#174).
-- **Camera:** follows the boat with the still's offset, `pos [bx + 11, 38→38, 32→30]`, look `[bx + 11, −8, −47]`, fov 42.
-  `bx` is the boat's x on that frame. The slight push-in settles on the board's frame at ~9.4 s.
-- **Fish:** `__chase('laketrout')` at 9.6 s, so a trout moves in the beam and on the phone.
+- **The phone, lifted (HQ 10-27):**
+  - Injected CSS moves the phone frame 215 CSS px up, at its real size. It now fills y 748–1233, read-out at ~y 900,
+    above the Reels bottom zone.
+  - The page draws the sonar into the frame's on-screen rect every frame (`SonarScreen.jsx`), so the picture follows.
+    No lake code is changed.
+- **Camera `h`:** follows the boat, `pos [bx + 11, 52, 55→52]`, look `[bx + 11, −25, −47]`, fov 42. `bx` is the boat's x
+  on that frame.
+  - The boat sits just under the line (y ~503), and the block's top fills the band between the line and the phone.
+  - The block's deep end and the trout are behind the phone; the phone shows them.
+- **Fish:** the lake trout swim on their own. `__chase('laketrout')` at ~100 ft answers 'blocked'.
 - **Type:** `Serious deep water ready.` fades in at 8.0–8.5 s (when the read-out passes ~80 ft), block top 380. No number.
 
 ### Shot 4: end card, 11.5–15.0 s (frames 345–449)
 
-- **Background:** the `deep` pass keeps recording to 15 s, so the water still moves. It darkens to 25 % with a light blur
-  over 11.5–12.0 s.
+- **Background:** the `deep` pass keeps recording to 15 s, so the water still moves. It darkens to 20 % with a 9 px blur
+  over 11.5–12.0 s. The lifted phone now sits behind the end card's type, hence darker than the 25 % first planned.
 - **11.5–11.8 s:** the small wordmark fades out (no double logo).
 - **11.8–12.3 s:** the big ACCUPHY wordmark (white, 720 px wide, centred, top ~640) fades in and scales 0.96 → 1.
 - **12.1–12.6 s:** a brand-blue rule (6 px) draws out from the centre to 720 px, under the wordmark.
@@ -151,11 +164,22 @@ Run copies of the scripts from the scratchpad (see Toolchain). The "ad-lake" pre
 **Reels safe zones** (14 % top, 35 % bottom, 6 % sides, as third-party checkers quote Meta's Reels ad specs; Meta's own
 page was not reached): y 269 / 1248, x 65 / 1015.
 
-- All the type is inside.
-- The small wordmark (y 262) reaches 7 px into the top zone.
-- In the deep-water shot the whole phone, read-out included (~y 1480), sits in the bottom zone, where Reels puts the
-  caption and the CTA.
-- The open 135° block from the top reaches y 1594, so its lower fifth is in the bottom zone too.
+- The 10 fps preview found three problems; HQ's fixes of 10-27 are in.
+- All the type is inside, and the wordmark now starts at y 280.
+- The deep-water phone, read-out included, is above y 1248.
+- The 135° block from the top ends at y 1266.
 
-**Still to make (after HQ's check):** the 30 fps `pinglive-916-en.mp4`, the 4:5 `pinglive-45-en.mp4` and the clean
-`pinglive-916-clean.mp4`, in `reference/ads/2026-11-bf/v3/`.
+**The film (2026-10-27, 30 fps, from lake 1abeedf, after HQ's preview check):** in `reference/ads/2026-11-bf/v3/`
+(git-ignored; this computer has no backup).
+
+| File | Size | Format |
+|---|---|---|
+| `pinglive-916-en.mp4` | 14.5 MB | 1080×1920, 15.0 s, 30 fps, H.264 ~8 Mbit/s |
+| `pinglive-916-clean.mp4` | 17.7 MB | the same, no type, no end card |
+| `pinglive-45-en.mp4` | 13.9 MB | 1080×1350, `../to45.py` |
+| `pinglive-45-clean.mp4` | 16.7 MB | 1080×1350, no type |
+
+- Contact sheet with the Reels zones: `docs/2026-10-27-ad-v3-film-sheet.jpg`.
+- The read-out climbs 58.8 → 101.5 ft (7.5–10 s).
+- The English lines are placeholders until Klaviyo HQ finals them. The end line is final.
+- For a new line, run `comp3.mjs` again on the kept frames, without recording again. The French version needs only `LINES`.

@@ -10,7 +10,7 @@
   #bg { position: absolute; left: -12px; top: -12px; width: 1104px; height: 1944px; } /* 12 px bleed, so the end card's blur has no dark rim */
   #grad { position: absolute; left: 0; top: 0; width: 1080px; height: 1100px;
     background: linear-gradient(180deg, rgba(2,8,14,.62) 0%, rgba(2,8,14,.38) 55%, rgba(2,8,14,0) 100%); }
-  #mark { position: absolute; left: 64px; top: 262px; width: 250px; filter: drop-shadow(0 2px 8px rgba(0,0,0,.5)); }
+  #mark { position: absolute; left: 64px; top: 280px; width: 250px; filter: drop-shadow(0 2px 8px rgba(0,0,0,.5)); }
   #block { position: absolute; left: 64px; width: 952px; color: #fff; }
   .num { font-family: 'Eurostile Heavy'; font-size: 230px; line-height: .9; letter-spacing: -.005em; white-space: nowrap; text-shadow: 0 4px 30px rgba(0,0,0,.45); }
   .num .unit { font-size: .46em; margin-left: .08em; vertical-align: .62em; letter-spacing: .02em; }
@@ -48,7 +48,7 @@
     $('bg').src = bg
     const show = (el, o, dy = 0) => { el.style.opacity = o; el.style.transform = `translateY(${(1 - o) * dy}px)` }
     const endK = type ? ease(span(t, 11.5, 12.0)) : 0 // the end card darkens and blurs the picture
-    $('bg').style.filter = endK ? `brightness(${1 - 0.75 * endK}) blur(${6 * endK}px)` : 'none'
+    $('bg').style.filter = endK ? `brightness(${1 - 0.8 * endK}) blur(${9 * endK}px)` : 'none'
     $('grad').style.opacity = type && t < 11.5 ? 1 : type ? 1 - endK : 0
     $('mark').style.opacity = type ? 0.9 * (1 - span(t, 11.5, 11.8)) : 0
     // the beat's block: shot 1 / 3 a line at 380; shot 2 the number, rule and line at 340

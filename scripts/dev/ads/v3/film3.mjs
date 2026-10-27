@@ -22,16 +22,22 @@ const span = (t, t0, t1) => clamp((t - t0) / (t1 - t0))
 // ---- the shots ----
 const F5 = { pos: [-2, 26, 60], look: [28, -6, 8], fov: 48 } // the board's opening
 const OPEN0 = { pos: [-6, 25, 64], look: [26, -6, 8], fov: 48 }
-const T = JSON.parse(process.env.T || 'null') || { pos: [31, 125, 3.2], look: [31, -10, -2.8], fov: 48 } // straight down on the fan: it fills y 810–1594, under the type
+const T = JSON.parse(process.env.T || 'null') || { pos: [31, 201, 11.4], look: [31, -10, 5.4], fov: 48 } // straight down on the fan: open, it fills y 780–1266, under the type (HQ 10-27)
 const S8 = { pos: [22, 80, 92], look: [27, -10, 0], fov: 48 } // the board's 135° landing
-// orbit from a to b about their look points: the offset direction is slerped, its length and the look point lerped
-const orbit = (a, b, u) => {
-  const oa = a.pos.map((x, i) => x - a.look[i]), ob = b.pos.map((x, i) => x - b.look[i])
-  const la = Math.hypot(...oa), lb = Math.hypot(...ob), na = oa.map((x) => x / la), nb = ob.map((x) => x / lb)
-  const om = Math.acos(clamp(na.reduce((s, x, i) => s + x * nb[i], 0))), so = Math.sin(om)
-  const dir = so < 1e-6 ? na : na.map((x, i) => (Math.sin((1 - u) * om) * x + Math.sin(u * om) * nb[i]) / so)
-  const look = lerp3(a.look, b.look, u), len = lerp(la, lb, u)
-  return { pos: look.map((x, i) => x + dir[i] * len), look, fov: lerp(a.fov, b.fov, u) }
+// the 135° pull-down (HQ 10-27: bigger and lower, still landing on s8): from straight above, the camera swings down past
+// s8's height to a low side view close to the water (elevation LOW_EL at 60 % of the move, distance LOW_R at 50 %), drifting
+// out to the west behind the boat and back (SWING_AZ, peak at 50 %), then rises into s8. Spherical about the look point.
+const LOW_EL = 26, LOW_R = 92, SWING_AZ = 30, LOOK_LIFT = +(process.env.LOOK_LIFT ?? 15) // lower than 26° the water mirrors the sky and hides the block (tried 16°)
+const sph = (c) => { const o = c.pos.map((x, i) => x - c.look[i]), r = Math.hypot(...o); return { r, el: Math.asin(o[1] / r) * 180 / Math.PI, az: Math.atan2(o[2], o[0]) * 180 / Math.PI } }
+const sstep = (u) => u * u * (3 - 2 * u)
+const swing = (a, b, u) => {
+  const A = sph(a), B = sph(b), rad = Math.PI / 180
+  const el = u < 0.6 ? lerp(A.el, LOW_EL, sstep(u / 0.6)) : lerp(LOW_EL, B.el, sstep((u - 0.6) / 0.4))
+  const r = u < 0.5 ? lerp(A.r, LOW_R, sstep(u / 0.5)) : lerp(LOW_R, B.r, sstep((u - 0.5) / 0.5))
+  const az = lerp(A.az, B.az, u) + SWING_AZ * Math.sin(Math.PI * u)
+  const look = lerp3(a.look, b.look, u); look[1] += LOOK_LIFT * Math.sin(Math.PI * u) // keeps the block under the type on the way down
+  const d = [Math.cos(el * rad) * Math.cos(az * rad), Math.sin(el * rad), Math.cos(el * rad) * Math.sin(az * rad)]
+  return { pos: look.map((x, i) => x + d[i] * r), look, fov: lerp(a.fov, b.fov, u) }
 }
 const shot = {
   open: (t) => {
@@ -41,11 +47,12 @@ const shot = {
   },
   pano: (t) => {
     const fanOpen = lerp(0.02, 1, easeOutCubic(span(t, 3.15, 4.6)))
-    return { cam: orbit(T, S8, smoother(span(t, 4.9, 6.9))), fanOpen }
+    return { cam: swing(T, S8, smoother(span(t, 4.9, 7.1))), fanOpen }
   },
   deep: (t, s) => {
-    const bx = s.boatX, pz = lerp(32, 30, smoother(span(t, 7.5, 9.4)))
-    return { cam: { pos: [bx + 11, 38, pz], look: [bx + 11, -8, -47], fov: 42 }, target: [lerp(-40, -32, smoother(span(t, 7.5, 9.3))), -47.2] }
+    // camera h (HQ 10-27): the boat just under the line, the block's top between the line and the lifted phone
+    const bx = s.boatX, k = smoother(span(t, 7.5, 9.4))
+    return { cam: { pos: [bx + 11, 52, lerp(55, 52, k)], look: [bx + 11, -25, -47], fov: 42 }, target: [lerp(-40, -32, smoother(span(t, 7.5, 9.3))), -47.2] }
   },
 }[pass]
 const calls = { open: [[0.3, 'largemouth']], pano: [[5.6, 'largemouth']], deep: [] }[pass] // a lake trout at ~100 ft answers __chase with 'blocked'; they swim on their own
@@ -73,6 +80,9 @@ if (phone) {
   await p.evaluate(() => { // as v3deep.mjs: no page buttons, no hint
     for (const el of document.querySelectorAll('a,button')) { const t = (el.textContent || '').trim(); if (/^←?\s*Lab$/.test(t) || /^Shop /.test(t)) el.style.visibility = 'hidden' }
     const s = window.__sonarState; if (s.hintEl) s.hintEl.style.visibility = 'hidden'
+    // the phone lifted out of the Reels bottom zone (HQ 10-27): 215 CSS px up, so it fills y 748–1233 of 1920 at its real
+    // size. The page draws the sonar into the phone frame's on-screen rect every frame, so the picture moves with it.
+    const st = document.createElement('style'); st.textContent = '[data-hint-avoid]{transform:translateY(-215px)}'; document.head.appendChild(st)
   })
 } else {
   await click('PingLive'); await click(pass === 'open' ? 'Forward' : 'Panoramic'); await p.waitForTimeout(2500)
