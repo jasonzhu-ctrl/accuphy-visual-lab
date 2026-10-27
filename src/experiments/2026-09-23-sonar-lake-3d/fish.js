@@ -52,22 +52,24 @@ export function makePopulation(bedY, obstacles) {
     fish.push({ species, len, home: [x, y, z], phase: ph, rot: (ph * 3.7) % (Math.PI * 2), radius: 4 + rnd() * 4, speed: 0.08 + rnd() * 0.06 })
   }
   // bass hold on timber (shelf edge x≈-18) and the rock hump (30,12)
-  add('largemouth', -16, 4, 1.2, 4, 10)
-  add('largemouth', 28, 10, 1.5, 3, 8)
-  add('smallmouth', 31, 14, 1.0, 4, 10)
+  add('largemouth', -16, 4, 1.2, 4, 16) // spread 10 → 16 m (#173)
+  add('largemouth', 28, 10, 1.5, 3, 16) // 8 → 16 m, smallmouth 10 → 16 m (#173: Jason's screenshot at the phone start had 8–9 fish
+  add('smallmouth', 31, 14, 1.0, 4, 16)  // within 14 m of the transducer)
   // walleye along the drop-off, tight to the bottom
   add('walleye', -8, -10, 0.6, 3, 14)
   add('walleye', -6, 18, 0.6, 3, 12)
   // crappie: two loose schools suspended near timber. Spread 5 → 13 m (#173, Jason 2026-10-27: "截图的位置鱼太多了，需要现实得
   // 分散一些" — 12–14 fish in 5 m read as one clump in the beam); same counts and the same draws, so no other fish moves
-  add('crappie', -15, -2, 4.0, 14, 13)
-  add('crappie', -20, 12, 3.5, 12, 13)
+  // (Jason's own screenshot, docs/2026-10-27-jason-fish-crowd.jpg: a Forward beam from the shelf edge crossed the whole
+  // first school) — each school is now two loose groups apart; the draws stay in the same order
+  add('crappie', -14, -9, 4.0, 7, 12); add('crappie', -6, 13, 4.0, 7, 12)
+  add('crappie', -21, 15, 3.5, 6, 12); add('crappie', -27, 4, 3.5, 6, 12)
   // shelf bait for the Panoramic step (the app's lake frames are full of small dashes in 1–6 m of water)
   add('smelt', -46, 12, 2.5, 40, 7)
-  add('crappie', -54, 4, 2.0, 8, 11)
+  add('crappie', -52, -8, 2.0, 8, 11) // (-54, 4) → off the perch line (#173)
   add('smelt', -58, 14, 2.0, 25, 6)
   add('smelt', -38, 2, 3.0, 30, 6)
-  add('crappie', -40, 16, 1.5, 12, 13)
+  add('crappie', -46, 20, 1.5, 6, 12); add('crappie', -38, -6, 1.5, 6, 12) // one school of 12 → two groups (#173)
   add('largemouth', -35, 9, 1.0, 4, 10)
   // smelt: two tight bait balls in open water
   add('smelt', 10, -6, 7.0, 60, 4)
@@ -87,11 +89,11 @@ export function makePopulation(bedY, obstacles) {
     .forEach(([x, z, off]) => addOne('salmon', x, z, off, 0.7 + rnd() * 0.3))
   // phase 3 (Jason #85/#89): more walleye along the drop-off, yellow perch schools on the weedy shelf and the timber
   // edge, northern pike cruising the weed edges. Appended after everyone else, so no earlier fish moves.
-  add('walleye', -14, 2, 0.6, 4, 12)
+  add('walleye', -14, 2, 0.6, 4, 18) // 12 → 18 m (#173)
   add('walleye', 4, -20, 0.8, 3, 12)
-  add('walleye', 14, 20, 0.7, 3, 10)
+  add('walleye', 10, 24, 0.7, 3, 16) // (14, 20) spread 10 → (10, 24) 16 m: off the phone start (#173)
   add('yellowperch', -46, 4, 1.2, 9, 12) // spread 6–7 → 12 m (#173)
-  add('yellowperch', -32, 16, 1.0, 8, 12)
+  add('yellowperch', -30, 28, 1.0, 8, 12) // (-32, 16) → off the crappie and the shelf's z ≈ 5 line (#173)
   add('yellowperch', -31, -13, 1.4, 8, 12) // (-24, -8) → onto the shelf: it sat on top of the crappie school (#173)
   addOne('pike', -52, 9, 1.4, 0.62); addOne('pike', -40, -3, 1.6, 0.8); addOne('pike', -30, 22, 1.4, 0.55); addOne('pike', 34, 25, 1.8, 0.86)
   // Spread bass, musky and salmon through the water column — some deep, some shallow (Jason 2026-09-24:

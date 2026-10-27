@@ -2918,3 +2918,16 @@ Numbered log. Newest at the bottom.
        - Ice grid (3 × 4) unchanged against the last run; 0 errors.
        - Before and after in Panoramic: `docs/2026-10-27-fish-spread.jpg`.
      - Local; not uploaded. HQ puts it on the test link for Jason.
+     - **Round 2 (Jason's own screenshot, `docs/2026-10-27-jason-fish-crowd.jpg`):** a Forward beam from the shelf edge
+       (about −24, −2) into the middle still crossed a whole crappie school, with walleye and largemouth on the same line
+       (the dark ones); the phone start (16, 11) also had 7–9 fish within 14 m.
+       - Each crappie school is now two loose groups apart.
+       - Spreads widened: the largemouth at (−16, 4) to 16 m, walleye at (−14, 2) to 18 m, the bass at the phone start to
+         16 m.
+       - Moved off shared lines: one walleye group to (10, 24), one perch group to (−30, 28), the west crappie to (−52, −8).
+       - The draws stay in the same order.
+       - Busiest 8 m cell: 13 → 5. Jason's view: 5–6 fish in the beam → 2.
+       - At the phone start, 4–6 fish within 14 m instead of 7–9.
+       - A 24 m Forward line through the fish-rich west half still meets up to ~12, spread along its length.
+       - fish-sim: 0 violations. Ice grid unchanged, 0 errors.
+       - Before and after: `docs/2026-10-27-fish-spread.jpg`.
