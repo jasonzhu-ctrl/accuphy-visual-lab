@@ -2944,3 +2944,14 @@ Numbered log. Newest at the bottom.
          never get a drop and there is no question of a button.
        - The ice page's jig (#127) is not touched.
      - The "how do visitors drop a jig" question from #172 is closed by this.
+175. **2026-10-27** — **The boat's wake: the round rings (#156) replace the Kelvin wake (#166)** (Jason in Lab HQ: "开始前我再次确认下
+     船四周的水波纹我要环形的哪个版本 我觉得更好"; he first said it in the cloud chat 电脑端完整版 on preview VxxnVnZr8cxQLXw3iizMdD).
+     - **Chosen:** the rings that spread out from the hull while the boat moves (#156, `Scene.jsx` Water shader at 7ae1edd:
+       `g += uWake * 0.35 * cos(dB * 2.0 - t * 5.0) * exp(-dB / 6.0) * rb / dB;`). They fade about 1/3 s after the boat stops.
+     - **Dropped:** the #166 Kelvin wake (V arms and slick lane, and the wake map that drives it).
+     - **Unchanged:** the sky photo, FFT wind sea, glitter path and ABYSSAL look (#161–#165). The rings bend the normals, so
+       they sit on top of all of that.
+     - The drag cue's ripple every 2.6 s is in both versions and stays.
+     - Of the three picks the one-version plan waits on (`docs/2026-10-27-lake-one-version.md`), two are now made: the wake
+       (this) and the 110 ft hole (#174). Panoramic still waits for Jason's phone compare.
+     - Not built yet: it goes in as part of the one-version work, after Jason says to start.
