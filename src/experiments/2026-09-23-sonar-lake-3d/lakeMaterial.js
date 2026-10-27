@@ -115,6 +115,27 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
         vBad = zc < 0.3 ? 1.0 : 0.0;
         float zcs = max(zc, 0.3);
         vSplat = vec3((vp.x / zcs) / uSplat.x, (vp.y / zcs) / uSplat.y, length(vp.xyz));
+      #ifdef FISH
+        // the fish image has 256 rows over the fan's reach (SonarScreen FISH_H): at 160–230 ft a row is 0.2–0.3 m, and a far fish
+        // seen side-on is only a few cm deep along the ray, so it fell on a row in one frame and between rows in the next (Jason
+        // 2026-10-27: 中距离的鱼 … 会变得很闪也变小). Along the ray the body is made at least 5 rows deep about its centre (only
+        // the half facing the sound returns, so ~2.5 rows show: 0.5 m at 160 ft); per fish the frame-to-frame swing fell from
+        // 65 % to 34 %. It fades in from 30 to 45 m of reach (~100–150 ft), so the 80 ft default and nearer keep their picture.
+        if (uSonarPass > 3.5) {
+          #ifdef USE_INSTANCING
+            mat4 mi = modelMatrix * instanceMatrix;
+          #else
+            mat4 mi = modelMatrix;
+          #endif
+          vec3 cw = (mi * vec4(0.0, 0.0, 0.0, 1.0)).xyz, ax = normalize(mat3(mi) * vec3(1.0, 0.0, 0.0));
+          float rc = length((viewMatrix * vec4(cw, 1.0)).xyz);
+          float along = abs(dot(ax, normalize(cw - cameraPosition)));
+          float tl2 = uFishSonarScale * length(mi[0].xyz), ls2 = max(tl2 * (1.0 + 0.9 * smoothstep(0.3, 1.1, tl2)), 0.22) * uFishEchoSize;
+          float ext = 1.2 * ls2 * (0.15 + 0.85 * along); // the drawn body's depth along the ray, roughly (side-on: its width; head-on: its length)
+          float dMin = 5.0 * uSplat.z / 256.0 * smoothstep(30.0, 45.0, uSplat.z);
+          vSplat.z = rc + (vSplat.z - rc) * max(1.0, dMin / ext);
+        }
+      #endif
         if (uSonarPass > 2.5) gl_Position = vec4(vSplat.x, (vSplat.z / uSplat.z) * 2.0 - 1.0, 0.0, 1.0);
         else gl_Position = projectionMatrix * viewMatrix * wp;
       }

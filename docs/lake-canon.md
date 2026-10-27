@@ -33,7 +33,7 @@ Jason, 2026-10-27: the lake scene (boat and lake), its effects, the sonar pictur
 | Echo texture | every return is a short arc across the beam (`arcGrain`) | #148 |
 | Structure | echo splat of every surface; bright cores, orange rims, solid targets hide the bottom | #135, #143–#147, #149 |
 | Bottom | one filled band; far bottom softer and weaker, never gone | #140, #152, #154 |
-| Fish in the sonar | drawn from the fish bodies, as the transducer hears them | #153, #170 |
+| Fish in the sonar | drawn from the fish bodies, as the transducer hears them; far fish at long range held at a steady middle size | #153, #170, #177 |
 | Panoramic | **OPEN:** the plan view (live pages) or the sound picture (`/pano/`). Jason compares on his phone. The loser is deleted | #171 |
 | Forward AUTO depth | **OPEN** | #154 |
 | Mini views | four views, the rest frosted; Combo range AUTO | #121, #124, #125 |

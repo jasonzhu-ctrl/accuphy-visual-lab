@@ -3026,3 +3026,26 @@ Numbered log. Newest at the bottom.
        has the round rings, fish round 3 and no lake jig. Test-link repo f297eab. `/jig/` now forwards to `/`. All four pages
        open with 0 console errors. The three old private previews were not updated, because overwriting them needs the
        whole page loaded into a chat. Jason decides whether to delete them. lab.accuphy.ca is still 50ad8ca until 动.
+177. **2026-10-27** — **Far fish in the sonar: steady, and a middle size** (Jason via Lab HQ, after the deep-water still:
+     "中距离的鱼在我的range开的很高的情况下会变得很闪也变小 我觉得闪不对 大小应该折中一点"; his screenshot was PingLive Forward at
+     160 ft in a landscape phone).
+     - **Cause:** the fish image (#153, `SonarScreen` pass 4) has 256 rows over the fan's reach.
+       - At 160–230 ft a row is 0.2–0.3 m.
+       - A far fish seen side-on is only a few cm deep along the ray, and only its side facing the sound returns.
+       - So it landed on a row in one frame and between rows in the next. Read back from the fish image: far fish were
+         1 row high.
+     - **Change (`lakeMaterial.js`, the fish pass):** along the ray each body is stretched about its centre to at least
+       5 rows deep. About 2.5 rows show: ≈ 0.5 m at 160 ft.
+       - A head-on fish (already long along the ray) is not stretched.
+       - It fades in from 30 to 45 m of reach (~100–150 ft), so 80 ft and nearer keep their picture exactly.
+       - Across the beam nothing changes: the beam pattern already spreads a far fish over ~1.1° (FWHM), the angular
+         resolution HQ asked for.
+     - **Measured** (fish tracked frame by frame in the fish image, Forward 180 ft): the per-fish swing went from 65 % to
+       34 %, and frames where a fish blinked out from 6 to 1.
+     - **Checked** (`docs/2026-10-27-far-fish-flicker.jpg`, before | after):
+       - Phone landscape Forward at 80, 150 and 200 ft; Down over the hole (AUTO 140 ft); desktop Forward at 160 and 230 ft.
+       - 80 ft is unchanged; at 150–230 ft far fish show as small steady marks instead of flickering specks.
+       - Lake 6 × 6 and ice 3 × 4 grids: 0 errors. The ice ranges are below 30 m of reach, so its picture does not change
+         (#94).
+     - Panoramic is untouched (the flat fan's fish image is the same pass, but this only acts on long reaches; /pano/
+       waits for Jason anyway).
