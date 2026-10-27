@@ -3,6 +3,20 @@
 Jason 2026-10-16: "你管理好不同的 version 哦 … 做好 version 记录". Every public or private page build is listed here
 with the source commit it was built from, so anyone can tell which version a link shows. Newest first.
 
+## Where the Lab lives (inventory, Lab HQ 2026-10-27)
+
+Newest code: **9ed9341**. Page types in the code: Both `/`, Mini `/mini/`, Ice `/ice/`, the store embed `/embed/`
+(built only for Vercel); French is `?lang=fr` on any of them; the fish test page (`VITE_LAB=fish`) still exists in the code
+but is published nowhere and is redundant since #170.
+
+| Where | Who sees it | Pages | Version |
+|---|---|---|---|
+| shop.accuphy.com/pages/lab and /fr/pages/lab | customers | an iframe of lab.accuphy.ca/ (not `/embed/`) | 283ecb9, one step behind |
+| lab.accuphy.ca = accuphy-lab.vercel.app (one deployment) | anyone with the link | `/`, `/mini/`, `/ice/`, `/embed/` | 283ecb9, one step behind (no #180, #181) |
+| Friends' test link jasonzhu-ctrl.github.io/accuphy-lab-test | friends, Jason | `/`, `/mini/`, `/ice/`; `/jig/`, `/pano/` forward to `/` | **9ed9341, newest** |
+| claude.ai private previews RnCBYTexY5vcEqJy2hAsN7, VxxnVnZr8cxQLXw3iizMdD (fish test), G5uZM8imcgsQNzoKfPkiMa (ice), 4GdHHYZKTHgYyEzjV12RmW (09-25) | Jason only | one page each | old (09-25 to 10-25) |
+| The v3 ad film | Meta, from 11/2 | recorded | lake 1abeedf (before #178; its shots show no Panoramic sonar) |
+
 ## Current lake (one version, #176)
 
 - **Friends' test links** `/`, `/mini/`, `/ice/`: built from **9ed9341** (adds #180 load plan B and #181). **lab.accuphy.ca** (+ `/embed/`): still **283ecb9**, follows on Jason's 动. Before that, both were built from **283ecb9**
