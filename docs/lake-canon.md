@@ -17,7 +17,7 @@ Jason, 2026-10-27: the lake scene (boat and lake), its effects, the sonar pictur
 |---|---|---|
 | Water surface | FFT wind-sea spectrum, ABYSSAL look | #165 (after #162–#164) |
 | Sky in the water | real photographed sky, sun glitter path, clouds | #161, #162 |
-| Boat wake | **round rings** spreading from the hull while it moves; the Kelvin V wake goes | #175 (replaces #166's wake) |
+| Boat wake | **round rings** spreading from the hull while it moves (in, 2026-10-27) | #175 (replaces #166's wake) |
 | Drag cue | reticle on the water, ripple every 2.6 s, back once the boat stops | #132, #160, #166 |
 | Water column from above | tints the bottom with depth | #156 |
 | Terrain | deep floor 24 m (79 ft); a 110 ft hole at (−22, −45) | #64, #172, #174 |
@@ -43,7 +43,7 @@ Jason, 2026-10-27: the lake scene (boat and lake), its effects, the sonar pictur
 - **Panoramic:** two drawings behind `panoMode`. One goes after Jason's pick.
 - **Old fish marks (#120):** kept only for the ice page's jig. That is the ice scene, so it may stay, but only on the ice
   path.
-- **Kelvin wake (#166):** removed when the round rings go in (#175).
+- **Kelvin wake (#166):** removed with its wake map (#175).
 - **Lake jig (#172):** removed by #174.
 
 ## 中文摘要（给 Jason）

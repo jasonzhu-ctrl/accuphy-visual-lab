@@ -2983,6 +2983,15 @@ Numbered log. Newest at the bottom.
      - Of the three picks the one-version plan waits on (`docs/2026-10-27-lake-one-version.md`), two are now made: the wake
        (this) and the 110 ft hole (#174). Panoramic still waits for Jason's phone compare.
      - Not built yet: it goes in as part of the one-version work, after Jason says to start.
+     - **Built (#176's start):** `Scene.jsx` Water.
+       - The #156 rings are back, the same formula, now added on top of the FFT sea after its gain.
+       - `uWake` follows the boat's distance to its target as in 1c0ba1c, so the rings run while it moves and fade ~1/3 s
+         after it stops.
+       - The Kelvin wake is gone entirely: the wake map, its path trail, the slick lane and the stern foam (−105 lines,
+         and one render pass less per frame).
+       - The drag cue's ripple (Boat) is unchanged.
+       - Checked: desktop and a 390 × 844 phone while the boat runs and after it stops
+         (`docs/2026-10-27-wake-rings.jpg`); the ice page has no Water (ice grid 3 × 4, 0 errors); 0 errors on the lake.
 176. **2026-10-27** — **One version of the lake: started** (Jason in Lab HQ: "开始做，湖景统一成一个版本，圆形水纹一起换上"; plan in
      `docs/2026-10-27-lake-one-version.md`).
      - **Owner:** only "冰钓版本视觉效果" changes the lake scene and the sonar imaging (ice included, #94). Rule added to

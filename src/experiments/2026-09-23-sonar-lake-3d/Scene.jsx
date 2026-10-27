@@ -270,10 +270,8 @@ function Fish({ mat, state }) {
 // Short waves fade out with the pixel's footprint, so the phone does not shimmer. The vertices stay flat.
 // Jason 2026-10-26 (#161, options B + C of docs/2026-10-26-lake-surface-options.md): fair-weather clouds drift across the
 // reflected sky and the sun stands low ahead of the camera, so a path of small blinking sparkles runs up the far water;
-// and the boat leaves a real wake along its path (Kelvin arms of short oblique crests at ±19.5°, transverse waves, a foam
-// trail) instead of the old round rings. Cost (#50: fewer samples, never a plainer look): the clouds are soft, so they
-// are sampled per vertex on a 3.5 m grid and interpolated, not per pixel; the wake is worked out once per frame in a
-// 256² map over the path (≤ 0.3 m a texel) and only looked up by the water; the fine foam grain stays per pixel.
+// and (#166) a Kelvin wake along the boat's path. Jason 2026-10-27 (#175, "船四周的水波纹我要环形的哪个版本"): that wake is
+// gone again; the round rings of #156 spread from the hull while the boat moves, on top of today's sea and sky.
 // Jason 2026-10-26 (#162, docs/2026-10-26-lake-water-resources.md picks 1 + 2, "湖面用免费的 1 和 2"): the reflected sky is
 // a real photographed sky (Poly Haven, CC0; its upper half, 1536 × 384, ~52 kB) instead of the noise clouds, its sun
 // placed ahead of the camera and the glitter path following that sun; the fine ripples near the camera come from a real
@@ -282,7 +280,6 @@ function Fish({ mat, state }) {
 // #163–#164 reworked the ripples against drone photos and dark deep-water references, but hand-made wave sums always
 // showed their few shapes again. Jason 2026-10-26 (#165, "动，把 ABYSSAL 的做法接进湖面"): the waves now come from a real
 // wind-sea spectrum summed by an FFT every frame (lakeFFT.js, after ABYSSAL, MIT); the ripple normal map is gone.
-const WAKE_N = 16, WAKE_STEP = 1.2, WAKE_KEEP = 8, WAKE_RES = 384, WAKE_REACH = 26 // path points kept for the wake: one every 1.2 m, for 8 s; the map covers the newest 26 m
 // the sky photo: where its sun is in the image (azimuth along the width, found from the HDR's brightest pixel). The sky
 // is turned so its sun stands SUN_AHEAD rad right of the default view direction; the glitter path is drawn from a sun
 // GLITTER_EL high on that bearing, so it runs up the far water as in option B (Jason's pick), whatever the photo's own
@@ -304,66 +301,7 @@ const WATER_NOISE = /* glsl */ `
         float a = hash(i), b = hash(i + vec2(1, 0)), c = hash(i + vec2(0, 1)), d = hash(i + vec2(1, 1));
         return vec3(du * vec2(b - a + (a - b - c + d) * u.y, c - a + (a - b - c + d) * u.x), a + (b - a) * u.x + (c - a) * u.y + (a - b - c + d) * u.x * u.y);
       }`
-// The wake map: for each texel, the nearest point of the boat's path (uTrail: x, z, distance along the path from the
-// boat, age in s; newest first) → the wake's slope (rg), the churned trail behind the stern (b) and the slick (a).
-// Jason 2026-10-26 on his iPhone ("船划过的地方的波纹看着还是非常奇怪"): the old arms read as a ladder of even bars with a
-// string of white beads on them, and transverse bars behind the stern. Now, after drone photos of small boats on calm
-// lakes (docs/2026-10-26-lake-wake-refs.jpg): a calm lane where the hull and prop flattened the ripples (the slick, what
-// reads first from above); two thin arms whose fine crests (~0.9 m) feather in from a sharp outer edge at 19.5°; white
-// water only in a short ragged trail at the stern. All of it in proportion to the speed the path was laid at, and short:
-// the arms ~10 m, gone ~2 s after the boat stops; the slick ~4 s.
-function makeWakeMap() {
-  const rt = new THREE.WebGLRenderTarget(WAKE_RES, WAKE_RES, { type: THREE.HalfFloatType, depthBuffer: false, magFilter: THREE.LinearFilter, minFilter: THREE.LinearFilter })
-  const mat = new THREE.ShaderMaterial({
-    uniforms: { uTime: { value: 0 }, uTrail: { value: Array.from({ length: WAKE_N }, () => new THREE.Vector4(0, 0, 0, 99)) }, uMap: { value: new THREE.Vector4(0, 0, 1, 0) } },
-    vertexShader: /* glsl */ `varying vec2 vUv; void main() { vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }`,
-    fragmentShader: /* glsl */ `
-      precision highp float; varying vec2 vUv; uniform float uTime; uniform vec4 uTrail[${WAKE_N}]; uniform vec4 uMap;
-      ${WATER_NOISE}
-      void main() {
-        float t = uTime;
-        vec2 x = uMap.xy + (vUv - 0.5) * uMap.z;
-        float bestD = 1e3, bestS = 0.0, bestA = 99.0, bestEnd = 0.0, bestV = 0.0; vec2 bestQ = x, bestT = vec2(1.0, 0.0);
-        for (int i = 0; i < ${WAKE_N - 1}; i++) {
-          vec4 a = uTrail[i], b = uTrail[i + 1];
-          if (b.w > 20.0) break;
-          vec2 ab = b.xy - a.xy; float L2 = dot(ab, ab);
-          if (L2 < 1e-4) continue;
-          float h0 = dot(x - a.xy, ab) / L2, h = clamp(h0, 0.0, 1.0); vec2 q = a.xy + ab * h; float d = length(x - q);
-          bool last = i == ${WAKE_N - 2} || uTrail[i + 2 < ${WAKE_N} ? i + 2 : ${WAKE_N - 1}].w > 20.0;
-          if (d < bestD) { bestD = d; bestS = mix(a.z, b.z, h); bestA = mix(a.w, b.w, h); bestQ = q; bestT = ab / sqrt(L2);
-            bestV = (b.z - a.z) / max(b.w - a.w, 0.05);                         // m/s the boat ran this stretch at
-            bestEnd = last ? max(0.0, h0 - 1.0) * sqrt(L2) : 0.0; }
-        }
-        float spd = smoothstep(0.4, 3.0, bestV);                               // a slow nudge leaves next to nothing
-        float tail = smoothstep(0.0, 1.2, bestS) * exp(-bestEnd / 1.2);        // nothing ahead of the hull or round the far end
-        vec2 side = (x - bestQ) / max(bestD, 1e-3);
-        // the slick: a calm lane about the boat's beam, widening slowly
-        float slick = exp(-pow(bestD / (1.3 + 0.08 * bestS), 2.0)) * exp(-bestA / 3.0) * exp(-bestS / 18.0) * tail * (0.35 + 0.65 * spd);
-        // the arms: a sharp outer edge on the 19.5° line, the crests dying away inward (as behind a real hull)
-        float u = bestD - (0.9 + 0.354 * bestS);
-        float env = u > 0.0 ? exp(-u * u / 0.12) : exp(u / (0.8 + 0.1 * bestS));
-        float arm = env * spd * exp(-bestA / 2.0) * exp(-bestS / 8.0) * smoothstep(0.5, 2.5, bestS) * exp(-bestEnd / 1.2);
-        // fine crests, ~0.9 m. Their waves run back and out at 35° to the path on the outer edge and turn square to it
-        // toward the middle, so each crest curves from the edge in and forward, a feather, not a rung; slow noise bends them
-        float ang = mix(1.45, 0.62, smoothstep(0.0, 1.0, bestD / (0.9 + 0.354 * bestS)));
-        vec2 kd = normalize(bestT * cos(ang) + side * sin(ang));
-        float ph = 7.0 * (cos(ang) * bestS + sin(ang) * bestD) - t * 1.6 + 1.2 * vnoised(x * 0.22 + 9.0).z;
-        vec2 g = kd * cos(ph) * arm * 0.85;
-        float foamW = exp(-pow(bestD / (0.8 + 0.1 * bestS), 2.0)) * exp(-bestA / 1.8) * exp(-bestS / 7.0) * smoothstep(0.0, 0.6, bestS) * exp(-bestEnd / 1.2) * spd;
-        float edge = smoothstep(0.5, 0.45, max(abs(vUv.x - 0.5), abs(vUv.y - 0.5)));  // fade at the map's border
-        gl_FragColor = vec4(g, foamW, slick) * edge;
-      }
-    `,
-  })
-  const scene = new THREE.Scene(), cam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1)
-  const quad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), mat); quad.frustumCulled = false
-  scene.add(quad)
-  return { rt, mat, scene, cam }
-}
 function Water({ state }) {
-  const wake = useMemo(makeWakeMap, [])
-  useEffect(() => () => { wake.rt.dispose(); wake.mat.dispose() }, [wake])
   const gl = useThree((st) => st.gl)
   const fft = useMemo(() => makeLakeFFT(gl), [gl])
   useEffect(() => () => fft.dispose(), [fft])
@@ -372,7 +310,7 @@ function Water({ state }) {
     uniforms: { uTime: { value: 0 }, uSky: { value: new THREE.Color('#9cc1cf') },
       uSkyMap: { value: loadTex(lakeSkyUrl, false) }, uSkyRot: { value: 0 }, uSunP: { value: new THREE.Vector3(0, 1, 0) },
       uFft0: { value: fft.tex[0] }, uFft1: { value: fft.tex[1] }, uFftL: { value: new THREE.Vector3(...FFT_L) }, uFftN: { value: fft.n }, uFftC: { value: fft.fine }, uFftGain: { value: import.meta.env.DEV ? +((/fftgain=([\d.]+)/.exec(window.location.search) || [])[1] || 0.7) : 0.7 }, // 0.7 of the spectrum's slope (1.0 read choppy from 60 m); dev: ?fftgain=
-      uWakeMap: { value: wake.rt.texture }, uMap: { value: new THREE.Vector4(0, 0, 1, 0) } }, // uMap: centre x, z, size (m), on
+      uBoat: { value: new THREE.Vector2() }, uWake: { value: 0 } }, // the boat (x, z) and how strongly its rings run (0–1)
     vertexShader: /* glsl */ `
       varying vec3 vW;
       void main() { vec4 wp = modelMatrix * vec4(position, 1.0); vW = wp.xyz; gl_Position = projectionMatrix * viewMatrix * wp; }
@@ -381,7 +319,7 @@ function Water({ state }) {
       precision highp float; varying vec3 vW; uniform vec3 uSky; uniform float uTime;
       uniform sampler2D uSkyMap; uniform float uSkyRot; uniform vec3 uSunP;
       uniform sampler2D uFft0, uFft1; uniform vec3 uFftL; uniform float uFftN, uFftGain, uFftC;
-      uniform sampler2D uWakeMap; uniform vec4 uMap;
+      uniform vec2 uBoat; uniform float uWake;
       ${WATER_NOISE}
       void main() {
         float t = uTime;
@@ -400,15 +338,9 @@ function Water({ state }) {
         float gust = vnoised(x * 0.018 - wind * t * 0.035).z * 0.65 + vnoised(x * 0.05 + 7.3 - wind * t * 0.06).z * 0.35;
         float paw = smoothstep(0.46, 0.74, vnoised((x - wind * t * 0.8) * 0.075 + 2.1).z);
         g *= uFftGain * (0.6 + 0.45 * smoothstep(0.3, 0.66, gust) + 0.35 * paw);
-        // the boat's wake, from the wake map (makeWakeMap); the foam's grain is per pixel
-        float foam = 0.0;
-        vec2 wu = (x - uMap.xy) / uMap.z + 0.5;
-        if (uMap.w > 0.5 && wu.x > 0.0 && wu.y > 0.0 && wu.x < 1.0 && wu.y < 1.0) {
-          vec4 W = texture2D(uWakeMap, wu);
-          g = g * (1.0 - 0.75 * W.w) + W.xy;                                  // the slick calms the sea, then the arms
-          float churn = vnoised(x * 2.2 + t * 0.3).z * 0.6 + vnoised(x * 5.0 - t * 0.5).z * 0.4;
-          foam = smoothstep(0.45, 0.8, churn + 0.3 * W.z) * W.z * 0.8;          // ragged white water at the stern only
-        }
+        // the wake: rings spreading from the boat while it moves (#156, back in #175)
+        vec2 rb = x - uBoat; float dB = length(rb) + 1e-3;
+        g += uWake * 0.35 * cos(dB * 2.0 - t * 5.0) * exp(-dB / 6.0) * rb / dB;
         vec3 N = normalize(vec3(-g.x, 1.0, -g.y));
         vec3 v = normalize(cameraPosition - vW);
         float cosI = max(dot(v, N), 0.0);
@@ -439,18 +371,13 @@ function Water({ state }) {
         // photos): thin and sparse, so the ripples read through light, not through a busy mottle
         float glint = smoothstep(0.05, 0.1, rip) * (1.0 - smoothstep(0.2, 0.6, foot));
         col += sky * glint * 0.13; alpha += glint * 0.05;
-        // the slick reads from above as a smoother, slightly brighter lane: the sky is mirrored evenly there (drone photos)
-        if (uMap.w > 0.5 && wu.x > 0.0 && wu.y > 0.0 && wu.x < 1.0 && wu.y < 1.0) { float sl = texture2D(uWakeMap, wu).w; col = mix(col, sky * 0.55 + veil * 0.45, sl * 0.18); }
-        foam = clamp(foam, 0.0, 1.0);
-        col = mix(col, vec3(0.93, 0.96, 0.97), foam * 0.85); alpha = max(alpha, foam * 0.9);
         float dist = length(vW - cameraPosition);
         float fog = smoothstep(120.0, 420.0, dist);
         gl_FragColor = vec4(mix(col, uSky, fog), mix(clamp(alpha + sun, 0.0, 1.0), 1.0, fog));
       }
     `,
   }), [fft])
-  const trail = useMemo(() => [], [])
-  useFrame(({ clock, gl }) => {
+  useFrame(({ clock }, dt) => {
     const now = clock.elapsedTime
     mat.uniforms.uTime.value = now
     fft.step(now)
@@ -461,30 +388,9 @@ function Water({ state }) {
       mat.uniforms.uSunP.value.set(Math.cos(el) * Math.cos(az), Math.sin(el), Math.cos(el) * Math.sin(az))
     }
     const s = state.current
-    // the boat's path, newest first: the live position, then a point every WAKE_STEP m, kept WAKE_KEEP s
-    if (!trail.length) trail.push({ x: s.boat.x, z: s.boat.z, t: now }, { x: s.boat.x, z: s.boat.z, t: now })
-    trail[0] = { x: s.boat.x, z: s.boat.z, t: now }
-    if (Math.hypot(trail[0].x - trail[1].x, trail[0].z - trail[1].z) > WAKE_STEP) trail.splice(1, 0, { x: s.boat.x, z: s.boat.z, t: now })
-    while (trail.length > WAKE_N || (trail.length > 2 && now - trail[trail.length - 1].t > WAKE_KEEP)) trail.pop()
-    const u = wake.mat.uniforms.uTrail.value
-    let cum = 0, x0 = 1e4, z0 = 1e4, x1 = -1e4, z1 = -1e4
-    for (let i = 0; i < WAKE_N; i++) {
-      const p = trail[i]
-      if (!p) { u[i].set(0, 0, 0, 99); continue }
-      if (i > 0) cum += Math.hypot(p.x - trail[i - 1].x, p.z - trail[i - 1].z)
-      u[i].set(p.x, p.z, cum, i === 0 ? 0 : now - p.t)
-      if (cum <= WAKE_REACH || i < 2) { x0 = Math.min(x0, p.x); z0 = Math.min(z0, p.z); x1 = Math.max(x1, p.x); z1 = Math.max(z1, p.z) }
-    }
-    // the map covers the newest WAKE_REACH m of the path and the arms' reach round it (all has faded by then); no path, no map.
-    // At most 44 m across: ≤ 0.12 m a texel, fine enough for the arms' 0.9 m crests
-    const on = cum > 0.3 && now - trail[trail.length - 1].t < WAKE_KEEP + 1 ? 1 : 0, M = mat.uniforms.uMap.value
-    if (on) {
-      const m = 2.0 + 0.36 * Math.min(cum, WAKE_REACH), size = Math.min(44, Math.max(12, x1 - x0 + 2 * m, z1 - z0 + 2 * m))
-      M.set((x0 + x1) / 2, (z0 + z1) / 2, size, 1)
-      wake.mat.uniforms.uMap.value.copy(M); wake.mat.uniforms.uTime.value = now
-      const prev = gl.getRenderTarget()
-      gl.setRenderTarget(wake.rt); gl.render(wake.scene, wake.cam); gl.setRenderTarget(prev)
-    } else M.w = 0
+    const speed = Math.hypot(s.target.x - s.boat.x, s.target.z - s.boat.z) // (the boat eases toward its target)
+    mat.uniforms.uBoat.value.set(s.boat.x, s.boat.z)
+    mat.uniforms.uWake.value += (Math.min(1, speed / 3) - mat.uniforms.uWake.value) * Math.min(1, dt * 3)
   })
   return (
     <mesh rotation-x={-Math.PI / 2} material={mat} onUpdate={(o) => o.layers.set(SONAR_HIDE_LAYER)}>
