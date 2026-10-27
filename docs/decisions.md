@@ -3004,3 +3004,7 @@ Numbered log. Newest at the bottom.
        lab.accuphy.ca only on 动.
      - **Housekeeping done:** the five 10-17 agent worktrees and `wip/ice-camera` are removed. Their commits and
        uncommitted work are saved first as tags `archive/2026-10-1*-*` on GitHub. The case-study worktree stays.
+     - **Built (2026-10-27):** every friends' test link (`/`, `/mini/`, `/ice/`, `/pano/`) rebuilt from c9f900b. That build
+       has the round rings, fish round 3 and no lake jig. Test-link repo f297eab. `/jig/` now forwards to `/`. All four pages
+       open with 0 console errors. The three old private previews were not updated, because overwriting them needs the
+       whole page loaded into a chat. Jason decides whether to delete them. lab.accuphy.ca is still 50ad8ca until 动.
