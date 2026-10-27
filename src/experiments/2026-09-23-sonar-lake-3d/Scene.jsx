@@ -249,9 +249,8 @@ function Fish({ mat, state }) {
       const live = s.holes[s.holes.length - 1], key = `${live.x.toFixed(1)},${live.z.toFixed(1)}`
       if (key !== campKey.current) { campKey.current = key; winterCamp(pop, live, circles, bedY) }
     }
-    // ice page: s.jig (IceCamp) draws fish to the lure. The lake's jig (LakeJig, #172) leaves the fish alone unless s.jigFish
-    const jigF = state.current.holes ? state.current.jig : state.current.jigFish ? state.current.jig : null
-    stepBehaviours(pop, clock.elapsedTime, Math.min(dt, 0.1), state.current.apex, circles, bedY, jigF || null)
+    // ice page: s.jig (IceCamp) draws fish to the lure (the lake's own jig, #172, was removed in #174)
+    stepBehaviours(pop, clock.elapsedTime, Math.min(dt, 0.1), state.current.apex, circles, bedY, state.current.holes ? state.current.jig || null : null)
   }, -1)
   const groups = useMemo(() => {
     const by = {}
@@ -512,68 +511,6 @@ function ellipseArc(a, b, w, t0, len, segs) {
 const fanned = (s) => (import.meta.env.DEV && s.fanOpen != null && s.fanOpen < 1
   ? s.specs.map((sp) => { const m = (sp.a0 + sp.a1) / 2, h = ((sp.a1 - sp.a0) / 2) * Math.max(0.01, s.fanOpen); return { ...sp, a0: m - h, a1: m + h } })
   : s.specs)
-// ---------- the lake's jig (#172; Jason 2026-10-26: "深水那一拍 jig 从船上掉到 100 ft") ----------
-// A rod over the starboard side and a 1–1.5 oz jig head with a soft plastic on the line. Once dropped it sinks at
-// ~1.4 ft/s (0.42 m/s, a real 1–1.5 oz head) to ~0.8 m off the bottom, then is worked in small hops. As soon as the boat
-// moves it is reeled up (3 m/s). It reaches the sonar the way the ice page's jig does: s.jig → computeMarks → the jig
-// mark in Down and Forward (SonarScreen). Drawn ~3× life size so it reads in the 3D view (the ice jig is ~4×).
-// Triggers: s.jigDrop = { v?, y0? } (recordings, dev), or ?jig on the page: the jig goes down whenever the boat has
-// rested ~1.5 s. Which trigger visitors get is still Jason's call.
-const JIG_AUTO = typeof window !== 'undefined' && /[?&]jig\b/.test(window.location.search)
-const JIG_TIP = new THREE.Vector3(0.9, 1.55, 2.25) // rod tip, boat-relative (bow +x, starboard +z)
-function LakeJig({ state }) {
-  const g = useMemo(() => {
-    const grp = new THREE.Group()
-    const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.02, 2.1, 6), new THREE.MeshStandardMaterial({ color: '#1b1d22', roughness: 0.5 }))
-    const base = new THREE.Vector3(0.35, 0.75, 0.75), dir = JIG_TIP.clone().sub(base)
-    rod.position.copy(base).addScaledVector(dir, 0.5)
-    rod.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.clone().normalize())
-    const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints([JIG_TIP, JIG_TIP.clone()]), new THREE.LineBasicMaterial({ color: '#e8f0f2', transparent: true, opacity: 0.7 }))
-    line.frustumCulled = false
-    const jig = new THREE.Group()
-    const head = new THREE.Mesh(new THREE.SphereGeometry(0.04, 12, 8), new THREE.MeshStandardMaterial({ color: '#c6f23a', emissive: '#3a4a08', roughness: 0.35 }))
-    const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.022, 0.22, 4, 8), new THREE.MeshStandardMaterial({ color: '#eef3f0', emissive: '#1a2224', roughness: 0.6 }))
-    body.rotation.z = Math.PI / 2; body.position.x = -0.15
-    const tail = new THREE.Mesh(new THREE.CircleGeometry(0.035, 10), body.material); tail.position.x = -0.3; tail.rotation.y = Math.PI / 2
-    jig.add(head, body, tail)
-    grp.add(rod, line, jig)
-    grp.userData = { line, jig }
-    grp.traverse((o) => o.layers.set(SONAR_HIDE_LAYER)) // the sonar sees it as its mark, not as geometry
-    return grp
-  }, [])
-  useFrame(({ clock }, dt) => {
-    const s = state.current, { line, jig } = g.userData
-    dt = Math.min(dt, 0.1)
-    g.position.set(s.boat.x, 0.02, s.boat.z)
-    const moving = s.dragging || Math.hypot(s.target.x - s.boat.x, s.target.z - s.boat.z) * 4 > 0.25
-    if (JIG_AUTO && !s.jigDrop && !moving && (s.stillT ?? 0) > 1.5 && s.jigYw === undefined) s.jigDrop = {}
-    const J = s.jigDrop
-    const bottomY = -depthAt(s.boat.x + JIG_TIP.x, s.boat.z + JIG_TIP.z)
-    if (J && !J.started) { J.started = true; s.jigYw = J.y0 ?? -0.25 }
-    if (s.jigYw !== undefined) {
-      if (moving) { s.jigYw += 3.0 * dt; if (s.jigYw > -0.1) { s.jigYw = undefined; s.jigDrop = null } } // reeled up as the boat moves
-      else {
-        const floorY = bottomY + 0.8
-        if (s.jigYw > floorY + 0.01) s.jigYw = Math.max(floorY, s.jigYw - (J?.v ?? 0.42) * dt) // the fall
-        else { // worked off the bottom: three small hops, a pause
-          const c = clock.elapsedTime % 5, k = c % 1.1
-          s.jigYw = floorY + (c < 3.3 ? (k < 0.18 ? 0.35 * (k / 0.18) : 0.35 * Math.exp(-(k - 0.18) * 2.8)) : 0)
-        }
-      }
-    }
-    const y = s.jigYw
-    const on = y !== undefined
-    line.visible = jig.visible = on
-    if (on) {
-      s.jigTrail = s.jigTrail === undefined ? y : s.jigTrail + (y - s.jigTrail) * Math.min(1, dt * 2.5)
-      const pa = line.geometry.attributes.position
-      pa.setXYZ(1, JIG_TIP.x, y - 0.02, JIG_TIP.z); pa.needsUpdate = true
-      jig.position.set(JIG_TIP.x, y, JIG_TIP.z); jig.rotation.y = 0.4 * Math.sin(clock.elapsedTime * 0.7)
-      s.jig = y < -0.3 ? { x: s.boat.x + JIG_TIP.x, z: s.boat.z + JIG_TIP.z, y, yPrev: s.jigTrail } : null
-    } else { s.jig = null; s.jigTrail = undefined }
-  })
-  return <primitive object={g} />
-}
 function Boat({ state, beamMats }) {
   const boat = useMemo(makeBassBoat, [])
   const contact = useMemo(makeWaterContact, [])
@@ -1026,7 +963,6 @@ export default function LakeScene({ state, sonarRect, paused = false, scene = 'l
       </>) : (<>
         <Water state={state} />
         <Boat state={state} beamMats={beamMats} />
-        <LakeJig state={state} />
         <PickPlane state={state} />
       </>)}
       <Beams key={state.current.specKey} state={state} ice={ice} />

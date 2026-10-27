@@ -2966,6 +2966,12 @@ Numbered log. Newest at the bottom.
          never get a drop and there is no question of a button.
        - The ice page's jig (#127) is not touched.
      - The "how do visitors drop a jig" question from #172 is closed by this.
+     - **Done (lake jig):** `LakeJig`, `?jig`, `s.jigDrop` and `s.jigFish` are out of `Scene.jsx`. The fish now react to a
+       jig only on the ice page.
+       - The deep-range widening of the jig mark (#172, `sonarMarks.js` / `legacyMark`) stays: it only acts past 13 m of
+         range, so on the ice page it changes nothing.
+       - Checked: the lake grid (6 × 6) and the ice grid (3 × 4) against the commit before show only swimming-fish
+         differences; 0 errors.
 175. **2026-10-27** — **The boat's wake: the round rings (#156) replace the Kelvin wake (#166)** (Jason in Lab HQ: "开始前我再次确认下
      船四周的水波纹我要环形的哪个版本 我觉得更好"; he first said it in the cloud chat 电脑端完整版 on preview VxxnVnZr8cxQLXw3iizMdD).
      - **Chosen:** the rings that spread out from the hull while the boat moves (#156, `Scene.jsx` Water shader at 7ae1edd:
