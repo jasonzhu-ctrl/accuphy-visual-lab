@@ -80,3 +80,4 @@ Nothing built, nothing live, no ads, no email. Building starts on Jason's 动 in
 - 11-02 goes live with **Canada and the US** only. The US gets PingLive Mini only.
 - Europe follows the plan above, one country at a time, each after Jason says so. It is no longer tied to 11-02.
 - Lab work before 11-02: the US Mini film (shot plan first, by the ad video chat), and Canada EN + FR (the PingLive film with Jason's pending changes, then a French type pass).
+- **Google Ads too** (Jason via CHIEF, 10-28: "也投 Google"), with Meta and YouTube, Canada + US from 11-02. Google and YouTube need landscape 16:9 and square 1:1 as well; the Lab has 9:16 and 4:5 only. Klaviyo HQ lists the exact assets and will ask.
