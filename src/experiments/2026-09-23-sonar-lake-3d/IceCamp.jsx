@@ -123,10 +123,12 @@ export function IceCamp({ state, beamMats, iceMat, T }) {
     u.uLampColor.value.set('#ffb060')
   }, [iceMat, camp, T, state])
   const glowRef = useRef()
-  useFrame((_, dt) => {
+  const presentationTime = useRef({ jig: null, reticle: null })
+  useFrame(({ frameloop }, dt) => {
+    const pausedRedraw = frameloop === 'never' && dt === 0
     const s = state.current
     const d = (s.drill ||= { phase: 'idle', t: 0, opened: false })
-    if (d.phase === 'idle' && Math.hypot(s.target.x - s.boat.x, s.target.z - s.boat.z) > 0.8) {
+    if (!pausedRedraw && d.phase === 'idle' && Math.hypot(s.target.x - s.boat.x, s.target.z - s.boat.z) > 0.8) {
       d.phase = 'lift'; d.t = 0; d.opened = false
       d.from = { x: s.boat.x, z: s.boat.z }; d.to = { x: s.target.x, z: s.target.z }
       const dist = Math.hypot(d.to.x - d.from.x, d.to.z - d.from.z)
@@ -137,22 +139,22 @@ export function IceCamp({ state, beamMats, iceMat, T }) {
     const { auger, park } = parts
     if (d.phase !== 'idle') {
       const u = Math.min(1, d.t / (d.phase === 'move' ? d.moveT || DUR.move : DUR[d.phase])), e = ease(u)
-      if (d.phase === 'lift') { lift = e * LIFT; if (u >= 1) { d.phase = 'move'; d.t = 0 } }
+      if (d.phase === 'lift') { lift = e * LIFT; if (!pausedRedraw && u >= 1) { d.phase = 'move'; d.t = 0 } }
       else if (d.phase === 'move') {
         lift = LIFT
-        s.boat.x = d.from.x + (d.to.x - d.from.x) * e; s.boat.z = d.from.z + (d.to.z - d.from.z) * e
-        if (u >= 1) { d.phase = 'drill'; d.t = 0 }
+        if (!pausedRedraw) { s.boat.x = d.from.x + (d.to.x - d.from.x) * e; s.boat.z = d.from.z + (d.to.z - d.from.z) * e }
+        if (!pausedRedraw && u >= 1) { d.phase = 'drill'; d.t = 0 }
       } else if (d.phase === 'drill') {
         lift = LIFT; drilling = u
-        if (!d.opened && u > 0.62) { // the auger breaks through: the hole opens, the old one is left behind
+        if (!pausedRedraw && !d.opened && u > 0.62) { // the auger breaks through: the hole opens, the old one is left behind
           d.opened = true
           s.holes.forEach((h) => { h.live = false })
           s.holes.push({ x: d.to.x, z: d.to.z, r: HOLE_DRAW_R, live: true })
           if (s.holes.length > MAX_HOLES) s.holes.shift()
           setHoles(iceMat, s.holes)
         }
-        if (u >= 1) { d.phase = 'drop'; d.t = 0 }
-      } else if (d.phase === 'drop') { lift = (1 - e) * LIFT; if (u >= 1) { d.phase = 'idle'; d.t = 0 } }
+        if (!pausedRedraw && u >= 1) { d.phase = 'drop'; d.t = 0 }
+      } else if (d.phase === 'drop') { lift = (1 - e) * LIFT; if (!pausedRedraw && u >= 1) { d.phase = 'idle'; d.t = 0 } }
     }
     // the auger: parked beside the hole, or over it, spinning and going down 0.55 m then back up
     if (drilling > 0) {
@@ -168,16 +170,19 @@ export function IceCamp({ state, beamMats, iceMat, T }) {
     // sinks back at 2.5 m/s. s.jig feeds the sonar marks (SonarScreen → computeMarks), so the dial, the fan and the
     // history all show it from one source.
     {
-      const tt = performance.now() / 1000, cyc = tt % 6
+      const tt = pausedRedraw && presentationTime.current.jig !== null ? presentationTime.current.jig : performance.now() / 1000, cyc = tt % 6
+      presentationTime.current.jig = tt
       let off
       if (cyc < 3.6) { const c = cyc % 1.2; off = c < 0.15 ? 0.3 * (c / 0.15) : 0.3 * Math.exp(-(c - 0.15) * 3.2) }
       else off = 0.02 * Math.sin(tt * 18) * Math.sin(tt * 2.3)
       const bottomY = -depthAt(s.boat.x, s.boat.z)
       const want = Math.min(-ICE_T - 0.4, bottomY + 1.6 + off)
       const up = -ICE_T - 0.15
-      if (d.phase !== 'idle') s.jigY = up
-      else if (s.jigY === undefined || s.jigY > want + 0.02) s.jigY = Math.max(want, (s.jigY ?? up) - 2.5 * dt)
-      else s.jigY = want
+      if (!pausedRedraw || s.jigY === undefined) {
+        if (d.phase !== 'idle') s.jigY = up
+        else if (s.jigY === undefined || s.jigY > want + 0.02) s.jigY = Math.max(want, (s.jigY ?? up) - 2.5 * dt)
+        else s.jigY = want
+      }
       s.jigTrail = s.jigTrail === undefined ? s.jigY : s.jigTrail + (s.jigY - s.jigTrail) * Math.min(1, dt * 6)
       const wet = s.jigY < -ICE_T - 0.2
       const tip = parts.fishline.userData.tip, pa = parts.fishline.geometry.attributes.position
@@ -229,7 +234,9 @@ export function IceCamp({ state, beamMats, iceMat, T }) {
       reticle.visible = !!a && s.view === 'section' && !s.hasDragged && d.phase === 'idle'
       if (reticle.visible) {
         reticle.position.set(a.x, 0.025, a.z)
-        const t = (performance.now() / 1000) % 2.6, u = Math.min(1, t / 1.6)
+        const now = pausedRedraw && presentationTime.current.reticle !== null ? presentationTime.current.reticle : performance.now() / 1000
+        presentationTime.current.reticle = now
+        const t = now % 2.6, u = Math.min(1, t / 1.6)
         const rip = reticle.userData.rip
         rip.scale.setScalar(1 + 0.9 * (1 - (1 - u) * (1 - u)))
         rip.material.opacity = 0.55 * (1 - u)

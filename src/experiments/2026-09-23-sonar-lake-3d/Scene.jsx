@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { labEvent } from './embed'
+import SceneLifecycle from './SceneLifecycle'
 import { mergeGeometries as _merge } from 'three/addons/utils/BufferGeometryUtils.js'
 // Extrude geometries are non-indexed, primitives are indexed — normalise first.
 const mergeGeometries = (parts) => _merge(parts.map((g) => (g.index ? g.toNonIndexed() : g)))
@@ -202,7 +203,9 @@ function FishGroup({ mat, body, fish }) {
   }, [fish])
   const tmp = useMemo(() => ({ m: new THREE.Matrix4(), q: new THREE.Quaternion(), e: new THREE.Euler(), p: new THREE.Vector3(), s: new THREE.Vector3(), pose: {},
     heading: new Float32Array(fish.length), speed: new Float32Array(fish.length), accel: new Float32Array(fish.length), first: true }), [fish])
-  useFrame(({ clock }, dt) => {
+  useFrame(({ clock, frameloop }, dt) => {
+    const pausedRedraw = frameloop === 'never' && dt === 0
+    if (pausedRedraw && !tmp.first) return
     const t = clock.elapsedTime, d = Math.min(Math.max(dt, 1e-4), 0.1)
     const fresh = tmp.first || dt > 0.25 // first frame, or back from a pause / hidden tab: no turn rate or slowing to read
     const sw = geo.attributes.aSwim, a = sw.array
@@ -214,6 +217,9 @@ function FishGroup({ mat, body, fish }) {
       tmp.p.set(o.x, o.y, o.z); tmp.s.set(L, L, L)
       tmp.m.compose(tmp.p, tmp.q, tmp.s)
       ref.current.setMatrixAt(i, tmp.m)
+      // The first paused draw still needs matrices; it must not evolve aSwim.
+      // Keep first=true so the first running frame retains its original initialization.
+      if (pausedRedraw) return
       // swimming, from the fish's own motion: speed in body lengths per second, turn rate, slowing down
       const U = o.speed, bl = U / L
       let dh = o.heading - tmp.heading[i]; dh -= Math.round(dh / (2 * Math.PI)) * 2 * Math.PI
@@ -225,7 +231,7 @@ function FishGroup({ mat, body, fish }) {
       a[i * 4 + 2] += (Math.max(-0.25, Math.min(0.25, -0.3 * turn)) - a[i * 4 + 2]) * eB // the body curves into a quick turn (by turn rate, rad/s); straight when cruising
       a[i * 4] = (a[i * 4] + 2 * Math.PI * Math.min(6, Math.max(1 / Math.sqrt(L), 1.5 * bl)) * d) % (2 * Math.PI) // tail beat 1.5 × BL/s, at least a cruising beat (big fish slower: 0.7 Hz musky, 1.5 Hz smelt)
     })
-    tmp.first = false
+    if (!pausedRedraw) tmp.first = false
     ref.current.instanceMatrix.needsUpdate = true
     sw.needsUpdate = true
   })
@@ -242,8 +248,9 @@ function Fish({ mat, state }) {
   state.current.pop = pop
   // behaviours (fish.js): boat-triggered rises, bass strikes on bait, salmon bursts — before anything reads a pose
   const campKey = useRef('')
-  useFrame(({ clock }, dt) => {
+  useFrame(({ clock, frameloop }, dt) => {
     if (import.meta.env.DEV) window.__lakeClock = clock
+    if (frameloop === 'never' && dt === 0) return // a presentation redraw must not run random behaviours
     const s = state.current
     if (s.jig !== undefined && s.holes && s.holes.length) { // the ice page: a winter population round each new hole (fish.js winterCamp)
       const live = s.holes[s.holes.length - 1], key = `${live.x.toFixed(1)},${live.z.toFixed(1)}`
@@ -813,7 +820,7 @@ function SectionCut({ state, mats }) {
 // paused: the sign-up gate is open — stop the render loop so the lake and the sonar picture freeze
 // scene: 'lake' (the boat, default) or 'ice' (the frozen lake: IceCamp.jsx replaces the water, the boat and the pick plane;
 // the lakebed, structure, fish, beams and the sonar engine are the same)
-export default function LakeScene({ state, sonarRect, paused = false, scene = 'lake' }) {
+export default function LakeScene({ state, sonarRect, paused = false, scene = 'lake', allowPausedDraw = true }) {
   const ice = scene === 'ice'
   const P = useMemo(() => (ice ? iceParams() : null), [ice])
   const mats = useMemo(() => {
@@ -842,6 +849,7 @@ export default function LakeScene({ state, sonarRect, paused = false, scene = 'l
   const bg = ice ? P.T.bg : '#9cc1cf'
   return (
     <Canvas frameloop={paused ? 'never' : 'always'} dpr={[1, 1.5]} camera={{ fov: 38, near: 0.5, far: 400, position: [-38, 34, 54] }} gl={{ antialias: true, powerPreference: 'high-performance' }} onCreated={({ gl }) => { gl.localClippingEnabled = true; labEvent('ready', {}, { once: true }) }}>
+      <SceneLifecycle allowPausedDraw={allowPausedDraw} />
       <color attach="background" args={[bg]} />
       <fog attach="fog" args={ice ? [bg, ICE_FOG.near, ICE_FOG.far] : [bg, 160, 420]} />
       {ice ? (<>

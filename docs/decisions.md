@@ -3165,3 +3165,14 @@ Numbered log. Newest at the bottom.
      - Not deployed; the production version in `versions.md` is unchanged. Revert this isolated commit to restore
        the old sun composition. #182 is already referenced by backlog's market-link fix but has no numbered entry
        in this checkout; this entry deliberately does not invent or overwrite that historical decision.
+184. **2026-10-28 — Freeze simulation time independently of presentation redraws.** Optimization review branch only.
+     - R3F 9.8 resets its clock when changing `frameloop`; an outstanding invalidation can also pass a RAF timestamp
+       in milliseconds into its `never` path, which expects seconds. A real-store regression reproduces that jump.
+       `SceneLifecycle`/`labMotion` preserve active elapsed time and drain pending frames synchronously on suspension.
+     - User pause, document visibility and iframe intersection are separate reasons to suspend. Becoming visible
+       does not clear the user's pause. A visible paused resize or setting change draws exactly one zero-delta frame.
+     - That presentation draw does not evolve fish swimming/random behavior or ice drill/jig state. Normal running
+       callbacks, including their first zero-delta frame, remain equal to the source baseline in executable tests.
+     - Regression covers the real R3F store/global-loop race, 100 suspension cycles, fish callbacks and the ice drill
+       callback; 15-minute fish simulation has zero structure/bottom/surface violations, minimum clearance 0.41 m.
+       Browser viewport rotation is checked separately; it is not a physical-phone performance result.

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import * as THREE from 'three'
 import LakeScene from './Scene'
+import { useSceneSuspended } from './SceneLifecycle'
 import { DEVICES, FT, ICE_MODES } from '../2026-09-23-sonar-beam/devices'
 import { iceParams, ICE_START, VIEWS } from './iceScene'
 import { wedgeSpecs } from '../2026-09-23-beam-shapes-3d/wedge'
@@ -98,6 +99,7 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
   const [glLost, setGlLost] = useState(false)
   const [glKey, setGlKey] = useState(0)
   const mainRef = useRef(null)
+  const suspended = useSceneSuspended(mainRef)
   useEffect(() => { let a = requestAnimationFrame(() => { a = requestAnimationFrame(() => setMount3d(true)) }); const t = setTimeout(() => setMount3d(true), 120); return () => { cancelAnimationFrame(a); clearTimeout(t) } }, []) // frames do not run in a background tab: the timeout mounts anyway
   useEffect(() => {
     if (!mount3d) return
@@ -320,7 +322,7 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
     <>
     <main ref={mainRef} inert={gate} aria-hidden={gate || undefined} className="font-brand fixed inset-x-0 top-0 select-none overflow-hidden bg-[#9cc1cf] text-white" style={{ height: 'var(--lab-h, 100%)', ...(ICE ? { background: iceParams().T.bg } : null) }} onPointerMove={onMove}>
       <div className="absolute inset-0 touch-none">
-        {mount3d && !glLost && <LakeScene key={glKey} state={state} sonarRect={sonarRect} paused={gate || paused} scene={scene} />}
+        {mount3d && !glLost && <LakeScene key={glKey} state={state} sonarRect={sonarRect} paused={gate || paused || suspended} allowPausedDraw={!suspended} scene={scene} />}
       </div>
       {EXTRAS === 'a' && phone && !land && started && !home && <AppBadges height={28} className="absolute z-20" style={{ left: 12, top: 'calc(12px + env(safe-area-inset-top))' }} />}
       {glLost && (
