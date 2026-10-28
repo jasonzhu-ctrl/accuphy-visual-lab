@@ -74,3 +74,9 @@ Nothing built, nothing live, no ads, no email. Building starts on Jason's 动 in
   - **波兰：** 商店里没有波兰语，而且波兰现在在“不能网上下单”的市场。投波兰的广告让人去哪买，要你定。
   - **拉脱维亚：** 商店里也没有拉脱维亚语。
 - **11 月 2 日：** 只要你在 10 月 29 日前定下还没定的几点，翻译在 10 月 31 日前审完，上表左栏都能做完。最稳的是加拿大和美国先上，欧洲四种语言审完一个上一个。
+
+## Update 2026-10-28 (CHIEF, Jason: "先上加拿大和美国")
+
+- 11-02 goes live with **Canada and the US** only. The US gets PingLive Mini only.
+- Europe follows the plan above, one country at a time, each after Jason says so. It is no longer tied to 11-02.
+- Lab work before 11-02: the US Mini film (shot plan first, by the ad video chat), and Canada EN + FR (the PingLive film with Jason's pending changes, then a French type pass).
