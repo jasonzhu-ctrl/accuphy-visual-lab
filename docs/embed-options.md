@@ -2,6 +2,9 @@
 
 > **Adopted 2026-10-24 (#142):** Option 3, the theme-mounted Lab; the iframe stays as the fallback. Lab side built
 > (`scripts/build-embed.mjs`); handoff draft `docs/handoffs/2026-10-24-lab-theme-mount.md`.
+
+> **2026-10-28 现场核实：** 本文保留为方案研究，不代表当前已部署方案。Shopify 生产 `/pages/lab` 和已核实的未发布主题 `189709156525` 目前仍使用 iframe，指向 `https://lab.accuphy.ca/`；现有发布事件名为 `accuphy:lab`，不要照下方历史示例写成 `accuphy_lab`。候选的法语/表单配置也不同于生产。接入前先看 [数据与事件保留契约](lab-preservation-contract.md) 及 [优化报告：Shopify 宿主](lab-optimization-report.md#5-shopify-宿主只读发现)，确认实际主题、iframe 构建版本与验收范围；这里不复制或修改宿主文件。
+
 # Putting the Lab on the store's address — the realistic options compared (2026-10-24)
 
 Research only; nothing built, nothing written into the repo. Baseline: decisions #133/#134 and

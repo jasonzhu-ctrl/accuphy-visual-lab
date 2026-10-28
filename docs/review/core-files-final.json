@@ -1,0 +1,536 @@
+{
+  "schemaVersion": 1,
+  "capturedAtUtc": "2026-10-28T12:36:45.827Z",
+  "repository": "D:\\shopify\\accuphy-visual-lab",
+  "baseline": "5c576fbc18cc13f979952393a97128b26c7b3ae8",
+  "currentHead": "d77ab73b213428c337b51941d841769f2c6c8a26",
+  "comparison": "Working-tree source files compared to original Git baseline; no build output or installed dependencies compared.",
+  "normalization": "Decode UTF-8; replace CRLF with LF only; encode UTF-8. No trimming or other whitespace changes.",
+  "hashAlgorithm": "SHA-256",
+  "coreFileCount": 27,
+  "normalizedEqualCount": 27,
+  "normalizedChangedCount": 0,
+  "rawEqualCount": 0,
+  "scope": "Explicit 27-file model, device, echo, URL and event inventory; not an assertion that every repository file is unchanged.",
+  "excludedReviewedChanges": [
+    "Scene.jsx: bounded water highlight, boat target helper, paused-frame guards and SceneLifecycle integration",
+    "IceCamp.jsx: paused-frame guards and frozen presentation time",
+    "SceneLifecycle.jsx and labMotion.js: active simulation clock and suspension lifecycle",
+    "index.jsx and UI modules: reviewed presentation and interaction changes"
+  ],
+  "files": [
+    {
+      "path": "src/experiments/2026-09-23-sonar-beam/devices.js",
+      "baseline": {
+        "source": "git show 5c576fbc18cc13f979952393a97128b26c7b3ae8:src/experiments/2026-09-23-sonar-beam/devices.js",
+        "rawBytes": 3137,
+        "rawSha256": "07d78479f1ddb056ebc94ac0af6b201a27c99c84ae8549167cd801f86411ae00",
+        "normalizedBytes": 3137,
+        "sha256Lf": "07d78479f1ddb056ebc94ac0af6b201a27c99c84ae8549167cd801f86411ae00"
+      },
+      "current": {
+        "source": "WORKTREE",
+        "rawBytes": 3202,
+        "rawSha256": "dc9462c1f175db109f2978cab09f268f301ae761f0146c4eeeddd6dae74f11b7",
+        "normalizedBytes": 3137,
+        "sha256Lf": "07d78479f1ddb056ebc94ac0af6b201a27c99c84ae8549167cd801f86411ae00"
+      },
+      "equalRaw": false,
+      "equalNormalized": true
+    },
+    {
+      "path": "src/experiments/2026-09-23-beam-shapes-3d/wedge.js",
+      "baseline": {
+        "source": "git show 5c576fbc18cc13f979952393a97128b26c7b3ae8:src/experiments/2026-09-23-beam-shapes-3d/wedge.js",
+        "rawBytes": 4961,
+        "rawSha256": "3dbf594031d671b0f891436b0e96694998a2017ac0585ba64f08f35f8005c776",
+        "normalizedBytes": 4961,
+        "sha256Lf": "3dbf594031d671b0f891436b0e96694998a2017ac0585ba64f08f35f8005c776"
+      },
+      "current": {
+        "source": "WORKTREE",
+        "rawBytes": 5049,
+        "rawSha256": "043ea42e8c13f1d32c2fc735764c0a02c652792bc90d19e0b0caafc4ca521a57",
+        "normalizedBytes": 4961,
+        "sha256Lf": "3dbf594031d671b0f891436b0e96694998a2017ac0585ba64f08f35f8005c776"
+      },
+      "equalRaw": false,
+      "equalNormalized": true
+    },
+    {
+      "path": "src/experiments/2026-09-23-sonar-lake-3d/fish.js",
+      "baseline": {
+        "source": "git show 5c576fbc18cc13f979952393a97128b26c7b3ae8:src/experiments/2026-09-23-sonar-lake-3d/fish.js",
+        "rawBytes": 37923,
+        "rawSha256": "bd127bbacc97a17b3203fdea4d3b492322f8a583103b517da620bd6cd8725d63",
+        "normalizedBytes": 37923,
+        "sha256Lf": "bd127bbacc97a17b3203fdea4d3b492322f8a583103b517da620bd6cd8725d63"
+      },
+      "current": {
+        "source": "WORKTREE",
+        "rawBytes": 38473,
+        "rawSha256": "4dc45e206506f1a770a8af4f86ddd0c8cce6b6193391d0ed3e795169a2e8ce61",
+        "normalizedBytes": 37923,
+        "sha256Lf": "bd127bbacc97a17b3203fdea4d3b492322f8a583103b517da620bd6cd8725d63"
+      },
+      "equalRaw": false,
+      "equalNormalized": true
+    },
+    {
+      "path": "src/experiments/2026-09-23-sonar-lake-3d/fishGeometry.js",
+      "baseline": {
+        "source": "git show 5c576fbc18cc13f979952393a97128b26c7b3ae8:src/experiments/2026-09-23-sonar-lake-3d/fishGeometry.js",
+        "rawBytes": 9599,
+        "rawSha256": "7627d669ade9a339dc1fd585769b0d0b61c89782c24cb2785fee720297b99704",
+        "normalizedBytes": 9599,
+        "sha256Lf": "7627d669ade9a339dc1fd585769b0d0b61c89782c24cb2785fee720297b99704"
+      },
+      "current": {
+        "source": "WORKTREE",
+        "rawBytes": 9740,
+        "rawSha256": "85c2668f4a6bf7e4d4fb660f11afed4263225cbc687639a3cdbe34ca6983c65c",
+        "normalizedBytes": 9599,
+        "sha256Lf": "7627d669ade9a339dc1fd585769b0d0b61c89782c24cb2785fee720297b99704"
+      },
+      "equalRaw": false,
+      "equalNormalized": true
+    },
+    {
+      "path": "src/experiments/2026-09-23-sonar-lake-3d/terrain.js",
+      "baseline": {
+        "source": "git show 5c576fbc18cc13f979952393a97128b26c7b3ae8:src/experiments/2026-09-23-sonar-lake-3d/terrain.js",
+        "rawBytes": 6238,
+        "rawSha256": "73ae3868f7dfd8283e38b176acf3ef60cbb3fea3e330159fb1849129a41c36eb",
+        "normalizedBytes": 6238,
+        "sha256Lf": "73ae3868f7dfd8283e38b176acf3ef60cbb3fea3e330159fb1849129a41c36eb"
+      },
+      "current": {
+        "source": "WORKTREE",
+        "rawBytes": 6330,
+        "rawSha256": "86dd00dabe9523c5432cb2eb5495570235ddd2cbd7a4f9991161389b4673979e",
+        "normalizedBytes": 6238,
+        "sha256Lf": "73ae3868f7dfd8283e38b176acf3ef60cbb3fea3e330159fb1849129a41c36eb"
+      },
+      "equalRaw": false,
+      "equalNormalized": true
+    },
+    {
+      "path": "src/experiments/2026-09-23-sonar-lake-3d/obstacles.js",
+      "baseline": {
+        "source": "git show 5c576fbc18cc13f979952393a97128b26c7b3ae8:src/experiments/2026-09-23-sonar-lake-3d/obstacles.js",
+        "rawBytes": 3686,
+        "rawSha256": "30856b9c9a08a2ad6fe23bcc7e7bf1678874267050fa02c9a1dd242fd374add6",
+        "normalizedBytes": 3686,
+        "sha256Lf": "30856b9c9a08a2ad6fe23bcc7e7bf1678874267050fa02c9a1dd242fd374add6"
+      },
+      "current": {
+        "source": "WORKTREE",
+        "rawBytes": 3745,
+        "rawSha256": "030a54930d6aef136617415302acefb2ecf07c422b68a8bf822407f8a8c5221e",
+        "normalizedBytes": 3686,
+        "sha256Lf": "30856b9c9a08a2ad6fe23bcc7e7bf1678874267050fa02c9a1dd242fd374add6"
+      },
+      "equalRaw": false,
+      "equalNormalized": true
+    },
+    {
+      "path": "src/experiments/2026-09-23-sonar-lake-3d/rocks.js",
+      "baseline": {
+        "source": "git show 5c576fbc18cc13f979952393a97128b26c7b3ae8:src/experiments/2026-09-23-sonar-lake-3d/rocks.js",
+        "rawBytes": 6919,
+        "rawSha256": "5f2ac5ce5512b169451bf0a4704d126351ea09223f88970fe1a12a8314ec07ec",
+        "normalizedBytes": 6919,
+        "sha256Lf": "5f2ac5ce5512b169451bf0a4704d126351ea09223f88970fe1a12a8314ec07ec"
+      },
+      "current": {
+        "source": "WORKTREE",
+        "rawBytes": 7024,
+        "rawSha256": "d085abd378701fa676e3d9b4d13241103313b6f25d2809e22d0a3733656e4521",
+        "normalizedBytes": 6919,
+        "sha256Lf": "5f2ac5ce5512b169451bf0a4704d126351ea09223f88970fe1a12a8314ec07ec"
+      },
+      "equalRaw": false,
+      "equalNormalized": true
+    },
+    {
+      "path": "src/experiments/2026-09-23-sonar-lake-3d/vegetation.js",
+      "baseline": {
+        "source": "git show 5c576fbc18cc13f979952393a97128b26c7b3ae8:src/experiments/2026-09-23-sonar-lake-3d/vegetation.js",
+        "rawBytes": 8458,
+        "rawSha256": "dd40d11a85e9833724ecffce7678e22099e06313f2f54bd7f819da5ded4f18e3",
+        "normalizedBytes": 8458,
+        "sha256Lf": "dd40d11a85e9833724ecffce7678e22099e06313f2f54bd7f819da5ded4f18e3"
+      },
+      "current": {
+        "source": "WORKTREE",
+        "rawBytes": 8605,
+        "rawSha256": "3db77bfdd6a297c90be246f13c0f84f2e209bfd61f49f6a77c0d3492bd7f2c1d",
+        "normalizedBytes": 8458,
+        "sha256Lf": "dd40d11a85e9833724ecffce7678e22099e06313f2f54bd7f819da5ded4f18e3"
+      },
+      "equalRaw": false,
+      "equalNormalized": true
+    },
+    {
+      "path": "src/experiments/2026-09-23-sonar-lake-3d/wreck.js",
+      "baseline": {
+        "source": "git show 5c576fbc18cc13f979952393a97128b26c7b3ae8:src/experiments/2026-09-23-sonar-lake-3d/wreck.js",
+        "rawBytes": 23762,
+        "rawSha256": "f47ab5344b0318d82d36b5d1ed58a7928547c83abcb5695bf2a383fed5e86a48",
+        "normalizedBytes": 23762,
+        "sha256Lf": "f47ab5344b0318d82d36b5d1ed58a7928547c83abcb5695bf2a383fed5e86a48"
+      },
+      "current": {
+        "source": "WORKTREE",
+        "rawBytes": 24110,
+        "rawSha256": "bc572d133dd4176789a290128fda8432d9b3c49f8b2bc23ce5d0333ba6d054e5",
+        "normalizedBytes": 23762,
+        "sha256Lf": "f47ab5344b0318d82d36b5d1ed58a7928547c83abcb5695bf2a383fed5e86a48"
+      },
+      "equalRaw": false,
+      "equalNormalized": true
+    },
+    {
+      "path": "src/experiments/2026-09-23-sonar-lake-3d/boat.js",
+      "baseline": {
+        "source": "git show 5c576fbc18cc13f979952393a97128b26c7b3ae8:src/experiments/2026-09-23-sonar-lake-3d/boat.js",
+        "rawBytes": 19759,
+        "rawSha256": "33c63f4955500e7e77d77429a4ac4d8c8a20de48487e923c8898fc7d114e12f5",
+        "normalizedBytes": 19759,
+        "sha256Lf": "33c63f4955500e7e77d77429a4ac4d8c8a20de48487e923c8898fc7d114e12f5"
+      },
+      "current": {
+        "source": "WORKTREE",
+        "rawBytes": 20040,
+        "rawSha256": "75c21fca46ef763e3edf79da6d0a1c4e7004727ec51916a1fc98079985f55b40",
+        "normalizedBytes": 19759,
+        "sha256Lf": "33c63f4955500e7e77d77429a4ac4d8c8a20de48487e923c8898fc7d114e12f5"
+      },
+      "equalRaw": false,
+      "equalNormalized": true
+    },
+    {
+      "path": "src/experiments/2026-09-23-sonar-lake-3d/lakeFFT.js",
+      "baseline": {
+        "source": "git show 5c576fbc18cc13f979952393a97128b26c7b3ae8:src/experiments/2026-09-23-sonar-lake-3d/lakeFFT.js",
+        "rawBytes": 11303,
+        "rawSha256": "122fabdbe8ed36b369d753cdccd42bc2c5eb63b3605658ddf5a7c8f2c60760b4",
+        "normalizedBytes": 11303,
+        "sha256Lf": "122fabdbe8ed36b369d753cdccd42bc2c5eb63b3605658ddf5a7c8f2c60760b4"
+      },
+      "current": {
+        "source": "WORKTREE",
+        "rawBytes": 11470,
+        "rawSha256": "577616caa4ce3f79d914f749e61c8b3e6c59965b1ad1fd37c015f0c3e41710ed",
+        "normalizedBytes": 11303,
+        "sha256Lf": "122fabdbe8ed36b369d753cdccd42bc2c5eb63b3605658ddf5a7c8f2c60760b4"
+      },
+      "equalRaw": false,
+      "equalNormalized": true
+    },
+    {
+      "path": "src/experiments/2026-09-23-sonar-lake-3d/lakeMaterial.js",
+      "baseline": {
+        "source": "git show 5c576fbc18cc13f979952393a97128b26c7b3ae8:src/experiments/2026-09-23-sonar-lake-3d/lakeMaterial.js",
+        "rawBytes": 32122,
+        "rawSha256": "23c14b5a8a1c7629f8fd6ef4bb3e4f0e2b4711d45f302b66d3643f02da7b5748",
+        "normalizedBytes": 32122,
+        "sha256Lf": "23c14b5a8a1c7629f8fd6ef4bb3e4f0e2b4711d45f302b66d3643f02da7b5748"
+      },
+      "current": {
+        "source": "WORKTREE",
+        "rawBytes": 32569,
+        "rawSha256": "41bd07fadf7d0c2ac8f63546de08b8096156dfde5f1396567dac0b5e2a561e92",
+        "normalizedBytes": 32122,
+        "sha256Lf": "23c14b5a8a1c7629f8fd6ef4bb3e4f0e2b4711d45f302b66d3643f02da7b5748"
+      },
+      "equalRaw": false,
+      "equalNormalized": true
+    },
+    {
+      "path": "src/experiments/2026-09-23-sonar-lake-3d/iceScene.js",
+      "baseline": {
+        "source": "git show 5c576fbc18cc13f979952393a97128b26c7b3ae8:src/experiments/2026-09-23-sonar-lake-3d/iceScene.js",
+        "rawBytes": 6844,
+        "rawSha256": "eb95bb65547aadc68569eccd402c5db1c237ae346f7934228a60713fb1a402a5",
+        "normalizedBytes": 6844,
+        "sha256Lf": "eb95bb65547aadc68569eccd402c5db1c237ae346f7934228a60713fb1a402a5"
+      },
+      "current": {
+        "source": "WORKTREE",
+        "rawBytes": 6926,
+        "rawSha256": "056f1228a93632e26f120b3ff34d2705c5abfa8c4a4428f61cfd959be90ff969",
+        "normalizedBytes": 6844,
+        "sha256Lf": "eb95bb65547aadc68569eccd402c5db1c237ae346f7934228a60713fb1a402a5"
+      },
+      "equalRaw": false,
+      "equalNormalized": true
+    },
+    {
+      "path": "src/experiments/2026-09-23-sonar-lake-3d/iceProps.js",
+      "baseline": {
+        "source": "git show 5c576fbc18cc13f979952393a97128b26c7b3ae8:src/experiments/2026-09-23-sonar-lake-3d/iceProps.js",
+        "rawBytes": 15879,
+        "rawSha256": "4ad8b0243cc91f559697c29a37a1c0ab6ac5ac97375467403c56f76dac7a1a7d",
+        "normalizedBytes": 15879,
+        "sha256Lf": "4ad8b0243cc91f559697c29a37a1c0ab6ac5ac97375467403c56f76dac7a1a7d"
+      },
+      "current": {
+        "source": "WORKTREE",
+        "rawBytes": 16111,
+        "rawSha256": "56b89bc4ee9fbfa9ea91b9e531a52f1e680611ca58f6f650a759d46e4e9439e5",
+        "normalizedBytes": 15879,
+        "sha256Lf": "4ad8b0243cc91f559697c29a37a1c0ab6ac5ac97375467403c56f76dac7a1a7d"
+      },
+      "equalRaw": false,
+      "equalNormalized": true
+    },
+    {
+      "path": "src/experiments/2026-09-23-sonar-lake-3d/iceSheet.js",
+      "baseline": {
+        "source": "git show 5c576fbc18cc13f979952393a97128b26c7b3ae8:src/experiments/2026-09-23-sonar-lake-3d/iceSheet.js",
+        "rawBytes": 27121,
+        "rawSha256": "3c837a8d40ef6e1f0ebac3736d921a6be5d1125c0226c272376d8a2cea7e6d2c",
+        "normalizedBytes": 27121,
+        "sha256Lf": "3c837a8d40ef6e1f0ebac3736d921a6be5d1125c0226c272376d8a2cea7e6d2c"
+      },
+      "current": {
+        "source": "WORKTREE",
+        "rawBytes": 27506,
+        "rawSha256": "603384df8218b6709752346344795832305f620afb5bd3ae1732414d344b1a5f",
+        "normalizedBytes": 27121,
+        "sha256Lf": "3c837a8d40ef6e1f0ebac3736d921a6be5d1125c0226c272376d8a2cea7e6d2c"
+      },
+      "equalRaw": false,
+      "equalNormalized": true
+    },
+    {
+      "path": "src/experiments/2026-09-23-sonar-lake-3d/iceSky.js",
+      "baseline": {
+        "source": "git show 5c576fbc18cc13f979952393a97128b26c7b3ae8:src/experiments/2026-09-23-sonar-lake-3d/iceSky.js",
+        "rawBytes": 4622,
+        "rawSha256": "c2568700ba07883fb90ce27dd559f2e993e5f0c5b62f18d7a8654d1906f6e45e",
+        "normalizedBytes": 4622,
+        "sha256Lf": "c2568700ba07883fb90ce27dd559f2e993e5f0c5b62f18d7a8654d1906f6e45e"
+      },
+      "current": {
+        "source": "WORKTREE",
+        "rawBytes": 4692,
+        "rawSha256": "0e6da23c13f01bb2cd46409973c6726e4b9fcbfd716f075428fb33e9ec318184",
+        "normalizedBytes": 4622,
+        "sha256Lf": "c2568700ba07883fb90ce27dd559f2e993e5f0c5b62f18d7a8654d1906f6e45e"
+      },
+      "equalRaw": false,
+      "equalNormalized": true
+    },
+    {
+      "path": "src/experiments/2026-09-23-sonar-lake-3d/snow.js",
+      "baseline": {
+        "source": "git show 5c576fbc18cc13f979952393a97128b26c7b3ae8:src/experiments/2026-09-23-sonar-lake-3d/snow.js",
+        "rawBytes": 3045,
+        "rawSha256": "e63517463649ad70294d121c483cb1b067b70196b75594394e531c90c0825edf",
+        "normalizedBytes": 3045,
+        "sha256Lf": "e63517463649ad70294d121c483cb1b067b70196b75594394e531c90c0825edf"
+      },
+      "current": {
+        "source": "WORKTREE",
+        "rawBytes": 3096,
+        "rawSha256": "629ff3879a7be30ba1832dd9a65d36e5dde398139a19e25927f4930d5dc97f17",
+        "normalizedBytes": 3045,
+        "sha256Lf": "e63517463649ad70294d121c483cb1b067b70196b75594394e531c90c0825edf"
+      },
+      "equalRaw": false,
+      "equalNormalized": true
+    },
+    {
+      "path": "src/experiments/2026-09-23-sonar-lake-3d/sonarShader.js",
+      "baseline": {
+        "source": "git show 5c576fbc18cc13f979952393a97128b26c7b3ae8:src/experiments/2026-09-23-sonar-lake-3d/sonarShader.js",
+        "rawBytes": 61308,
+        "rawSha256": "59a81e9beeddaf08347bd049de39315c8da120921ee562b64ee2745968392488",
+        "normalizedBytes": 61308,
+        "sha256Lf": "59a81e9beeddaf08347bd049de39315c8da120921ee562b64ee2745968392488"
+      },
+      "current": {
+        "source": "WORKTREE",
+        "rawBytes": 62042,
+        "rawSha256": "e967d45141f40bbd3c94119ac6f0db8d01099a4b117b23de7a32d39a7ccfe2cb",
+        "normalizedBytes": 61308,
+        "sha256Lf": "59a81e9beeddaf08347bd049de39315c8da120921ee562b64ee2745968392488"
+      },
+      "equalRaw": false,
+      "equalNormalized": true
+    },
+    {
+      "path": "src/experiments/2026-09-23-sonar-lake-3d/SonarScreen.jsx",
+      "baseline": {
+        "source": "git show 5c576fbc18cc13f979952393a97128b26c7b3ae8:src/experiments/2026-09-23-sonar-lake-3d/SonarScreen.jsx",
+        "rawBytes": 35787,
+        "rawSha256": "51baee55e9b577ff32d7f7f6ecd2f9174a410ef216eefcebbb21c698718356d6",
+        "normalizedBytes": 35787,
+        "sha256Lf": "51baee55e9b577ff32d7f7f6ecd2f9174a410ef216eefcebbb21c698718356d6"
+      },
+      "current": {
+        "source": "WORKTREE",
+        "rawBytes": 36224,
+        "rawSha256": "22511d24a3d13fe2ef30167572ad8661bd978caff8a57085bdd1ee9ec5d2e869",
+        "normalizedBytes": 35787,
+        "sha256Lf": "51baee55e9b577ff32d7f7f6ecd2f9174a410ef216eefcebbb21c698718356d6"
+      },
+      "equalRaw": false,
+      "equalNormalized": true
+    },
+    {
+      "path": "src/experiments/2026-09-23-sonar-lake-3d/sonarMarks.js",
+      "baseline": {
+        "source": "git show 5c576fbc18cc13f979952393a97128b26c7b3ae8:src/experiments/2026-09-23-sonar-lake-3d/sonarMarks.js",
+        "rawBytes": 9441,
+        "rawSha256": "25d2ff9df2e0a5eb24c39037859bdf795e4493bc67c975b2e1b4f54ce250eaa5",
+        "normalizedBytes": 9441,
+        "sha256Lf": "25d2ff9df2e0a5eb24c39037859bdf795e4493bc67c975b2e1b4f54ce250eaa5"
+      },
+      "current": {
+        "source": "WORKTREE",
+        "rawBytes": 9587,
+        "rawSha256": "043296e948f030cefa071aa21b11bccc8365659ef3e16f23610e9f9f92f0cec5",
+        "normalizedBytes": 9441,
+        "sha256Lf": "25d2ff9df2e0a5eb24c39037859bdf795e4493bc67c975b2e1b4f54ce250eaa5"
+      },
+      "equalRaw": false,
+      "equalNormalized": true
+    },
+    {
+      "path": "src/experiments/2026-09-23-sonar-lake-3d/colormaps.js",
+      "baseline": {
+        "source": "git show 5c576fbc18cc13f979952393a97128b26c7b3ae8:src/experiments/2026-09-23-sonar-lake-3d/colormaps.js",
+        "rawBytes": 83461,
+        "rawSha256": "a16b4b4a19ae4f3e08ea2bbaac1f846dd363e778946ccf2074007eb248880460",
+        "normalizedBytes": 83461,
+        "sha256Lf": "a16b4b4a19ae4f3e08ea2bbaac1f846dd363e778946ccf2074007eb248880460"
+      },
+      "current": {
+        "source": "WORKTREE",
+        "rawBytes": 83503,
+        "rawSha256": "02e4095042166eb1a24ee5a43995149c156d5c9ab2f591f6c11f14ebe4031f92",
+        "normalizedBytes": 83461,
+        "sha256Lf": "a16b4b4a19ae4f3e08ea2bbaac1f846dd363e778946ccf2074007eb248880460"
+      },
+      "equalRaw": false,
+      "equalNormalized": true
+    },
+    {
+      "path": "src/experiments/2026-09-23-sonar-lake-3d/embed.js",
+      "baseline": {
+        "source": "git show 5c576fbc18cc13f979952393a97128b26c7b3ae8:src/experiments/2026-09-23-sonar-lake-3d/embed.js",
+        "rawBytes": 6280,
+        "rawSha256": "44d02d9170f607881465d9b56e238c5ee4775ace646b1fdc5f1f73d20899afe2",
+        "normalizedBytes": 6280,
+        "sha256Lf": "44d02d9170f607881465d9b56e238c5ee4775ace646b1fdc5f1f73d20899afe2"
+      },
+      "current": {
+        "source": "WORKTREE",
+        "rawBytes": 6375,
+        "rawSha256": "a9fdb159e8ea355b78bd9c1a3196b8b3e475a4bc42457fa5bbfe6bb2db4a2308",
+        "normalizedBytes": 6280,
+        "sha256Lf": "44d02d9170f607881465d9b56e238c5ee4775ace646b1fdc5f1f73d20899afe2"
+      },
+      "equalRaw": false,
+      "equalNormalized": true
+    },
+    {
+      "path": "src/experiments/2026-09-23-sonar-lake-3d/signup.js",
+      "baseline": {
+        "source": "git show 5c576fbc18cc13f979952393a97128b26c7b3ae8:src/experiments/2026-09-23-sonar-lake-3d/signup.js",
+        "rawBytes": 2554,
+        "rawSha256": "10ed10fc259780dabe8824f9a0b896bdf19fd66b356573c33ee7ae82aeaebe00",
+        "normalizedBytes": 2554,
+        "sha256Lf": "10ed10fc259780dabe8824f9a0b896bdf19fd66b356573c33ee7ae82aeaebe00"
+      },
+      "current": {
+        "source": "WORKTREE",
+        "rawBytes": 2605,
+        "rawSha256": "e4307e11c333dc275cf295f6b21785df4237802f75a8124b4f0bbaf694f786ad",
+        "normalizedBytes": 2554,
+        "sha256Lf": "10ed10fc259780dabe8824f9a0b896bdf19fd66b356573c33ee7ae82aeaebe00"
+      },
+      "equalRaw": false,
+      "equalNormalized": true
+    },
+    {
+      "path": "src/experiments/2026-09-23-sonar-lake-3d/SignupGate.jsx",
+      "baseline": {
+        "source": "git show 5c576fbc18cc13f979952393a97128b26c7b3ae8:src/experiments/2026-09-23-sonar-lake-3d/SignupGate.jsx",
+        "rawBytes": 3591,
+        "rawSha256": "15c9dd79756ac2483c81dc2d0753fc85343779ad005ff5b07f1c8adcba01267e",
+        "normalizedBytes": 3591,
+        "sha256Lf": "15c9dd79756ac2483c81dc2d0753fc85343779ad005ff5b07f1c8adcba01267e"
+      },
+      "current": {
+        "source": "WORKTREE",
+        "rawBytes": 3646,
+        "rawSha256": "4d64d112f8d396add7ce30d99976b3abc1644683cd6aa051dfd58170367f06b5",
+        "normalizedBytes": 3591,
+        "sha256Lf": "15c9dd79756ac2483c81dc2d0753fc85343779ad005ff5b07f1c8adcba01267e"
+      },
+      "equalRaw": false,
+      "equalNormalized": true
+    },
+    {
+      "path": "src/experiments/2026-09-23-sonar-lake-3d/ShopButton.jsx",
+      "baseline": {
+        "source": "git show 5c576fbc18cc13f979952393a97128b26c7b3ae8:src/experiments/2026-09-23-sonar-lake-3d/ShopButton.jsx",
+        "rawBytes": 1306,
+        "rawSha256": "ecebfbae3eda88591943b4f981509a242897601581250ffa3b3b7d517d9d7a2c",
+        "normalizedBytes": 1306,
+        "sha256Lf": "ecebfbae3eda88591943b4f981509a242897601581250ffa3b3b7d517d9d7a2c"
+      },
+      "current": {
+        "source": "WORKTREE",
+        "rawBytes": 1324,
+        "rawSha256": "a9517f16a9a37a2b3a86cdcb88be3a6d451739d12eaeed6f50a90939dd31bb1e",
+        "normalizedBytes": 1306,
+        "sha256Lf": "ecebfbae3eda88591943b4f981509a242897601581250ffa3b3b7d517d9d7a2c"
+      },
+      "equalRaw": false,
+      "equalNormalized": true
+    },
+    {
+      "path": "src/experiments/2026-09-23-sonar-lake-3d/ShareButton.jsx",
+      "baseline": {
+        "source": "git show 5c576fbc18cc13f979952393a97128b26c7b3ae8:src/experiments/2026-09-23-sonar-lake-3d/ShareButton.jsx",
+        "rawBytes": 2702,
+        "rawSha256": "ccd8cdd174fabbd5f8f0ef8d9d20691c00f0e7650fdf1266091f494f9a71f27a",
+        "normalizedBytes": 2702,
+        "sha256Lf": "ccd8cdd174fabbd5f8f0ef8d9d20691c00f0e7650fdf1266091f494f9a71f27a"
+      },
+      "current": {
+        "source": "WORKTREE",
+        "rawBytes": 2747,
+        "rawSha256": "569a7a7c353f230e13f305f96666986907ded5052fe232902b5cb0e2fb3917c8",
+        "normalizedBytes": 2702,
+        "sha256Lf": "ccd8cdd174fabbd5f8f0ef8d9d20691c00f0e7650fdf1266091f494f9a71f27a"
+      },
+      "equalRaw": false,
+      "equalNormalized": true
+    },
+    {
+      "path": "src/experiments/2026-09-23-sonar-lake-3d/AppBadges.jsx",
+      "baseline": {
+        "source": "git show 5c576fbc18cc13f979952393a97128b26c7b3ae8:src/experiments/2026-09-23-sonar-lake-3d/AppBadges.jsx",
+        "rawBytes": 1579,
+        "rawSha256": "2d22b90a3895f4200b519c064f08337c113eabf72637069370d894b731735d91",
+        "normalizedBytes": 1579,
+        "sha256Lf": "2d22b90a3895f4200b519c064f08337c113eabf72637069370d894b731735d91"
+      },
+      "current": {
+        "source": "WORKTREE",
+        "rawBytes": 1601,
+        "rawSha256": "7c267345fc312a745a5cfbf122b5c8aa2f7e499624316ddecd3e81f27d83b315",
+        "normalizedBytes": 1579,
+        "sha256Lf": "2d22b90a3895f4200b519c064f08337c113eabf72637069370d894b731735d91"
+      },
+      "equalRaw": false,
+      "equalNormalized": true
+    }
+  ]
+}

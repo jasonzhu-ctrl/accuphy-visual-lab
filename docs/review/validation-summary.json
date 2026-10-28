@@ -1,0 +1,2309 @@
+{
+  "generatedAt": "2026-10-28T12:34:34.502Z",
+  "codeCommit": "d77ab73b213428c337b51941d841769f2c6c8a26",
+  "sourceBase": "5c576fbc18cc13f979952393a97128b26c7b3ae8",
+  "inputs": [
+    {
+      "file": "lockstep-grid/comparison.json",
+      "sha256": "b64e45bb3660d758dc43b456a5a6c0d337dd5e91699de07aacbdf2cac4a1d158"
+    },
+    {
+      "file": "performance-summary.json",
+      "sha256": "d27d961540cdc2c1b87cbdce476bbcdad3939cd0d98a18f7d90f73df7bb6ebc2"
+    },
+    {
+      "file": "final-build-report.json",
+      "sha256": "2154e930e61c9a5cd13ca9fb0f35ecbfd41aa31bafcb3c858b8d80b64bac8460"
+    },
+    {
+      "file": "layout-comparison-final.json",
+      "sha256": "184ca077c9656e1f5aa10c41ea296b9811e10e7044639597f7b9303aec9fc20e"
+    },
+    {
+      "file": "heap-cycles-final.json",
+      "sha256": "1c327722aed2dcf61004e97e29947561ca7920ecd0260e315c8b14cf465f08b6"
+    },
+    {
+      "file": "gpu-resource-cycles-final.json",
+      "sha256": "e15ce45f7e202445b1fad50acea7b5a8e2a6f41134106ffca3ec0e361e2985af"
+    }
+  ],
+  "buildAndCommitVerification": {
+    "count": 85,
+    "allMatch": true,
+    "fullBuildRecordAggregateSha256": "f67c33df248bc3ac4f148017639369ff5292976301e0ee1a012b92b7197ad8a3",
+    "excludedDevelopmentTools": [
+      "scripts/dev/ads/burn.py",
+      "scripts/dev/ads/frames2mp4.swift",
+      "scripts/dev/ads/make.sh",
+      "scripts/dev/ads/numbers/README.md",
+      "scripts/dev/ads/numbers/overlay.html",
+      "scripts/dev/ads/numbers/render.mjs",
+      "scripts/dev/ads/rec.mjs",
+      "scripts/dev/ads/to45.py",
+      "scripts/dev/ads/v2/README.md",
+      "scripts/dev/ads/v2/overlay2.html",
+      "scripts/dev/ads/v2/stills.mjs",
+      "scripts/dev/ads/v2/v2bg.mjs",
+      "scripts/dev/ads/v2/v2bg3.mjs",
+      "scripts/dev/ads/v2/v2fwd.mjs",
+      "scripts/dev/ads/v2/v2s0c.mjs",
+      "scripts/dev/ads/v3/README.md",
+      "scripts/dev/ads/v3/comp3.mjs",
+      "scripts/dev/ads/v3/film3.mjs",
+      "scripts/dev/ads/v3/grade.py",
+      "scripts/dev/ads/v3/overlay3.html",
+      "scripts/dev/ads/v3/sheet3.py",
+      "scripts/dev/ads/v3/stills3.mjs",
+      "scripts/dev/ads/v3/v3a.mjs",
+      "scripts/dev/ads/v3/v3deep.mjs",
+      "scripts/dev/build-lab-qa.mjs",
+      "scripts/dev/fish-sim.mjs",
+      "scripts/dev/lab-contract-test.mjs",
+      "scripts/dev/lab-controls-test.mjs",
+      "scripts/dev/lab-fish-pause-test.mjs",
+      "scripts/dev/lab-ice-pause-test.mjs",
+      "scripts/dev/lab-lifecycle-test.mjs",
+      "scripts/dev/lab-motion-test.mjs",
+      "scripts/dev/lab-scene-baseline.mjs",
+      "scripts/dev/layout-dump.mjs",
+      "scripts/dev/measure/README.md",
+      "scripts/dev/measure/meas.py",
+      "scripts/dev/node-hook.mjs",
+      "scripts/dev/node-register.mjs",
+      "scripts/dev/shop-url-test.mjs"
+    ],
+    "normalization": "Production source/build inputs compare exact local bytes against build record; commit comparison normalizes CRLF to LF. Development-only tools are committed separately and excluded from this production source match."
+  },
+  "limitations": [
+    "This is a compact export; full local captures and immutable manifests remain in the evidence directory.",
+    "Strict GPU comparison and performance runs precede three presentation-only fixes; validationReuse records their exact files.",
+    "No new-build Shopify preview, backend receipts/history reconciliation or physical-device acceptance."
+  ],
+  "gpu": {
+    "createdAt": "2026-10-28T11:40:06.187416+00:00",
+    "method": "Exact captured scene, all fish fields, instanceMatrix/aSwim, post-reset RNG count/state and sonarTime; decoded original PNG RGB 0..255 absolute difference.",
+    "semantic_fields": [
+      "scene",
+      "fish",
+      "fishMeshes",
+      "randomCalls",
+      "randomSeed",
+      "sonarTime"
+    ],
+    "metadata_policy": "Capture/init clock, frame counters, pending RAF, startup RNG and subscriber counts are retained for protocol audit but are not classified as model inequality. The additional lifecycle subscriber is expected.",
+    "limitations": [
+      "The QA harness queues RAF before initialization and explicitly advances the actual R3F normal-running loop; it is not release performance or natural user input timing.",
+      "This compares captured fields and rendered images at these steps; it does not recreate an independent hit algorithm or prove all asynchronous AUTO/physics timelines.",
+      "No preset pixel tolerance converts nonzero differences into equality; RGB equality is exact, >8 only a review metric.",
+      "Event equality describes captured local lists only, not backend delivery or historical statistics."
+    ],
+    "records_sha256": "ec6145ace37e1e6345a1fc88b4c4f5c25ebc0d0035e9d5734e21a733023f4332",
+    "manifests": {
+      "before": {
+        "file": "before-manifest.json",
+        "sha256": "3a366d684dbb92d02e46600e0d290a9a90f4b1c02be1ab045d46b714a0de0e5c",
+        "createdAt": "2026-10-28T11:28:53.676Z",
+        "revision": "5c576fbc18cc13f979952393a97128b26c7b3ae8",
+        "head": "e226bc655e9db64213ab9b0169caaedb4f83c092"
+      },
+      "after": {
+        "file": "after-manifest.json",
+        "sha256": "96b14f5f1a5a93e7de3ab024d925f47193f81828715ca9b66eedd3b64b6700e1",
+        "createdAt": "2026-10-28T11:29:01.314Z",
+        "revision": "WORKTREE",
+        "head": "e226bc655e9db64213ab9b0169caaedb4f83c092"
+      }
+    },
+    "summary": {
+      "pairs": 48,
+      "semantic_equal_pairs": 48,
+      "semantic_difference_count": 0,
+      "semantic_fields_equal_pairs": {
+        "scene": 48,
+        "fish": 48,
+        "fishMeshes": 48,
+        "randomCalls": 48,
+        "randomSeed": 48,
+        "sonarTime": 48
+      },
+      "protocol_valid_pairs": 48,
+      "exact_rgb_pairs": 43,
+      "byte_identical_png_pairs": 43,
+      "max_mean_absolute_rgb": 0.00014693648726851852,
+      "max_channel_delta": 7,
+      "max_fraction_pixels_changed": 0.00017293294270833334,
+      "max_fraction_pixels_over_8": 0
+    },
+    "by_scene": {
+      "lake": {
+        "pairs": 36,
+        "semantic_equal_pairs": 36,
+        "semantic_difference_count": 0,
+        "semantic_fields_equal_pairs": {
+          "scene": 36,
+          "fish": 36,
+          "fishMeshes": 36,
+          "randomCalls": 36,
+          "randomSeed": 36,
+          "sonarTime": 36
+        },
+        "protocol_valid_pairs": 36,
+        "exact_rgb_pairs": 34,
+        "byte_identical_png_pairs": 34,
+        "max_mean_absolute_rgb": 0.00014693648726851852,
+        "max_channel_delta": 7,
+        "max_fraction_pixels_changed": 0.00017293294270833334,
+        "max_fraction_pixels_over_8": 0
+      },
+      "ice": {
+        "pairs": 12,
+        "semantic_equal_pairs": 12,
+        "semantic_difference_count": 0,
+        "semantic_fields_equal_pairs": {
+          "scene": 12,
+          "fish": 12,
+          "fishMeshes": 12,
+          "randomCalls": 12,
+          "randomSeed": 12,
+          "sonarTime": 12
+        },
+        "protocol_valid_pairs": 12,
+        "exact_rgb_pairs": 9,
+        "byte_identical_png_pairs": 9,
+        "max_mean_absolute_rgb": 0.00006555627893518519,
+        "max_channel_delta": 5,
+        "max_fraction_pixels_changed": 0.00009833441840277778,
+        "max_fraction_pixels_over_8": 0
+      }
+    }
+  },
+  "performance": {
+    "generatedAt": "2026-10-28T11:16:41.429Z",
+    "conditions": {
+      "device": "Windows desktop, AMD Ryzen 7 9700X, 31.1 GiB RAM",
+      "browser": "Codex IAB Chromium 156.0.0.0",
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce RTX 5070 (0x00002F04) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "dpr": 1
+      },
+      "network": "localhost HTTP/1.1, uncompressed, Cache-Control:no-store, no throttling",
+      "cache": "fresh document per run; existing browser process and driver caches warm; not a cold-device measurement",
+      "scene": "PL Forward, default desktop boat (-6,4), 80ft manual range, gain40%, AUTO depth; real clock",
+      "samples": "3 before and 3 after; 120 RAF intervals per run after cover removal, about 2.1 seconds",
+      "metrics": {
+        "coverRemoved": "presentation milestone only, NOT TTI or GPU readiness",
+        "shaderCalls": "compileShader/linkProgram synchronous JS call durations, not GPU compilation completion",
+        "interaction": "pointerdown to view event and two RAF callbacks; not calibrated input latency",
+        "parse": "not independently instrumented; navigation domInteractive is not pure parse time"
+      },
+      "unmeasured": [
+        "physical iPhone/Android/tablet performance",
+        "cold GPU/process caches",
+        "4G/real internet",
+        "GPU shader completion",
+        "full parse/compile trace",
+        "sustained thermal performance",
+        "true stable TTI",
+        "real Shopify pixel delivery"
+      ],
+      "budgets": {
+        "rafIntervalP95Ms": 20,
+        "twoRafInteractionMs": 100,
+        "localFcpMs": 250,
+        "rawHtmlGrowthMaxBytes": 65536
+      }
+    },
+    "method": {
+      "runCountPerGroup": 3,
+      "groupSummary": "Median and minimum-maximum of three run-level measurements; not pooled frame samples.",
+      "frameP50": "Median of 120 frame intervals per run (average of central pair).",
+      "frameP95": "Nearest rank ceil(0.95 * 120)-1 in zero-based sorted sample; rank 114.",
+      "timeOrigin": "Navigation start for milestones; individual durations otherwise. All timing values in milliseconds.",
+      "variabilityCheck": "Descriptive only: compare median change to observed within-group ranges, and report whether sample ranges overlap. No significance test, confidence interval or causal inference from n=3.",
+      "ordering": "Before and after collected in separate blocks; first run navigated, remaining runs reloaded. Process/driver caches already warm.",
+      "runtimeVersion": "After artifacts are a worktree snapshot referenced by final-build-report.json, not a claim that production runs the same commit."
+    },
+    "comparisons": {
+      "fcpMs": {
+        "before": {
+          "n": 3,
+          "median": 104,
+          "min": 96,
+          "max": 156,
+          "range": 60,
+          "values": [
+            156,
+            104,
+            96
+          ]
+        },
+        "after": {
+          "n": 3,
+          "median": 120,
+          "min": 100,
+          "max": 128,
+          "range": 28,
+          "values": [
+            128,
+            100,
+            120
+          ]
+        },
+        "medianDifference": 16,
+        "medianPercentChange": 15.384615,
+        "rangesOverlap": true,
+        "absoluteMedianChangeExceedsLargerWithinGroupRange": false
+      },
+      "responseEndMs": {
+        "before": {
+          "n": 3,
+          "median": 12.2,
+          "min": 11.2,
+          "max": 22.3,
+          "range": 11.1,
+          "values": [
+            22.3,
+            11.2,
+            12.2
+          ]
+        },
+        "after": {
+          "n": 3,
+          "median": 11.5,
+          "min": 10.6,
+          "max": 13.6,
+          "range": 3,
+          "values": [
+            13.6,
+            10.6,
+            11.5
+          ]
+        },
+        "medianDifference": -0.7,
+        "medianPercentChange": -5.737705,
+        "rangesOverlap": true,
+        "absoluteMedianChangeExceedsLargerWithinGroupRange": false
+      },
+      "domInteractiveMs": {
+        "before": {
+          "n": 3,
+          "median": 55.8,
+          "min": 41.6,
+          "max": 77.8,
+          "range": 36.2,
+          "values": [
+            77.8,
+            55.8,
+            41.6
+          ]
+        },
+        "after": {
+          "n": 3,
+          "median": 56.6,
+          "min": 41.7,
+          "max": 60.3,
+          "range": 18.6,
+          "values": [
+            60.3,
+            41.7,
+            56.6
+          ]
+        },
+        "medianDifference": 0.8,
+        "medianPercentChange": 1.433692,
+        "rangesOverlap": true,
+        "absoluteMedianChangeExceedsLargerWithinGroupRange": false
+      },
+      "readyMs": {
+        "before": {
+          "n": 3,
+          "median": 896.6,
+          "min": 885.3,
+          "max": 969.8,
+          "range": 84.5,
+          "values": [
+            969.8,
+            896.6,
+            885.3
+          ]
+        },
+        "after": {
+          "n": 3,
+          "median": 912.6,
+          "min": 909,
+          "max": 949.5,
+          "range": 40.5,
+          "values": [
+            949.5,
+            909,
+            912.6
+          ]
+        },
+        "medianDifference": 16,
+        "medianPercentChange": 1.784519,
+        "rangesOverlap": true,
+        "absoluteMedianChangeExceedsLargerWithinGroupRange": false
+      },
+      "coverRemovedMs": {
+        "before": {
+          "n": 3,
+          "median": 1622.3,
+          "min": 1612.7,
+          "max": 1703,
+          "range": 90.3,
+          "values": [
+            1703,
+            1622.3,
+            1612.7
+          ]
+        },
+        "after": {
+          "n": 3,
+          "median": 1656.9,
+          "min": 1650.8,
+          "max": 1684.8,
+          "range": 34,
+          "values": [
+            1684.8,
+            1650.8,
+            1656.9
+          ]
+        },
+        "medianDifference": 34.6,
+        "medianPercentChange": 2.132774,
+        "rangesOverlap": true,
+        "absoluteMedianChangeExceedsLargerWithinGroupRange": false
+      },
+      "initializationLongTaskCount": {
+        "before": {
+          "n": 3,
+          "median": 2,
+          "min": 2,
+          "max": 2,
+          "range": 0,
+          "values": [
+            2,
+            2,
+            2
+          ]
+        },
+        "after": {
+          "n": 3,
+          "median": 2,
+          "min": 2,
+          "max": 2,
+          "range": 0,
+          "values": [
+            2,
+            2,
+            2
+          ]
+        },
+        "medianDifference": 0,
+        "medianPercentChange": 0,
+        "rangesOverlap": true,
+        "absoluteMedianChangeExceedsLargerWithinGroupRange": false
+      },
+      "initializationLongTaskTotalMs": {
+        "before": {
+          "n": 3,
+          "median": 852,
+          "min": 844,
+          "max": 875,
+          "range": 31,
+          "values": [
+            875,
+            844,
+            852
+          ]
+        },
+        "after": {
+          "n": 3,
+          "median": 870,
+          "min": 846,
+          "max": 882,
+          "range": 36,
+          "values": [
+            882,
+            870,
+            846
+          ]
+        },
+        "medianDifference": 18,
+        "medianPercentChange": 2.112676,
+        "rangesOverlap": true,
+        "absoluteMedianChangeExceedsLargerWithinGroupRange": false
+      },
+      "initializationLongTaskMaxMs": {
+        "before": {
+          "n": 3,
+          "median": 739,
+          "min": 738,
+          "max": 764,
+          "range": 26,
+          "values": [
+            764,
+            739,
+            738
+          ]
+        },
+        "after": {
+          "n": 3,
+          "median": 761,
+          "min": 741,
+          "max": 770,
+          "range": 29,
+          "values": [
+            770,
+            761,
+            741
+          ]
+        },
+        "medianDifference": 22,
+        "medianPercentChange": 2.976996,
+        "rangesOverlap": true,
+        "absoluteMedianChangeExceedsLargerWithinGroupRange": false
+      },
+      "shaderJsCallCount": {
+        "before": {
+          "n": 3,
+          "median": 96,
+          "min": 96,
+          "max": 96,
+          "range": 0,
+          "values": [
+            96,
+            96,
+            96
+          ]
+        },
+        "after": {
+          "n": 3,
+          "median": 96,
+          "min": 96,
+          "max": 96,
+          "range": 0,
+          "values": [
+            96,
+            96,
+            96
+          ]
+        },
+        "medianDifference": 0,
+        "medianPercentChange": 0,
+        "rangesOverlap": true,
+        "absoluteMedianChangeExceedsLargerWithinGroupRange": false
+      },
+      "shaderJsDurationTotalMs": {
+        "before": {
+          "n": 3,
+          "median": 0.3,
+          "min": 0.1,
+          "max": 0.4,
+          "range": 0.3,
+          "values": [
+            0.4,
+            0.1,
+            0.3
+          ]
+        },
+        "after": {
+          "n": 3,
+          "median": 0.2,
+          "min": 0.2,
+          "max": 0.5,
+          "range": 0.3,
+          "values": [
+            0.5,
+            0.2,
+            0.2
+          ]
+        },
+        "medianDifference": -0.1,
+        "medianPercentChange": -33.333333,
+        "rangesOverlap": true,
+        "absoluteMedianChangeExceedsLargerWithinGroupRange": false
+      },
+      "shaderJsDurationMaxMs": {
+        "before": {
+          "n": 3,
+          "median": 0.1,
+          "min": 0.1,
+          "max": 0.1,
+          "range": 0,
+          "values": [
+            0.1,
+            0.1,
+            0.1
+          ]
+        },
+        "after": {
+          "n": 3,
+          "median": 0.2,
+          "min": 0.1,
+          "max": 0.2,
+          "range": 0.1,
+          "values": [
+            0.2,
+            0.2,
+            0.1
+          ]
+        },
+        "medianDifference": 0.1,
+        "medianPercentChange": 100,
+        "rangesOverlap": true,
+        "absoluteMedianChangeExceedsLargerWithinGroupRange": false
+      },
+      "shaderJsIssuingSpanMs": {
+        "before": {
+          "n": 3,
+          "median": 95.1,
+          "min": 92,
+          "max": 99.4,
+          "range": 7.4,
+          "values": [
+            95.1,
+            92,
+            99.4
+          ]
+        },
+        "after": {
+          "n": 3,
+          "median": 94.8,
+          "min": 92.7,
+          "max": 96.9,
+          "range": 4.2,
+          "values": [
+            96.9,
+            94.8,
+            92.7
+          ]
+        },
+        "medianDifference": -0.3,
+        "medianPercentChange": -0.315457,
+        "rangesOverlap": true,
+        "absoluteMedianChangeExceedsLargerWithinGroupRange": false
+      },
+      "rafP50Ms": {
+        "before": {
+          "n": 3,
+          "median": 17.6,
+          "min": 17.4,
+          "max": 17.7,
+          "range": 0.3,
+          "values": [
+            17.6,
+            17.4,
+            17.7
+          ]
+        },
+        "after": {
+          "n": 3,
+          "median": 17.7,
+          "min": 17.5,
+          "max": 17.8,
+          "range": 0.3,
+          "values": [
+            17.5,
+            17.8,
+            17.7
+          ]
+        },
+        "medianDifference": 0.1,
+        "medianPercentChange": 0.568182,
+        "rangesOverlap": true,
+        "absoluteMedianChangeExceedsLargerWithinGroupRange": false
+      },
+      "rafP95Ms": {
+        "before": {
+          "n": 3,
+          "median": 18.1,
+          "min": 18,
+          "max": 18.1,
+          "range": 0.1,
+          "values": [
+            18.1,
+            18,
+            18.1
+          ]
+        },
+        "after": {
+          "n": 3,
+          "median": 18.1,
+          "min": 18,
+          "max": 18.1,
+          "range": 0.1,
+          "values": [
+            18.1,
+            18,
+            18.1
+          ]
+        },
+        "medianDifference": 0,
+        "medianPercentChange": 0,
+        "rangesOverlap": true,
+        "absoluteMedianChangeExceedsLargerWithinGroupRange": false
+      },
+      "rafMaxMs": {
+        "before": {
+          "n": 3,
+          "median": 18.1,
+          "min": 18.1,
+          "max": 18.3,
+          "range": 0.2,
+          "values": [
+            18.1,
+            18.1,
+            18.3
+          ]
+        },
+        "after": {
+          "n": 3,
+          "median": 18.5,
+          "min": 18.1,
+          "max": 18.6,
+          "range": 0.5,
+          "values": [
+            18.5,
+            18.6,
+            18.1
+          ]
+        },
+        "medianDifference": 0.4,
+        "medianPercentChange": 2.209945,
+        "rangesOverlap": true,
+        "absoluteMedianChangeExceedsLargerWithinGroupRange": false
+      },
+      "rafWindowMs": {
+        "before": {
+          "n": 3,
+          "median": 2114.8,
+          "min": 2097.7,
+          "max": 2117.3,
+          "range": 19.6,
+          "values": [
+            2117.3,
+            2097.7,
+            2114.8
+          ]
+        },
+        "after": {
+          "n": 3,
+          "median": 2118.3,
+          "min": 2106.9,
+          "max": 2124.7,
+          "range": 17.8,
+          "values": [
+            2106.9,
+            2124.7,
+            2118.3
+          ]
+        },
+        "medianDifference": 3.5,
+        "medianPercentChange": 0.1655,
+        "rangesOverlap": true,
+        "absoluteMedianChangeExceedsLargerWithinGroupRange": false
+      },
+      "pointerToViewEventMs": {
+        "before": {
+          "n": 3,
+          "median": 12.4,
+          "min": 12.2,
+          "max": 12.7,
+          "range": 0.5,
+          "values": [
+            12.4,
+            12.2,
+            12.7
+          ]
+        },
+        "after": {
+          "n": 3,
+          "median": 13,
+          "min": 12.7,
+          "max": 15.4,
+          "range": 2.7,
+          "values": [
+            13,
+            15.4,
+            12.7
+          ]
+        },
+        "medianDifference": 0.6,
+        "medianPercentChange": 4.83871,
+        "rangesOverlap": true,
+        "absoluteMedianChangeExceedsLargerWithinGroupRange": false
+      },
+      "pointerToTwoRafMs": {
+        "before": {
+          "n": 3,
+          "median": 47.1,
+          "min": 45.9,
+          "max": 48.1,
+          "range": 2.2,
+          "values": [
+            47.1,
+            45.9,
+            48.1
+          ]
+        },
+        "after": {
+          "n": 3,
+          "median": 47,
+          "min": 47,
+          "max": 48.6,
+          "range": 1.6,
+          "values": [
+            47,
+            48.6,
+            47
+          ]
+        },
+        "medianDifference": -0.1,
+        "medianPercentChange": -0.212314,
+        "rangesOverlap": true,
+        "absoluteMedianChangeExceedsLargerWithinGroupRange": false
+      },
+      "transferBytes": {
+        "before": {
+          "n": 3,
+          "median": 1884662,
+          "min": 1884662,
+          "max": 1884662,
+          "range": 0,
+          "values": [
+            1884662,
+            1884662,
+            1884662
+          ]
+        },
+        "after": {
+          "n": 3,
+          "median": 1913967,
+          "min": 1913967,
+          "max": 1913967,
+          "range": 0,
+          "values": [
+            1913967,
+            1913967,
+            1913967
+          ]
+        },
+        "medianDifference": 29305,
+        "medianPercentChange": 1.554921,
+        "rangesOverlap": false,
+        "absoluteMedianChangeExceedsLargerWithinGroupRange": true
+      },
+      "encodedBodyBytes": {
+        "before": {
+          "n": 3,
+          "median": 1884362,
+          "min": 1884362,
+          "max": 1884362,
+          "range": 0,
+          "values": [
+            1884362,
+            1884362,
+            1884362
+          ]
+        },
+        "after": {
+          "n": 3,
+          "median": 1913667,
+          "min": 1913667,
+          "max": 1913667,
+          "range": 0,
+          "values": [
+            1913667,
+            1913667,
+            1913667
+          ]
+        },
+        "medianDifference": 29305,
+        "medianPercentChange": 1.555168,
+        "rangesOverlap": false,
+        "absoluteMedianChangeExceedsLargerWithinGroupRange": true
+      },
+      "decodedBodyBytes": {
+        "before": {
+          "n": 3,
+          "median": 1884362,
+          "min": 1884362,
+          "max": 1884362,
+          "range": 0,
+          "values": [
+            1884362,
+            1884362,
+            1884362
+          ]
+        },
+        "after": {
+          "n": 3,
+          "median": 1913667,
+          "min": 1913667,
+          "max": 1913667,
+          "range": 0,
+          "values": [
+            1913667,
+            1913667,
+            1913667
+          ]
+        },
+        "medianDifference": 29305,
+        "medianPercentChange": 1.555168,
+        "rangesOverlap": false,
+        "absoluteMedianChangeExceedsLargerWithinGroupRange": true
+      },
+      "jsHeapUsedBytes": {
+        "before": {
+          "n": 3,
+          "median": 53042366,
+          "min": 45759861,
+          "max": 57739102,
+          "range": 11979241,
+          "values": [
+            53042366,
+            57739102,
+            45759861
+          ]
+        },
+        "after": {
+          "n": 3,
+          "median": 69229065,
+          "min": 63555269,
+          "max": 69833026,
+          "range": 6277757,
+          "values": [
+            69229065,
+            69833026,
+            63555269
+          ]
+        },
+        "medianDifference": 16186699,
+        "medianPercentChange": 30.516548,
+        "rangesOverlap": false,
+        "absoluteMedianChangeExceedsLargerWithinGroupRange": true
+      }
+    },
+    "budgets": [
+      {
+        "metric": "rafP95Ms",
+        "limitMs": 20,
+        "scope": "120 RAF intervals per run, about 2.1 seconds; not the proposed 10-second steady-state acceptance.",
+        "afterValues": [
+          18.1,
+          18,
+          18.1
+        ],
+        "passed": true
+      },
+      {
+        "metric": "pointerToTwoRafMs",
+        "limitMs": 100,
+        "scope": "One warmed-up mode-selection interaction per run, not calibrated input-to-pixel latency.",
+        "afterValues": [
+          47,
+          48.6,
+          47
+        ],
+        "passed": true
+      },
+      {
+        "metric": "fcpMs",
+        "limitMs": 250,
+        "scope": "Localhost contentful paint with warm browser process/driver caches, not remote-network LCP.",
+        "afterValues": [
+          128,
+          100,
+          120
+        ],
+        "passed": true
+      }
+    ],
+    "qualityChecks": {
+      "allSixRunsHave120Frames": true,
+      "allRunsHaveOneReadyEmptyPayload": true,
+      "allSixInteractionsSelectSameView": true,
+      "shaderCallsStable": true,
+      "noPostCoverLongTasksRecorded": true,
+      "encodedEqualsDecoded": true,
+      "beforeAfterUseSameInstrumentationSize": true
+    },
+    "interpretation": {
+      "confidence": "High for computed local descriptive results and budget checks; low for causal improvement claims or extrapolation to production/mobile.",
+      "overall": "This sample meets the three local short-window budgets; it does not establish an overall speedup. Core timing medians change within observed run variation, and initialization long tasks remain.",
+      "remaining": "Largest initialization tasks remain 738-770 ms across runs. Sustained performance, true readiness, GPU completion, physical devices and Shopify delivery are unmeasured.",
+      "heap": "After JS heap snapshots are higher, but capture times and garbage collection are not controlled; this is an observed resource signal, not evidence of a leak or steady-state regression."
+    },
+    "finalDisplayOnlyRevision": {
+      "buildReport": "D:\\shopify\\output\\accuphy-baseline\\final-build-report.json",
+      "buildReportSha256": "2154e930e61c9a5cd13ca9fb0f35ecbfd41aa31bafcb3c858b8d80b64bac8460",
+      "changedApplicationFiles": [
+        {
+          "path": "src/experiments/2026-09-23-sonar-lake-3d/i18n.js",
+          "description": "One en/fr ice fallback illustration alt entry."
+        },
+        {
+          "path": "src/experiments/2026-09-23-sonar-lake-3d/index.jsx",
+          "description": "Display-only range AUTO/manual labels and conditional ice fallback SVG/alt selection; no state setter changed."
+        },
+        {
+          "path": "src/experiments/2026-09-23-sonar-lake-3d/SonarChrome.jsx",
+          "description": "AUTO text visible only for autoRange && (autoDepth || combo); button disabled logic and state unchanged."
+        }
+      ],
+      "performanceRerun": false,
+      "reason": "Range status text in HUD/presets/App chrome and ice fallback illustration only; performance values refer to the archived pre-display-fixes snapshot.",
+      "finalHtmlBytes": 1912366,
+      "measuredHtmlBytes": 1911957,
+      "additionalBytes": 409
+    }
+  },
+  "finalBuild": {
+    "createdAt": "2026-10-28T12:14:42.776Z",
+    "completedAt": "2026-10-28T12:14:48.353Z",
+    "revisionLabel": "Final display-only corrections: range status in HUD/presets/App chrome and ice fallback illustration",
+    "node": "v24.20.0",
+    "scope": "Local compile and packaging only; no publishing, browser, Shopify preview, pixel or device acceptance.",
+    "artifactSizeMeaning": "Raw filesystem bytes and computed gzip bytes; not measured network transfer.",
+    "validationReuse": {
+      "strictSourceManifest": "D:\\shopify\\output\\accuphy-baseline\\qa-lockstep-after\\qa-build.json",
+      "strictSourceManifestSha256": "96b14f5f1a5a93e7de3ab024d925f47193f81828715ca9b66eedd3b64b6700e1",
+      "comparedSourceCount": 49,
+      "unchangedSourceCount": 46,
+      "changedSources": [
+        {
+          "path": "src/experiments/2026-09-23-sonar-lake-3d/i18n.js",
+          "beforeSha256Lf": "6d118bec493fd89902676705ce9956a8c2da9b44352921c7b5b02bb05db44932",
+          "afterSha256Lf": "184f06ebd3ec116f6e10eb3f400f4dc961c1a980c1d45abdd7c50ae9a087aad8",
+          "description": "One en/fr ice fallback illustration alt entry."
+        },
+        {
+          "path": "src/experiments/2026-09-23-sonar-lake-3d/index.jsx",
+          "beforeSha256Lf": "ee7c2c96be502805f7dbaa40e83c4fb766f9c0443e9d53c11815449268749194",
+          "afterSha256Lf": "ca7df5ceabd4be88b2a619269bf356bb584bf7293ca569cd6c586fcf3ac27084",
+          "description": "Display-only range AUTO/manual labels and conditional ice fallback SVG/alt selection; no state setter changed."
+        },
+        {
+          "path": "src/experiments/2026-09-23-sonar-lake-3d/SonarChrome.jsx",
+          "beforeSha256Lf": "7c26f75d9ae72106e2739e37dbcde882aeedb5238dc8f84a7a2e316653598497",
+          "afterSha256Lf": "92e4f44213d2f36ac1d390554edfe2ba712ae33fe19964e27f608385b30edebe",
+          "description": "AUTO text visible only for autoRange && (autoDepth || combo); button disabled logic and state unchanged."
+        }
+      ],
+      "note": "Prior 48-pair strict semantic and six-run performance evidence uses the pre-display-fixes snapshot. No repeat of those runs; original lockstep artifacts/manifests remain unchanged."
+    },
+    "builds": [
+      {
+        "name": "qa-after",
+        "outDir": "D:\\shopify\\output\\accuphy-baseline\\qa-after",
+        "command": [
+          "node",
+          "scripts/dev/build-lab-qa.mjs",
+          "--out",
+          "D:\\shopify\\output\\accuphy-baseline\\qa-after"
+        ],
+        "variant": {
+          "scene": "",
+          "devices": "",
+          "lab": ""
+        },
+        "elapsedMs": 882,
+        "exitCode": 0,
+        "status": "passed",
+        "log": "D:\\shopify\\output\\accuphy-baseline\\final-build-logs\\qa-after.log",
+        "cssVerification": {
+          "passed": true,
+          "evidence": [
+            {
+              "path": "assets/style-CPDUrpe8.css",
+              "panelRule": ".ac-lab .lab-panel{width:360px;max-height:calc(var(--lab-h,100dvh) - 48px);scrollbar-width:thin;-webkit-backdrop-filter:none;backdrop-filter:none;background:linear-gradient(145deg,#1b3d4ef0,#1b3d4ee0);border-color:#e8f8ff66;border-radius:20px;gap:14px;padding:18px;top:24px;left:20px;overflow-y:auto}",
+              "fallbackRule": ".ac-lab .lab-fallback-card>svg{width:100%;height:120px}"
+            }
+          ]
+        },
+        "artifacts": [
+          {
+            "path": "assets/index-LIomWy8n.js",
+            "bytes": 1798558,
+            "sha256": "f666ed6c9f4f6769f6a011e7c1a8f4a328a28b1545ae0b707402e2b2a7cc8808",
+            "computedGzipBytes": 581910
+          },
+          {
+            "path": "assets/pl-down-D869dnDC.jpg",
+            "bytes": 14459,
+            "sha256": "21b451fc3eee1a161d8c4efd4146bca5a215b778e1e36f2f42e12c15d1e67662"
+          },
+          {
+            "path": "assets/pl-forward-C-KvL08O.jpg",
+            "bytes": 13553,
+            "sha256": "18dde20cab1f5af250a8a613952b2bd8fc728e99b882b9cee9649943df03aeae"
+          },
+          {
+            "path": "assets/pl-panoramic-ZYg9FkA8.jpg",
+            "bytes": 13591,
+            "sha256": "2032330686b1b4410b58f0c03cd0f57361c3f0ea0fca0c1e55c154de4b68b10b"
+          },
+          {
+            "path": "assets/plm-chirp-C7S5koxU.jpg",
+            "bytes": 16420,
+            "sha256": "4468d77835e6a8cda1df49e527be8795340a486cfd846dae618d742fe091d7a5"
+          },
+          {
+            "path": "assets/plm-combo-DJ5wxL6i.jpg",
+            "bytes": 17341,
+            "sha256": "7ad166f43a6bb34701ac846f99071062de022e2ad00fb96949c9778e86ed83cc"
+          },
+          {
+            "path": "assets/plm-down-DGXzGwSA.jpg",
+            "bytes": 8432,
+            "sha256": "ff6cc5fad18dd06357e706101f0cefb4f313044e70ecb603e8722b267fbb4612"
+          },
+          {
+            "path": "assets/plm-downscan-CtHMYkQy.jpg",
+            "bytes": 17555,
+            "sha256": "19f2ba6200e10467e8e3ec56d426850f61e0fed9ead49aa1e55e0723706ff102"
+          },
+          {
+            "path": "assets/plm-forward-CcJ2BmUA.jpg",
+            "bytes": 11326,
+            "sha256": "fb85f8325630692974ce6c07316202fe4bdc9d59b76c7fc35971c56f9885415c"
+          },
+          {
+            "path": "assets/plm-icefishing-BiN9ka_s.jpg",
+            "bytes": 13787,
+            "sha256": "c04fb41b4d844c24a2e51dbcb4a2e85f6b0a63a40dccf0767f1bd20a86f9b18d"
+          },
+          {
+            "path": "assets/plm-liveice-BLKaA9cO.jpg",
+            "bytes": 13789,
+            "sha256": "d7277ab0c799a1e4f3026f05565b44e765d782902f0e282ec13f0bc1db8b645f"
+          },
+          {
+            "path": "assets/plm-panoramic-BDrTE_qK.jpg",
+            "bytes": 11020,
+            "sha256": "62ab665c95fabac8b687de22f9cd144553e29cafd03465f83b121469e6e0e5cf"
+          },
+          {
+            "path": "assets/style-CPDUrpe8.css",
+            "bytes": 44072,
+            "sha256": "8b98dfe8e9d02360c62d2cd24d7400fc74fb0c1bad128d8ad542355ca36e4234",
+            "computedGzipBytes": 9763
+          },
+          {
+            "path": "brand/fonts/Eurostile-Heavy.otf",
+            "bytes": 43772,
+            "sha256": "1d6b23aa6d5cd29949de29a1531190d64099daea643a44f5e747de856b9e71ba"
+          },
+          {
+            "path": "brand/fonts/Eurostile-Heavy.woff2",
+            "bytes": 17856,
+            "sha256": "147d768399f1bd8760cecc1f2e6cbc6cbe8bb3138bee6d7549b51e545a504a65"
+          },
+          {
+            "path": "brand/fonts/InstrumentSans-Italic-Variable.ttf",
+            "bytes": 201044,
+            "sha256": "2e9dccf7b145334a49d2ec113d52f3b7a8bdeef2ea95e7b1d541644b8c15ac3f"
+          },
+          {
+            "path": "brand/fonts/InstrumentSans-Variable.ttf",
+            "bytes": 193312,
+            "sha256": "55748ab364d5408ceb15fc3de300e4f643617d060fa2132b704484f11cb507c5"
+          },
+          {
+            "path": "brand/fonts/InstrumentSans-Variable.woff2",
+            "bytes": 36000,
+            "sha256": "c508b6dc988f5b7ca53f7329249eb024ecb04692a797b649486e7d6f508c99a4"
+          },
+          {
+            "path": "brand/logo/A62.ai",
+            "bytes": 8500,
+            "sha256": "8b26c258d659601c72e55f85385129a68c62f9d280b7a4c90e8ab592c6e94180"
+          },
+          {
+            "path": "brand/logo/A62.cdr",
+            "bytes": 20017,
+            "sha256": "ce11d680531b66760390918877c6b100138b334dbda6d00d019a679f96f184af"
+          },
+          {
+            "path": "brand/logo/accuphy-white.svg",
+            "bytes": 2313,
+            "sha256": "e9ca91faccd807c3adecf071b9d47b766a17616daf08a7ec331a3cdbef9b3731",
+            "computedGzipBytes": 1115
+          },
+          {
+            "path": "brand/logo/logo_OG copy 2.png",
+            "bytes": 16276,
+            "sha256": "7b315be50e77814ba949cdcc9f60114a862174e23c04b4b23abda6b714709c57"
+          },
+          {
+            "path": "brand/logo/logo_OG copy 3.png",
+            "bytes": 16276,
+            "sha256": "7b315be50e77814ba949cdcc9f60114a862174e23c04b4b23abda6b714709c57"
+          },
+          {
+            "path": "brand/logo/logo_OG.png",
+            "bytes": 16278,
+            "sha256": "c027422266afffee9bf2635faa57d5f4b7a0172d790b0668c2fed90bd56bf8af"
+          },
+          {
+            "path": "brand/logo/LOGO.jpg",
+            "bytes": 11116,
+            "sha256": "58d2557214e2cba5f1fca4acc4ae882c5a297e1e833d70ee8186ede9fd7e63d1"
+          },
+          {
+            "path": "brand/logo/logo.zip",
+            "bytes": 131547,
+            "sha256": "ae9bf531a7e74eb4941f3c2ffdce7015a26eb9f4874a379d195e3691ec0210ad"
+          },
+          {
+            "path": "brand/logo/Untitled-1 copy.svg",
+            "bytes": 5024,
+            "sha256": "d5a32a89110c7719c5b41d224ffcf6d59f0189a89b0d98841431bd92ddde7f15",
+            "computedGzipBytes": 1616
+          },
+          {
+            "path": "brand/logo/Untitled-1.ai",
+            "bytes": 1208494,
+            "sha256": "1315e593fc64b78ec5ef9055b8cc757123b6d77b5b44affd96cdc42b8d8b4787"
+          },
+          {
+            "path": "brand/logo/Untitled-1.svg",
+            "bytes": 4466,
+            "sha256": "76e46f1ae9f6eab4a3f6c0042dbe0eafcdc6c7f09c34e8907e09db5ec605f427",
+            "computedGzipBytes": 1302
+          },
+          {
+            "path": "brand/logo/White Accuphy Logo copy.png",
+            "bytes": 147201,
+            "sha256": "3256275d6b3f88c930797283d44d09d5e346b201b6c1c12d58c048e6cd170a47"
+          },
+          {
+            "path": "brand/logo/White Accuphy Logo.png",
+            "bytes": 147201,
+            "sha256": "3256275d6b3f88c930797283d44d09d5e346b201b6c1c12d58c048e6cd170a47"
+          },
+          {
+            "path": "qa-build.json",
+            "bytes": 18055,
+            "sha256": "7c8ec12508e5ce7887fa13f67b6f33dd1fa96aea3950afff4c940219cba09917",
+            "computedGzipBytes": 5500
+          },
+          {
+            "path": "share/index.html",
+            "bytes": 7013,
+            "sha256": "e92b8a88fd4f11c72c1c97cf1331b039e2d717a99f3be5f48a46ce58bcb29eca",
+            "computedGzipBytes": 2415
+          }
+        ]
+      },
+      {
+        "name": "share-both",
+        "outDir": "D:\\shopify\\output\\accuphy-baseline\\source-after",
+        "command": [
+          "node",
+          "scripts/build-share.mjs",
+          "D:\\shopify\\output\\accuphy-baseline\\source-after"
+        ],
+        "variant": {
+          "scene": "",
+          "devices": "",
+          "lab": ""
+        },
+        "elapsedMs": 831,
+        "exitCode": 0,
+        "status": "passed",
+        "log": "D:\\shopify\\output\\accuphy-baseline\\final-build-logs\\share-both.log",
+        "cssVerification": {
+          "passed": true,
+          "evidence": [
+            {
+              "path": "accuphy-lab.html",
+              "panelRule": ".ac-lab .lab-panel{width:360px;max-height:calc(var(--lab-h,100dvh) - 48px);scrollbar-width:thin;-webkit-backdrop-filter:none;backdrop-filter:none;background:linear-gradient(145deg,#1b3d4ef0,#1b3d4ee0);border-color:#e8f8ff66;border-radius:20px;gap:14px;padding:18px;top:24px;left:20px;overflow-y:auto}",
+              "fallbackRule": ".ac-lab .lab-fallback-card>svg{width:100%;height:120px}"
+            },
+            {
+              "path": "pages/index.html",
+              "panelRule": ".ac-lab .lab-panel{width:360px;max-height:calc(var(--lab-h,100dvh) - 48px);scrollbar-width:thin;-webkit-backdrop-filter:none;backdrop-filter:none;background:linear-gradient(145deg,#1b3d4ef0,#1b3d4ee0);border-color:#e8f8ff66;border-radius:20px;gap:14px;padding:18px;top:24px;left:20px;overflow-y:auto}",
+              "fallbackRule": ".ac-lab .lab-fallback-card>svg{width:100%;height:120px}"
+            }
+          ]
+        },
+        "artifacts": [
+          {
+            "path": "accuphy-lab.html",
+            "bytes": 2113771,
+            "sha256": "112f28f0e38e49d3581146208bb8d127336050db5111a2e95a044d458de40ef5",
+            "computedGzipBytes": 790691
+          },
+          {
+            "path": "pages/.nojekyll",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "path": "pages/home/pl-down-D869dnDC.jpg",
+            "bytes": 14459,
+            "sha256": "21b451fc3eee1a161d8c4efd4146bca5a215b778e1e36f2f42e12c15d1e67662"
+          },
+          {
+            "path": "pages/home/pl-forward-C-KvL08O.jpg",
+            "bytes": 13553,
+            "sha256": "18dde20cab1f5af250a8a613952b2bd8fc728e99b882b9cee9649943df03aeae"
+          },
+          {
+            "path": "pages/home/pl-panoramic-ZYg9FkA8.jpg",
+            "bytes": 13591,
+            "sha256": "2032330686b1b4410b58f0c03cd0f57361c3f0ea0fca0c1e55c154de4b68b10b"
+          },
+          {
+            "path": "pages/home/plm-chirp-C7S5koxU.jpg",
+            "bytes": 16420,
+            "sha256": "4468d77835e6a8cda1df49e527be8795340a486cfd846dae618d742fe091d7a5"
+          },
+          {
+            "path": "pages/home/plm-combo-DJ5wxL6i.jpg",
+            "bytes": 17341,
+            "sha256": "7ad166f43a6bb34701ac846f99071062de022e2ad00fb96949c9778e86ed83cc"
+          },
+          {
+            "path": "pages/home/plm-down-DGXzGwSA.jpg",
+            "bytes": 8432,
+            "sha256": "ff6cc5fad18dd06357e706101f0cefb4f313044e70ecb603e8722b267fbb4612"
+          },
+          {
+            "path": "pages/home/plm-downscan-CtHMYkQy.jpg",
+            "bytes": 17555,
+            "sha256": "19f2ba6200e10467e8e3ec56d426850f61e0fed9ead49aa1e55e0723706ff102"
+          },
+          {
+            "path": "pages/home/plm-forward-CcJ2BmUA.jpg",
+            "bytes": 11326,
+            "sha256": "fb85f8325630692974ce6c07316202fe4bdc9d59b76c7fc35971c56f9885415c"
+          },
+          {
+            "path": "pages/home/plm-icefishing-BiN9ka_s.jpg",
+            "bytes": 13787,
+            "sha256": "c04fb41b4d844c24a2e51dbcb4a2e85f6b0a63a40dccf0767f1bd20a86f9b18d"
+          },
+          {
+            "path": "pages/home/plm-liveice-BLKaA9cO.jpg",
+            "bytes": 13789,
+            "sha256": "d7277ab0c799a1e4f3026f05565b44e765d782902f0e282ec13f0bc1db8b645f"
+          },
+          {
+            "path": "pages/home/plm-panoramic-BDrTE_qK.jpg",
+            "bytes": 11020,
+            "sha256": "62ab665c95fabac8b687de22f9cd144553e29cafd03465f83b121469e6e0e5cf"
+          },
+          {
+            "path": "pages/index.html",
+            "bytes": 1912366,
+            "sha256": "2570ffea98a71ec69f5fc318f4a636e81d91d4c1a40396253bc2b04f32c5ac4a",
+            "computedGzipBytes": 649676
+          },
+          {
+            "path": "pages/robots.txt",
+            "bytes": 26,
+            "sha256": "331ea9090db0c9f6f597bd9840fd5b171830f6e0b3ba1cb24dfa91f0c95aedc1",
+            "computedGzipBytes": 46
+          },
+          {
+            "path": "pages/vercel.json",
+            "bytes": 979,
+            "sha256": "47d4fbc3e97c54eb40e8e570059699b436d3db217d12f8f7858f9fdfb7cade73",
+            "computedGzipBytes": 305
+          }
+        ]
+      },
+      {
+        "name": "normal",
+        "outDir": "D:\\shopify\\output\\accuphy-baseline\\final-build",
+        "command": [
+          "node",
+          "node_modules/vite/bin/vite.js",
+          "build",
+          "--outDir",
+          "D:\\shopify\\output\\accuphy-baseline\\final-build",
+          "--emptyOutDir"
+        ],
+        "variant": {
+          "scene": "",
+          "devices": "",
+          "lab": ""
+        },
+        "elapsedMs": 782,
+        "exitCode": 0,
+        "status": "passed",
+        "log": "D:\\shopify\\output\\accuphy-baseline\\final-build-logs\\normal.log",
+        "cssVerification": {
+          "passed": true,
+          "evidence": [
+            {
+              "path": "assets/index-BDAaVMMw.css",
+              "panelRule": ".ac-lab .lab-panel{width:360px;max-height:calc(var(--lab-h,100dvh) - 48px);scrollbar-width:thin;-webkit-backdrop-filter:none;backdrop-filter:none;background:linear-gradient(145deg,#1b3d4ef0,#1b3d4ee0);border-color:#e8f8ff66;border-radius:20px;gap:14px;padding:18px;top:24px;left:20px;overflow-y:auto}",
+              "fallbackRule": ".ac-lab .lab-fallback-card>svg{width:100%;height:120px}"
+            }
+          ]
+        },
+        "artifacts": [
+          {
+            "path": "assets/app-store-en-C-eOGvqu.svg",
+            "bytes": 10850,
+            "sha256": "86c9954e1457d27db013c1f10a96ffaba845e5af7765c4ef9df4ac1549e47d67",
+            "computedGzipBytes": 3968
+          },
+          {
+            "path": "assets/app-store-fr-CL3TdU1I.svg",
+            "bytes": 12688,
+            "sha256": "90210818cd163df47110b324a6273d8179f6ca52e1d082eea3587922397a310a",
+            "computedGzipBytes": 4455
+          },
+          {
+            "path": "assets/google-play-en-BAXiFmDF.png",
+            "bytes": 4904,
+            "sha256": "f72611e2df8e88204009fd896d05d5e8e83c77009c63943bbffa169559934849"
+          },
+          {
+            "path": "assets/google-play-fr-7j44Auk5.png",
+            "bytes": 17531,
+            "sha256": "add4fc159c41242dc18d746aa5c6a6128d6d6f25f1dcc5039544bbd66cfe3061"
+          },
+          {
+            "path": "assets/index-BDAaVMMw.css",
+            "bytes": 44056,
+            "sha256": "8d7f61ff4f0e6912edfdede453224410d3206cd65f480fae4326c8012b72eab0",
+            "computedGzipBytes": 9748
+          },
+          {
+            "path": "assets/index-DEoQEIpi.js",
+            "bytes": 1754974,
+            "sha256": "c0e02b1a4230ee376d4f3daa3f0661389302890b60f4d57d90471b319536db93",
+            "computedGzipBytes": 555991
+          },
+          {
+            "path": "assets/pl-down-D869dnDC.jpg",
+            "bytes": 14459,
+            "sha256": "21b451fc3eee1a161d8c4efd4146bca5a215b778e1e36f2f42e12c15d1e67662"
+          },
+          {
+            "path": "assets/pl-forward-C-KvL08O.jpg",
+            "bytes": 13553,
+            "sha256": "18dde20cab1f5af250a8a613952b2bd8fc728e99b882b9cee9649943df03aeae"
+          },
+          {
+            "path": "assets/pl-panoramic-ZYg9FkA8.jpg",
+            "bytes": 13591,
+            "sha256": "2032330686b1b4410b58f0c03cd0f57361c3f0ea0fca0c1e55c154de4b68b10b"
+          },
+          {
+            "path": "assets/plm-chirp-C7S5koxU.jpg",
+            "bytes": 16420,
+            "sha256": "4468d77835e6a8cda1df49e527be8795340a486cfd846dae618d742fe091d7a5"
+          },
+          {
+            "path": "assets/plm-combo-DJ5wxL6i.jpg",
+            "bytes": 17341,
+            "sha256": "7ad166f43a6bb34701ac846f99071062de022e2ad00fb96949c9778e86ed83cc"
+          },
+          {
+            "path": "assets/plm-down-DGXzGwSA.jpg",
+            "bytes": 8432,
+            "sha256": "ff6cc5fad18dd06357e706101f0cefb4f313044e70ecb603e8722b267fbb4612"
+          },
+          {
+            "path": "assets/plm-downscan-CtHMYkQy.jpg",
+            "bytes": 17555,
+            "sha256": "19f2ba6200e10467e8e3ec56d426850f61e0fed9ead49aa1e55e0723706ff102"
+          },
+          {
+            "path": "assets/plm-forward-CcJ2BmUA.jpg",
+            "bytes": 11326,
+            "sha256": "fb85f8325630692974ce6c07316202fe4bdc9d59b76c7fc35971c56f9885415c"
+          },
+          {
+            "path": "assets/plm-icefishing-BiN9ka_s.jpg",
+            "bytes": 13787,
+            "sha256": "c04fb41b4d844c24a2e51dbcb4a2e85f6b0a63a40dccf0767f1bd20a86f9b18d"
+          },
+          {
+            "path": "assets/plm-liveice-BLKaA9cO.jpg",
+            "bytes": 13789,
+            "sha256": "d7277ab0c799a1e4f3026f05565b44e765d782902f0e282ec13f0bc1db8b645f"
+          },
+          {
+            "path": "assets/plm-panoramic-BDrTE_qK.jpg",
+            "bytes": 11020,
+            "sha256": "62ab665c95fabac8b687de22f9cd144553e29cafd03465f83b121469e6e0e5cf"
+          },
+          {
+            "path": "brand/fonts/Eurostile-Heavy.otf",
+            "bytes": 43772,
+            "sha256": "1d6b23aa6d5cd29949de29a1531190d64099daea643a44f5e747de856b9e71ba"
+          },
+          {
+            "path": "brand/fonts/Eurostile-Heavy.woff2",
+            "bytes": 17856,
+            "sha256": "147d768399f1bd8760cecc1f2e6cbc6cbe8bb3138bee6d7549b51e545a504a65"
+          },
+          {
+            "path": "brand/fonts/InstrumentSans-Italic-Variable.ttf",
+            "bytes": 201044,
+            "sha256": "2e9dccf7b145334a49d2ec113d52f3b7a8bdeef2ea95e7b1d541644b8c15ac3f"
+          },
+          {
+            "path": "brand/fonts/InstrumentSans-Variable.ttf",
+            "bytes": 193312,
+            "sha256": "55748ab364d5408ceb15fc3de300e4f643617d060fa2132b704484f11cb507c5"
+          },
+          {
+            "path": "brand/fonts/InstrumentSans-Variable.woff2",
+            "bytes": 36000,
+            "sha256": "c508b6dc988f5b7ca53f7329249eb024ecb04692a797b649486e7d6f508c99a4"
+          },
+          {
+            "path": "brand/logo/A62.ai",
+            "bytes": 8500,
+            "sha256": "8b26c258d659601c72e55f85385129a68c62f9d280b7a4c90e8ab592c6e94180"
+          },
+          {
+            "path": "brand/logo/A62.cdr",
+            "bytes": 20017,
+            "sha256": "ce11d680531b66760390918877c6b100138b334dbda6d00d019a679f96f184af"
+          },
+          {
+            "path": "brand/logo/accuphy-white.svg",
+            "bytes": 2313,
+            "sha256": "e9ca91faccd807c3adecf071b9d47b766a17616daf08a7ec331a3cdbef9b3731",
+            "computedGzipBytes": 1115
+          },
+          {
+            "path": "brand/logo/logo_OG copy 2.png",
+            "bytes": 16276,
+            "sha256": "7b315be50e77814ba949cdcc9f60114a862174e23c04b4b23abda6b714709c57"
+          },
+          {
+            "path": "brand/logo/logo_OG copy 3.png",
+            "bytes": 16276,
+            "sha256": "7b315be50e77814ba949cdcc9f60114a862174e23c04b4b23abda6b714709c57"
+          },
+          {
+            "path": "brand/logo/logo_OG.png",
+            "bytes": 16278,
+            "sha256": "c027422266afffee9bf2635faa57d5f4b7a0172d790b0668c2fed90bd56bf8af"
+          },
+          {
+            "path": "brand/logo/LOGO.jpg",
+            "bytes": 11116,
+            "sha256": "58d2557214e2cba5f1fca4acc4ae882c5a297e1e833d70ee8186ede9fd7e63d1"
+          },
+          {
+            "path": "brand/logo/logo.zip",
+            "bytes": 131547,
+            "sha256": "ae9bf531a7e74eb4941f3c2ffdce7015a26eb9f4874a379d195e3691ec0210ad"
+          },
+          {
+            "path": "brand/logo/Untitled-1 copy.svg",
+            "bytes": 5024,
+            "sha256": "d5a32a89110c7719c5b41d224ffcf6d59f0189a89b0d98841431bd92ddde7f15",
+            "computedGzipBytes": 1616
+          },
+          {
+            "path": "brand/logo/Untitled-1.ai",
+            "bytes": 1208494,
+            "sha256": "1315e593fc64b78ec5ef9055b8cc757123b6d77b5b44affd96cdc42b8d8b4787"
+          },
+          {
+            "path": "brand/logo/Untitled-1.svg",
+            "bytes": 4466,
+            "sha256": "76e46f1ae9f6eab4a3f6c0042dbe0eafcdc6c7f09c34e8907e09db5ec605f427",
+            "computedGzipBytes": 1302
+          },
+          {
+            "path": "brand/logo/White Accuphy Logo copy.png",
+            "bytes": 147201,
+            "sha256": "3256275d6b3f88c930797283d44d09d5e346b201b6c1c12d58c048e6cd170a47"
+          },
+          {
+            "path": "brand/logo/White Accuphy Logo.png",
+            "bytes": 147201,
+            "sha256": "3256275d6b3f88c930797283d44d09d5e346b201b6c1c12d58c048e6cd170a47"
+          },
+          {
+            "path": "index.html",
+            "bytes": 428,
+            "sha256": "6062e1745cf73613d5d957d1afedefebdf76148336cef8189fa52a8715a2cb3a",
+            "computedGzipBytes": 289
+          }
+        ]
+      },
+      {
+        "name": "share-mini",
+        "outDir": "D:\\shopify\\output\\accuphy-baseline\\source-mini-after",
+        "command": [
+          "node",
+          "scripts/build-share.mjs",
+          "D:\\shopify\\output\\accuphy-baseline\\source-mini-after"
+        ],
+        "variant": {
+          "scene": "",
+          "devices": "PLM",
+          "lab": ""
+        },
+        "elapsedMs": 830,
+        "exitCode": 0,
+        "status": "passed",
+        "log": "D:\\shopify\\output\\accuphy-baseline\\final-build-logs\\share-mini.log",
+        "cssVerification": {
+          "passed": true,
+          "evidence": [
+            {
+              "path": "accuphy-lab.html",
+              "panelRule": ".ac-lab .lab-panel{width:360px;max-height:calc(var(--lab-h,100dvh) - 48px);scrollbar-width:thin;-webkit-backdrop-filter:none;backdrop-filter:none;background:linear-gradient(145deg,#1b3d4ef0,#1b3d4ee0);border-color:#e8f8ff66;border-radius:20px;gap:14px;padding:18px;top:24px;left:20px;overflow-y:auto}",
+              "fallbackRule": ".ac-lab .lab-fallback-card>svg{width:100%;height:120px}"
+            },
+            {
+              "path": "pages/index.html",
+              "panelRule": ".ac-lab .lab-panel{width:360px;max-height:calc(var(--lab-h,100dvh) - 48px);scrollbar-width:thin;-webkit-backdrop-filter:none;backdrop-filter:none;background:linear-gradient(145deg,#1b3d4ef0,#1b3d4ee0);border-color:#e8f8ff66;border-radius:20px;gap:14px;padding:18px;top:24px;left:20px;overflow-y:auto}",
+              "fallbackRule": ".ac-lab .lab-fallback-card>svg{width:100%;height:120px}"
+            }
+          ]
+        },
+        "artifacts": [
+          {
+            "path": "accuphy-lab.html",
+            "bytes": 2113789,
+            "sha256": "0e87ef615fecda16b2ce24a19f7d431872945cae88af2490e2bb2c1a5684190a",
+            "computedGzipBytes": 790727
+          },
+          {
+            "path": "pages/.nojekyll",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "path": "pages/home/pl-down-D869dnDC.jpg",
+            "bytes": 14459,
+            "sha256": "21b451fc3eee1a161d8c4efd4146bca5a215b778e1e36f2f42e12c15d1e67662"
+          },
+          {
+            "path": "pages/home/pl-forward-C-KvL08O.jpg",
+            "bytes": 13553,
+            "sha256": "18dde20cab1f5af250a8a613952b2bd8fc728e99b882b9cee9649943df03aeae"
+          },
+          {
+            "path": "pages/home/pl-panoramic-ZYg9FkA8.jpg",
+            "bytes": 13591,
+            "sha256": "2032330686b1b4410b58f0c03cd0f57361c3f0ea0fca0c1e55c154de4b68b10b"
+          },
+          {
+            "path": "pages/home/plm-chirp-C7S5koxU.jpg",
+            "bytes": 16420,
+            "sha256": "4468d77835e6a8cda1df49e527be8795340a486cfd846dae618d742fe091d7a5"
+          },
+          {
+            "path": "pages/home/plm-combo-DJ5wxL6i.jpg",
+            "bytes": 17341,
+            "sha256": "7ad166f43a6bb34701ac846f99071062de022e2ad00fb96949c9778e86ed83cc"
+          },
+          {
+            "path": "pages/home/plm-down-DGXzGwSA.jpg",
+            "bytes": 8432,
+            "sha256": "ff6cc5fad18dd06357e706101f0cefb4f313044e70ecb603e8722b267fbb4612"
+          },
+          {
+            "path": "pages/home/plm-downscan-CtHMYkQy.jpg",
+            "bytes": 17555,
+            "sha256": "19f2ba6200e10467e8e3ec56d426850f61e0fed9ead49aa1e55e0723706ff102"
+          },
+          {
+            "path": "pages/home/plm-forward-CcJ2BmUA.jpg",
+            "bytes": 11326,
+            "sha256": "fb85f8325630692974ce6c07316202fe4bdc9d59b76c7fc35971c56f9885415c"
+          },
+          {
+            "path": "pages/home/plm-icefishing-BiN9ka_s.jpg",
+            "bytes": 13787,
+            "sha256": "c04fb41b4d844c24a2e51dbcb4a2e85f6b0a63a40dccf0767f1bd20a86f9b18d"
+          },
+          {
+            "path": "pages/home/plm-liveice-BLKaA9cO.jpg",
+            "bytes": 13789,
+            "sha256": "d7277ab0c799a1e4f3026f05565b44e765d782902f0e282ec13f0bc1db8b645f"
+          },
+          {
+            "path": "pages/home/plm-panoramic-BDrTE_qK.jpg",
+            "bytes": 11020,
+            "sha256": "62ab665c95fabac8b687de22f9cd144553e29cafd03465f83b121469e6e0e5cf"
+          },
+          {
+            "path": "pages/index.html",
+            "bytes": 1912384,
+            "sha256": "fa97d454ce9aa8cad2e4c0fa58517c129ebe0192433f78b42932c188067dbb94",
+            "computedGzipBytes": 649704
+          },
+          {
+            "path": "pages/robots.txt",
+            "bytes": 26,
+            "sha256": "331ea9090db0c9f6f597bd9840fd5b171830f6e0b3ba1cb24dfa91f0c95aedc1",
+            "computedGzipBytes": 46
+          },
+          {
+            "path": "pages/vercel.json",
+            "bytes": 979,
+            "sha256": "47d4fbc3e97c54eb40e8e570059699b436d3db217d12f8f7858f9fdfb7cade73",
+            "computedGzipBytes": 305
+          }
+        ]
+      },
+      {
+        "name": "share-ice",
+        "outDir": "D:\\shopify\\output\\accuphy-baseline\\source-ice-after",
+        "command": [
+          "node",
+          "scripts/build-share.mjs",
+          "D:\\shopify\\output\\accuphy-baseline\\source-ice-after"
+        ],
+        "variant": {
+          "scene": "ice",
+          "devices": "",
+          "lab": ""
+        },
+        "elapsedMs": 847,
+        "exitCode": 0,
+        "status": "passed",
+        "log": "D:\\shopify\\output\\accuphy-baseline\\final-build-logs\\share-ice.log",
+        "cssVerification": {
+          "passed": true,
+          "evidence": [
+            {
+              "path": "accuphy-lab.html",
+              "panelRule": ".ac-lab .lab-panel{width:360px;max-height:calc(var(--lab-h,100dvh) - 48px);scrollbar-width:thin;-webkit-backdrop-filter:none;backdrop-filter:none;background:linear-gradient(145deg,#1b3d4ef0,#1b3d4ee0);border-color:#e8f8ff66;border-radius:20px;gap:14px;padding:18px;top:24px;left:20px;overflow-y:auto}",
+              "fallbackRule": ".ac-lab .lab-fallback-card>svg{width:100%;height:120px}"
+            },
+            {
+              "path": "pages/index.html",
+              "panelRule": ".ac-lab .lab-panel{width:360px;max-height:calc(var(--lab-h,100dvh) - 48px);scrollbar-width:thin;-webkit-backdrop-filter:none;backdrop-filter:none;background:linear-gradient(145deg,#1b3d4ef0,#1b3d4ee0);border-color:#e8f8ff66;border-radius:20px;gap:14px;padding:18px;top:24px;left:20px;overflow-y:auto}",
+              "fallbackRule": ".ac-lab .lab-fallback-card>svg{width:100%;height:120px}"
+            }
+          ]
+        },
+        "artifacts": [
+          {
+            "path": "accuphy-lab.html",
+            "bytes": 2113747,
+            "sha256": "d5a3a240cfcc77d9edcd8b4b0f3e27f740dda7b944bf16eb4e37eb379d4c8606",
+            "computedGzipBytes": 790707
+          },
+          {
+            "path": "pages/.nojekyll",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "path": "pages/home/pl-down-D869dnDC.jpg",
+            "bytes": 14459,
+            "sha256": "21b451fc3eee1a161d8c4efd4146bca5a215b778e1e36f2f42e12c15d1e67662"
+          },
+          {
+            "path": "pages/home/pl-forward-C-KvL08O.jpg",
+            "bytes": 13553,
+            "sha256": "18dde20cab1f5af250a8a613952b2bd8fc728e99b882b9cee9649943df03aeae"
+          },
+          {
+            "path": "pages/home/pl-panoramic-ZYg9FkA8.jpg",
+            "bytes": 13591,
+            "sha256": "2032330686b1b4410b58f0c03cd0f57361c3f0ea0fca0c1e55c154de4b68b10b"
+          },
+          {
+            "path": "pages/home/plm-chirp-C7S5koxU.jpg",
+            "bytes": 16420,
+            "sha256": "4468d77835e6a8cda1df49e527be8795340a486cfd846dae618d742fe091d7a5"
+          },
+          {
+            "path": "pages/home/plm-combo-DJ5wxL6i.jpg",
+            "bytes": 17341,
+            "sha256": "7ad166f43a6bb34701ac846f99071062de022e2ad00fb96949c9778e86ed83cc"
+          },
+          {
+            "path": "pages/home/plm-down-DGXzGwSA.jpg",
+            "bytes": 8432,
+            "sha256": "ff6cc5fad18dd06357e706101f0cefb4f313044e70ecb603e8722b267fbb4612"
+          },
+          {
+            "path": "pages/home/plm-downscan-CtHMYkQy.jpg",
+            "bytes": 17555,
+            "sha256": "19f2ba6200e10467e8e3ec56d426850f61e0fed9ead49aa1e55e0723706ff102"
+          },
+          {
+            "path": "pages/home/plm-forward-CcJ2BmUA.jpg",
+            "bytes": 11326,
+            "sha256": "fb85f8325630692974ce6c07316202fe4bdc9d59b76c7fc35971c56f9885415c"
+          },
+          {
+            "path": "pages/home/plm-icefishing-BiN9ka_s.jpg",
+            "bytes": 13787,
+            "sha256": "c04fb41b4d844c24a2e51dbcb4a2e85f6b0a63a40dccf0767f1bd20a86f9b18d"
+          },
+          {
+            "path": "pages/home/plm-liveice-BLKaA9cO.jpg",
+            "bytes": 13789,
+            "sha256": "d7277ab0c799a1e4f3026f05565b44e765d782902f0e282ec13f0bc1db8b645f"
+          },
+          {
+            "path": "pages/home/plm-panoramic-BDrTE_qK.jpg",
+            "bytes": 11020,
+            "sha256": "62ab665c95fabac8b687de22f9cd144553e29cafd03465f83b121469e6e0e5cf"
+          },
+          {
+            "path": "pages/index.html",
+            "bytes": 1912342,
+            "sha256": "669ad8c7f3d065f65cbad0eb38fee45ee8895e1085c422d9e11b965c92912d8e",
+            "computedGzipBytes": 649686
+          },
+          {
+            "path": "pages/robots.txt",
+            "bytes": 26,
+            "sha256": "331ea9090db0c9f6f597bd9840fd5b171830f6e0b3ba1cb24dfa91f0c95aedc1",
+            "computedGzipBytes": 46
+          },
+          {
+            "path": "pages/vercel.json",
+            "bytes": 979,
+            "sha256": "47d4fbc3e97c54eb40e8e570059699b436d3db217d12f8f7858f9fdfb7cade73",
+            "computedGzipBytes": 305
+          }
+        ]
+      },
+      {
+        "name": "embed",
+        "outDir": "D:\\shopify\\output\\accuphy-baseline\\final-embed",
+        "command": [
+          "node",
+          "scripts/build-embed.mjs",
+          "D:\\shopify\\output\\accuphy-baseline\\final-embed"
+        ],
+        "variant": {
+          "scene": "",
+          "devices": "",
+          "lab": ""
+        },
+        "elapsedMs": 1036,
+        "exitCode": 0,
+        "status": "passed",
+        "log": "D:\\shopify\\output\\accuphy-baseline\\final-build-logs\\embed.log",
+        "cssVerification": {
+          "passed": true,
+          "evidence": [
+            {
+              "path": "embed/lab-7ce9358452.js",
+              "panelRule": ".ac-lab .lab-panel{width:360px;max-height:calc(var(--lab-h,100dvh) - 48px);scrollbar-width:thin;-webkit-backdrop-filter:none;backdrop-filter:none;background:linear-gradient(145deg,#1b3d4ef0,#1b3d4ee0);border-color:#e8f8ff66;border-radius:20px;gap:14px;padding:18px;top:24px;left:20px;overflow-y:auto}",
+              "fallbackRule": ".ac-lab .lab-fallback-card>svg{width:100%;height:120px}"
+            }
+          ]
+        },
+        "artifacts": [
+          {
+            "path": "embed/lab-7ce9358452.js",
+            "bytes": 2108100,
+            "sha256": "7ce9358452620a92f1c0b8ef15f0eb62773a37c85097829147fc4e964a1816a3",
+            "computedGzipBytes": 787440
+          },
+          {
+            "path": "embed/lab.js",
+            "bytes": 624,
+            "sha256": "bf7b0470dcf5c1005726337171c36beefaaf8cb03bf22ba1a2c4c306afda0d0a",
+            "computedGzipBytes": 417
+          },
+          {
+            "path": "embed/test.html",
+            "bytes": 708,
+            "sha256": "ce1a7fbc21bbf7a0c4e7b5efe9fa1f1e21d9cd95705c5ad00f90ff1a26a72fa5",
+            "computedGzipBytes": 478
+          }
+        ]
+      }
+    ],
+    "sourceUnchangedDuringBuilds": true,
+    "verification": {
+      "qaSourceManifestMatchesCurrentSources": true,
+      "qaSourceMismatches": [],
+      "allCompiledCssRulesPreserved": true,
+      "protectedEvidence": {
+        "before": [
+          {
+            "directory": "qa-lockstep-before",
+            "fileCount": 33,
+            "aggregateSha256": "37511fdf5fac1860c9b39edb5ac3c40042d3f3458368034768055e523dea8a7d"
+          },
+          {
+            "directory": "qa-lockstep-after",
+            "fileCount": 33,
+            "aggregateSha256": "d6a92be4e56c88bb33678ab9928fe996d0810ecf0aca6142880be7f757e67d88"
+          },
+          {
+            "directory": "lockstep-grid",
+            "fileCount": 105,
+            "aggregateSha256": "198191c00064afef8a4442f54e947c632472c9c5bdb8eb322407c91b6c567e54"
+          }
+        ],
+        "after": [
+          {
+            "directory": "qa-lockstep-before",
+            "fileCount": 33,
+            "aggregateSha256": "37511fdf5fac1860c9b39edb5ac3c40042d3f3458368034768055e523dea8a7d"
+          },
+          {
+            "directory": "qa-lockstep-after",
+            "fileCount": 33,
+            "aggregateSha256": "d6a92be4e56c88bb33678ab9928fe996d0810ecf0aca6142880be7f757e67d88"
+          },
+          {
+            "directory": "lockstep-grid",
+            "fileCount": 105,
+            "aggregateSha256": "198191c00064afef8a4442f54e947c632472c9c5bdb8eb322407c91b6c567e54"
+          }
+        ],
+        "unchanged": true
+      },
+      "pageSizeComparison": {
+        "beforeBytes": 1882652,
+        "beforeSha256": "217f7dbfe4b654bfb3177a5167cb4b9da40974ac3fb1dad2f6d77d480c260bd8",
+        "afterBytes": 1912366,
+        "afterSha256": "2570ffea98a71ec69f5fc318f4a636e81d91d4c1a40396253bc2b04f32c5ac4a",
+        "deltaBytes": 29714,
+        "percentChange": 1.5783054967142096,
+        "withinProposed64KiBBudget": true
+      },
+      "benchmarkContextFromParent": {
+        "renderer": "ANGLE NVIDIA RTX 5070 Direct3D11",
+        "browser": "Chrome 156",
+        "dpr": 1,
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "note": "Browser facts supplied by parent after direct verification; this build task does not measure rendering performance."
+      }
+    }
+  },
+  "layout": {
+    "method": "Actual before and after release builds, real clocks, no QA hooks. Desktop explicit boat -6,4. Mobile no URL override: shared PHONE_START [16,11] and default frameX=15 per source index.jsx. Wait for cover removal and AUTO25ft visible. Both desktop1440x900/mobileactual390x845. Paired same product Forward,80ft,40% gain; desktopAUTO45ft/mobileAUTO25ft. Live fish/time/waves differ. Layout evidence only; strict model/echo evidence is separate.",
+    "records": [
+      {
+        "name": "desktop-before",
+        "requestedBoat": [
+          -6,
+          4
+        ],
+        "url": "http://127.0.0.1:5173/source-before/pages/?boat=-6,4",
+        "domState": {
+          "canvas": 1,
+          "cover": false,
+          "dpr": 0.9999999947207314,
+          "images": [
+            {
+              "alt": "Accuphy",
+              "complete": true,
+              "width": 300
+            },
+            {
+              "alt": "",
+              "complete": true,
+              "width": 300
+            }
+          ],
+          "innerHeight": 900,
+          "innerWidth": 1440,
+          "panelOpacity": "1"
+        }
+      },
+      {
+        "name": "desktop-after",
+        "requestedBoat": [
+          -6,
+          4
+        ],
+        "url": "http://127.0.0.1:5173/source-after/pages/?boat=-6,4",
+        "domState": {
+          "canvas": 1,
+          "cover": false,
+          "dpr": 0.9999999947207314,
+          "images": [
+            {
+              "alt": "Accuphy",
+              "complete": true,
+              "width": 300
+            },
+            {
+              "alt": "",
+              "complete": true,
+              "width": 300
+            }
+          ],
+          "innerHeight": 900,
+          "innerWidth": 1440,
+          "panelOpacity": "1"
+        }
+      },
+      {
+        "name": "mobile-home-before",
+        "requestedBoat": "default PHONE_START [16,11]; no boat parameter, preserving default frameX=15",
+        "url": "http://127.0.0.1:5173/source-before/pages/",
+        "domState": {
+          "canvas": 1,
+          "cover": false,
+          "dpr": 0.9999999947207314,
+          "images": [
+            {
+              "alt": "Accuphy",
+              "complete": true,
+              "width": 300
+            },
+            {
+              "alt": "",
+              "complete": true,
+              "width": 300
+            },
+            {
+              "alt": "",
+              "complete": true,
+              "width": 360
+            },
+            {
+              "alt": "",
+              "complete": true,
+              "width": 360
+            },
+            {
+              "alt": "",
+              "complete": true,
+              "width": 360
+            },
+            {
+              "alt": "",
+              "complete": true,
+              "width": 360
+            },
+            {
+              "alt": "",
+              "complete": true,
+              "width": 360
+            },
+            {
+              "alt": "",
+              "complete": true,
+              "width": 360
+            },
+            {
+              "alt": "",
+              "complete": true,
+              "width": 360
+            },
+            {
+              "alt": "",
+              "complete": true,
+              "width": 360
+            },
+            {
+              "alt": "",
+              "complete": true,
+              "width": 360
+            },
+            {
+              "alt": "",
+              "complete": true,
+              "width": 360
+            },
+            {
+              "alt": "",
+              "complete": true,
+              "width": 360
+            }
+          ],
+          "innerHeight": 845,
+          "innerWidth": 390,
+          "panelOpacity": "1"
+        }
+      },
+      {
+        "name": "mobile-active-before",
+        "requestedBoat": "default PHONE_START [16,11]; no boat parameter, preserving default frameX=15",
+        "url": "http://127.0.0.1:5173/source-before/pages/",
+        "domState": {
+          "canvas": 1,
+          "cover": false,
+          "dpr": 0.9999999947207314,
+          "images": [
+            {
+              "alt": "Accuphy",
+              "complete": true,
+              "width": 300
+            },
+            {
+              "alt": "",
+              "complete": true,
+              "width": 300
+            }
+          ],
+          "innerHeight": 845,
+          "innerWidth": 390,
+          "panelOpacity": "1"
+        }
+      },
+      {
+        "name": "mobile-home-after",
+        "requestedBoat": "default PHONE_START [16,11]; no boat parameter, preserving default frameX=15",
+        "url": "http://127.0.0.1:5173/source-after/pages/",
+        "domState": {
+          "canvas": 1,
+          "cover": false,
+          "dpr": 0.9999999947207314,
+          "images": [
+            {
+              "alt": "Accuphy",
+              "complete": true,
+              "width": 300
+            },
+            {
+              "alt": "",
+              "complete": true,
+              "width": 300
+            },
+            {
+              "alt": "",
+              "complete": true,
+              "width": 360
+            },
+            {
+              "alt": "",
+              "complete": true,
+              "width": 360
+            },
+            {
+              "alt": "",
+              "complete": true,
+              "width": 360
+            },
+            {
+              "alt": "",
+              "complete": true,
+              "width": 360
+            },
+            {
+              "alt": "",
+              "complete": true,
+              "width": 360
+            },
+            {
+              "alt": "",
+              "complete": true,
+              "width": 360
+            },
+            {
+              "alt": "",
+              "complete": true,
+              "width": 360
+            },
+            {
+              "alt": "",
+              "complete": true,
+              "width": 360
+            },
+            {
+              "alt": "",
+              "complete": true,
+              "width": 360
+            },
+            {
+              "alt": "",
+              "complete": true,
+              "width": 360
+            },
+            {
+              "alt": "",
+              "complete": true,
+              "width": 360
+            }
+          ],
+          "innerHeight": 845,
+          "innerWidth": 390,
+          "panelOpacity": "1"
+        }
+      },
+      {
+        "name": "mobile-active-after",
+        "requestedBoat": "default PHONE_START [16,11]; no boat parameter, preserving default frameX=15",
+        "url": "http://127.0.0.1:5173/source-after/pages/",
+        "domState": {
+          "canvas": 1,
+          "cover": false,
+          "dpr": 0.9999999947207314,
+          "images": [
+            {
+              "alt": "Accuphy",
+              "complete": true,
+              "width": 300
+            },
+            {
+              "alt": "",
+              "complete": true,
+              "width": 300
+            }
+          ],
+          "innerHeight": 845,
+          "innerWidth": 390,
+          "panelOpacity": "1"
+        }
+      }
+    ]
+  },
+  "heap": {
+    "limitations": [
+      "HeapProfiler.collectGarbage unsupported by available CDP. These are NOT retained-size or controlled-GC measurements.",
+      "Warm-up durations differ above 5 seconds; same isolate sequential navigations, no inference of leak or equivalence."
+    ],
+    "runs": [
+      {
+        "version": "before",
+        "method": "Normal production build; explicit GC unavailable. At least 5 s warm-up, 30 cycles with 100 ms per action. End every cycle in Forward.",
+        "isolate": {
+          "id": "a3f57e4b5735b3dd"
+        },
+        "samples": [
+          {
+            "cycles": 0,
+            "backingStorageSize": 33969369,
+            "embedderHeapUsedSize": 7722400,
+            "totalSize": 91193344,
+            "usedSize": 52918944
+          },
+          {
+            "cycles": 10,
+            "backingStorageSize": 35599498,
+            "embedderHeapUsedSize": 17131784,
+            "totalSize": 107708416,
+            "usedSize": 65018300
+          },
+          {
+            "cycles": 20,
+            "backingStorageSize": 37229578,
+            "embedderHeapUsedSize": 26806392,
+            "totalSize": 129466368,
+            "usedSize": 65801032
+          },
+          {
+            "cycles": 30,
+            "backingStorageSize": 38859658,
+            "embedderHeapUsedSize": 36234336,
+            "totalSize": 137592832,
+            "usedSize": 77487292
+          }
+        ]
+      },
+      {
+        "version": "after",
+        "method": "Normal production build; explicit GC unavailable. At least 5 s warm-up, 30 cycles with 100 ms per action. End every cycle in Forward.",
+        "isolate": {
+          "id": "a3f57e4b5735b3dd"
+        },
+        "samples": [
+          {
+            "cycles": 0,
+            "backingStorageSize": 35159656,
+            "embedderHeapUsedSize": 13386400,
+            "totalSize": 149311488,
+            "usedSize": 73952432
+          },
+          {
+            "cycles": 10,
+            "backingStorageSize": 32490141,
+            "embedderHeapUsedSize": 6959880,
+            "totalSize": 138641408,
+            "usedSize": 65513592
+          },
+          {
+            "cycles": 20,
+            "backingStorageSize": 34119971,
+            "embedderHeapUsedSize": 2907560,
+            "totalSize": 135233536,
+            "usedSize": 54053512
+          },
+          {
+            "cycles": 30,
+            "backingStorageSize": 33576861,
+            "embedderHeapUsedSize": 15066152,
+            "totalSize": 135233536,
+            "usedSize": 80095156
+          }
+        ]
+      }
+    ]
+  },
+  "resources": {
+    "method": "Static QA with DEV hooks, real clock, no QA interception, same desktop viewport, 30 cycles PL Down/Panoramic/Forward, 100ms between actions. Three renderer counts are not GPU bytes or JS retained heap.",
+    "runs": [
+      {
+        "version": "before",
+        "samples": [
+          {
+            "cycles": 0,
+            "geometries": 83,
+            "programs": 32,
+            "textures": 21
+          },
+          {
+            "cycles": 10,
+            "geometries": 83,
+            "programs": 40,
+            "textures": 21
+          },
+          {
+            "cycles": 20,
+            "geometries": 83,
+            "programs": 40,
+            "textures": 21
+          },
+          {
+            "cycles": 30,
+            "geometries": 83,
+            "programs": 40,
+            "textures": 21
+          }
+        ]
+      },
+      {
+        "version": "after",
+        "samples": [
+          {
+            "cycles": 0,
+            "geometries": 83,
+            "programs": 32,
+            "textures": 22
+          },
+          {
+            "cycles": 10,
+            "geometries": 83,
+            "programs": 40,
+            "textures": 22
+          },
+          {
+            "cycles": 20,
+            "geometries": 83,
+            "programs": 40,
+            "textures": 22
+          },
+          {
+            "cycles": 30,
+            "geometries": 83,
+            "programs": 40,
+            "textures": 22
+          }
+        ]
+      }
+    ]
+  }
+}
