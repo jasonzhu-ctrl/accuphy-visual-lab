@@ -1,0 +1,32 @@
+状态：OPEN
+From：accuphy-website HQ   To：accuphy-visual-lab HQ   创建：2026-10-28   期限：11-02 广告开投前（最好 10-31）
+
+# Lab “去商店”按市场：用店铺传进来的 shop 参数拼地址（网站 #228，总管 X-14W）
+
+## 背景和 Jason 批准了什么
+- 黑五投放加了美国和欧洲代理商国家（总管 X-14，handoffs/2026-10-28-bf-scope-expanded.md）。
+- 网站查到的问题：Lab 的“去商店”只认 `?lang=fr`，其余都去不带前缀的地址。德国、美国的访客点了，会去**加拿大**的产品页（加元价格、加拿大购买按钮）。美国看不到“只卖 Mini”的 301，欧洲看不到 “Find Retail Locations”。
+- Jason 2026-10-28 在网站 HQ 回 X-14W 汇报（引的就是这一句：“‘去商店’按钮：德国、美国的客人点了，会跳到加拿大的商品页。”）：**“修复”**。网站决定 #228。
+- lab.accuphy.ca 是你们项目的线上。要不要 Jason 在 Lab HQ 再说一次“动”，按你们的规矩定。
+
+## 网站这边会给框多传的参数（00 改桥，Lab 不认识的参数会忽略，所以桥先上没事）
+| 参数 | 值 | 例子 |
+|---|---|---|
+| `shop` | 访客所在市场和语言的根路径，Liquid `routes.root_url` | `/`（加拿大英文）、`/fr`、`/en-us`、`/de-de`、`/fr-benelux`、`/en-pl`、`/en-ro` |
+| `market` | 国家代码小写 | `ca`、`us`、`de`、`be`、`pl`、`lv` |
+| `lang` | 页面网址上带的 `?lang=`（白名单 en/fr/de/nl/pl/lv），没有就用店铺语言 | 德国页 `de`，荷兰语页 `nl`，波兰广告 `/en-pl/pages/lab?lang=pl` → `pl` |
+
+## 请 Lab 改（embed.js 的 shopUrl）
+1. 地址用 `shop` 拼：`shop` 存在、并且匹配 `^/([a-z]{2}(-[a-z]{2,})?)?$` 时，地址 = `(shop === '/' ? '' : shop) + '/products/' + product`；不匹配或没有，照现在的做法（fr → /fr，其余不带前缀）。
+2. 在店里时仍然不加 utm（原规则不变）。
+3. 美国：`/en-us/products/pinglive-sonar` 店里已经 301 到 Mini（网站 #118），所以第 1 条做了，美国就不会进 PingLive 页。`market=us` 时打开直接是 Mini、不出 “Shop PingLive” 按钮，是更好的做法（可以之后补）。
+4. 语言：德、荷、波兰、拉脱维亚语界面另算（X-14W 方案第 3 条）。德、荷用词照法语那次，由网站 HQ 按 #198 和词表核。波兰语、拉脱维亚语谁来核，总管在问 Jason，先别上机器翻译。
+
+## 不要做
+- 不改商店（桥由网站 00 改）。
+
+## 完成标准和证据
+- lab.accuphy.ca 新版上线后，网站 03 在 /de-de、/en-us、/fr、/、/nl-benelux、/en-pl 的 Lab 页点“去商店”，打开的都是本市场的产品页（美国是 Mini）。
+
+结果：
+- 2026-10-28 Lab HQ：收到，已派“手机网页端”改 embed.js 的 shopUrl（第 1、2 条；第 3、4 条之后）。代码做完 HQ 重打包测试链接；lab.accuphy.ca 上线按 Lab 规矩要 Jason 在 Lab HQ 说“动”。
