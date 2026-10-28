@@ -172,6 +172,10 @@ page was not reached): y 269 / 1248, x 65 / 1015.
 **The film (2026-10-27, 30 fps, from lake 1abeedf, after HQ's preview check):** in `reference/ads/2026-11-bf/v3/`
 (git-ignored; this computer has no backup).
 
+- **Backup:** approved films go to the shared Google Drive, Accuphy Public Drive → Marketing (drafts),
+  <https://drive.google.com/drive/folders/1qAXHSENYbUzx8SuMWsG_9Qa2xXxyb94h> (HQ 2026-10-28).
+- IT & HR copied these four there. Put every later version in the same folder, and tell HQ when you do.
+
 | File | Size | Format |
 |---|---|---|
 | `pinglive-916-en.mp4` | 14.5 MB | 1080×1920, 15.0 s, 30 fps, H.264 ~8 Mbit/s |
