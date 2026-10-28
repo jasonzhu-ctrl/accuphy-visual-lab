@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { labEvent } from './embed'
+import { setBoatTarget } from './boatControls'
 import SceneLifecycle from './SceneLifecycle'
 import { mergeGeometries as _merge } from 'three/addons/utils/BufferGeometryUtils.js'
 // Extrude geometries are non-indexed, primitives are indexed — normalise first.
@@ -784,8 +785,7 @@ function PickPlane({ state }) {
   const move = (e) => {
     const s = state.current
     if (!s.dragging) return
-    s.target.x = THREE.MathUtils.clamp(e.point.x, -58, 58)
-    s.target.z = THREE.MathUtils.clamp(e.point.z, -58, 58)
+    setBoatTarget(s, e.point.x, e.point.z)
   }
   const onUp = () => { state.current.dragging = false }
   // R3F never passes a pointercancel on to the mesh (it only clears hover), and iOS cancels touches readily: the drag

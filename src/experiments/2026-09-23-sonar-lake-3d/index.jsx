@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
+import { createPortal } from 'react-dom'
 import * as THREE from 'three'
 import LakeScene from './Scene'
-import { useSceneSuspended } from './SceneLifecycle'
 import { DEVICES, FT, ICE_MODES } from '../2026-09-23-sonar-beam/devices'
 import { iceParams, ICE_START, VIEWS } from './iceScene'
 import { wedgeSpecs } from '../2026-09-23-beam-shapes-3d/wedge'
@@ -15,9 +15,16 @@ import AppHome from './home/AppHome' // the app's Home (view selection) page ins
 import { isSignedUp } from './signup'
 import { labEvent, PRODUCT, sentEvents } from './embed'
 import ShopButton from './ShopButton' // the one link to the store (X-6L, 2026-10-25; placement B, Jason)
-import { t } from './i18n' // every visitor-visible string, English or French (?lang=fr; X-6L-fr)
+import { t, LANG } from './i18n' // every visitor-visible string, English or French (?lang=fr; X-6L-fr)
 import ShareButton from './ShareButton'
 import AppBadges from './AppBadges'
+import LearningGuide from './LearningGuide'
+import ModeGuide from './ModeGuide'
+import { nudgeBoat } from './boatControls'
+import SceneBoundary from './SceneBoundary'
+import { startCanvasLifecycle } from './labLifecycle'
+import { useReducedMotion, useSceneSuspended } from './SceneLifecycle'
+import './labExperience.css'
 // BF funnel items 1–2 (handoff 2026-10-26): two placements for Jason to pick (HQ: 先出 2 个样子，不直接定); off until he does
 const EXTRAS = (() => { try { const v = new URLSearchParams(window.location.search).get('extras'); return v === 'a' || v === 'b' ? v : null } catch { return null } })()
 import { depthAt } from './terrain'
@@ -68,6 +75,7 @@ export const meta = {
 // 3D bodies as the transducer sees them (#153 round 3, true size); dev only: ?fish=marks shows the old #120 marks for A/B,
 // ?fishsize=1.6 enlarges the sonar fish, and the test page shows its two switches
 export default function SonarLake3D({ scene: sceneProp, lab }) {
+  const rangeId = useId()
   const scene = sceneProp || SCENE_ENV || (/[?&]scene=ice/.test(window.location.search) ? 'ice' : 'lake')
   const ICE = scene === 'ice'
   const ONLY = ICE ? 'PLM' : ONLY_ENV // on the ice the Mini is the device: the app's ice views are the Mini's
@@ -96,32 +104,47 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
   // (2) A lost WebGL context (Meta's browser drops it when memory is short) shows a tap-to-reload card instead of a frozen
   // page; a restored context remounts the scene. (3) The page's height follows window.innerHeight, not only 100vh/dvh.
   const [mount3d, setMount3d] = useState(false)
+  const [loading, setLoading] = useState(() => !!document.getElementById('lab-cover'))
   const [glLost, setGlLost] = useState(false)
   const [glKey, setGlKey] = useState(0)
+  const [glError, setGlError] = useState(false)
+  const onGlFailure = useCallback(() => setGlError(true), [])
   const mainRef = useRef(null)
+  const fallbackRef = useRef(null)
+  const focusAfterLoading = useRef(false)
+  const coverShop = useMemo(() => document.getElementById('lab-cover-shop'), [])
   const suspended = useSceneSuspended(mainRef)
+  const reducedMotion = useReducedMotion()
+  useEffect(() => {
+    if (loading || !focusAfterLoading.current || glLost || glError) return
+    focusAfterLoading.current = false
+    // Move focus only if it was on the fading cover; ordinary loading never steals focus.
+    Array.from(mainRef.current?.querySelectorAll('button:not([disabled])') || [])
+      .find((el) => el.getClientRects().length && !el.closest('[inert]'))?.focus()
+  }, [loading, glLost, glError])
+  useEffect(() => { if (glError || glLost) document.getElementById('lab-cover')?.remove() }, [glError, glLost])
+  useEffect(() => {
+    if (!glError && !glLost) return
+    const previous = document.activeElement
+    fallbackRef.current?.focus()
+    return () => { if (previous?.isConnected) previous.focus?.() }
+  }, [glError, glLost])
   useEffect(() => { let a = requestAnimationFrame(() => { a = requestAnimationFrame(() => setMount3d(true)) }); const t = setTimeout(() => setMount3d(true), 120); return () => { cancelAnimationFrame(a); clearTimeout(t) } }, []) // frames do not run in a background tab: the timeout mounts anyway
   useEffect(() => {
-    if (!mount3d) return
-    let raf = 0, canvas = null, frames = 0, ready = false, timer = 0
-    const cover = document.getElementById('lab-cover')
-    const onLost = (e) => { e.preventDefault(); setGlLost(true) }
-    const onRestored = () => { setGlLost(false); setGlKey((k) => k + 1) }
-    const onEvent = (e) => { if (e.detail?.event === 'ready') ready = true } // `ready` = the WebGL context exists; the scene
-    window.addEventListener('accuphy-lab', onEvent)                        // then builds in one blocking task, so the next
-    const tick = () => {                                                   // two frames come after the first render
-      if (!canvas) canvas = mainRef.current?.querySelector('canvas')
-      if (!ready && sentEvents.has('ready')) ready = true // `ready` can fire before this listener exists (R3F's onCreated timing)
-      if (canvas && ready && ++frames >= 2) {
-        if (cover) { cover.classList.add('is-done'); setTimeout(() => cover.remove(), 600) }
-        canvas.addEventListener('webglcontextlost', onLost); canvas.addEventListener('webglcontextrestored', onRestored)
-        return
-      }
-      raf = requestAnimationFrame(tick); timer = setTimeout(tick, 400) // the timeout keeps it going in a background tab
-    }
-    tick()
-    return () => { cancelAnimationFrame(raf); clearTimeout(timer); window.removeEventListener('accuphy-lab', onEvent); canvas?.removeEventListener('webglcontextlost', onLost); canvas?.removeEventListener('webglcontextrestored', onRestored) }
-  }, [mount3d, glKey])
+    if (!mount3d || glError) return
+    return startCanvasLifecycle({
+      getCanvas: () => mainRef.current?.querySelector('canvas'),
+      cover: document.getElementById('lab-cover'),
+      readySeen: () => sentEvents.has('ready'),
+      onSettled: () => {
+        focusAfterLoading.current = !!document.getElementById('lab-cover')?.contains(document.activeElement)
+        setLoading(false)
+      },
+      onLost: () => setGlLost(true),
+      // Keep the canvas mounted during loss so the browser can restore its context.
+      onRestored: () => { setGlLost(false); setGlKey(k => k + 1) },
+    })
+  }, [mount3d, glKey, glError])
   useEffect(() => {
     const set = () => document.documentElement.style.setProperty('--lab-h', `${window.innerHeight}px`)
     set(); window.addEventListener('resize', set); window.addEventListener('orientationchange', set); window.visualViewport?.addEventListener('resize', set)
@@ -247,7 +270,7 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
   state.current.land = land
   state.current.fishMode = fishNew ? 'echo' : 'marks' // #170 (Jason 2026-10-26: 把第 3 轮这一版的鱼搬进正式页面); Panoramic always draws them from their bodies (SonarScreen)
   state.current.fishSize = fishBig ? 1.6 : 1
-  state.current.hintOff = land && !lakeBig // sideways with the sonar full-screen: no drag caption over the sonar
+  state.current.hintOff = (phone && home) || (land && !lakeBig) // Home first: choosing a view is the primary instruction
 
   // AUTO depth: deeper at once (the bottom never drops off the screen), shallower only after 1.5 s
   // so the axis does not pump while the boat crosses uneven bottom
@@ -270,7 +293,7 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
 
   // embed bridge (#134): the store page learns which view the visitor picked — on a real pick only (Home tile, panel
   // button, guide step), never for the default view on load (#139); `source` says where the pick came from
-  const pickView = (d, m, source) => { setDeviceId(d); setMode(m); labEvent('view', { view: m, product: PRODUCT[d] || PRODUCT.PLM, source }) }
+  const pickView = (d, m, source) => { setDeviceId(d); setMode(m); if (source !== 'step') setStep(null); labEvent('view', { view: m, product: PRODUCT[d] || PRODUCT.PLM, source }) }
 
   // the app's buttons are display-only: on desktop a tap asks for an email (once per browser); on phones nothing
   // happens — the Lab itself carries no sign-up gate on the phone (Jason 2026-10-24: 注册门你这个层级不要有; the
@@ -283,10 +306,15 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
 
   const onMove = (e) => {
     const s = state.current
+    if (reducedMotion) { s.parallax.x = 0; s.parallax.y = 0; return }
     s.parallax.x = (e.clientX / window.innerWidth - 0.5) * 2
     s.parallax.y = (e.clientY / window.innerHeight - 0.5) * 2
   }
+  useEffect(() => { if (reducedMotion) { state.current.parallax.x = 0; state.current.parallax.y = 0 } }, [reducedMotion])
   const fmt = (ft) => (imperial ? `${Math.round(ft)} ft` : `${(ft * FT).toFixed(1)} m`)
+  // Presentation only: a manually stepped depth remains manual when entering Down.
+  // Combo still derives its forward range from the existing comboAutoRangeFt path.
+  const rangeIsAutomatic = (view) => view === 'combo' || (autoDepth && ['down', 'ice', 'liveice'].includes(view))
   // phones: the range is changed with the app's own −/+ on the phone screen (Jason 2026-10-03), in steps
   const [paused, setPaused] = useState(false)
   const stepDepth = (dir) => { // the app's depth-range −/+ : manual steps, AUTO off
@@ -302,7 +330,10 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
   }
 
   // the three-step guide (docs/3d-beam-reference.md §3): each step is a preset
-  const [step, setStep] = useState(0)
+  const [step, setStep] = useState(ICE ? 0 : null) // the default Forward view has not applied the Down teaching preset
+  const [feedback, setFeedback] = useState('')
+  const feedbackTimer = useRef(0)
+  useEffect(() => () => { clearTimeout(feedbackTimer.current); clearTimeout(toastT.current) }, [])
   const STEPS = ICE ? [
     { n: 1, title: t('i1_title'), text: t('i1_text'), device: 'PLM', mode: 'liveice', range: 60, boat: ICE_START },
     { n: 2, title: t('i2_title'), text: t('i2_text'), device: 'PLM', mode: 'liveice', range: 60, boat: [-8, -10] },
@@ -316,47 +347,44 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
     const st = STEPS[i]; setStep(i); pickView(st.device, st.mode, 'step'); setRangeFt(st.range)
     state.current.target.x = st.boat[0]; state.current.target.z = st.boat[1]
     state.current.frameX = st.boat[0] + 14 // phones: re-centre the zoomed-out view on the preset (boat left, beam right)
+    setFeedback(t('learn_applied', { product: DEVICES[st.device].name, mode: t('mode_' + st.mode), range: t(rangeIsAutomatic(st.mode) ? 'lab_auto' : 'lab_manual') }))
+    clearTimeout(feedbackTimer.current); feedbackTimer.current = setTimeout(() => setFeedback(''), 3600)
   }
+  const onNudge = (dx, dz) => { if (!paused) { nudgeBoat(state.current, dx, dz); setStep(null) } }
+  const openHome = () => { setHome(true); setLakeBig(false) }
+  const guide = <LearningGuide steps={STEPS} step={step} onStep={goStep} onNudge={onNudge} paused={paused} mobile={phone} />
 
   return (
     <>
-    <main ref={mainRef} inert={gate} aria-hidden={gate || undefined} className="font-brand fixed inset-x-0 top-0 select-none overflow-hidden bg-[#9cc1cf] text-white" style={{ height: 'var(--lab-h, 100%)', ...(ICE ? { background: iceParams().T.bg } : null) }} onPointerMove={onMove}>
+    <main ref={mainRef} lang={LANG} inert={gate || glLost || glError || loading} aria-hidden={gate || glLost || glError || loading || undefined} className="ac-lab font-brand fixed inset-x-0 top-0 select-none overflow-hidden bg-[#9cc1cf] text-white" style={{ height: 'var(--lab-h, 100%)', ...(ICE ? { background: iceParams().T.bg } : null) }} onPointerMove={onMove}>
       <div className="absolute inset-0 touch-none">
-        {mount3d && !glLost && <LakeScene key={glKey} state={state} sonarRect={sonarRect} paused={gate || paused || suspended} allowPausedDraw={!suspended} scene={scene} />}
+        {mount3d && !glError && <SceneBoundary onFailure={onGlFailure}><LakeScene key={glKey} state={state} sonarRect={sonarRect} paused={gate || paused || glLost || suspended} allowPausedDraw={!suspended && !glLost} scene={scene} /></SceneBoundary>}
       </div>
       {EXTRAS === 'a' && phone && !land && started && !home && <AppBadges height={28} className="absolute z-20" style={{ left: 12, top: 'calc(12px + env(safe-area-inset-top))' }} />}
-      {glLost && (
-        <div role="alert" className="pointer-events-auto absolute inset-0 z-50 flex items-center justify-center p-6" style={{ background: 'rgba(3,18,26,0.55)' }}>
-          <button type="button" className="ac-card px-5 py-4 text-left" onClick={() => window.location.reload()}>
-            <div className="text-[15px] font-semibold">{t('gl_lost_title')}</div>
-            <div className="ac-body mt-1 text-[12.5px]">{t('gl_lost_text')}</div>
-          </button>
-        </div>
-      )}
 
       {/* ---- control panel — Apple-style frosted glass over the lake (Jason 2026-09-24) ---- */}
-      <motion.div ref={(el) => { panelRef.current = el; state.current.panelEl = el }} data-hint-avoid initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-        className="ac-panel pointer-events-auto absolute flex flex-col gap-3 max-sm:hidden sm:left-4 sm:top-14 sm:w-[400px] sm:p-4" style={land ? { display: 'none' } : undefined}>
+      <motion.div ref={(el) => { panelRef.current = el; state.current.panelEl = el }} data-hint-avoid initial={false}
+        aria-hidden={phone || undefined} inert={phone ? true : undefined} className={`ac-panel ${ICE ? '' : 'lab-panel'} pointer-events-auto absolute flex flex-col gap-3 max-sm:hidden sm:left-4 sm:top-14 sm:w-[400px] sm:p-4`} style={land ? { display: 'none' } : undefined}>
         <div className="flex items-center justify-between px-1 pt-0.5">
           <img src="/brand/logo/White Accuphy Logo.png" alt="Accuphy" className="h-[18px] w-auto drop-shadow-[0_1px_2px_rgba(0,20,30,0.25)]" draggable={false} />
           <span className="ac-title">Lab</span>
         </div>
         <div className="ac-divider" />
         <Row label={t('device')}>
-          <div className="ac-seg">{SHOWN_DEVICES.map((d) => <button key={d.id} className={`ac-btn ${deviceId === d.id ? 'is-active' : ''}`} onClick={() => pickView(d.id, mode, 'panel')}>{d.name}</button>)}</div>
+          <div className="ac-seg" role="group" aria-label={t('device')}>{SHOWN_DEVICES.map((d) => <button type="button" key={d.id} aria-pressed={deviceId === d.id} className={`ac-btn ${deviceId === d.id ? 'is-active' : ''}`} onClick={() => pickView(d.id, mode, 'panel')}>{deviceId === d.id && <span aria-hidden="true" className="lab-selected-mark">✓</span>}{d.name}</button>)}</div>
         </Row>
-        <Row label={t('view')}>
-          <div className="ac-seg">{modes.map((m) => <button key={m} className={`ac-btn ${mode === m ? 'is-active' : ''}`} onClick={() => pickView(deviceId, m, 'panel')}>{t('mode_' + m)}</button>)}</div>
-        </Row>
+        {!ICE ? <ModeGuide deviceId={deviceId} mode={mode} paused={paused} onPick={(m) => pickView(deviceId, m, 'panel')} /> : <Row label={t('view')}>
+          <div className="ac-seg" role="group" aria-label={t('view')}>{modes.map((m) => <button type="button" key={m} aria-pressed={mode === m} className={`ac-btn ${mode === m ? 'is-active' : ''}`} onClick={() => pickView(deviceId, m, 'panel')}>{mode === m && <span aria-hidden="true" className="lab-selected-mark">✓</span>}{t('mode_' + m)}</button>)}</div>
+        </Row>}
         {ICE && (
           <Row label={t('camera')}>
             <div className="ac-seg">{VIEWS.map((v) => <button key={v} className={`ac-btn ${view === v ? 'is-active' : ''}`} onClick={() => setView(v)}>{{ top: t('cam_top'), under: t('cam_under'), section: t('cam_section') }[v]}</button>)}</div>
           </Row>
         )}
-        <Row label={t('range')}>
+        <Row label={t('range')} inputId={rangeId}>
           {/* Down: the range is the AUTO depth range, so the slider only shows it */}
-          <input type="range" min={20} max={maxFt} step={5} value={effRangeFt} disabled={downLike || comboAuto} title={downLike || comboAuto ? 'AUTO: follows the water depth' : undefined} onChange={(e) => setRangeFt(+e.target.value)} className="ac-range w-36" style={{ '--fill': `${((effRangeFt - 20) / (maxFt - 20)) * 100}%`, opacity: downLike || comboAuto ? 0.45 : 1 }} />
-          <button className="ac-value" onClick={() => setImperial((v) => !v)} title="ft / m">{fmt(effRangeFt)}</button>
+          <input id={rangeId} type="range" aria-valuetext={fmt(effRangeFt)} min={20} max={maxFt} step={5} value={effRangeFt} disabled={downLike || comboAuto} title={downLike || comboAuto ? t('auto_follows') : t('lab_manual')} onChange={(e) => setRangeFt(+e.target.value)} className="ac-range w-28" style={{ '--fill': `${((effRangeFt - 20) / (maxFt - 20)) * 100}%`, opacity: downLike || comboAuto ? 0.45 : 1 }} />
+          <button type="button" className="ac-value" aria-label={t('lab_units', { unit: imperial ? 'ft → m' : 'm → ft' })} onClick={() => setImperial((v) => !v)} title="ft / m">{fmt(effRangeFt)}</button>
           {(downLike || comboAuto) && <span className="ac-soft text-[11px]">{t('auto_follows')}</span>} {/* no "max …" hint (website review 2026-10-26: specs say 230 ft, the app's steps go to 240) */}
         </Row>
         {DEV_TOOLS && deviceId === 'PL' && mode === 'forward' && (
@@ -387,9 +415,20 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
         <div className="ac-soft hidden px-1 text-[11.5px] leading-snug sm:block">
           {t(ICE ? 'desc_ice' : 'desc_lake', { device: device.name, beam: `${device.beamDeg}° × ${ICE ? 20 : device.thickDeg}°` })} {/* text only: specs say 39° × 20° for the Mini; the engine's 18° stays (Jason 2026-09-23) */}
         </div>
+        {!ICE && <><div className="lab-status"><span className={`lab-status-text ${paused ? 'is-paused' : ''}`}>{t(paused ? 'lab_paused' : 'lab_running')}</span><button type="button" className="lab-action" aria-pressed={paused} onClick={() => setPaused((v) => !v)}>{t(paused ? 'sonar_resume' : 'sonar_pause')}</button></div>{guide}</>}
         <ShopButton deviceId={deviceId} placement="panel" wide />
         {EXTRAS === 'a' && <div className="flex items-center justify-between gap-2 pt-1"><ShareButton /><AppBadges height={30} /></div>}
       </motion.div>
+      {!ICE && phone && !land && <section className="lab-mobile-hud" data-hint-avoid aria-label={t('learn_heading')}>
+        <p className="lab-eyebrow">ACCUPHY LAB</p>
+        <h1 className="lab-mobile-title">{home ? t('learn_home_title') : `${device.name} · ${t('mode_' + mode)}`}</h1>
+        {home ? <p className="lab-guide-copy">{t('learn_home_hint')}</p> : <>
+          <ModeGuide deviceId={deviceId} mode={mode} compact paused={paused} onPick={(m) => pickView(deviceId, m, 'panel')} />
+          <div className="lab-mobile-actions"><button type="button" className="lab-action" onClick={openHome}>{t('learn_change_view')}</button><button type="button" className="lab-action" aria-label={t('lab_units', { unit: imperial ? 'ft → m' : 'm → ft' })} onClick={() => setImperial(v => !v)}>{fmt(effRangeFt)} · {t(rangeIsAutomatic(mode) ? 'lab_auto' : 'lab_manual')}</button><button type="button" className="lab-action" aria-pressed={paused} onClick={() => setPaused(v => !v)}>{t(paused ? 'sonar_resume' : 'sonar_pause')}</button></div>
+          <details><summary>{t('learn_mobile_help')}</summary>{guide}</details>
+        </>}
+      </section>}
+      <div className="lab-feedback" role="status" aria-live="polite" aria-atomic="true">{feedback}</div>
       {/* B: a glass strip top-right (desktop: under the step cards' row; phones: under the safe area) with share + badges */}
       {EXTRAS === 'b' && (!phone || (started && !home)) && !land && (
         <div data-hint-avoid className="ac-hint pointer-events-auto absolute z-20 flex items-center gap-2 px-2 py-1.5 opacity-100" style={phone ? { left: 12, right: 12, top: 'calc(12px + env(safe-area-inset-top))', justifyContent: 'space-between' } : { right: 28, top: 204 }}>
@@ -422,17 +461,17 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
           {/* the display. Sideways phones (#140): the whole screen inside the safe areas (no drawn phone — the visitor's
               phone is the device), or, with the lake enlarged, a small sonar box top-right that taps back */}
           <div ref={(el) => { sonarRect.current.el = el }} style={land ? (lakeBig ? { ...LAND_SMALL, height: `${(34 / landAspect).toFixed(2)}vw` } : LAND_FULL) : { position: 'absolute', inset: '2.6%', borderRadius: '5.4% / 11.3%', containerType: 'size', overflow: 'hidden' }}>
-            <SonarChrome layout={layout} deviceId={deviceId} mode={mode} rangeFt={effRangeFt} depthFt={depthFt} imperial={imperial} gain={gain} autoDepth={autoDepth} autoRange={downLike || comboAuto} onRange={phone ? stepRange : undefined} onHome={phone ? () => { setHome(true); setLakeBig(false) } : undefined} phone={phone && !land} noMark={land && !lakeBig && !home && started} waterTempC={ICE ? 1.6 : 21.8} app={appCtl} onLocked={phone ? undefined : onLocked} depthRef={(el) => { state.current.depthEl = el }} />
+            <SonarChrome covered={phone && home} layout={layout} deviceId={deviceId} mode={mode} rangeFt={effRangeFt} depthFt={depthFt} imperial={imperial} gain={gain} autoDepth={autoDepth} autoRange={downLike || comboAuto} onRange={phone ? stepRange : undefined} onHome={phone ? openHome : undefined} phone={phone && !land} noMark={land && !lakeBig && !home && started} waterTempC={ICE ? 1.6 : 21.8} app={appCtl} onLocked={phone ? undefined : onLocked} depthRef={(el) => { state.current.depthEl = el }} />
             {phone && home && <AppHome ice={ICE} devices={SHOWN_DEVICES} deviceId={started ? deviceId : null} mode={started ? mode : null} onPick={(d, m) => { pickView(d, m, 'home'); setHome(false); setStarted(true) }} />}
             {/* sideways: the lake inset (drawn by SonarScreen.jsx into this button's rectangle); a tap swaps lake and sonar.
                 Top-right, clear of the rulers and the depth-range −/+; Combo keeps its readout top-right, so there top-left */}
             {land && !lakeBig && !home && started && (
-              <button ref={(el) => { sonarRect.current.lake = el }} type="button" className="ph-lake" aria-label="Show the lake" onPointerDown={(e) => e.stopPropagation()} onClick={() => setLakeBig(true)}
+              <button ref={(el) => { sonarRect.current.lake = el }} type="button" className="ph-lake" aria-label={t('show_lake')} onPointerDown={(e) => e.stopPropagation()} onClick={() => setLakeBig(true)}
                 style={{ top: '5.5cqh', width: '21%', ...(layout.split ? { left: '4.5%' } : { right: '4.5%' }) }}>
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M10 20H4v-6M20 4l-6.5 6.5M4 20l6.5-6.5" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" /></svg>
               </button>
             )}
-            {land && lakeBig && <button type="button" className="ph-lake-back" aria-label="Show the sonar full-screen" onPointerDown={(e) => e.stopPropagation()} onClick={() => setLakeBig(false)} />}
+            {land && lakeBig && <button type="button" className="ph-lake-back" aria-label={t('show_sonar')} onPointerDown={(e) => e.stopPropagation()} onClick={() => setLakeBig(false)} />}
             {!land && <div className="ph-glass" />}
           </div>
           {!land && (<>
@@ -454,7 +493,7 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
         )}
         {/* after sign-up the app buttons stay display-only: a short hint above the phone instead of the gate */}
         <div role="status" aria-live="polite" className={`ac-hint absolute bottom-full right-0 mb-3 max-sm:mb-16 whitespace-nowrap px-3.5 py-2 text-[12px] font-medium transition-opacity duration-300 ${toast ? 'opacity-100' : 'opacity-0'}`}>
-          {t(phone ? 'toast_phone' : 'toast_desktop')}
+          {toast ? t(phone ? 'toast_phone' : 'toast_desktop') : ''}
         </div>
       </div>
 
@@ -482,7 +521,7 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
       )}
 
       {/* ---- guide strip ---- */}
-      <div data-hint-avoid className={ICE ? 'pointer-events-auto absolute hidden flex-col gap-2 md:flex' : 'pointer-events-auto absolute right-[28px] top-4 hidden w-[min(620px,44vw)] items-stretch gap-2.5 md:flex'} style={ICE ? { left: 16, top: cardsTop, width: 400 } : land ? { display: 'none' } : undefined}>
+      {ICE && <div data-hint-avoid className="pointer-events-auto absolute hidden flex-col gap-2 md:flex" style={{ left: 16, top: cardsTop, width: 400 }}>
         {STEPS.map((st, i) => (
           <button key={st.n} onClick={() => goStep(i)} className={`ac-card flex-1 text-left ${ICE ? 'px-3.5 py-2.5' : 'px-3.5 py-3'} ${step === i ? 'is-active' : ''}`}>
             <div className="flex items-center gap-2"><span className="ac-num">0{st.n}</span><span className="ac-label">{t('step')}</span></div>
@@ -490,12 +529,19 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
             {step === i && <div className="ac-body mt-1.5 text-[11.5px] leading-snug">{st.text}</div>}
           </button>
         ))}
-      </div>
+      </div>}
       {import.meta.env.DEV && window.location.search.includes('debug') && (
         <pre ref={(el) => { state.current.debugEl = el }} className="pointer-events-none absolute left-2 top-1/2 rounded bg-black/60 p-1 text-[10px] text-lime-300" />
       )}
     </main>
-    {gate && <SignupGate onDone={() => setGate(false)} />}
+    {coverShop && createPortal(<ShopButton deviceId={deviceId} placement={phone ? 'frame-top' : 'panel'} />, coverShop)}
+    {(glLost || glError) && <div className="ac-lab font-brand" lang={LANG}><div className="lab-fallback" role="alert"><div className="lab-fallback-card">
+      <h2>{t(glLost ? 'gl_lost_title' : 'gl_unavailable_title')}</h2>
+      <p>{t(glLost ? 'gl_lost_text' : 'gl_unavailable_text')}</p>
+      <svg viewBox="0 0 400 120" role="img" aria-label={t(ICE ? 'gl_diagram_ice' : 'gl_diagram')}><path d="M0 105Q100 85 200 100T400 85" stroke="#92c7da" strokeWidth="2" fill="none"/><path d="M160 22 125 100 235 100Z" fill="#58b9e635" stroke="#83d2fa"/>{ICE ? <path d="M0 18H147M177 18H400" stroke="#c9e8f5" strokeWidth="12"/> : <><path d="M0 22H400" stroke="#92c7da" strokeWidth="2"/><path d="m134 10 10 13h48l12-13Z" fill="#fff"/></>}<path d="M176 68q12-15 24 0-12 15-24 0l-7 7V61Z" fill="#ffc969"/></svg>
+      <div className="lab-mobile-actions"><button ref={fallbackRef} type="button" className="lab-action" onClick={() => window.location.reload()}>{t('gl_retry')}</button><ShopButton deviceId={deviceId} placement={phone ? 'frame-top' : 'panel'} /></div>
+    </div></div></div>}
+    {gate && <div inert={glLost || glError ? true : undefined} aria-hidden={glLost || glError || undefined}><SignupGate onDone={() => setGate(false)} /></div>}
     </>
   )
 }
@@ -508,10 +554,10 @@ const LAND_SMALL = { position: 'absolute', top: 'calc(env(safe-area-inset-top) +
 function ring(pad) {
   return { position: 'absolute', inset: 0, padding: pad, WebkitMask: 'linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)', WebkitMaskComposite: 'xor', mask: 'linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0)' }
 }
-function Row({ label, children }) {
+function Row({ label, inputId, children }) {
   return (
     <div className="flex flex-wrap items-center gap-3">
-      <span className="ac-label w-14">{label}</span>
+      {inputId ? <label htmlFor={inputId} className="ac-label w-14">{label}</label> : <span className="ac-label w-14">{label}</span>}
       {children}
     </div>
   )

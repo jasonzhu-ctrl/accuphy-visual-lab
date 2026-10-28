@@ -3176,3 +3176,23 @@ Numbered log. Newest at the bottom.
      - Regression covers the real R3F store/global-loop race, 100 suspension cycles, fish callbacks and the ice drill
        callback; 15-minute fish simulation has zero structure/bottom/surface violations, minimum clearance 0.41 m.
        Browser viewport rotation is checked separately; it is not a physical-phone performance result.
+185. **2026-10-28 — Clearer learning controls and a game-like view guide.** Optimization review branch only,
+     explicitly requested by the user; not a change to the sonar model or the Shopify host.
+     - Summer mode selection uses translucent large Beam / Down View / Panoramic text, a short click/tap cue,
+       a check mark and pressed semantics. Beam maps to existing Forward; Mini's third view remains Combo.
+       A cue lasts at most three 1.4-second cycles per mounted guide and stops on selection. User pause and
+       reduced-motion preferences suppress it. Mobile still starts at App Home and keeps its return path.
+     - Consolidate learning with product/mode controls. Existing presets retain their actual state transitions;
+       feedback describes product, view and the actual AUTO/manual range status. Keyboard/directional movement
+       shares the boat target boundary, without generating the historical pointerdown-based first_drag event.
+     - Manual depth remains manual on entering Down: the new HUD/feedback and the app's AUTO text reflect that
+       state. Range button disabling, AUTO algorithms, values, supported views and simulation outputs are unchanged.
+     - Keep the real app layout; name live/reference controls, provide focus and selected semantics, and prevent
+       interaction with covered controls. Existing clipped app hit areas are measured and reported, not claimed
+       to all meet a 44-pixel target. The added mobile Home/Pause controls offer larger alternatives.
+     - Static share-page introduction and the existing product CTA precede 3D. Loading is a presentation state,
+       not a redefinition of ready. Initialization failure and context loss show an honest illustration/reload/CTA;
+       the ice illustration depicts an ice hole. Canvas restoration preserves React interaction state.
+     - Keep the iframe and all event/link implementations. No dependency, analytics consumer, historical report,
+       theme configuration or deployed version is changed. See lab-optimization-report.md for measured evidence
+       and outstanding real-host, analytics-backend and physical-device acceptance.

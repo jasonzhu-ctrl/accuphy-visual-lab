@@ -5,6 +5,7 @@
 import { build } from 'vite'
 import fs from 'node:fs'
 import path from 'node:path'
+import { LOADING_COPY } from '../src/experiments/2026-09-23-sonar-lake-3d/loadingCopy.js'
 
 const outDir = path.resolve(process.argv[2] || 'dist-share')
 const variant = process.env.VITE_LAB === 'fish' ? 'fish' : process.env.VITE_SCENE === 'ice' ? 'ice' : process.env.VITE_DEVICES === 'PLM' ? 'mini' : 'both' // pages (Jason 2026-10-16): PingLive + Mini, Mini only, and the ice-fishing page
@@ -42,15 +43,28 @@ if (left.length) throw new Error('unresolved absolute asset paths: ' + left.join
 js = js.replace(/<\/script/gi, '<\\/script'); css = css.replace(/<\/style/gi, '<\\/style')
 
 // The cover (BF funnel handoff 2026-10-26, item 3): pure HTML/CSS, painted as soon as the file has arrived, long before
-// the 3D is built (docs/2026-10-26-lab-load-time.md: the page lands at ~1.0 s on 4G, the lake at ~3.7 s). index.jsx fades it
-// out after the lake's first frames. The logo is the brand SVG, white.
+// the 3D is built (docs/2026-10-26-lab-load-time.md: the page lands at ~1.0 s on 4G, the lake at ~3.7 s). The app's canvas
+// lifecycle fades it out after the first frames. The logo is the brand SVG, white. The app may portal its existing
+// ShopButton into the empty slot; the builder never duplicates product URLs, UTM rules or event publishing.
 const logoSvg = fs.readFileSync(path.join('public', logo.slice(1)), 'utf8')
-const cover = `<div id="lab-cover" aria-live="polite"><div class="lab-cover-logo">${logoSvg}</div><div class="lab-cover-text">${variant === 'ice' ? 'Loading the ice' : 'Loading the lake'}…</div><div class="lab-cover-bar"><i></i></div></div>`
-const coverCss = `#lab-cover{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:${variant === 'ice' ? '#1a2335' : '#0f3b44'};color:#fff;font:600 14px/1.3 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;letter-spacing:.02em;transition:opacity .45s}#lab-cover.is-done{opacity:0;pointer-events:none}.lab-cover-logo svg{width:min(44vw,180px);height:auto;display:block;filter:drop-shadow(0 2px 8px rgba(0,0,0,.25))}.lab-cover-text{opacity:.85}.lab-cover-bar{width:min(44vw,180px);height:3px;border-radius:3px;background:rgba(255,255,255,.18);overflow:hidden}.lab-cover-bar i{display:block;height:100%;width:40%;border-radius:3px;background:#0d8fdb;animation:lab-cover-slide 1.4s ease-in-out infinite}@keyframes lab-cover-slide{0%{transform:translateX(-110%)}100%{transform:translateX(260%)}}`
+const escapeHtml = (text) => text.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]))
+const coverText = (key) => ['en', 'fr'].map((lang) => `<span class="lab-cover-${lang}" lang="${lang}">${escapeHtml(LOADING_COPY[key][lang])}</span>`).join('')
+const coverScene = variant === 'ice' ? 'ice' : 'lake'
+const cover = `<section id="lab-cover" aria-labelledby="lab-cover-title">
+<div class="lab-cover-logo" role="img" aria-label="Accuphy">${logoSvg}</div>
+<h1 id="lab-cover-title">${coverText('loading_heading')}</h1>
+<p class="lab-cover-hint">${coverText('loading_' + coverScene + '_hint')}</p>
+<p class="lab-cover-text" role="status">${coverText('loading_' + coverScene + '_status')}</p>
+<div class="lab-cover-bar" aria-hidden="true"><i></i></div>
+<div id="lab-cover-shop"></div>
+<noscript><style>#lab-cover .lab-cover-text,#lab-cover .lab-cover-bar{display:none}</style><div class="lab-cover-noscript"><p lang="en">${escapeHtml(LOADING_COPY.loading_no_script.en)}</p><p lang="fr">${escapeHtml(LOADING_COPY.loading_no_script.fr)}</p></div></noscript>
+</section>`
+const coverCss = `#lab-cover{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;box-sizing:border-box;padding:32px 24px;overflow-y:auto;text-align:center;background:${variant === 'ice' ? '#1a2335' : '#0f3b44'};color:#fff;font:500 14px/1.5 "Instrument Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;transition:opacity .45s}#lab-cover>*{flex-shrink:0}#lab-cover.is-done{opacity:0;pointer-events:none}#lab-cover .lab-cover-logo svg{width:min(44vw,180px);height:auto;display:block;filter:drop-shadow(0 2px 8px rgba(0,0,0,.25))}#lab-cover h1{max-width:22ch;margin:8px 0 0;font-size:clamp(25px,4vw,36px);font-weight:650;line-height:1.15;letter-spacing:-.02em}#lab-cover p{margin:0}#lab-cover .lab-cover-hint{max-width:38ch;font-size:clamp(15px,2vw,17px);color:rgba(255,255,255,.9)}#lab-cover .lab-cover-text{font-size:13px;color:rgba(255,255,255,.7)}#lab-cover .lab-cover-bar{width:min(44vw,180px);height:3px;border-radius:3px;background:rgba(255,255,255,.18);overflow:hidden}#lab-cover .lab-cover-bar i{display:block;height:100%;width:40%;border-radius:3px;background:#0d8fdb;animation:lab-cover-slide 1.4s ease-in-out infinite}#lab-cover-shop:empty{display:none}#lab-cover .lab-cover-noscript{max-width:42ch;color:rgba(255,255,255,.85)}#lab-cover .lab-cover-noscript p+p{margin-top:10px}#lab-cover .lab-cover-fr{display:none}html[lang="fr"] #lab-cover .lab-cover-en{display:none}html[lang="fr"] #lab-cover .lab-cover-fr{display:inline}@keyframes lab-cover-slide{0%{transform:translateX(-110%)}100%{transform:translateX(260%)}}@media(max-height:480px){#lab-cover{gap:10px;padding:16px 20px}#lab-cover .lab-cover-logo svg{width:120px}#lab-cover h1{font-size:22px;margin-top:0}#lab-cover .lab-cover-hint{font-size:14px}}@media(prefers-reduced-motion:reduce){#lab-cover{transition:none}#lab-cover .lab-cover-bar i{animation:none;transform:none;width:100%;opacity:.7}}`
 const makePage = (js) => `<title>${title}</title>
 <style>html,body{height:100%;margin:0;background:${variant === 'ice' ? '#1a2335' : '#0f3b44'};overscroll-behavior:none}#root{height:100%}${coverCss}</style>
 <style>${css}</style>
 <div id="root"></div>
+<script>try{document.documentElement.lang=new URLSearchParams(location.search).get('lang')==='fr'?'fr':'en'}catch{}</script>
 ${cover}
 <script>globalThis.__acLogo=${JSON.stringify(dataUri(logo.slice(1), 'image/svg+xml'))}</script>
 <script type="module">${js}</script>

@@ -1,0 +1,16 @@
+/* Preserve the measured app chrome when reference controls use native buttons. */
+.ph-chrome .ph-ctl {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+}
+
+/* Keep the existing .ph-live::before hit areas; expanding them again overlaps controls. */
+.ph-chrome .ph-live:focus-visible,
+.ph-chrome .ph-ctl:focus-visible,
+.ph-home .ph-tile:focus-visible {
+  outline: 2px solid #7fcfff;
+  outline-offset: 3px;
+}

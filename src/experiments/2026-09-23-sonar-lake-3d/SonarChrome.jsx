@@ -4,6 +4,8 @@
 // The app's buttons are display-only here: dimmed like a disabled iOS control (values stay bright) and a tap
 // opens the sign-up gate (onLocked) — Jason 2026-09-24. The depth axis runs on AUTO.
 import { FT } from '../2026-09-23-sonar-beam/devices'
+import { t } from './i18n'
+import './controls-a11y.css'
 
 const num = 'font-brand-body tabular-nums'
 
@@ -27,10 +29,11 @@ function BackIcon({ size }) {
   return <svg viewBox="0 0 24 24" aria-hidden="true" style={{ display: 'block', width: size, height: size }}><path fill="currentColor" d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z" /></svg>
 }
 
-function LockedCtl({ onLocked, children, style }) {
+function LockedCtl({ onLocked, children, label, style }) {
+  const description = t('sonar_reference_control', { control: label })
   return (
-    <span className="ph-ctl" role="button" aria-disabled="true" tabIndex={-1} title="App control — shown for reference"
-      onPointerDown={(e) => e.stopPropagation()} onClick={(e) => { e.stopPropagation(); onLocked?.() }} style={style}>{children}</span>
+    <button type="button" className="ph-ctl" disabled={!onLocked} aria-label={description} title={description}
+      onPointerDown={(e) => e.stopPropagation()} onClick={(e) => { e.stopPropagation(); onLocked?.() }} style={style}>{children}</button>
   )
 }
 
@@ -43,7 +46,7 @@ function LiveCtl({ onPress, disabled, children, label, style }) {
   )
 }
 
-export default function SonarChrome({ layout, deviceId, mode, rangeFt, depthFt, imperial, gain, depthRef, onLocked, autoDepth = true, autoRange = false, onRange, onHome, phone = false, waterTempC = 21.8, app, noMark = false }) {
+export default function SonarChrome({ layout, deviceId, mode, rangeFt, depthFt, imperial, gain, depthRef, onLocked, autoDepth = true, autoRange = false, onRange, onHome, phone = false, waterTempC = 21.8, app, noMark = false, covered = false }) {
   // `app` (phones, Jason 2026-10-16: 这些控制都做在手机上 … 模拟真实的 Accuphy Sonar app 里面的功能): the app's own controls are
   // live — gain −/+ (1 % a tap), pause and the depth-range −/+ (manual steps, AUTO off). The ⋯ settings button stays greyed and cannot be opened
   // (Jason 2026-10-17/18: noise reject 这些功能不要加进去 … 把 color map 也去掉). Without `app` they stay display-only (desktop).
@@ -92,7 +95,7 @@ export default function SonarChrome({ layout, deviceId, mode, rangeFt, depthFt, 
     <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: cq(7), height: cq(7), borderRadius: '50%', border: `${cq(0.55)} solid #fff`, fontSize: cq(5.5), lineHeight: 1, ...style }}>{children}</span>
   )
   return (
-    <div className="absolute inset-0 select-none text-white" style={{ fontFamily: 'var(--font-body, "Instrument Sans", system-ui, sans-serif)' }}>
+    <div className="ph-chrome absolute inset-0 select-none text-white" inert={covered || undefined} aria-hidden={covered || undefined} style={{ fontFamily: 'var(--font-body, "Instrument Sans", system-ui, sans-serif)' }}>
       {/* rulers: italic numbers, no lines (orange mode has no grid) */}
       {!iceHistory && top.map((v) => { const x = ((v - hx0) / (hx1 - hx0)) * 100; if (x < 1.5 || x > 98.5) return null; return <span key={`t${v}`} className={num} style={{ position: 'absolute', top: '1.5cqh', left: `${panelX(x)}%`, transform: 'translateX(-50%)', fontSize: '3.2cqh', fontStyle: 'italic', opacity: 0.9 }}>{label(v)}</span> })}
       {side.map((v) => { const y = ((v * unit - box.y0) / box.h) * 100; const yy = flat ? 100 - y : y; if (yy < 4 || yy > 96) return null; return <span key={`r${v}`} className={num} style={{ position: 'absolute', right: '0.6%', top: `${yy}%`, transform: 'translateY(-50%)', fontSize: '3.2cqh', opacity: 0.9 }}>{label(v)}</span> })}
@@ -122,12 +125,12 @@ export default function SonarChrome({ layout, deviceId, mode, rangeFt, depthFt, 
       {/* depth-range control on the right edge (PL Forward only) */}
       {showDepthRange && (
         <div style={{ position: 'absolute', right: '5.5%', top: '50%', transform: 'translateY(-50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: cq(2) }}>
-          {app ? <LiveCtl label="Depth range shallower" onPress={() => app.onDepth(-1)}><Ring>−</Ring></LiveCtl> : <LockedCtl onLocked={onLocked}><Ring>−</Ring></LockedCtl>}
+          {app ? <LiveCtl label={t('sonar_depth_shallower')} onPress={() => app.onDepth(-1)}><Ring>−</Ring></LiveCtl> : <LockedCtl label={t('sonar_depth_shallower')} onLocked={onLocked}><Ring>−</Ring></LockedCtl>}
           <span style={{ textAlign: 'center', lineHeight: 1.05 }}>
             {autoDepth && <span className={num} style={{ display: 'block', fontSize: cq(2.6), fontWeight: 700, letterSpacing: '0.12em', color: '#7fcfff' }}>AUTO</span>}
             <span className={num} style={{ fontSize: cq(4.6), fontWeight: 500 }}>{depthLabel}</span>
           </span>
-          {app ? <LiveCtl label="Depth range deeper" onPress={() => app.onDepth(1)}><Ring>+</Ring></LiveCtl> : <LockedCtl onLocked={onLocked}><Ring>+</Ring></LockedCtl>}
+          {app ? <LiveCtl label={t('sonar_depth_deeper')} onPress={() => app.onDepth(1)}><Ring>+</Ring></LiveCtl> : <LockedCtl label={t('sonar_depth_deeper')} onLocked={onLocked}><Ring>+</Ring></LockedCtl>}
         </div>
       )}
 
@@ -135,16 +138,17 @@ export default function SonarChrome({ layout, deviceId, mode, rangeFt, depthFt, 
       <div style={{ position: 'absolute', left: 0, right: 0, bottom: '2.5cqh', height: cq(9) }}>
         {/* the app's back button: on phones it is live and opens the app's Home (view selection) page (Jason 2026-10-16) */}
         {onHome
-          ? <LiveCtl label="Home" onPress={onHome} style={{ position: 'absolute', left: '2.5%', top: '50%', transform: 'translateY(-50%)', lineHeight: 0 }}><BackIcon size={cq(7.4)} /></LiveCtl>
-          : <LockedCtl onLocked={onLocked} style={{ position: 'absolute', left: '2.5%', top: '50%', transform: 'translateY(-50%)', lineHeight: 0 }}><BackIcon size={cq(7.4)} /></LockedCtl>}
+          ? <LiveCtl label={t('tab_home')} onPress={onHome} style={{ position: 'absolute', left: '2.5%', top: '50%', transform: 'translateY(-50%)', lineHeight: 0 }}><BackIcon size={cq(7.4)} /></LiveCtl>
+          : <LockedCtl label={t('tab_home')} onLocked={onLocked} style={{ position: 'absolute', left: '2.5%', top: '50%', transform: 'translateY(-50%)', lineHeight: 0 }}><BackIcon size={cq(7.4)} /></LockedCtl>}
         {!split && (
           <div style={{ position: 'absolute', left: phone ? '23%' : '19%', top: '50%', transform: 'translate(-50%, -50%)', display: 'flex', alignItems: 'center', gap: gapPM }}>
-            {onRange ? <LiveCtl label="Range shorter" disabled={autoRange} onPress={() => onRange(-1)}><Ring>−</Ring></LiveCtl> : <LockedCtl onLocked={onLocked}><Ring>−</Ring></LockedCtl>}
+            {onRange ? <LiveCtl label={t('sonar_range_shorter')} disabled={autoRange} onPress={() => onRange(-1)}><Ring>−</Ring></LiveCtl> : <LockedCtl label={t('sonar_range_shorter')} onLocked={onLocked}><Ring>−</Ring></LockedCtl>}
             <span style={{ position: 'relative', lineHeight: 1.05 }}>
-              {autoRange && <span className={num} style={{ position: 'absolute', left: '50%', bottom: '100%', transform: 'translateX(-50%)', fontSize: cq(2.6), fontWeight: 700, letterSpacing: '0.12em', color: '#7fcfff' }}>AUTO</span>}
+              {/* Disabling range buttons does not make a manually stepped depth automatic. */}
+              {autoRange && (autoDepth || mode === 'combo') && <span className={num} style={{ position: 'absolute', left: '50%', bottom: '100%', transform: 'translateX(-50%)', fontSize: cq(2.6), fontWeight: 700, letterSpacing: '0.12em', color: '#7fcfff' }}>AUTO</span>}
               <span className={num} style={{ fontSize: cq(4.8), fontWeight: 500 }}>{rangeLabel}</span>
             </span>
-            {onRange ? <LiveCtl label="Range longer" disabled={autoRange} onPress={() => onRange(1)}><Ring>+</Ring></LiveCtl> : <LockedCtl onLocked={onLocked}><Ring>+</Ring></LockedCtl>}
+            {onRange ? <LiveCtl label={t('sonar_range_longer')} disabled={autoRange} onPress={() => onRange(1)}><Ring>+</Ring></LiveCtl> : <LockedCtl label={t('sonar_range_longer')} onLocked={onLocked}><Ring>+</Ring></LockedCtl>}
           </div>
         )}
         {(() => { const glyph = app && app.paused
@@ -152,14 +156,14 @@ export default function SonarChrome({ layout, deviceId, mode, rangeFt, depthFt, 
           : <><i style={{ display: 'block', width: cq(0.9), height: cq(3.6), background: '#fff', borderRadius: cq(0.3) }} /><i style={{ display: 'block', width: cq(0.9), height: cq(3.6), background: '#fff', borderRadius: cq(0.3) }} /></>
           const ring = <Ring style={{ width: cq(9), height: cq(9), gap: cq(0.9) }}>{glyph}</Ring>
           const st = { position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }
-          return app ? <LiveCtl label={app.paused ? 'Resume' : 'Pause'} onPress={app.onPause} style={st}>{ring}</LiveCtl> : <LockedCtl onLocked={onLocked} style={st}>{ring}</LockedCtl> })()}
+          return app ? <LiveCtl label={t(app.paused ? 'sonar_resume' : 'sonar_pause')} onPress={app.onPause} style={st}>{ring}</LiveCtl> : <LockedCtl label={t('sonar_pause')} onLocked={onLocked} style={st}>{ring}</LockedCtl> })()}
         {!split && (
           <div style={{ position: 'absolute', left: phone ? '77%' : '75%', top: '50%', transform: 'translate(-50%, -50%)', display: 'flex', alignItems: 'center', gap: gapPM }}>
-            {app ? <LiveCtl label="Gain lower" onPress={() => app.onGain(-1)}><Ring>−</Ring></LiveCtl> : <LockedCtl onLocked={onLocked}><Ring>−</Ring></LockedCtl>}<span className={num} style={{ fontSize: cq(4.8), fontWeight: 500 }}>{Math.round(gain * 100)}%</span>{app ? <LiveCtl label="Gain higher" onPress={() => app.onGain(1)}><Ring>+</Ring></LiveCtl> : <LockedCtl onLocked={onLocked}><Ring>+</Ring></LockedCtl>}
+            {app ? <LiveCtl label={t('sonar_gain_lower')} onPress={() => app.onGain(-1)}><Ring>−</Ring></LiveCtl> : <LockedCtl label={t('sonar_gain_lower')} onLocked={onLocked}><Ring>−</Ring></LockedCtl>}<span className={num} style={{ fontSize: cq(4.8), fontWeight: 500 }}>{Math.round(gain * 100)}%</span>{app ? <LiveCtl label={t('sonar_gain_higher')} onPress={() => app.onGain(1)}><Ring>+</Ring></LiveCtl> : <LockedCtl label={t('sonar_gain_higher')} onLocked={onLocked}><Ring>+</Ring></LockedCtl>}
           </div>
         )}
         {/* ⋯ settings: always greyed; on phones a tap does nothing (Jason 2026-10-18: 这三个点的设置灰色按钮不让进) */}
-        <LockedCtl onLocked={app ? undefined : onLocked} style={{ position: 'absolute', right: '2.5%', top: '50%', transform: 'translateY(-50%)', fontSize: cq(7), lineHeight: 0.6, letterSpacing: '-0.05em' }}>•••</LockedCtl>
+        <LockedCtl label={t('tab_setting')} onLocked={app ? undefined : onLocked} style={{ position: 'absolute', right: '2.5%', top: '50%', transform: 'translateY(-50%)', fontSize: cq(7), lineHeight: 0.6, letterSpacing: '-0.05em' }}>•••</LockedCtl>
       </div>
     </div>
   )
