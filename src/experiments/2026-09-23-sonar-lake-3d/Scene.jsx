@@ -366,14 +366,21 @@ function Water({ state }) {
         F = clamp(F * (1.0 + 5.0 * rip), 0.0, 1.0);
         s *= clamp(1.0 + 1.6 * rip, 0.7, 1.35);
         float alpha = clamp(F + (1.0 - F) * s, 0.0, 1.0);
-        vec3 col = (sky * F + veil * (1.0 - F) * s) / max(alpha, 1e-3) + vec3(1.0, 0.97, 0.9) * sun;
+        vec3 col = (sky * F + veil * (1.0 - F) * s) / max(alpha, 1e-3);
         // crisp sky glints on the ripples' backs (#164, Accuphy's own PingLive animations and the dark-lake
         // photos): thin and sparse, so the ripples read through light, not through a busy mottle
         float glint = smoothstep(0.05, 0.1, rip) * (1.0 - smoothstep(0.2, 0.6, foot));
         col += sky * glint * 0.13; alpha += glint * 0.05;
+        // Roll off the sun's strongest facets before compositing. Adding sun to both straight RGB and alpha
+        // clipped strong facets to opaque white. Composite bounded highlight coverage
+        // over the existing surface instead; wave normals, the path and the real water-column colour below stay.
+        float sunCover = sun / (1.0 + sun);
+        float surfaceCover = clamp(alpha, 0.0, 1.0) * (1.0 - sunCover);
+        alpha = surfaceCover + sunCover;
+        col = (col * surfaceCover + vec3(1.0, 0.97, 0.9) * sunCover) / max(alpha, 1e-3);
         float dist = length(vW - cameraPosition);
         float fog = smoothstep(120.0, 420.0, dist);
-        gl_FragColor = vec4(mix(col, uSky, fog), mix(clamp(alpha + sun, 0.0, 1.0), 1.0, fog));
+        gl_FragColor = vec4(mix(col, uSky, fog), mix(alpha, 1.0, fog));
       }
     `,
   }), [fft])

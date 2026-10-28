@@ -3152,3 +3152,16 @@ Numbered log. Newest at the bottom.
        - In Combo the app keeps the ACCUPHY wordmark above the readout at top right; ours drops the wordmark there.
      - **Checks:** before/after sheet `docs/2026-10-27-plm-forward-no-depth.jpg` (lake desktop, ice desktop, phone 390×844,
        the app frame). 0 console errors on both pages.
+183. **2026-10-28 — Bounded water highlights, on the optimization review branch only.** The user authorized the
+     ACCUPHY Lab optimization plan and studying webgl-seascape-video's water/light approach. The existing FFT sea,
+     photographic sky, Fresnel, water-column tint and circular wake remain the single lake implementation.
+     - `Scene.jsx` Water now composites `sun / (1 + sun)` coverage over the existing surface, instead of adding the
+       unbounded sun to both straight RGB and opacity. No external shader code or assets were copied.
+     - This changes the decorative surface only: no terrain, fish, beam geometry, hit/echo shader, calibration or
+       product parameter changes. Normal views and Panoramic still use the same sonar pipeline.
+     - Validation: 2,016 coverage cases finite and bounded; no-sun output agrees within floating-point roundoff.
+       The 36 fixed GPU view/position pairs keep identical simulation state; 22 echo images are pixel-identical,
+       and the maximum mean RGB difference is 0.000673 on a 0–255 scale. See `lab-optimization-report.md` for scope.
+     - Not deployed; the production version in `versions.md` is unchanged. Revert this isolated commit to restore
+       the old sun composition. #182 is already referenced by backlog's market-link fix but has no numbered entry
+       in this checkout; this entry deliberately does not invent or overwrite that historical decision.

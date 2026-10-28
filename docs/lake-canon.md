@@ -16,7 +16,7 @@ Jason, 2026-10-27: the lake scene (boat and lake), its effects, the sonar pictur
 | Element | Canon | Decisions |
 |---|---|---|
 | Water surface | FFT wind-sea spectrum, ABYSSAL look | #165 (after #162–#164) |
-| Sky in the water | real photographed sky, sun glitter path, clouds | #161, #162 |
+| Sky in the water | real photographed sky, sun glitter path, clouds; bounded sun coverage keeps the brightest facets from clipping the water to opaque white (review branch, not deployed) | #161, #162, #183 |
 | Boat wake | **round rings** spreading from the hull while it moves (in, 2026-10-27) | #175 (replaces #166's wake) |
 | Drag cue | reticle on the water, ripple every 2.6 s, back once the boat stops | #132, #160, #166 |
 | Water column from above | tints the bottom with depth | #156 |
