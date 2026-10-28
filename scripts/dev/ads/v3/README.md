@@ -280,3 +280,22 @@ second preview server, "ad-lake-mini" (port 5191), added to `.claude/launch.json
   - 10 fps preview and contact sheet for HQ: 30 min.
 - After HQ's check: the 30 fps 9:16, 4:5 and clean versions, about 1 h (the render runs ~25 min).
 - If Jason's v3 changes are large (new beats or cameras), add their time once known.
+
+## Google Ads / YouTube formats: 16:9 and 1:1 (plan only, 2026-10-28)
+
+Jason (10-28, via CHIEF): Google Ads joins Meta and YouTube for Canada and the US from 11-02. Google and YouTube also take
+landscape 16:9 and square 1:1. Klaviyo HQ lists the exact assets, and nothing is rendered before HQ relays Jason's go. The
+same answer holds for the PingLive v3 film and the Mini US film.
+
+| Format | From the existing passes? | Type layout | Safe zones | Time per film |
+|---|---|---|---|---|
+| 9:16 1080×1920 | exists (YouTube Shorts uses it as is) | as now | Reels / Shorts zones as now | — |
+| 4:5 1080×1350 | exists (`to45.py`) | the 9:16 type at 70 % | — | — |
+| **1:1 1080×1080** | **Yes: a crop plus a new type pass.** Crop the clean graded frames to the window y ≈ 240–1320. That window holds the line, the 135° block from above (780–1266), the boat and the lifted phone (748–1233) and the end card (640–1105), all at full resolution. | Re-laid for the square on the kept clean frames: the wordmark top left at ~40 px, the number and line ~70 px down, the end card centred. `comp3.mjs` gets a square layout. | ~6 % margins all round; nothing in the bottom ~12 % (feed captions / CTA bars). Check against Google's spec sheet | ~1–1.5 h (window per shot, layout, check, encode) |
+| **16:9 1920×1080** | **No: a new recording at 1920×1080.** The 9:16 picture would be only 608 px wide in a 1920 frame. A `to45.py`-style side fill is possible as a ~20 min emergency fallback, but it looks like a phone video in a TV frame, so it is not recommended. | **Lake shots:** new cameras for landscape. The fov is vertical, so the same camera shows far more water to the sides. The block or curtains sit centre-right, the type in a left column (x 96–860). **Deep shot:** the page's desktop layout puts the phone at its desktop size bottom right. Lift it toward the centre with the same CSS trick, clear of the YouTube Skip button. | Title-safe ~5 %; keep the bottom-right corner (Skip ad), the bottom ~15 % (progress bar, CTA) and the top-left ad badge clear. Check against Google's spec sheet | ~3–4 h (three passes re-recorded on the same clock and choreography, cameras re-fitted, a landscape type layout, preview for HQ, render ~30 min) |
+
+- Doing both new formats for both films comes to roughly 9–11 h of work: 1:1 ≈ 2.5 h for the two films, 16:9 ≈ 7 h.
+  HQ's preview check comes on top, once per format.
+- If time is short before 11-02, the order I'd pick is: 1:1 for both films first (cheap, from the passes), then 16:9
+  PingLive (Canada), then 16:9 Mini (US).
+- 16:9 also suits YouTube's 15 s in-stream slot. Like all the films, it is silent by design (no music yet).
