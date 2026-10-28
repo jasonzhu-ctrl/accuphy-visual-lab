@@ -13,7 +13,7 @@ but is published nowhere and is redundant since #170.
 |---|---|---|---|
 | shop.accuphy.com/pages/lab and /fr/pages/lab | customers | an iframe of lab.accuphy.ca/ (not `/embed/`) | **9ed9341, newest** |
 | lab.accuphy.ca = accuphy-lab.vercel.app (one deployment) | anyone with the link | `/`, `/mini/`, `/ice/`, `/embed/` | **9ed9341, newest** |
-| Friends' test link jasonzhu-ctrl.github.io/accuphy-lab-test | friends, Jason | `/`, `/mini/`, `/ice/`; `/jig/`, `/pano/` forward to `/` | **9ed9341, newest** |
+| Friends' test link jasonzhu-ctrl.github.io/accuphy-lab-test | friends, Jason | `/`, `/mini/`, `/ice/`; `/jig/`, `/pano/` forward to `/` | **1fc1678, newest** |
 | claude.ai private previews | — | **none**: the four old ones (RnCB, VxxnV fish test, G5uZ ice, 4GdHH) were deleted 2026-10-27 at Jason's word ("如果是现在项目需要的话留一个就行了"; the test link does the job) | — |
 | The v3 ad film | Meta, from 11/2 | recorded | lake 1abeedf (before #178; its shots show no Panoramic sonar) |
 
@@ -88,6 +88,7 @@ the Mini page; `VITE_SCENE=ice` for the ice page → `/ice/` on GitHub Pages sin
 | 2026-10-27 | Public test page `/jig/` | 218e483 | 0f4439e | Lake with the 110 ft hole and the jig drop from the boat (`?jig`, best with `?boat=-22.9,-47.2`) (#172) |
 | 2026-10-27 | Public test page `/jig/` | 557f1b2 | 7191adc | Fish schools spread out (#173) on top of the hole and jig (#172) |
 | 2026-10-27 | Public test page `/jig/` | 58ea10f | 2418a2d | Fish spread round 2 at Jason's screenshot spot and the phone start (#173) |
+| 2026-10-28 | **All test links** `/`, `/mini/`, `/ice/` | 1fc1678 | bb1aa31 | The Shop link follows the store's market (`?shop=`, #182, website #228). HQ check: with `?shop=/de-de` the button goes to `/de-de/products/pinglive-sonar` (navigation caught in the page). Test-link repo re-cloned into the HQ scratchpad (the old clone lost its `.git` core files at midnight). lab.accuphy.ca still 9ed9341 |
 | 2026-10-27 | **Vercel** `accuphy-lab` → **lab.accuphy.ca** `/`, `/mini/`, `/ice/`, `/embed/` | 9ed9341 | — | Jason said 动 in Lab HQ ("动，lab.accuphy.ca 更新到最新版"). Each page folder carries its `home/` thumbnails (#180). Checked: pages md5-identical to the test links, thumbnails and `/embed/` 200, CSP and noindex, embed stand-in mounts, phone layout 11/11 thumbnails, the store page frames it, 0 console errors. Replaces 283ecb9 |
 | 2026-10-27 | **All test links** `/`, `/mini/`, `/ice/` | 9ed9341 | ccac583 | Download halved (#180: woff2 subsets, SVG logo, Home thumbnails as files in `home/` beside each page); PingLive Mini Forward without the depth readout (#181). Each page folder now carries its own `home/`. All 11 thumbnails load on the phone layout; 0 errors. lab.accuphy.ca still 283ecb9 |
 | 2026-10-27 | **Vercel** `accuphy-lab` → **lab.accuphy.ca** `/`, `/mini/`, `/ice/`, `/embed/` | 283ecb9 | — | Jason said 动 in Lab HQ. Built from a clean checkout of 283ecb9: the three share pages (byte-identical to the test links) + `build-embed.mjs` (`lab-e35c0a69c4.js`) + `vercel.json`; deployed with the Vercel CLI (`deploy --prod --scope accuphy`). Checked: all paths 200, md5 match, CSP frame-ancestors and noindex, `/embed/` CORS, the embed stand-in mounts, 0 console errors. Replaces 50ad8ca |
