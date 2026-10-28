@@ -3176,3 +3176,20 @@ Numbered log. Newest at the bottom.
        must not touch the sonar imaging engine or its logic. Jason decides what goes live.
      - Where his material is: the scripts and plans in `scripts/dev/ads/` (README v3: shots, Mini US, Google/YouTube formats),
        the films in the shared Drive Marketing folder (#179 note), the `ad-video` skill.
+184. **2026-10-28** — **Shop click: wait 1 s, "Opening the store…", no repeat clicks** (website #228 second part; Jason to the
+     website HQ: "修复"; dispatched by Lab HQ). GA4's `lab_shop_click` was lost: gtag queues events for ~5 s and flushes on
+     unload, and the Lab left the page 150 ms after the click, before the event was queued. The website's 00 measured that
+     1000 ms delivers both GA4 and Meta (`accuphy-website/backups/2026-10-28-d228b-shopclick-events/README.md`).
+     - `embed.js`: `SHOP_DELAY_MS = 1000`; `openShop` ignores further calls while the jump is pending (`isOpeningShop`,
+       `onOpeningShop`), and `pageshow` with `persisted` (back from the store through the bfcache) resets it.
+     - `ShopButton.jsx`: both placements (desktop panel, phone pill) share that state — label `shop_opening` ("Opening the
+       store…" / "Ouverture de la boutique…", the FR drafted from the glossary, **for the website HQ's review**), no arrow,
+       `aria-busy`, `.is-opening` (progress cursor, slightly dimmed).
+     - **Checked** on the built page in headless Chrome, EN and FR: after one click the label changes, three clicks send one
+       `shop_click`, the document request to `/de-de/products/pinglive-sonar` (and `/fr/…`) leaves 1006–1030 ms after the
+       click. In the browser pane on the phone pill: the jump reached the real store; the back button returned to a fresh
+       button (`back_forward`; whether that was the bfcache or a reload is not proven).
+     - Noticed, for the website: in the pane a click with `?lang=fr` requested `/fr/products/pinglive-sonar`, but the store
+       answered with the English page `/products/pinglive-sonar` (a store-side language redirect for a browser without French);
+       `curl` gets 200 on `/fr/…`, 200 on `/de-de/…`, and the 301 to the Mini on `/en-us/…`.
+     - Not now: the bridge receipt before jumping (website: after 11-02).

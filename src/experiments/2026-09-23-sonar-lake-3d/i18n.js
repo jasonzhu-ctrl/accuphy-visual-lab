@@ -59,6 +59,7 @@ const S = {
   share_copied: { en: 'Link copied', fr: 'Lien copié' },
   // the Shop button
   shop: { en: 'Shop {name}', fr: 'Achetez le {name}' }, // after the store's own "Achetez maintenant →" (shop.accuphy.com/fr); the arrow is the button's icon
+  shop_opening: { en: 'Opening the store…', fr: 'Ouverture de la boutique…' }, // shown for the 1 s before the page leaves (website #228). FR drafted from the glossary (boutique = the store) — FOR THE WEBSITE HQ'S REVIEW
   // the app's Home page inside the phone
   tile_panoramic: { en: 'Panoramic View', fr: 'Vue panoramique' },
   tile_forward: { en: 'Forward View', fr: 'Vue avant' },

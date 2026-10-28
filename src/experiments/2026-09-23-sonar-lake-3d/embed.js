@@ -85,11 +85,25 @@ export function shopUrl(deviceId) {
   return url.href
 }
 
-// Opens the product page in the top window (out of the iframe), after reporting the click. The navigation waits a
-// moment so the click reaches the store page (postMessage is delivered as a later task) and its pixel before unload.
+// Opens the product page in the top window (out of the iframe), after reporting the click. The navigation waits ONE SECOND
+// so the click reaches the store page and its pixels before unload: GA4's gtag queues events for ~5 s and only flushes the
+// queue on unload, so at 150 ms `lab_shop_click` was never queued and was lost; the website's 00 measured that 1000 ms
+// delivers both GA4 and Meta (website #228, accuphy-website/backups/2026-10-28-d228b-shopclick-events/README.md; Jason
+// 2026-10-28: "修复"). The button shows "Opening the store…" meanwhile and repeat clicks do nothing (ShopButton.jsx).
+export const SHOP_DELAY_MS = 1000
+let opening = false
+const openingListeners = new Set()
+export function isOpeningShop() { return opening }
+export function onOpeningShop(fn) { openingListeners.add(fn); return () => openingListeners.delete(fn) }
+function setOpening(v) { opening = v; for (const fn of openingListeners) fn(v) }
+// back from the store with the back button (bfcache keeps the page alive): the button must work again
+try { window.addEventListener('pageshow', (e) => { if (e.persisted) setOpening(false) }) } catch { /* no window */ }
 export function openShop(deviceId, placement) {
+  if (opening) return false
+  setOpening(true)
   const href = shopUrl(deviceId)
   labEvent('shop_click', { product: PRODUCT[deviceId] || PRODUCT.PLM, placement, lang: LANG }) // no `device`: the website uses that field for phone/desktop (Lab HQ 2026-10-25)
   const go = () => { try { window.top.location.href = href } catch { window.location.href = href } }
-  setTimeout(go, 150)
+  setTimeout(go, SHOP_DELAY_MS)
+  return true
 }
