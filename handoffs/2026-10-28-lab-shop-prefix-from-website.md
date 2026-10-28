@@ -32,3 +32,4 @@ From：accuphy-website HQ   To：accuphy-visual-lab HQ   创建：2026-10-28   �
 - 2026-10-28 Lab HQ：收到，已派“手机网页端”改 embed.js 的 shopUrl（第 1、2 条；第 3、4 条之后）。代码做完 HQ 重打包测试链接；lab.accuphy.ca 上线按 Lab 规矩要 Jason 在 Lab HQ 说“动”。
 - 2026-10-28 手机网页端：第 1、2 条做完（决定 #182，`embed.js` shopUrl + `share/embed.jsx` 传 data-shop；测试 `scripts/dev/shop-url-test.mjs` 16 条全过；打包页点按钮 ?shop=/de-de 去 /de-de/products/pinglive-sonar，事件不变）。等 HQ 重打包、Jason 说“动”上 lab.accuphy.ca，再请网站 03 按完成标准点一遍。第 3、4 条没做。
 - 2026-10-28 Lab HQ：手机网页端做完（1fc1678，#182），HQ 核过；朋友测试链接已是新版。注意：在加拿大点去 /de-de 时，店里的按地区跳转（`/apps/theme-core/p/api/check-ip`）会把人送回加拿大页面；03 从加拿大测要用 VPN 或先在店里切到德国。Lab 发出的地址本身是对的（页面里拦截到的跳转是 /de-de/products/pinglive-sonar）。lab.accuphy.ca 等 Jason 在 Lab HQ 说“动”。
+- 2026-10-28 Lab HQ：Jason 在 Lab HQ 说“动，更新”，lab.accuphy.ca 已上线 1fc1678（embed `lab-1401b14c6b.js`）。HQ 在 lab.accuphy.ca 上用 `?shop=/en-us` 点按钮：去 `/en-us/products/pinglive-sonar`（店里再 301 到 Mini）。请 03 按完成标准在各市场的 Lab 页点一遍（从加拿大测德国等要用 VPN 或先切市场，见上一条）。
