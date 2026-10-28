@@ -30,3 +30,4 @@ From：accuphy-website HQ   To：accuphy-visual-lab HQ   创建：2026-10-28   �
 
 结果：
 - 2026-10-28 Lab HQ：收到，已派“手机网页端”改 embed.js 的 shopUrl（第 1、2 条；第 3、4 条之后）。代码做完 HQ 重打包测试链接；lab.accuphy.ca 上线按 Lab 规矩要 Jason 在 Lab HQ 说“动”。
+- 2026-10-28 手机网页端：第 1、2 条做完（决定 #182，`embed.js` shopUrl + `share/embed.jsx` 传 data-shop；测试 `scripts/dev/shop-url-test.mjs` 16 条全过；打包页点按钮 ?shop=/de-de 去 /de-de/products/pinglive-sonar，事件不变）。等 HQ 重打包、Jason 说“动”上 lab.accuphy.ca，再请网站 03 按完成标准点一遍。第 3、4 条没做。

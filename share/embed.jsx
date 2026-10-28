@@ -3,9 +3,11 @@
 // build and calls mount(); the page's data-* attributes stay on the element for later use (market, shop URL).
 import ReactDOM from 'react-dom/client'
 import SonarLake3D from '../src/experiments/2026-09-23-sonar-lake-3d'
+import { setEmbedOptions } from '../src/experiments/2026-09-23-sonar-lake-3d/embed'
 import '../src/index.css'
 
 export function mount(el) {
+  setEmbedOptions({ shop: el.dataset.shop, market: el.dataset.market, lang: el.dataset.lang }) // the store page's data-shop / data-market / data-lang (website #228)
   const root = ReactDOM.createRoot(el)
   root.render(<SonarLake3D />)
   return { unmount: () => root.unmount() }

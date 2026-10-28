@@ -36,6 +36,22 @@ export const PRODUCT = { PL: 'pinglive-sonar', PLM: 'pinglive-mini' }
 const LANG = (() => { try { return new URLSearchParams(window.location.search).get('lang') === 'fr' ? 'fr' : 'en' } catch { return 'en' } })() // ?lang=fr → the store's French pages (/fr/products/…), X-6L-fr
 export const LANG_PATH = LANG === 'fr' ? '/fr' : ''
 
+// The market root (website #228, handoffs/2026-10-28-lab-shop-prefix-from-website.md; Jason 2026-10-28 to the website HQ: "修复"):
+// the store's bridge passes `shop` = Liquid routes.root_url — "/" (Canada, English), "/fr", "/en-us", "/de-de", "/fr-benelux",
+// "/en-pl", "/en-ro" — on the iframe URL (?shop=…) or, theme-mounted, as data-shop on the mount element (share/embed.jsx →
+// setEmbedOptions). A value that does not look like a root is ignored, and the link falls back to the ?lang rule above.
+// Without it German and US visitors landed on the Canadian product page.
+const SHOP_ROOT = /^\/([a-z]{2}(-[a-z]{2,})?)?$/
+const embedOpts = {}
+export function setEmbedOptions(o = {}) { Object.assign(embedOpts, o) }
+export function shopRoot() {
+  let s = embedOpts.shop
+  if (s == null) { try { s = new URLSearchParams(window.location.search).get('shop') } catch { s = null } }
+  if (typeof s !== 'string') return null
+  s = s.trim().toLowerCase()
+  return SHOP_ROOT.test(s) ? (s === '/' ? '' : s) : null
+}
+
 export function storeOrigin() {
   try {
     // theme-mounted: the Lab runs on the store's own page, so the page's origin IS the store (the referrer there is
@@ -59,7 +75,8 @@ export function inStore() {
 
 export function shopUrl(deviceId) {
   const product = PRODUCT[deviceId] || PRODUCT.PLM
-  const url = new URL((LANG === 'fr' ? '/fr' : '') + '/products/' + product, inStore() ? storeOrigin() : STORE)
+  const root = shopRoot()
+  const url = new URL((root !== null ? root : LANG_PATH) + '/products/' + product, inStore() ? storeOrigin() : STORE)
   if (!inStore()) {
     let own = []
     try { own = [...new URLSearchParams(window.location.search)].filter(([k]) => k.startsWith('utm_')) } catch { own = [] }
