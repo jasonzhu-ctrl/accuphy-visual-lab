@@ -3167,7 +3167,12 @@ Numbered log. Newest at the bottom.
        Write on the repo). HQ takes AJ-nb to be 孙英杰, since the org has no one else.
      - 孙英杰 takes the ad film over to optimize it. Lab HQ stops asking Jason for his v3 changes.
      - The ad video chat (#179) pauses: no new renders until the scope below is clear.
-     - **Open, asked in Lab HQ:** does the handover cover only the PingLive v3 film, or also the US Mini film and the 16:9 / 1:1
-       versions that CHIEF wants by 10-31?
+     - **Scope, Jason in Lab HQ the same day:** "广告片的单一语言版本是所有的，然后基于这个我还会跟他讨论要修改什么，然后最终是你这里把它
+       制作成不同语言版本的。" So 孙英杰 owns every ad film's single-language master (PingLive v3, the US Mini film, the 16:9 /
+       1:1 formats). Jason agrees the changes with him. **The Lab makes the language versions** from the approved masters.
+     - **His brief:** Jason's email of 2026-10-28 (01:16 Toronto) to customerservice@accuphy.ca, "Accuphy Lab 项目：GitHub、视频和
+       最新进展". He answered "好的 收到". It says to work on his own branch and open a pull request, which Jason reviews before
+       merging into main. He may change and optimize the lake scene, and pick scenes and sonar pictures for videos himself. He
+       must not touch the sonar imaging engine or its logic. Jason decides what goes live.
      - Where his material is: the scripts and plans in `scripts/dev/ads/` (README v3: shots, Mini US, Google/YouTube formats),
        the films in the shared Drive Marketing folder (#179 note), the `ad-video` skill.
