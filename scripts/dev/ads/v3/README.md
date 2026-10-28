@@ -187,3 +187,96 @@ page was not reached): y 269 / 1248, x 65 / 1015.
 - The read-out climbs 58.8 → 101.5 ft (7.5–10 s).
 - The English lines are placeholders until Klaviyo HQ finals them. The end line is final.
 - For a new line, run `comp3.mjs` again on the kept frames, without recording again. The French version needs only `LINES`.
+
+## Mini US: the 15 s film for the US (plan only, 2026-10-28; nothing recorded)
+
+Why: 11-02 goes live in Canada and the US. PingLive is not sold in the US before February, so the US gets a PingLive Mini
+film (`docs/2026-10-28-bf-scope-expanded-plan.md`). The PingLive v3 film is the template: the same four beats, the virtual
+clock, the type layer, the grade, the Reels zones, the end card. **It waits for two things:** Jason's pending changes to
+the v3 film (they will likely apply here too) and his go for this film, both relayed by HQ.
+
+**True to the Mini:**
+- **Beam:** 39° (live view) × 20° (`IT/accuphy-website/docs/specs.md`). No 135° and no beam number on screen.
+- **Views:** Live Forward, Live Down and Live Combo; Live Ice belongs to the ice page.
+  - Live Forward has no depth read-out (#181).
+  - Live Down shows the depth top left, Live Combo top right.
+- **Units:** imperial (the page defaults to feet: read-outs `96.3 ft`, range `140ft`). English. The US Reels safe zones are
+  Meta's same Reels zones (14 % / 35 % / 6 %: y 269 / 1248).
+- **The Mini's hero beat is Live Combo:** two curtains at once, Down under the hull and Forward reaching ahead into the
+  timber. That is the Mini's own view, and the Lab already says it ("Combo shows Down and Forward side by side").
+
+**Recording source:** a fresh clean checkout of the current lake commit (`docs/versions.md`; 1fc1678 or later, so that
+#181 is in), built as the Mini-only page (`VITE_DEVICES=PLM`, like `/mini/`, which the US store page frames). It runs on a
+second preview server, "ad-lake-mini" (port 5191), added to `.claude/launch.json` at recording time.
+
+### Shots (probed on 2026-10-28 on 1abeedf; cameras to be fine-tuned in the 10 fps preview)
+
+**1 · Opening, 0–3 s: Mini Live Forward at the timber flat**
+- `?boat=16,11`, lake context, the same dolly as the v3 opening (`OPEN0` → `f5`).
+- Probed: the Mini's Forward curtain is narrower than PingLive's and reads well running into the standing timber.
+- Boat bow-first 16 → 18.5; `__chase('largemouth')` at 0.3 s.
+- Line (placeholder): `See what's ahead of your boat.` (Forward looks ahead; the v3 line is about "under").
+
+**2 · Hero, 3–7.5 s: Live Combo, the two curtains at once**
+- Same place, Live Combo (Down curtain R ≈ 10 m to the AUTO depth, Forward curtain R ≈ 25 m; both are in `s.specs`, so
+  `fanOpen` opens both at once).
+- **3.0–4.3 s:**
+  - Hard cut to camera `C1`: low behind the boat, looking along the beam (probe: `pos [4, 3, 13]`, look `[30, -6, 11]`,
+    fov 50).
+  - It needs pulling back (about `pos [-4, 6, 16]`), so the hull stays out of the type band.
+  - `fanOpen` runs 0.05 → 1. Both curtains grow together, one straight down under the hull, one ahead into the trees.
+- **4.6–6.9 s:**
+  - The swing: the camera orbits about 90° out to the south side and rises, landing on `C2`.
+  - `C2` is the probe's high side view, `pos [24, 22, 58]`, look `[24, -9, 11]`, fov 44: both curtains in the lake with
+    the timber lit.
+  - It is the same spherical swing as v3 (`swing()`), with its own low point and lift tuned in the preview.
+  - `__chase('largemouth')` at 5.6 s.
+- **6.9–7.5 s:** hold on `C2`.
+- **Type:**
+  - Instead of a counting number, a headline in Eurostile Heavy (~150 px): `AHEAD + BELOW`, with the `+` in brand blue.
+  - It lands when both curtains are fully open (4.3 s), with the blue rule.
+  - Line: `Live Forward and Live Down, at the same time.` Both are placeholders for Klaviyo HQ; Jason or HQ can pick another
+    headline, e.g. `LIVE COMBO`.
+- The brand-blue outline from the top is dropped: there is no top-down start here. The 3D curtains' own outlines carry it.
+
+**3 · Deep water, 7.5–11.5 s: Mini Live Down over the 110 ft hole**
+- Phone layout, tile "Live Down", the phone lifted out of the Reels zone exactly as in v3 (215 CSS px, real size).
+- Boat bow-first −33 → −25 over 7.5–9.3 s. The read-out climbs 96.3 → 109.9 ft (probed).
+- The three lake trout (~92–99 ft) show as marks just over the bottom on the phone (probed at −25).
+- Camera: like v3's `h`, with `dx` re-fitted so the boat sits under the line and the top of the Down curtain shows between
+  the line and the phone.
+- Line (placeholder): `Serious deep water ready.`
+- **Not Live Combo here:** over the hole, Combo's Forward panel paints the lakebed "ACCUPHY LAB" lettering. `noLogo` hides
+  it only from the 3D camera, not from the sonar. Live Down at −25 is clean.
+
+**4 · End card, 11.5–15 s:** as v3: the big wordmark, the blue rule, `Play the free sonar demo` / `Accuphy Lab` (final).
+
+### What is needed from others
+
+- **冰钓版本视觉效果 (#176): no new hook is needed.** `camOverride`, `fanOpen` (both Combo curtains), `adClean`, `adBeam`,
+  `__chase` and `window.__camera` cover every shot. Two things to check, not hooks:
+  - **Beam width:** the engine's Mini fan spans ±21.5° (43°) in `s.specs`; the spec is 39°. No number is shown, so the ad
+    is not blocked, but the curtain is ~10 % wider than the spec.
+  - **Lakebed lettering in the sonar:** if a later version wants Combo on the phone near the hole, a dev switch that keeps
+    the lakebed lockup out of the sonar picture would be needed.
+- **Klaviyo HQ:** the four English lines (US); the end line is final.
+- **Website HQ:** the US store page frames `lab.accuphy.ca/mini/` (already on their list).
+
+### Code changes (ad scripts only)
+
+- `film3.mjs`: a `FILM=pl|mini` switch picks the shot table (cameras, views, boat paths, calls); the passes and the clock
+  stay shared.
+- `overlay3.html` / `comp3.mjs`: the hero beat takes either a counting number (v3) or a headline word (Mini). Lines come
+  per film.
+- Outputs: `reference/ads/2026-11-bf/mini-us/plm-916-en.mp4`, `plm-45-en.mp4` and the two clean versions. They are copied
+  to the shared Drive folder above once approved.
+
+### Time
+
+- About half a day of work from the go, plus HQ's review loop:
+  - checkout and server: 15 min;
+  - script switch: 1 h;
+  - camera fitting for C1 / C2 / the deep camera: 1–2 h;
+  - 10 fps preview and contact sheet for HQ: 30 min.
+- After HQ's check: the 30 fps 9:16, 4:5 and clean versions, about 1 h (the render runs ~25 min).
+- If Jason's v3 changes are large (new beats or cameras), add their time once known.
