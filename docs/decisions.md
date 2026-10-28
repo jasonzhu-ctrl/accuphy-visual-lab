@@ -3152,3 +3152,22 @@ Numbered log. Newest at the bottom.
        - In Combo the app keeps the ACCUPHY wordmark above the readout at top right; ours drops the wordmark there.
      - **Checks:** before/after sheet `docs/2026-10-27-plm-forward-no-depth.jpg` (lake desktop, ice desktop, phone 390×844,
        the app frame). 0 console errors on both pages.
+182. **2026-10-28** — **The Shop link follows the store's market** (website #228, `handoffs/2026-10-28-lab-shop-prefix-from-website.md`;
+     Jason to the website HQ: "修复"; live on Jason's "动，更新" in Lab HQ).
+     - `embed.js` `shopUrl` takes the market root `shop` that the store passes (`?shop=` on the iframe URL, or `data-shop` on the
+       theme mount). It builds `<shop>/products/<product>` when the value matches `^/([a-z]{2}(-[a-z]{2,})?)?$`. Otherwise it
+       keeps the old rule (fr → `/fr`, the rest without a prefix). No utm inside the store, as before.
+     - Made by 手机网页端 (1fc1678, 16-case test `scripts/dev/shop-url-test.mjs`); written here by Lab HQ, which the commit had
+       named but not logged.
+     - Live on lab.accuphy.ca 2026-10-28 (`dpl_6T7KQTqt1zSKNHNbeXovVjMvbuDH`). HQ check: `?shop=/en-us` → `/en-us/products/pinglive-sonar`.
+     - Not done: `market=us` → Mini by default; the de/nl/pl/lv interface.
+183. **2026-10-28** — **The Lab's ad films go to the colleague 孙英杰** (Jason in Lab HQ: "PinLab 的广告片是交给那个，你要清楚一下，现在
+     GitHub 上面已经有一个公司的……organization 的一个账户了，然后他是我的同事孙英杰在管，他会拿过去去做优化").
+     - The GitHub organization `accuphy-marketing` holds the Lab repo. Its members are Jason (Owner) and AJ-nb (Member,
+       Write on the repo). HQ takes AJ-nb to be 孙英杰, since the org has no one else.
+     - 孙英杰 takes the ad film over to optimize it. Lab HQ stops asking Jason for his v3 changes.
+     - The ad video chat (#179) pauses: no new renders until the scope below is clear.
+     - **Open, asked in Lab HQ:** does the handover cover only the PingLive v3 film, or also the US Mini film and the 16:9 / 1:1
+       versions that CHIEF wants by 10-31?
+     - Where his material is: the scripts and plans in `scripts/dev/ads/` (README v3: shots, Mini US, Google/YouTube formats),
+       the films in the shared Drive Marketing folder (#179 note), the `ad-video` skill.
