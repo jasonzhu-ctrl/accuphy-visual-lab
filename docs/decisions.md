@@ -3245,3 +3245,35 @@ Numbered log. Newest at the bottom.
        `scripts/dev/shop-url-test.mjs` still 16/16. A wrong-origin receipt could not be staged from a real parent (a parent's
        origin is what `storeOrigin()` resolves); the source check covers the sibling case.
      - Release order (handoff): the website's bridge first (an old Lab without `url` gets no receipt and no jump), then the Lab.
+188. **2026-10-29** — **"Send to a friend" redone: a QR code and a link to copy on desktop, the native sheet on phones, the link
+     by market** (Jason in Lab HQ: "开搞 要做到丝滑 顺畅 无误 的"; on a Mac the #169 button opened the macOS share sheet — AirDrop,
+     Notes — which felt wrong on a computer; his idea: a QR code plus a link to copy).
+     - **Desktop** (the panel's link): a click opens a popover in the #186 store style — the QR of the share link as an SVG
+       (crisp at any DPR, made in the page by `qrcode-generator` 1.5.2, MIT, `assets/LICENSES.md`, no network), the caption
+       "Scan with your phone camera to open the Lab on your phone", the link in a read-only field that selects itself, "Copy
+       link" → "Copied ✓" for 1.5 s, the hint "Paste it into a message to a friend." Closes on ×, Esc, a click outside and a
+       second click; focus goes to × and comes back to the link; `role=dialog`, labels. Framer Motion fade (already in the
+       bundle). `navigator.share` is never called on desktop.
+     - **Phones** (the "Share" beside the Shop pill): the native sheet (iMessage, Messenger, WhatsApp…). Missing or refused
+       (NotAllowedError in the store's iframe without `web-share`): the same popover without the QR — link + Copy + WhatsApp +
+       SMS — rendered through a portal to `<body>` (inside the transformed dock `position: fixed` was relative to the dock).
+     - **The link** (`embed.js shareUrl(medium)`): `https://shop.accuphy.com<root>/pages/lab` with root = `shopRoot()` else the
+       ?lang rule (before, everyone shared the Canadian page); `ref=share&utm_source=lab_share&utm_medium=<qr|copy|native|
+       whatsapp|sms>&utm_campaign=bf2026_lab_<market>`; market = the `market` param, else from the root (`/fr` → fr, `/en-us` →
+       us, `/fr-benelux` → be, `/de-de` → de…), default ca. Klaviyo's D5 scheme; HQ confirms the names.
+     - **Events** `share { channel, market }`: qr_shown / fallback_shown when the popover opens, copy, native, whatsapp, sms.
+     - **Copy** in the store's iframe: `clipboard.writeText` → `execCommand('copy')` on the selected field → the text left
+       selected with "Press ⌘C / Ctrl+C to copy". Never `window.prompt`. HQ asks the website for `allow="clipboard-write;
+       web-share"` on the iframe.
+     - **Strings** (FR drafted, for the website's review #198): share_qr_caption, share_link_label, share_copy_hint,
+       share_copied_check, share_press_copy, share_close; "Partager" reused.
+     - **Checked:** `scripts/dev/share-url-test.mjs` 9/9 — the link for /, /fr, /en-us, /de-de, /fr-benelux, /en-pl (+market),
+       no shop with and without ?lang=fr, the copy medium; each QR decoded with jsQR to exactly that link. Dev server, Chrome:
+       desktop EN and FR popover opens once, one `qr_shown` event, Copy writes the exact link and shows "Copied ✓" (+ `copy`),
+       Esc and an outside click close it, focus returns to the link, a second open does not duplicate, 0 console errors;
+       the ice page the same (#94). Phone 390×844: native path hands `url …utm_medium=native` to the sheet (+ `native`, no
+       popover); NotAllowedError → the fallback popover centred, WhatsApp / SMS links carry their media, outside tap closes.
+       Built page in a store-like iframe (headless Chrome, trusted clicks): popover + QR, Copy → "Copied ✓" with and without
+       `allow=clipboard-write` (same-origin frame, so the permission case is not a strict proof; the JS-click run without a
+       gesture exercised the last fallback, "Press ⌘C"). **Not run:** Safari and Firefox (no Playwright here); a real phone.
+       Share build 1.92 MB, gzip 654.6 KB (+17.7 KB for the encoder and the popover). Sheet `docs/2026-10-29-share-popover.jpg`.

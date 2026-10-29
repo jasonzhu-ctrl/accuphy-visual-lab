@@ -53,3 +53,8 @@ SOFTWARE.
   the file was deleted.
 
 three.js: Copyright © 2010–2026 three.js authors, MIT licence (https://github.com/mrdoob/three.js/blob/dev/LICENSE).
+
+## qrcode-generator 1.5.2 (npm) — MIT
+
+QR encoder for "Send to a friend" (#188, 2026-10-29): the share link drawn as an SVG in the page, no network call.
+Copyright (c) 2009 Kazuhiko Arase. MIT License — https://github.com/kazuhikoarase/qrcode-generator

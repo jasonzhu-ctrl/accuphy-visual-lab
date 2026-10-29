@@ -128,9 +128,25 @@
 .ac-share.is-compact { font-size: 12.5px; text-shadow: 0 1px 2px rgba(0,20,30,0.55); }
 .ac-share.is-compact svg { filter: drop-shadow(0 1px 2px rgba(0,20,30,0.55)); }
 @media (pointer: coarse) { .ac-share { min-height: 44px; } } /* touch target */
-.ac-share-menu { position: absolute; left: 0; top: calc(100% + 8px); z-index: 60; display: flex; flex-direction: column; min-width: 168px; padding: 6px; border-radius: 10px; }
-.ac-share-menu > * { display: block; padding: 10px 12px; border-radius: 6px; border: 0; background: none; color: #fff; text-align: left; font: 600 13.5px 'Instrument Sans', sans-serif; text-decoration: none; cursor: pointer; }
-.ac-share-menu > *:hover { background: rgba(255,255,255,0.14); }
+.ac-share-pop { position: absolute; left: 0; bottom: calc(100% + 10px); z-index: 70; width: 292px; padding: 14px 14px 12px; border-radius: 10px; box-sizing: border-box;
+  background: rgba(14, 28, 36, 0.96); border: 1px solid rgba(255,255,255,0.14); box-shadow: 0 16px 40px rgba(2,20,30,0.45), 0 1px 0 rgba(255,255,255,0.08) inset; color: #fff; text-align: left; font: 500 12.5px/1.4 'Instrument Sans', system-ui, sans-serif; }
+.ac-share-pop.is-phone { position: fixed; left: 12px; right: 12px; bottom: auto; top: 50%; width: auto; transform: translateY(-50%); }
+.ac-share-pop h3 { margin: 0 24px 10px 0; font: 700 14px/1.2 'Instrument Sans', system-ui, sans-serif; }
+.ac-share-x { position: absolute; right: 8px; top: 8px; width: 28px; height: 28px; border: 0; border-radius: 6px; background: none; color: rgba(255,255,255,0.7); font-size: 18px; line-height: 28px; cursor: pointer; }
+.ac-share-x:hover, .ac-share-x:focus-visible { background: rgba(255,255,255,0.12); color: #fff; outline: none; }
+.ac-share-qr { display: block; width: 148px; height: 148px; margin: 0 auto 8px; padding: 8px; background: #fff; border-radius: 6px; box-sizing: border-box; }
+.ac-share-qr svg { display: block; width: 100%; height: 100%; shape-rendering: crispEdges; }
+.ac-share-cap { margin: 0 0 12px; text-align: center; color: rgba(255,255,255,0.78); }
+.ac-share-row { display: flex; gap: 6px; }
+.ac-share-field { flex: 1; min-width: 0; height: 34px; padding: 0 9px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.08); color: #fff; font: 500 12px 'Instrument Sans', system-ui, sans-serif; }
+.ac-share-field:focus { outline: 2px solid #028CDF; outline-offset: 0; }
+.ac-share-copy { flex: 0 0 auto; height: 34px; padding: 0 12px; border: 0; border-radius: 6px; background: #028CDF; color: #fff; font: 700 12.5px 'Instrument Sans', system-ui, sans-serif; cursor: pointer; white-space: nowrap; }
+.ac-share-copy:hover { filter: brightness(1.06); } .ac-share-copy:focus-visible { outline: 2px solid #fff; outline-offset: 1px; }
+.ac-share-copy.is-done { background: #1f9d55; }
+.ac-share-hint { margin: 7px 0 0; color: rgba(255,255,255,0.62); }
+.ac-share-alts { display: flex; gap: 6px; margin-top: 10px; }
+.ac-share-alts a { flex: 1; display: block; height: 34px; line-height: 34px; text-align: center; border-radius: 6px; border: 1px solid rgba(255,255,255,0.18); color: #fff; font: 600 12.5px 'Instrument Sans', system-ui, sans-serif; text-decoration: none; }
+.ac-share-alts a:hover { background: rgba(255,255,255,0.1); }
 .ac-badges-wrap { display: inline-flex; flex-direction: column; gap: 7px; pointer-events: auto; }
 .ac-cap { font: 600 11px/1.2 'Instrument Sans', system-ui, sans-serif; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255,255,255,0.68); text-shadow: 0 1px 2px rgba(0,20,30,0.35); }
 .ac-badges { display: inline-flex; gap: 10px; align-items: center; } /* gap ≥ a quarter of the badge height (Apple's clear space) */

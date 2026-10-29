@@ -64,6 +64,25 @@ export function storeOrigin() {
   return STORE
 }
 
+// "Send to a friend" (#188, Jason 2026-10-29 in Lab HQ): the STORE page of the visitor's own market — before, everyone shared
+// the Canadian page. Root = shopRoot() (the store's `shop`), else the ?lang rule. Tags follow Klaviyo's D5 scheme (HQ confirms
+// the names): ref=share, utm_source=lab_share, utm_medium = qr | copy | native | whatsapp | sms, utm_campaign=bf2026_lab_<market>.
+export function shareMarket() {
+  const m = (embedOpts.market ?? (() => { try { return new URLSearchParams(window.location.search).get('market') } catch { return null } })())
+  if (typeof m === 'string' && /^[a-z]{2}$/i.test(m.trim())) return m.trim().toLowerCase()
+  const root = shopRoot()
+  if (root === null || root === '') return LANG === 'fr' ? 'fr' : 'ca'
+  if (root === '/fr') return 'fr'
+  const region = root.split('-')[1] || ''
+  return region === 'benelux' ? 'be' : region.slice(0, 2) || 'ca'
+}
+export function shareUrl(medium) {
+  const root = shopRoot(); const path = (root !== null ? root : LANG_PATH) + '/pages/lab'
+  const u = new URL(path, STORE)
+  u.searchParams.set('ref', 'share'); u.searchParams.set('utm_source', 'lab_share'); u.searchParams.set('utm_medium', medium); u.searchParams.set('utm_campaign', 'bf2026_lab_' + shareMarket())
+  return u.href
+}
+
 // Inside the store (iframe or theme-mounted) the link carries NO utm_*: the visitor's own ad tags are already on the
 // store's visit, and a second set would overwrite the ad source — shop_click records the click instead (HQ's rule).
 // Opened on its own (lab.accuphy.ca) the visitor's utm_* are passed along as they are; none → the Lab's own referral tags.
