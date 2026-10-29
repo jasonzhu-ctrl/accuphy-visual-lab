@@ -3222,3 +3222,6 @@ Numbered log. Newest at the bottom.
      - Checked on the dev server, desktop and phone, EN and FR, lake and ice: no overlap, no console errors. Sheet
        `docs/2026-10-28-share-badges-store-style.jpg` sent to Jason; waiting for his look before HQ rebuilds.
      - `index.jsx` was touched for the placement lines only (buttons are the phone chat's, #176 note from HQ); the ice chat told.
+     - HQ's check (2026-10-28): Google's PNG carries its own transparent margin, so at the same box height its badge looked
+       smaller than Apple's. The two PNGs are cropped to their visible shape (en 564×168, fr 646×192), so at 40 px both badges
+       are the same height; Google asks for equal size side by side. Sheet redone.
