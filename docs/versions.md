@@ -5,7 +5,7 @@ with the source commit it was built from, so anyone can tell which version a lin
 
 ## Where the Lab lives (inventory, Lab HQ 2026-10-27)
 
-Newest code: **1e32b6b**. Page types in the code: Both `/`, Mini `/mini/`, Ice `/ice/`, the store embed `/embed/`
+Newest code: **8c15c20**. Page types in the code: Both `/`, Mini `/mini/`, Ice `/ice/`, the store embed `/embed/`
 (built only for Vercel); French is `?lang=fr` on any of them; the fish test page (`VITE_LAB=fish`) still exists in the code
 but is published nowhere and is redundant since #170.
 
@@ -13,7 +13,7 @@ but is published nowhere and is redundant since #170.
 |---|---|---|---|
 | shop.accuphy.com/pages/lab and /fr/pages/lab | customers | an iframe of lab.accuphy.ca/ (not `/embed/`) | **1e32b6b, newest** |
 | lab.accuphy.ca = accuphy-lab.vercel.app (one deployment) | anyone with the link | `/`, `/mini/`, `/ice/`, `/embed/` | **1e32b6b, newest** |
-| Friends' test link jasonzhu-ctrl.github.io/accuphy-lab-test | friends, Jason | `/`, `/mini/`, `/ice/`; `/jig/`, `/pano/` forward to `/` | **1e32b6b, newest** |
+| Friends' test link jasonzhu-ctrl.github.io/accuphy-lab-test | friends, Jason | `/`, `/mini/`, `/ice/`; `/jig/`, `/pano/` forward to `/` | **8c15c20, newest** |
 | claude.ai private previews | — | **none**: the four old ones (RnCB, VxxnV fish test, G5uZ ice, 4GdHH) were deleted 2026-10-27 at Jason's word ("如果是现在项目需要的话留一个就行了"; the test link does the job) | — |
 | The v3 ad film | Meta, from 11/2 | recorded | lake 1abeedf (before #178; its shots show no Panoramic sonar) |
 
@@ -88,6 +88,7 @@ the Mini page; `VITE_SCENE=ice` for the ice page → `/ice/` on GitHub Pages sin
 | 2026-10-27 | Public test page `/jig/` | 218e483 | 0f4439e | Lake with the 110 ft hole and the jig drop from the boat (`?jig`, best with `?boat=-22.9,-47.2`) (#172) |
 | 2026-10-27 | Public test page `/jig/` | 557f1b2 | 7191adc | Fish schools spread out (#173) on top of the hole and jig (#172) |
 | 2026-10-27 | Public test page `/jig/` | 58ea10f | 2418a2d | Fish spread round 2 at Jason's screenshot spot and the phone start (#173) |
+| 2026-10-29 | **All test links** `/`, `/mini/`, `/ice/` | 8c15c20 | 51ba917 | shop_click carries `url`; inside the store the Lab waits up to 400 ms for the store page's `shop_click_ack` and lets the store jump; without it, it jumps itself after 1 s (#187, website #229). HQ check on the live test link: one shop_click with the `/de-de/products/…` url for two clicks; headless jump to `/de-de/products/pinglive-sonar`, 0 errors (timing in software GL is ~10 s for both this and the live 1e32b6b, so the environment, not the change). lab.accuphy.ca still 1e32b6b |
 | 2026-10-28 | **Vercel** → **lab.accuphy.ca** + **all test links** `/`, `/mini/`, `/ice/` (+ `/embed/`) | 1e32b6b | b7e486c | Jason said 动 in Lab HQ after the list: the Shop click waits 1 s with "Opening the store…" (#184) and the share link + store badges in the store's style (#186, website-reviewed French). Deployment `dpl_5NuYegBX5drzurJrhpQGVTY8QnV6`, embed `lab-a600b3eb01.js`. Checked: lab.accuphy.ca and the test links md5-identical, thumbnails and `/embed/` 200, CSP and noindex, embed stand-in mounts, both badges 40 px on the live desktop panel, 0 console errors. No lake or sonar change since 1fc1678 |
 | 2026-10-28 | **All test links** `/`, `/mini/`, `/ice/` | 479ca21 | 0fd7281 | Shop click waits 1 s so GA4 keeps it; "Opening the store…" / "Ouverture de la boutique…"; repeat clicks ignored (#184, website #228). HQ check on the live test link (FR, 3 quick clicks): 1 shop_click, label switched, navigation to `/fr/products/pinglive-sonar` at 1002 ms. lab.accuphy.ca still 1fc1678 |
 | 2026-10-28 | **Vercel** `accuphy-lab` → **lab.accuphy.ca** `/`, `/mini/`, `/ice/`, `/embed/` | 1fc1678 | — | Jason said 动 in Lab HQ ("动，更新"). The Shop link follows the store's market (#182, website #228). Deployment `dpl_6T7KQTqt1zSKNHNbeXovVjMvbuDH`, embed `lab-1401b14c6b.js`. Checked: pages md5-identical to the test links, thumbnails and `/embed/` 200, CSP and noindex, embed stand-in mounts, 0 console errors; on lab.accuphy.ca `?shop=/en-us` sends the button to `/en-us/products/pinglive-sonar` (the store then 301s to Mini). Replaces 9ed9341 |
