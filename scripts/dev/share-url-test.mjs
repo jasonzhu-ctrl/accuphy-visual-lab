@@ -2,15 +2,15 @@
 import jsQR from 'jsqr'
 import qrcode from 'qrcode-generator'
 const cases = [
-  { shop: '/', expect: 'https://shop.accuphy.com/pages/lab?ref=share&utm_source=lab_share&utm_medium=qr&utm_campaign=bf2026_lab_ca' },
-  { shop: '/fr', expect: 'https://shop.accuphy.com/fr/pages/lab?ref=share&utm_source=lab_share&utm_medium=qr&utm_campaign=bf2026_lab_fr' },
-  { shop: '/en-us', expect: 'https://shop.accuphy.com/en-us/pages/lab?ref=share&utm_source=lab_share&utm_medium=qr&utm_campaign=bf2026_lab_us' },
-  { shop: '/de-de', expect: 'https://shop.accuphy.com/de-de/pages/lab?ref=share&utm_source=lab_share&utm_medium=qr&utm_campaign=bf2026_lab_de' },
-  { shop: '/fr-benelux', expect: 'https://shop.accuphy.com/fr-benelux/pages/lab?ref=share&utm_source=lab_share&utm_medium=qr&utm_campaign=bf2026_lab_be' },
-  { shop: '/en-pl', market: 'pl', expect: 'https://shop.accuphy.com/en-pl/pages/lab?ref=share&utm_source=lab_share&utm_medium=qr&utm_campaign=bf2026_lab_pl' },
-  { shop: null, lang: 'fr', expect: 'https://shop.accuphy.com/fr/pages/lab?ref=share&utm_source=lab_share&utm_medium=qr&utm_campaign=bf2026_lab_fr', note: 'no shop, ?lang=fr' },
-  { shop: null, expect: 'https://shop.accuphy.com/pages/lab?ref=share&utm_source=lab_share&utm_medium=qr&utm_campaign=bf2026_lab_ca', note: 'nothing: Canada' },
-  { shop: '/en-us', medium: 'copy', expect: 'https://shop.accuphy.com/en-us/pages/lab?ref=share&utm_source=lab_share&utm_medium=copy&utm_campaign=bf2026_lab_us' },
+  { shop: '/', expect: 'https://shop.accuphy.com/pages/lab?ref=share&utm_source=lab_share&utm_medium=referral&utm_content=qr&utm_campaign=bf2026_lab_ca' },
+  { shop: '/fr', expect: 'https://shop.accuphy.com/fr/pages/lab?ref=share&utm_source=lab_share&utm_medium=referral&utm_content=qr&utm_campaign=bf2026_lab_ca' },
+  { shop: '/en-us', expect: 'https://shop.accuphy.com/en-us/pages/lab?ref=share&utm_source=lab_share&utm_medium=referral&utm_content=qr&utm_campaign=bf2026_lab_us' },
+  { shop: '/de-de', expect: 'https://shop.accuphy.com/de-de/pages/lab?ref=share&utm_source=lab_share&utm_medium=referral&utm_content=qr&utm_campaign=bf2026_lab_de' },
+  { shop: '/fr-benelux', expect: 'https://shop.accuphy.com/fr-benelux/pages/lab?ref=share&utm_source=lab_share&utm_medium=referral&utm_content=qr&utm_campaign=bf2026_lab_be' },
+  { shop: '/en-pl', market: 'pl', expect: 'https://shop.accuphy.com/en-pl/pages/lab?ref=share&utm_source=lab_share&utm_medium=referral&utm_content=qr&utm_campaign=bf2026_lab_pl' },
+  { shop: null, lang: 'fr', expect: 'https://shop.accuphy.com/fr/pages/lab?ref=share&utm_source=lab_share&utm_medium=referral&utm_content=qr&utm_campaign=bf2026_lab_ca', note: 'no shop, ?lang=fr' },
+  { shop: null, expect: 'https://shop.accuphy.com/pages/lab?ref=share&utm_source=lab_share&utm_medium=referral&utm_content=qr&utm_campaign=bf2026_lab_ca', note: 'nothing: Canada' },
+  { shop: '/en-us', medium: 'copy', expect: 'https://shop.accuphy.com/en-us/pages/lab?ref=share&utm_source=lab_share&utm_medium=referral&utm_content=copy&utm_campaign=bf2026_lab_us' },
 ]
 const decode = (text) => { // the same encoder as the page, rendered to pixels with a quiet zone, read back with jsQR
   const qr = qrcode(0, 'M'); qr.addData(text); qr.make(); const n = qr.getModuleCount(), s = 4, q = 4 * s, w = n * s + 2 * q

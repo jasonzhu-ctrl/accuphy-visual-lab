@@ -3258,9 +3258,10 @@ Numbered log. Newest at the bottom.
        (NotAllowedError in the store's iframe without `web-share`): the same popover without the QR — link + Copy + WhatsApp +
        SMS — rendered through a portal to `<body>` (inside the transformed dock `position: fixed` was relative to the dock).
      - **The link** (`embed.js shareUrl(medium)`): `https://shop.accuphy.com<root>/pages/lab` with root = `shopRoot()` else the
-       ?lang rule (before, everyone shared the Canadian page); `ref=share&utm_source=lab_share&utm_medium=<qr|copy|native|
-       whatsapp|sms>&utm_campaign=bf2026_lab_<market>`; market = the `market` param, else from the root (`/fr` → fr, `/en-us` →
-       us, `/fr-benelux` → be, `/de-de` → de…), default ca. Klaviyo's D5 scheme; HQ confirms the names.
+       ?lang rule (before, everyone shared the Canadian page); `ref=share&utm_source=lab_share&utm_medium=referral&utm_content=<qr|copy|
+       native|whatsapp|sms>&utm_campaign=bf2026_lab_<market>` (website HQ 2026-10-29: GA4 files unknown mediums as
+       "Unassigned", so the channel goes in utm_content); market = the `market` param, else the country code from the root as
+       the bridge uses it (`/` and `/fr` → ca, `/en-us` → us, `/fr-benelux` → be, `/de-de` → de…), default ca. Klaviyo's D5 scheme.
      - **Events** `share { channel, market }`: qr_shown / fallback_shown when the popover opens, copy, native, whatsapp, sms.
      - **Copy** in the store's iframe: `clipboard.writeText` → `execCommand('copy')` on the selected field → the text left
        selected with "Press ⌘C / Ctrl+C to copy". Never `window.prompt`. HQ asks the website for `allow="clipboard-write;
