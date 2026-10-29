@@ -2,6 +2,8 @@
 // (Facebook's Android browser) three fallbacks: WhatsApp, SMS, copy the link. What goes out is the STORE page
 // (shop.accuphy.com/pages/lab?ref=share, /fr/ for French), never the Lab's own address. Each send reports `share`
 // with the channel. No reward wording anywhere (Meta forbids it; none is offered during BF).
+// Look (Jason 2026-10-28, "太 AI 了" about the pill): a plain text link in the panel's own type, a small share glyph before
+// it — the store's footer style, no pill, no glass.
 import { useEffect, useRef, useState } from 'react'
 import { labEvent, LANG_PATH } from './embed'
 import { t } from './i18n'
@@ -31,7 +33,7 @@ export default function ShareButton({ compact = false, className = '', style }) 
     <span className={`ac-share-wrap ${className}`} style={style} onPointerDown={(e) => e.stopPropagation()}>
       <button type="button" className={`ac-share ${compact ? 'is-compact' : ''}`} aria-label={t('share')} aria-expanded={open} onClick={onClick}>
         <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M11 2.5 8 5.5M11 2.5v3M11 2.5H8M8 5.5 3 10.5v3h3l5-5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>
-        {!compact && <span>{t('share')}</span>}
+        <span>{t(compact ? 'share_short' : 'share')}</span>
       </button>
       {open && (
         <span className="ac-share-menu glass" role="menu">

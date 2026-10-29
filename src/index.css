@@ -120,16 +120,19 @@
 @media (pointer: coarse) { .ac-shop { height: 44px; padding: 0 18px 0 20px; } } /* touch targets ≥ 44 px (docs/ui-screen-rules.md) */
 
 /* "Send to a friend" + the App badges (BF funnel 2026-10-26, items 1–2) */
+/* "Send to a friend" and the store badges, store style (Jason 2026-10-28: the first pill-and-glass look was "太 AI 了") */
 .ac-share-wrap { position: relative; display: inline-flex; pointer-events: auto; }
-.ac-share { display: inline-flex; align-items: center; gap: 7px; height: 38px; padding: 0 16px; border-radius: 999px; border: 0; cursor: pointer; color: #fff;
-  font-family: 'Instrument Sans', sans-serif; font-weight: 600; font-size: 13.5px; white-space: nowrap; background: rgba(255,255,255,0.16);
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.32), 0 6px 18px rgba(2,22,32,0.18); -webkit-tap-highlight-color: transparent; touch-action: manipulation; transition: background .18s; }
-.ac-share:hover { background: rgba(255,255,255,0.24); }
-.ac-share.is-compact { width: 38px; padding: 0; justify-content: center; }
-@media (pointer: coarse) { .ac-share { height: 44px; } .ac-share.is-compact { width: 44px; } }
-.ac-share-menu { position: absolute; left: 0; top: calc(100% + 8px); z-index: 60; display: flex; flex-direction: column; min-width: 168px; padding: 6px; border-radius: 14px; }
-.ac-share-menu > * { display: block; padding: 10px 12px; border-radius: 9px; border: 0; background: none; color: #fff; text-align: left; font: 600 13.5px 'Instrument Sans', sans-serif; text-decoration: none; cursor: pointer; }
+.ac-share { display: inline-flex; align-items: center; gap: 6px; padding: 0; border: 0; background: none; cursor: pointer; color: #fff; white-space: nowrap;
+  font: 600 13px/1.2 'Instrument Sans', system-ui, sans-serif; text-decoration: underline; text-decoration-thickness: 1px; text-decoration-color: rgba(255,255,255,0.4); text-underline-offset: 3px; }
+.ac-share:hover { text-decoration-color: #fff; }
+.ac-share.is-compact { font-size: 12.5px; text-shadow: 0 1px 2px rgba(0,20,30,0.55); }
+.ac-share.is-compact svg { filter: drop-shadow(0 1px 2px rgba(0,20,30,0.55)); }
+@media (pointer: coarse) { .ac-share { min-height: 44px; } } /* touch target */
+.ac-share-menu { position: absolute; left: 0; top: calc(100% + 8px); z-index: 60; display: flex; flex-direction: column; min-width: 168px; padding: 6px; border-radius: 10px; }
+.ac-share-menu > * { display: block; padding: 10px 12px; border-radius: 6px; border: 0; background: none; color: #fff; text-align: left; font: 600 13.5px 'Instrument Sans', sans-serif; text-decoration: none; cursor: pointer; }
 .ac-share-menu > *:hover { background: rgba(255,255,255,0.14); }
-.ac-badges { display: inline-flex; gap: 8px; align-items: center; pointer-events: auto; }
-.ac-badges img { display: block; height: var(--h, 32px); width: auto; border-radius: 6px; }
+.ac-badges-wrap { display: inline-flex; flex-direction: column; gap: 7px; pointer-events: auto; }
+.ac-cap { font: 600 11px/1.2 'Instrument Sans', system-ui, sans-serif; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255,255,255,0.68); text-shadow: 0 1px 2px rgba(0,20,30,0.35); }
+.ac-badges { display: inline-flex; gap: 10px; align-items: center; } /* gap ≥ a quarter of the badge height (Apple's clear space) */
+.ac-badges img { display: block; height: var(--h, 40px); width: auto; } /* the official artwork as shipped: no rounding, no tint */
 .ac-badges a { display: block; line-height: 0; }

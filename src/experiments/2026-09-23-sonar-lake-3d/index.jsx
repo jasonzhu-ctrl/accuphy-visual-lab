@@ -18,7 +18,6 @@ import { t } from './i18n' // every visitor-visible string, English or French (?
 import ShareButton from './ShareButton'
 import AppBadges from './AppBadges'
 // BF funnel items 1–2 (handoff 2026-10-26): two placements for Jason to pick (HQ: 先出 2 个样子，不直接定); off until he does
-const EXTRAS = (() => { try { const v = new URLSearchParams(window.location.search).get('extras'); return v === 'a' || v === 'b' ? v : null } catch { return null } })()
 import { depthAt } from './terrain'
 import { panoHalfWidth } from './sonarMarks'
 // dev: ?bigphone makes the phone huge so the sonar picture can be inspected in screenshots
@@ -322,7 +321,8 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
       <div className="absolute inset-0 touch-none">
         {mount3d && !glLost && <LakeScene key={glKey} state={state} sonarRect={sonarRect} paused={gate || paused} scene={scene} />}
       </div>
-      {EXTRAS === 'a' && phone && !land && started && !home && <AppBadges height={28} className="absolute z-20" style={{ left: 12, top: 'calc(12px + env(safe-area-inset-top))' }} />}
+      {/* the store badges on phones (Jason 2026-10-28: store style, decision #185): top left over the lake, 40 px (Apple's minimum) */}
+      {phone && !land && started && !home && <AppBadges height={40} className="absolute z-20 items-end" style={{ right: 12, top: 'calc(12px + env(safe-area-inset-top))' }} />}
       {glLost && (
         <div role="alert" className="pointer-events-auto absolute inset-0 z-50 flex items-center justify-center p-6" style={{ background: 'rgba(3,18,26,0.55)' }}>
           <button type="button" className="ac-card px-5 py-4 text-left" onClick={() => window.location.reload()}>
@@ -386,15 +386,10 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
           {t(ICE ? 'desc_ice' : 'desc_lake', { device: device.name, beam: `${device.beamDeg}° × ${ICE ? 20 : device.thickDeg}°` })} {/* text only: specs say 39° × 20° for the Mini; the engine's 18° stays (Jason 2026-09-23) */}
         </div>
         <ShopButton deviceId={deviceId} placement="panel" wide />
-        {EXTRAS === 'a' && <div className="flex items-center justify-between gap-2 pt-1"><ShareButton /><AppBadges height={30} /></div>}
+        <AppBadges height={40} className="pt-2" />
+        <div className="pt-2.5"><ShareButton /></div>
       </motion.div>
       {/* B: a glass strip top-right (desktop: under the step cards' row; phones: under the safe area) with share + badges */}
-      {EXTRAS === 'b' && (!phone || (started && !home)) && !land && (
-        <div data-hint-avoid className="ac-hint pointer-events-auto absolute z-20 flex items-center gap-2 px-2 py-1.5 opacity-100" style={phone ? { left: 12, right: 12, top: 'calc(12px + env(safe-area-inset-top))', justifyContent: 'space-between' } : { right: 28, top: 204 }}>
-          <ShareButton compact={phone} />
-          <AppBadges height={phone ? 30 : 32} />
-        </div>
-      )}
 
       {/* ---- the cue caption, shown until the first drag / tap (position set by the render loop). The ice page: under the
            reticle on the ice (IceCamp.jsx, #123); the lake: above the water reticle round the boat (Scene.jsx Boat, #132).
@@ -447,7 +442,7 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
         {phone && !land && started && !home && (
           <div ref={(el) => { sonarRect.current.dock = el }} className="pointer-events-auto absolute bottom-full left-1/2 mb-3 flex -translate-x-1/2 items-center gap-2">
             <ShopButton deviceId={deviceId} placement="frame-top" />
-            {EXTRAS === 'a' && <ShareButton compact />}
+            <ShareButton compact />
           </div>
         )}
         {/* after sign-up the app buttons stay display-only: a short hint above the phone instead of the gate */}

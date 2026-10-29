@@ -57,6 +57,8 @@ const S = {
   share_sms: { en: 'Text message', fr: 'Message texte' },
   share_copy: { en: 'Copy link', fr: 'Copier le lien' },
   share_copied: { en: 'Link copied', fr: 'Lien copié' },
+  share_short: { en: 'Share', fr: 'Partager' }, // the phone dock beside the Shop pill: no room for the long label
+  get_app: { en: 'Get the Accuphy Sonar app', fr: 'Téléchargez l’application Accuphy Sonar' }, // the caption over the store badges (Jason 2026-10-28; the badges themselves say "Download on the App Store" / "Get it on Google Play"). FR FOR THE WEBSITE HQ'S REVIEW
   // the Shop button
   shop: { en: 'Shop {name}', fr: 'Achetez le {name}' }, // after the store's own "Achetez maintenant →" (shop.accuphy.com/fr); the arrow is the button's icon
   shop_opening: { en: 'Opening the store…', fr: 'Ouverture de la boutique…' }, // shown for the 1 s before the page leaves (website #228). FR drafted from the glossary (boutique = the store) — FOR THE WEBSITE HQ'S REVIEW

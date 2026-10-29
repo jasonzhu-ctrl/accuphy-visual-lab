@@ -3204,3 +3204,21 @@ Numbered log. Newest at the bottom.
        as reference.
      - Which film is that one: **the PingLive Mini film** (Jason in Lab HQ, 10-28: "用 Mini 的片子"). It works for Canada and the
        US, and is made from the "Mini US" shot plan, in English, 9:16 + 16:9 only.
+186. **2026-10-28** — **Share link and store badges: store style, on by default** (Jason, this chat: "要的，但是按钮徽章设计做的太
+     ai了" about the #169 looks, then "方案一" = the store's style, and "看看大公司怎么干的，是不是旁边要写个小字…download app now").
+     Replaces both #169 placements and the `?extras=a|b` switch.
+     - **What the research said:** Apple's badge rules — at least 40 px high onscreen, clear space a quarter of the height,
+       "legible but not dominant", never altered (developer.apple.com/app-store/marketing/guidelines). Brands put one short
+       caption near the badges rather than "download now", because the badges already say "Download on the App Store" /
+       "Get it on Google Play" (Strava: a one-line sentence, badges side by side; the store's own footer: the text link
+       "Download Accuphy Sonar App").
+     - **Desktop:** in the control panel under the Shop button — the caption "GET THE ACCUPHY SONAR APP" (small caps, muted),
+       the two official badges at 40 px, 10 px apart, no rounding or glass of ours; below, "Send to a friend" as a plain
+       underlined text link with a small share glyph. **Phone:** badges with the caption at the top right over the lake (the
+       top left is the back button), 40 px; "Share" / "Partager" as a text link beside the Shop pill on the phone frame.
+       The share behaviour (system sheet, WhatsApp / SMS / copy fallback, `share` event) and the badge links are #169's.
+     - Strings: `get_app` ("Get the Accuphy Sonar app" / "Téléchargez l’application Accuphy Sonar") and `share_short` ("Share" /
+       "Partager") — the FR for the website HQ's review, with `share_opening` (#184).
+     - Checked on the dev server, desktop and phone, EN and FR, lake and ice: no overlap, no console errors. Sheet
+       `docs/2026-10-28-share-badges-store-style.jpg` sent to Jason; waiting for his look before HQ rebuilds.
+     - `index.jsx` was touched for the placement lines only (buttons are the phone chat's, #176 note from HQ); the ice chat told.
