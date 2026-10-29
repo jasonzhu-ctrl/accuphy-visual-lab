@@ -3202,4 +3202,5 @@ Numbered log. Newest at the bottom.
      - **Already made, kept but not pushed further:** the French v3 (`reference/ads/2026-11-bf/v3/pinglive-*-fr.mp4`, final
        lines). It is not copied to the Drive unless HQ or Jason asks. The shot plans in `scripts/dev/ads/v3/README.md` stay
        as reference.
-     - Which film is that one (the existing English PingLive v3, or a Mini film for the US) is Jason's to say.
+     - Which film is that one: **the PingLive Mini film** (Jason in Lab HQ, 10-28: "用 Mini 的片子"). It works for Canada and the
+       US, and is made from the "Mini US" shot plan, in English, 9:16 + 16:9 only.
