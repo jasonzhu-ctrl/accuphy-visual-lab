@@ -5,7 +5,7 @@ with the source commit it was built from, so anyone can tell which version a lin
 
 ## Where the Lab lives (inventory, Lab HQ 2026-10-27)
 
-Newest code: **7390d39**. Page types in the code: Both `/`, Mini `/mini/`, Ice `/ice/`, the store embed `/embed/`
+Newest code: **dfeef9f**. Page types in the code: Both `/`, Mini `/mini/`, Ice `/ice/`, the store embed `/embed/`
 (built only for Vercel); French is `?lang=fr` on any of them; the fish test page (`VITE_LAB=fish`) still exists in the code
 but is published nowhere and is redundant since #170.
 
@@ -13,7 +13,7 @@ but is published nowhere and is redundant since #170.
 |---|---|---|---|
 | shop.accuphy.com/pages/lab and /fr/pages/lab | customers | an iframe of lab.accuphy.ca/ (not `/embed/`) | **8c15c20, newest** |
 | lab.accuphy.ca = accuphy-lab.vercel.app (one deployment) | anyone with the link | `/`, `/mini/`, `/ice/`, `/embed/` | **8c15c20, newest** |
-| Friends' test link jasonzhu-ctrl.github.io/accuphy-lab-test | friends, Jason | `/`, `/mini/`, `/ice/`; `/jig/`, `/pano/` forward to `/` | **7390d39, newest** |
+| Friends' test link jasonzhu-ctrl.github.io/accuphy-lab-test | friends, Jason | `/`, `/mini/`, `/ice/`; `/jig/`, `/pano/` forward to `/` | **dfeef9f, newest** |
 | claude.ai private previews | — | **none**: the four old ones (RnCB, VxxnV fish test, G5uZ ice, 4GdHH) were deleted 2026-10-27 at Jason's word ("如果是现在项目需要的话留一个就行了"; the test link does the job) | — |
 | The v3 ad film | Meta, from 11/2 | recorded | lake 1abeedf (before #178; its shots show no Panoramic sonar) |
 | Colleague branches (not merged): PR #30 `codex/lab-clarity-optics` (AJ-nb, 10-28), PR #31 `codex/blue-hour-lake` (Codex agent, 10-29; private preview on accuphy-blue-hour-lake-20261029.accuphy-1012.chatgpt.site, owner-only) | the colleague, Jason | their own builds | not in main, not on any Lab link |
@@ -89,6 +89,7 @@ the Mini page; `VITE_SCENE=ice` for the ice page → `/ice/` on GitHub Pages sin
 | 2026-10-27 | Public test page `/jig/` | 218e483 | 0f4439e | Lake with the 110 ft hole and the jig drop from the boat (`?jig`, best with `?boat=-22.9,-47.2`) (#172) |
 | 2026-10-27 | Public test page `/jig/` | 557f1b2 | 7191adc | Fish schools spread out (#173) on top of the hole and jig (#172) |
 | 2026-10-27 | Public test page `/jig/` | 58ea10f | 2418a2d | Fish spread round 2 at Jason's screenshot spot and the phone start (#173) |
+| 2026-10-29 | **All test links** `/`, `/mini/`, `/ice/` | dfeef9f | f83f012 | Phone QR caption French as reviewed by the website ("Un ami peut scanner ce code…", #188). No other change. lab.accuphy.ca still 8c15c20 |
 | 2026-10-29 | **All test links** `/`, `/mini/`, `/ice/` | 7390d39 | 2a9f871 | Phones also get the QR + copy popover (Jason: "手机也用二维码和copy"); no native share sheet; phone caption "Let a friend scan this…" (#188). HQ headless check at 390×844 @3 (EN `?shop=/en-us&market=us`, FR `?lang=fr&shop=/fr`): popover centred 198–578 px, QR 172 px, US / FR-CA addresses and tags right, native share not called, 0 errors. lab.accuphy.ca still 8c15c20 |
 | 2026-10-29 | **All test links** `/`, `/mini/`, `/ice/` | 2408b81 | ae476ba | "Send to a friend" redone (#188): desktop popover with a 168 px QR + Copy link; phones keep the native sheet with a fallback; share links by market (`utm_source=lab_share&utm_medium=referral&utm_content=<channel>&utm_campaign=bf2026_lab_<market>`), website-reviewed French. HQ headless check on the live test link: US → `/en-us/pages/lab` + bf2026_lab_us, FR → `/fr/pages/lab` + bf2026_lab_ca, default → `/pages/lab` + ca; copy = field, Esc closes, 0 errors. lab.accuphy.ca still 8c15c20 |
 | 2026-10-29 | **Vercel** → **lab.accuphy.ca** `/`, `/mini/`, `/ice/`, `/embed/` | 8c15c20 | — | Jason said 动 in Lab HQ. shop_click carries `url`; the store page jumps on its receipt (#187, website #229). Deployment `dpl_27YqQfdxV3aeymx9Sa8vnJfLNa94`, embed `lab-9ccdf42625.js`. Checked: md5-identical to the test links, thumbnails and `/embed/` 200, CSP and noindex, embed stand-in mounts, headless standalone jump to `/de-de/products/pinglive-sonar`, 0 errors. Replaces 1e32b6b |
