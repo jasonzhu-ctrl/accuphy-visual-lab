@@ -305,9 +305,10 @@ same answer holds for the PingLive v3 film and the Mini US film.
 **French, PingLive v3 (2026-10-28, Jason "做法文版")**
 - **How it is made:** a type pass on the kept clean frames, with no new recording.
   `AD_LINES_FILE=lines-fr.json node comp3.mjs <comp> <final-fr>`, then `frames2mp4` and `../to45.py`.
-- **Lines:** `lines-fr.json`, drafts under the website's review (`IT/accuphy-website/handoffs/2026-10-28-lab-ad-v3-fr-review.md`,
-  due 10-29). The end card is already reviewed.
-  - When the final French arrives, edit the JSON and run the same three steps again (~10 min).
+- **Lines:** `lines-fr.json`, **final** from the website's review (`IT/accuphy-website/handoffs/2026-10-28-lab-ad-v3-fr-review.md`,
+  website 7ba6fc09).
+  - Line 3 changed from the draft to `Prêt pour les grandes profondeurs.`; the others and the end card stayed.
+  - Re-rendered 2026-10-28; a line change is ~10 min (edit the JSON, run the same three steps).
 - **Layout rules in `overlay3.html`**, for any language. English renders unchanged (checked: mean difference 0.04/255):
   - The deep-water line stays on one line, because the boat sits just under it. A longer line shrinks, to 56 px at least.
   - The end line may wrap into two balanced lines, which push `Accuphy Lab` down (French: y 1065–1185).
