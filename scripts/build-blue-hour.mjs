@@ -9,6 +9,13 @@ import {execFileSync} from 'node:child_process'
 const out=path.resolve(process.argv[2]||'dist/blue-hour');fs.mkdirSync(out,{recursive:true})
 await build({configFile:false,plugins:[react(),tailwind()],base:'./',publicDir:false,define:{'process.env.NODE_ENV':'"production"','import.meta.env.VITE_NO_GATE':'"1"'},build:{outDir:out,emptyOutDir:false,lib:{entry:'share/blue-hour.jsx',formats:['es'],fileName:'blue-hour',cssFileName:'blue-hour'},assetsInlineLimit:10000000}})
 const hash=b=>crypto.createHash('sha256').update(b).digest('hex')
+// Original SonarChrome uses a public-root Logo URL. Embed the exact tracked asset
+// in this host artifact so both targets work without assuming a /brand directory.
+const logoPath='public/brand/logo/White Accuphy Logo.png'
+const jsPath=path.join(out,'blue-hour.js')
+const js=fs.readFileSync(jsPath,'utf8'),logoUrl='/brand/logo/White Accuphy Logo.png'
+if(!js.includes(logoUrl))throw new Error('Expected original SonarChrome Logo reference missing')
+fs.writeFileSync(jsPath,js.replaceAll(logoUrl,`data:image/png;base64,${fs.readFileSync(logoPath).toString('base64')}`))
 const cssPath=path.join(out,'blue-hour.css');let css=fs.readFileSync(cssPath,'utf8')
 css=css.replace(/url\(["']?\/brand\/([^"')]+)["']?\)/g,(_,f)=>`url(data:font/woff2;base64,${fs.readFileSync(path.join('public/brand',f)).toString('base64')})`)
 const scope=':where([data-accuphy-blue-hour])';const ast=postcss.parse(css)
@@ -23,7 +30,7 @@ fs.writeFileSync(path.join(out,'index.html'),`<!doctype html><html lang="en"><me
 const sha=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();const dirty=!!execFileSync('git',['status','--porcelain'],{encoding:'utf8'}).trim()
 const protectedFiles=execFileSync('git',['ls-files','src/experiments/2026-09-23-sonar-lake-3d/*.js','src/experiments/2026-09-23-sonar-beam/devices.js','src/experiments/2026-09-23-beam-shapes-3d/wedge.js'],{encoding:'utf8'}).trim().split('\n').filter(Boolean)
 const protectedSourceHashes=Object.fromEntries(protectedFiles.map(f=>[f,hash(fs.readFileSync(f,'utf8').replace(/\r\n/g,'\n'))]))
-const manifest={sourceCommit:sha,dirty,coreVersion:'48f15ccc990fdb69f9edd1a04d14257d100da610',protectedSourceHashes,sourceAssetHashes:Object.fromEntries(['reference/blue-hour/approved.png','src/experiments/2026-09-23-sonar-lake-3d/assets/blue-hour/distant-skyline.png','public/brand/fonts/InstrumentSans-Variable.woff2','public/brand/fonts/Eurostile-Heavy.woff2'].map(f=>[f,hash(fs.readFileSync(f))])),base:'48f15ccc990fdb69f9edd1a04d14257d100da610',targets:['standalone','shopify-us'],assets:Object.fromEntries(fs.readdirSync(out).filter(f=>/\.(js|css)$/.test(f)).map(f=>[f,hash(fs.readFileSync(path.join(out,f)))]))}
+const manifest={sourceCommit:sha,dirty,coreVersion:'48f15ccc990fdb69f9edd1a04d14257d100da610',protectedSourceHashes,sourceAssetHashes:Object.fromEntries(['reference/blue-hour/approved.png','src/experiments/2026-09-23-sonar-lake-3d/assets/blue-hour/distant-skyline.png',logoPath,'public/brand/fonts/InstrumentSans-Variable.woff2','public/brand/fonts/Eurostile-Heavy.woff2'].map(f=>[f,hash(fs.readFileSync(f))])),base:'48f15ccc990fdb69f9edd1a04d14257d100da610',targets:['standalone','shopify-us'],assets:Object.fromEntries(fs.readdirSync(out).filter(f=>/\.(js|css)$/.test(f)).map(f=>[f,hash(fs.readFileSync(path.join(out,f)))]))}
 fs.writeFileSync(path.join(out,'manifest.json'),JSON.stringify(manifest,null,2));console.log(JSON.stringify(manifest))
 const theme=path.join(out,'theme');fs.mkdirSync(path.join(theme,'assets'),{recursive:true});fs.mkdirSync(path.join(theme,'sections'),{recursive:true});fs.mkdirSync(path.join(theme,'locales'),{recursive:true});
 for(const f of [jsName,cssName,'accuphy-blue-hour-loader.js'])fs.copyFileSync(path.join(out,f),path.join(theme,'assets',f))
