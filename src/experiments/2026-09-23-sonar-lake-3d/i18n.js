@@ -57,11 +57,11 @@ const S = {
   share_sms: { en: 'Text message', fr: 'Message texte' },
   share_copy: { en: 'Copy link', fr: 'Copier le lien' },
   share_copied: { en: 'Link copied', fr: 'Lien copié' },
-  share_qr_caption: { en: 'Scan with your phone camera to open the Lab on your phone', fr: 'Balayez avec l’appareil photo de votre téléphone pour ouvrir le Lab sur votre téléphone' }, // #188 — FR FOR THE WEBSITE HQ'S REVIEW (#198)
+  share_qr_caption: { en: 'Scan with your phone camera to open the Lab on your phone', fr: 'Scannez avec l’appareil photo de votre téléphone pour ouvrir le Lab.' }, // #188; FR reviewed by the website HQ 2026-10-29 (#198)
   share_link_label: { en: 'Link', fr: 'Lien' },
-  share_copy_hint: { en: 'Paste it into a message to a friend.', fr: 'Collez-le dans un message à un ami.' }, // FR FOR REVIEW
-  share_copied_check: { en: 'Copied ✓', fr: 'Copié ✓' }, // FR FOR REVIEW
-  share_press_copy: { en: 'Press {keys} to copy', fr: 'Appuyez sur {keys} pour copier' }, // when neither clipboard path is allowed; FR FOR REVIEW
+  share_copy_hint: { en: 'Paste it into a message to a friend.', fr: 'Collez-le dans un message à un ami.' }, // FR reviewed (#198)
+  share_copied_check: { en: 'Copied ✓', fr: 'Copié ✓' }, // FR reviewed (#198)
+  share_press_copy: { en: 'Press {keys} to copy', fr: 'Appuyez sur {keys} pour copier' }, // when neither clipboard path is allowed; FR reviewed (#198)
   share_close: { en: 'Close', fr: 'Fermer' },
   share_short: { en: 'Share', fr: 'Partager' }, // the phone dock beside the Shop pill: no room for the long label (FR passes, #198)
   get_app: { en: 'Get the Accuphy Sonar app', fr: 'Télécharger l’application Accuphy Sonar' }, // the caption over the store badges (Jason 2026-10-28; the badges themselves say "Download on the App Store" / "Get it on Google Play"). FR reviewed by the website HQ 2026-10-28 (#198): the infinitive, as the store's /fr footer

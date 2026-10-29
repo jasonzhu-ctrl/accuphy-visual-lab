@@ -3283,3 +3283,6 @@ Numbered log. Newest at the bottom.
        field keeps the start of the address in view when selected (scrollLeft reset) and the popover focuses × on open; the
        test decodes every market's QR at 3, 2 and 1 px per module. Tags per the website / Klaviyo HQ: utm_medium=referral,
        utm_content = channel, market = the bridge's country code. 15/15. Sheet redone.
+     - The website's French review (#198, 2026-10-29): `share_qr_caption` = "Scannez avec l’appareil photo de votre téléphone pour
+       ouvrir le Lab."; the other five pass as drafted (Collez-le dans un message à un ami. / Copié ✓ / Appuyez sur {keys} pour
+       copier / Lien / Fermer). Marks removed.
