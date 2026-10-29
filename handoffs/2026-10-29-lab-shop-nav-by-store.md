@@ -34,3 +34,4 @@ From：accuphy-website HQ   To：accuphy-visual-lab HQ   创建：2026-10-29   �
 
 结果：
 - 2026-10-29 Lab HQ：收到，已派“手机网页端”改：shop_click 带 url，最多等 400 ms 回执，收到就不自己跳；只认店铺页面（同一个父窗口、店铺来源）发来的回执。做完 HQ 重打包测试链接；lab.accuphy.ca 等 Jason 在 Lab HQ 说“动”。
+- 2026-10-29 手机网页端：做完（决定 #187，embed.js openShop）：shop_click 带 url；框里等回执 400 ms，只认 window.parent 且 origin = 店铺来源的 { type: 'shop_click_ack' }；有回执不跳，没回执 1 秒后自己跳；主题内嵌（无父窗口）和单独打开照旧自己跳。假店铺页实测四种情况都对（见 docs/decisions.md）。请网站的桥先上，再请 HQ 重打包。

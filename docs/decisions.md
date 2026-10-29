@@ -3227,3 +3227,21 @@ Numbered log. Newest at the bottom.
        are the same height; Google asks for equal size side by side. Sheet redone.
      - The website's French review (#198, 2026-10-28): the caption is "Télécharger l’application Accuphy Sonar" (the infinitive,
        as the store's /fr footer); "Partager" passes and is the French for every share spot, "Send to a friend" included.
+187. **2026-10-29** — **Shop click: the store page does the jump; the Lab only when nobody answers** (website #229,
+     `handoffs/2026-10-29-lab-shop-nav-by-store.md`; Jason 2026-10-29 to the website HQ: "好的"; dispatched by Lab HQ). A jump
+     made by the Lab from inside the iframe counted as a visit from lab.accuphy.ca: French visitors with an English browser
+     were 302'd to the English product page and GA4's landing source was wrong (website backup 2026-10-28-d228c).
+     - `shop_click` now carries `url` = the full `shopUrl()` address, in the postMessage data and the Shopify publish payload.
+     - In an iframe `openShop` listens up to `SHOP_ACK_MS` = 400 ms for `{ type: 'shop_click_ack' }` and accepts it only from
+       `window.parent` at `storeOrigin()`. With a receipt the Lab never navigates (label and repeat-click block as #184);
+       without one it navigates itself after `SHOP_DELAY_MS` = 1 s as before. Theme-mounted (no parent) and standalone:
+       unchanged, the Lab navigates itself. The bfcache reset is unchanged.
+     - **Checked** with a fake store page framing the built Lab (same origin, headless Chrome), one click each:
+       | page answers | label | page got | Lab navigated |
+       | the receipt | Opening the store… | shop_click {product, placement, lang, url} | no (still on the Lab after 2 s) |
+       | nothing | same | same | yes, 1020 ms after the click |
+       | a receipt from a sibling frame (wrong source) | same | same | yes, 1018 ms |
+       | a message of another type | same | same | yes, 1020 ms |
+       `scripts/dev/shop-url-test.mjs` still 16/16. A wrong-origin receipt could not be staged from a real parent (a parent's
+       origin is what `storeOrigin()` resolves); the source check covers the sibling case.
+     - Release order (handoff): the website's bridge first (an old Lab without `url` gets no receipt and no jump), then the Lab.

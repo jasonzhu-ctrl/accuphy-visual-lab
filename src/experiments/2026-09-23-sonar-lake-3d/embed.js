@@ -98,12 +98,30 @@ export function onOpeningShop(fn) { openingListeners.add(fn); return () => openi
 function setOpening(v) { opening = v; for (const fn of openingListeners) fn(v) }
 // back from the store with the back button (bfcache keeps the page alive): the button must work again
 try { window.addEventListener('pageshow', (e) => { if (e.persisted) setOpening(false) }) } catch { /* no window */ }
+// Website #229 (handoffs/2026-10-29-lab-shop-nav-by-store.md; Jason 2026-10-29 to the website HQ: "好的"): in the store's iframe
+// the STORE PAGE does the jump, not the Lab — a jump made by the Lab counted as a visit from lab.accuphy.ca (French visitors
+// 302'd to English by their browser language, the GA4 source wrong). `shop_click` now carries `url`; the store's bridge
+// answers { type: 'shop_click_ack' } and navigates itself ~1 s later. The Lab waits up to SHOP_ACK_MS for that receipt:
+// with it, it never navigates (the label and the repeat-click block stay); without it (opened on its own, an old bridge)
+// it navigates itself after SHOP_DELAY_MS as before. Only a receipt from the parent window at the store's origin counts.
+// Theme-mounted (no iframe, no parent) nothing changes: the Lab navigates itself.
+export const SHOP_ACK_MS = 400
 export function openShop(deviceId, placement) {
   if (opening) return false
   setOpening(true)
   const href = shopUrl(deviceId)
-  labEvent('shop_click', { product: PRODUCT[deviceId] || PRODUCT.PLM, placement, lang: LANG }) // no `device`: the website uses that field for phone/desktop (Lab HQ 2026-10-25)
-  const go = () => { try { window.top.location.href = href } catch { window.location.href = href } }
+  let acked = false
+  if (isEmbedded()) {
+    const storeOrg = storeOrigin()
+    const onAck = (e) => {
+      if (e.source !== window.parent || e.origin !== storeOrg || !e.data || e.data.type !== 'shop_click_ack') return
+      acked = true; window.removeEventListener('message', onAck)
+    }
+    window.addEventListener('message', onAck)
+    setTimeout(() => window.removeEventListener('message', onAck), SHOP_ACK_MS) // a late receipt no longer counts
+  }
+  labEvent('shop_click', { product: PRODUCT[deviceId] || PRODUCT.PLM, placement, lang: LANG, url: href }) // no `device`: the website uses that field for phone/desktop (Lab HQ 2026-10-25); `url` for the store page's own jump (#229)
+  const go = () => { if (acked) return; try { window.top.location.href = href } catch { window.location.href = href } }
   setTimeout(go, SHOP_DELAY_MS)
   return true
 }
