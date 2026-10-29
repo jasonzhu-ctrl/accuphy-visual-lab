@@ -340,3 +340,9 @@ The one test film for the funnel and ad tests (Canada + US). English placeholder
 - **Sheets (10 fps):** `docs/2026-10-28-ad-mini-test-916-sheet.jpg` (Reels zones) and
   `docs/2026-10-28-ad-mini-test-169-sheet.jpg` (YouTube's rough zones: bottom 15 %, Skip ad, the ad badge).
 - **Read-out:** 99.6 → 109.9 ft as the boat crosses into the hole.
+- **Films (30 fps, HQ checked 2026-10-28):** `reference/ads/2026-11-bf/mini-test/`:
+  - `plm-test-916-en.mp4` 14.0 MB and `plm-test-169-en.mp4` 14.8 MB;
+  - `plm-test-916-clean.mp4` 17.1 MB and `plm-test-169-clean.mp4` 18.0 MB.
+- **Copied to the shared Drive** with a 说明.txt: Accuphy Public Drive → Marketing → 05_Paid Ads → Paid Ads → 2026-11 Black
+  Friday（Lab 广告）→ "Mini 测试片 2026-10-28", <https://drive.google.com/drive/folders/1jNYiKwKVre8dh-Z8BP0HDhVGHiuLAJfZ>.
+- **That is the one film (#185).** No further versions.
