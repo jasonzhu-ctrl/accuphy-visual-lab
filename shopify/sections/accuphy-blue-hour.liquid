@@ -1,0 +1,34 @@
+{% if request.page_type == 'index' and localization.country.iso_code == 'US' %}
+  {{ 'accuphy-blue-hour.css' | asset_url | stylesheet_tag }}
+  <div data-accuphy-blue-hour
+    data-title="{{ section.settings.title | escape }}"
+    data-subtitle="{{ section.settings.subtitle | escape }}"
+    data-cta="{{ section.settings.cta | escape }}"
+    {% if section.settings.poster != blank %}data-poster="{{ section.settings.poster | image_url: width: 1920 }}"{% endif %}
+    data-product-url="{{ section.settings.product_url | default: '/en-us/products/pinglive-mini' | escape }}">
+    <div style="padding:48px 24px;background:#10253d;color:#fff;text-align:center">
+      <h1>{{ section.settings.title | escape }}</h1>
+      <p>{{ section.settings.subtitle | escape }}</p>
+      {% if section.settings.poster != blank %}
+        {{ section.settings.poster | image_url: width: 1920 | image_tag: loading: 'eager', widths: '390,768,1440,1920', alt: 'Blue Hour Lake visual illustration' }}
+      {% endif %}
+      <p>Interactive simulation. If the lake does not load, you can still explore PingLive Mini.</p>
+      <a href="{{ section.settings.product_url | default: '/en-us/products/pinglive-mini' }}">{{ section.settings.cta | escape }}</a>
+    </div>
+  </div>
+  <script type="module" src="{{ 'accuphy-blue-hour-loader.js' | asset_url }}"></script>
+{% endif %}
+{% schema %}
+{
+  "name": "ACCUPHY Blue Hour",
+  "settings": [
+    {"type":"text","id":"title","label":"Title","default":"SEE BENEATH THE SURFACE."},
+    {"type":"text","id":"subtitle","label":"Subtitle","default":"BE PART OF THE ACTION."},
+    {"type":"text","id":"cta","label":"Button label","default":"Explore PingLive Mini"},
+    {"type":"url","id":"product_url","label":"Product link"},
+    {"type":"image_picker","id":"poster","label":"Approved loading illustration"}
+  ],
+  "enabled_on":{"templates":["index"]},
+  "presets":[{"name":"ACCUPHY Blue Hour"}]
+}
+{% endschema %}

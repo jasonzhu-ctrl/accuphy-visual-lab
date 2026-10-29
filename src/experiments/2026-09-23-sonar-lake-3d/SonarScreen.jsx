@@ -254,7 +254,7 @@ export default function SonarScreen({ state, rect, lakeMats }) {
     let lay
     {
       const el0 = rect.current.el
-      const aspect = el0 && el0.offsetHeight > 0 ? el0.offsetWidth / el0.offsetHeight : 2
+      const aspect = s.presentationAspect ?? (el0 && el0.offsetHeight > 0 ? el0.offsetWidth / el0.offsetHeight : 2)
       lay = screenLayout(s.deviceId, s.mode, s.rangeM, aspect, s.specs.slice(0, MAX_FANS), s.depthM)
       // the ice views: which panels, the display aspect for the dial, one tick per ruler step round the ring
       u.uIce.value = lay.ice || 0; u.uIceSplit.value = lay.iceSplit ?? ICE_SPLIT; u.uAspect.value = aspect
@@ -410,7 +410,7 @@ export default function SonarScreen({ state, rect, lakeMats }) {
     const fr = frame.getBoundingClientRect()
     if (fr.width < 8) return
     const cx = fr.left + fr.width / 2, cy = fr.top + fr.height / 2
-    const { perspective: P, rotY, rotX } = s.land ? PHONE_POSE_FLAT : phonePose()
+    const { perspective: P, rotY, rotX } = s.land || s.flatDevice ? PHONE_POSE_FLAT : phonePose()
     const ay = (rotY * Math.PI) / 180, ax = (rotX * Math.PI) / 180
     const corners = [[el.offsetLeft, el.offsetTop], [el.offsetLeft + el.offsetWidth, el.offsetTop], [el.offsetLeft, el.offsetTop + el.offsetHeight], [el.offsetLeft + el.offsetWidth, el.offsetTop + el.offsetHeight]]
     const pos = res.quad.geometry.attributes.position, aW = res.quad.geometry.attributes.aW

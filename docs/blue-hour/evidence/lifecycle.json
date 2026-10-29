@@ -1,0 +1,16 @@
+{
+  "pauseStable": true,
+  "pausedTime": 15.874299999982117,
+  "resizedTime": 15.874299999982117,
+  "resumedTime": 16.385900000005964,
+  "resumeDelta": 0.5116000000238472,
+  "reducedBoat": {
+    "x": 22,
+    "z": 8
+  },
+  "reducedTarget": {
+    "x": 22,
+    "z": 8
+  },
+  "errors": []
+}

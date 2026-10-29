@@ -1,0 +1,758 @@
+[
+  {
+    "name": "base-a-default-PL-down",
+    "pngHash": "33b4ca7ecaf3d11bfed473c3023579e0f6acf4c6208a751ea3820632e3128eaa",
+    "modelHash": "6823594f93150ce1ccf26af01978076ed0f23b13f76f467e586c8026202efefd",
+    "fishGPUHash": "0d7eb6d50dabd7ded03fe859fe3a871e45faac324b6ab7f3b30fb04826cf8e92",
+    "time": 0.5
+  },
+  {
+    "name": "base-a-default-PL-forward",
+    "pngHash": "1148ffe12c88c39a9362eca9526aaa63b3fcb7322bb1ea570932853bd9f7b744",
+    "modelHash": "791c3d3dbc9f8505f6215bb4142c644555a786260636423ef26c605967f03a95",
+    "fishGPUHash": "b09b58094d76d77b5f30ecab640d86b4c97189a5c9160c88f31638fda8517475",
+    "time": 1
+  },
+  {
+    "name": "base-a-default-PL-panoramic",
+    "pngHash": "bcd1a7bc1354fccb7eeaec1bb7849784f87b67b29bfb64d98b3c33580a75fb32",
+    "modelHash": "47a0653c5841e5c9905c5e2cdbdd56dc77aac33d0e32374ae153ab4668bbd57b",
+    "fishGPUHash": "221e89c97c61f5add5d197c22bf9f755af1f7de3c41ff4fdc2d26d38d7b5e804",
+    "time": 1.5
+  },
+  {
+    "name": "base-a-default-PLM-down",
+    "pngHash": "cb3defb6d7e5ebb2520051cb9ad2bfaaeb31146658607cb8d93367db2077dfa5",
+    "modelHash": "b82a907968e33a5cb8650b080b7f20571872139e8029344692a120cd33fb0d0f",
+    "fishGPUHash": "5ce697e273872a4784d08525767abb419a4bd598d9e4933fb76beec0e47600fe",
+    "time": 2
+  },
+  {
+    "name": "base-a-default-PLM-forward",
+    "pngHash": "83d712ee91616614c3d4509e5d3463028ea533fff5c0f9402ae584358e4e4542",
+    "modelHash": "733ced9638897479a32d3325b674c34132ea0f9f82f06a2daa8a610d9ed72b9f",
+    "fishGPUHash": "6a5421e380c849e4b18273877007d1af00377bb2e1af38502b0edde8522a7fe2",
+    "time": 2.5
+  },
+  {
+    "name": "base-a-default-PLM-combo",
+    "pngHash": "c88f880570d50aba795d8723460f83ac045a7851fd0444916faa527220c0a419",
+    "modelHash": "10fedb757d4fb5d308d168a2b1ace0a0134ded427075af7f82960a17df347970",
+    "fishGPUHash": "42adbcbe2603d98259b1c415c4daef8c0677fefaec02e4a5c607802a5c308539",
+    "time": 3
+  },
+  {
+    "name": "base-a-shelf-PL-down",
+    "pngHash": "565e852f95d48398fc579bb34cfe28801aafdb67e37fb1aaf0780f7981c19b51",
+    "modelHash": "645a345899d90419bb8055a98bf66ef69e22ac61eadba614630cb397efeda10e",
+    "fishGPUHash": "1116da4116c70e38d812532ef0764eed72e36f17d14b49183b9332d8c58efe67",
+    "time": 3.5
+  },
+  {
+    "name": "base-a-shelf-PL-forward",
+    "pngHash": "759f64e8fb646342009e9c2cf167586d59ce4a9c7680e1d4a3f211fb52d575fc",
+    "modelHash": "21c077c4253def6b60e005defff137463c3c8262782b1ae335ccb97600a7f628",
+    "fishGPUHash": "338eef9f9454fac2449cf6d53d6cf96df460c0ec3b4b394c9d80e557ddf04889",
+    "time": 4
+  },
+  {
+    "name": "base-a-shelf-PL-panoramic",
+    "pngHash": "a9cd337ec7a33ab83fa892d87cc31030b884e67446b7d7599b5970a69c6e8a35",
+    "modelHash": "51cc5178e7d4b76d43645047a49f7dab3e2a47f04852c6cc420b4c044a567211",
+    "fishGPUHash": "6d7b85ac6c9b7589fc6849fd63d16ea78b06c780e1e68ee88738a8384ab57b74",
+    "time": 4.5
+  },
+  {
+    "name": "base-a-shelf-PLM-down",
+    "pngHash": "1e5a248753c296f508f8910b921b4e5c2cc8e27fe5d90d65567157bf202a3113",
+    "modelHash": "05125932d3926b400df2c522fbfd1d9cbf01134217cc7d62c3284e555ef2e571",
+    "fishGPUHash": "722292793575688a63fa1a56ca6db0b1bd679f6ad61a96cf061e439e517c0b06",
+    "time": 5
+  },
+  {
+    "name": "base-a-shelf-PLM-forward",
+    "pngHash": "a8477952e72880f291e08e7598acf88b10b55557898324d25d1f78bc3cfcb22b",
+    "modelHash": "12a16e5cb9cb4dd2f28edbc55d8c0ba639291d9f15cf322174399990cfee80d2",
+    "fishGPUHash": "75a5be9b14dd349143dc29f55312130c6de2f29c1c159a8ba1d31fe6cd0dfe01",
+    "time": 5.5
+  },
+  {
+    "name": "base-a-shelf-PLM-combo",
+    "pngHash": "c07f2def7cf1b8f582a2e0084177ba96c58cd54f8a0f31b686601ddfe72b1053",
+    "modelHash": "fd6beb18004244128424aee8eca16ff41c35387f8ffd8cc9d5e49aeab6fdaa9e",
+    "fishGPUHash": "9ab782f99e64153fe630e1f3c3d6bf972ad4e75ea14117b0a1ca4afdd28f4f25",
+    "time": 6
+  },
+  {
+    "name": "base-a-hump-PL-down",
+    "pngHash": "48eeb453ae221649e92134edb14aca7da0022bab8cd227d88484b5e695811167",
+    "modelHash": "e933f4a6448cf98a7bef219b3c0cac5512fdca8a6349a1642ca2f65a1c7a5a4b",
+    "fishGPUHash": "fecdde501693cb7a1937bbfa2307dff8a83d85e9ebf0c3b3824173300be930ac",
+    "time": 6.5
+  },
+  {
+    "name": "base-a-hump-PL-forward",
+    "pngHash": "07c766e62cc998da1677c89249bb283c1d865da74563671cabb483c0b622cc3f",
+    "modelHash": "ec416cd604fbcdd67815a552835082a2a190befd9148e2fb2a95d06d41669ba8",
+    "fishGPUHash": "ca1493da486995b3ec146d281446cafd110fff65cc145302ac7852663381194d",
+    "time": 7
+  },
+  {
+    "name": "base-a-hump-PL-panoramic",
+    "pngHash": "94468d43cb06d56f32edcdad33c6032e8948f8dadcc146e7e0d93e5a4d1523b6",
+    "modelHash": "f480babda2d7a6c2e62a642d14a3aebaa3306be86bd339f9e32fb42d49a45683",
+    "fishGPUHash": "7fb54207c740a7daf3cfcc3e6557776581358d83cc34fc1a8c61c55862cf0482",
+    "time": 7.5
+  },
+  {
+    "name": "base-a-hump-PLM-down",
+    "pngHash": "7809056bd546b8e8879e9cc75888d6c9b532ed60ebdc156af77f1e29db35774c",
+    "modelHash": "3feafd755d294c4762aa68def218e5cafd8d8be72813c54e3474a2bd3a1cf970",
+    "fishGPUHash": "92466f1d35d6474b4e12809d500f237f9a052f0a4a58e75e7c85f68aaffcc946",
+    "time": 8
+  },
+  {
+    "name": "base-a-hump-PLM-forward",
+    "pngHash": "56d3179b5eb7d6365dd59dad918489a6e156065affb4780c01eb47cc137e8905",
+    "modelHash": "94d57356af6788f09a292c733ee7364e3d77f9f03afae069004006ed2aad5137",
+    "fishGPUHash": "e27f22c94698453cfec08ef96a7f7aba6e0a0de78640b5a94b1035f3eaa7a590",
+    "time": 8.5
+  },
+  {
+    "name": "base-a-hump-PLM-combo",
+    "pngHash": "eed889102afa304ca9c4cb07710ba1675faf13c92fa39db3136275f490b785e3",
+    "modelHash": "e2f326105fef26fec929a93de0738b3e3d560e09b226220d9a8834b05d43152a",
+    "fishGPUHash": "03b1def98ef5536182d52014842f386326a292350245256fbd60ae04434f1712",
+    "time": 9
+  },
+  {
+    "name": "base-a-deep-PL-down",
+    "pngHash": "304f735b0f1b535f5680e54a55499ad7abbe0d6edffeb74d3a22afff51a991a9",
+    "modelHash": "b6526461cf9232ee5647c495669b1c23c68b64641737be5d22f52d62c95ee60a",
+    "fishGPUHash": "64a9311a57d49deac7eb0a438bbb75a9177a35a8dfeaa279ba5a4efe489c283b",
+    "time": 9.5
+  },
+  {
+    "name": "base-a-deep-PL-forward",
+    "pngHash": "335198d18492b458f86d1e36cc8d0f459190c3a3e0f640df2c1f6627442f121c",
+    "modelHash": "2da4554b091ed31fa501efd5ad3063d6e94a0edbd783c89d47a5add81c83c7a3",
+    "fishGPUHash": "656e4d447e21aa2cb9ccd82f259a95df902ab81d1e999cf8e983abbcca99a5cc",
+    "time": 10
+  },
+  {
+    "name": "base-a-deep-PL-panoramic",
+    "pngHash": "8c9fae36a65457eabf8167c3d6ab098fc9de3527ae9b5728261066be17d71890",
+    "modelHash": "a4927658f8aa73a3a263848649de147d691200eb4637d082f5494b0260416c46",
+    "fishGPUHash": "9b8b50376cd8cb751f770cbe277e5a2cb83896ba7c9228fcf5e63ddb09c090db",
+    "time": 10.5
+  },
+  {
+    "name": "base-a-deep-PLM-down",
+    "pngHash": "f8ec74a992f3dd19de4811d932a238cf64ce60c5fcf3b45a988863a84f28fd49",
+    "modelHash": "3a3cca38657fd87117d1a67741157db33b99edf5d5593a93789a4271d3a36ef0",
+    "fishGPUHash": "edb4dad2e5ff21ad62efd6ea954275ddd35f0f682ecf19303c75be9b7f3ebdc4",
+    "time": 11
+  },
+  {
+    "name": "base-a-deep-PLM-forward",
+    "pngHash": "35a449482a90997e4d00f0f8ede23c517051693310e9a6dbde5d4beb6059d60a",
+    "modelHash": "f1e2c92c5523b5d33283331fc6a575c731b64bfa7b3f177971450ec12db3a31d",
+    "fishGPUHash": "1e60221a8a8daab0c67d8d9fb23274f464a546ac043d295580e8229218303e2d",
+    "time": 11.5
+  },
+  {
+    "name": "base-a-deep-PLM-combo",
+    "pngHash": "f6d1f1f4f8a5e25b3d0662d875fbad9cb6ae81728292de2455be0c6794fb5009",
+    "modelHash": "c00babd03434e5ef128047e98753fa3636b8d6222911d350a776cfe03556aee7",
+    "fishGPUHash": "48a1a3b4a325385a9152fbad8d027e871f020e7da001a34fb02dadbba8bd71c4",
+    "time": 12
+  },
+  {
+    "name": "base-a-lockup-PL-down",
+    "pngHash": "5f1efb7f501766366d381d04d896897947d78719c428fd17dc437af72ee0a56e",
+    "modelHash": "f1263ad0b8c2b2ade08c894f265385cc42882d1f0091d69cfa41c472d6483a59",
+    "fishGPUHash": "59e3af75928bdbf059c1b385fa4bf714c8b055d270dcbbae2ba041a9b9d76995",
+    "time": 12.5
+  },
+  {
+    "name": "base-a-lockup-PL-forward",
+    "pngHash": "a753a38ccf6c17e8bfa67a1ebf5e7906e1219259fec85acfaa89a811200ea0c4",
+    "modelHash": "b03da209ec828867b505aee50e9c8db99498b69bbaefe3905f8257a33ac9c22f",
+    "fishGPUHash": "d531887e384863e59381f666b98f0aca338be1c5d999fa3cad0e83ecb24682ac",
+    "time": 13
+  },
+  {
+    "name": "base-a-lockup-PL-panoramic",
+    "pngHash": "386fc43d883c1e32135f2ca0d5f9e9adb40b00a95c822bdc7eea1cc1111d4e6b",
+    "modelHash": "9f7d2a6f02be83f5f7d79bd3101f659cd848f9f0769c1571602ac599333b59a5",
+    "fishGPUHash": "cf76c86ba50cb037bd79faf222373622e9cd6a7c1c3cbf242c50768443362cdf",
+    "time": 13.5
+  },
+  {
+    "name": "base-a-lockup-PLM-down",
+    "pngHash": "dbd8aa8a81e6a2f471002d67b4537236367c5bb25c40ea47fbdc9535f1f374bf",
+    "modelHash": "930b38745db7636c9c56e4c6e52dccd9a75840833180543e9817dd477c31a6c5",
+    "fishGPUHash": "b38e10153609e52d426c2be8b5edb937db8300faa881aeee11db25e533c94007",
+    "time": 14
+  },
+  {
+    "name": "base-a-lockup-PLM-forward",
+    "pngHash": "218aa02b65043c68c1a29a76e390fd828f993f8624b92380053e7d11d92e8e5a",
+    "modelHash": "3727b0a569373830f5f2bdf438b0b8e0a2f175caaf169d666a3b250e9e9b1cbd",
+    "fishGPUHash": "41af34c28cec2aa64062325275dd8e9c6c28fffa34e4bbd336afff32a0d5e92e",
+    "time": 14.5
+  },
+  {
+    "name": "base-a-lockup-PLM-combo",
+    "pngHash": "30aee3b8b6016b91c540c026d313694702b2b9142e1d8e6afcff2a9a7e1a59d3",
+    "modelHash": "4074bd61fa9d35fb9245a7341172c1bda9721aad1e3b27d5f3067e69a1ea8be6",
+    "fishGPUHash": "dd3bdb2369309e0e65670e9797e7e449a32db663fb9e4fd5ca28dedb99268913",
+    "time": 15
+  },
+  {
+    "name": "base-a-dropoff-PL-down",
+    "pngHash": "8d906ffa81a4182eaf9391478d395ca4e7f391b0a31699ef32ffea4c8451f389",
+    "modelHash": "3ec03f664c31412994d6e772906c277011506dd0f358ffa031c0badd7f1cf1d5",
+    "fishGPUHash": "9ce2d7b19f2968f1e26f29e8643d6ff67406b1709633c843620ba53d3de51cac",
+    "time": 15.5
+  },
+  {
+    "name": "base-a-dropoff-PL-forward",
+    "pngHash": "d6708ccee3ae7de89fb409c75a6d9c95c997104f81f510bbb29aa74d99724359",
+    "modelHash": "1890674acc62d810678f4bcf3b2c3e90cabcd80c73da6fe9f80a2892c0f9e69a",
+    "fishGPUHash": "84399c08d647d06f95f52c90a7c7a7c009a5054df2d720eb01f926a912868df6",
+    "time": 16
+  },
+  {
+    "name": "base-a-dropoff-PL-panoramic",
+    "pngHash": "886b0469ec4ccc06691135a67de69dece497a08868466a9b4741bedeefe06a17",
+    "modelHash": "11731debd9961a8ad7ce0849fa9ea4331a36afe079e80d9a17d2023876d86782",
+    "fishGPUHash": "2f4ff823d17289fae7bf50a217a047c3e51475f299fc11aceeb5ce66438b746d",
+    "time": 16.5
+  },
+  {
+    "name": "base-a-dropoff-PLM-down",
+    "pngHash": "8b51aa77f9d22040dce29f3f6457282f18d37f18d3e1c3a95385800da5507c49",
+    "modelHash": "725fbe08c4f0ddac197a21a9457161dd4682d1372df1a0853fbe4edde8e8f287",
+    "fishGPUHash": "6f45c0038d4f0ba777ec3a6637e86faf116e3a8866fc8b5afda7a774e34a15d8",
+    "time": 17
+  },
+  {
+    "name": "base-a-dropoff-PLM-forward",
+    "pngHash": "2ea5bb1f3bc04222b6d12503422c41cc2f5716ea9cdb79bb46758d16ac8426bf",
+    "modelHash": "868eb2352b1f43c05de956d61c0b8fe641bba9b393de34b147d23b2e5079e2f3",
+    "fishGPUHash": "c72ddb9ec45ddcbd998b0687336431c343b8ac125cbc7f5b06ce8663c106b246",
+    "time": 17.5
+  },
+  {
+    "name": "base-a-dropoff-PLM-combo",
+    "pngHash": "455269be32d358a221297042336dc2ab8ba5c1d91e9097aa698fa677b7aef174",
+    "modelHash": "ce96ade9e0cf3f650562d361d9249e2be6594c8977e4a7afaa53c077f10af300",
+    "fishGPUHash": "085e693af39e4302f137d433508fb42a7a330cd1024978cda9d15157d27b7a24",
+    "time": 18
+  },
+  {
+    "name": "base-b-default-PL-down",
+    "pngHash": "33b4ca7ecaf3d11bfed473c3023579e0f6acf4c6208a751ea3820632e3128eaa",
+    "modelHash": "6823594f93150ce1ccf26af01978076ed0f23b13f76f467e586c8026202efefd",
+    "fishGPUHash": "0d7eb6d50dabd7ded03fe859fe3a871e45faac324b6ab7f3b30fb04826cf8e92",
+    "time": 0.5
+  },
+  {
+    "name": "base-b-default-PL-forward",
+    "pngHash": "1148ffe12c88c39a9362eca9526aaa63b3fcb7322bb1ea570932853bd9f7b744",
+    "modelHash": "791c3d3dbc9f8505f6215bb4142c644555a786260636423ef26c605967f03a95",
+    "fishGPUHash": "b09b58094d76d77b5f30ecab640d86b4c97189a5c9160c88f31638fda8517475",
+    "time": 1
+  },
+  {
+    "name": "base-b-default-PL-panoramic",
+    "pngHash": "bcd1a7bc1354fccb7eeaec1bb7849784f87b67b29bfb64d98b3c33580a75fb32",
+    "modelHash": "47a0653c5841e5c9905c5e2cdbdd56dc77aac33d0e32374ae153ab4668bbd57b",
+    "fishGPUHash": "221e89c97c61f5add5d197c22bf9f755af1f7de3c41ff4fdc2d26d38d7b5e804",
+    "time": 1.5
+  },
+  {
+    "name": "base-b-default-PLM-down",
+    "pngHash": "cb3defb6d7e5ebb2520051cb9ad2bfaaeb31146658607cb8d93367db2077dfa5",
+    "modelHash": "b82a907968e33a5cb8650b080b7f20571872139e8029344692a120cd33fb0d0f",
+    "fishGPUHash": "5ce697e273872a4784d08525767abb419a4bd598d9e4933fb76beec0e47600fe",
+    "time": 2
+  },
+  {
+    "name": "base-b-default-PLM-forward",
+    "pngHash": "83d712ee91616614c3d4509e5d3463028ea533fff5c0f9402ae584358e4e4542",
+    "modelHash": "733ced9638897479a32d3325b674c34132ea0f9f82f06a2daa8a610d9ed72b9f",
+    "fishGPUHash": "6a5421e380c849e4b18273877007d1af00377bb2e1af38502b0edde8522a7fe2",
+    "time": 2.5
+  },
+  {
+    "name": "base-b-default-PLM-combo",
+    "pngHash": "c88f880570d50aba795d8723460f83ac045a7851fd0444916faa527220c0a419",
+    "modelHash": "10fedb757d4fb5d308d168a2b1ace0a0134ded427075af7f82960a17df347970",
+    "fishGPUHash": "42adbcbe2603d98259b1c415c4daef8c0677fefaec02e4a5c607802a5c308539",
+    "time": 3
+  },
+  {
+    "name": "base-b-shelf-PL-down",
+    "pngHash": "565e852f95d48398fc579bb34cfe28801aafdb67e37fb1aaf0780f7981c19b51",
+    "modelHash": "645a345899d90419bb8055a98bf66ef69e22ac61eadba614630cb397efeda10e",
+    "fishGPUHash": "1116da4116c70e38d812532ef0764eed72e36f17d14b49183b9332d8c58efe67",
+    "time": 3.5
+  },
+  {
+    "name": "base-b-shelf-PL-forward",
+    "pngHash": "759f64e8fb646342009e9c2cf167586d59ce4a9c7680e1d4a3f211fb52d575fc",
+    "modelHash": "21c077c4253def6b60e005defff137463c3c8262782b1ae335ccb97600a7f628",
+    "fishGPUHash": "338eef9f9454fac2449cf6d53d6cf96df460c0ec3b4b394c9d80e557ddf04889",
+    "time": 4
+  },
+  {
+    "name": "base-b-shelf-PL-panoramic",
+    "pngHash": "a9cd337ec7a33ab83fa892d87cc31030b884e67446b7d7599b5970a69c6e8a35",
+    "modelHash": "51cc5178e7d4b76d43645047a49f7dab3e2a47f04852c6cc420b4c044a567211",
+    "fishGPUHash": "6d7b85ac6c9b7589fc6849fd63d16ea78b06c780e1e68ee88738a8384ab57b74",
+    "time": 4.5
+  },
+  {
+    "name": "base-b-shelf-PLM-down",
+    "pngHash": "1e5a248753c296f508f8910b921b4e5c2cc8e27fe5d90d65567157bf202a3113",
+    "modelHash": "05125932d3926b400df2c522fbfd1d9cbf01134217cc7d62c3284e555ef2e571",
+    "fishGPUHash": "722292793575688a63fa1a56ca6db0b1bd679f6ad61a96cf061e439e517c0b06",
+    "time": 5
+  },
+  {
+    "name": "base-b-shelf-PLM-forward",
+    "pngHash": "a8477952e72880f291e08e7598acf88b10b55557898324d25d1f78bc3cfcb22b",
+    "modelHash": "12a16e5cb9cb4dd2f28edbc55d8c0ba639291d9f15cf322174399990cfee80d2",
+    "fishGPUHash": "75a5be9b14dd349143dc29f55312130c6de2f29c1c159a8ba1d31fe6cd0dfe01",
+    "time": 5.5
+  },
+  {
+    "name": "base-b-shelf-PLM-combo",
+    "pngHash": "c07f2def7cf1b8f582a2e0084177ba96c58cd54f8a0f31b686601ddfe72b1053",
+    "modelHash": "fd6beb18004244128424aee8eca16ff41c35387f8ffd8cc9d5e49aeab6fdaa9e",
+    "fishGPUHash": "9ab782f99e64153fe630e1f3c3d6bf972ad4e75ea14117b0a1ca4afdd28f4f25",
+    "time": 6
+  },
+  {
+    "name": "base-b-hump-PL-down",
+    "pngHash": "48eeb453ae221649e92134edb14aca7da0022bab8cd227d88484b5e695811167",
+    "modelHash": "e933f4a6448cf98a7bef219b3c0cac5512fdca8a6349a1642ca2f65a1c7a5a4b",
+    "fishGPUHash": "fecdde501693cb7a1937bbfa2307dff8a83d85e9ebf0c3b3824173300be930ac",
+    "time": 6.5
+  },
+  {
+    "name": "base-b-hump-PL-forward",
+    "pngHash": "07c766e62cc998da1677c89249bb283c1d865da74563671cabb483c0b622cc3f",
+    "modelHash": "ec416cd604fbcdd67815a552835082a2a190befd9148e2fb2a95d06d41669ba8",
+    "fishGPUHash": "ca1493da486995b3ec146d281446cafd110fff65cc145302ac7852663381194d",
+    "time": 7
+  },
+  {
+    "name": "base-b-hump-PL-panoramic",
+    "pngHash": "94468d43cb06d56f32edcdad33c6032e8948f8dadcc146e7e0d93e5a4d1523b6",
+    "modelHash": "f480babda2d7a6c2e62a642d14a3aebaa3306be86bd339f9e32fb42d49a45683",
+    "fishGPUHash": "7fb54207c740a7daf3cfcc3e6557776581358d83cc34fc1a8c61c55862cf0482",
+    "time": 7.5
+  },
+  {
+    "name": "base-b-hump-PLM-down",
+    "pngHash": "7809056bd546b8e8879e9cc75888d6c9b532ed60ebdc156af77f1e29db35774c",
+    "modelHash": "3feafd755d294c4762aa68def218e5cafd8d8be72813c54e3474a2bd3a1cf970",
+    "fishGPUHash": "92466f1d35d6474b4e12809d500f237f9a052f0a4a58e75e7c85f68aaffcc946",
+    "time": 8
+  },
+  {
+    "name": "base-b-hump-PLM-forward",
+    "pngHash": "deb5ca011e059fba0f5e9f29f4462ce2519f95aab52a852f26c0ff719cafc754",
+    "modelHash": "94d57356af6788f09a292c733ee7364e3d77f9f03afae069004006ed2aad5137",
+    "fishGPUHash": "e27f22c94698453cfec08ef96a7f7aba6e0a0de78640b5a94b1035f3eaa7a590",
+    "time": 8.5
+  },
+  {
+    "name": "base-b-hump-PLM-combo",
+    "pngHash": "372aba716ff686757c5a69af65fba3ccedf6965e99a090f672e572bc9716c9dc",
+    "modelHash": "e2f326105fef26fec929a93de0738b3e3d560e09b226220d9a8834b05d43152a",
+    "fishGPUHash": "03b1def98ef5536182d52014842f386326a292350245256fbd60ae04434f1712",
+    "time": 9
+  },
+  {
+    "name": "base-b-deep-PL-down",
+    "pngHash": "304f735b0f1b535f5680e54a55499ad7abbe0d6edffeb74d3a22afff51a991a9",
+    "modelHash": "b6526461cf9232ee5647c495669b1c23c68b64641737be5d22f52d62c95ee60a",
+    "fishGPUHash": "64a9311a57d49deac7eb0a438bbb75a9177a35a8dfeaa279ba5a4efe489c283b",
+    "time": 9.5
+  },
+  {
+    "name": "base-b-deep-PL-forward",
+    "pngHash": "335198d18492b458f86d1e36cc8d0f459190c3a3e0f640df2c1f6627442f121c",
+    "modelHash": "2da4554b091ed31fa501efd5ad3063d6e94a0edbd783c89d47a5add81c83c7a3",
+    "fishGPUHash": "656e4d447e21aa2cb9ccd82f259a95df902ab81d1e999cf8e983abbcca99a5cc",
+    "time": 10
+  },
+  {
+    "name": "base-b-deep-PL-panoramic",
+    "pngHash": "8c9fae36a65457eabf8167c3d6ab098fc9de3527ae9b5728261066be17d71890",
+    "modelHash": "a4927658f8aa73a3a263848649de147d691200eb4637d082f5494b0260416c46",
+    "fishGPUHash": "9b8b50376cd8cb751f770cbe277e5a2cb83896ba7c9228fcf5e63ddb09c090db",
+    "time": 10.5
+  },
+  {
+    "name": "base-b-deep-PLM-down",
+    "pngHash": "f8ec74a992f3dd19de4811d932a238cf64ce60c5fcf3b45a988863a84f28fd49",
+    "modelHash": "3a3cca38657fd87117d1a67741157db33b99edf5d5593a93789a4271d3a36ef0",
+    "fishGPUHash": "edb4dad2e5ff21ad62efd6ea954275ddd35f0f682ecf19303c75be9b7f3ebdc4",
+    "time": 11
+  },
+  {
+    "name": "base-b-deep-PLM-forward",
+    "pngHash": "35a449482a90997e4d00f0f8ede23c517051693310e9a6dbde5d4beb6059d60a",
+    "modelHash": "f1e2c92c5523b5d33283331fc6a575c731b64bfa7b3f177971450ec12db3a31d",
+    "fishGPUHash": "1e60221a8a8daab0c67d8d9fb23274f464a546ac043d295580e8229218303e2d",
+    "time": 11.5
+  },
+  {
+    "name": "base-b-deep-PLM-combo",
+    "pngHash": "00cc1108909043dda058080fc1e5eff16ee0d86f5bb2e4e00d671dbeb335d4a8",
+    "modelHash": "c00babd03434e5ef128047e98753fa3636b8d6222911d350a776cfe03556aee7",
+    "fishGPUHash": "48a1a3b4a325385a9152fbad8d027e871f020e7da001a34fb02dadbba8bd71c4",
+    "time": 12
+  },
+  {
+    "name": "base-b-lockup-PL-down",
+    "pngHash": "5f1efb7f501766366d381d04d896897947d78719c428fd17dc437af72ee0a56e",
+    "modelHash": "f1263ad0b8c2b2ade08c894f265385cc42882d1f0091d69cfa41c472d6483a59",
+    "fishGPUHash": "59e3af75928bdbf059c1b385fa4bf714c8b055d270dcbbae2ba041a9b9d76995",
+    "time": 12.5
+  },
+  {
+    "name": "base-b-lockup-PL-forward",
+    "pngHash": "a753a38ccf6c17e8bfa67a1ebf5e7906e1219259fec85acfaa89a811200ea0c4",
+    "modelHash": "b03da209ec828867b505aee50e9c8db99498b69bbaefe3905f8257a33ac9c22f",
+    "fishGPUHash": "d531887e384863e59381f666b98f0aca338be1c5d999fa3cad0e83ecb24682ac",
+    "time": 13
+  },
+  {
+    "name": "base-b-lockup-PL-panoramic",
+    "pngHash": "386fc43d883c1e32135f2ca0d5f9e9adb40b00a95c822bdc7eea1cc1111d4e6b",
+    "modelHash": "9f7d2a6f02be83f5f7d79bd3101f659cd848f9f0769c1571602ac599333b59a5",
+    "fishGPUHash": "cf76c86ba50cb037bd79faf222373622e9cd6a7c1c3cbf242c50768443362cdf",
+    "time": 13.5
+  },
+  {
+    "name": "base-b-lockup-PLM-down",
+    "pngHash": "dbd8aa8a81e6a2f471002d67b4537236367c5bb25c40ea47fbdc9535f1f374bf",
+    "modelHash": "930b38745db7636c9c56e4c6e52dccd9a75840833180543e9817dd477c31a6c5",
+    "fishGPUHash": "b38e10153609e52d426c2be8b5edb937db8300faa881aeee11db25e533c94007",
+    "time": 14
+  },
+  {
+    "name": "base-b-lockup-PLM-forward",
+    "pngHash": "218aa02b65043c68c1a29a76e390fd828f993f8624b92380053e7d11d92e8e5a",
+    "modelHash": "3727b0a569373830f5f2bdf438b0b8e0a2f175caaf169d666a3b250e9e9b1cbd",
+    "fishGPUHash": "41af34c28cec2aa64062325275dd8e9c6c28fffa34e4bbd336afff32a0d5e92e",
+    "time": 14.5
+  },
+  {
+    "name": "base-b-lockup-PLM-combo",
+    "pngHash": "30aee3b8b6016b91c540c026d313694702b2b9142e1d8e6afcff2a9a7e1a59d3",
+    "modelHash": "4074bd61fa9d35fb9245a7341172c1bda9721aad1e3b27d5f3067e69a1ea8be6",
+    "fishGPUHash": "dd3bdb2369309e0e65670e9797e7e449a32db663fb9e4fd5ca28dedb99268913",
+    "time": 15
+  },
+  {
+    "name": "base-b-dropoff-PL-down",
+    "pngHash": "8d906ffa81a4182eaf9391478d395ca4e7f391b0a31699ef32ffea4c8451f389",
+    "modelHash": "3ec03f664c31412994d6e772906c277011506dd0f358ffa031c0badd7f1cf1d5",
+    "fishGPUHash": "9ce2d7b19f2968f1e26f29e8643d6ff67406b1709633c843620ba53d3de51cac",
+    "time": 15.5
+  },
+  {
+    "name": "base-b-dropoff-PL-forward",
+    "pngHash": "d6708ccee3ae7de89fb409c75a6d9c95c997104f81f510bbb29aa74d99724359",
+    "modelHash": "1890674acc62d810678f4bcf3b2c3e90cabcd80c73da6fe9f80a2892c0f9e69a",
+    "fishGPUHash": "84399c08d647d06f95f52c90a7c7a7c009a5054df2d720eb01f926a912868df6",
+    "time": 16
+  },
+  {
+    "name": "base-b-dropoff-PL-panoramic",
+    "pngHash": "20002c8cc6dc5ab1cfa41223fe482ac488b2ef462ad28d46ae7c0ed7fbb30523",
+    "modelHash": "11731debd9961a8ad7ce0849fa9ea4331a36afe079e80d9a17d2023876d86782",
+    "fishGPUHash": "2f4ff823d17289fae7bf50a217a047c3e51475f299fc11aceeb5ce66438b746d",
+    "time": 16.5
+  },
+  {
+    "name": "base-b-dropoff-PLM-down",
+    "pngHash": "8b51aa77f9d22040dce29f3f6457282f18d37f18d3e1c3a95385800da5507c49",
+    "modelHash": "725fbe08c4f0ddac197a21a9457161dd4682d1372df1a0853fbe4edde8e8f287",
+    "fishGPUHash": "6f45c0038d4f0ba777ec3a6637e86faf116e3a8866fc8b5afda7a774e34a15d8",
+    "time": 17
+  },
+  {
+    "name": "base-b-dropoff-PLM-forward",
+    "pngHash": "2ea5bb1f3bc04222b6d12503422c41cc2f5716ea9cdb79bb46758d16ac8426bf",
+    "modelHash": "868eb2352b1f43c05de956d61c0b8fe641bba9b393de34b147d23b2e5079e2f3",
+    "fishGPUHash": "c72ddb9ec45ddcbd998b0687336431c343b8ac125cbc7f5b06ce8663c106b246",
+    "time": 17.5
+  },
+  {
+    "name": "base-b-dropoff-PLM-combo",
+    "pngHash": "455269be32d358a221297042336dc2ab8ba5c1d91e9097aa698fa677b7aef174",
+    "modelHash": "ce96ade9e0cf3f650562d361d9249e2be6594c8977e4a7afaa53c077f10af300",
+    "fishGPUHash": "085e693af39e4302f137d433508fb42a7a330cd1024978cda9d15157d27b7a24",
+    "time": 18
+  },
+  {
+    "name": "candidate-default-PL-down",
+    "pngHash": "33b4ca7ecaf3d11bfed473c3023579e0f6acf4c6208a751ea3820632e3128eaa",
+    "modelHash": "6823594f93150ce1ccf26af01978076ed0f23b13f76f467e586c8026202efefd",
+    "fishGPUHash": "0d7eb6d50dabd7ded03fe859fe3a871e45faac324b6ab7f3b30fb04826cf8e92",
+    "time": 0.5
+  },
+  {
+    "name": "candidate-default-PL-forward",
+    "pngHash": "1148ffe12c88c39a9362eca9526aaa63b3fcb7322bb1ea570932853bd9f7b744",
+    "modelHash": "791c3d3dbc9f8505f6215bb4142c644555a786260636423ef26c605967f03a95",
+    "fishGPUHash": "b09b58094d76d77b5f30ecab640d86b4c97189a5c9160c88f31638fda8517475",
+    "time": 1
+  },
+  {
+    "name": "candidate-default-PL-panoramic",
+    "pngHash": "bcd1a7bc1354fccb7eeaec1bb7849784f87b67b29bfb64d98b3c33580a75fb32",
+    "modelHash": "47a0653c5841e5c9905c5e2cdbdd56dc77aac33d0e32374ae153ab4668bbd57b",
+    "fishGPUHash": "221e89c97c61f5add5d197c22bf9f755af1f7de3c41ff4fdc2d26d38d7b5e804",
+    "time": 1.5
+  },
+  {
+    "name": "candidate-default-PLM-down",
+    "pngHash": "cb3defb6d7e5ebb2520051cb9ad2bfaaeb31146658607cb8d93367db2077dfa5",
+    "modelHash": "b82a907968e33a5cb8650b080b7f20571872139e8029344692a120cd33fb0d0f",
+    "fishGPUHash": "5ce697e273872a4784d08525767abb419a4bd598d9e4933fb76beec0e47600fe",
+    "time": 2
+  },
+  {
+    "name": "candidate-default-PLM-forward",
+    "pngHash": "83d712ee91616614c3d4509e5d3463028ea533fff5c0f9402ae584358e4e4542",
+    "modelHash": "733ced9638897479a32d3325b674c34132ea0f9f82f06a2daa8a610d9ed72b9f",
+    "fishGPUHash": "6a5421e380c849e4b18273877007d1af00377bb2e1af38502b0edde8522a7fe2",
+    "time": 2.5
+  },
+  {
+    "name": "candidate-default-PLM-combo",
+    "pngHash": "c88f880570d50aba795d8723460f83ac045a7851fd0444916faa527220c0a419",
+    "modelHash": "10fedb757d4fb5d308d168a2b1ace0a0134ded427075af7f82960a17df347970",
+    "fishGPUHash": "42adbcbe2603d98259b1c415c4daef8c0677fefaec02e4a5c607802a5c308539",
+    "time": 3
+  },
+  {
+    "name": "candidate-shelf-PL-down",
+    "pngHash": "565e852f95d48398fc579bb34cfe28801aafdb67e37fb1aaf0780f7981c19b51",
+    "modelHash": "645a345899d90419bb8055a98bf66ef69e22ac61eadba614630cb397efeda10e",
+    "fishGPUHash": "1116da4116c70e38d812532ef0764eed72e36f17d14b49183b9332d8c58efe67",
+    "time": 3.5
+  },
+  {
+    "name": "candidate-shelf-PL-forward",
+    "pngHash": "759f64e8fb646342009e9c2cf167586d59ce4a9c7680e1d4a3f211fb52d575fc",
+    "modelHash": "21c077c4253def6b60e005defff137463c3c8262782b1ae335ccb97600a7f628",
+    "fishGPUHash": "338eef9f9454fac2449cf6d53d6cf96df460c0ec3b4b394c9d80e557ddf04889",
+    "time": 4
+  },
+  {
+    "name": "candidate-shelf-PL-panoramic",
+    "pngHash": "a9cd337ec7a33ab83fa892d87cc31030b884e67446b7d7599b5970a69c6e8a35",
+    "modelHash": "51cc5178e7d4b76d43645047a49f7dab3e2a47f04852c6cc420b4c044a567211",
+    "fishGPUHash": "6d7b85ac6c9b7589fc6849fd63d16ea78b06c780e1e68ee88738a8384ab57b74",
+    "time": 4.5
+  },
+  {
+    "name": "candidate-shelf-PLM-down",
+    "pngHash": "1e5a248753c296f508f8910b921b4e5c2cc8e27fe5d90d65567157bf202a3113",
+    "modelHash": "05125932d3926b400df2c522fbfd1d9cbf01134217cc7d62c3284e555ef2e571",
+    "fishGPUHash": "722292793575688a63fa1a56ca6db0b1bd679f6ad61a96cf061e439e517c0b06",
+    "time": 5
+  },
+  {
+    "name": "candidate-shelf-PLM-forward",
+    "pngHash": "a8477952e72880f291e08e7598acf88b10b55557898324d25d1f78bc3cfcb22b",
+    "modelHash": "12a16e5cb9cb4dd2f28edbc55d8c0ba639291d9f15cf322174399990cfee80d2",
+    "fishGPUHash": "75a5be9b14dd349143dc29f55312130c6de2f29c1c159a8ba1d31fe6cd0dfe01",
+    "time": 5.5
+  },
+  {
+    "name": "candidate-shelf-PLM-combo",
+    "pngHash": "c07f2def7cf1b8f582a2e0084177ba96c58cd54f8a0f31b686601ddfe72b1053",
+    "modelHash": "fd6beb18004244128424aee8eca16ff41c35387f8ffd8cc9d5e49aeab6fdaa9e",
+    "fishGPUHash": "9ab782f99e64153fe630e1f3c3d6bf972ad4e75ea14117b0a1ca4afdd28f4f25",
+    "time": 6
+  },
+  {
+    "name": "candidate-hump-PL-down",
+    "pngHash": "48eeb453ae221649e92134edb14aca7da0022bab8cd227d88484b5e695811167",
+    "modelHash": "e933f4a6448cf98a7bef219b3c0cac5512fdca8a6349a1642ca2f65a1c7a5a4b",
+    "fishGPUHash": "fecdde501693cb7a1937bbfa2307dff8a83d85e9ebf0c3b3824173300be930ac",
+    "time": 6.5
+  },
+  {
+    "name": "candidate-hump-PL-forward",
+    "pngHash": "07c766e62cc998da1677c89249bb283c1d865da74563671cabb483c0b622cc3f",
+    "modelHash": "ec416cd604fbcdd67815a552835082a2a190befd9148e2fb2a95d06d41669ba8",
+    "fishGPUHash": "ca1493da486995b3ec146d281446cafd110fff65cc145302ac7852663381194d",
+    "time": 7
+  },
+  {
+    "name": "candidate-hump-PL-panoramic",
+    "pngHash": "94468d43cb06d56f32edcdad33c6032e8948f8dadcc146e7e0d93e5a4d1523b6",
+    "modelHash": "f480babda2d7a6c2e62a642d14a3aebaa3306be86bd339f9e32fb42d49a45683",
+    "fishGPUHash": "7fb54207c740a7daf3cfcc3e6557776581358d83cc34fc1a8c61c55862cf0482",
+    "time": 7.5
+  },
+  {
+    "name": "candidate-hump-PLM-down",
+    "pngHash": "7809056bd546b8e8879e9cc75888d6c9b532ed60ebdc156af77f1e29db35774c",
+    "modelHash": "3feafd755d294c4762aa68def218e5cafd8d8be72813c54e3474a2bd3a1cf970",
+    "fishGPUHash": "92466f1d35d6474b4e12809d500f237f9a052f0a4a58e75e7c85f68aaffcc946",
+    "time": 8
+  },
+  {
+    "name": "candidate-hump-PLM-forward",
+    "pngHash": "deb5ca011e059fba0f5e9f29f4462ce2519f95aab52a852f26c0ff719cafc754",
+    "modelHash": "94d57356af6788f09a292c733ee7364e3d77f9f03afae069004006ed2aad5137",
+    "fishGPUHash": "e27f22c94698453cfec08ef96a7f7aba6e0a0de78640b5a94b1035f3eaa7a590",
+    "time": 8.5
+  },
+  {
+    "name": "candidate-hump-PLM-combo",
+    "pngHash": "eed889102afa304ca9c4cb07710ba1675faf13c92fa39db3136275f490b785e3",
+    "modelHash": "e2f326105fef26fec929a93de0738b3e3d560e09b226220d9a8834b05d43152a",
+    "fishGPUHash": "03b1def98ef5536182d52014842f386326a292350245256fbd60ae04434f1712",
+    "time": 9
+  },
+  {
+    "name": "candidate-deep-PL-down",
+    "pngHash": "304f735b0f1b535f5680e54a55499ad7abbe0d6edffeb74d3a22afff51a991a9",
+    "modelHash": "b6526461cf9232ee5647c495669b1c23c68b64641737be5d22f52d62c95ee60a",
+    "fishGPUHash": "64a9311a57d49deac7eb0a438bbb75a9177a35a8dfeaa279ba5a4efe489c283b",
+    "time": 9.5
+  },
+  {
+    "name": "candidate-deep-PL-forward",
+    "pngHash": "335198d18492b458f86d1e36cc8d0f459190c3a3e0f640df2c1f6627442f121c",
+    "modelHash": "2da4554b091ed31fa501efd5ad3063d6e94a0edbd783c89d47a5add81c83c7a3",
+    "fishGPUHash": "656e4d447e21aa2cb9ccd82f259a95df902ab81d1e999cf8e983abbcca99a5cc",
+    "time": 10
+  },
+  {
+    "name": "candidate-deep-PL-panoramic",
+    "pngHash": "8c9fae36a65457eabf8167c3d6ab098fc9de3527ae9b5728261066be17d71890",
+    "modelHash": "a4927658f8aa73a3a263848649de147d691200eb4637d082f5494b0260416c46",
+    "fishGPUHash": "9b8b50376cd8cb751f770cbe277e5a2cb83896ba7c9228fcf5e63ddb09c090db",
+    "time": 10.5
+  },
+  {
+    "name": "candidate-deep-PLM-down",
+    "pngHash": "eb7abca50ab117e34cce8a8bc6aa1016c803278cdf9414b46e9b04326f05a2c1",
+    "modelHash": "3a3cca38657fd87117d1a67741157db33b99edf5d5593a93789a4271d3a36ef0",
+    "fishGPUHash": "edb4dad2e5ff21ad62efd6ea954275ddd35f0f682ecf19303c75be9b7f3ebdc4",
+    "time": 11
+  },
+  {
+    "name": "candidate-deep-PLM-forward",
+    "pngHash": "35a449482a90997e4d00f0f8ede23c517051693310e9a6dbde5d4beb6059d60a",
+    "modelHash": "f1e2c92c5523b5d33283331fc6a575c731b64bfa7b3f177971450ec12db3a31d",
+    "fishGPUHash": "1e60221a8a8daab0c67d8d9fb23274f464a546ac043d295580e8229218303e2d",
+    "time": 11.5
+  },
+  {
+    "name": "candidate-deep-PLM-combo",
+    "pngHash": "00b325edbdf9e0d323b797910268fd27d760fd8c13f25618911fe9cdbd8df4fc",
+    "modelHash": "c00babd03434e5ef128047e98753fa3636b8d6222911d350a776cfe03556aee7",
+    "fishGPUHash": "48a1a3b4a325385a9152fbad8d027e871f020e7da001a34fb02dadbba8bd71c4",
+    "time": 12
+  },
+  {
+    "name": "candidate-lockup-PL-down",
+    "pngHash": "5f1efb7f501766366d381d04d896897947d78719c428fd17dc437af72ee0a56e",
+    "modelHash": "f1263ad0b8c2b2ade08c894f265385cc42882d1f0091d69cfa41c472d6483a59",
+    "fishGPUHash": "59e3af75928bdbf059c1b385fa4bf714c8b055d270dcbbae2ba041a9b9d76995",
+    "time": 12.5
+  },
+  {
+    "name": "candidate-lockup-PL-forward",
+    "pngHash": "a753a38ccf6c17e8bfa67a1ebf5e7906e1219259fec85acfaa89a811200ea0c4",
+    "modelHash": "b03da209ec828867b505aee50e9c8db99498b69bbaefe3905f8257a33ac9c22f",
+    "fishGPUHash": "d531887e384863e59381f666b98f0aca338be1c5d999fa3cad0e83ecb24682ac",
+    "time": 13
+  },
+  {
+    "name": "candidate-lockup-PL-panoramic",
+    "pngHash": "386fc43d883c1e32135f2ca0d5f9e9adb40b00a95c822bdc7eea1cc1111d4e6b",
+    "modelHash": "9f7d2a6f02be83f5f7d79bd3101f659cd848f9f0769c1571602ac599333b59a5",
+    "fishGPUHash": "cf76c86ba50cb037bd79faf222373622e9cd6a7c1c3cbf242c50768443362cdf",
+    "time": 13.5
+  },
+  {
+    "name": "candidate-lockup-PLM-down",
+    "pngHash": "dbd8aa8a81e6a2f471002d67b4537236367c5bb25c40ea47fbdc9535f1f374bf",
+    "modelHash": "930b38745db7636c9c56e4c6e52dccd9a75840833180543e9817dd477c31a6c5",
+    "fishGPUHash": "b38e10153609e52d426c2be8b5edb937db8300faa881aeee11db25e533c94007",
+    "time": 14
+  },
+  {
+    "name": "candidate-lockup-PLM-forward",
+    "pngHash": "218aa02b65043c68c1a29a76e390fd828f993f8624b92380053e7d11d92e8e5a",
+    "modelHash": "3727b0a569373830f5f2bdf438b0b8e0a2f175caaf169d666a3b250e9e9b1cbd",
+    "fishGPUHash": "41af34c28cec2aa64062325275dd8e9c6c28fffa34e4bbd336afff32a0d5e92e",
+    "time": 14.5
+  },
+  {
+    "name": "candidate-lockup-PLM-combo",
+    "pngHash": "30aee3b8b6016b91c540c026d313694702b2b9142e1d8e6afcff2a9a7e1a59d3",
+    "modelHash": "4074bd61fa9d35fb9245a7341172c1bda9721aad1e3b27d5f3067e69a1ea8be6",
+    "fishGPUHash": "dd3bdb2369309e0e65670e9797e7e449a32db663fb9e4fd5ca28dedb99268913",
+    "time": 15
+  },
+  {
+    "name": "candidate-dropoff-PL-down",
+    "pngHash": "8d906ffa81a4182eaf9391478d395ca4e7f391b0a31699ef32ffea4c8451f389",
+    "modelHash": "3ec03f664c31412994d6e772906c277011506dd0f358ffa031c0badd7f1cf1d5",
+    "fishGPUHash": "9ce2d7b19f2968f1e26f29e8643d6ff67406b1709633c843620ba53d3de51cac",
+    "time": 15.5
+  },
+  {
+    "name": "candidate-dropoff-PL-forward",
+    "pngHash": "d6708ccee3ae7de89fb409c75a6d9c95c997104f81f510bbb29aa74d99724359",
+    "modelHash": "1890674acc62d810678f4bcf3b2c3e90cabcd80c73da6fe9f80a2892c0f9e69a",
+    "fishGPUHash": "84399c08d647d06f95f52c90a7c7a7c009a5054df2d720eb01f926a912868df6",
+    "time": 16
+  },
+  {
+    "name": "candidate-dropoff-PL-panoramic",
+    "pngHash": "20a13a1bbde8f7f4d0af6c403c41d9dcd8dbafe3d9f6c5ff43fc2871f3315d0b",
+    "modelHash": "11731debd9961a8ad7ce0849fa9ea4331a36afe079e80d9a17d2023876d86782",
+    "fishGPUHash": "2f4ff823d17289fae7bf50a217a047c3e51475f299fc11aceeb5ce66438b746d",
+    "time": 16.5
+  },
+  {
+    "name": "candidate-dropoff-PLM-down",
+    "pngHash": "8b51aa77f9d22040dce29f3f6457282f18d37f18d3e1c3a95385800da5507c49",
+    "modelHash": "725fbe08c4f0ddac197a21a9457161dd4682d1372df1a0853fbe4edde8e8f287",
+    "fishGPUHash": "6f45c0038d4f0ba777ec3a6637e86faf116e3a8866fc8b5afda7a774e34a15d8",
+    "time": 17
+  },
+  {
+    "name": "candidate-dropoff-PLM-forward",
+    "pngHash": "2ea5bb1f3bc04222b6d12503422c41cc2f5716ea9cdb79bb46758d16ac8426bf",
+    "modelHash": "868eb2352b1f43c05de956d61c0b8fe641bba9b393de34b147d23b2e5079e2f3",
+    "fishGPUHash": "c72ddb9ec45ddcbd998b0687336431c343b8ac125cbc7f5b06ce8663c106b246",
+    "time": 17.5
+  },
+  {
+    "name": "candidate-dropoff-PLM-combo",
+    "pngHash": "455269be32d358a221297042336dc2ab8ba5c1d91e9097aa698fa677b7aef174",
+    "modelHash": "ce96ade9e0cf3f650562d361d9249e2be6594c8977e4a7afaa53c077f10af300",
+    "fishGPUHash": "085e693af39e4302f137d433508fb42a7a330cd1024978cda9d15157d27b7a24",
+    "time": 18
+  }
+]

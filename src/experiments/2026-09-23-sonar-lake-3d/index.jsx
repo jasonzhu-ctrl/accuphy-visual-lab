@@ -20,6 +20,7 @@ import AppBadges from './AppBadges'
 // BF funnel items 1–2 (handoff 2026-10-26): two placements for Jason to pick (HQ: 先出 2 个样子，不直接定); off until he does
 import { depthAt } from './terrain'
 import { panoHalfWidth } from './sonarMarks'
+import BlueHourHero from './BlueHourHero'
 // dev: ?bigphone makes the phone huge so the sonar picture can be inspected in screenshots
 const BIG_PHONE = import.meta.env.DEV && window.location.search.includes('bigphone')
 // Build variant (Jason 2026-10-16): VITE_DEVICES='PLM' makes a PingLive Mini-only page — no device switch, the
@@ -65,10 +66,11 @@ export const meta = {
 // lab="fish": the fish-echo test page (2026-10-24-sonar-fish-echo, #153). Since #170 every page draws the fish from their
 // 3D bodies as the transducer sees them (#153 round 3, true size); dev only: ?fish=marks shows the old #120 marks for A/B,
 // ?fishsize=1.6 enlarges the sonar fish, and the test page shows its two switches
-export default function SonarLake3D({ scene: sceneProp, lab }) {
+export default function SonarLake3D({ scene: sceneProp, lab, presentation, config }) {
+  const blueHour = presentation === 'blue-hour'
   const scene = sceneProp || SCENE_ENV || (/[?&]scene=ice/.test(window.location.search) ? 'ice' : 'lake')
   const ICE = scene === 'ice'
-  const ONLY = ICE ? 'PLM' : ONLY_ENV // on the ice the Mini is the device: the app's ice views are the Mini's
+  const ONLY = ICE || blueHour ? 'PLM' : ONLY_ENV // Hero uses the original Mini configuration.
   const SHOWN_DEVICES = ONLY ? [DEVICES[ONLY]] : Object.values(DEVICES)
   const [deviceId, setDeviceId] = useState(ONLY || 'PL')
   const [mode, setMode] = useState(ICE ? 'liveice' : 'forward')
@@ -120,6 +122,7 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
     return () => { cancelAnimationFrame(raf); clearTimeout(timer); window.removeEventListener('accuphy-lab', onEvent); canvas?.removeEventListener('webglcontextlost', onLost); canvas?.removeEventListener('webglcontextrestored', onRestored) }
   }, [mount3d, glKey])
   useEffect(() => {
+    if (blueHour) return
     const set = () => document.documentElement.style.setProperty('--lab-h', `${window.innerHeight}px`)
     set(); window.addEventListener('resize', set); window.addEventListener('orientationchange', set); window.visualViewport?.addEventListener('resize', set)
     return () => { window.removeEventListener('resize', set); window.removeEventListener('orientationchange', set); window.visualViewport?.removeEventListener('resize', set) }
@@ -127,7 +130,7 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
   const [toast, setToast] = useState(false)
   // Phones (lake scene) open ON the app's Home page and nothing starts until a view is picked (Jason 2026-10-16:
   // 显示首页选视图 而且应该必须先选才能开始): no beam, no sonar picture, no capsules until the first pick.
-  const homeFirst = (isPhoneLayout() || isLandscapePhone()) && !ICE
+  const homeFirst = !blueHour && (isPhoneLayout() || isLandscapePhone()) && !ICE
   const [home, setHome] = useState(homeFirst)      // the app's Home page is open inside the phone display
   const [started, setStarted] = useState(!homeFirst) // a view has been picked (always true on desktop and on the ice page)
   const toastT = useRef(0)
@@ -144,8 +147,8 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
   const sonarRect = useRef({ el: null, frame: null, lake: null })
   // a phone held sideways (#140): the phone is the app itself — Home, then the sonar full-screen with the app's controls,
   // the lake a small inset; a tap on the inset swaps them (lakeBig). The lake page only: the ice page keeps its layout.
-  const land = isLandscapePhone() && !ICE
-  const phone = isPhoneLayout() || land
+  const land = !blueHour && isLandscapePhone() && !ICE
+  const phone = !blueHour && (isPhoneLayout() || land)
   const [lakeBig, setLakeBig] = useState(false)
   // the fish-echo test page (#153): two switches on the page itself (Jason opens it from a link, not with URL flags)
   const [fishNew, setFishNew] = useState(!(import.meta.env.DEV && /[?&]fish=marks/.test(window.location.search)))
@@ -160,7 +163,7 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
   }, [land])
   const dispAspect = land ? landAspect : 2.08
   // the gallery's "← Lab" link would sit on the app's depth readout and Home title (dev gallery only; the public build has none)
-  useEffect(() => { document.body.classList.toggle('lab-land', land); return () => document.body.classList.remove('lab-land') }, [land])
+  useEffect(() => { if (blueHour) return; document.body.classList.toggle('lab-land', land); return () => document.body.classList.remove('lab-land') }, [land, blueHour])
 
   const device = DEVICES[deviceId]
   const modes = ICE ? ICE_MODES : device.modes
@@ -314,6 +317,8 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
     state.current.target.x = st.boat[0]; state.current.target.z = st.boat[1]
     state.current.frameX = st.boat[0] + 14 // phones: re-centre the zoomed-out view on the preset (boat left, beam right)
   }
+
+  if (blueHour) return <BlueHourHero {...{mainRef,state,sonarRect,mount3d,glLost,layout,mode,depthFt,imperial,gain,autoDepth,setAutoDepth,pickView,stepRange,stepDepth,setImperial,setGain,paused,setPaused,config}} rangeFt={effRangeFt} autoRange={downLike || comboAuto} />
 
   return (
     <>

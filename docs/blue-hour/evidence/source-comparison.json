@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "createdAt": "2026-10-29T05:49:09.913Z",
+  "base": "48f15ccc990fdb69f9edd1a04d14257d100da610",
+  "result": "PASS_GEOMETRY_CONFIG_ONLY",
+  "beforeSha256": "f0f0a0f286510c0425bbb07f628790d073eea089f8b579100bd46f07d49ce893",
+  "afterSha256": "f0f0a0f286510c0425bbb07f628790d073eea089f8b579100bd46f07d49ce893",
+  "cases": 108,
+  "dependencyLockMatches": true,
+  "deterministic": true,
+  "semanticDifferences": [],
+  "sourceChanges": [
+    {
+      "group": "notExecutedSourceSha256Lf",
+      "file": "src/experiments/2026-09-23-sonar-lake-3d/index.jsx"
+    },
+    {
+      "group": "notExecutedSourceSha256Lf",
+      "file": "src/experiments/2026-09-23-sonar-lake-3d/Scene.jsx"
+    },
+    {
+      "group": "notExecutedSourceSha256Lf",
+      "file": "src/experiments/2026-09-23-sonar-lake-3d/SonarScreen.jsx"
+    }
+  ],
+  "limitations": {
+    "description": "实际函数的离线几何/配置基线；没有实现另一套命中判定。",
+    "spots": 6,
+    "views": 6,
+    "clocksSeconds": [
+      0,
+      4,
+      12
+    ],
+    "spotViewClockCases": 108,
+    "actualFunctions": [
+      "depthAt",
+      "bedY",
+      "bakeTerrain",
+      "buildObstacles",
+      "toCircles",
+      "makePopulation",
+      "fishPose",
+      "drawnLen",
+      "wedgeSpecs",
+      "wedgeGeometry",
+      "setBeamUniforms"
+    ],
+    "scope": "固定 80 ft 标准扇体；没有运行 index.jsx 的 AUTO / screen-box 裁剪，也没有模拟 React 状态。",
+    "fishClockScope": "同一新建种群的基础轨道 t=0/4/12；未调用 stepBehaviours、winterCamp 或 jig，不能代表浏览器随机行为历史。",
+    "notVerified": [
+      "鱼体/鱼中心命中列表",
+      "结构遮挡、first-hit / far-hit",
+      "GPU echo 亮度、纹理采样与像素",
+      "index.jsx 最终裁剪与 AUTO 档位",
+      "真实浏览器/手机/冰钓交互",
+      "Shopify / Meta / Klaviyo 数据送达或历史统计"
+    ]
+  }
+}

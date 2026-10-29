@@ -1,0 +1,12 @@
+{
+  "lost": {
+    "message": "The interactive lake is unavailable. Reload to try again, or explore PingLive Mini below.",
+    "stepDisabled": true,
+    "cta": true,
+    "scrollY": 140
+  },
+  "noJs": {
+    "title": "SEE BENEATH THE SURFACE.",
+    "cta": 2
+  }
+}

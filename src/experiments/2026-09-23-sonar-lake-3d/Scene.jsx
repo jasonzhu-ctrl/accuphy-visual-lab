@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
+import SceneLifecycle from './SceneLifecycle'
+import BlueHourEnvironment from './BlueHourEnvironment'
 import * as THREE from 'three'
 import { labEvent } from './embed'
 import { mergeGeometries as _merge } from 'three/addons/utils/BufferGeometryUtils.js'
@@ -22,6 +24,7 @@ import { IceSky, IceSheet, IceCamp, IceWalls, Snowfall, IcePick, LightShaft, Mar
 import { makeIceMaterial } from './iceSheet'
 import { bakeTerrain } from './sonarMarks'
 import lakeSkyUrl from './assets/lake-sky.jpg?inline' // the sky mirrored in the summer lake (#162): a CC0 photo, see assets/LICENSES.md
+import blueSkyUrl from './assets/blue-hour/distant-skyline.png?inline'
 import { makeLakeFFT, FFT_L } from './lakeFFT' // the waves: a wind-sea spectrum by FFT (#165, after ABYSSAL, MIT, see assets/LICENSES.md)
 import { iceParams, ICE_CAM_T, ICE_CAM_D, ICE_LAKE_W, ICE_FOG, UNDER_CAM, SECTION_CAM, SECTION_CAM_PHONE, ICE_T, dir } from './iceScene'
 
@@ -176,7 +179,7 @@ function Logo({ mat, stoneMat }) {
 // wavelength) every frame and the vertex shader bends the body (lakeMaterial.js). Body wavelength in body lengths.
 const WAVELENGTH = { bass: 0.95, panfish: 0.95, perch: 0.9, walleye: 0.85, salmonid: 0.85, bait: 0.85, pike: 0.8 }
 const smooth01 = (a, b, x) => { const u = Math.min(1, Math.max(0, (x - a) / (b - a))); return u * u * (3 - 2 * u) }
-function FishGroup({ mat, body, fish }) {
+function FishGroup({ mat, body, fish, state }) {
   const geo = useMemo(() => {
     const g = makeFishGeometry(body)
     const pat = new Float32Array(fish.length), belly = new Float32Array(fish.length * 3), side = new Float32Array(fish.length * 3)
@@ -203,6 +206,7 @@ function FishGroup({ mat, body, fish }) {
   const tmp = useMemo(() => ({ m: new THREE.Matrix4(), q: new THREE.Quaternion(), e: new THREE.Euler(), p: new THREE.Vector3(), s: new THREE.Vector3(), pose: {},
     heading: new Float32Array(fish.length), speed: new Float32Array(fish.length), accel: new Float32Array(fish.length), first: true }), [fish])
   useFrame(({ clock }, dt) => {
+    if (state.current.blueHour && state.current.heroPaused) return
     const t = clock.elapsedTime, d = Math.min(Math.max(dt, 1e-4), 0.1)
     const fresh = tmp.first || dt > 0.25 // first frame, or back from a pause / hidden tab: no turn rate or slowing to read
     const sw = geo.attributes.aSwim, a = sw.array
@@ -245,6 +249,7 @@ function Fish({ mat, state }) {
   useFrame(({ clock }, dt) => {
     if (import.meta.env.DEV) window.__lakeClock = clock
     const s = state.current
+    if (s.blueHour && s.heroPaused) return
     if (s.jig !== undefined && s.holes && s.holes.length) { // the ice page: a winter population round each new hole (fish.js winterCamp)
       const live = s.holes[s.holes.length - 1], key = `${live.x.toFixed(1)},${live.z.toFixed(1)}`
       if (key !== campKey.current) { campKey.current = key; winterCamp(pop, live, circles, bedY) }
@@ -257,7 +262,7 @@ function Fish({ mat, state }) {
     pop.forEach((f) => { const b = SPECIES[f.species].body; (by[b] ||= []).push(f) })
     return Object.entries(by)
   }, [pop])
-  return groups.map(([body, fish]) => <FishGroup key={body} mat={mat} body={body} fish={fish} />)
+  return groups.map(([body, fish]) => <FishGroup key={body} mat={mat} body={body} fish={fish} state={state} />)
 }
 
 // ---------- water surface ----------
@@ -307,8 +312,8 @@ function Water({ state }) {
   useEffect(() => () => fft.dispose(), [fft])
   const mat = useMemo(() => new THREE.ShaderMaterial({
     transparent: true, depthWrite: false, side: THREE.DoubleSide,
-    uniforms: { uTime: { value: 0 }, uSky: { value: new THREE.Color('#9cc1cf') },
-      uSkyMap: { value: loadTex(lakeSkyUrl, false) }, uSkyRot: { value: 0 }, uSunP: { value: new THREE.Vector3(0, 1, 0) },
+    uniforms: { uTime: { value: 0 }, uBlueHour: { value: state.current.blueHour ? 1 : 0 }, uSky: { value: new THREE.Color(state.current.blueHour ? '#132d4d' : '#9cc1cf') },
+      uSkyMap: { value: loadTex(lakeSkyUrl, false) }, uBlueMap: { value: state.current.blueHour ? loadTex(blueSkyUrl, false) : null }, uSkyRot: { value: 0 }, uSunP: { value: new THREE.Vector3(0, 1, 0) },
       uFft0: { value: fft.tex[0] }, uFft1: { value: fft.tex[1] }, uFftL: { value: new THREE.Vector3(...FFT_L) }, uFftN: { value: fft.n }, uFftC: { value: fft.fine }, uFftGain: { value: import.meta.env.DEV ? +((/fftgain=([\d.]+)/.exec(window.location.search) || [])[1] || 0.7) : 0.7 }, // 0.7 of the spectrum's slope (1.0 read choppy from 60 m); dev: ?fftgain=
       uBoat: { value: new THREE.Vector2() }, uWake: { value: 0 } }, // the boat (x, z) and how strongly its rings run (0–1)
     vertexShader: /* glsl */ `
@@ -316,8 +321,8 @@ function Water({ state }) {
       void main() { vec4 wp = modelMatrix * vec4(position, 1.0); vW = wp.xyz; gl_Position = projectionMatrix * viewMatrix * wp; }
     `,
     fragmentShader: /* glsl */ `
-      precision highp float; varying vec3 vW; uniform vec3 uSky; uniform float uTime;
-      uniform sampler2D uSkyMap; uniform float uSkyRot; uniform vec3 uSunP;
+      precision highp float; varying vec3 vW; uniform vec3 uSky; uniform float uTime, uBlueHour;
+      uniform sampler2D uSkyMap, uBlueMap; uniform float uSkyRot; uniform vec3 uSunP;
       uniform sampler2D uFft0, uFft1; uniform vec3 uFftL; uniform float uFftN, uFftGain, uFftC;
       uniform vec2 uBoat; uniform float uWake;
       ${WATER_NOISE}
@@ -374,9 +379,25 @@ function Water({ state }) {
         float dist = length(vW - cameraPosition);
         float fog = smoothstep(120.0, 420.0, dist);
         gl_FragColor = vec4(mix(col, uSky, fog), mix(clamp(alpha + sun, 0.0, 1.0), 1.0, fog));
+        if (uBlueHour > 0.5) {
+          // Presentation-only water layer: distant reflections, graded near-water reveal.
+          // Reflect the same distant backdrop using the existing FFT normals.
+          // The backdrop plane spans x +/-390, y -5..275, z -280.
+          float hit = (-280.0-vW.z) / min(R.z,-0.001);
+          vec3 reflected = vW + R * hit;
+          vec2 buv = clamp(vec2((reflected.x+390.0)/780.0,(reflected.y+5.0)/280.0),0.001,0.999);
+          vec3 dusk = texture2D(uBlueMap,buv).rgb * vec3(.64,.76,.9);
+          dusk = mix(vec3(.025,.10,.15),dusk,0.72+0.28*F);
+          gl_FragColor = vec4(dusk,mix(0.015,0.97,smoothstep(16.0,85.0,dist)));
+        }
       }
     `,
   }), [fft])
+  useEffect(() => () => {
+    mat.uniforms.uBlueMap.value?.dispose()
+    mat.uniforms.uSkyMap.value?.dispose()
+    mat.dispose()
+  }, [mat])
   useFrame(({ clock }, dt) => {
     const now = clock.elapsedTime
     mat.uniforms.uTime.value = now
@@ -559,6 +580,19 @@ function Rig({ state, sonarRect, fogMats, cam = LAKE_CAM }) {
   useFrame(({ clock }, dt) => {
     const s = state.current
     if (import.meta.env.DEV) window.__camera = camera // dev (ads): to project lake points onto the screen for overlays
+    if (s.blueHour) {
+      if (camera.view?.enabled) camera.clearViewOffset()
+      if(camera.far!==1200){camera.far=1200;camera.updateProjectionMatrix()}
+      const zoom=s.blueZoom || 1, narrow=size.width<700
+      const cx=s.boat.x+(narrow?0:9), cz=s.boat.z
+      const p=tmp.set(cx-(narrow?0:12)*zoom,3.5*zoom,cz+40*zoom)
+      // The original boat trajectory already eases. Following that trajectory
+      // directly keeps the boat clear of the tablet during a long step change.
+      camera.position.copy(p)
+      s.blueCameraReady=true
+      camera.lookAt(cx,narrow?-4:0,cz-30)
+      return
+    }
     if (import.meta.env.DEV && s.camOverride) { // dev (ads, BF ad v2): the camera set from outside — { pos, look, fov }
       const o = s.camOverride
       if (camera.view?.enabled) camera.clearViewOffset()
@@ -766,7 +800,12 @@ function Rig({ state, sonarRect, fogMats, cam = LAKE_CAM }) {
   return null
 }
 function PickPlane({ state }) {
-  const onDown = (e) => { e.stopPropagation(); state.current.dragging = true; state.current.hasDragged = true; labEvent('first_drag', {}, { once: true }); e.target.setPointerCapture?.(e.pointerId); move(e) }
+  const onDown = (e) => {
+    const s=state.current
+    if(s.blueHour && (s.heroPaused || e.pointerType==='touch' || Math.hypot(e.point.x-s.boat.x,e.point.z-s.boat.z)>7)) return
+    if(s.blueHour)s.blueManualTakeover=true
+    e.stopPropagation(); s.blueVoyage=false; s.dragging = true; s.hasDragged = true; labEvent('first_drag', {}, { once: true }); e.target.setPointerCapture?.(e.pointerId); move(e)
+  }
   const move = (e) => {
     const s = state.current
     if (!s.dragging) return
@@ -832,9 +871,12 @@ export default function LakeScene({ state, sonarRect, paused = false, scene = 'l
     return m
   }, [ice, P])
   const beamMats = useMemo(() => (iceMat ? [...lakeMats, iceMat] : lakeMats), [lakeMats, iceMat]) // the ice shows the beam's reach too
-  const bg = ice ? P.T.bg : '#9cc1cf'
+  const blueHour = !!state.current.blueHour
+  const bg = ice ? P.T.bg : blueHour ? '#132d4d' : '#9cc1cf'
   return (
     <Canvas frameloop={paused ? 'never' : 'always'} dpr={[1, 1.5]} camera={{ fov: 38, near: 0.5, far: 400, position: [-38, 34, 54] }} gl={{ antialias: true, powerPreference: 'high-performance' }} onCreated={({ gl }) => { gl.localClippingEnabled = true; labEvent('ready', {}, { once: true }) }}>
+      {blueHour && <SceneLifecycle allowPausedDraw />}
+      {blueHour && <BlueHourEnvironment />}
       <color attach="background" args={[bg]} />
       <fog attach="fog" args={ice ? [bg, ICE_FOG.near, ICE_FOG.far] : [bg, 160, 420]} />
       {ice ? (<>

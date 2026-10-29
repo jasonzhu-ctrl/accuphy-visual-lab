@@ -1,0 +1,24 @@
+{
+  "results": [
+    {
+      "selector": ".bh-canvas",
+      "delta": 140
+    },
+    {
+      "selector": ".bh-steps button",
+      "delta": 140
+    },
+    {
+      "selector": ".bh-sonar-content",
+      "delta": 140
+    },
+    {
+      "selector": ".bh-screen-controls button",
+      "delta": 140
+    }
+  ],
+  "initial": 1,
+  "unloaded": 0,
+  "reloaded": 1,
+  "errors": []
+}
