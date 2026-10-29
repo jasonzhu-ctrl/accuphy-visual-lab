@@ -52,13 +52,13 @@ const S = {
   gl_lost_title: { en: 'The 3D view stopped', fr: 'La vue 3D s’est arrêtée' },
   gl_lost_text: { en: 'Your browser freed the graphics memory. Tap to reload the lake.', fr: 'Votre navigateur a libéré la mémoire graphique. Touchez pour recharger le lac.' },
   // "Send to a friend" (BF funnel item 1)
-  share: { en: 'Send to a friend', fr: 'Envoyer à un ami' },
+  share: { en: 'Send to a friend', fr: 'Partager' }, // FR reviewed by the website HQ 2026-10-28 (#198): "Partager" everywhere, no longer sentence
   share_text: { en: 'Try the Accuphy Lab — drag a boat and watch the live sonar light up.', fr: 'Essayez l’Accuphy Lab : déplacez un bateau et regardez le sondeur live s’allumer.' },
   share_sms: { en: 'Text message', fr: 'Message texte' },
   share_copy: { en: 'Copy link', fr: 'Copier le lien' },
   share_copied: { en: 'Link copied', fr: 'Lien copié' },
-  share_short: { en: 'Share', fr: 'Partager' }, // the phone dock beside the Shop pill: no room for the long label
-  get_app: { en: 'Get the Accuphy Sonar app', fr: 'Téléchargez l’application Accuphy Sonar' }, // the caption over the store badges (Jason 2026-10-28; the badges themselves say "Download on the App Store" / "Get it on Google Play"). FR FOR THE WEBSITE HQ'S REVIEW
+  share_short: { en: 'Share', fr: 'Partager' }, // the phone dock beside the Shop pill: no room for the long label (FR passes, #198)
+  get_app: { en: 'Get the Accuphy Sonar app', fr: 'Télécharger l’application Accuphy Sonar' }, // the caption over the store badges (Jason 2026-10-28; the badges themselves say "Download on the App Store" / "Get it on Google Play"). FR reviewed by the website HQ 2026-10-28 (#198): the infinitive, as the store's /fr footer
   // the Shop button
   shop: { en: 'Shop {name}', fr: 'Achetez le {name}' }, // after the store's own "Achetez maintenant →" (shop.accuphy.com/fr); the arrow is the button's icon
   shop_opening: { en: 'Opening the store…', fr: 'Ouverture de la boutique…' }, // shown for the 1 s before the page leaves (website #228). FR drafted from the glossary (boutique = the store) — FOR THE WEBSITE HQ'S REVIEW

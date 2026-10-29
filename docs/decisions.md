@@ -3225,3 +3225,5 @@ Numbered log. Newest at the bottom.
      - HQ's check (2026-10-28): Google's PNG carries its own transparent margin, so at the same box height its badge looked
        smaller than Apple's. The two PNGs are cropped to their visible shape (en 564×168, fr 646×192), so at 40 px both badges
        are the same height; Google asks for equal size side by side. Sheet redone.
+     - The website's French review (#198, 2026-10-28): the caption is "Télécharger l’application Accuphy Sonar" (the infinitive,
+       as the store's /fr footer); "Partager" passes and is the French for every share spot, "Send to a friend" included.
