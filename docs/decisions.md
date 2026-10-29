@@ -3278,3 +3278,8 @@ Numbered log. Newest at the bottom.
        `allow=clipboard-write` (same-origin frame, so the permission case is not a strict proof; the JS-click run without a
        gesture exercised the last fallback, "Press ⌘C"). **Not run:** Safari and Firefox (no Playwright here); a real phone.
        Share build 1.92 MB, gzip 654.6 KB (+17.7 KB for the encoder and the popover). Sheet `docs/2026-10-29-share-popover.jpg`.
+     - **HQ's check (2026-10-29), second cut:** the QR is 168 CSS px in a 208 px white box (a 4-module quiet zone at ≈3.5–3.7
+       px/module), ECC M; `ref=share` dropped (nothing reads it; Klaviyo's draft only named it — HQ tells Klaviyo); the link
+       field keeps the start of the address in view when selected (scrollLeft reset) and the popover focuses × on open; the
+       test decodes every market's QR at 3, 2 and 1 px per module. Tags per the website / Klaviyo HQ: utm_medium=referral,
+       utm_content = channel, market = the bridge's country code. 15/15. Sheet redone.

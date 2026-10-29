@@ -66,7 +66,7 @@ export function storeOrigin() {
 
 // "Send to a friend" (#188, Jason 2026-10-29 in Lab HQ): the STORE page of the visitor's own market — before, everyone shared
 // the Canadian page. Root = shopRoot() (the store's `shop`), else the ?lang rule. Tags follow Klaviyo's D5 scheme (HQ confirms
-// the names; website HQ 2026-10-29: GA4 files unknown mediums as "Unassigned"): ref=share, utm_source=lab_share,
+// the names; website HQ 2026-10-29: GA4 files unknown mediums as "Unassigned"): utm_source=lab_share (no ref=share: nothing reads it, and the QR stays lean — HQ 2026-10-29),
 // utm_medium=referral, utm_content = qr | copy | native | whatsapp | sms, utm_campaign=bf2026_lab_<market> — the market is the
 // country code the bridge uses (ca for /fr too: Quebec is Canada).
 export function shareMarket() {
@@ -80,7 +80,7 @@ export function shareMarket() {
 export function shareUrl(medium) {
   const root = shopRoot(); const path = (root !== null ? root : LANG_PATH) + '/pages/lab'
   const u = new URL(path, STORE)
-  u.searchParams.set('ref', 'share'); u.searchParams.set('utm_source', 'lab_share'); u.searchParams.set('utm_medium', 'referral'); u.searchParams.set('utm_content', medium); u.searchParams.set('utm_campaign', 'bf2026_lab_' + shareMarket())
+  u.searchParams.set('utm_source', 'lab_share'); u.searchParams.set('utm_medium', 'referral'); u.searchParams.set('utm_content', medium); u.searchParams.set('utm_campaign', 'bf2026_lab_' + shareMarket())
   return u.href
 }
 
