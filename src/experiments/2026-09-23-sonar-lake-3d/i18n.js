@@ -15,6 +15,10 @@ const S = {
   range: { en: 'Range', fr: 'Portée' },
   depth: { en: 'Depth', fr: 'Profondeur' },
   auto_follows: { en: 'AUTO · follows the water', fr: 'AUTO · suit la profondeur' },
+  range_fwd: { en: 'Forward range', fr: 'Portée avant' }, // PLM Combo's two ranges (#189)
+  range_down: { en: 'Down range', fr: 'Portée vers le bas' },
+  combo_fwd: { en: 'FORWARD', fr: 'AVANT' }, // the small captions over the phone's two Combo range controls
+  combo_down: { en: 'DOWN', fr: 'BAS' },
   cam_top: { en: 'Top', fr: 'Dessus' },
   cam_under: { en: 'Under the ice', fr: 'Sous la glace' },
   cam_section: { en: 'Section', fr: 'Coupe' },

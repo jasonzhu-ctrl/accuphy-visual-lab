@@ -177,8 +177,14 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
   const autoDepthOn = autoDepth && mode !== 'panoramic' // Down, Forward and Combo's Down panel
   const downLike = mode === 'down' || mode === 'ice' || mode === 'liveice' // the ice views are the Down fan (+ the flasher): AUTO range too
   // the range everything uses: Down's is the AUTO depth range; Forward and Panoramic use the visitor's range
-  const comboAuto = mode === 'combo' // PLM Combo: AUTO range (comboAutoRangeFt)
-  const effRangeFt = downLike ? depthFt : comboAuto ? comboAutoRangeFt(depthFt, maxFt) : rangeFt
+  // PLM Combo: two ranges, each moved on its own (Jason 2026-10-29: forward 的 range 跟 down 的 range 可以分别的调, #189;
+  // was one AUTO range, #125). Until the visitor moves one it follows the water: Forward the old AUTO range, Down the AUTO
+  // depth. Entering Combo starts on AUTO again.
+  const combo = mode === 'combo'
+  const [comboFwdFt, setComboFwdFt] = useState(null), [comboDownFt, setComboDownFt] = useState(null)
+  useEffect(() => { setComboFwdFt(null); setComboDownFt(null) }, [mode, deviceId])
+  const comboFwd = comboFwdFt ?? comboAutoRangeFt(depthFt, maxFt), comboDown = comboDownFt ?? depthFt
+  const effRangeFt = downLike ? depthFt : combo ? comboFwd : rangeFt
   const specs = useMemo(() => {
     const rangeFt = effRangeFt
     const sp = wedgeSpecs(device, mode, rangeFt * FT)
@@ -195,22 +201,22 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
     if (deviceId === 'PL' && mode === 'down' && sp[0]) { const D = rangeFt * FT, w = D * 2.08; sp[0] = { ...sp[0], R: Math.hypot(w / 2, D) * 1.001, box: { xMin: -w / 2, xMax: w / 2, yMax: D } } }
     // PLM Combo: the Down fan reaches its AUTO-depth panel, the Forward fan its 0.7 × range panel (SonarScreen.jsx)
     if (deviceId === 'PLM' && mode === 'combo' && sp[1]) {
-      const R = rangeFt * FT, D = depthFt * FT, wd = (D * 2.08) / 2
+      const R = rangeFt * FT, D = comboDown * FT, wd = (D * 2.08) / 2
       // the Down fan's beam is drawn whole in the lake (Jason 2026-10-23: 三角形不够完整 … 左边缺了一个角 补完整): the app's
       // Combo panel still crops its left side (the apex sits 20 % in), but the coverage in the water is the full fan
       sp[0] = { ...sp[0], R: Math.hypot(0.8 * wd, D) * 1.001 }
-      const hF = comboFwdDepth(R, D); sp[1] = { ...sp[1], R: Math.hypot(R, hF) * 1.001, box: { xMin: -0.25 * R, xMax: R, yMax: hF } } // the Forward panel's depth (SonarScreen.jsx)
+      const hF = comboFwdDepth(R, depthFt * FT); sp[1] = { ...sp[1], R: Math.hypot(R, hF) * 1.001, box: { xMin: -0.25 * R, xMax: R, yMax: hF } } // the Forward panel's depth (SonarScreen.jsx)
     }
     if (deviceId === 'PLM' && mode === 'forward' && sp[0]) { const R = rangeFt * FT, D = depthFt * FT; sp[0] = { ...sp[0], R: Math.hypot(R, D) * 1.001, box: { xMin: -0.25 * R, xMax: R, yMax: D } } }
     return sp
-  }, [device, deviceId, mode, effRangeFt, depthFt])
+  }, [device, deviceId, mode, effRangeFt, depthFt, comboDown])
   // Before the first pick on a phone there are no fans at all. The gate is tied to the CURRENT layout, not only to the
   // `started` flag: if the page mounted narrow (Home first) and then became wide (phone rotated to landscape, a resized
   // window, or a browser pane that grew), desktop has no Home page to pick from, so it must run as started.
   const live = started || !phone
   const liveSpecs = live ? specs : []
   const specKey = `${deviceId}-${mode}-${effRangeFt}-${live ? 1 : 0}`
-  const layout = useMemo(() => screenLayout(deviceId, mode, effRangeFt * FT, dispAspect, specs, depthFt * FT), [deviceId, mode, effRangeFt, depthFt, specs, dispAspect]) // display aspect = phone frame aspect (sideways: the screen's)
+  const layout = useMemo(() => screenLayout(deviceId, mode, effRangeFt * FT, dispAspect, specs, (combo ? comboDown : depthFt) * FT, depthFt * FT), [deviceId, mode, effRangeFt, depthFt, combo, comboDown, specs, dispAspect]) // display aspect = phone frame aspect (sideways: the screen's)
 
   const b0 = (/boat=(-?[\d.]+),(-?[\d.]+)/.exec(window.location.search) || []).slice(1).map(Number) // dev: ?boat=x,z
   // Phones open on the standing-timber flat (18 ft; bass, walleye and pike 8–15 m ahead), so the 50 m-wide phone view
@@ -233,6 +239,7 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
   state.current.specKey = specKey
   state.current.rangeM = effRangeFt * FT
   state.current.depthM = depthFt * FT
+  state.current.panelDepthM = (combo ? comboDown : depthFt) * FT // Combo: the Down panel's own range (#189); the Forward panel's depth still follows the water (depthM)
   state.current.imperial = imperial
   state.current.colormap = colormap
   state.current.gain = gain
@@ -297,6 +304,18 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
     const i = dir > 0 ? steps.findIndex((v) => v > rangeFt + 0.5) : steps.findLastIndex((v) => v < rangeFt - 0.5)
     if (i >= 0) setRangeFt(steps[i])
   }
+  // Combo on phones (#189): each panel's own −/+, the Forward panel on Live Forward's range steps, the Down panel on Live
+  // Down's depth steps (in the visitor's unit)
+  const stepComboFwd = (dir) => {
+    const steps = RANGE_STEPS_FT.filter((v) => v <= maxFt)
+    const i = dir > 0 ? steps.findIndex((v) => v > comboFwd + 0.5) : steps.findLastIndex((v) => v < comboFwd - 0.5)
+    if (i >= 0) setComboFwdFt(steps[i])
+  }
+  const stepComboDown = (dir) => {
+    const steps = (imperial ? DEPTH_STEPS_FT : DEPTH_STEPS_M.map((m) => m / FT)).filter((v) => v <= device.maxDepthFt + 0.01)
+    const i = dir > 0 ? steps.findIndex((v) => v > comboDown + 0.5) : steps.findLastIndex((v) => v < comboDown - 0.5)
+    if (i >= 0) setComboDownFt(steps[i])
+  }
 
   // the three-step guide (docs/3d-beam-reference.md §3): each step is a preset
   const [step, setStep] = useState(0)
@@ -351,12 +370,24 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
             <div className="ac-seg">{VIEWS.map((v) => <button key={v} className={`ac-btn ${view === v ? 'is-active' : ''}`} onClick={() => setView(v)}>{{ top: t('cam_top'), under: t('cam_under'), section: t('cam_section') }[v]}</button>)}</div>
           </Row>
         )}
-        <Row label={t('range')}>
-          {/* Down: the range is the AUTO depth range, so the slider only shows it */}
-          <input type="range" min={20} max={maxFt} step={5} value={effRangeFt} disabled={downLike || comboAuto} title={downLike || comboAuto ? 'AUTO: follows the water depth' : undefined} onChange={(e) => setRangeFt(+e.target.value)} className="ac-range w-36" style={{ '--fill': `${((effRangeFt - 20) / (maxFt - 20)) * 100}%`, opacity: downLike || comboAuto ? 0.45 : 1 }} />
-          <button className="ac-value" onClick={() => setImperial((v) => !v)} title="ft / m">{fmt(effRangeFt)}</button>
-          {(downLike || comboAuto) && <span className="ac-soft text-[11px]">{t('auto_follows')}</span>} {/* no "max …" hint (website review 2026-10-26: specs say 230 ft, the app's steps go to 240) */}
-        </Row>
+        {combo ? (<>
+          {/* PLM Combo (#189): each panel's range on its own, like the app's Live Forward and Live Down settings */}
+          <Row label={t('range_fwd')} wide>
+            <input type="range" min={20} max={maxFt} step={5} value={comboFwd} onChange={(e) => setComboFwdFt(+e.target.value)} className="ac-range w-28" style={{ '--fill': `${((comboFwd - 20) / (maxFt - 20)) * 100}%` }} />
+            <button className="ac-value" onClick={() => setImperial((v) => !v)} title="ft / m">{fmt(comboFwd)}</button>
+          </Row>
+          <Row label={t('range_down')} wide>
+            <input type="range" min={20} max={device.maxDepthFt} step={5} value={Math.round(comboDown)} onChange={(e) => setComboDownFt(+e.target.value)} className="ac-range w-28" style={{ '--fill': `${((comboDown - 20) / (device.maxDepthFt - 20)) * 100}%` }} />
+            <button className="ac-value" onClick={() => setImperial((v) => !v)} title="ft / m">{fmt(comboDown)}</button>
+          </Row>
+        </>) : (
+          <Row label={t('range')}>
+            {/* Down: the range is the AUTO depth range, so the slider only shows it */}
+            <input type="range" min={20} max={maxFt} step={5} value={effRangeFt} disabled={downLike} title={downLike ? 'AUTO: follows the water depth' : undefined} onChange={(e) => setRangeFt(+e.target.value)} className="ac-range w-36" style={{ '--fill': `${((effRangeFt - 20) / (maxFt - 20)) * 100}%`, opacity: downLike ? 0.45 : 1 }} />
+            <button className="ac-value" onClick={() => setImperial((v) => !v)} title="ft / m">{fmt(effRangeFt)}</button>
+            {downLike && <span className="ac-soft text-[11px]">{t('auto_follows')}</span>} {/* no "max …" hint (website review 2026-10-26: specs say 230 ft, the app's steps go to 240) */}
+          </Row>
+        )}
         {DEV_TOOLS && deviceId === 'PL' && mode === 'forward' && (
           <Row label="Depth">
             <input type="range" min={20} max={device.maxDepthFt} step={5} value={Math.round(depthFt)} onChange={(e) => { setAutoDepth(false); setDepthFt(+e.target.value) }} className="ac-range w-36" style={{ '--fill': `${((depthFt - 20) / (device.maxDepthFt - 20)) * 100}%` }} />
@@ -415,7 +446,7 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
           {/* the display. Sideways phones (#140): the whole screen inside the safe areas (no drawn phone — the visitor's
               phone is the device), or, with the lake enlarged, a small sonar box top-right that taps back */}
           <div ref={(el) => { sonarRect.current.el = el }} style={land ? (lakeBig ? { ...LAND_SMALL, height: `${(34 / landAspect).toFixed(2)}vw` } : LAND_FULL) : { position: 'absolute', inset: '2.6%', borderRadius: '5.4% / 11.3%', containerType: 'size', overflow: 'hidden' }}>
-            <SonarChrome layout={layout} deviceId={deviceId} mode={mode} rangeFt={effRangeFt} depthFt={depthFt} imperial={imperial} gain={gain} autoDepth={autoDepth} autoRange={downLike || comboAuto} onRange={phone ? stepRange : undefined} onHome={phone ? () => { setHome(true); setLakeBig(false) } : undefined} phone={phone && !land} noMark={land && !lakeBig && !home && started} waterTempC={ICE ? 1.6 : 21.8} app={appCtl} onLocked={phone ? undefined : onLocked} depthRef={(el) => { state.current.depthEl = el }} />
+            <SonarChrome layout={layout} deviceId={deviceId} mode={mode} rangeFt={effRangeFt} depthFt={depthFt} imperial={imperial} gain={gain} autoDepth={autoDepth} autoRange={downLike} onRange={phone ? stepRange : undefined} combo={combo ? { fwdFt: comboFwd, downFt: comboDown, onFwd: phone ? stepComboFwd : undefined, onDown: phone ? stepComboDown : undefined, fwdLabel: t('combo_fwd'), downLabel: t('combo_down') } : undefined} onHome={phone ? () => { setHome(true); setLakeBig(false) } : undefined} phone={phone && !land} noMark={land && !lakeBig && !home && started} waterTempC={ICE ? 1.6 : 21.8} app={appCtl} onLocked={phone ? undefined : onLocked} depthRef={(el) => { state.current.depthEl = el }} />
             {phone && home && <AppHome ice={ICE} devices={SHOWN_DEVICES} deviceId={started ? deviceId : null} mode={started ? mode : null} onPick={(d, m) => { pickView(d, m, 'home'); setHome(false); setStarted(true) }} />}
             {/* sideways: the lake inset (drawn by SonarScreen.jsx into this button's rectangle); a tap swaps lake and sonar.
                 Top-right, clear of the rulers and the depth-range −/+; Combo keeps its readout top-right, so there top-left */}
@@ -501,10 +532,10 @@ const LAND_SMALL = { position: 'absolute', top: 'calc(env(safe-area-inset-top) +
 function ring(pad) {
   return { position: 'absolute', inset: 0, padding: pad, WebkitMask: 'linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)', WebkitMaskComposite: 'xor', mask: 'linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0)' }
 }
-function Row({ label, children }) {
+function Row({ label, children, wide = false }) {
   return (
     <div className="flex flex-wrap items-center gap-3">
-      <span className="ac-label w-14">{label}</span>
+      <span className={`ac-label ${wide ? 'w-24' : 'w-14'}`}>{label}</span>
       {children}
     </div>
   )

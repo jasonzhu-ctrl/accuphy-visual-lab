@@ -43,7 +43,7 @@ function LiveCtl({ onPress, disabled, children, label, style }) {
   )
 }
 
-export default function SonarChrome({ layout, deviceId, mode, rangeFt, depthFt, imperial, gain, depthRef, onLocked, autoDepth = true, autoRange = false, onRange, onHome, phone = false, waterTempC = 21.8, app, noMark = false }) {
+export default function SonarChrome({ layout, deviceId, mode, rangeFt, depthFt, imperial, gain, depthRef, onLocked, autoDepth = true, autoRange = false, onRange, onHome, phone = false, waterTempC = 21.8, app, noMark = false, combo }) {
   // `app` (phones, Jason 2026-10-16: 这些控制都做在手机上 … 模拟真实的 Accuphy Sonar app 里面的功能): the app's own controls are
   // live — gain −/+ (1 % a tap), pause and the depth-range −/+ (manual steps, AUTO off). The ⋯ settings button stays greyed and cannot be opened
   // (Jason 2026-10-17/18: noise reject 这些功能不要加进去 … 把 color map 也去掉). Without `app` they stay display-only (desktop).
@@ -57,7 +57,8 @@ export default function SonarChrome({ layout, deviceId, mode, rangeFt, depthFt, 
   const gapPM = phone ? '6cqh' : '2.2cqh'
   const unit = imperial ? FT : 1 // metres per display unit
   const box = layout.box0
-  const rangeLabel = imperial ? `${Math.round(rangeFt)}ft` : `${Math.round(rangeFt * FT)}m`
+  const lenLabel = (ft) => (imperial ? `${Math.round(ft)}ft` : `${Math.round(ft * FT)}m`)
+  const rangeLabel = lenLabel(rangeFt)
   const depthLabel = imperial ? `${Math.round(depthFt ?? rangeFt)}ft` : `${Math.round((depthFt ?? rangeFt) * FT)}m`
   const flat = mode === 'panoramic'
   const split = layout.split
@@ -147,6 +148,18 @@ export default function SonarChrome({ layout, deviceId, mode, rangeFt, depthFt, 
             {onRange ? <LiveCtl label="Range longer" disabled={autoRange} onPress={() => onRange(1)}><Ring>+</Ring></LiveCtl> : <LockedCtl onLocked={onLocked}><Ring>+</Ring></LockedCtl>}
           </div>
         )}
+        {/* PLM Combo (#189, Jason 2026-10-29: forward 的 range 跟 down 的 range 可以分别的调): each panel's range under it —
+            Down lower-left, Forward lower-right clear of the panels' diagonal, a small caption naming the panel (the app sets them in its ⋯ menu) */}
+        {split && combo && [['down', combo.downFt, combo.onDown, combo.downLabel, phone ? '23%' : '19%'], ['fwd', combo.fwdFt, combo.onFwd, combo.fwdLabel, '80%']].map(([k, ft, on, cap, x]) => (
+          <div key={k} style={{ position: 'absolute', left: x, top: '50%', transform: 'translate(-50%, -50%)', display: 'flex', alignItems: 'center', gap: gapPM }}>
+            {on ? <LiveCtl label={`${cap} range shorter`} onPress={() => on(-1)}><Ring>−</Ring></LiveCtl> : <LockedCtl onLocked={onLocked}><Ring>−</Ring></LockedCtl>}
+            <span style={{ position: 'relative', lineHeight: 1.05 }}>
+              <span className={num} style={{ position: 'absolute', left: '50%', bottom: '100%', transform: 'translateX(-50%)', fontSize: cq(2.6), fontWeight: 700, letterSpacing: '0.12em', color: '#7fcfff', whiteSpace: 'nowrap' }}>{cap}</span>
+              <span className={num} style={{ fontSize: cq(4.8), fontWeight: 500 }}>{lenLabel(ft)}</span>
+            </span>
+            {on ? <LiveCtl label={`${cap} range longer`} onPress={() => on(1)}><Ring>+</Ring></LiveCtl> : <LockedCtl onLocked={onLocked}><Ring>+</Ring></LockedCtl>}
+          </div>
+        ))}
         {(() => { const glyph = app && app.paused
           ? <i style={{ display: 'block', width: 0, height: 0, marginLeft: cq(0.8), borderTop: `${cq(2)} solid transparent`, borderBottom: `${cq(2)} solid transparent`, borderLeft: `${cq(3.4)} solid #fff` }} />
           : <><i style={{ display: 'block', width: cq(0.9), height: cq(3.6), background: '#fff', borderRadius: cq(0.3) }} /><i style={{ display: 'block', width: cq(0.9), height: cq(3.6), background: '#fff', borderRadius: cq(0.3) }} /></>

@@ -3297,3 +3297,30 @@ Numbered log. Newest at the bottom.
        207–570 px (pill at 598), QR 172 px, Copy → "Copied ✓" + `copy`, outside tap and Esc close (the iframe test page
        does not pass `?lang`, so FR was checked on the dev server only); desktop and the ice page unchanged, 0 errors.
        Sheet `docs/2026-10-29-share-popover-phone.jpg`. Share build gzip 654.4 KB.
+189. **2026-10-29** — **PingLive Mini Combo: two ranges, each moved on its own; replaces #125's AUTO** (Jason in Lab HQ:
+     "在 mini 的 combo view 下面，我发现 range 是动不了的。实际的情况是forward 的 range 跟 down 的 range 可以分别的调，因为 combo
+     view 本来就是forward view 加那个 down view"). In the app the two ranges are set in the ⋯ menu's Live Forward / Live Down
+     tabs (`plm-combo-menu.jpg`); the screen shows neither (`40-live-combo.jpg`).
+     - **Built** (`index.jsx`, `SonarScreen.jsx`, `SonarChrome.jsx`, `i18n.js`):
+       - **Forward range:** horizontal, on Live Forward's steps and limits (20 ft to the Mini's maximum).
+       - **Down range:** the Down panel's depth, on Live Down's depth steps in the visitor's unit.
+       - Until the visitor moves one, each follows the water as before: Forward the old AUTO range (#125), Down the AUTO
+         depth. Entering Combo, or changing device, starts on AUTO again.
+       - **Desktop panel:** "Forward range" and "Down range" sliders (FR "Portée avant", "Portée vers le bas") in place of
+         the greyed one with "AUTO · follows the water".
+       - **Phones:** a −/+ under each panel: Down lower-left, Forward lower-right, each with a small caption (DOWN /
+         FORWARD, BAS / AVANT).
+       - The 3D curtains follow both. Each panel's rulers follow its own range.
+     - **Moving one never moves the other.** The Forward panel's depth (#124) now follows the water's AUTO depth, not the Down
+       range. It also has a floor: never shallower than that AUTO depth. Without the floor, a short Forward range in deep
+       water (40 ft in 36 ft of water) put the bottom below the panel and left an empty picture. Under the old AUTO range
+       (≥ 3 × depth) the floor never bites, so the pictures on entering Combo are unchanged.
+     - **Checks:**
+       - Panel boxes read back on the lake and ice pages after each slider move: Forward 120 → 40 ft leaves the Down box
+         as it was; Down 45 → 60 → 30 ft leaves the Forward box as it was.
+       - Lake 6×6 grid and ice grid against 904e4ee: the same picture, Combo included (entering Combo is on AUTO). The
+         only differences are moving fish and grain. 0 errors.
+       - Phone 390×844 steppers checked. FR panel checked.
+       - Sheet `docs/2026-10-29-plm-combo-two-ranges.jpg`: desktop and phone, two range pairs each, and the ice page.
+     - **Not built:** the Forward panel's `1.0x` zoom (#181 note). On a phone the FORWARD −/+ sits where the panels' diagonal
+       meets the bottom bar; the line runs past its − ring.

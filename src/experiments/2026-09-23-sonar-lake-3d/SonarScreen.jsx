@@ -25,10 +25,13 @@ export const phonePose = () => (isPhoneLayout() ? PHONE_POSE_PHONE : PHONE_POSE)
 // How the app frames each view (measured on the tablet 2026-09-24, docs/app-chrome.md §2/§6).
 // A box is {x0, y0, w, h} in metres with the apex at (0,0) and y growing with depth;
 // the quad maps it onto the whole display, so each axis is stretched independently.
-// PLM Combo, Forward panel depth (m) for range R and water depth D (both m); index.jsx uses it for the 3D curtain too
-export const comboFwdDepth = (R, D) => Math.min(0.7 * R, Math.sqrt(0.7 * R * 1.3 * D))
+// PLM Combo, Forward panel depth (m) for range R and water depth D (both m); index.jsx uses it for the 3D curtain too.
+// Never shallower than the water's AUTO depth range (#189): with the Forward range now the visitor's own, a short range in
+// deep water put the bottom below the panel (40 ft in 36 ft of water: an empty picture). Under the old AUTO range
+// (≥ 3 × depth) the floor never bites, so those pictures are unchanged.
+export const comboFwdDepth = (R, D) => Math.max(D, Math.min(0.7 * R, Math.sqrt(0.7 * R * 1.3 * D)))
 
-export function screenLayout(deviceId, mode, R, aspect, specs, depthM) {
+export function screenLayout(deviceId, mode, R, aspect, specs, depthM, waterM) {
   const half = specs[0] ? (specs[0].a1 - specs[0].a0) / 2 : 0.6
   const mini = deviceId === 'PLM'
   if (mode === 'forward') {
@@ -51,14 +54,14 @@ export function screenLayout(deviceId, mode, R, aspect, specs, depthM) {
   // runs out to the screen corners (no arc), only the two straight fan edges are drawn
   if (mode === 'panoramic') { const h = 0.9 * R, w = h * aspect; return { box0: { x0: -w / 2, y0: 0.1 * R, w, h }, apexU: 0.5, split: false } }
   // Combo (PLM): Forward panel upper-right (fan 1), Down panel lower-left (fan 0), shared apex at 20 %. Each panel has
-  // its own scale, as in the app: Forward 0.7 × range deep; Down on the AUTO depth range (the app frame: 4.1 m of water,
-  // Down panel 0–5.5 m). It used R / 3, which matched that one frame by chance and in 54 ft of water at 80 ft range
+  // its own scale, as in the app: Forward 0.7 × range deep; Down on its own range (#189: the visitor's Down range, AUTO depth
+  // until moved; the app frame: 4.1 m of water, Down panel 0–5.5 m). R is the Forward range. It used R / 3, which matched that one frame by chance and in 54 ft of water at 80 ft range
   // left the bottom off the Down panel (2026-09-25 QA). The sound reaches each panel's far corner.
   const Dd = depthM ?? R / 3
   // the Forward panel's depth axis: the app's 0.7 × range at short range; at long range it no longer grows with the
   // range alone but meets the water halfway — the geometric mean of 0.7 × range and 1.3 × the water depth — so the bottom
   // is not squeezed into the top strip, yet rises only gently (Jason 2026-10-23: 方案 A 更好 但抬高的再少一点 曲度跟原来相近)
-  const fwd = { x0: -0.25 * R, y0: 0, w: 1.25 * R, h: comboFwdDepth(R, Dd) }
+  const fwd = { x0: -0.25 * R, y0: 0, w: 1.25 * R, h: comboFwdDepth(R, waterM ?? Dd) } // (the water's AUTO depth, not the Down range: moving one panel never moves the other, #189)
   const wd = (Dd * aspect) / 2 // the Down panel is stretched ×2 like Live Down
   const down = { x0: -0.2 * wd, y0: 0, w: wd, h: Dd }
   return { box0: fwd, box1: down, apexU: 0.2, split: true, mottle: false, reach: Math.max(Math.hypot(R, 0.7 * R), Math.hypot(0.8 * wd, Dd)) }
@@ -255,7 +258,7 @@ export default function SonarScreen({ state, rect, lakeMats }) {
     {
       const el0 = rect.current.el
       const aspect = el0 && el0.offsetHeight > 0 ? el0.offsetWidth / el0.offsetHeight : 2
-      lay = screenLayout(s.deviceId, s.mode, s.rangeM, aspect, s.specs.slice(0, MAX_FANS), s.depthM)
+      lay = screenLayout(s.deviceId, s.mode, s.rangeM, aspect, s.specs.slice(0, MAX_FANS), s.panelDepthM ?? s.depthM, s.depthM)
       // the ice views: which panels, the display aspect for the dial, one tick per ruler step round the ring
       u.uIce.value = lay.ice || 0; u.uIceSplit.value = lay.iceSplit ?? ICE_SPLIT; u.uAspect.value = aspect
       if (lay.ice) { const unit = s.imperial ? FT : 1, span = s.rangeM / unit; u.uTicks.value = span / niceStep(span) }

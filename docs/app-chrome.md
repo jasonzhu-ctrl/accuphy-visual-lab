@@ -70,7 +70,7 @@ its simulation pack / recording is not on the device yet.
 |---|---|---|---|
 | **Live Forward** | **top-left corner** (x ≈ 0) | top ruler 0 → range (18 m); side rulers 0 → 10 m depth (1:1 here) | range −/+ · gain −/+ · **zoom `1.0x` with ˄ ˅** on the right edge (no depth-range control) |
 | **Live Down** | top-centre | top ruler ±3 (fan corners meet the screen corners); side rulers 1 → 7 (range 8 m) | range −/+ · gain −/+; the 39° fan is **stretched ×2 horizontally** to fill the width |
-| **Live Combo** | one shared apex at the top, x ≈ 20 % | **Down panel lower-left** (its own scales: 0 1 2 along the bottom, 1…5 down the left), **Forward panel upper-right** (0 → 18 along the top, 2…12 down the right); a thin grey **double diagonal line** from the apex to the bottom-right separates them; black gap between | only ⏸ and back/⋯; depth readout + temp + voltage move to the **top-right** (x ≈ 78 %) |
+| **Live Combo** | one shared apex at the top, x ≈ 20 % | **Down panel lower-left** (its own scales: 0 1 2 along the bottom, 1…5 down the left), **Forward panel upper-right** (0 → 18 along the top, 2…12 down the right); a thin grey **double diagonal line** from the apex to the bottom-right separates them; black gap between | only ⏸ and back/⋯ on screen; the **Forward and Down ranges are set separately** (the ⋯ menu's Live Forward / Live Down tabs; Jason 2026-10-29). Depth readout + temp + voltage move to the **top-right** (x ≈ 78 %). *Lab (#189):* two sliders on the desktop panel, and on phones a −/+ under each panel |
 
 Combo's ⋯ menu has three tabs: 🐟→ Live Forward settings, 🐟↓ Live Down
 settings (Contrast / Noise Reject / TVG at 20 %, Color Map, Image

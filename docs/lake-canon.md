@@ -36,7 +36,7 @@ Jason, 2026-10-27: the lake scene (boat and lake), its effects, the sonar pictur
 | Fish in the sonar | drawn from the fish bodies, as the transducer hears them; far fish at long range held at a steady middle size | #153, #170, #177 |
 | Panoramic | **the sound picture**, the only one (Jason 10-27): the vertical views' pipeline with the fan laid flat. Hot rocks, soft dark-crimson shadows instead of black lanes, no rings, fish as smooth dashes (`uPanoK`). The plan view and `/pano/` are deleted | #171, #178 |
 | Forward AUTO depth | **OPEN** | #154 |
-| Mini views | four views, the rest frosted; Combo range AUTO | #121, #124, #125 |
+| Mini views | four views, the rest frosted; Combo has two ranges moved on their own (Forward, Down), AUTO until moved; Forward shows no depth readout | #121, #124, #181, #189 (replaces #125) |
 
 ## Known second copies (to remove)
 
