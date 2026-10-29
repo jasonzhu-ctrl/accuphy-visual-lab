@@ -1,0 +1,201 @@
+{
+  "url": "https://accuphy-blue-hour-lake-20261029.accuphy-1012.chatgpt.site",
+  "checkedAt": "2026-10-29T06:43:20.625Z",
+  "anonymous": {
+    "status": 403,
+    "requiresSignIn": false
+  },
+  "assets": [
+    {
+      "name": "accuphy-blue-hour-0b6c01418076.js",
+      "status": 403,
+      "bytes": 4547,
+      "sha256": "82ce9f5a8aaa236de6f9b3f2c988784cfcd573f34955a924d45eabdf0256a77b",
+      "matchesBuild": false
+    },
+    {
+      "name": "accuphy-blue-hour-822669c346d5.css",
+      "status": 403,
+      "bytes": 4547,
+      "sha256": "e06c3767d29c80a47488d0b7ab540d5b1fc48dea3689d7a8f7054bd4f4862671",
+      "matchesBuild": false
+    }
+  ],
+  "viewports": [
+    {
+      "width": 1920,
+      "height": 1080,
+      "status": 200,
+      "step3Notice": "Panoramic View is not available for PingLive Mini in this simulation. Your current view and boat position are unchanged.",
+      "scroll": [
+        {
+          "selector": ".bh-canvas",
+          "delta": 20
+        },
+        {
+          "selector": ".bh-steps button",
+          "delta": 20
+        },
+        {
+          "selector": ".bh-sonar-content",
+          "delta": 20
+        },
+        {
+          "selector": ".bh-screen-controls button",
+          "delta": 20
+        }
+      ],
+      "refreshReady": true,
+      "canvasCount": 1,
+      "horizontalOverflow": false,
+      "errors": [],
+      "failed": []
+    },
+    {
+      "width": 1440,
+      "height": 900,
+      "status": 200,
+      "step3Notice": "Panoramic View is not available for PingLive Mini in this simulation. Your current view and boat position are unchanged.",
+      "scroll": [
+        {
+          "selector": ".bh-canvas",
+          "delta": 140
+        },
+        {
+          "selector": ".bh-steps button",
+          "delta": 140
+        },
+        {
+          "selector": ".bh-sonar-content",
+          "delta": 140
+        },
+        {
+          "selector": ".bh-screen-controls button",
+          "delta": 140
+        }
+      ],
+      "refreshReady": true,
+      "canvasCount": 1,
+      "horizontalOverflow": false,
+      "errors": [],
+      "failed": []
+    },
+    {
+      "width": 1024,
+      "height": 768,
+      "status": 200,
+      "step3Notice": "Panoramic View is not available for PingLive Mini in this simulation. Your current view and boat position are unchanged.",
+      "scroll": [
+        {
+          "selector": ".bh-canvas",
+          "delta": 172
+        },
+        {
+          "selector": ".bh-steps button",
+          "delta": 172
+        },
+        {
+          "selector": ".bh-sonar-content",
+          "delta": 172
+        },
+        {
+          "selector": ".bh-screen-controls button",
+          "delta": 172
+        }
+      ],
+      "refreshReady": true,
+      "canvasCount": 1,
+      "horizontalOverflow": false,
+      "errors": [],
+      "failed": []
+    },
+    {
+      "width": 768,
+      "height": 1024,
+      "status": 200,
+      "step3Notice": "Panoramic View is not available for PingLive Mini in this simulation. Your current view and boat position are unchanged.",
+      "scroll": [
+        {
+          "selector": ".bh-canvas",
+          "delta": 76
+        },
+        {
+          "selector": ".bh-steps button",
+          "delta": 76
+        },
+        {
+          "selector": ".bh-sonar-content",
+          "delta": 76
+        },
+        {
+          "selector": ".bh-screen-controls button",
+          "delta": 76
+        }
+      ],
+      "refreshReady": true,
+      "canvasCount": 1,
+      "horizontalOverflow": false,
+      "errors": [],
+      "failed": []
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "status": 200,
+      "step3Notice": "Panoramic View is not available for PingLive Mini in this simulation. Your current view and boat position are unchanged.",
+      "scroll": [
+        {
+          "selector": ".bh-canvas",
+          "delta": 400
+        },
+        {
+          "selector": ".bh-steps button",
+          "delta": 400
+        },
+        {
+          "selector": ".bh-sonar-content",
+          "delta": 400
+        },
+        {
+          "selector": ".bh-screen-controls button",
+          "delta": 0
+        }
+      ],
+      "refreshReady": true,
+      "canvasCount": 1,
+      "horizontalOverflow": false,
+      "errors": [],
+      "failed": []
+    },
+    {
+      "width": 375,
+      "height": 812,
+      "status": 200,
+      "step3Notice": "Panoramic View is not available for PingLive Mini in this simulation. Your current view and boat position are unchanged.",
+      "scroll": [
+        {
+          "selector": ".bh-canvas",
+          "delta": 400
+        },
+        {
+          "selector": ".bh-steps button",
+          "delta": 400
+        },
+        {
+          "selector": ".bh-sonar-content",
+          "delta": 400
+        },
+        {
+          "selector": ".bh-screen-controls button",
+          "delta": 0
+        }
+      ],
+      "refreshReady": true,
+      "canvasCount": 1,
+      "horizontalOverflow": false,
+      "errors": [],
+      "failed": []
+    }
+  ],
+  "authentication": "Sites-supported service access, token retained in memory only; owner browser sign-in flow not tested"
+}

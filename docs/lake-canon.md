@@ -13,6 +13,8 @@ Jason, 2026-10-27: the lake scene (boat and lake), its effects, the sonar pictur
 
 ## Lake scene
 
+Branch review note (2026-10-29, #187): `codex/blue-hour-lake` adds an optional Blue Hour presentation around this same engine. It does not replace the current standard lake or its public links. The review artifact uses source 6976055; contracts and unresolved acceptance gates are in `docs/blue-hour/delivery.md`. Mini Panoramic is unavailable in the baseline; the third teaching entry explains that limit.
+
 | Element | Canon | Decisions |
 |---|---|---|
 | Water surface | FFT wind-sea spectrum, ABYSSAL look | #165 (after #162–#164) |

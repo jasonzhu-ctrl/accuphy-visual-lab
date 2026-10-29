@@ -20,10 +20,15 @@ Overall: **BLOCKED for final Shopify acceptance**. This is an implemented, runna
 | Context loss / no JavaScript | PASS isolated local retry | Error status, disabled Step, working product link and native scroll; static HTML remains without JS |
 | Performance on real mobile / long-session leaks | NOT TESTED | Local timing evidence is not a mobile FPS claim |
 | Latest complete brand manual | BLOCKED | Supplied Logo matches repo exactly; folder contains no manual |
-| Shopify save | BLOCKED | CLI authentication missing; zero files uploaded |
+| Private HTTPS publication | PASS tested fixtures | Owner-private deployment; six online viewport runs + refresh; deployed asset hashes match; no broken images/errors; see delivery.md |
+| Shopify save | BLOCKED / deferred | User chose code + private preview first; CLI authentication missing; zero files uploaded |
 
 One context-loss test attempted while software GPU replay was running found the canvas already removed before fault injection. It is retained as a failed attempt; isolated retry successfully verified the explicit fallback. Do not infer resilience under all memory-pressure conditions from the retry.
 
 Six viewports: 1920×1080, 1440×900, 1024×768, 768×1024, 390×844, 375×812. Recorded results had no page errors and no horizontal overflow. These are desktop browser sizes, not six physical devices. Screenshots alone are not used as movement/scroll proof.
 
-Read baseline-and-regression.md for tested input conditions and known differences. Read integration-and-deployment.md for the exact theme whitelist, backup and rollback procedure. Independent HTTPS preview and final committed artifact identifiers are recorded in delivery.md after publication. Until a real Shopify upload is authorized by an authenticated CLI and its post-upload checks pass, theme acceptance remains BLOCKED.
+Read baseline-and-regression.md for tested input conditions and known differences. Read integration-and-deployment.md for the exact theme whitelist, backup and rollback procedure. The HTTPS preview and committed artifact identifiers are recorded in delivery.md. Final Shopify acceptance remains BLOCKED until the deferred upload and post-upload checks pass.
+
+Performance diagnostic: local headless Chrome on RTX 5070 / ANGLE D3D11. Baseline Vite development route first contentful paint 556 ms, controls ready 18,178 ms; pre-delivery built Hero first contentful paint 204 ms, controls ready 18,112 ms. These are different packaging modes and a warm local network, not an apples-to-apples speed claim. Both sampled RAF medians were 8.3 ms and p95 8.4 ms; RAF scheduling is not GPU frame duration or proven FPS. Startup is still slow and remains an optimization item. Real mobile timing, long-session memory growth, and a defensible real-device FPS target are NOT TESTED. Raw evidence is under evidence/performance-*.json.
+
+Delivery-only Logo repair: source commit 6976055 changes the build script to embed the exact tracked PNG instead of relying on `/brand/logo/` at the host root. It changes no renderer, sonar state or formulas. Asset SHA is now in the manifest. The earlier standalone could return HTML at that path; the final online image-completion check covers this packaging defect.

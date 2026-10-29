@@ -3227,3 +3227,8 @@ Numbered log. Newest at the bottom.
        are the same height; Google asks for equal size side by side. Sheet redone.
      - The website's French review (#198, 2026-10-28): the caption is "Télécharger l’application Accuphy Sonar" (the infinitive,
        as the store's /fr footer); "Partager" passes and is the French for every share spot, "Send to a friend" included.
+187. **2026-10-29 — Blue Hour Lake review branch, original sonar retained.** User's explicit v7 request authorizes a scoped branch and US unpublished-theme integration; latest instruction is to deliver code and private preview first, deferring Shopify login/upload.
+     - BASE_SHA `48f15ccc990fdb69f9edd1a04d14257d100da610`; source build `697605583698a1659d371be4a8ed9b0b07a1896c`; branch `codex/blue-hour-lake`. No merge or replacement of the standard/public lake.
+     - Optional presentation wraps the original engine with Blue Hour environment, landscape iPad mini and boat-target orchestration. No replacement sonar engine, new fish, altered calibration or fabricated Mini Panoramic. Exact Logo asset is bundled at build time for portable hosts.
+     - Original state/fish GPU inputs match in 36 all-device fixtures; controlled Mini software GPU replay is 18/18 exact. Strict hardware PNG comparison is 31/36, with baseline repeat differences retained, not concealed or tolerated away.
+     - Owner-private HTTPS technical preview on Sites; same compiled core for standalone and prepared Shopify Section. Zero Shopify writes, no public access expansion, no production-domain change. Details/evidence/remaining gates: `docs/blue-hour/delivery.md` and `final-qa.md`.

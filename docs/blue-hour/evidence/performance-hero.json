@@ -1,0 +1,46 @@
+{
+  "paint": [
+    {
+      "name": "first-paint",
+      "startTime": 204
+    },
+    {
+      "name": "first-contentful-paint",
+      "startTime": 204
+    }
+  ],
+  "frameCount": 601,
+  "medianFrameMs": 8.30000000000291,
+  "p95FrameMs": 8.400000000001455,
+  "renderer": "ANGLE (NVIDIA, NVIDIA GeForce RTX 5070 (0x00002F04) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+  "heapBytes": 27172592,
+  "resources": [
+    {
+      "url": "http://127.0.0.1:5183/accuphy-blue-hour-c6dbeb1809f1.css",
+      "bytes": 66376,
+      "duration": 6.699999988079071
+    },
+    {
+      "url": "http://127.0.0.1:5183/accuphy-blue-hour-loader.js",
+      "bytes": 833,
+      "duration": 4.200000017881393
+    },
+    {
+      "url": "http://127.0.0.1:5183/accuphy-blue-hour-003fa7dfa5eb.js",
+      "bytes": 2439394,
+      "duration": 85
+    },
+    {
+      "url": "http://127.0.0.1:5183/favicon.ico",
+      "bytes": 300,
+      "duration": 1.199999988079071
+    },
+    {
+      "url": "http://127.0.0.1:5183/brand/logo/White%20Accuphy%20Logo.png",
+      "bytes": 1268,
+      "duration": 8.400000005960464
+    }
+  ],
+  "note": "Headless Chrome on this Windows host. Not real mobile FPS; warm local network, no throttling.",
+  "controlsReadyMs": 18112
+}

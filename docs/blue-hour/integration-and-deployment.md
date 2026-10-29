@@ -1,6 +1,6 @@
 # Integration and deployment
 
-This branch is a reviewable implementation. Shopify upload and independent HTTPS deployment are **BLOCKED**, not completed. No live theme, market settings, product data or shared navigation was changed.
+This branch is a reviewable implementation with an owner-private HTTPS preview. Shopify upload remains **BLOCKED / deferred at the user's request** (2026-10-29: deliver code and private preview first). No theme, market settings, product data or shared navigation was changed.
 
 ## Source and artifacts
 
@@ -38,10 +38,14 @@ After upload: verify HTTPS asset paths, refresh, models, modes, all scroll surfa
 
 Rollback: restore only the backed-up US context file after another concurrency check; old assets remain because nodelete was used. Do not delete unrelated remote files or restore the entire theme.
 
-## Independent preview blocker
+## Owner-private HTTPS preview
 
-Authenticated GitHub REST verified the source repository is private; current account has push/pull, not admin/maintain. Pages returned 404; no Actions workflows or deployments were configured. No authenticated Vercel project/session was found in the checked local locations. No preview URL was invented and no private repository was made public.
+Published on Sites: https://accuphy-blue-hour-lake-20261029.accuphy-1012.chatgpt.site . Access remains owner-only: one owner, zero external visitors, no groups. This is an independent technical review environment; it is not the Shopify storefront. Source remains private. Browser QA uses the platform's documented service-access header, retained in memory only and sent only to this Site. Owner sign-in UX is NOT TESTED by that service-access test.
 
-Minimal administrator step: connect this private repository's authorized branch to an approved HTTPS static preview host, configure `node scripts/build-blue-hour.mjs dist/blue-hour` and publish directory `dist/blue-hour`, without production-domain aliases; then supply the real preview URL for online regression. The standalone contains product links, so GitHub Pages suitability must not be assumed: [GitHub Pages limits](https://docs.github.com/en/pages/getting-started-with-github-pages/github-pages-limits) exclude running an e-commerce/business site. Shopify production hosting remains separate.
+Source commit `697605583698a1659d371be4a8ed9b0b07a1896c`; clean build manifest in `release-final`. Sites artifact repository commit `61947792059b561a7cc9eeb3f1f2bc29d37f2209` contains only compiled output plus hosting metadata, not a second maintainable sonar engine. Project `appgprj_6ae2e5e17cec819194571a920a66df17`; deployment `appgdep_6ae2ec8d5394819199f460e9c61e1617` succeeded; version `appgprj_6ae2e5e17cec819194571a920a66df17~appgver_804ac80472288191b62ff4043329414d`. Rebuild from the authoritative branch for future updates; do not edit compiled output. Existing standalone/source links are not replaced.
+
+GitHub REST confirmed this repository is private and current access has push/pull, not admin/maintain. Pages returned 404 and no Actions workflows/deployments were configured. Pages is not used. [GitHub Pages limits](https://docs.github.com/en/pages/getting-started-with-github-pages/github-pages-limits) and Shopify production hosting remain separate concerns.
+
+Shopify CLI returned `Authorization is required`. No attempt was made to upload via another API to evade the requested CLI workflow. Future upload requires login, a fresh role/concurrency/market check and completion of the remaining acceptance gates; the prepared backup is not assumed current indefinitely.
 
 CLI semantics checked against [Shopify theme push documentation](https://shopify.dev/docs/api/shopify-cli/theme/theme-push). User's explicit scoped request governs this branch's work; older repo handoff-only guidance is documented, not used to broaden authorization or touch other themes.

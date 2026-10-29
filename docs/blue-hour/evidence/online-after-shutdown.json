@@ -1,0 +1,69 @@
+{
+  "url": "https://accuphy-blue-hour-lake-20261029.accuphy-1012.chatgpt.site",
+  "checkedAt": "2026-10-29T06:57:17.632Z",
+  "anonymous": {
+    "status": 403,
+    "requiresSignIn": false
+  },
+  "assets": [
+    {
+      "name": "accuphy-blue-hour-822669c346d5.css",
+      "status": 200,
+      "bytes": 130915,
+      "sha256": "822669c346d5399d60d04910d474de0161e7aed88e3b6fed52d072385c4d8dae",
+      "matchesBuild": true
+    },
+    {
+      "name": "accuphy-blue-hour-ee63d1999446.js",
+      "status": 200,
+      "bytes": 5440668,
+      "sha256": "ee63d1999446407933146de389d299e1e05d5eb900cc104924ef1370be2b1b1f",
+      "matchesBuild": true
+    },
+    {
+      "name": "accuphy-blue-hour-loader.js",
+      "status": 200,
+      "bytes": 533,
+      "sha256": "912148b595cdc7d14c0d5802154ef333516a1921b5ec22ce2ba8fc9dbddcde84",
+      "matchesBuild": true
+    }
+  ],
+  "viewports": [
+    {
+      "width": 1440,
+      "height": 900,
+      "status": 200,
+      "step3Notice": "Panoramic View is not available for PingLive Mini in this simulation. Your current view and boat position are unchanged.",
+      "scroll": [
+        {
+          "selector": ".bh-canvas",
+          "direction": 400,
+          "delta": 140
+        },
+        {
+          "selector": ".bh-steps button",
+          "direction": 400,
+          "delta": 140
+        },
+        {
+          "selector": ".bh-sonar-content",
+          "direction": 400,
+          "delta": 140
+        },
+        {
+          "selector": ".bh-screen-controls button",
+          "direction": 400,
+          "delta": 140
+        }
+      ],
+      "refreshReady": true,
+      "canvasCount": 1,
+      "horizontalOverflow": false,
+      "brokenImages": [],
+      "errors": [],
+      "failed": []
+    }
+  ],
+  "authentication": "Sites-supported service access, token retained in memory only; owner browser sign-in flow not tested",
+  "sourceCommit": "697605583698a1659d371be4a8ed9b0b07a1896c"
+}

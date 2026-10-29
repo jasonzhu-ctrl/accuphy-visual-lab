@@ -1,0 +1,446 @@
+{
+  "paint": [
+    {
+      "name": "first-paint",
+      "startTime": 556
+    },
+    {
+      "name": "first-contentful-paint",
+      "startTime": 556
+    }
+  ],
+  "frameCount": 601,
+  "medianFrameMs": 8.30000000000291,
+  "p95FrameMs": 8.400000000001455,
+  "renderer": "ANGLE (NVIDIA, NVIDIA GeForce RTX 5070 (0x00002F04) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+  "heapBytes": 53179932,
+  "resources": [
+    {
+      "url": "http://127.0.0.1:5181/@vite/client",
+      "bytes": 211231,
+      "duration": 10.5
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/main.jsx",
+      "bytes": 2029,
+      "duration": 10.5
+    },
+    {
+      "url": "http://127.0.0.1:5181/@react-refresh",
+      "bytes": 112194,
+      "duration": 11.799999982118607
+    },
+    {
+      "url": "http://127.0.0.1:5181/node_modules/.vite/deps/react.js?v=3586287c",
+      "bytes": 135782,
+      "duration": 2.5999999940395355
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/App.jsx",
+      "bytes": 10429,
+      "duration": 2.4000000059604645
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/index.css",
+      "bytes": 47918,
+      "duration": 13.400000005960464
+    },
+    {
+      "url": "http://127.0.0.1:5181/node_modules/.vite/deps/react-dom_client.js?v=a94809dc",
+      "bytes": 3098695,
+      "duration": 19.599999994039536
+    },
+    {
+      "url": "http://127.0.0.1:5181/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=3586287c",
+      "bytes": 36203,
+      "duration": 13.699999988079071
+    },
+    {
+      "url": "http://127.0.0.1:5181/@fs/D:/shopify/accuphy-visual-lab/node_modules/vite/dist/client/env.mjs",
+      "bytes": 3778,
+      "duration": 12.300000011920929
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments.js",
+      "bytes": 3204,
+      "duration": 20.200000017881393
+    },
+    {
+      "url": "http://127.0.0.1:5181/node_modules/.vite/deps/framer-motion.js?v=1c4ab896",
+      "bytes": 2015289,
+      "duration": 22.200000017881393
+    },
+    {
+      "url": "http://127.0.0.1:5181/node_modules/.vite/deps/rolldown-runtime-DC62tzP2.js?v=7ac73cfd",
+      "bytes": 8124,
+      "duration": 20.299999982118607
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-23-sonar-beam/index.jsx",
+      "bytes": 31419,
+      "duration": 3
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-23-beam-shapes-3d/index.jsx",
+      "bytes": 31693,
+      "duration": 2.9000000059604645
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-23-sonar-lake-3d/index.jsx",
+      "bytes": 146805,
+      "duration": 4
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-24-hello/index.jsx",
+      "bytes": 4346,
+      "duration": 4
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-10-16-sonar-ice-3d/index.jsx",
+      "bytes": 4650,
+      "duration": 4.199999988079071
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-10-24-sonar-fish-echo/index.jsx",
+      "bytes": 5404,
+      "duration": 4.0999999940395355
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-23-sonar-beam/SonarScene.jsx",
+      "bytes": 13785,
+      "duration": 2.0999999940395355
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-23-sonar-beam/devices.js",
+      "bytes": 8728,
+      "duration": 2.0999999940395355
+    },
+    {
+      "url": "http://127.0.0.1:5181/node_modules/.vite/deps/@react-three_fiber.js?v=6a74f105",
+      "bytes": 1872785,
+      "duration": 11
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-23-beam-shapes-3d/wedge.js",
+      "bytes": 17372,
+      "duration": 11.599999994039536
+    },
+    {
+      "url": "http://127.0.0.1:5181/node_modules/.vite/deps/three.js?v=56681568",
+      "bytes": 72801,
+      "duration": 11
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-23-sonar-lake-3d/Scene.jsx",
+      "bytes": 201874,
+      "duration": 8.199999988079071
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-23-sonar-lake-3d/iceScene.js",
+      "bytes": 18320,
+      "duration": 8.400000005960464
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-23-sonar-lake-3d/SonarScreen.jsx",
+      "bytes": 115076,
+      "duration": 9
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-23-sonar-lake-3d/home/AppHome.jsx",
+      "bytes": 32196,
+      "duration": 12
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-23-sonar-lake-3d/SignupGate.jsx",
+      "bytes": 16167,
+      "duration": 11.5
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-23-sonar-lake-3d/colormaps.js",
+      "bytes": 284351,
+      "duration": 10.699999988079071
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-23-sonar-lake-3d/SonarChrome.jsx",
+      "bytes": 60634,
+      "duration": 11.099999994039536
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-23-sonar-lake-3d/signup.js",
+      "bytes": 7469,
+      "duration": 12
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-23-sonar-lake-3d/embed.js",
+      "bytes": 21321,
+      "duration": 12.199999988079071
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-23-sonar-lake-3d/i18n.js",
+      "bytes": 24059,
+      "duration": 12.5
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-23-sonar-lake-3d/ShopButton.jsx",
+      "bytes": 8961,
+      "duration": 12.300000011920929
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-23-sonar-lake-3d/ShareButton.jsx",
+      "bytes": 13228,
+      "duration": 12.900000005960464
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-23-sonar-lake-3d/AppBadges.jsx",
+      "bytes": 9825,
+      "duration": 13.099999994039536
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-23-sonar-lake-3d/terrain.js",
+      "bytes": 19451,
+      "duration": 13.300000011920929
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-23-sonar-lake-3d/sonarMarks.js",
+      "bytes": 30064,
+      "duration": 13.600000023841858
+    },
+    {
+      "url": "http://127.0.0.1:5181/node_modules/.vite/deps/react-dom.js?v=3586287c",
+      "bytes": 51434,
+      "duration": 13.400000005960464
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-23-sonar-beam/shaders.js",
+      "bytes": 16289,
+      "duration": 13.5
+    },
+    {
+      "url": "http://127.0.0.1:5181/node_modules/.vite/deps/scheduler-C3zdRHa3.js?v=7ac73cfd",
+      "bytes": 34888,
+      "duration": 13.5
+    },
+    {
+      "url": "http://127.0.0.1:5181/node_modules/.vite/deps/react_jsx-runtime.js?v=3586287c",
+      "bytes": 37915,
+      "duration": 10.099999994039536
+    },
+    {
+      "url": "http://127.0.0.1:5181/node_modules/.vite/deps/three.module-DDMGvseK.js?v=7ac73cfd",
+      "bytes": 5983750,
+      "duration": 50.79999998211861
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-23-sonar-lake-3d/logo.js",
+      "bytes": 41708,
+      "duration": 31.5
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-23-sonar-lake-3d/sonarShader.js",
+      "bytes": 147502,
+      "duration": 31.5
+    },
+    {
+      "url": "http://127.0.0.1:5181/node_modules/.vite/deps/three_addons_utils_BufferGeometryUtils__js.js?v=9679efb7",
+      "bytes": 111882,
+      "duration": 31.399999976158142
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-23-sonar-lake-3d/vegetation.js",
+      "bytes": 30780,
+      "duration": 32.599999994039536
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-23-sonar-lake-3d/lakeMaterial.js",
+      "bytes": 79743,
+      "duration": 32.39999997615814
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-23-sonar-lake-3d/fish.js",
+      "bytes": 122753,
+      "duration": 31.899999976158142
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-23-sonar-lake-3d/rocks.js",
+      "bytes": 23598,
+      "duration": 32.69999998807907
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-23-sonar-lake-3d/boat.js",
+      "bytes": 67639,
+      "duration": 33.599999994039536
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-23-sonar-lake-3d/fishGeometry.js",
+      "bytes": 36818,
+      "duration": 33.599999994039536
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-23-sonar-lake-3d/wreck.js",
+      "bytes": 84257,
+      "duration": 33.900000005960464
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-23-sonar-lake-3d/obstacles.js",
+      "bytes": 13242,
+      "duration": 33.80000001192093
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-23-sonar-lake-3d/iceSheet.js",
+      "bytes": 68918,
+      "duration": 34.5
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-23-sonar-lake-3d/IceCamp.jsx",
+      "bytes": 117363,
+      "duration": 34.20000001788139
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-23-sonar-lake-3d/assets/lake-sky.jpg?import&inline",
+      "bytes": 194515,
+      "duration": 40.30000001192093
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-23-sonar-lake-3d/lakeFFT.js",
+      "bytes": 34241,
+      "duration": 40.5
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-23-sonar-lake-3d/home/pl-panoramic.jpg?import",
+      "bytes": 871,
+      "duration": 33.5
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-23-sonar-lake-3d/home/pl-forward.jpg?import",
+      "bytes": 865,
+      "duration": 33.60000002384186
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-23-sonar-lake-3d/home/plm-panoramic.jpg?import",
+      "bytes": 876,
+      "duration": 33.89999997615814
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-23-sonar-lake-3d/home/pl-down.jpg?import",
+      "bytes": 854,
+      "duration": 33.79999998211861
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-23-sonar-lake-3d/home/plm-forward.jpg?import",
+      "bytes": 866,
+      "duration": 34.099999994039536
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-23-sonar-lake-3d/home/plm-down.jpg?import",
+      "bytes": 855,
+      "duration": 34.099999994039536
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-23-sonar-lake-3d/home/plm-downscan.jpg?import",
+      "bytes": 871,
+      "duration": 34.29999998211861
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-23-sonar-lake-3d/home/plm-chirp.jpg?import",
+      "bytes": 860,
+      "duration": 34.400000005960464
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-23-sonar-lake-3d/home/plm-liveice.jpg?import",
+      "bytes": 866,
+      "duration": 34.599999994039536
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-23-sonar-lake-3d/home/plm-icefishing.jpg?import",
+      "bytes": 877,
+      "duration": 34.69999998807907
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-23-sonar-lake-3d/home/plm-combo.jpg?import",
+      "bytes": 860,
+      "duration": 34.69999998807907
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-23-sonar-lake-3d/badges/app-store-en.svg?import",
+      "bytes": 889,
+      "duration": 34.30000001192093
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-23-sonar-lake-3d/badges/app-store-fr.svg?import",
+      "bytes": 889,
+      "duration": 34.599999994039536
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-23-sonar-lake-3d/badges/google-play-en.png?import",
+      "bytes": 895,
+      "duration": 35.099999994039536
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-23-sonar-lake-3d/badges/google-play-fr.png?import",
+      "bytes": 895,
+      "duration": 35.19999998807907
+    },
+    {
+      "url": "http://127.0.0.1:5181/node_modules/.vite/deps/three_addons_loaders_SVGLoader__js.js?v=367fc4e9",
+      "bytes": 238961,
+      "duration": 7.5999999940395355
+    },
+    {
+      "url": "http://127.0.0.1:5181/node_modules/.vite/deps/three_addons_geometries_RoundedBoxGeometry__js.js?v=92468ac9",
+      "bytes": 19341,
+      "duration": 7.4000000059604645
+    },
+    {
+      "url": "http://127.0.0.1:5181/node_modules/.vite/deps/three_addons_geometries_LoftGeometry__js.js?v=e85972fd",
+      "bytes": 26349,
+      "duration": 7.899999976158142
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-23-sonar-lake-3d/snow.js",
+      "bytes": 9429,
+      "duration": 8.199999988079071
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-23-sonar-lake-3d/iceSky.js",
+      "bytes": 12522,
+      "duration": 8.299999982118607
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-23-sonar-lake-3d/iceProps.js",
+      "bytes": 52767,
+      "duration": 8.199999988079071
+    },
+    {
+      "url": "http://127.0.0.1:5181/brand/logo/White%20Accuphy%20Logo.png",
+      "bytes": 147501,
+      "duration": 10.399999976158142
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-23-sonar-lake-3d/badges/google-play-en.png",
+      "bytes": 12414,
+      "duration": 8
+    },
+    {
+      "url": "http://127.0.0.1:5181/src/experiments/2026-09-23-sonar-lake-3d/badges/app-store-en.svg",
+      "bytes": 11150,
+      "duration": 8.099999994039536
+    },
+    {
+      "url": "http://127.0.0.1:5181/brand/fonts/Eurostile-Heavy.woff2",
+      "bytes": 18156,
+      "duration": 40.70000001788139
+    },
+    {
+      "url": "http://127.0.0.1:5181/brand/fonts/InstrumentSans-Variable.woff2",
+      "bytes": 36300,
+      "duration": 40.29999998211861
+    },
+    {
+      "url": "http://127.0.0.1:5181/favicon.ico",
+      "bytes": 300,
+      "duration": 1.9000000059604645
+    }
+  ],
+  "note": "Headless Chrome on this Windows host. Not real mobile FPS; warm local network, no throttling.",
+  "controlsReadyMs": 18178.29999998212
+}

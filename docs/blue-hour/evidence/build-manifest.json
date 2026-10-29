@@ -1,0 +1,49 @@
+{
+  "sourceCommit": "697605583698a1659d371be4a8ed9b0b07a1896c",
+  "dirty": false,
+  "coreVersion": "48f15ccc990fdb69f9edd1a04d14257d100da610",
+  "protectedSourceHashes": {
+    "src/experiments/2026-09-23-beam-shapes-3d/wedge.js": "3dbf594031d671b0f891436b0e96694998a2017ac0585ba64f08f35f8005c776",
+    "src/experiments/2026-09-23-sonar-beam/devices.js": "07d78479f1ddb056ebc94ac0af6b201a27c99c84ae8549167cd801f86411ae00",
+    "src/experiments/2026-09-23-sonar-lake-3d/boat.js": "33c63f4955500e7e77d77429a4ac4d8c8a20de48487e923c8898fc7d114e12f5",
+    "src/experiments/2026-09-23-sonar-lake-3d/colormaps.js": "a16b4b4a19ae4f3e08ea2bbaac1f846dd363e778946ccf2074007eb248880460",
+    "src/experiments/2026-09-23-sonar-lake-3d/embed.js": "2615f4f11cb0c8d4db8f4c184ebef659e95ddf39674e64d42f56c13bc9ca9f1d",
+    "src/experiments/2026-09-23-sonar-lake-3d/fish.js": "bd127bbacc97a17b3203fdea4d3b492322f8a583103b517da620bd6cd8725d63",
+    "src/experiments/2026-09-23-sonar-lake-3d/fishGeometry.js": "7627d669ade9a339dc1fd585769b0d0b61c89782c24cb2785fee720297b99704",
+    "src/experiments/2026-09-23-sonar-lake-3d/i18n.js": "7f3680026b3288c8ffc0a70ee2c7608f8cb0a99e848c1222b6d728089a090c60",
+    "src/experiments/2026-09-23-sonar-lake-3d/iceProps.js": "4ad8b0243cc91f559697c29a37a1c0ab6ac5ac97375467403c56f76dac7a1a7d",
+    "src/experiments/2026-09-23-sonar-lake-3d/iceScene.js": "eb95bb65547aadc68569eccd402c5db1c237ae346f7934228a60713fb1a402a5",
+    "src/experiments/2026-09-23-sonar-lake-3d/iceSheet.js": "3c837a8d40ef6e1f0ebac3736d921a6be5d1125c0226c272376d8a2cea7e6d2c",
+    "src/experiments/2026-09-23-sonar-lake-3d/iceSky.js": "c2568700ba07883fb90ce27dd559f2e993e5f0c5b62f18d7a8654d1906f6e45e",
+    "src/experiments/2026-09-23-sonar-lake-3d/labMotion.js": "4982b27fd06f4d939e9c6d1a5a025643dbd00531e419fe287f0875fbeb88665b",
+    "src/experiments/2026-09-23-sonar-lake-3d/lakeFFT.js": "122fabdbe8ed36b369d753cdccd42bc2c5eb63b3605658ddf5a7c8f2c60760b4",
+    "src/experiments/2026-09-23-sonar-lake-3d/lakeMaterial.js": "23c14b5a8a1c7629f8fd6ef4bb3e4f0e2b4711d45f302b66d3643f02da7b5748",
+    "src/experiments/2026-09-23-sonar-lake-3d/logo.js": "9c26bac38070038f50ed1aa81cf67560483f457c8fe010874485a9e179760cbb",
+    "src/experiments/2026-09-23-sonar-lake-3d/obstacles.js": "30856b9c9a08a2ad6fe23bcc7e7bf1678874267050fa02c9a1dd242fd374add6",
+    "src/experiments/2026-09-23-sonar-lake-3d/rocks.js": "5f2ac5ce5512b169451bf0a4704d126351ea09223f88970fe1a12a8314ec07ec",
+    "src/experiments/2026-09-23-sonar-lake-3d/signup.js": "10ed10fc259780dabe8824f9a0b896bdf19fd66b356573c33ee7ae82aeaebe00",
+    "src/experiments/2026-09-23-sonar-lake-3d/snow.js": "e63517463649ad70294d121c483cb1b067b70196b75594394e531c90c0825edf",
+    "src/experiments/2026-09-23-sonar-lake-3d/sonarMarks.js": "25d2ff9df2e0a5eb24c39037859bdf795e4493bc67c975b2e1b4f54ce250eaa5",
+    "src/experiments/2026-09-23-sonar-lake-3d/sonarShader.js": "59a81e9beeddaf08347bd049de39315c8da120921ee562b64ee2745968392488",
+    "src/experiments/2026-09-23-sonar-lake-3d/terrain.js": "73ae3868f7dfd8283e38b176acf3ef60cbb3fea3e330159fb1849129a41c36eb",
+    "src/experiments/2026-09-23-sonar-lake-3d/vegetation.js": "dd40d11a85e9833724ecffce7678e22099e06313f2f54bd7f819da5ded4f18e3",
+    "src/experiments/2026-09-23-sonar-lake-3d/wreck.js": "f47ab5344b0318d82d36b5d1ed58a7928547c83abcb5695bf2a383fed5e86a48"
+  },
+  "sourceAssetHashes": {
+    "reference/blue-hour/approved.png": "84c2d5bb516f9f8841188a6e40facd9471cf424abfe7d75a81e5f5ece7b1a35e",
+    "src/experiments/2026-09-23-sonar-lake-3d/assets/blue-hour/distant-skyline.png": "e2eecda3998ec63af8297a1e2f1d1ad287023997c35d663b586953d860eb5077",
+    "public/brand/logo/White Accuphy Logo.png": "3256275d6b3f88c930797283d44d09d5e346b201b6c1c12d58c048e6cd170a47",
+    "public/brand/fonts/InstrumentSans-Variable.woff2": "c508b6dc988f5b7ca53f7329249eb024ecb04692a797b649486e7d6f508c99a4",
+    "public/brand/fonts/Eurostile-Heavy.woff2": "147d768399f1bd8760cecc1f2e6cbc6cbe8bb3138bee6d7549b51e545a504a65"
+  },
+  "base": "48f15ccc990fdb69f9edd1a04d14257d100da610",
+  "targets": [
+    "standalone",
+    "shopify-us"
+  ],
+  "assets": {
+    "accuphy-blue-hour-822669c346d5.css": "822669c346d5399d60d04910d474de0161e7aed88e3b6fed52d072385c4d8dae",
+    "accuphy-blue-hour-ee63d1999446.js": "ee63d1999446407933146de389d299e1e05d5eb900cc104924ef1370be2b1b1f",
+    "accuphy-blue-hour-loader.js": "912148b595cdc7d14c0d5802154ef333516a1921b5ec22ce2ba8fc9dbddcde84"
+  }
+}
