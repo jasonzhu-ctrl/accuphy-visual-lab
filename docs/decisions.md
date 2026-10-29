@@ -3291,7 +3291,7 @@ Numbered log. Newest at the bottom.
        badges above), opacity-only fade so the CSS centring holds. No native share sheet any more, no WhatsApp / SMS buttons;
        `navigator.share` is never called; the native / whatsapp / sms channels are gone. Phone caption `share_qr_caption_phone`
        "Let a friend scan this with their phone camera" / FR draft "Faites scanner ce code par un ami avec l’appareil photo de
-       son téléphone" (for the website's review, #198); the desktop caption unchanged. `shop_opening`'s review mark dropped
+       son téléphone" → reviewed by the website 2026-10-29: "Un ami peut scanner ce code avec l’appareil photo de son téléphone."; the desktop caption unchanged. `shop_opening`'s review mark dropped
        (approved 10-28). Checked: dev server 390×844 EN and FR (caption, /fr link, 0 errors), outside tap and Esc close;
        built page in a store-like iframe at 390×844 with trusted taps, without and with `allow=clipboard-write`: popover
        207–570 px (pill at 598), QR 172 px, Copy → "Copied ✓" + `copy`, outside tap and Esc close (the iframe test page

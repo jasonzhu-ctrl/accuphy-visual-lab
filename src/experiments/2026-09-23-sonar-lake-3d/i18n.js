@@ -57,7 +57,7 @@ const S = {
   share_sms: { en: 'Text message', fr: 'Message texte' },
   share_copy: { en: 'Copy link', fr: 'Copier le lien' },
   share_copied: { en: 'Link copied', fr: 'Lien copié' },
-  share_qr_caption_phone: { en: 'Let a friend scan this with their phone camera', fr: 'Faites scanner ce code par un ami avec l’appareil photo de son téléphone' }, // phones (Jason 2026-10-29: 手机也用二维码和 copy) — FR FOR THE WEBSITE HQ'S REVIEW (#198)
+  share_qr_caption_phone: { en: 'Let a friend scan this with their phone camera', fr: 'Un ami peut scanner ce code avec l’appareil photo de son téléphone.' }, // phones (Jason 2026-10-29: 手机也用二维码和 copy); FR reviewed by the website HQ 2026-10-29 (#198)
   share_qr_caption: { en: 'Scan with your phone camera to open the Lab on your phone', fr: 'Scannez avec l’appareil photo de votre téléphone pour ouvrir le Lab.' }, // #188; FR reviewed by the website HQ 2026-10-29 (#198)
   share_link_label: { en: 'Link', fr: 'Lien' },
   share_copy_hint: { en: 'Paste it into a message to a friend.', fr: 'Collez-le dans un message à un ami.' }, // FR reviewed (#198)
