@@ -67,7 +67,7 @@ export function storeOrigin() {
 // "Send to a friend" (#188, Jason 2026-10-29 in Lab HQ): the STORE page of the visitor's own market — before, everyone shared
 // the Canadian page. Root = shopRoot() (the store's `shop`), else the ?lang rule. Tags follow Klaviyo's D5 scheme (HQ confirms
 // the names; website HQ 2026-10-29: GA4 files unknown mediums as "Unassigned"): utm_source=lab_share (no ref=share: nothing reads it, and the QR stays lean — HQ 2026-10-29),
-// utm_medium=referral, utm_content = qr | copy | native | whatsapp | sms, utm_campaign=bf2026_lab_<market> — the market is the
+// utm_medium=referral, utm_content = qr | copy (native / whatsapp / sms were dropped 2026-10-29: QR and copy only, Jason), utm_campaign=bf2026_lab_<market> — the market is the
 // country code the bridge uses (ca for /fr too: Quebec is Canada).
 export function shareMarket() {
   const m = (embedOpts.market ?? (() => { try { return new URLSearchParams(window.location.search).get('market') } catch { return null } })())

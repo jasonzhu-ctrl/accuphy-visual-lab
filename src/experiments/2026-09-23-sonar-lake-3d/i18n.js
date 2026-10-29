@@ -57,6 +57,7 @@ const S = {
   share_sms: { en: 'Text message', fr: 'Message texte' },
   share_copy: { en: 'Copy link', fr: 'Copier le lien' },
   share_copied: { en: 'Link copied', fr: 'Lien copié' },
+  share_qr_caption_phone: { en: 'Let a friend scan this with their phone camera', fr: 'Faites scanner ce code par un ami avec l’appareil photo de son téléphone' }, // phones (Jason 2026-10-29: 手机也用二维码和 copy) — FR FOR THE WEBSITE HQ'S REVIEW (#198)
   share_qr_caption: { en: 'Scan with your phone camera to open the Lab on your phone', fr: 'Scannez avec l’appareil photo de votre téléphone pour ouvrir le Lab.' }, // #188; FR reviewed by the website HQ 2026-10-29 (#198)
   share_link_label: { en: 'Link', fr: 'Lien' },
   share_copy_hint: { en: 'Paste it into a message to a friend.', fr: 'Collez-le dans un message à un ami.' }, // FR reviewed (#198)
@@ -67,7 +68,7 @@ const S = {
   get_app: { en: 'Get the Accuphy Sonar app', fr: 'Télécharger l’application Accuphy Sonar' }, // the caption over the store badges (Jason 2026-10-28; the badges themselves say "Download on the App Store" / "Get it on Google Play"). FR reviewed by the website HQ 2026-10-28 (#198): the infinitive, as the store's /fr footer
   // the Shop button
   shop: { en: 'Shop {name}', fr: 'Achetez le {name}' }, // after the store's own "Achetez maintenant →" (shop.accuphy.com/fr); the arrow is the button's icon
-  shop_opening: { en: 'Opening the store…', fr: 'Ouverture de la boutique…' }, // shown for the 1 s before the page leaves (website #228). FR drafted from the glossary (boutique = the store) — FOR THE WEBSITE HQ'S REVIEW
+  shop_opening: { en: 'Opening the store…', fr: 'Ouverture de la boutique…' }, // shown for the 1 s before the page leaves (website #228). FR reviewed by the website HQ 2026-10-28 (#198)
   // the app's Home page inside the phone
   tile_panoramic: { en: 'Panoramic View', fr: 'Vue panoramique' },
   tile_forward: { en: 'Forward View', fr: 'Vue avant' },

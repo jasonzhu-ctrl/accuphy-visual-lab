@@ -3286,3 +3286,14 @@ Numbered log. Newest at the bottom.
      - The website's French review (#198, 2026-10-29): `share_qr_caption` = "Scannez avec l’appareil photo de votre téléphone pour
        ouvrir le Lab."; the other five pass as drafted (Collez-le dans un message à un ami. / Copié ✓ / Appuyez sur {keys} pour
        copier / Lien / Fermer). Marks removed.
+     - **Phones too (Jason in Lab HQ, 2026-10-29: "手机也用二维码和copy"):** the "Share" beside the Shop pill opens the same popover —
+       QR + link + Copy — centred through the portal (top 46 %, clear of the Shop pill and the phone frame below and the
+       badges above), opacity-only fade so the CSS centring holds. No native share sheet any more, no WhatsApp / SMS buttons;
+       `navigator.share` is never called; the native / whatsapp / sms channels are gone. Phone caption `share_qr_caption_phone`
+       "Let a friend scan this with their phone camera" / FR draft "Faites scanner ce code par un ami avec l’appareil photo de
+       son téléphone" (for the website's review, #198); the desktop caption unchanged. `shop_opening`'s review mark dropped
+       (approved 10-28). Checked: dev server 390×844 EN and FR (caption, /fr link, 0 errors), outside tap and Esc close;
+       built page in a store-like iframe at 390×844 with trusted taps, without and with `allow=clipboard-write`: popover
+       207–570 px (pill at 598), QR 172 px, Copy → "Copied ✓" + `copy`, outside tap and Esc close (the iframe test page
+       does not pass `?lang`, so FR was checked on the dev server only); desktop and the ice page unchanged, 0 errors.
+       Sheet `docs/2026-10-29-share-popover-phone.jpg`. Share build gzip 654.4 KB.

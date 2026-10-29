@@ -1,8 +1,8 @@
 // "Send to a friend" (BF funnel handoff 2026-10-26, item 1; redone #188, Jason 2026-10-29 in Lab HQ: "开搞 要做到丝滑 顺畅 无误 的").
-// Desktop: a click opens a small popover in the store style — a QR code of the share link (scan with the phone camera),
-// the link in a read-only field, "Copy link". The macOS share sheet (AirDrop, Notes…) felt wrong on a computer, so
-// navigator.share is never called on desktop. Phones: the native share sheet (iMessage, Messenger, WhatsApp…); when it is
-// missing or refused (the store's iframe without web-share) the same popover without the QR: link + Copy + WhatsApp + SMS.
+// A click opens a small popover in the store style — a QR code of the share link, the link in a read-only field, "Copy
+// link". Desktop: the QR is for the visitor's own phone camera. Phones (Jason 2026-10-29 in Lab HQ: "手机也用二维码和copy"): the
+// same popover, centred, the QR for a friend standing next to you; no native share sheet (the macOS one felt wrong on a
+// computer, and Jason wants QR and copy only), no WhatsApp / SMS buttons. navigator.share is never called.
 // What goes out is the STORE page of the visitor's market (embed.js shareUrl: utm by channel), never the Lab's
 // own address. Each send reports `share` { channel, market }. No reward wording anywhere (Meta forbids it).
 // Copy inside the store's iframe: clipboard.writeText needs allow="clipboard-write"; else execCommand('copy') on the
@@ -36,7 +36,6 @@ export default function ShareButton({ compact = false, className = '', style }) 
   const wrap = useRef(null), pop = useRef(null), field = useRef(null), closeBtn = useRef(null), opener = useRef(null), timer = useRef(0)
   const id = useId()
   const market = shareMarket()
-  const text = t('share_text')
   useEffect(() => () => clearTimeout(timer.current), [])
 
   const close = () => { setOpen(false); setCopied(false); setPressHint(false); opener.current?.focus() }
@@ -52,15 +51,7 @@ export default function ShareButton({ compact = false, className = '', style }) 
     return () => { document.removeEventListener('keydown', onKey, true); document.removeEventListener('pointerdown', onDown, true); clearTimeout(f) }
   }, [open]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const onClick = async (e) => {
-    e.stopPropagation()
-    if (open) { close(); return }
-    if (phone && typeof navigator.share === 'function') {
-      try { await navigator.share({ title: 'Accuphy Lab', text, url: shareUrl('native') }); labEvent('share', { channel: 'native', market }); return }
-      catch (err) { if (err && err.name === 'AbortError') return /* the visitor closed the sheet */ } // NotAllowedError etc.: the popover
-    }
-    show(phone ? 'fallback_shown' : 'qr_shown')
-  }
+  const onClick = (e) => { e.stopPropagation(); if (open) close(); else show('qr_shown') }
 
   const copy = async () => {
     const url = shareUrl('copy')
@@ -73,7 +64,6 @@ export default function ShareButton({ compact = false, className = '', style }) 
   const copyUrl = shareUrl('copy')
   // selecting an input scrolls it to the end of the selection; keep the start of the address in view (HQ 2026-10-29)
   const selectKeepStart = (e) => { const el = e.target; el.select(); requestAnimationFrame(() => { el.scrollLeft = 0 }) }
-  const enc = encodeURIComponent(`${text} ${shareUrl('whatsapp')}`), encSms = encodeURIComponent(`${text} ${shareUrl('sms')}`)
   return (
     <span ref={wrap} className={`ac-share-wrap ${className}`} style={style} onPointerDown={(e) => e.stopPropagation()}>
       <button ref={opener} type="button" className={`ac-share ${compact ? 'is-compact' : ''}`} aria-label={t('share')} aria-expanded={open} aria-controls={id} onClick={onClick}>
@@ -84,25 +74,17 @@ export default function ShareButton({ compact = false, className = '', style }) 
       {(phone ? (n) => createPortal(n, document.body) : (n) => n)(<AnimatePresence>
         {open && (
           <motion.div ref={pop} key="pop" id={id} role="dialog" aria-modal="false" aria-labelledby={`${id}-t`} className={`ac-share-pop ${phone ? 'is-phone' : ''}`}
-            initial={{ opacity: 0, y: phone ? 0 : 6, scale: 0.98 }} animate={{ opacity: 1, y: phone ? '-50%' : 0, scale: 1 }} exit={{ opacity: 0, y: phone ? '-50%' : 4, scale: 0.98 }} transition={{ duration: 0.18, ease: 'easeOut' }}
-            style={phone ? { y: '-50%' } : undefined} onPointerDown={(e) => e.stopPropagation()}>
+            initial={phone ? { opacity: 0 } : { opacity: 0, y: 6, scale: 0.98 }} animate={phone ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }} exit={phone ? { opacity: 0 } : { opacity: 0, y: 4, scale: 0.98 }} transition={{ duration: 0.18, ease: 'easeOut' }}
+            onPointerDown={(e) => e.stopPropagation()}> {/* phones: opacity only — the centring transform is the CSS's (.is-phone) */}
             <h3 id={`${id}-t`}>{t('share')}</h3>
             <button ref={closeBtn} type="button" className="ac-share-x" aria-label={t('share_close')} onClick={close}>×</button>
-            {!phone && (<>
-              <span className="ac-share-qr"><QR text={shareUrl('qr')} /></span>
-              <p className="ac-share-cap">{t('share_qr_caption')}</p>
-            </>)}
+            <span className="ac-share-qr"><QR text={shareUrl('qr')} /></span>
+            <p className="ac-share-cap">{t(phone ? 'share_qr_caption_phone' : 'share_qr_caption')}</p>
             <div className="ac-share-row">
               <input ref={field} className="ac-share-field" type="text" readOnly value={copyUrl} aria-label={t('share_link_label')} onFocus={selectKeepStart} onClick={selectKeepStart} />
               <button type="button" className={`ac-share-copy ${copied ? 'is-done' : ''}`} onClick={copy} aria-live="polite">{copied ? t('share_copied_check') : t('share_copy')}</button>
             </div>
             <p className="ac-share-hint">{pressHint ? t('share_press_copy', { keys: isMac() ? '⌘C' : 'Ctrl+C' }) : t('share_copy_hint')}</p>
-            {phone && (
-              <div className="ac-share-alts">
-                <a href={`https://wa.me/?text=${enc}`} target="_blank" rel="noopener" onClick={() => { labEvent('share', { channel: 'whatsapp', market }); close() }}>WhatsApp</a>
-                <a href={`sms:?&body=${encSms}`} onClick={() => { labEvent('share', { channel: 'sms', market }); close() }}>{t('share_sms')}</a>
-              </div>
-            )}
           </motion.div>
         )}
       </AnimatePresence>)}
