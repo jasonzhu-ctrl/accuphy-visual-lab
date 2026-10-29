@@ -3,6 +3,7 @@
   "configurations": [
     { "name": "lab", "runtimeExecutable": "npm", "runtimeArgs": ["run", "dev"], "port": 5173 },
     { "name": "ice-environment", "runtimeExecutable": "npm", "runtimeArgs": ["--prefix", "exports/ice-environment", "run", "dev"], "port": 5180 },
-    { "name": "ad-lake", "runtimeExecutable": "npm", "runtimeArgs": ["--prefix", "reference/ads/lake-checkout", "run", "dev", "--", "--port", "5190", "--strictPort"], "port": 5190, "autoPort": false }
+    { "name": "ad-lake", "runtimeExecutable": "npm", "runtimeArgs": ["--prefix", "reference/ads/lake-checkout", "run", "dev", "--", "--port", "5190", "--strictPort"], "port": 5190, "autoPort": false },
+    { "name": "ad-lake-mini", "runtimeExecutable": "env", "runtimeArgs": ["VITE_DEVICES=PLM", "npm", "--prefix", "reference/ads/lake-mini-479ca21", "run", "dev", "--", "--port", "5191", "--strictPort"], "port": 5191, "autoPort": false }
   ]
 }

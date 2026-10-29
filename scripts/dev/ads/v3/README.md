@@ -324,3 +324,19 @@ same answer holds for the PingLive v3 film and the Mini US film.
   - Copied to the shared Drive folder after HQ's check.
 - **Note:** the phone inside the film shows feet (`101.5 ft`), as recorded for the English master. A metric French version
   (Europe) would need the deep shot recorded again in metres; that is the master owner's call.
+
+### Mini test film: built (2026-10-28, #185, Jason "用 Mini 的片子")
+
+The one test film for the funnel and ad tests (Canada + US). English placeholders (`lines-mini.json`), 9:16 and 16:9 only.
+
+- **Source:** `reference/ads/lake-mini-479ca21/`, a clean `git archive 479ca21`. Served by "ad-lake-mini" (`VITE_DEVICES=PLM`,
+  port 5191).
+- **Recorder:** `FILM=mini ASPECT=916|169 node film3.mjs open|pano|deep <dir> 5191 <fps>`; `MINI_CAMS=<json>` overrides
+  the cameras.
+  - 16:9 lake shots render at 1920×1080. The 16:9 phone uses the desktop layout at 960×540 @2, with everything but the lake
+    and the phone hidden. The phone sits at the right, y ~330–718, clear of the Skip button and the bottom bar.
+- **Type:** `ASPECT=… OVERLAY=overlay-mini.html AD_LINES_FILE=lines-mini.json node comp3.mjs <comp> <final> [clean]`.
+  - 16:9 has a left column with a side gradient, and the wordmark at y 124 (below YouTube's ad badge).
+- **Sheets (10 fps):** `docs/2026-10-28-ad-mini-test-916-sheet.jpg` (Reels zones) and
+  `docs/2026-10-28-ad-mini-test-169-sheet.jpg` (YouTube's rough zones: bottom 15 %, Skip ad, the ad badge).
+- **Read-out:** 99.6 → 109.9 ft as the boat crosses into the hole.

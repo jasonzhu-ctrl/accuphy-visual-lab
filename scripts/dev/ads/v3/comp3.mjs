@@ -4,6 +4,7 @@
 // the 30 fps frame number) and pano.json (film3.mjs's frames.json of the pano pass: the fan per frame).
 // AD_LINES='{"open":…,"pano":…,"deep":…,"end1":…,"end2":…}' (or AD_LINES_FILE=<json>) replaces the English lines (the
 // French version). Not LINES: zsh keeps that name for the terminal's height and refuses text in it.
+// OVERLAY=overlay-mini.html ASPECT=916|169: the Mini test film's type layer (#185), at 1080×1920 or 1920×1080.
 import { chromium } from 'playwright-core'
 import fs from 'node:fs'
 const [dir, out, mode] = process.argv.slice(2)
@@ -15,9 +16,12 @@ const lines = {
 }
 const fans = Object.fromEntries((fs.existsSync(`${dir}/pano.json`) ? JSON.parse(fs.readFileSync(`${dir}/pano.json`, 'utf8')) : []).map((f) => [f.name, f.fan]))
 const frames = fs.readdirSync(`${dir}/bg`).filter((f) => f.endsWith('.jpg')).sort()
+const WIDE = process.env.ASPECT === '169', OVERLAY = process.env.OVERLAY || 'overlay3.html'
 const b = await chromium.launch({ headless: true })
-const p = await b.newPage({ viewport: { width: 1080, height: 1920 } })
-await p.goto(`file://${dir}/overlay3.html`); await p.evaluate(() => document.fonts.ready)
+const p = await b.newPage({ viewport: WIDE ? { width: 1920, height: 1080 } : { width: 1080, height: 1920 } })
+await p.goto(`file://${dir}/${OVERLAY}`); await p.evaluate(() => document.fonts.ready)
+// load the faces explicitly: a page that uses Eurostile only later (the Mini headline) would not have loaded it yet
+await p.evaluate(() => Promise.all([document.fonts.load("800 100px 'Eurostile Heavy'"), document.fonts.load("600 70px 'Instrument Sans'")]))
 if (!(await p.evaluate(() => document.fonts.check("800 100px 'Eurostile Heavy'")))) throw new Error('Eurostile Heavy did not load: is Creative Cloud running?')
 for (const f of frames) {
   const name = f.replace('.jpg', ''), t = +name.slice(1) / 30

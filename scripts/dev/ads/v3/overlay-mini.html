@@ -1,0 +1,78 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<!-- The PingLive Mini test film's type layer (#185; README "Mini US"), 9:16 (1080×1920) or 16:9 (1920×1080) by the page size.
+     From overlay3.html: the hero beat carries a headline (lines.head, the "+" in brand blue) instead of a counting number,
+     and there is no outline on the water. comp3.mjs calls setFrame({ bg, t, lines, type }) per frame. -->
+<style>
+  @font-face { font-family: 'Eurostile Heavy'; src: local('Eurostile Heavy'), local('Eurostile-Hea'); font-weight: 800; } /* Creative Cloud activation; no font file is read */
+  @font-face { font-family: 'Instrument Sans'; src: url('fonts/InstrumentSans-Variable.ttf') format('truetype'); font-weight: 400 700; }
+  html, body { margin: 0; background: #000; }
+  /* 9:16 by default; .wide is 16:9: the type in a left column, clear of YouTube's top-left badge, Skip button and bottom bar */
+  :root { --W: 1080px; --H: 1920px; --markX: 64px; --markY: 280px; --markW: 250px; --blockX: 64px; --blockW: 952px; --top: 380px; --heroTop: 340px;
+    --head: 96px; --line: 70px; --lineMax: 900px; --bigW: 720px; --bigY: 640px; --ruleY: 830px; --e1Y: 880px; --e1: 70px; --e2: 120px; }
+  .wide { --W: 1920px; --H: 1080px; --markX: 96px; --markY: 124px; --markW: 210px; --blockX: 96px; --blockW: 760px; --top: 200px; --heroTop: 200px;
+    --head: 84px; --line: 56px; --lineMax: 740px; --bigW: 600px; --bigY: 300px; --ruleY: 460px; --e1Y: 500px; --e1: 58px; --e2: 100px; }
+  #stage { position: relative; width: var(--W); height: var(--H); overflow: hidden; background: #000; }
+  #bg { position: absolute; left: -12px; top: -12px; width: calc(var(--W) + 24px); height: calc(var(--H) + 24px); }
+  #grad { position: absolute; left: 0; top: 0; width: 1080px; height: 1100px; background: linear-gradient(180deg, rgba(2,8,14,.62) 0%, rgba(2,8,14,.38) 55%, rgba(2,8,14,0) 100%); }
+  .wide #grad { width: 1920px; height: 1080px; background: linear-gradient(90deg, rgba(2,8,14,.6) 0%, rgba(2,8,14,.34) 42%, rgba(2,8,14,0) 66%); }
+  #mark { position: absolute; left: var(--markX); top: var(--markY); width: var(--markW); filter: drop-shadow(0 2px 8px rgba(0,0,0,.5)); }
+  #block { position: absolute; left: var(--blockX); width: var(--blockW); color: #fff; }
+  .head { font-family: 'Eurostile Heavy'; font-size: var(--head); line-height: 1; letter-spacing: .01em; white-space: nowrap; text-shadow: 0 4px 30px rgba(0,0,0,.45); }
+  .head .plus { color: #028CDF; }
+  .rule { margin-top: 22px; height: 6px; background: #028CDF; border-radius: 3px; box-shadow: 0 0 20px rgba(2,140,223,.6); }
+  .line { margin-top: 30px; font-family: 'Instrument Sans'; font-weight: 600; font-size: var(--line); line-height: 1.15; letter-spacing: -.005em;
+    text-shadow: 0 2px 14px rgba(0,0,0,.55); max-width: var(--lineMax); text-wrap: balance; }
+  #end { position: absolute; left: 0; top: 0; width: var(--W); text-align: center; color: #fff; }
+  #bigmark { position: absolute; left: calc((var(--W) - var(--bigW)) / 2); top: var(--bigY); width: var(--bigW); filter: drop-shadow(0 4px 24px rgba(0,0,0,.5)); }
+  #endrule { position: absolute; left: calc(var(--W) / 2); top: var(--ruleY); height: 6px; background: #028CDF; border-radius: 3px; box-shadow: 0 0 20px rgba(2,140,223,.6); }
+  .e1 { position: absolute; left: 0; width: var(--W); top: var(--e1Y); font-family: 'Instrument Sans'; font-weight: 600; font-size: var(--e1); line-height: 1.15; }
+  .e2 { position: absolute; left: 0; width: var(--W); font-family: 'Eurostile Heavy'; font-size: var(--e2); line-height: 1; letter-spacing: .01em; }
+  .hidden { display: none }
+</style></head>
+<body>
+<div id="stage">
+  <img id="bg">
+  <div id="grad"></div>
+  <img id="mark" src="logo.png">
+  <div id="block"><div class="head" id="head"></div><div class="rule" id="rule"></div><div class="line" id="line"></div></div>
+  <div id="end"><img id="bigmark" src="logo.png"><div id="endrule"></div><div class="e1" id="e1"></div><div class="e2" id="e2"></div></div>
+</div>
+<script>
+  if (innerWidth > innerHeight) document.documentElement.classList.add('wide')
+  const WIDE = innerWidth > innerHeight
+  const clamp = (u) => Math.min(1, Math.max(0, u)), span = (t, a, b) => clamp((t - a) / (b - a)), ease = (u) => 1 - (1 - u) ** 3
+  const $ = (id) => document.getElementById(id)
+  // lines: { open, head, pano, deep, end1, end2 } (English placeholders until Klaviyo HQ finals them; end1/end2 are final)
+  window.setFrame = ({ bg, t, lines, type = true }) => {
+    $('bg').src = bg
+    const show = (el, o, dy = 0) => { el.style.opacity = o; el.style.transform = `translateY(${(1 - o) * dy}px)` }
+    const endK = type ? ease(span(t, 11.5, 12.0)) : 0 // the end card darkens and blurs the picture
+    $('bg').style.filter = endK ? `brightness(${1 - 0.8 * endK}) blur(${9 * endK}px)` : 'none'
+    $('grad').style.opacity = type ? 1 - endK : 0
+    $('mark').style.opacity = type ? 0.9 * (1 - span(t, 11.5, 11.8)) : 0
+    const beat = t < 3 ? 'open' : t < 7.5 ? 'pano' : t < 11.5 ? 'deep' : 'end', hero = beat === 'pano'
+    $('block').style.display = type && beat !== 'end' ? '' : 'none'
+    $('block').style.top = `var(${hero ? '--heroTop' : '--top'})`
+    $('head').classList.toggle('hidden', !hero); $('rule').classList.toggle('hidden', !hero)
+    $('line').style.marginTop = hero ? '30px' : '0'
+    $('line').textContent = lines[beat] || ''
+    if (hero) {
+      $('head').innerHTML = (lines.head || '').replace(/</g, '&lt;').replace('+', '<span class="plus">+</span>')
+      show($('head'), ease(span(t, 3.2, 3.6)), 24) // in while both curtains open; the rule lands with them at 4.3 s
+      $('rule').style.width = `${$('head').scrollWidth * ease(span(t, 3.15, 4.3))}px`
+      show($('line'), ease(span(t, 4.4, 4.8)), 24)
+    } else show($('line'), ease(span(t, beat === 'open' ? 0.3 : 8.0, beat === 'open' ? 0.8 : 8.5)), 24)
+    $('end').style.display = type && beat === 'end' ? '' : 'none'
+    if (beat === 'end') {
+      const m = ease(span(t, 11.8, 12.3)); $('bigmark').style.opacity = m; $('bigmark').style.transform = `scale(${0.96 + 0.04 * m})`
+      const r = ease(span(t, 12.1, 12.6)) * parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--bigW'))
+      $('endrule').style.width = r + 'px'; $('endrule').style.marginLeft = -r / 2 + 'px'
+      $('e1').textContent = lines.end1; $('e2').textContent = lines.end2
+      $('e2').style.top = `${$('e1').offsetTop + $('e1').offsetHeight + (WIDE ? 14 : 24)}px`
+      show($('e1'), ease(span(t, 12.4, 12.8)), 20); show($('e2'), ease(span(t, 12.6, 13.0)), 20)
+    }
+    return new Promise((r) => { const im = $('bg'); if (im.complete && im.naturalWidth && im.src.endsWith(bg)) r(); else { im.onload = r; im.onerror = r } })
+  }
+</script>
+</body></html>
