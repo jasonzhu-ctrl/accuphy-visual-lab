@@ -109,8 +109,9 @@ anyone's memory.
   (ice included). Other chats send it what they need. The canon is `docs/lake-canon.md`; every link is built from one commit.
 - **The colleague 孙英杰 (GitHub AJ-nb, #183, Jason 2026-10-28):** works on his own branch and opens a pull request that
   Jason reviews before it is merged into main. He may change and optimize the lake scene, and pick scenes and sonar pictures
-  for videos. He must not touch the sonar imaging engine or its logic. He owns the ad films' single-language masters; the
-  Lab makes the language versions from them. Jason decides what goes live.
+  for videos. He must not touch the sonar imaging engine or its logic. He is optimizing the ad films. **No ad language
+  versions** (#185, Jason 2026-10-28): at most one film, only to run the funnel and ad tests (vertical and horizontal OK).
+  Jason decides what goes live.
 - **Lake and ice share code (#94):** the ice page lives in the lake folder. Any change there for the ice page is
   checked on the summer lake (desktop and phone, a sonar-qa grid against the last commit) before it is merged, and
   any lake change is checked on the ice page (Jason 2026-10-18: 这个确实要非常注意).
@@ -128,9 +129,9 @@ anyone's memory.
     need Jason's "动" said in the HQ chat.
   - "冰钓版本视觉效果" — the working chat for the sonar picture, the lake and the ice page.
   - "手机网页端" — the phone web page.
-  - "广告视频制作" (#179, Jason 2026-10-27; role narrowed by #183 on 10-28) — makes the language versions of the ad films
-    from 孙英杰's approved masters, with the `ad-video` skill. It never changes the lake or the sonar; it asks
-    "冰钓版本视觉效果" for those.
+  - "广告视频制作" (#179; narrowed by #183 and #185 on 10-28) — paused. No ad versions; at most the ONE film Jason names,
+    only to run the funnel and ad tests (vertical + horizontal), with the `ad-video` skill. It never changes the lake or
+    the sonar.
   - "LiveScope 研究" — the LiveScope reference study (`docs/livescope-study.md`).
   - "案例工具调研" — research on case studies and tools.
 - **The name:** "visual lab" and "Accuphy Lab" are the same project; Jason dropped "visual"

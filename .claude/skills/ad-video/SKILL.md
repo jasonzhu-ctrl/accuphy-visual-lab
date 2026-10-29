@@ -8,13 +8,16 @@ description: Make Accuphy Lab ad videos (stills, 15 s films, 9:16 / 4:5, EN / FR
 Owner: the chat **"广告视频制作"** (decision #179, Jason 2026-10-27: "做广告视频……单独制作视频……视频制作专门让他做"). It reports to
 Lab HQ (`local_1022478a-b63a-4fff-8403-7c58646dab95`).
 
-## Role since 2026-10-28 (#183)
+## Role since 2026-10-28 (#183, #185) — read first
 
-Jason handed every ad film's **single-language master** to his colleague 孙英杰 (GitHub AJ-nb). That covers the PingLive
-v3 film, the US Mini film and the 16:9 / 1:1 formats. Jason agrees the changes with him. **This chat makes the language
-versions** (FR, DE, NL, PL, LV…) from the approved masters: type passes on the clean films, the 4:5 and other crops, the
-encodes. It starts a language only when HQ relays Jason's go. The shot plans and scripts in `scripts/dev/ads/` stay as
-reference for the colleague.
+Jason, 2026-10-28: "广告我们目前为止先不做了，孙英杰那边在优化……这种小视频不做了。做的话，你也就做一个就可以了……只是为了跑通项目为主嘛，
+跑通那漏斗啊，跟投放那些测试走嘛，但不要花精力继续做各种版本的……横版竖版为了去跑通是没问题的，那多语言版本完全没必要".
+- **No ad versions:** no language versions, no Mini US film, no 1:1, no other cuts. His colleague 孙英杰 (AJ-nb) is optimizing
+  the ad films.
+- **At most ONE film**, the one Jason names, only to run the funnel and the ad-delivery tests through. Its vertical and
+  horizontal formats are allowed. Start it only on Jason's word, relayed by HQ.
+- Already made and kept, not pushed further: the PingLive v3 EN and FR files in `reference/ads/2026-11-bf/v3/`. The shot plans
+  in `scripts/dev/ads/` stay as reference.
 
 ## What this chat may and may not touch
 
