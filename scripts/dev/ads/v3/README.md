@@ -302,6 +302,10 @@ same answer holds for the PingLive v3 film and the Mini US film.
 
 ## Language versions (from the approved masters, #183)
 
+> **Stopped 2026-10-28 (#185, Jason):** no more language versions, and no further ad versions from this chat. At most one
+> film to run the funnel and the ad tests through (vertical and horizontal are fine). The French files below exist but are
+> not pushed further.
+
 **French, PingLive v3 (2026-10-28, Jason "做法文版")**
 - **How it is made:** a type pass on the kept clean frames, with no new recording.
   `AD_LINES_FILE=lines-fr.json node comp3.mjs <comp> <final-fr>`, then `frames2mp4` and `../to45.py`.

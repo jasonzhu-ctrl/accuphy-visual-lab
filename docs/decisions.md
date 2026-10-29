@@ -3193,3 +3193,13 @@ Numbered log. Newest at the bottom.
        answered with the English page `/products/pinglive-sonar` (a store-side language redirect for a browser without French);
        `curl` gets 200 on `/fr/…`, 200 on `/de-de/…`, and the 301 to the Mini on `/en-us/…`.
      - Not now: the bridge receipt before jumping (website: after 11-02).
+185. **2026-10-28** — **No more ad video versions; at most one short film to test the funnel** (Jason to the ad video chat:
+     "广告我们目前为止先不做了，孙英杰那边在优化……这种小视频不做了。做的话，你也就做一个就可以了……只是为了跑通项目为主嘛，跑通那漏斗啊，跟投放那些测试走嘛，但不要花精力继续做各种版本的……横版竖版为了去跑通是没问题的，那多语言版本完全没必要").
+     - **Stopped:** the ad video chat makes no more language versions (French, DE, NL, PL, LV), and no Mini US or 16:9 / 1:1
+       versions on its own. 孙英杰 is optimizing the ad films (#183).
+     - **Allowed:** if a film is needed, **one** film, only to run the funnel and the ad-delivery tests through. Its
+       vertical and horizontal formats are fine for that.
+     - **Already made, kept but not pushed further:** the French v3 (`reference/ads/2026-11-bf/v3/pinglive-*-fr.mp4`, final
+       lines). It is not copied to the Drive unless HQ or Jason asks. The shot plans in `scripts/dev/ads/v3/README.md` stay
+       as reference.
+     - Which film is that one (the existing English PingLive v3, or a Mini film for the US) is Jason's to say.
