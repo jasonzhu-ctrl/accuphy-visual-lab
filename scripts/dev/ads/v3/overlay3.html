@@ -20,7 +20,7 @@
   #end { position: absolute; left: 0; top: 0; width: 1080px; text-align: center; color: #fff; }
   #bigmark { position: absolute; left: 180px; top: 640px; width: 720px; filter: drop-shadow(0 4px 24px rgba(0,0,0,.5)); }
   #endrule { position: absolute; left: 540px; top: 830px; height: 6px; background: #028CDF; border-radius: 3px; box-shadow: 0 0 20px rgba(2,140,223,.6); }
-  .e1 { position: absolute; left: 0; width: 1080px; top: 880px; font-family: 'Instrument Sans'; font-weight: 600; font-size: 70px; line-height: 1.15; }
+  .e1 { position: absolute; left: 90px; width: 900px; top: 880px; font-family: 'Instrument Sans'; font-weight: 600; font-size: 70px; line-height: 1.15; text-wrap: balance; }
   .e2 { position: absolute; left: 0; width: 1080px; top: 985px; font-family: 'Eurostile Heavy'; font-size: 120px; line-height: 1; letter-spacing: .01em; }
   .hidden { display: none }
 </style></head>
@@ -59,6 +59,9 @@
     $('num').classList.toggle('hidden', !isPano); $('rule').classList.toggle('hidden', !isPano)
     $('line').style.marginTop = isPano ? '30px' : '0'
     $('line').textContent = lines[beat] || ''
+    // the deep-water line stays on one line (the boat sits just under it): a longer language shrinks it, to 56 px at least
+    $('line').style.fontSize = '70px'; $('line').style.whiteSpace = beat === 'deep' ? 'nowrap' : ''
+    if (beat === 'deep') for (let fs = 70; fs > 56 && $('line').scrollWidth > 952; fs -= 2) $('line').style.fontSize = `${fs - 2}px`
     if (isPano) {
       const open = fan ? fan.open : 1
       $('n').textContent = String(Math.round(135 * open)) // lands on the frame the fan is widest (brief rule 4)
@@ -77,6 +80,7 @@
       const m = ease(span(t, 11.8, 12.3)); $('bigmark').style.opacity = m; $('bigmark').style.transform = `scale(${0.96 + 0.04 * m})`
       const r = ease(span(t, 12.1, 12.6)) * 720; $('endrule').style.width = r + 'px'; $('endrule').style.marginLeft = -r / 2 + 'px'
       $('e1').textContent = lines.end1; $('e2').textContent = lines.end2
+      $('e2').style.top = `${880 + $('e1').offsetHeight + 24}px` // a line that wraps (French) pushes "Accuphy Lab" down
       show($('e1'), ease(span(t, 12.4, 12.8)), 20); show($('e2'), ease(span(t, 12.6, 13.0)), 20)
     }
     return new Promise((r) => { const im = $('bg'); if (im.complete && im.naturalWidth && im.src.endsWith(bg)) r(); else { im.onload = r; im.onerror = r } })

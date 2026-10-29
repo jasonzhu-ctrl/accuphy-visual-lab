@@ -2,7 +2,8 @@
 //   node comp3.mjs <dir> <out> [clean]
 // <dir> holds overlay3.html, fonts/InstrumentSans-Variable.ttf, logo.png, bg/ (the graded frames of all passes, named by
 // the 30 fps frame number) and pano.json (film3.mjs's frames.json of the pano pass: the fan per frame).
-// LINES='{"open":…,"pano":…,"deep":…,"end1":…,"end2":…}' replaces the English lines (the French version).
+// AD_LINES='{"open":…,"pano":…,"deep":…,"end1":…,"end2":…}' (or AD_LINES_FILE=<json>) replaces the English lines (the
+// French version). Not LINES: zsh keeps that name for the terminal's height and refuses text in it.
 import { chromium } from 'playwright-core'
 import fs from 'node:fs'
 const [dir, out, mode] = process.argv.slice(2)
@@ -10,7 +11,7 @@ fs.mkdirSync(out, { recursive: true })
 const lines = {
   open: "This is what's under your boat.", pano: 'See the whole bay in one look.', deep: 'Serious deep water ready.', // placeholders until Klaviyo HQ finals them
   end1: 'Play the free sonar demo', end2: 'Accuphy Lab', // final (Klaviyo HQ's BF caption, #168)
-  ...JSON.parse(process.env.LINES || '{}'),
+  ...JSON.parse(process.env.AD_LINES_FILE ? fs.readFileSync(process.env.AD_LINES_FILE, 'utf8') : process.env.AD_LINES || '{}'),
 }
 const fans = Object.fromEntries((fs.existsSync(`${dir}/pano.json`) ? JSON.parse(fs.readFileSync(`${dir}/pano.json`, 'utf8')) : []).map((f) => [f.name, f.fan]))
 const frames = fs.readdirSync(`${dir}/bg`).filter((f) => f.endsWith('.jpg')).sort()

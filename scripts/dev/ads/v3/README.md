@@ -150,7 +150,7 @@ Run copies of the scripts from the scratchpad (see Toolchain). The "ad-lake" pre
    `fanOpen`, the read-out, the boat).
 2. `python3 grade.py <dir>/<pass> <comp>/bg` for each pass. Put `overlay3.html`, `fonts/`, `logo.png` and the pano pass's
    `frames.json` as `pano.json` in `<comp>`.
-3. `node comp3.mjs <comp> <final>`: the type, per frame. Add `clean` for the version without type. `LINES='{…}'` gives
+3. `node comp3.mjs <comp> <final>`: the type, per frame. Add `clean` for the version without type. `AD_LINES_FILE=lines-fr.json` (or `AD_LINES='{…}'`) gives
    the French version.
 4. `frames2mp4 <final> <out.mp4> [fps] [bitrate]`, and `../to45.py` for 4:5.
 5. `python3 sheet3.py <final> <sheet.jpg> <frames> [--reels]`: a contact sheet, optionally with the Reels safe zones.
@@ -186,7 +186,7 @@ page was not reached): y 269 / 1248, x 65 / 1015.
 - Contact sheet with the Reels zones: `docs/2026-10-27-ad-v3-film-sheet.jpg`.
 - The read-out climbs 58.8 → 101.5 ft (7.5–10 s).
 - The English lines are placeholders until Klaviyo HQ finals them. The end line is final.
-- For a new line, run `comp3.mjs` again on the kept frames, without recording again. The French version needs only `LINES`.
+- For a new line, run `comp3.mjs` again on the kept frames, without recording again. The French version needs only `AD_LINES_FILE`.
 
 ## Mini US: the 15 s film for the US (plan only, 2026-10-28; nothing recorded)
 
@@ -299,3 +299,23 @@ same answer holds for the PingLive v3 film and the Mini US film.
 - If time is short before 11-02, the order I'd pick is: 1:1 for both films first (cheap, from the passes), then 16:9
   PingLive (Canada), then 16:9 Mini (US).
 - 16:9 also suits YouTube's 15 s in-stream slot. Like all the films, it is silent by design (no music yet).
+
+## Language versions (from the approved masters, #183)
+
+**French, PingLive v3 (2026-10-28, Jason "做法文版")**
+- **How it is made:** a type pass on the kept clean frames, with no new recording.
+  `AD_LINES_FILE=lines-fr.json node comp3.mjs <comp> <final-fr>`, then `frames2mp4` and `../to45.py`.
+- **Lines:** `lines-fr.json`, drafts under the website's review (`IT/accuphy-website/handoffs/2026-10-28-lab-ad-v3-fr-review.md`,
+  due 10-29). The end card is already reviewed.
+  - When the final French arrives, edit the JSON and run the same three steps again (~10 min).
+- **Layout rules in `overlay3.html`**, for any language. English renders unchanged (checked: mean difference 0.04/255):
+  - The deep-water line stays on one line, because the boat sits just under it. A longer line shrinks, to 56 px at least.
+  - The end line may wrap into two balanced lines, which push `Accuphy Lab` down (French: y 1065–1185).
+- **Glyphs:** é è ê ç œ ’ « » à â î ô û É ° are all present in both the Creative Cloud Eurostile Heavy and Instrument Sans
+  (no fallback font).
+- **Files:**
+  - `reference/ads/2026-11-bf/v3/pinglive-916-fr.mp4` (14.5 MB) and `pinglive-45-fr.mp4` (13.9 MB).
+  - Sheet with the Reels zones: `docs/2026-10-28-ad-v3-fr-sheet.jpg`.
+  - Copied to the shared Drive folder after HQ's check.
+- **Note:** the phone inside the film shows feet (`101.5 ft`), as recorded for the English master. A metric French version
+  (Europe) would need the deep shot recorded again in metres; that is the master owner's call.
