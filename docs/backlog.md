@@ -2,10 +2,10 @@
 
 > 状态（2026-10-30，Lab HQ；10-27～10-29 的长版原文在下面“明细”里）
 > 阶段：X-6L Lab 上线后收尾，11-02 广告开投（加拿大 + 美国）；lab.accuphy.ca 现在是 a1fd3ee（10-30 Jason 动）
-> 进行中：#187/#228 去商店由商店页跳转 · Lab 和网站的桥都已上线 · 等网站 03 在 /pages/lab、/fr/pages/lab、/en-us/pages/lab 点一遍；#185 广告只留一条 Mini 测试片 · reference/ads/2026-11-bf/mini-test/，广告视频窗口暂停，母版由孙英杰优化
-> 等 Jason：① 孙英杰的 PR #30 / #31 看过才合 · 10-28 起；② LiveScope 研究 7 个问题（docs/livescope-study.md）· 10-23 起；③ 老问题（加载提速 C、App Store provider token、Klaviyo 框挪左下角、#153、#154）· 10-25 起
-> 卡住：无。待补（不急）：#228 第 3 条美国默认 Mini、第 4 条德/荷/波兰/拉脱维亚界面。（商店页 iframe 已有 clipboard-write、web-share：网站 #230，deeeb3ec，HQ 10-30 curl 核过）
-> 本周做完：#189 Mini Combo 前后 range + #188 分享改版 · lab.accuphy.ca a1fd3ee（docs/versions.md 10-30 行）· HQ 核过（md5 同测试链接、线上 Combo 两条滑杆、二维码弹框、0 报错）；#173 鱼群第 3 轮、#175 圆形水纹船迹、#178 新全景并进湖面 · 已在线上 8c15c20（/jig/、/pano/ 已下线）· 冰钓窗口核过；#182/#184/#186/#187 去商店按市场、GA4、分享徽章、商店页跳转 · lab.accuphy.ca 8c15c20 · HQ 核过；#185 Mini 测试片 · docs/2026-10-28-ad-mini-test-*-sheet.jpg · HQ 核过；#189 · docs/2026-10-29-plm-combo-two-ranges.jpg · HQ 核过
+> 进行中：#185 广告只留一条 Mini 测试片 · reference/ads/2026-11-bf/mini-test/，广告视频窗口暂停，母版由孙英杰优化
+> 等 Jason：⓪ 美国访客按钮写 “Shop PingLive” 却落到 Mini（网站 03 10-30 发现），要不要改成 Mini（#228 第 3 条）· 10-30 起；① 孙英杰的 PR #30 / #31 看过才合 · 10-28 起；② LiveScope 研究 7 个问题（docs/livescope-study.md）· 10-23 起；③ 老问题（加载提速 C、App Store provider token、Klaviyo 框挪左下角、#153、#154）· 10-25 起
+> 卡住：无。待补：#228 第 4 条德/荷/波兰/拉脱维亚界面（不急）
+> 本周做完：#187/#188/#189 线上复查 · 网站 03 3dbfbec5（accuphy-website/docs/verification/2026-10-30-lab-a1fd3ee/result.md）· 已核（别的聊天）；#189 Mini Combo 前后 range + #188 分享改版 · lab.accuphy.ca a1fd3ee（docs/versions.md 10-30 行）· HQ 核过（md5 同测试链接、线上 Combo 两条滑杆、二维码弹框、0 报错）；#173 鱼群第 3 轮、#175 圆形水纹船迹、#178 新全景并进湖面 · 已在线上 8c15c20（/jig/、/pano/ 已下线）· 冰钓窗口核过；#182/#184/#186/#187 去商店按市场、GA4、分享徽章、商店页跳转 · lab.accuphy.ca 8c15c20 · HQ 核过；#185 Mini 测试片 · docs/2026-10-28-ad-mini-test-*-sheet.jpg · HQ 核过；#189 · docs/2026-10-29-plm-combo-two-ranges.jpg · HQ 核过
 
 > **状态栏长版原文（10-27～10-29，整理前，没删）：**
 > 状态（2026-10-27 更新）
