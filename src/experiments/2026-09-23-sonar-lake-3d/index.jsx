@@ -526,7 +526,7 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
         <pre ref={(el) => { state.current.debugEl = el }} className="pointer-events-none absolute left-2 top-1/2 rounded bg-black/60 p-1 text-[10px] text-lime-300" />
       )}
     </main>
-    {unlock && <UnlockCard onClose={() => setUnlock(null)} onDone={onUnlocked} />}
+    {unlock && <UnlockCard product={PRODUCT[unlock.d] || PRODUCT.PLM} view="combo" onClose={() => setUnlock(null)} onDone={onUnlocked} />}
     </>
   )
 }

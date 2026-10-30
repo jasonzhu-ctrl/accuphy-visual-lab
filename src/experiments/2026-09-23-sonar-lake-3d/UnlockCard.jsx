@@ -11,7 +11,7 @@ export function LockIcon({ size = 11, style }) {
   return <svg viewBox="0 0 16 16" width={size} height={size} aria-hidden="true" style={style}><path d="M4.5 7V5a3.5 3.5 0 0 1 7 0v2" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" /><rect x="2.8" y="6.8" width="10.4" height="7.6" rx="1.8" fill="currentColor" /></svg>
 }
 
-export default function UnlockCard({ onClose, onDone }) {
+export default function UnlockCard({ product, view, onClose, onDone }) {
   const [email, setEmail] = useState('')
   const [status, setStatus] = useState('idle') // idle | sending | error
   const [error, setError] = useState('')
@@ -28,7 +28,7 @@ export default function UnlockCard({ onClose, onDone }) {
     e.preventDefault()
     if (!isEmail(email)) { setStatus('error'); setError(t('unlock_err_email')); return }
     setStatus('sending'); setError('')
-    try { await submitSignup({ email }); labEvent('signup', { source: 'combo' }, { once: true }); onDone() } catch (err) { setStatus('error'); setError(t(err.message === 'not_ready' ? 'unlock_err_closed' : 'unlock_err_send')) }
+    try { await submitSignup({ email }); labEvent('signup', { source: 'combo', product, view }, { once: true }) /* never the email: the iframe message goes to '*' */; onDone() } catch (err) { setStatus('error'); setError(t(err.message === 'not_ready' ? 'unlock_err_closed' : 'unlock_err_send')) }
   }
 
   return (

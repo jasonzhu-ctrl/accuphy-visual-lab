@@ -3350,7 +3350,7 @@ Numbered log. Newest at the bottom.
        with a blue lock badge. Screen and Combo picture untouched.
      - **Card:** closes by ×, Esc, a tap outside; the visitor stays where they were. The lake keeps running (it no longer freezes).
        Success opens Combo at once and `signup.js` remembers it on this device. It works without Klaviyo's form, so also on
-       lab.accuphy.ca alone. Emits `signup` { source: 'combo' }. The old display-only gate path is gone (`onLocked` only hints).
+       lab.accuphy.ca alone. Emits `signup` { source: 'combo', product, view } and never the email (the iframe message targets `*`; the website counts it as Meta Lead / GA4 generate_lead and changes its bridge itself). The old display-only gate path is gone (`onLocked` only hints).
      - **No fake success:** `KLAVIYO.listId` stays null this round. With it empty, on accuphy.ca / accuphy.com / vercel.app /
        myshopify.com the card refuses ("Subscribing isn't open yet") and Combo stays shut; on test links and localhost it unlocks
        and prints "Test mode: nothing is sent." **W24Qdc must be filled before lab.accuphy.ca carries this** (`docs/versions.md`).
@@ -3368,7 +3368,7 @@ Numbered log. Newest at the bottom.
        drafts for the website's review. The card avoids the word "PingLive" alone, for the US (#190).
      - **Ads:** no URL goes straight into Combo. `scripts/dev/ads/v3/film3.mjs` clicks the Combo button on the frozen checkout
        `lake-mini-479ca21`, so it is unaffected; a new checkout would need localStorage `accuphy_sonar_signup_v1=1`.
-     - **For the website:** `signup` is not yet counted as Meta Lead. In the store, Klaviyo's 20 s form can come up over the card.
+     - **For the website:** in the store, Klaviyo's 20 s form can come up over the card.
      - **Checked** on built pages in Chromium behind a stand-in store page, 0 failures, 0 console errors: desktop 1280×800 for us, ca,
        /mini/, fr (lock, card, Esc, ×, outside, bad email, step 3, subscribe → Combo, remembered after reload); phone 390×844 for us, ca,
        /mini/, /ice/ and sideways 844×390 (tile lock, card, close back to Home, both notices last past 2 s and close on a tap, neutral
