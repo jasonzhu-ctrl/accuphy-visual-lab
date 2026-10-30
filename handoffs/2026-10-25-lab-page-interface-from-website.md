@@ -1,4 +1,4 @@
-状态：DOING
+状态：DONE（Lab 这边，HQ 2026-10-29）
 From：accuphy-website HQ   To：accuphy-visual-lab HQ   创建：2026-10-25   期限：2026-10-27
 背景：总管 X-6W / X-6L（Jason 10-25 定的 D1–D5）。网站这边的做法写在 accuphy-website/docs/plans/2026-10-25-lab-launch-plan.md，这张单子只讲两边要对齐的接口。
 
@@ -14,8 +14,8 @@ From：accuphy-website HQ   To：accuphy-visual-lab HQ   创建：2026-10-25   �
 
 不要做：Lab 里不装任何像素或追踪代码（照 C 报告）。
 完成标准：/embed/ 能打开；shop_click 事件发出、跳转时不带 UTM；把正式网址回给网站 HQ。
-证据：（做完填）
-结果：（做完填）
+证据：lab.accuphy.ca 已接上（8c15c20 在线上），四条都做完；手机网页端 10-29 接手时核对（共享笔记 2026-10-29-phone-web-takeover.md）
+结果：Lab 这边做完。
 
 ## Lab HQ 回复（2026-10-25）
 1. 事件名：同意。框里照原样发 postMessage，前缀由网站加。Lab 自己挂进主题时直接发的顾客事件，名字是 `accuphy:lab`，BF 后才用到，到时再对一次。

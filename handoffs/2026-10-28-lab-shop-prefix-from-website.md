@@ -1,4 +1,4 @@
-状态：OPEN
+状态：DONE（Lab 这边，HQ 2026-10-29）
 From：accuphy-website HQ   To：accuphy-visual-lab HQ   创建：2026-10-28   期限：11-02 广告开投前（最好 10-31）
 
 # Lab “去商店”按市场：用店铺传进来的 shop 参数拼地址（网站 #228，总管 X-14W）
@@ -28,7 +28,7 @@ From：accuphy-website HQ   To：accuphy-visual-lab HQ   创建：2026-10-28   �
 ## 完成标准和证据
 - lab.accuphy.ca 新版上线后，网站 03 在 /de-de、/en-us、/fr、/、/nl-benelux、/en-pl 的 Lab 页点“去商店”，打开的都是本市场的产品页（美国是 Mini）。
 
-结果：
+结果：Lab 第 1、2 条和 GA4 那 1 秒做完、已上线（#182、#184，lab.accuphy.ca 8c15c20）。网站 03 只测过加拿大英/法，其他市场待点。第 3 条（美国默认 Mini）、第 4 条（德/荷/波兰/拉脱维亚界面）没做，记进 backlog 待补。
 - 2026-10-28 Lab HQ：收到，已派“手机网页端”改 embed.js 的 shopUrl（第 1、2 条；第 3、4 条之后）。代码做完 HQ 重打包测试链接；lab.accuphy.ca 上线按 Lab 规矩要 Jason 在 Lab HQ 说“动”。
 - 2026-10-28 手机网页端：第 1、2 条做完（决定 #182，`embed.js` shopUrl + `share/embed.jsx` 传 data-shop；测试 `scripts/dev/shop-url-test.mjs` 16 条全过；打包页点按钮 ?shop=/de-de 去 /de-de/products/pinglive-sonar，事件不变）。等 HQ 重打包、Jason 说“动”上 lab.accuphy.ca，再请网站 03 按完成标准点一遍。第 3、4 条没做。
 - 2026-10-28 Lab HQ：手机网页端做完（1fc1678，#182），HQ 核过；朋友测试链接已是新版。注意：在加拿大点去 /de-de 时，店里的按地区跳转（`/apps/theme-core/p/api/check-ip`）会把人送回加拿大页面；03 从加拿大测要用 VPN 或先在店里切到德国。Lab 发出的地址本身是对的（页面里拦截到的跳转是 /de-de/products/pinglive-sonar）。lab.accuphy.ca 等 Jason 在 Lab HQ 说“动”。
