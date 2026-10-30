@@ -32,19 +32,20 @@ const SECTIONS = {
     { mode: 'down', label: t('tile_down'), img: plDown, fan: true },
   ] },
   PLM: { title: 'PingLive Mini', tiles: [
-    { label: t('tile_live_panoramic'), img: plmPanoramic },
+    { id: 'pano', label: t('tile_live_panoramic'), img: plmPanoramic },
     { mode: 'forward', label: t('tile_live_forward'), img: plmForward },
     { mode: 'down', label: t('tile_live_down'), img: plmDown },
     { mode: 'combo', label: t('tile_live_combo'), img: plmCombo }, // in the Mini's row, not a separate Combo section (Jason 2026-10-23: 不要单独再放一栏了 这样人家搞不懂)
     { label: t('tile_downscan'), img: plmDownscan, moving: true }, // needs a slowly moving boat, not simulated (#191)
     { label: t('tile_chirp'), img: plmChirp, moving: true },
-    { label: t('tile_ice'), img: plmIceFishing }, // frosted: Jason 2026-10-23 keeps only Live Ice Fishing, Live Forward, Live Down, Live Combo
+    { id: 'ice', label: t('tile_ice'), img: plmIceFishing }, // frosted: Jason 2026-10-23 keeps only Live Ice Fishing, Live Forward, Live Down, Live Combo
     { id: 'liveice', label: t('tile_live_ice'), img: plmLiveIce }, // frosted on the lake page (its link to the ice page never worked in public builds; Jason 2026-10-24: 去掉); a view on the ice page
   ] },
 }
 
 const BLUE = '#2f8fff'
-const unlockLabel = t('unlock_locked')
+export const isLocked = (d, m) => m === 'combo' || m === 'ice' || (d === 'PLM' && m === 'panoramic') // the views behind the subscribe card (#191)
+const unlockLabel = (view) => t('unlock_locked', { view })
 const movingText = (view) => t('na_moving', { view })
 function Icon({ name, active }) {
   const c = active ? BLUE : '#fff'
@@ -63,11 +64,17 @@ function Tab({ label, icon, active }) {
   )
 }
 
-export default function AppHome({ devices, deviceId, mode, onPick, ice = false, comboLocked = false }) {
+export default function AppHome({ devices, deviceId, mode, onPick, onIce, ice = false, locked: lockOn = false }) {
   // on the ice page the back button opens this Home too (2026-10-23): Live Ice Fishing is a view of this page there,
   // not a link to it
   const sections = devices.map((d) => ({ id: d.id, ...SECTIONS[d.id] })).filter((s) => s.tiles)
-    .map((sec) => (ice ? { ...sec, tiles: sec.tiles.map((tile) => (tile.id === 'liveice' ? { ...tile, mode: 'liveice' } : tile)) } : sec))
+    .map((sec) => ({ ...sec, tiles: sec.tiles.map((tile) => {
+      // all unlocked by subscribing (#191, Jason 2026-10-30: "订阅就打开"); on the lake the two ice tiles lead to the ice page
+      if (tile.id === 'pano') return ice ? tile : { ...tile, mode: 'panoramic' }
+      if (tile.id === 'ice') return ice ? { ...tile, mode: 'ice' } : { ...tile, toIce: 'ice' }
+      if (tile.id === 'liveice') return ice ? { ...tile, mode: 'liveice' } : { ...tile, toIce: 'liveice' }
+      return tile
+    }) }))
   const [toast, setToast] = useState('')
   const [moving, setMoving] = useState('') // the tile's name while its big notice is up; a tap closes it (#191)
   const toastT = useRef(0)
@@ -83,12 +90,12 @@ export default function AppHome({ devices, deviceId, mode, onPick, ice = false, 
             <div style={{ background: '#1c1c1c', borderRadius: '3cqh', padding: '3cqh', display: 'flex', flexWrap: 'wrap', gap: '3cqh' }}>
               {sec.tiles.map((t) => {
                 const dev = t.device || sec.id
-                const live = !!t.mode
+                const live = !!t.mode || !!t.toIce
                 const active = live && dev === deviceId && t.mode === mode
-                const locked = comboLocked && t.mode === 'combo' // frosted with a lock: a tap opens the subscribe card (#191)
-                const onClick = live ? () => onPick(dev, t.mode) : t.moving ? () => setMoving(t.label) : notAvailable
+                const locked = lockOn && (t.toIce || (live && isLocked(dev, t.mode))) // frosted with a lock: a tap opens the subscribe card (#191)
+                const onClick = t.toIce ? () => onIce(t.toIce, t.label) : live ? () => onPick(dev, t.mode, t.label) : t.moving ? () => setMoving(t.label) : notAvailable
                 return (
-                  <button key={t.label} type="button" className={`ph-tile ${live ? '' : 'is-off'}`} onClick={onClick} aria-label={locked ? unlockLabel : t.label} aria-current={active || undefined} aria-disabled={live ? undefined : 'true'} style={{ flex: '0 0 44cqh', textAlign: 'center' }}>
+                  <button key={t.label} type="button" className={`ph-tile ${live ? '' : 'is-off'}`} onClick={onClick} aria-label={locked ? unlockLabel(t.label) : t.label} aria-current={active || undefined} aria-disabled={live ? undefined : 'true'} style={{ flex: '0 0 44cqh', textAlign: 'center' }}>
                     <span style={{ position: 'relative', display: 'block', borderRadius: t.fan ? 0 : '1.8cqh', overflow: 'hidden', boxShadow: active && !t.fan ? `0 0 0 0.6cqh ${BLUE}` : 'none' }}>
                       <img src={t.img} alt="" draggable={false} loading="lazy" decoding="async" style={{ display: 'block', width: '100%', height: '22cqh', objectFit: t.fan ? 'contain' : 'cover' }} />
                       {(!live || locked) && <span className="ph-frost" aria-hidden="true" />}

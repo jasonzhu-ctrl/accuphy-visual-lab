@@ -11,7 +11,7 @@ export const KLAVIYO = {
   revision: '2026-07-15', // Klaviyo API revision (each is supported ~2 years; bump when Klaviyo retires it)
 }
 
-// The consent sent with each sign-up: change it here when Klaviyo settles the wording and the consent type (#191).
+// The consent sent with each sign-up (#191). SUBSCRIBED is the only value Klaviyo's client endpoint takes.
 const CONSENT = 'SUBSCRIBED'
 
 // listId must be W24Qdc before lab.accuphy.ca goes live with the Combo lock (#191, docs/versions.md). Until it is set nothing is
@@ -33,7 +33,7 @@ function rememberSignedUp() {
 
 export const isEmail = (s) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(s).trim())
 
-export async function submitSignup({ email, source = 'Accuphy Lab' }) {
+export async function submitSignup({ email, language = 'en', source = 'Accuphy Lab' }) {
   const addr = String(email).trim()
   if (!isEmail(addr)) throw new Error('bad_email')
   if (!signupReady() && onLiveHost()) throw new Error('not_ready')
@@ -48,7 +48,7 @@ export async function submitSignup({ email, source = 'Accuphy Lab' }) {
             custom_source: source,
             profile: { data: { type: 'profile', attributes: {
               email: addr,
-              properties: { signup_page: 'accuphy-lab' },
+              properties: { signup_page: 'accuphy-lab', signup_channel: 'lab_unlock', signup_language: language },
               subscriptions: { email: { marketing: { consent: CONSENT } } }, // the list's single/double opt-in setting still applies
             } } },
           },

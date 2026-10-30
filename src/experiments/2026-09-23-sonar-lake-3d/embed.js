@@ -97,6 +97,16 @@ export function inStore() {
 // big PingLive is not sold there until 2027-02 (website #226). Inside the store only — the Lab opened on its own never changes.
 export function miniOnly() { return inStore() && shareMarket() === 'us' }
 
+// The ice page from the lake (#191): same address parameters (market, shop, lang), inside the iframe too; `from=lake` shows the way back.
+// Theme-mounted there is no /ice/ on the store: the same page reloads with scene=ice.
+export function iceUrl(view) {
+  const u = new URL(window.location.href)
+  if (isEmbedded() || !inStore()) u.pathname = u.pathname.replace(/(mini|ice)\/?(index\.html)?$/, '').replace(/\/?$/, '/') + 'ice/'
+  else u.searchParams.set('scene', 'ice')
+  u.searchParams.set('from', 'lake'); u.searchParams.set('view', view)
+  return u.href
+}
+
 export function shopUrl(deviceId) {
   const product = PRODUCT[deviceId] || PRODUCT.PLM
   const root = shopRoot()

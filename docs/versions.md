@@ -7,7 +7,7 @@ with the source commit it was built from, so anyone can tell which version a lin
 
 `KLAVIYO.listId` in `src/experiments/2026-09-23-sonar-lake-3d/signup.js` must be **W24Qdc** first. Left empty, the live card refuses every
 sign-up and Combo stays shut for everyone (no fake success). Test links show "Test mode: nothing is sent." The consent wording
-(`unlock_consent` in i18n.js, `CONSENT` in signup.js) also waits for Klaviyo.
+(`unlock_consent` in i18n.js) is Klaviyo HQ's draft and waits for Jason.
 
 ## Where the Lab lives (inventory, Lab HQ 2026-10-27)
 

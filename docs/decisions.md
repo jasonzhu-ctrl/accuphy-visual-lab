@@ -3364,14 +3364,27 @@ Numbered log. Newest at the bottom.
      - **Guide:** step 1 "The {device} sonar beam" / "Drag the boat — anything inside the beam appears on your phone."; step 2 "This is what
        {device} sees, live on your phone in the Accuphy Sonar app: the bottom, timber and fish.", the name follows the device on screen. The ice
        page's steps had no "curtain".
-     - **Placeholders:** `unlock_consent` waits for Klaviyo. French of the card, s1, s2, s3_text_locked, not_available and na_moving are
+     - **Placeholders:** French of the card, s1, s2, s3_text_locked, not_available and na_moving are
        drafts for the website's review. The card avoids the word "PingLive" alone, for the US (#190).
      - **Ads:** no URL goes straight into Combo. `scripts/dev/ads/v3/film3.mjs` clicks the Combo button on the frozen checkout
        `lake-mini-479ca21`, so it is unaffected; a new checkout would need localStorage `accuphy_sonar_signup_v1=1`.
      - **For the website:** in the store, Klaviyo's 20 s form can come up over the card.
-     - **Checked** on built pages in Chromium behind a stand-in store page, 0 failures, 0 console errors: desktop 1280×800 for us, ca,
+     - **Widened the same day** (Jason in Lab HQ: "订阅就打开"): Live Panoramic, Ice Fishing and Live Ice Fishing also sit behind the card (`isLocked` in `home/AppHome.jsx`). Their
+       names follow the view on the card and in "You're in. {view} is unlocked." (shown 1.1 s). `signup` now carries `source: 'unlock'` and `view` = the view unlocked.
+       - **Ice tiles:** the lake's two tiles go to the ice page (`embed.js iceUrl`: same address parameters, inside the iframe too, a test link's sub-path kept;
+         theme-mounted, the page reloads with `scene=ice`), with `from=lake`, which shows "← Back to the lake" (history back). `view=ice` opens the 2D Ice Fishing view
+         (it was in the engine, not offered, #94 note), now also a locked panel pill and a locked tile on the ice page; subscribing is the same localStorage on the same
+         origin, so the ice page knows. Opened directly, the ice page's Live Ice view stays free. Live Panoramic on the ice page keeps "Not available in this simulation yet."
+         The desktop has no ice tiles on the lake, so only phones reach the ice page this way.
+       - **Mini Panoramic:** a locked fourth pill and the Home tile; it uses the existing flat fan at the Mini's own 39°, no change to imaging or the lake. It is a 39° slice,
+         not a wide scan like the big PingLive's; whether that is the app's Live Panoramic is for Jason to look at.
+     - **Klaviyo (HQ's draft; Jason has not seen it):** consent text with Accuphy Trading Ltd., link to shop.accuphy.com/policies/privacy-policy, nothing pre-ticked. Sent as
+       `custom_source` Accuphy Lab, `properties` signup_channel=lab_unlock and signup_language. Checked against Klaviyo's Create Client Subscription reference (revision 2026-10-15):
+       the placement matches, and SUBSCRIBED is the only allowed consent value. W24Qdc is single opt-in. A real send has not run: `listId` stays null.
+     - **Checked** on built pages in Chromium behind a stand-in store page, 0 failures of 144, 0 console errors: ice tiles in both directions at market=us (card, line, /ice/ with
+       params, ice page knows, Combo opens there, back, direct when subscribed), a second device with fresh storage (locked again, same email opens); desktop 1280×800 for us, ca,
        /mini/, fr (lock, card, Esc, ×, outside, bad email, step 3, subscribe → Combo, remembered after reload); phone 390×844 for us, ca,
        /mini/, /ice/ and sideways 844×390 (tile lock, card, close back to Home, both notices last past 2 s and close on a tap, neutral
        hint, subscribe → Combo); /ice/ desktop; theme-mounted US. `signup-guard-test.mjs` 7/7, `shop-url-test.mjs` 26/26,
-       `share-url-test.mjs` 15/15. Sheet `docs/2026-10-30-combo-unlock.jpg`. Sideways, the card is taller than the screen and scrolls.
+       `share-url-test.mjs` 15/15. Sheet `docs/2026-10-30-combo-unlock.jpg`. Sideways, the card is taller than the screen and scrolls. The theme-mounted `scene=ice` jump was not run.
        **Not run:** the device list in the research doc (Facebook / Instagram browsers, Safari, real phones), a real Klaviyo send.
