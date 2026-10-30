@@ -35,4 +35,12 @@ for (const c of cases) {
   const ok = got === c.expect && (c.medium || dec === c.expect) && onScreen; if (!ok) fail++
   console.log(`${ok ? 'OK  ' : 'FAIL'} shop=${JSON.stringify(c.shop)}${c.market ? ' market=' + c.market : ''}${c.lang ? ' lang=' + c.lang : ''}${c.medium ? ' ' + c.medium : ''} → ${got}${c.medium ? '' : dec === got ? '  (QR decodes to the same, down to 1 px/module)' : '  QR DECODED TO ' + dec}${ok ? '' : '   expected ' + c.expect}${c.note ? '   · ' + c.note : ''}`)
 }
-console.log(fail ? `${fail} FAILED` : `all ${cases.length} passed`); process.exit(fail ? 1 : 0)
+// the subscribers' email link never spreads through a share (#191)
+{
+  const w = { location: { search: '?shop=/en-us&market=us&lab_unlock=sub', origin: 'https://shop.accuphy.com' }, addEventListener() {}, dispatchEvent() {} }; w.self = w; w.top = w; w.parent = w
+  globalThis.window = w
+  const m = await import(`../../src/experiments/2026-09-23-sonar-lake-3d/embed.js?share=${++n}`)
+  const ok = !m.shareUrl('copy').includes('lab_unlock'); if (!ok) fail++
+  console.log(`${ok ? 'OK  ' : 'FAIL'} lab_unlock stays out of the share link`)
+}
+console.log(fail ? `${fail} FAILED` : `all ${cases.length + 1} passed`); process.exit(fail ? 1 : 0)

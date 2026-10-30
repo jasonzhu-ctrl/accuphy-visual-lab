@@ -4,7 +4,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { submitSignup, isEmail, signupTestMode } from './signup'
-import { labEvent } from './embed'
+import { labEvent, shareMarket } from './embed'
 import { t, LANG } from './i18n'
 
 export function LockIcon({ size = 11, style }) {
@@ -30,7 +30,7 @@ export default function UnlockCard({ name, product, view, onClose, onDone }) {
     e.preventDefault()
     if (!isEmail(email)) { setStatus('error'); setError(t('unlock_err_email')); return }
     setStatus('sending'); setError('')
-    try { await submitSignup({ email, language: LANG }); labEvent('signup', { source: 'unlock', product, view }, { once: true }) /* never the email: the iframe message goes to '*' */; setStatus('done'); setTimeout(onDone, DONE_MS) } catch (err) { setStatus('error'); setError(t(err.message === 'not_ready' ? 'unlock_err_closed' : 'unlock_err_send')) }
+    try { await submitSignup({ email, language: LANG, market: shareMarket(), view, product }); labEvent('signup', { source: 'unlock', product, view }, { once: true }) /* never the email: the iframe message goes to '*' */; setStatus('done'); setTimeout(onDone, DONE_MS) } catch (err) { setStatus('error'); setError(t(err.message === 'not_ready' ? 'unlock_err_closed' : 'unlock_err_send')) }
   }
 
   return (

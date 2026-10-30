@@ -3381,6 +3381,10 @@ Numbered log. Newest at the bottom.
      - **Klaviyo (HQ's draft; Jason has not seen it):** consent text with Accuphy Trading Ltd., link to shop.accuphy.com/policies/privacy-policy, nothing pre-ticked. Sent as
        `custom_source` Accuphy Lab, `properties` signup_channel=lab_unlock and signup_language. Checked against Klaviyo's Create Client Subscription reference (revision 2026-10-15):
        the placement matches, and SUBSCRIBED is the only allowed consent value. W24Qdc is single opt-in. A real send has not run: `listId` stays null.
+     - **Existing subscribers (Jason via Klaviyo HQ):** `?lab_unlock=sub` on the address (the bridge passes it into the iframe) unlocks and remembers, with no card and **no `signup`**, which
+       would inflate Meta Leads. Only that exact value counts. `isSignedUp` in `signup.js`. Share links are built fresh and never carry it (test); `iceUrl` keeps it.
+     - **Klaviyo properties added:** signup_market (`shareMarket()`), lab_scene (the view), lab_product. The Lab's email never passes the store page, so the bridge's `klaviyo.identify` cannot record them.
+       Checked: `signup-guard-test.mjs` (body and email link), `share-url-test.mjs` 16/16, and on built pages frame / `/ice/` / alone / theme-mounted: no locks, no card, no `signup`, remembered once the parameter is gone; another value stays locked.
      - **Checked** on built pages in Chromium behind a stand-in store page, 0 failures of 144, 0 console errors: ice tiles in both directions at market=us (card, line, /ice/ with
        params, ice page knows, Combo opens there, back, direct when subscribed), a second device with fresh storage (locked again, same email opens); desktop 1280×800 for us, ca,
        /mini/, fr (lock, card, Esc, ×, outside, bad email, step 3, subscribe → Combo, remembered after reload); phone 390×844 for us, ca,

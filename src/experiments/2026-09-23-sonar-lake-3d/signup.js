@@ -24,7 +24,12 @@ export const signupTestMode = () => !signupReady() && !onLiveHost()
 
 const FLAG = 'accuphy_sonar_signup_v1'
 
+// Existing subscribers come from Klaviyo emails with ?lab_unlock=sub (#191, Jason via Klaviyo HQ): unlocked, no card, and no `signup`
+// event, or they would count as new Meta Leads. The store's bridge passes the parameter into the iframe; shareUrl never carries it.
+const fromEmail = () => { try { return new URLSearchParams(window.location.search).get('lab_unlock') === 'sub' } catch { return false } }
+
 export function isSignedUp() {
+  if (fromEmail()) { rememberSignedUp(); return true }
   try { return localStorage.getItem(FLAG) === '1' } catch { return false }
 }
 function rememberSignedUp() {
@@ -33,7 +38,7 @@ function rememberSignedUp() {
 
 export const isEmail = (s) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(s).trim())
 
-export async function submitSignup({ email, language = 'en', source = 'Accuphy Lab' }) {
+export async function submitSignup({ email, language = 'en', market, view, product, source = 'Accuphy Lab' }) {
   const addr = String(email).trim()
   if (!isEmail(addr)) throw new Error('bad_email')
   if (!signupReady() && onLiveHost()) throw new Error('not_ready')
@@ -48,7 +53,7 @@ export async function submitSignup({ email, language = 'en', source = 'Accuphy L
             custom_source: source,
             profile: { data: { type: 'profile', attributes: {
               email: addr,
-              properties: { signup_page: 'accuphy-lab', signup_channel: 'lab_unlock', signup_language: language },
+              properties: { signup_page: 'accuphy-lab', signup_channel: 'lab_unlock', signup_language: language, signup_market: market, lab_scene: view, lab_product: product }, // here because the Lab's email never passes the store page, so the bridge's klaviyo.identify cannot record it
               subscriptions: { email: { marketing: { consent: CONSENT } } }, // the list's single/double opt-in setting still applies
             } } },
           },
