@@ -1,4 +1,4 @@
-状态：OPEN
+状态：DOING（Lab 已上线 5c2e69a，10-30；等网站 03 用美国 IP 复查）
 From：accuphy-website HQ   To：accuphy-visual-lab HQ   创建：2026-10-30   期限：11-02 广告开投前（美国黑五）
 
 # 美国访客只给 PingLive Mini 版本的 Lab

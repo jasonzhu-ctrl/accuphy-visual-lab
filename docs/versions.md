@@ -11,9 +11,9 @@ but is published nowhere and is redundant since #170.
 
 | Where | Who sees it | Pages | Version |
 |---|---|---|---|
-| shop.accuphy.com/pages/lab and /fr/pages/lab | customers | an iframe of lab.accuphy.ca/ (not `/embed/`) | **a1fd3ee, newest** |
-| lab.accuphy.ca = accuphy-lab.vercel.app (one deployment) | anyone with the link | `/`, `/mini/`, `/ice/`, `/embed/` | **a1fd3ee, newest** |
-| Friends' test link jasonzhu-ctrl.github.io/accuphy-lab-test | friends, Jason | `/`, `/mini/`, `/ice/`; `/jig/`, `/pano/` forward to `/` | **a1fd3ee, newest** |
+| shop.accuphy.com/pages/lab and /fr/pages/lab | customers | an iframe of lab.accuphy.ca/ (not `/embed/`) | **5c2e69a, newest** |
+| lab.accuphy.ca = accuphy-lab.vercel.app (one deployment) | anyone with the link | `/`, `/mini/`, `/ice/`, `/embed/` | **5c2e69a, newest** |
+| Friends' test link jasonzhu-ctrl.github.io/accuphy-lab-test | friends, Jason | `/`, `/mini/`, `/ice/`; `/jig/`, `/pano/` forward to `/` | **5c2e69a, newest** |
 | claude.ai private previews | — | **none**: the four old ones (RnCB, VxxnV fish test, G5uZ ice, 4GdHH) were deleted 2026-10-27 at Jason's word ("如果是现在项目需要的话留一个就行了"; the test link does the job) | — |
 | The v3 ad film | Meta, from 11/2 | recorded | lake 1abeedf (before #178; its shots show no Panoramic sonar) |
 | Colleague branches (not merged): PR #30 `codex/lab-clarity-optics` (AJ-nb, 10-28), PR #31 `codex/blue-hour-lake` (Codex agent, 10-29; private preview on accuphy-blue-hour-lake-20261029.accuphy-1012.chatgpt.site, owner-only) | the colleague, Jason | their own builds | not in main, not on any Lab link |
@@ -89,6 +89,7 @@ the Mini page; `VITE_SCENE=ice` for the ice page → `/ice/` on GitHub Pages sin
 | 2026-10-27 | Public test page `/jig/` | 218e483 | 0f4439e | Lake with the 110 ft hole and the jig drop from the boat (`?jig`, best with `?boat=-22.9,-47.2`) (#172) |
 | 2026-10-27 | Public test page `/jig/` | 557f1b2 | 7191adc | Fish schools spread out (#173) on top of the hole and jig (#172) |
 | 2026-10-27 | Public test page `/jig/` | 58ea10f | 2418a2d | Fish spread round 2 at Jason's screenshot spot and the phone start (#173) |
+| 2026-10-30 | **Vercel** → **lab.accuphy.ca** `/`, `/mini/`, `/ice/`, `/embed/` | 5c2e69a | — | Jason said 动 in Lab HQ (the only live item waiting; #191 not included). US market in the store: PingLive Mini only (#190). Deployment `dpl_Dng6uRtYt8h3ZMZwGWAkhZyDUe3b`, embed `lab-d143de9435.js`. Checked: pages md5-identical to the test links (30df2bd), `/embed/` and robots 200, the loader points at the new build, CSP + noindex, embed CORS. Real US IP: website 03 next. Replaces a1fd3ee |
 | 2026-10-30 | **All test links** `/`, `/mini/`, `/ice/` | 5c2e69a | 30df2bd | US market in the store: PingLive Mini only, iframe and theme-mounted (#190). The test links open on their own, so they look unchanged; the US view only shows inside the store (check image docs/2026-10-30-us-mini-only.jpg). Unit tests 26/26 + 15/15. lab.accuphy.ca still a1fd3ee |
 | 2026-10-30 | **Vercel** → **lab.accuphy.ca** `/`, `/mini/`, `/ice/`, `/embed/` | a1fd3ee | — | Jason said 动 in Lab HQ (new app). #189 Mini Combo Forward/Down ranges + #188 share redo (QR + Copy link). Built from a clean checkout of a1fd3ee; deployment `dpl_2fipAjsmYu7XGFp2akfeoyN133nt`, embed `lab-2a273819b6.js`. Checked: `/`, `/mini/`, `/ice/` md5-identical to the test links (84e65df), thumbnails, `/embed/` and robots 200, CSP frame-ancestors + noindex, embed CORS, live /mini/: Combo shows Forward range 70 ft + Down range 25 ft, the share popover shows the QR + Copy link, 0 console errors. Replaces 8c15c20 |
 | 2026-10-29 | **All test links** `/`, `/mini/`, `/ice/` | dfeef9f | f83f012 | Phone QR caption French as reviewed by the website ("Un ami peut scanner ce code…", #188). No other change. lab.accuphy.ca still 8c15c20 |
