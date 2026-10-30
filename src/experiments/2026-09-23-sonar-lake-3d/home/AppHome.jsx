@@ -44,6 +44,7 @@ const SECTIONS = {
 }
 
 const BLUE = '#2f8fff'
+export const VIEW_IMG = { combo: plmCombo, panoramic: plmPanoramic, ice: plmIceFishing, liveice: plmLiveIce } // the subscribe card's picture of what it opens (#191)
 export const isLocked = (d, m) => m === 'combo' || m === 'ice' || (d === 'PLM' && m === 'panoramic') // the views behind the subscribe card (#191)
 const unlockLabel = (view) => t('unlock_locked', { view })
 const movingText = (view) => t('na_moving', { view })
@@ -98,8 +99,8 @@ export default function AppHome({ devices, deviceId, mode, onPick, onIce, ice = 
                   <button key={t.label} type="button" className={`ph-tile ${live ? '' : 'is-off'}`} onClick={onClick} aria-label={locked ? unlockLabel(t.label) : t.label} aria-current={active || undefined} aria-disabled={live ? undefined : 'true'} style={{ flex: '0 0 44cqh', textAlign: 'center' }}>
                     <span style={{ position: 'relative', display: 'block', borderRadius: t.fan ? 0 : '1.8cqh', overflow: 'hidden', boxShadow: active && !t.fan ? `0 0 0 0.6cqh ${BLUE}` : 'none' }}>
                       <img src={t.img} alt="" draggable={false} loading="lazy" decoding="async" style={{ display: 'block', width: '100%', height: '22cqh', objectFit: t.fan ? 'contain' : 'cover' }} />
-                      {(!live || locked) && <span className="ph-frost" aria-hidden="true" />}
-                      {locked && <span className="ph-lock" aria-hidden="true"><LockIcon size="62%" /></span>}
+                      {(!live || locked) && <span className={`ph-frost ${locked ? 'is-locked' : ''}`} aria-hidden="true" />}
+                      {locked && <span className="ph-lock" aria-hidden="true"><LockIcon size="56%" /></span>}
                     </span>
                     <div style={{ fontSize: '4cqh', fontWeight: 500, marginTop: '1.8cqh', color: active ? BLUE : live ? '#fff' : 'rgba(255,255,255,0.55)' }}>{t.label}</div>
                   </button>

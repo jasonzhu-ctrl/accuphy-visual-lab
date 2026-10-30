@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import * as THREE from 'three'
 import LakeScene from './Scene'
 import { DEVICES, FT, ICE_MODES } from '../2026-09-23-sonar-beam/devices'
@@ -10,7 +10,7 @@ import { COLORMAP_NAMES } from './colormaps'
 import SonarChrome from './SonarChrome'
 import { screenLayout } from './SonarScreen'
 import UnlockCard, { LockIcon } from './UnlockCard'
-import AppHome, { isLocked } from './home/AppHome' // the app's Home (view selection) page inside the phone, phones only (2026-10-16)
+import AppHome, { isLocked, VIEW_IMG } from './home/AppHome' // the app's Home (view selection) page inside the phone, phones only (2026-10-16)
 import { isSignedUp } from './signup'
 import { iceUrl, labEvent, miniOnly, PRODUCT, sentEvents } from './embed'
 import ShopButton from './ShopButton' // the one link to the store (X-6L, 2026-10-25; placement B, Jason)
@@ -532,7 +532,7 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
         <pre ref={(el) => { state.current.debugEl = el }} className="pointer-events-none absolute left-2 top-1/2 rounded bg-black/60 p-1 text-[10px] text-lime-300" />
       )}
     </main>
-    {unlock && <UnlockCard name={unlock.name} product={PRODUCT[unlock.d] || PRODUCT.PLM} view={unlock.m} onClose={() => setUnlock(null)} onDone={onUnlocked} />}
+    <AnimatePresence>{unlock && <UnlockCard key="unlock" name={unlock.name} img={VIEW_IMG[unlock.m]} product={PRODUCT[unlock.d] || PRODUCT.PLM} view={unlock.m} onClose={() => setUnlock(null)} onDone={onUnlocked} />}</AnimatePresence>
     </>
   )
 }

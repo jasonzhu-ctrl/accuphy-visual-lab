@@ -3385,6 +3385,14 @@ Numbered log. Newest at the bottom.
        would inflate Meta Leads. Only that exact value counts. `isSignedUp` in `signup.js`. Share links are built fresh and never carry it (test); `iceUrl` keeps it.
      - **Klaviyo properties added:** signup_market (`shareMarket()`), lab_scene (the view), lab_product. The Lab's email never passes the store page, so the bridge's `klaviyo.identify` cannot record them.
        Checked: `signup-guard-test.mjs` (body and email link), `share-url-test.mjs` 16/16, and on built pages frame / `/ice/` / alone / theme-mounted: no locks, no card, no `signup`, remembered once the parameter is gone; another value stays locked.
+     - **Design pass (Jason in Lab HQ 2026-10-30: "可以高级一点设计再"; #50):** looks and motion only; no wording, logic, sonar or lake change. The card is the panel's glass, darker, with a 150 px head: the
+       view's own Home thumbnail under light frost and a faint grid (`VIEW_IMG`), a small lock chip, the title in Eurostile Heavy capitals, 6 px field and button. **The unlock moment:** the frost clears, the
+       lock's shackle lifts, the chip turns blue, one sonar sweep crosses the picture, the form folds away, then the card fades (`DONE_MS` 1500). Locks: a small line lock on muted pills (blue tint only on
+       hover); on Home tiles a corner glass chip and a water-coloured frost, so "locked" differs from the white "not in this simulation" frost. Down Scan / Chirp notice: dark glass, 6 px, a blue top
+       line. Sideways phones: picture left, form right, so the card fits. `prefers-reduced-motion`: no sweep, no transitions (MotionConfig + CSS). Mini's four pills: tighter, so "View" stays on their row.
+       - **Fonts kept as they are, not as the brand file says:** the Lab's own Eurostile Heavy woff2 and Instrument Sans, because the Adobe kit needs the Lab's domain added and Inter would add a font
+         for one card. Moving the whole Lab to the kit and Inter stays open (the old .otf's web licence is unverified). Downloads: page +~4 KB, gzip ~660 KB; the thumbnail loads only when the card opens.
+       - Sheet `docs/2026-10-30-unlock-design.jpg`, before and after, desktop and phone.
      - **Checked** on built pages in Chromium behind a stand-in store page, 0 failures of 144, 0 console errors: ice tiles in both directions at market=us (card, line, /ice/ with
        params, ice page knows, Combo opens there, back, direct when subscribed), a second device with fresh storage (locked again, same email opens); desktop 1280×800 for us, ca,
        /mini/, fr (lock, card, Esc, ×, outside, bad email, step 3, subscribe → Combo, remembered after reload); phone 390×844 for us, ca,

@@ -46,14 +46,11 @@
 .ac-seg { display: inline-flex; padding: 3px; gap: 2px; border-radius: 999px; background: rgba(255,255,255,0.14); box-shadow: inset 0 1px 2px rgba(0,20,30,0.14), inset 0 0 0 0.5px rgba(255,255,255,0.18); }
 .ac-btn { font-family: 'Instrument Sans', sans-serif; font-weight: 600; font-size: 12.5px; letter-spacing: 0.01em; padding: 6px 14px; border-radius: 999px; color: rgba(255,255,255,0.9); background: transparent; line-height: 1.1; white-space: nowrap; transition: background .22s, color .22s, box-shadow .22s; }
 .ac-btn:hover { background: rgba(255,255,255,0.12); }
-.ac-btn.is-locked { display: inline-flex; align-items: center; gap: 5px; color: #fff; background: rgba(2,140,223,0.34); }
-.ac-btn.is-locked:hover { background: rgba(2,140,223,0.55); }
-.ac-seg-tight .ac-btn { padding: 6px 9px; }
+.ac-seg-tight { gap: 0; }
+.ac-seg-tight .ac-btn { padding: 6px 7px; font-size: 12px; }
+.ac-seg-tight .ac-btn.is-locked { gap: 3px; }
 .ac-back-lake { position: absolute; z-index: 30; left: 12px; top: calc(12px + env(safe-area-inset-top)); padding: 8px 12px; border: 0; border-radius: 999px; font: 600 13px/1 'Instrument Sans', system-ui, sans-serif; color: #fff; background: rgba(3,18,26,0.55); cursor: pointer; }
 @media (max-width: 639px) { .ac-back-lake { top: calc(82px + env(safe-area-inset-top)); } } /* below the store badges */
-.ac-unlock-x { position: absolute; top: 8px; right: 8px; width: 36px; height: 36px; border: 0; border-radius: 50%; background: none; color: rgba(255,255,255,0.85); font-size: 22px; line-height: 1; cursor: pointer; }
-.ac-unlock-x:hover { background: rgba(255,255,255,0.14); }
-.ac-unlock-badge { width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 50%; color: #fff; background: var(--accuphy-blue); }
 .ac-btn.is-active { color: #0b1c24; background: rgba(255,255,255,0.94); box-shadow: 0 3px 10px rgba(0,20,30,0.18), 0 0 0 0.5px rgba(0,0,0,0.05); }
 /* slider: 4 px track, brand-blue fill, white thumb */
 .ac-range { -webkit-appearance: none; appearance: none; height: 4px; border-radius: 4px; outline: none; background: linear-gradient(90deg, var(--accuphy-blue) var(--fill, 30%), rgba(255,255,255,0.30) var(--fill, 30%)); box-shadow: inset 0 0.5px 1px rgba(0,20,30,0.2); }
@@ -102,9 +99,6 @@
 .ph-tile img { transition: transform .12s; }
 /* Home tiles the Lab cannot show yet: a frosted layer over the thumbnail; a tap only shows the toast below */
 .ph-frost { position: absolute; inset: 0; background: linear-gradient(160deg, rgba(255,255,255,0.34), rgba(255,255,255,0.16)); -webkit-backdrop-filter: blur(5px) saturate(120%); backdrop-filter: blur(5px) saturate(120%); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.28); }
-.ph-lock { position: absolute; left: 50%; top: 50%; width: 10cqh; height: 10cqh; transform: translate(-50%, -50%); display: flex; align-items: center; justify-content: center; border-radius: 50%; color: #fff; background: #028cdf; box-shadow: 0 0.4cqh 1.6cqh rgba(0,0,0,0.4); }
-.ph-notice { position: absolute; inset: 0; z-index: 2; display: flex; align-items: center; justify-content: center; padding: 6cqh 10cqh; border: 0; background: rgba(0,0,0,0.62); color: #fff; font: inherit; cursor: pointer; }
-.ph-notice span { max-width: 92%; padding: clamp(10px, 5cqh, 22px) clamp(12px, 6cqh, 26px); border-radius: clamp(8px, 3cqh, 14px); background: #1c1c1c; box-shadow: 0 0 0 1px #3a3a3a; font-size: clamp(12.5px, 7.4cqh, 19px); font-weight: 600; line-height: 1.3; text-align: center; }
 .ph-tile.is-off { cursor: default; }
 .ph-tile.is-off:active img { transform: none; }
 .ph-toast { position: absolute; left: 50%; bottom: 20cqh; transform: translateX(-50%); padding: 2cqh 4cqh; border-radius: 999px; font-size: 3.8cqh; font-weight: 600; white-space: nowrap; pointer-events: none; transition: opacity .3s; }
@@ -160,3 +154,65 @@
 .ac-badges { display: inline-flex; gap: 10px; align-items: center; } /* gap ≥ a quarter of the badge height (Apple's clear space) */
 .ac-badges img { display: block; height: var(--h, 40px); width: auto; } /* the official artwork as shipped: no rounding, no tint */
 .ac-badges a { display: block; line-height: 0; }
+
+/* --- the subscribe card, the locks, the notice (#191, Jason 2026-10-30: "可以高级一点设计"): the panel's glass, darker; Eurostile for the
+   title, 6 px controls, one blue. Nothing here is a paywall sign: small locks, the view itself under frost, one sonar sweep on success. */
+.ac-btn.is-locked { display: inline-flex; align-items: center; gap: 4px; color: rgba(255,255,255,0.72); }
+.ac-btn.is-locked .ac-lock { color: rgba(255,255,255,0.56); transition: color .2s; }
+.ac-btn.is-locked:hover { color: #fff; background: rgba(2,140,223,0.22); }
+.ac-btn.is-locked:hover .ac-lock { color: #6cc4f7; }
+.ac-lock { flex: none; overflow: visible; }
+.ac-lock-shackle { transform-box: fill-box; transform-origin: 100% 100%; transition: transform .45s cubic-bezier(.2,.8,.2,1) .35s; }
+.ac-lock.is-open .ac-lock-shackle { transform: translateY(-1.2px) rotate(22deg); }
+
+.ac-unlock { --glass-tint: rgba(5,20,29,0.68); --glass-hi: rgba(255,255,255,0.10); --glass-lo: rgba(255,255,255,0.02); max-width: 400px; border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; }
+.ac-unlock-media { position: relative; height: 150px; flex: none; overflow: hidden; background: #050e14; }
+.ac-unlock-media img { position: absolute; inset: -6px; width: calc(100% + 12px); height: calc(100% + 12px); max-width: none; object-fit: cover; filter: blur(3px) saturate(0.72) brightness(0.72); transition: filter .8s ease-out .15s; }
+.ac-unlock-media::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(5,20,29,0) 40%, rgba(8,24,33,0.92) 100%), linear-gradient(160deg, rgba(190,226,245,0.20), rgba(190,226,245,0.04)); transition: opacity .8s ease-out .15s; pointer-events: none; }
+.ac-unlock-grid { position: absolute; inset: 0; opacity: 0.32; background-image: linear-gradient(rgba(255,255,255,0.13) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.13) 1px, transparent 1px); background-size: 100% 25%, 12.5% 100%; transition: opacity .6s; }
+.ac-unlock-sweep { position: absolute; z-index: 1; top: 0; bottom: 0; left: 0; width: 34%; opacity: 0; transform: translateX(-100%); background: linear-gradient(90deg, rgba(2,140,223,0), rgba(2,140,223,0.20) 70%, rgba(108,196,247,0.95) 99%, #fff 100%); pointer-events: none; }
+.ac-unlock-chip { position: absolute; z-index: 2; left: 18px; bottom: 12px; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 6px; color: #fff; background: rgba(5,20,29,0.55); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.26); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); transition: background .4s .4s, box-shadow .4s .4s; }
+.ac-unlock.is-done .ac-unlock-media img { filter: none; }
+.ac-unlock.is-done .ac-unlock-media::after { opacity: 0.55; }
+.ac-unlock.is-done .ac-unlock-grid { opacity: 0; }
+.ac-unlock.is-done .ac-unlock-chip { background: var(--accuphy-blue); box-shadow: 0 0 0 4px rgba(2,140,223,0.22); }
+.ac-unlock.is-done .ac-unlock-sweep { animation: ac-sweep 1s cubic-bezier(.4,0,.3,1) .1s both; }
+@keyframes ac-sweep { 0% { opacity: 1; transform: translateX(-100%); } 85% { opacity: 1; } 100% { opacity: 0; transform: translateX(300%); } }
+.ac-unlock-x { position: absolute; z-index: 3; top: 10px; right: 10px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border: 0; border-radius: 6px; color: #fff; background: rgba(5,20,29,0.5); cursor: pointer; transition: background .15s; }
+.ac-unlock-x:hover { background: rgba(5,20,29,0.85); }
+.ac-unlock-body { padding: 14px 18px 16px; }
+.ac-unlock-title { margin: 0; font-family: 'Eurostile Heavy', 'Instrument Sans', sans-serif; font-weight: 800; font-size: 19px; line-height: 1.16; letter-spacing: 0.015em; text-transform: uppercase; }
+.ac-unlock-text { margin: 6px 0 0; font-size: 13.5px; line-height: 1.42; color: rgba(255,255,255,0.76); }
+.ac-unlock .ac-input { height: 42px; border-radius: 6px; background: rgba(2,14,20,0.5); border-color: rgba(255,255,255,0.2); }
+.ac-unlock .ac-input:focus { background: rgba(2,14,20,0.65); border-color: rgba(108,196,247,0.9); box-shadow: 0 0 0 3px rgba(2,140,223,0.3); }
+.ac-unlock .ac-primary { height: 44px; border-radius: 6px; font-size: 14.5px; letter-spacing: 0.01em; box-shadow: inset 0 1px 0 rgba(255,255,255,0.28), 0 6px 18px rgba(2,140,223,0.34); }
+.ac-unlock-fine { margin: 10px 0 0; font-size: 11.5px; line-height: 1.38; color: rgba(255,255,255,0.56); }
+.ac-unlock-fine a { color: rgba(255,255,255,0.82); text-decoration: underline; text-decoration-color: rgba(255,255,255,0.35); text-underline-offset: 2px; }
+/* sideways phones: picture left, form right, so the whole card fits the short screen */
+@media (max-height: 480px) {
+  .ac-unlock { flex-direction: row; max-width: 620px; }
+  .ac-unlock-media { width: 200px; height: auto; }
+  .ac-unlock-media::after { background: linear-gradient(90deg, rgba(5,20,29,0) 55%, rgba(8,24,33,0.92) 100%), linear-gradient(160deg, rgba(190,226,245,0.20), rgba(190,226,245,0.04)); }
+  .ac-unlock-body { flex: 1; min-width: 0; padding: 12px 44px 10px 14px; }
+  .ac-unlock-title { font-size: 16px; }
+  .ac-unlock-text { margin-top: 4px; font-size: 12.5px; }
+  .ac-unlock .ac-input { height: 36px; }
+  .ac-unlock .ac-primary { height: 38px; font-size: 13.5px; }
+  .ac-unlock-body .mt-3\.5 { margin-top: 6px; }
+  .ac-unlock-fine { margin-top: 6px; font-size: 10.5px; }
+}
+
+/* Home tiles: frost in the water's own colours for a locked tile (the white frost means "not in this simulation"), a small glass chip in the corner */
+.ph-frost.is-locked { background: linear-gradient(160deg, rgba(120,190,230,0.22), rgba(8,28,40,0.34)); -webkit-backdrop-filter: blur(3px) saturate(115%); backdrop-filter: blur(3px) saturate(115%); box-shadow: inset 0 0 0 1px rgba(160,215,245,0.34); }
+.ph-lock { position: absolute; right: 1.6cqh; top: 1.6cqh; width: clamp(15px, 7.4cqh, 24px); height: clamp(15px, 7.4cqh, 24px); display: flex; align-items: center; justify-content: center; border-radius: clamp(3px, 1.6cqh, 6px); color: #fff; background: rgba(5,20,29,0.62); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.24); }
+
+/* Down Scan / Chirp: the same dark glass inside the app, one blue line on top */
+.ph-notice { position: absolute; inset: 0; z-index: 2; display: flex; align-items: center; justify-content: center; padding: 6cqh 10cqh; border: 0; background: rgba(4,12,18,0.62); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); color: #fff; font: inherit; cursor: pointer; animation: ph-notice-in .22s ease-out both; }
+.ph-notice span { position: relative; max-width: 92%; overflow: hidden; padding: clamp(10px, 5.4cqh, 24px) clamp(12px, 6.4cqh, 28px); border-radius: 6px; background: rgba(12,30,41,0.92); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.14), 0 2cqh 6cqh rgba(0,0,0,0.5); font-size: clamp(12.5px, 7.2cqh, 18px); font-weight: 600; line-height: 1.32; text-align: center; }
+.ph-notice span::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 2px; background: linear-gradient(90deg, rgba(2,140,223,0), #028cdf 30%, #6cc4f7 50%, #028cdf 70%, rgba(2,140,223,0)); }
+@keyframes ph-notice-in { from { opacity: 0; } to { opacity: 1; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .ac-unlock-sweep, .ac-unlock.is-done .ac-unlock-sweep, .ph-notice { animation: none; }
+  .ac-unlock-media img, .ac-unlock-media::after, .ac-unlock-grid, .ac-unlock-chip, .ac-lock-shackle { transition: none; }
+}
