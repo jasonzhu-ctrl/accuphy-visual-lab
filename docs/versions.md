@@ -11,8 +11,8 @@ but is published nowhere and is redundant since #170.
 
 | Where | Who sees it | Pages | Version |
 |---|---|---|---|
-| shop.accuphy.com/pages/lab and /fr/pages/lab | customers | an iframe of lab.accuphy.ca/ (not `/embed/`) | **8c15c20, newest** |
-| lab.accuphy.ca = accuphy-lab.vercel.app (one deployment) | anyone with the link | `/`, `/mini/`, `/ice/`, `/embed/` | **8c15c20, newest** |
+| shop.accuphy.com/pages/lab and /fr/pages/lab | customers | an iframe of lab.accuphy.ca/ (not `/embed/`) | **a1fd3ee, newest** |
+| lab.accuphy.ca = accuphy-lab.vercel.app (one deployment) | anyone with the link | `/`, `/mini/`, `/ice/`, `/embed/` | **a1fd3ee, newest** |
 | Friends' test link jasonzhu-ctrl.github.io/accuphy-lab-test | friends, Jason | `/`, `/mini/`, `/ice/`; `/jig/`, `/pano/` forward to `/` | **a1fd3ee, newest** |
 | claude.ai private previews | — | **none**: the four old ones (RnCB, VxxnV fish test, G5uZ ice, 4GdHH) were deleted 2026-10-27 at Jason's word ("如果是现在项目需要的话留一个就行了"; the test link does the job) | — |
 | The v3 ad film | Meta, from 11/2 | recorded | lake 1abeedf (before #178; its shots show no Panoramic sonar) |
@@ -89,6 +89,7 @@ the Mini page; `VITE_SCENE=ice` for the ice page → `/ice/` on GitHub Pages sin
 | 2026-10-27 | Public test page `/jig/` | 218e483 | 0f4439e | Lake with the 110 ft hole and the jig drop from the boat (`?jig`, best with `?boat=-22.9,-47.2`) (#172) |
 | 2026-10-27 | Public test page `/jig/` | 557f1b2 | 7191adc | Fish schools spread out (#173) on top of the hole and jig (#172) |
 | 2026-10-27 | Public test page `/jig/` | 58ea10f | 2418a2d | Fish spread round 2 at Jason's screenshot spot and the phone start (#173) |
+| 2026-10-30 | **Vercel** → **lab.accuphy.ca** `/`, `/mini/`, `/ice/`, `/embed/` | a1fd3ee | — | Jason said 动 in Lab HQ (new app). #189 Mini Combo Forward/Down ranges + #188 share redo (QR + Copy link). Built from a clean checkout of a1fd3ee; deployment `dpl_2fipAjsmYu7XGFp2akfeoyN133nt`, embed `lab-2a273819b6.js`. Checked: `/`, `/mini/`, `/ice/` md5-identical to the test links (84e65df), thumbnails, `/embed/` and robots 200, CSP frame-ancestors + noindex, embed CORS, live /mini/: Combo shows Forward range 70 ft + Down range 25 ft, the share popover shows the QR + Copy link, 0 console errors. Replaces 8c15c20 |
 | 2026-10-29 | **All test links** `/`, `/mini/`, `/ice/` | dfeef9f | f83f012 | Phone QR caption French as reviewed by the website ("Un ami peut scanner ce code…", #188). No other change. lab.accuphy.ca still 8c15c20 |
 | 2026-10-29 | **All test links** `/`, `/mini/`, `/ice/` | a1fd3ee | 84e65df | Mini Combo: Forward range and Down range, each moved on its own (#189, replaces #125 AUTO); phones get −/+ under each panel. HQ headless check: EN + FR sliders move independently, PingLive page unchanged, 0 errors. lab.accuphy.ca still 8c15c20 |
 | 2026-10-29 | **All test links** `/`, `/mini/`, `/ice/` | 7390d39 | 2a9f871 | Phones also get the QR + copy popover (Jason: "手机也用二维码和copy"); no native share sheet; phone caption "Let a friend scan this…" (#188). HQ headless check at 390×844 @3 (EN `?shop=/en-us&market=us`, FR `?lang=fr&shop=/fr`): popover centred 198–578 px, QR 172 px, US / FR-CA addresses and tags right, native share not called, 0 errors. lab.accuphy.ca still 8c15c20 |

@@ -1,11 +1,11 @@
 # Backlog — Sonar Beam Visualizer (kept current every round)
 
-> 状态（2026-10-29 晚，新 app 的 Lab HQ；五个干活窗口已重开并回报；10-27～10-29 的长版原文在下面“明细”里）
-> 阶段：X-6L Lab 上线后收尾，11-02 广告开投（加拿大 + 美国）；lab.accuphy.ca 现在是 8c15c20
-> 进行中：#189 Mini Combo 前后 range 分开调 · a1fd3ee、测试链接 be9b66e、HQ 核过 · 等“动”上线；#188 分享改版（电脑二维码 + 复制链接）· 测试链接已有 · 等“动”上线（和 #189 一次带上去）；#187/#228 去商店由商店页跳转 · Lab 和网站的桥都已上线 · 等网站 03 在 /pages/lab、/fr/pages/lab、/en-us/pages/lab 点一遍；#185 广告只留一条 Mini 测试片 · reference/ads/2026-11-bf/mini-test/，广告视频窗口暂停，母版由孙英杰优化
-> 等 Jason：① lab.accuphy.ca 更新到 a1fd3ee（#189 + #188）说“动” · 10-29 起（11-02 前要）；② 孙英杰的 PR #30 / #31 看过才合 · 10-28 起；③ LiveScope 研究 7 个问题（docs/livescope-study.md）· 10-23 起；④ 老问题（加载提速 C、App Store provider token、Klaviyo 框挪左下角、#153、#154）· 10-25 起
+> 状态（2026-10-30，Lab HQ；10-27～10-29 的长版原文在下面“明细”里）
+> 阶段：X-6L Lab 上线后收尾，11-02 广告开投（加拿大 + 美国）；lab.accuphy.ca 现在是 a1fd3ee（10-30 Jason 动）
+> 进行中：#187/#228 去商店由商店页跳转 · Lab 和网站的桥都已上线 · 等网站 03 在 /pages/lab、/fr/pages/lab、/en-us/pages/lab 点一遍；#185 广告只留一条 Mini 测试片 · reference/ads/2026-11-bf/mini-test/，广告视频窗口暂停，母版由孙英杰优化
+> 等 Jason：① 孙英杰的 PR #30 / #31 看过才合 · 10-28 起；② LiveScope 研究 7 个问题（docs/livescope-study.md）· 10-23 起；③ 老问题（加载提速 C、App Store provider token、Klaviyo 框挪左下角、#153、#154）· 10-25 起
 > 卡住：无。待补（不急）：#228 第 3 条美国默认 Mini、第 4 条德/荷/波兰/拉脱维亚界面；iframe 复制/分享权限网站有没有加上，没找到证据，问网站 HQ
-> 本周做完：#173 鱼群第 3 轮、#175 圆形水纹船迹、#178 新全景并进湖面 · 已在线上 8c15c20（/jig/、/pano/ 已下线）· 冰钓窗口核过；#182/#184/#186/#187 去商店按市场、GA4、分享徽章、商店页跳转 · lab.accuphy.ca 8c15c20 · HQ 核过；#185 Mini 测试片 · docs/2026-10-28-ad-mini-test-*-sheet.jpg · HQ 核过；#189 · docs/2026-10-29-plm-combo-two-ranges.jpg · HQ 核过
+> 本周做完：#189 Mini Combo 前后 range + #188 分享改版 · lab.accuphy.ca a1fd3ee（docs/versions.md 10-30 行）· HQ 核过（md5 同测试链接、线上 Combo 两条滑杆、二维码弹框、0 报错）；#173 鱼群第 3 轮、#175 圆形水纹船迹、#178 新全景并进湖面 · 已在线上 8c15c20（/jig/、/pano/ 已下线）· 冰钓窗口核过；#182/#184/#186/#187 去商店按市场、GA4、分享徽章、商店页跳转 · lab.accuphy.ca 8c15c20 · HQ 核过；#185 Mini 测试片 · docs/2026-10-28-ad-mini-test-*-sheet.jpg · HQ 核过；#189 · docs/2026-10-29-plm-combo-two-ranges.jpg · HQ 核过
 
 > **状态栏长版原文（10-27～10-29，整理前，没删）：**
 > 状态（2026-10-27 更新）
