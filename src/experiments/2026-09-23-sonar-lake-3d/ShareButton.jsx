@@ -28,7 +28,7 @@ function QR({ text }) {
 
 const isMac = () => { try { return /Mac|iPhone|iPad/.test(navigator.platform || '') } catch { return false } }
 
-export default function ShareButton({ compact = false, className = '', style }) {
+export default function ShareButton({ compact = false, thumb, className = '', style }) {
   const phone = compact // the phone dock passes `compact`; the panel (desktop) does not
   const [open, setOpen] = useState(false)
   const [copied, setCopied] = useState(false)
@@ -66,8 +66,8 @@ export default function ShareButton({ compact = false, className = '', style }) 
   const selectKeepStart = (e) => { const el = e.target; el.select(); requestAnimationFrame(() => { el.scrollLeft = 0 }) }
   return (
     <span ref={wrap} className={`ac-share-wrap ${className}`} style={style} onPointerDown={(e) => e.stopPropagation()}>
-      <button ref={opener} type="button" className={`ac-share ${compact ? 'is-compact' : ''}`} aria-label={t('share')} aria-expanded={open} aria-controls={id} onClick={onClick}>
-        <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M11 2.5 8 5.5M11 2.5v3M11 2.5H8M8 5.5 3 10.5v3h3l5-5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>
+      <button ref={opener} type="button" className={`ac-share ${compact ? 'is-compact' : 'is-panel'}`} aria-label={t(compact ? 'share_short' : 'share')} aria-expanded={open} aria-controls={id} onClick={onClick}>
+        <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M14 2 1.8 7l4.7 2.3M14 2 11 14.2 6.5 9.3M14 2 6.5 9.3" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" /></svg>
         <span>{t(compact ? 'share_short' : 'share')}</span>
       </button>
       {/* the phone popover goes to <body>: inside the phone dock (a transformed element) position: fixed would be relative to the dock */}
@@ -76,8 +76,10 @@ export default function ShareButton({ compact = false, className = '', style }) 
           <motion.div ref={pop} key="pop" id={id} role="dialog" aria-modal="false" aria-labelledby={`${id}-t`} className={`ac-share-pop ${phone ? 'is-phone' : ''}`}
             initial={phone ? { opacity: 0 } : { opacity: 0, y: 6, scale: 0.98 }} animate={phone ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }} exit={phone ? { opacity: 0 } : { opacity: 0, y: 4, scale: 0.98 }} transition={{ duration: 0.18, ease: 'easeOut' }}
             onPointerDown={(e) => e.stopPropagation()}> {/* phones: opacity only — the centring transform is the CSS's (.is-phone) */}
-            <h3 id={`${id}-t`}>{t('share')}</h3>
+            <h3 id={`${id}-t`}>{t('share_title')}</h3>
             <button ref={closeBtn} type="button" className="ac-share-x" aria-label={t('share_close')} onClick={close}>×</button>
+            {/* what the friend gets: the view on screen, one line. Sending unlocks nothing and carries no reward */}
+            {thumb && <div className="ac-share-preview"><img src={thumb} alt="" draggable={false} />{t('share_line') && <p>{t('share_line')}</p>}</div>}
             <span className="ac-share-qr"><QR text={shareUrl('qr')} /></span>
             <p className="ac-share-cap">{t(phone ? 'share_qr_caption_phone' : 'share_qr_caption')}</p>
             <div className="ac-share-row">

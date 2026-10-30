@@ -446,7 +446,7 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
         </div>
         <ShopButton deviceId={deviceId} placement="panel" wide />
         <AppBadges height={40} className="pt-2" />
-        <div className="pt-2.5"><ShareButton /></div>
+        <div className="pt-1"><ShareButton thumb={viewThumb(deviceId, mode)} /></div>
       </motion.div>
       {/* B: a glass strip top-right (desktop: under the step cards' row; phones: under the safe area) with share + badges */}
 
@@ -501,7 +501,7 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
         {phone && !land && started && !home && (
           <div ref={(el) => { sonarRect.current.dock = el }} className="pointer-events-auto absolute bottom-full left-1/2 mb-3 flex -translate-x-1/2 items-center gap-2">
             <ShopButton deviceId={deviceId} placement="frame-top" />
-            <ShareButton compact />
+            <ShareButton compact thumb={viewThumb(deviceId, mode)} />
           </div>
         )}
         {/* after sign-up the app buttons stay display-only: a short hint above the phone instead of the gate */}

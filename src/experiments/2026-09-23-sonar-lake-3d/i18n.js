@@ -57,7 +57,7 @@ const S = {
   gl_lost_title: { en: 'The 3D view stopped', fr: 'La vue 3D s’est arrêtée' },
   gl_lost_text: { en: 'Your browser freed the graphics memory. Tap to reload the lake.', fr: 'Votre navigateur a libéré la mémoire graphique. Touchez pour recharger le lac.' },
   // "Send to a friend" (BF funnel item 1)
-  share: { en: 'Send to a friend', fr: 'Partager' }, // FR reviewed by the website HQ 2026-10-28 (#198): "Partager" everywhere, no longer sentence
+  share: { en: 'Send to a fishing buddy', fr: 'Partager' }, // EN Jason's pick 2026-10-30; FR goes through the website HQ // FR reviewed by the website HQ 2026-10-28 (#198): "Partager" everywhere, no longer sentence
   share_text: { en: 'Try the Accuphy Lab — drag a boat and watch the live sonar light up.', fr: 'Essayez l’Accuphy Lab : déplacez un bateau et regardez le sondeur live s’allumer.' },
   share_sms: { en: 'Text message', fr: 'Message texte' },
   share_copy: { en: 'Copy link', fr: 'Copier le lien' },
@@ -69,6 +69,9 @@ const S = {
   share_copied_check: { en: 'Copied ✓', fr: 'Copié ✓' }, // FR reviewed (#198)
   share_press_copy: { en: 'Press {keys} to copy', fr: 'Appuyez sur {keys} pour copier' }, // when neither clipboard path is allowed; FR reviewed (#198)
   share_close: { en: 'Close', fr: 'Fermer' },
+  // the preview card (brief part 5): drafts until Jason picks them; French after the website's review, so no line in French yet
+  share_title: { en: 'Show a buddy what’s under the boat', fr: 'Partager' },
+  share_line: { en: 'Drag the boat. Watch the sonar light up.', fr: '' },
   share_short: { en: 'Share', fr: 'Partager' }, // the phone dock beside the Shop pill: no room for the long label (FR passes, #198)
   get_app: { en: 'Get the Accuphy Sonar app', fr: 'Télécharger l’application Accuphy Sonar' }, // the caption over the store badges (Jason 2026-10-28; the badges themselves say "Download on the App Store" / "Get it on Google Play"). FR reviewed by the website HQ 2026-10-28 (#198): the infinitive, as the store's /fr footer
   // the Shop button
