@@ -10,7 +10,9 @@ import { COLORMAP_NAMES } from './colormaps'
 import SonarChrome from './SonarChrome'
 import { screenLayout } from './SonarScreen'
 import UnlockCard, { LockIcon } from './UnlockCard'
-import AppHome, { isLocked, VIEW_IMG } from './home/AppHome' // the app's Home (view selection) page inside the phone, phones only (2026-10-16)
+import AppHome, { isLocked, viewThumb, VIEW_IMG } from './home/AppHome'
+import ViewIcon from './ViewIcon'
+import GlassLayer, { GLASS } from './GlassLayer' // the app's Home (view selection) page inside the phone, phones only (2026-10-16)
 import { isSignedUp } from './signup'
 import { iceUrl, labEvent, miniOnly, PRODUCT, sentEvents } from './embed'
 import ShopButton from './ShopButton' // the one link to the store (X-6L, 2026-10-25; placement B, Jason)
@@ -367,17 +369,30 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
       {/* ---- control panel — Apple-style frosted glass over the lake (Jason 2026-09-24) ---- */}
       <motion.div ref={(el) => { panelRef.current = el; state.current.panelEl = el }} data-hint-avoid initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
         className="ac-panel pointer-events-auto absolute flex flex-col gap-3 max-sm:hidden sm:left-4 sm:top-14 sm:w-[400px] sm:p-4" style={land ? { display: 'none' } : undefined}>
-        <div className="flex items-center justify-between px-1 pt-0.5">
-          <img src="/brand/logo/White Accuphy Logo.png" alt="Accuphy" className="h-[18px] w-auto drop-shadow-[0_1px_2px_rgba(0,20,30,0.25)]" draggable={false} />
-          <span className="ac-title">Lab</span>
+        <div className="flex items-center gap-2.5 px-1 pt-0.5">
+          <img src="/brand/logo/White Accuphy Logo.png" alt="Accuphy" className="h-[21px] w-auto" draggable={false} />
+          <span className="ac-lab-title">Lab</span>
         </div>
         <div className="ac-divider" />
         <Row label={t('device')}>
           <div className="ac-seg">{SHOWN_DEVICES.map((d) => <button key={d.id} className={`ac-btn ${deviceId === d.id ? 'is-active' : ''}`} onClick={() => pickView(d.id, isLocked(d.id, mode) && !unlocked ? 'down' : mode, 'panel')}>{d.name}</button>)}</div>
         </Row>
-        <Row label={t('view')}>
-          <div className={`ac-seg ${modes.length > 3 ? 'ac-seg-tight' : ''}`}>{modes.map((m) => { const locked = isLocked(deviceId, m) && !unlocked; return <button key={m} className={`ac-btn ${mode === m ? 'is-active' : ''} ${locked ? 'is-locked' : ''}`} aria-label={locked ? t('unlock_locked', { view: t(LOCKED_NAME[m]) }) : undefined} onClick={() => pickView(deviceId, m, 'panel')}>{locked && <LockIcon />}{t('mode_' + m)}</button> })}</div>
-        </Row>
+        <div>
+          <span className="ac-label">{t('view')}</span>
+          <div className={`ac-views is-${modes.length}`}>{modes.map((m) => {
+            const locked = isLocked(deviceId, m) && !unlocked, active = mode === m
+            return (
+              <button key={m} type="button" className={`ac-view ${active ? 'is-active' : ''} ${locked ? 'is-locked' : ''}`} aria-pressed={active} aria-label={locked ? t('unlock_locked', { view: t(LOCKED_NAME[m]) }) : undefined} onClick={() => pickView(deviceId, m, 'panel')}>
+                <span className="ac-view-pic">
+                  <img src={viewThumb(deviceId, m)} alt="" draggable={false} />
+                  {locked && <span className="ac-view-lock"><LockIcon size={10} /></span>}
+                </span>
+                <ViewIcon view={m === 'liveice' || m === 'ice' ? 'down' : m} deg={m === 'combo' ? 39 : device.beamDeg} active={active} />
+                <span className="ac-view-name">{t('mode_' + m)}</span>
+              </button>
+            )
+          })}</div>
+        </div>
         {ICE && (
           <Row label={t('camera')}>
             <div className="ac-seg">{VIEWS.map((v) => <button key={v} className={`ac-btn ${view === v ? 'is-active' : ''}`} onClick={() => setView(v)}>{{ top: t('cam_top'), under: t('cam_under'), section: t('cam_section') }[v]}</button>)}</div>
@@ -521,7 +536,8 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
       {/* ---- guide strip ---- */}
       <div data-hint-avoid className={ICE ? 'pointer-events-auto absolute hidden flex-col gap-2 md:flex' : 'pointer-events-auto absolute right-[28px] top-4 hidden w-[min(620px,44vw)] items-stretch gap-2.5 md:flex'} style={ICE ? { left: 16, top: cardsTop, width: 400 } : land ? { display: 'none' } : undefined}>
         {STEPS.map((st, i) => (
-          <button key={st.n} onClick={() => goStep(i)} className={`ac-card flex-1 text-left ${ICE ? 'px-3.5 py-2.5' : 'px-3.5 py-3'} ${step === i ? 'is-active' : ''}`}>
+          <button key={st.n} onClick={() => goStep(i)} className={`ac-card flex-1 text-left ${ICE ? 'px-3.5 py-2.5' : 'px-3.5 py-3'} ${step === i ? 'is-active' : ''} ${GLASS ? 'is-glass' : ''}`}>
+            {GLASS && <GlassLayer kind={GLASS} />}
             <div className="flex items-center gap-2"><span className="ac-num">0{st.n}</span><span className="ac-label">{t('step')}</span></div>
             <div className="mt-1.5 text-[13.5px] font-semibold leading-tight">{st.title}</div>
             {step === i && <div className="ac-body mt-1.5 text-[11.5px] leading-snug">{st.text}</div>}

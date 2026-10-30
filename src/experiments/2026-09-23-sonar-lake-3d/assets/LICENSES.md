@@ -58,3 +58,9 @@ three.js: Copyright © 2010–2026 three.js authors, MIT licence (https://github
 
 QR encoder for "Send to a friend" (#188, 2026-10-29): the share link drawn as an SVG in the page, no network call.
 Copyright (c) 2009 Kazuhiko Arase. MIT License — https://github.com/kazuhikoarase/qrcode-generator
+
+## Liquid glass trial (`GlassLayer.jsx`, ?glass=)
+
+The idea and SVG filter structure are adapted, no package is installed. Both MIT; licence texts checked 2026-10-30.
+- https://github.com/shuding/liquid-glass — MIT License, Copyright (c) 2025 Shu Ding
+- https://github.com/rdev/liquid-glass-react — MIT, Copyright 2025 Max Rovensky

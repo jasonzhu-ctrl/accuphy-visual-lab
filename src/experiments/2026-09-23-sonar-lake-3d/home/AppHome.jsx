@@ -45,6 +45,8 @@ const SECTIONS = {
 
 const BLUE = '#2f8fff'
 const OFF = 'rgba(255,255,255,0.32)' // Setting and Map: greyed, nothing happens on a tap (Jason 2026-10-30: "map不用打开吧 setting那就灰掉")
+// the desktop panel's view tiles use the same pictures (Jason 2026-10-30)
+export const viewThumb = (d, m) => (d === 'PL' ? { down: plDown, forward: plForward, panoramic: plPanoramic } : { down: plmDown, forward: plmForward, combo: plmCombo, panoramic: plmPanoramic, ice: plmIceFishing, liveice: plmLiveIce })[m]
 export const VIEW_IMG = { combo: plmCombo, panoramic: plmPanoramic, ice: plmIceFishing, liveice: plmLiveIce } // the subscribe card's picture of what it opens (#191)
 export const isLocked = (d, m) => m === 'combo' || m === 'ice' || (d === 'PLM' && m === 'panoramic') // the views behind the subscribe card (#191)
 const unlockLabel = (view) => t('unlock_locked', { view })
