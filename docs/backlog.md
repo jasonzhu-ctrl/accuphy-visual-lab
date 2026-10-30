@@ -2,10 +2,10 @@
 
 > 状态（2026-10-30，Lab HQ；10-27～10-29 的长版原文在下面“明细”里）
 > 阶段：X-6L Lab 上线后收尾，11-02 广告开投（加拿大 + 美国）；lab.accuphy.ca 现在是 5c2e69a（10-30 Jason 动）
-> 进行中：#191 Combo 模糊、订阅后打开，Down Scan/Chirp 提示，新引导文字（Jason 10-30）· 派给手机网页端，不上线 · Klaviyo、网站已发交接单（同意文字有草稿；Jason 定解锁上线后关 20 秒框 VpD3CV，由 Klaviyo 做，上线日要提前告诉 Klaviyo HQ；Lead 走网站的桥）；#190 美国只出 Mini · 已上线 5c2e69a · 等网站 03 用美国 IP 复查；#185 广告只留一条 Mini 测试片 · reference/ads/2026-11-bf/mini-test/，广告视频窗口暂停，母版由孙英杰优化
-> 等 Jason：⓪b Live Panoramic、Ice Fishing、Live Ice Fishing 三格订阅后给看什么 · 10-30 起；① 孙英杰的 PR #30 / #31 看过才合 · 10-28 起；② LiveScope 研究 7 个问题（docs/livescope-study.md）· 10-23 起；③ 老问题（加载提速 C、App Store provider token、Klaviyo 框挪左下角、#153、#154）· 10-25 起
+> 进行中：#191 模糊视图订阅后打开 · 881c8b2、测试链接 dec5b79、HQ 看过对比图 · 等 Jason 看；上线前：填 W24Qdc、核法文、Klaviyo 文字、真机、Klaviyo 关 20 秒框；#185 广告只留一条 Mini 测试片 · reference/ads/2026-11-bf/mini-test/，广告视频窗口暂停，母版由孙英杰优化
+> 等 Jason：⓪b 看 #191 测试版（Mini 全景 39° 窄扇形、Klaviyo 文字、直接开 /ice/ 时 Live Ice 免费、电脑进不了冰钓）· 10-30 起；⓪c 版本管理方案 · 10-30 起；① 孙英杰的 PR #30 / #31 看过才合 · 10-28 起；② LiveScope 研究 7 个问题（docs/livescope-study.md）· 10-23 起；③ 老问题（加载提速 C、App Store provider token、Klaviyo 框挪左下角、#153、#154）· 10-25 起
 > 卡住：无。待补：#228 第 4 条德/荷/波兰/拉脱维亚界面（不急）
-> 本周做完：#187/#188/#189 线上复查 · 网站 03 3dbfbec5（accuphy-website/docs/verification/2026-10-30-lab-a1fd3ee/result.md）· 已核（别的聊天）；#189 Mini Combo 前后 range + #188 分享改版 · lab.accuphy.ca a1fd3ee（docs/versions.md 10-30 行）· HQ 核过（md5 同测试链接、线上 Combo 两条滑杆、二维码弹框、0 报错）；#173 鱼群第 3 轮、#175 圆形水纹船迹、#178 新全景并进湖面 · 已在线上 8c15c20（/jig/、/pano/ 已下线）· 冰钓窗口核过；#182/#184/#186/#187 去商店按市场、GA4、分享徽章、商店页跳转 · lab.accuphy.ca 8c15c20 · HQ 核过；#185 Mini 测试片 · docs/2026-10-28-ad-mini-test-*-sheet.jpg · HQ 核过；#189 · docs/2026-10-29-plm-combo-two-ranges.jpg · HQ 核过
+> 本周做完：#190 美国只出 Mini · 线上 5c2e69a，网站 03 复查 310dedd1 · 已核（别的聊天）；#187/#188/#189 线上复查 · 网站 03 3dbfbec5（accuphy-website/docs/verification/2026-10-30-lab-a1fd3ee/result.md）· 已核（别的聊天）；#189 Mini Combo 前后 range + #188 分享改版 · lab.accuphy.ca a1fd3ee（docs/versions.md 10-30 行）· HQ 核过（md5 同测试链接、线上 Combo 两条滑杆、二维码弹框、0 报错）；#173 鱼群第 3 轮、#175 圆形水纹船迹、#178 新全景并进湖面 · 已在线上 8c15c20（/jig/、/pano/ 已下线）· 冰钓窗口核过；#182/#184/#186/#187 去商店按市场、GA4、分享徽章、商店页跳转 · lab.accuphy.ca 8c15c20 · HQ 核过；#185 Mini 测试片 · docs/2026-10-28-ad-mini-test-*-sheet.jpg · HQ 核过；#189 · docs/2026-10-29-plm-combo-two-ranges.jpg · HQ 核过
 
 > **状态栏长版原文（10-27～10-29，整理前，没删）：**
 > 状态（2026-10-27 更新）

@@ -1,4 +1,4 @@
-状态：DOING（Lab 已上线 5c2e69a，10-30；等网站 03 用美国 IP 复查）
+状态：DONE（5c2e69a，网站 03 复查通过）
 From：accuphy-website HQ   To：accuphy-visual-lab HQ   创建：2026-10-30   期限：11-02 广告开投前（美国黑五）
 
 # 美国访客只给 PingLive Mini 版本的 Lab
@@ -22,3 +22,4 @@ From：accuphy-website HQ   To：accuphy-visual-lab HQ   创建：2026-10-30   �
 证据：docs/decisions.md #190；docs/2026-10-30-us-mini-only.jpg
 结果：
 - 2026-10-30 手机网页端：代码做完（#190，embed.js miniOnly + index.jsx）。店铺框和主题挂载两条路，market=us 都只见 Mini，按钮和跳转都是 Mini，分享链接回 /en-us/pages/lab；加拿大、德国、/fr、独立打开不变。桥不用改。还没上测试链接和线上（HQ 负责，等 Jason“动”）；上线后告诉网站 HQ，03 用美国 IP 复查。
+- 2026-10-30 网站 03：线上 5c2e69a 复查通过。美国 IP /en-us/pages/lab 电脑、手机：大 PingLive 字样 0 处（第一屏、进视图后、分享弹框），只有 PingLive Mini，“去商店”只跳 1 次到 /en-us/products/pinglive-mini，分享链接和二维码都回 /en-us/pages/lab（utm_campaign=bf2026_lab_us）。加拿大 /pages/lab、/fr/pages/lab 没变。无 Lab 报错。证据：accuphy-website `docs/verification/2026-10-30-lab-5c2e69a/result.md`。
