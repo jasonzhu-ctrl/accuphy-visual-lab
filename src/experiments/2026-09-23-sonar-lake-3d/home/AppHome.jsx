@@ -44,12 +44,13 @@ const SECTIONS = {
 }
 
 const BLUE = '#2f8fff'
+const OFF = 'rgba(255,255,255,0.32)' // Setting and Map: greyed, nothing happens on a tap (Jason 2026-10-30: "map不用打开吧 setting那就灰掉")
 export const VIEW_IMG = { combo: plmCombo, panoramic: plmPanoramic, ice: plmIceFishing, liveice: plmLiveIce } // the subscribe card's picture of what it opens (#191)
 export const isLocked = (d, m) => m === 'combo' || m === 'ice' || (d === 'PLM' && m === 'panoramic') // the views behind the subscribe card (#191)
 const unlockLabel = (view) => t('unlock_locked', { view })
 const movingText = (view) => t('na_moving', { view })
 function Icon({ name, active }) {
-  const c = active ? BLUE : '#fff'
+  const c = active ? BLUE : OFF
   const s = { width: '6cqh', height: '6cqh', display: 'block', margin: '0 auto 0.8cqh' }
   if (name === 'gear') return <svg viewBox="0 0 24 24" style={s} fill="none" stroke={c} strokeWidth="2.2" strokeLinejoin="round"><circle cx="12" cy="12" r="3.2" /><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z" /></svg>
   if (name === 'home') return <svg viewBox="0 0 24 24" style={s} fill={c}><path d="M12 3 2.5 11.2h2.7V21h5.3v-6h3v6h5.3v-9.8h2.7z" /></svg>
@@ -57,9 +58,8 @@ function Icon({ name, active }) {
 }
 function Tab({ label, icon, active }) {
   return (
-    <div style={{ textAlign: 'center', fontSize: '3.8cqh', fontWeight: 500, color: active ? BLUE : '#fff', position: 'relative' }}>
+    <div style={{ textAlign: 'center', fontSize: '3.8cqh', fontWeight: 500, color: active ? BLUE : OFF, position: 'relative' }}>
       <Icon name={icon} active={active} />
-      {icon === 'gear' && <span style={{ position: 'absolute', top: '-0.4cqh', left: 'calc(50% + 2.2cqh)', width: '1.6cqh', height: '1.6cqh', borderRadius: '50%', background: '#e53935' }} />}
       {label}
     </div>
   )

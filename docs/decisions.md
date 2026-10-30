@@ -3392,6 +3392,7 @@ Numbered log. Newest at the bottom.
        line. Sideways phones: picture left, form right, so the card fits. `prefers-reduced-motion`: no sweep, no transitions (MotionConfig + CSS). Mini's four pills: tighter, so "View" stays on their row.
        - **Fonts kept as they are, not as the brand file says:** the Lab's own Eurostile Heavy woff2 and Instrument Sans, because the Adobe kit needs the Lab's domain added and Inter would add a font
          for one card. Moving the whole Lab to the kit and Inter stays open (the old .otf's web licence is unverified). Downloads: page +~4 KB, gzip ~660 KB; the thumbnail loads only when the card opens.
+       - **Home tab bar (Jason 2026-10-30: "map不用打开吧 setting那就灰掉"):** Setting and Map greyed, the red dot gone, a tap does nothing; Home stays blue. Checked on a phone upright and sideways.
        - Sheet `docs/2026-10-30-unlock-design.jpg`, before and after, desktop and phone.
      - **Checked** on built pages in Chromium behind a stand-in store page, 0 failures of 144, 0 console errors: ice tiles in both directions at market=us (card, line, /ice/ with
        params, ice page knows, Combo opens there, back, direct when subscribed), a second device with fresh storage (locked again, same email opens); desktop 1280×800 for us, ca,
