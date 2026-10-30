@@ -44,3 +44,23 @@ widths follow `accuphy-website/docs/specs.md`, nothing invented.
 ## Keep working
 Tile click events, `pickView`, lock logic, aria labels, French lengths, the ice page, sideways. Run the existing guard tests.
 Write the decision into `docs/decisions.md`. Report to HQ with a screenshot before anything is published.
+
+## 5. Send to a friend (added by Jason the same day)
+Jason: change the design, study how big companies design and word it.
+
+What the cases show: Spotify Wrapped, Strava and Duolingo get shared because the card shows something the person saw or
+did, as a picture, not because the button is prominent. Sources are mostly marketing blogs. No study comparing "share" and
+"send" was found, so the wording is a judgement, not a tested result.
+
+Build, on desktop and in the phone popover:
+- Keep QR + Copy link and everything else in #188: no native share sheet, no WhatsApp / SMS buttons, no reward wording,
+  the link stays the visitor's store page, `share` events unchanged. Never carry `lab_unlock`.
+- Add a preview card at the top of the popover: the thumbnail of the view on screen (`home/*.jpg`), and one line saying
+  what the friend gets, so the visitor sees what they are sending.
+- Button: a quiet secondary control in the new style (part 2), with a clear send icon, not the current pencil-like arrow.
+
+Wording, English draft (Jason decides the button; French goes through the website HQ afterwards, keep "Partager" until then):
+- Button: "Send to a fishing buddy". Phone dock stays "Share".
+- Popover title: "Show a buddy what's under the boat"
+- Line: "Drag the boat. Watch the sonar light up."
+- Keep QR caption and Copy link as they are.
