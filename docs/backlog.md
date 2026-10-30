@@ -3,7 +3,7 @@
 > 状态（2026-10-30，Lab HQ；10-27～10-29 的长版原文在下面“明细”里）
 > 阶段：X-6L Lab 上线后收尾，11-02 广告开投（加拿大 + 美国）；lab.accuphy.ca 现在是 a1fd3ee（10-30 Jason 动）
 > 进行中：#190 美国只出 Mini · 5c2e69a、测试链接 30df2bd、HQ 核过代码和对比图 · 等“动”上线，之后网站 03 用美国 IP 复查；#185 广告只留一条 Mini 测试片 · reference/ads/2026-11-bf/mini-test/，广告视频窗口暂停，母版由孙英杰优化
-> 等 Jason：⓪b 引导文字 + 模糊格子弹窗方案（Jason 10-30 看预览提的：第 1 步文字不通；格子点了现在是极小的 “Available with Accuphy PingLive Mini” 提示，字不对，建议改大弹窗 + “Not in this demo”，文字要网站核法文）· 10-30 起；⓪ lab.accuphy.ca 更新到 5c2e69a（#190 美国只出 Mini）说“动” · 10-30 起（11-02 前要）；① 孙英杰的 PR #30 / #31 看过才合 · 10-28 起；② LiveScope 研究 7 个问题（docs/livescope-study.md）· 10-23 起；③ 老问题（加载提速 C、App Store provider token、Klaviyo 框挪左下角、#153、#154）· 10-25 起
+> 等 Jason：⓪b 模糊格子改成“订阅后打开”（Jason 10-30，调研 docs/2026-10-30-unlock-with-subscribe.md）：打开后给看什么要他定；引导文字新版待确认 · 10-30 起；⓪ lab.accuphy.ca 更新到 5c2e69a（#190 美国只出 Mini）说“动” · 10-30 起（11-02 前要）；① 孙英杰的 PR #30 / #31 看过才合 · 10-28 起；② LiveScope 研究 7 个问题（docs/livescope-study.md）· 10-23 起；③ 老问题（加载提速 C、App Store provider token、Klaviyo 框挪左下角、#153、#154）· 10-25 起
 > 卡住：无。待补：#228 第 4 条德/荷/波兰/拉脱维亚界面（不急）
 > 本周做完：#187/#188/#189 线上复查 · 网站 03 3dbfbec5（accuphy-website/docs/verification/2026-10-30-lab-a1fd3ee/result.md）· 已核（别的聊天）；#189 Mini Combo 前后 range + #188 分享改版 · lab.accuphy.ca a1fd3ee（docs/versions.md 10-30 行）· HQ 核过（md5 同测试链接、线上 Combo 两条滑杆、二维码弹框、0 报错）；#173 鱼群第 3 轮、#175 圆形水纹船迹、#178 新全景并进湖面 · 已在线上 8c15c20（/jig/、/pano/ 已下线）· 冰钓窗口核过；#182/#184/#186/#187 去商店按市场、GA4、分享徽章、商店页跳转 · lab.accuphy.ca 8c15c20 · HQ 核过；#185 Mini 测试片 · docs/2026-10-28-ad-mini-test-*-sheet.jpg · HQ 核过；#189 · docs/2026-10-29-plm-combo-two-ranges.jpg · HQ 核过
 
