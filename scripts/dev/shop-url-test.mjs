@@ -31,4 +31,28 @@ for (const c of cases) {
   const ok = got === c.expect; if (!ok) fail++
   console.log(`${ok ? 'OK  ' : 'FAIL'} shop=${JSON.stringify(c.shop)}${c.lang ? ' lang=' + c.lang : ''}${c.mount ? ' (mount)' : ''}${c.standalone ? ' (standalone)' : ''}${c.device ? ' ' + c.device : ''} → ${got}${ok ? '' : '   expected ' + c.expect}${c.note ? '   · ' + c.note : ''}`)
 }
-console.log(fail ? `${fail} FAILED` : `all ${cases.length} passed`); process.exit(fail ? 1 : 0)
+// Mini only in the store's US market (#190): the iframe path, the theme-mounted path, and everything that must stay as it was
+const only = [
+  { q: '?shop=/en-us&market=us', framed: true, expect: true, note: 'iframe, US' },
+  { q: '?shop=/en-us', framed: true, expect: true, note: 'iframe, root only' },
+  { q: '?shop=/fr&market=us', framed: true, expect: true, note: 'iframe, French page in the US' },
+  { q: '?shop=/&market=ca', framed: true, expect: false, note: 'iframe, Canada' },
+  { q: '?shop=/de-de&market=de', framed: true, expect: false, note: 'iframe, Germany' },
+  { q: '', framed: true, expect: false, note: 'iframe, nothing passed' },
+  { q: '', mount: { shop: '/en-us', market: 'us' }, expect: true, note: 'theme-mounted, US' },
+  { q: '', mount: { shop: '/', market: 'ca' }, expect: false, note: 'theme-mounted, Canada' },
+  { q: '?shop=/en-us&market=us', expect: false, note: 'opened on its own: never changes' },
+  { q: '', expect: false, note: 'opened on its own, no params' },
+]
+for (const c of only) {
+  const w = { location: { search: c.q, origin: 'https://lab.accuphy.ca', href: 'https://lab.accuphy.ca/' + c.q }, addEventListener() {}, dispatchEvent() {} }
+  w.self = w; w.top = c.framed ? {} : w; w.parent = w.top
+  if (c.mount) w.Shopify = { analytics: { publish() {} } }
+  globalThis.window = w; globalThis.document = { referrer: '' }
+  const m = await import(`../../src/experiments/2026-09-23-sonar-lake-3d/embed.js?case=${++n}`)
+  if (c.mount) m.setEmbedOptions(c.mount)
+  const got = m.miniOnly()
+  if (got !== c.expect) fail++
+  console.log(`${got === c.expect ? 'OK  ' : 'FAIL'} miniOnly ${JSON.stringify(c.q)} ${c.note} → ${got}`)
+}
+console.log(fail ? `${fail} FAILED` : `all ${cases.length + only.length} passed`); process.exit(fail ? 1 : 0)

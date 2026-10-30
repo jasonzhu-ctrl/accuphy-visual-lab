@@ -93,6 +93,10 @@ export function inStore() {
   return isEmbedded() || typeof window.Shopify?.analytics?.publish === 'function'
 }
 
+// The US sees the Mini only (handoffs/2026-10-30-us-mini-only.md, #190; Jason 2026-10-30: "美国只能给只有PingLive Mini的版本"): the
+// big PingLive is not sold there until 2027-02 (website #226). Inside the store only — the Lab opened on its own never changes.
+export function miniOnly() { return inStore() && shareMarket() === 'us' }
+
 export function shopUrl(deviceId) {
   const product = PRODUCT[deviceId] || PRODUCT.PLM
   const root = shopRoot()

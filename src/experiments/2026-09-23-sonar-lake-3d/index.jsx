@@ -12,7 +12,7 @@ import { screenLayout } from './SonarScreen'
 import SignupGate from './SignupGate'
 import AppHome from './home/AppHome' // the app's Home (view selection) page inside the phone, phones only (2026-10-16)
 import { isSignedUp } from './signup'
-import { labEvent, PRODUCT, sentEvents } from './embed'
+import { labEvent, miniOnly, PRODUCT, sentEvents } from './embed'
 import ShopButton from './ShopButton' // the one link to the store (X-6L, 2026-10-25; placement B, Jason)
 import { t } from './i18n' // every visitor-visible string, English or French (?lang=fr; X-6L-fr)
 import ShareButton from './ShareButton'
@@ -68,7 +68,7 @@ export const meta = {
 export default function SonarLake3D({ scene: sceneProp, lab }) {
   const scene = sceneProp || SCENE_ENV || (/[?&]scene=ice/.test(window.location.search) ? 'ice' : 'lake')
   const ICE = scene === 'ice'
-  const ONLY = ICE ? 'PLM' : ONLY_ENV // on the ice the Mini is the device: the app's ice views are the Mini's
+  const ONLY = ICE || miniOnly() ? 'PLM' : ONLY_ENV // on the ice the Mini is the device: the app's ice views are the Mini's; the store's US market too (#190)
   const SHOWN_DEVICES = ONLY ? [DEVICES[ONLY]] : Object.values(DEVICES)
   const [deviceId, setDeviceId] = useState(ONLY || 'PL')
   const [mode, setMode] = useState(ICE ? 'liveice' : 'forward')

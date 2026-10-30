@@ -19,5 +19,6 @@ From：accuphy-website HQ   To：accuphy-visual-lab HQ   创建：2026-10-30   �
 
 批准：Jason 的原话是方向。上传 lab.accuphy.ca 仍要他在 Lab HQ 亲口说“动”。
 
-证据：（做完填）
-结果：（做完填；告诉网站 HQ，03 会用美国 IP 复查）
+证据：docs/decisions.md #190；docs/2026-10-30-us-mini-only.jpg
+结果：
+- 2026-10-30 手机网页端：代码做完（#190，embed.js miniOnly + index.jsx）。店铺框和主题挂载两条路，market=us 都只见 Mini，按钮和跳转都是 Mini，分享链接回 /en-us/pages/lab；加拿大、德国、/fr、独立打开不变。桥不用改。还没上测试链接和线上（HQ 负责，等 Jason“动”）；上线后告诉网站 HQ，03 用美国 IP 复查。

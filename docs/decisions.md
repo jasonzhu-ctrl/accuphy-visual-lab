@@ -3324,3 +3324,20 @@ Numbered log. Newest at the bottom.
        - Sheet `docs/2026-10-29-plm-combo-two-ranges.jpg`: desktop and phone, two range pairs each, and the ice page.
      - **Not built:** the Forward panel's `1.0x` zoom (#181 note). On a phone the FORWARD −/+ sits where the panels' diagonal
        meets the bottom bar; the line runs past its − ring.
+190. **2026-10-30** — **The store's US market sees the PingLive Mini only** (`handoffs/2026-10-30-us-mini-only.md`; Jason 2026-10-30 to the
+     website HQ: "美国只能给只有PingLive Mini的版本", and "可以" in Lab HQ). The big PingLive is not sold in the US until 2027-02 (website #226).
+     - `embed.js miniOnly()` = in the store (iframe or theme-mounted) and `shareMarket()` is `us`. `index.jsx` sets the existing
+       `ONLY` to the Mini then, the same switch as the ice page and the `/mini/` build: one device, the Mini's views, its Home section
+       only, step 3 on Combo. So no other component changed. Both paths work, since `market` arrives on the iframe URL or as
+       `data-market`; without `market`, the root `/en-us` counts.
+     - Opened on its own lab.accuphy.ca never changes, even with `?market=us`. All other markets unchanged.
+     - The share link and QR needed no change: they already point to `/en-us/pages/lab`, and the store's bridge passes `market=us` there.
+     - Left as it is: the Mini's Home keeps its frosted "Live Panoramic" tile (the app's own tile, tapping says "Available with
+       Accuphy PingLive Mini"); the sign-up gate's "PingLive tips" cannot appear (off in public builds); `/ice/` was Mini only already.
+     - **Checked** on the built pages (share + embed) in Chromium behind a stand-in store page, market=us against market=ca, desktop
+       1280×800 and phone 390×844: US shows only "PingLive Mini" (device row, Home, description), 0 mentions of the big PingLive,
+       button "Shop PingLive Mini", `shop_click` product pinglive-mini with `/en-us/products/pinglive-mini`, share link
+       `/en-us/pages/lab…bf2026_lab_us`, pill fits (182 px). Canada, Germany and /fr keep both devices and pinglive-sonar. Theme-mounted
+       us / ca the same. Standalone with and without `?market=us` unchanged. 0 console errors. `shop-url-test.mjs` 26/26 (10 new),
+       `share-url-test.mjs` 15/15. Sheet `docs/2026-10-30-us-mini-only.jpg`. **Not run:** a real US IP (the website's 03 does that),
+       Safari, a real phone.
