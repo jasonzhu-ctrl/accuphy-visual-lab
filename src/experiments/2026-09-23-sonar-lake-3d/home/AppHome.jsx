@@ -6,8 +6,9 @@
 // Live Combo sits in the Mini's row (2026-10-23; the app has a separate Combo section) — rounded dark panels, labels under the
 // tiles, and the Setting · Home · Map tab bar. The thumbnails are crops of the app's own tiles.
 // Tiles the Lab can show are live. The others are shown under a frosted layer (Jason: 其他的用那种我们也有的雾蒙蒙的一层)
-// and a tap only shows "Available with Accuphy PingLive Mini". Sizes are in cqh of the display, like SonarChrome.
+// and a tap only shows a short notice (#191: Live Combo unlocks by subscribing; Down Scan and Chirp explain themselves). Sizes are in cqh of the display, like SonarChrome.
 import { useEffect, useRef, useState } from 'react'
+import { LockIcon } from '../UnlockCard'
 import { t } from '../i18n' // English / French (?lang=fr); the French is the real app's own (website review 2026-10-26)
 // the thumbnails are files beside the page, not inlined (load plan B, 2026-10-27): fetched only when the Home page is shown — never on desktop
 import plPanoramic from './pl-panoramic.jpg'
@@ -35,14 +36,16 @@ const SECTIONS = {
     { mode: 'forward', label: t('tile_live_forward'), img: plmForward },
     { mode: 'down', label: t('tile_live_down'), img: plmDown },
     { mode: 'combo', label: t('tile_live_combo'), img: plmCombo }, // in the Mini's row, not a separate Combo section (Jason 2026-10-23: 不要单独再放一栏了 这样人家搞不懂)
-    { label: t('tile_downscan'), img: plmDownscan },
-    { label: t('tile_chirp'), img: plmChirp },
+    { label: t('tile_downscan'), img: plmDownscan, moving: true }, // needs a slowly moving boat, not simulated (#191)
+    { label: t('tile_chirp'), img: plmChirp, moving: true },
     { label: t('tile_ice'), img: plmIceFishing }, // frosted: Jason 2026-10-23 keeps only Live Ice Fishing, Live Forward, Live Down, Live Combo
     { id: 'liveice', label: t('tile_live_ice'), img: plmLiveIce }, // frosted on the lake page (its link to the ice page never worked in public builds; Jason 2026-10-24: 去掉); a view on the ice page
   ] },
 }
 
 const BLUE = '#2f8fff'
+const unlockLabel = t('unlock_locked')
+const movingText = (view) => t('na_moving', { view })
 function Icon({ name, active }) {
   const c = active ? BLUE : '#fff'
   const s = { width: '6cqh', height: '6cqh', display: 'block', margin: '0 auto 0.8cqh' }
@@ -60,12 +63,13 @@ function Tab({ label, icon, active }) {
   )
 }
 
-export default function AppHome({ devices, deviceId, mode, onPick, ice = false }) {
+export default function AppHome({ devices, deviceId, mode, onPick, ice = false, comboLocked = false }) {
   // on the ice page the back button opens this Home too (2026-10-23): Live Ice Fishing is a view of this page there,
   // not a link to it
   const sections = devices.map((d) => ({ id: d.id, ...SECTIONS[d.id] })).filter((s) => s.tiles)
     .map((sec) => (ice ? { ...sec, tiles: sec.tiles.map((tile) => (tile.id === 'liveice' ? { ...tile, mode: 'liveice' } : tile)) } : sec))
   const [toast, setToast] = useState('')
+  const [moving, setMoving] = useState('') // the tile's name while its big notice is up; a tap closes it (#191)
   const toastT = useRef(0)
   useEffect(() => () => clearTimeout(toastT.current), [])
   const notAvailable = () => { setToast(t('not_available')); clearTimeout(toastT.current); toastT.current = setTimeout(() => setToast(''), 2200) }
@@ -81,12 +85,14 @@ export default function AppHome({ devices, deviceId, mode, onPick, ice = false }
                 const dev = t.device || sec.id
                 const live = !!t.mode
                 const active = live && dev === deviceId && t.mode === mode
-                const onClick = live ? () => onPick(dev, t.mode) : notAvailable
+                const locked = comboLocked && t.mode === 'combo' // frosted with a lock: a tap opens the subscribe card (#191)
+                const onClick = live ? () => onPick(dev, t.mode) : t.moving ? () => setMoving(t.label) : notAvailable
                 return (
-                  <button key={t.label} type="button" className={`ph-tile ${live ? '' : 'is-off'}`} onClick={onClick} aria-label={t.label} aria-current={active || undefined} aria-disabled={live ? undefined : 'true'} style={{ flex: '0 0 44cqh', textAlign: 'center' }}>
+                  <button key={t.label} type="button" className={`ph-tile ${live ? '' : 'is-off'}`} onClick={onClick} aria-label={locked ? unlockLabel : t.label} aria-current={active || undefined} aria-disabled={live ? undefined : 'true'} style={{ flex: '0 0 44cqh', textAlign: 'center' }}>
                     <span style={{ position: 'relative', display: 'block', borderRadius: t.fan ? 0 : '1.8cqh', overflow: 'hidden', boxShadow: active && !t.fan ? `0 0 0 0.6cqh ${BLUE}` : 'none' }}>
                       <img src={t.img} alt="" draggable={false} loading="lazy" decoding="async" style={{ display: 'block', width: '100%', height: '22cqh', objectFit: t.fan ? 'contain' : 'cover' }} />
-                      {!live && <span className="ph-frost" aria-hidden="true" />}
+                      {(!live || locked) && <span className="ph-frost" aria-hidden="true" />}
+                      {locked && <span className="ph-lock" aria-hidden="true"><LockIcon size="62%" /></span>}
                     </span>
                     <div style={{ fontSize: '4cqh', fontWeight: 500, marginTop: '1.8cqh', color: active ? BLUE : live ? '#fff' : 'rgba(255,255,255,0.55)' }}>{t.label}</div>
                   </button>
@@ -102,6 +108,7 @@ export default function AppHome({ devices, deviceId, mode, onPick, ice = false }
         <Tab label={t('tab_map')} icon="map" />
       </div>
       <div role="status" aria-live="polite" className="ph-toast glass" style={{ opacity: toast ? 1 : 0 }}>{toast}</div>
+      {moving && <button type="button" className="ph-notice" onClick={() => setMoving('')}><span role="alert">{movingText(moving)}</span></button>}
     </div>
   )
 }

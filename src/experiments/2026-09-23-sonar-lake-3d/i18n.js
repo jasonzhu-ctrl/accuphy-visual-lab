@@ -39,13 +39,14 @@ const S = {
   toast_desktop: { en: 'These are the app’s own controls — use the panel to change the view.', fr: 'Ce sont les commandes de l’application : changez de vue dans le panneau.' },
   // the step cards
   step: { en: 'Step', fr: 'Étape' },
-  s1_title: { en: 'This is the beam', fr: 'Voici le faisceau' },
-  s1_text: { en: 'A thin curtain of sound under the boat. Drag the boat — whatever the curtain touches lights up.', fr: 'Un mince rideau d’ondes sonores sous le bateau. Faites glisser le bateau : tout ce que le rideau touche s’allume.' },
+  s1_title: { en: 'The {device} sonar beam', fr: 'Le faisceau du sonar {device}' }, // FR of s1 and s2: for the website's review (#191)
+  s1_text: { en: 'Drag the boat — anything inside the beam appears on your phone.', fr: 'Faites glisser le bateau : tout ce qui entre dans le faisceau apparaît sur votre téléphone.' },
   s2_title: { en: 'This is what your phone shows', fr: 'Voici ce qu’affiche votre téléphone' },
-  s2_text: { en: 'The screen is that curtain, seen edge-on: bottom, timber, fish. Forward View aims it ahead of the boat.', fr: 'L’écran, c’est ce rideau vu de profil : le fond, les arbres immergés, les poissons. La vue avant l’oriente devant le bateau.' },
+  s2_text: { en: 'This is what {device} sees, live on your phone in the Accuphy Sonar app: the bottom, timber and fish.', fr: 'Voici ce que voit le {device}, en direct sur votre téléphone dans l’application Accuphy Sonar : le fond, les arbres immergés et les poissons.' },
   s3_title: { en: 'Which view, when', fr: 'Quelle vue choisir, et quand' },
   s3_text: { en: 'Panoramic scans wide to find fish and structure; Forward to cast at them; Down to fish straight below.', fr: 'La vue panoramique scanne de larges zones pour repérer poissons et structures ; la vue avant, pour lancer dessus ; la vue vers le bas, pour pêcher à la verticale.' },
   s3_text_combo: { en: 'Combo shows Down and Forward side by side; Forward to cast at fish ahead; Down to fish straight below.', fr: 'La vue combinée montre le bas et l’avant côte à côte : la vue avant pour lancer sur les poissons devant vous, la vue vers le bas pour pêcher à la verticale.' },
+  s3_text_locked: { en: 'Forward to cast at fish ahead; Down to fish straight below. Combo shows both side by side: subscribe to unlock it.', fr: 'La vue avant pour lancer sur les poissons devant vous, la vue vers le bas pour pêcher à la verticale. La vue combinée montre les deux côte à côte : abonnez-vous pour la débloquer.' }, // FR: for the website's review (#191)
   i1_title: { en: 'The beam under the ice', fr: 'Le faisceau sous la glace' },
   i1_text: { en: 'The PingLive Mini hangs in the hole and pings straight down. Tap the ice anywhere to drill a new hole — whatever the beam touches lights up.', fr: 'Le PingLive Mini est suspendu dans le trou et émet droit vers le bas. Touchez la glace n’importe où pour percer un nouveau trou : tout ce que le faisceau touche s’allume.' },
   i2_title: { en: 'Watch them come in', fr: 'Regardez-les arriver' },
@@ -88,7 +89,21 @@ const S = {
   tab_setting: { en: 'Setting', fr: 'Paramètres' },
   tab_home: { en: 'Home', fr: 'Accueil' },
   tab_map: { en: 'Map', fr: 'Map' },
-  not_available: { en: 'Available with Accuphy PingLive Mini', fr: 'Disponible avec le PingLive Mini' },
+  not_available: { en: 'Not available in this simulation yet.', fr: 'Pas encore disponible dans cette simulation.' }, // FR: for the website's review (#191)
+  // {view} is the tile's name (#191, Jason 2026-10-30)
+  na_moving: { en: '{view} needs the boat moving slowly, so it isn’t available in this simulation yet.', fr: '{view} exige que le bateau avance lentement : cette vue n’est donc pas encore disponible dans cette simulation.' },
+  // the subscribe card (#191). unlock_consent is a PLACEHOLDER: Klaviyo is settling the wording. All FR here: drafts for the website's review
+  unlock_title: { en: 'Unlock Live Combo', fr: 'Débloquez la vue combinée' },
+  unlock_locked: { en: 'Combo, locked: subscribe to unlock', fr: 'Vue combinée verrouillée : abonnez-vous pour la débloquer' },
+  unlock_text: { en: 'Subscribe with your email to see Forward and Down side by side, with sonar tips and early offers from Accuphy.', fr: 'Abonnez-vous avec votre courriel pour voir l’avant et le bas côte à côte, et recevoir des conseils sonar et des offres en primeur d’Accuphy.' },
+  unlock_email: { en: 'Email', fr: 'Courriel' },
+  unlock_cta: { en: 'Subscribe and unlock', fr: 'M’abonner et débloquer' },
+  unlock_sending: { en: 'Subscribing…', fr: 'Abonnement en cours…' },
+  unlock_consent: { en: 'By subscribing you agree to receive emails from Accuphy. Unsubscribe anytime.', fr: 'En vous abonnant, vous acceptez de recevoir des courriels d’Accuphy. Désabonnement possible à tout moment.' },
+  unlock_privacy: { en: 'Privacy policy', fr: 'Politique de confidentialité' },
+  unlock_err_email: { en: 'Please enter a valid email address.', fr: 'Veuillez entrer une adresse courriel valide.' },
+  unlock_err_send: { en: 'Something went wrong. Please try again.', fr: 'Une erreur est survenue. Veuillez réessayer.' },
+  unlock_err_closed: { en: 'Subscribing isn’t open yet. Please try again later.', fr: 'L’abonnement n’est pas encore ouvert. Veuillez réessayer plus tard.' },
 }
 
 export function t(key, vars) {

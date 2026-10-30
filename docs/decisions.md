@@ -3341,3 +3341,37 @@ Numbered log. Newest at the bottom.
        us / ca the same. Standalone with and without `?market=us` unchanged. 0 console errors. `shop-url-test.mjs` 26/26 (10 new),
        `share-url-test.mjs` 15/15. Sheet `docs/2026-10-30-us-mini-only.jpg`. **Not run:** a real US IP (the website's 03 does that),
        Safari, a real phone.
+191. **2026-10-30** — **Live Combo locked until the visitor subscribes; Down Scan and Chirp explain why they are off; guide copy** (Jason in
+     Lab HQ: "把live combo给blur了吧 电脑手机各个版本你要想一想 订阅以后可以全部给看 Down scan和chirp可以弹出来说需要船慢慢开 模拟环境暂时不available"; research
+     `docs/2026-10-30-unlock-with-subscribe.md`, way 1: the Lab's own card). This changes #139 (no sign-up in the Lab) by Jason's own word.
+     - **Lock:** `pickView` in `index.jsx` is the one door: a Combo pick before subscribing opens `UnlockCard.jsx` (the old
+       `SignupGate.jsx` reworked) and nothing else changes. So every page is covered: `/`, `/mini/`, `/ice/`, embed, the store's
+       iframe, US Mini (#190), French, sideways phones. Panel: Combo with a padlock on a blue tint. Home: the Live Combo tile frosted
+       with a blue lock badge. Screen and Combo picture untouched.
+     - **Card:** closes by ×, Esc, a tap outside; the visitor stays where they were. The lake keeps running (it no longer freezes).
+       Success opens Combo at once and `signup.js` remembers it on this device. It works without Klaviyo's form, so also on
+       lab.accuphy.ca alone. Emits `signup` { source: 'combo' }. The old display-only gate path is gone (`onLocked` only hints).
+     - **No fake success:** `KLAVIYO.listId` stays null this round. With it empty, on accuphy.ca / accuphy.com / vercel.app /
+       myshopify.com the card refuses ("Subscribing isn't open yet") and Combo stays shut; on test links and localhost it unlocks
+       and prints "Test mode: nothing is sent." **W24Qdc must be filled before lab.accuphy.ca carries this** (`docs/versions.md`).
+       `CONSENT` at the top of `signup.js` is where the hard-coded SUBSCRIBED changes.
+     - **Step 3 on Mini pages:** locked, it stays on Forward and says "Combo shows both side by side: subscribe to unlock it."; unlocked,
+       it goes to Combo as before. The big PingLive's step 3 (Panoramic) is unchanged.
+     - **Down Scan, Chirp Sonar:** a tap shows a large notice in the middle of the phone screen ("… needs the boat moving slowly, so it
+       isn't available in this simulation yet."), a tap closes it; the same before and after subscribing. Those tiles exist only on the
+       phone's Home, so the desktop has nothing to show. Live Panoramic, Ice Fishing, Live Ice Fishing keep the short hint with
+       neutral words: "Not available in this simulation yet."
+     - **Guide:** step 1 "The {device} sonar beam" / "Drag the boat — anything inside the beam appears on your phone."; step 2 "This is what
+       {device} sees, live on your phone in the Accuphy Sonar app: the bottom, timber and fish.", the name follows the device on screen. The ice
+       page's steps had no "curtain".
+     - **Placeholders:** `unlock_consent` waits for Klaviyo. French of the card, s1, s2, s3_text_locked, not_available and na_moving are
+       drafts for the website's review. The card avoids the word "PingLive" alone, for the US (#190).
+     - **Ads:** no URL goes straight into Combo. `scripts/dev/ads/v3/film3.mjs` clicks the Combo button on the frozen checkout
+       `lake-mini-479ca21`, so it is unaffected; a new checkout would need localStorage `accuphy_sonar_signup_v1=1`.
+     - **For the website:** `signup` is not yet counted as Meta Lead. In the store, Klaviyo's 20 s form can come up over the card.
+     - **Checked** on built pages in Chromium behind a stand-in store page, 0 failures, 0 console errors: desktop 1280×800 for us, ca,
+       /mini/, fr (lock, card, Esc, ×, outside, bad email, step 3, subscribe → Combo, remembered after reload); phone 390×844 for us, ca,
+       /mini/, /ice/ and sideways 844×390 (tile lock, card, close back to Home, both notices last past 2 s and close on a tap, neutral
+       hint, subscribe → Combo); /ice/ desktop; theme-mounted US. `signup-guard-test.mjs` 7/7, `shop-url-test.mjs` 26/26,
+       `share-url-test.mjs` 15/15. Sheet `docs/2026-10-30-combo-unlock.jpg`. Sideways, the card is taller than the screen and scrolls.
+       **Not run:** the device list in the research doc (Facebook / Instagram browsers, Safari, real phones), a real Klaviyo send.

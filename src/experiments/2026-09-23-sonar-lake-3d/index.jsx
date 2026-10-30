@@ -9,7 +9,7 @@ import { phonePose, isPhoneLayout, isLandscapePhone, PHONE_POSE_FLAT, comboFwdDe
 import { COLORMAP_NAMES } from './colormaps'
 import SonarChrome from './SonarChrome'
 import { screenLayout } from './SonarScreen'
-import SignupGate from './SignupGate'
+import UnlockCard, { LockIcon } from './UnlockCard'
 import AppHome from './home/AppHome' // the app's Home (view selection) page inside the phone, phones only (2026-10-16)
 import { isSignedUp } from './signup'
 import { labEvent, miniOnly, PRODUCT, sentEvents } from './embed'
@@ -88,7 +88,8 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
   const devNum = (k) => (import.meta.env.DEV ? +((new RegExp(`[?&]${k}=([\\d.]+)`).exec(window.location.search) || [])[1] || NaN) : NaN)
   const [depthFt, setDepthFt] = useState(Number.isFinite(devNum('depth')) ? devNum('depth') : 70) // depth range (PL Forward; every PLM view) — driven by AUTO below
   const [autoDepth, setAutoDepth] = useState(!Number.isFinite(devNum('depth'))) // off only when the dev Depth slider is touched (or ?depth=)
-  const [gate, setGate] = useState(false)          // sign-up gate open → the lake and the sonar picture freeze
+  const [unlock, setUnlock] = useState(null)       // the subscribe card is open: { d, source } of the Combo pick it holds (#191)
+  const [unlocked, setUnlocked] = useState(isSignedUp) // Combo opens after subscribing, remembered on this device (signup.js)
   // In-app browsers (BF funnel handoff 2026-10-26, item 3). (1) The 3D mounts one frame AFTER the page so the static cover
   // (#lab-cover, share build) is on screen while the scene builds; the cover fades after the lake's first frames.
   // (2) A lost WebGL context (Meta's browser drops it when memory is short) shows a tap-to-reload card instead of a frozen
@@ -274,14 +275,20 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
 
   // embed bridge (#134): the store page learns which view the visitor picked — on a real pick only (Home tile, panel
   // button, guide step), never for the default view on load (#139); `source` says where the pick came from
-  const pickView = (d, m, source) => { setDeviceId(d); setMode(m); labEvent('view', { view: m, product: PRODUCT[d] || PRODUCT.PLM, source }) }
+  const showView = (d, m, source) => { setDeviceId(d); setMode(m); labEvent('view', { view: m, product: PRODUCT[d] || PRODUCT.PLM, source }) }
+  // every pick passes here, so nothing reaches Combo before subscribing (#191): the card opens and the view stays as it was
+  const pickView = (d, m, source) => {
+    if (m === 'combo' && !unlocked) { setUnlock({ d, source }); return false }
+    showView(d, m, source); return true
+  }
+  const onUnlocked = () => {
+    const { d, source } = unlock
+    setUnlocked(true); setUnlock(null); showView(d, 'combo', source)
+    if (source === 'home') { setHome(false); setStarted(true) }
+  }
 
-  // the app's buttons are display-only: on desktop a tap asks for an email (once per browser); on phones nothing
-  // happens — the Lab itself carries no sign-up gate on the phone (Jason 2026-10-24: 注册门你这个层级不要有; the
-  // sign-up funnel is the Klaviyo chat's decision)
+  // the app's buttons are display-only: only a short hint (Jason 2026-10-24: no sign-up gate on them)
   const onLocked = () => {
-    // the friends test build has no sign-up gate (Jason 2026-09-26: 他能直接看 不要邮箱什么的): only the hint
-    if (!import.meta.env.VITE_NO_GATE && !isSignedUp()) { setGate(true); return }
     setToast(true); clearTimeout(toastT.current); toastT.current = setTimeout(() => setToast(false), 2400)
   }
 
@@ -324,10 +331,10 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
     { n: 2, title: t('i2_title'), text: t('i2_text'), device: 'PLM', mode: 'liveice', range: 60, boat: [-8, -10] },
     { n: 3, title: t('i3_title'), text: t('i3_text'), device: 'PLM', mode: 'forward', range: 60, boat: [16, 11] },
   ] : [
-    { n: 1, title: t('s1_title'), text: t('s1_text'), device: 'PL', mode: 'down', range: 80, boat: [-20, 6] },
-    { n: 2, title: t('s2_title'), text: t('s2_text'), device: 'PL', mode: 'forward', range: 60, boat: [16, 11] }, // standing timber + bass 8–15 m ahead on the 7 m flat
+    { n: 1, title: t('s1_title', { device: device.name }), text: t('s1_text'), device: 'PL', mode: 'down', range: 80, boat: [-20, 6] },
+    { n: 2, title: t('s2_title'), text: t('s2_text', { device: device.name }), device: 'PL', mode: 'forward', range: 60, boat: [16, 11] }, // standing timber + bass 8–15 m ahead on the 7 m flat
     { n: 3, title: t('s3_title'), text: t('s3_text'), device: 'PL', mode: 'panoramic', range: 70, boat: [-50, 8] }, // on the 5 m shelf, scanning toward the drop-off: the flat fan paints the bottom
-  ].map((st) => (ONLY ? { ...st, device: ONLY, mode: st.mode === 'panoramic' ? 'combo' : st.mode, ...(st.mode === 'panoramic' ? { text: t('s3_text_combo') } : {}) } : st))
+  ].map((st) => (ONLY ? { ...st, device: ONLY, ...(st.mode === 'panoramic' ? (unlocked ? { mode: 'combo', text: t('s3_text_combo') } : { mode: 'forward', text: t('s3_text_locked') }) : {}) } : st)) // before subscribing step 3 stays out of Combo (#191)
   const goStep = (i) => {
     const st = STEPS[i]; setStep(i); pickView(st.device, st.mode, 'step'); setRangeFt(st.range)
     state.current.target.x = st.boat[0]; state.current.target.z = st.boat[1]
@@ -336,9 +343,9 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
 
   return (
     <>
-    <main ref={mainRef} inert={gate} aria-hidden={gate || undefined} className="font-brand fixed inset-x-0 top-0 select-none overflow-hidden bg-[#9cc1cf] text-white" style={{ height: 'var(--lab-h, 100%)', ...(ICE ? { background: iceParams().T.bg } : null) }} onPointerMove={onMove}>
+    <main ref={mainRef} inert={!!unlock} aria-hidden={unlock ? true : undefined} className="font-brand fixed inset-x-0 top-0 select-none overflow-hidden bg-[#9cc1cf] text-white" style={{ height: 'var(--lab-h, 100%)', ...(ICE ? { background: iceParams().T.bg } : null) }} onPointerMove={onMove}>
       <div className="absolute inset-0 touch-none">
-        {mount3d && !glLost && <LakeScene key={glKey} state={state} sonarRect={sonarRect} paused={gate || paused} scene={scene} />}
+        {mount3d && !glLost && <LakeScene key={glKey} state={state} sonarRect={sonarRect} paused={paused} scene={scene} />}
       </div>
       {/* the store badges on phones (Jason 2026-10-28: store style, decision #185): top left over the lake, 40 px (Apple's minimum) */}
       {phone && !land && started && !home && <AppBadges height={40} className="absolute z-20 items-end" style={{ right: 12, top: 'calc(12px + env(safe-area-inset-top))' }} />}
@@ -363,7 +370,7 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
           <div className="ac-seg">{SHOWN_DEVICES.map((d) => <button key={d.id} className={`ac-btn ${deviceId === d.id ? 'is-active' : ''}`} onClick={() => pickView(d.id, mode, 'panel')}>{d.name}</button>)}</div>
         </Row>
         <Row label={t('view')}>
-          <div className="ac-seg">{modes.map((m) => <button key={m} className={`ac-btn ${mode === m ? 'is-active' : ''}`} onClick={() => pickView(deviceId, m, 'panel')}>{t('mode_' + m)}</button>)}</div>
+          <div className="ac-seg">{modes.map((m) => { const locked = m === 'combo' && !unlocked; return <button key={m} className={`ac-btn ${mode === m ? 'is-active' : ''} ${locked ? 'is-locked' : ''}`} aria-label={locked ? t('unlock_locked') : undefined} onClick={() => pickView(deviceId, m, 'panel')}>{locked && <LockIcon />}{t('mode_' + m)}</button> })}</div>
         </Row>
         {ICE && (
           <Row label={t('camera')}>
@@ -447,7 +454,7 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
               phone is the device), or, with the lake enlarged, a small sonar box top-right that taps back */}
           <div ref={(el) => { sonarRect.current.el = el }} style={land ? (lakeBig ? { ...LAND_SMALL, height: `${(34 / landAspect).toFixed(2)}vw` } : LAND_FULL) : { position: 'absolute', inset: '2.6%', borderRadius: '5.4% / 11.3%', containerType: 'size', overflow: 'hidden' }}>
             <SonarChrome layout={layout} deviceId={deviceId} mode={mode} rangeFt={effRangeFt} depthFt={depthFt} imperial={imperial} gain={gain} autoDepth={autoDepth} autoRange={downLike} onRange={phone ? stepRange : undefined} combo={combo ? { fwdFt: comboFwd, downFt: comboDown, onFwd: phone ? stepComboFwd : undefined, onDown: phone ? stepComboDown : undefined, fwdLabel: t('combo_fwd'), downLabel: t('combo_down') } : undefined} onHome={phone ? () => { setHome(true); setLakeBig(false) } : undefined} phone={phone && !land} noMark={land && !lakeBig && !home && started} waterTempC={ICE ? 1.6 : 21.8} app={appCtl} onLocked={phone ? undefined : onLocked} depthRef={(el) => { state.current.depthEl = el }} />
-            {phone && home && <AppHome ice={ICE} devices={SHOWN_DEVICES} deviceId={started ? deviceId : null} mode={started ? mode : null} onPick={(d, m) => { pickView(d, m, 'home'); setHome(false); setStarted(true) }} />}
+            {phone && home && <AppHome ice={ICE} devices={SHOWN_DEVICES} deviceId={started ? deviceId : null} mode={started ? mode : null} comboLocked={!unlocked} onPick={(d, m) => { if (pickView(d, m, 'home')) { setHome(false); setStarted(true) } }} />}
             {/* sideways: the lake inset (drawn by SonarScreen.jsx into this button's rectangle); a tap swaps lake and sonar.
                 Top-right, clear of the rulers and the depth-range −/+; Combo keeps its readout top-right, so there top-left */}
             {land && !lakeBig && !home && started && (
@@ -519,7 +526,7 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
         <pre ref={(el) => { state.current.debugEl = el }} className="pointer-events-none absolute left-2 top-1/2 rounded bg-black/60 p-1 text-[10px] text-lime-300" />
       )}
     </main>
-    {gate && <SignupGate onDone={() => setGate(false)} />}
+    {unlock && <UnlockCard onClose={() => setUnlock(null)} onDone={onUnlocked} />}
     </>
   )
 }

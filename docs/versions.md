@@ -3,6 +3,12 @@
 Jason 2026-10-16: "你管理好不同的 version 哦 … 做好 version 记录". Every public or private page build is listed here
 with the source commit it was built from, so anyone can tell which version a link shows. Newest first.
 
+## Before any lab.accuphy.ca release that includes #191 (Combo lock)
+
+`KLAVIYO.listId` in `src/experiments/2026-09-23-sonar-lake-3d/signup.js` must be **W24Qdc** first. Left empty, the live card refuses every
+sign-up and Combo stays shut for everyone (no fake success). Test links show "Test mode: nothing is sent." The consent wording
+(`unlock_consent` in i18n.js, `CONSENT` in signup.js) also waits for Klaviyo.
+
 ## Where the Lab lives (inventory, Lab HQ 2026-10-27)
 
 Newest code: **a1fd3ee**. Page types in the code: Both `/`, Mini `/mini/`, Ice `/ice/`, the store embed `/embed/`

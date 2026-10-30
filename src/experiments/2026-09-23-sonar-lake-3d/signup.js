@@ -11,21 +11,33 @@ export const KLAVIYO = {
   revision: '2026-07-15', // Klaviyo API revision (each is supported ~2 years; bump when Klaviyo retires it)
 }
 
+// The consent sent with each sign-up: change it here when Klaviyo settles the wording and the consent type (#191).
+const CONSENT = 'SUBSCRIBED'
+
+// listId must be W24Qdc before lab.accuphy.ca goes live with the Combo lock (#191, docs/versions.md). Until it is set nothing is
+// sent: on the Lab's real hosts the card refuses (no fake success, Combo stays shut); on test links and localhost it unlocks,
+// and the card says "Test mode".
+const LIVE_HOST = /(^|\.)(accuphy\.ca|accuphy\.com|vercel\.app|myshopify\.com)$/
+const signupReady = () => !!(KLAVIYO.publicKey && KLAVIYO.listId)
+const onLiveHost = () => { try { return LIVE_HOST.test(window.location.hostname) } catch { return true } }
+export const signupTestMode = () => !signupReady() && !onLiveHost()
+
 const FLAG = 'accuphy_sonar_signup_v1'
 
 export function isSignedUp() {
   try { return localStorage.getItem(FLAG) === '1' } catch { return false }
 }
 function rememberSignedUp() {
-  try { localStorage.setItem(FLAG, '1') } catch { /* private mode: the gate may show again next visit */ }
+  try { localStorage.setItem(FLAG, '1') } catch { /* private mode: the card may show again next visit */ }
 }
 
 export const isEmail = (s) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(s).trim())
 
 export async function submitSignup({ email, source = 'Accuphy Lab' }) {
   const addr = String(email).trim()
-  if (!isEmail(addr)) throw new Error('Please enter a valid email address.')
-  if (KLAVIYO.publicKey && KLAVIYO.listId) {
+  if (!isEmail(addr)) throw new Error('bad_email')
+  if (!signupReady() && onLiveHost()) throw new Error('not_ready')
+  if (signupReady()) {
     const res = await fetch(`https://a.klaviyo.com/client/subscriptions?company_id=${encodeURIComponent(KLAVIYO.publicKey)}`, {
       method: 'POST',
       headers: { 'content-type': 'application/vnd.api+json', revision: KLAVIYO.revision },
@@ -37,14 +49,14 @@ export async function submitSignup({ email, source = 'Accuphy Lab' }) {
             profile: { data: { type: 'profile', attributes: {
               email: addr,
               properties: { signup_page: 'accuphy-lab' },
-              subscriptions: { email: { marketing: { consent: 'SUBSCRIBED' } } }, // the list's single/double opt-in setting still applies
+              subscriptions: { email: { marketing: { consent: CONSENT } } }, // the list's single/double opt-in setting still applies
             } } },
           },
           relationships: { list: { data: { type: 'list', id: KLAVIYO.listId } } },
         },
       }),
     })
-    if (!res.ok) throw new Error('Sign-up failed — please try again.')
+    if (!res.ok) throw new Error('send_failed')
   }
   rememberSignedUp()
   return true
