@@ -50,6 +50,7 @@
 .ac-btn.is-locked:hover { background: rgba(2,140,223,0.55); }
 .ac-seg-tight .ac-btn { padding: 6px 9px; }
 .ac-back-lake { position: absolute; z-index: 30; left: 12px; top: calc(12px + env(safe-area-inset-top)); padding: 8px 12px; border: 0; border-radius: 999px; font: 600 13px/1 'Instrument Sans', system-ui, sans-serif; color: #fff; background: rgba(3,18,26,0.55); cursor: pointer; }
+@media (max-width: 639px) { .ac-back-lake { top: calc(82px + env(safe-area-inset-top)); } } /* below the store badges */
 .ac-unlock-x { position: absolute; top: 8px; right: 8px; width: 36px; height: 36px; border: 0; border-radius: 50%; background: none; color: rgba(255,255,255,0.85); font-size: 22px; line-height: 1; cursor: pointer; }
 .ac-unlock-x:hover { background: rgba(255,255,255,0.14); }
 .ac-unlock-badge { width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 50%; color: #fff; background: var(--accuphy-blue); }
