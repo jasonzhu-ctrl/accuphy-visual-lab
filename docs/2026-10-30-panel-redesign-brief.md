@@ -59,8 +59,8 @@ Build, on desktop and in the phone popover:
   what the friend gets, so the visitor sees what they are sending.
 - Button: a quiet secondary control in the new style (part 2), with a clear send icon, not the current pencil-like arrow.
 
-Wording, English draft (Jason decides the button; French goes through the website HQ afterwards, keep "Partager" until then):
-- Button: "Send to a fishing buddy". Phone dock stays "Share".
+Wording (button picked by Jason 2026-10-30; the other lines stay draft; French goes through the website HQ afterwards, keep "Partager" until then):
+- Button: "Send to a fishing buddy" (Jason's pick). Phone dock stays "Share".
 - Popover title: "Show a buddy what's under the boat"
 - Line: "Drag the boat. Watch the sonar light up."
 - Keep QR caption and Copy link as they are.
