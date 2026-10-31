@@ -86,10 +86,33 @@ Jason, 2026-10-28: "广告我们目前为止先不做了，孙英杰那边在优
 `reference/ads/**` is git-ignored and **this computer has no backup**. Small boards and stills go in `docs/` (in git).
 When a film is approved, tell HQ so the finals can be copied somewhere safe.
 
-## Where things stand (2026-10-27)
+## Where things stand (2026-10-31)
 
-- Brief: end of `docs/2026-10-26-ad-v2-pinglive-brief.md` (第 3 版 + "Jason 10-27 定（#174）").
-- Stills, PingLive only: `docs/2026-10-27-ad-v3-stills-r3.jpg` (opening, 135°, deep water at ~100 ft over the hole).
-  Waiting for Jason's nod before the 15 s film.
-- Earlier work: v2 (`scripts/dev/ads/v2/`), the BF clips (#168, `docs/2026-10-26-bf-ad-clips.md`), the numbers draft
-  (`scripts/dev/ads/numbers/`).
+This lane is **paused** (#183, #185). Nothing is rendered or recorded unless HQ relays Jason's go for one named job.
+
+- **The one test film (#185, Jason 10-28 "用 Mini 的片子"):** PingLive Mini, English, 15 s, silent, for the funnel and ad
+  tests in Canada and the US (11-02 on). Four files in `reference/ads/2026-11-bf/mini-test/`: `plm-test-916-en.mp4` and
+  `plm-test-169-en.mp4` (with the type), `plm-test-916-clean.mp4` and `plm-test-169-clean.mp4` (no type). 9:16 and 16:9
+  only. HQ checked it from the sheets on 10-28 (`docs/2026-10-28-ad-mini-test-916-sheet.jpg`, `-169-sheet.jpg`).
+  - **Backed up on the shared Drive** with a 说明.txt: Accuphy Public Drive → Marketing → 05_Paid Ads → Paid Ads →
+    2026-11 Black Friday（Lab 广告）→ "Mini 测试片 2026-10-28". Byte-identical to the local files.
+  - It was recorded from a clean checkout of the lake at 479ca21 (Mini-only build). The recorder is `FILM=mini` in
+    `scripts/dev/ads/v3/film3.mjs`, the type layer `overlay-mini.html`; the shot plan and build notes are in
+    `scripts/dev/ads/v3/README.md` ("Mini US" and "Mini test film: built").
+  - The English lines are placeholders (`lines-mini.json`); only the end card ("Play the free sonar demo" /
+    "Accuphy Lab") is final.
+- **PingLive v3** (`reference/ads/2026-11-bf/v3/`, 9:16 and 4:5, EN and clean, plus the French `pinglive-*-fr.mp4` with the
+  website's final lines): kept, not pushed further. The four English v3 files also sit on the Drive as a draft
+  ("v3 草稿 2026-10-27", copied by IT & HR on 10-28, before #185). The French files are local only.
+- **No "Simulated demo" tag in the corner** (Jason 10-29: "不加"). The caption-burning script stays as it is. Klaviyo says
+  the demo is simulated in the ad text.
+- **Open video questions** live in Klaviyo's `Campaigns/2026-11 Black Friday/视频问题清单.md`, owned by the BF funnel chat,
+  not by this one. Two of them would mean a new render here if Jason answers yes: the end card name ("Accuphy Sonar
+  Lab" in the ads), and the placeholder lines. Do not act on them until HQ relays his answer.
+- **孙英杰 (AJ-nb) optimizes the single-language masters** (PingLive v3, US Mini, 16:9, 1:1; #183). His pull requests
+  #30 and #31 are reference only, not merged (Jason 10-30). This chat makes language versions only when HQ relays an
+  approved master and Jason's go (#185: no language versions for now).
+- **Earlier work:** v2 (`scripts/dev/ads/v2/`), the BF clips (#168, `docs/2026-10-26-bf-ad-clips.md`), the numbers draft
+  (`scripts/dev/ads/numbers/`), the v3 stills (`docs/2026-10-27-ad-v3-stills-r3.jpg`).
+- **`reference/ads/` has no backup of its own.** The Drive copies above are the only other copy. Local
+  `reference/ads/lake-checkout/` and `lake-mini-479ca21/` are throwaway lake checkouts for recording.
