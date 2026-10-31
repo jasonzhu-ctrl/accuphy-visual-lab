@@ -3490,6 +3490,9 @@ Numbered log. Newest at the bottom.
        identify; the code does not, and it conflicts with "no personal data in events". Not built until Jason decides.
 
 197. **2026-10-31** — **The Mini beam is written 39° × 20° everywhere; 18° is never shown** (Jason in Lab HQ: "18度不提了 听起来太小了").
+     - **Final, same day** (Jason at CHIEF: "算了 还是写吧", "mini是19 combo 78*19"; confirmed in Lab HQ: "写 39×19 / 78×19 / 135×20"):
+       visitor text says **Mini 39° × 19°, Mini Combo 78° × 19°, PingLive 135° × 20°**. The two bullets below are superseded.
+       Open, for Jason: should the engine's drawn Mini thickness (18°) become 19°? (Base checks the effect on lake and ice.)
      - **Corrected the same day** (Jason: "正确的是20 但是不要提 因为听起来很小"): 20° is the right thickness, but visitor
        text names **no thickness at all**, neither 18° nor 20°. The panel line shows only the wide angle (PingLive 135°, Mini
        39°). HQ applies the same to PingLive (its 20° sounds just as small). The bullets below are superseded where they say "× 20°".
