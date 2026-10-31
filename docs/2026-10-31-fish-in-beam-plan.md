@@ -45,12 +45,13 @@ not to add fish or widen the beam.
 **How it works:**
 
 1. Every 2–3 s while the boat is still, count the fish in the active beam, excluding smelt.
-2. Below the target's minimum: pick the 1–2 nearest free fish within about 25 m, at a suitable depth, and let them swim
-   in slowly (about 0.5–0.8 m/s), clear of structure, using the existing path checks.
+2. Below the target's minimum: pick the 1–2 nearest free fish at a suitable depth, nearest first, and let them cruise in,
+   clear of structure, using the existing path checks. Jason 2026-10-31: about 10 s, natural, no darting in: speed about
+   1 m/s at most, eased in and out, on a gentle curve, the nose turning first. Fish from further away take longer.
 3. A visiting fish stays around for 30–60 s in its normal loop, then may wander off, only if the count stays at the minimum.
 4. Fish already in the beam are never touched.
 5. At or above the minimum nothing happens. Nothing is pushed out above the maximum.
-6. While the boat is dragged nothing is called. It starts when the boat stops, so 2–3 fish arrive within about 20–40 s.
+6. While the boat is dragged nothing is called. It starts when the boat stops, and the first fish arrives in about 10 s.
 7. On page load, before anyone sees the lake, the opening spot starts with fish already at the minimum, so the first view is not empty.
 
 Keeps: fish species, sizes, behaviours and rises, the jig under the ice, true beam angles, the sonar imaging.
