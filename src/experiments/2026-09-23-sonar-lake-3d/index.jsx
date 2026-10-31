@@ -33,7 +33,7 @@ const ONLY_ENV = import.meta.env.VITE_DEVICES === 'PLM' ? 'PLM' : null
 const SCENE_ENV = import.meta.env.VITE_SCENE === 'ice' ? 'ice' : null
 // The page is for people who have never used live sonar (Jason 2026-09-24): only Device / View / Range are
 // public. Colour map, gain, contrast, noise reject and the depth-range axis are calibration tools — dev only (?dev).
-const DEV_TOOLS = import.meta.env.DEV && window.location.search.includes('dev')
+const DEV_TOOLS = import.meta.env.DEV && /[?&]dev(?:[=&]|$)/.test(window.location.search) // the ?dev parameter itself, not "dev" inside another value (?glass=rdev)
 
 // AUTO depth range (PL Forward), as the app does it (Jason 2026-09-24: 声纳是根据他垂直往下的深度来判断深度的
 // 然后auto depth是根据这个数字去调节画面depth range的): AUTO follows the depth READOUT — the water straight below
