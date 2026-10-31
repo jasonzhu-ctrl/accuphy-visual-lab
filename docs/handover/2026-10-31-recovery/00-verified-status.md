@@ -32,7 +32,7 @@
 
 - 10-29 晚 Jason 把各 HQ 搬到个人 Claude 账号的新 app（网站：`accuphy-website/docs/handover/2026-10-29-hq-to-personal-account.md`）。Lab 的 10-30、10-31 工作都是新 app 里的 HQ 做的。
 - 已上线：#189 Mini Combo 两个 range + #188 分享改版（10-30，a1fd3ee），然后 #190 美国只出 Mini（10-30，5c2e69a，网站 03 复查过）。
-- 新决定：#190–#193。PR #30、#31 只作参考、不合并（Jason 10-30）。问题一律用卡片（记忆 questions-as-cards）。主管用 Opus medium，干活聊天用 Sonnet（总管 10-31，protocol §0）。
+- 新决定：#190–#193。PR #30、#31 只作参考、不合并（Jason 10-30）。问题一律用卡片（记忆 questions-as-cards）。10-31 的换模型只是临时安排，不是规矩（Jason 10-31，经总管更正）。
 - **规矩冲突（要 Jason 定）：** 10-27/28 Jason 要仓库放在公司组织 accuphy-marketing，好让同事基于他的代码改（`handoffs/2026-10-28-repo-moved-to-org.md`，#183）。10-29 他在一个 Lab 聊天里说“抓回到 jasonzhu-ctrl”，之后所有提交只推到 jasonzhu-ctrl。总管的 `02-organization.md` 写的是“accuphy-marketing，本地=远端”，和实际不符。同事现在看到的是 10-29 的旧代码。
 
 ## 5. 待办和负责人

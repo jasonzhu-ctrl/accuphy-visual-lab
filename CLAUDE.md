@@ -123,7 +123,7 @@ anyone's memory.
 - **Go-ahead:** build only after Jason explicitly says to start ("我没说动不要动"). Plans,
   proposals and options are not approval; offer them, then wait.
 - **Chats as of 2026-10-31** (Jason 2026-10-31 via CHIEF: this app is the one; the second app's Lab chats are retired) (three layers, Jason 2026-10-25; rules in
-  `IT/CHIEF Agent/docs/protocol.md`). Workers run on Sonnet (protocol §0). Message each by its session id, not by name:
+  `IT/CHIEF Agent/docs/protocol.md`). Message each by its session id, not by name:
   - "accuphy-visual-lab HQ" (`local_1022478a-b63a-4fff-8403-7c58646dab95`) — the Lab's lead: keeps `docs/backlog.md` and its status bar,
     dispatches work, checks what comes back, reports to "项目总管 | CHIEF Agent". Live changes
     need Jason's "动" said in the HQ chat.
