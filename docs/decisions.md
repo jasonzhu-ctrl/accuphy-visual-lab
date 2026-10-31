@@ -3484,3 +3484,7 @@ Numbered log. Newest at the bottom.
        the behaviour to 对接. Tell the other chat and HQ before editing, and say "freed" after the commit.
      - Handover notes: `docs/handover/chats/ui-design.md`, `marketing-integration.md`, split by HQ from `mobile-web.md`
        (kept as the base). The old "手机网页端" chat is archived once both new chats have reported back.
+     - After the read-backs (10-31): `logo.js` (the 3D ACCUPHY sculpture on the lake floor), `boat.js` and `obstacles.js`
+       belong to Base; load-speed plan C is Base's. Open question for Jason (from 对接's read-back): the tracking plan
+       (`docs/2026-10-30-tracking-plan.md` §3) has Lab post the visitor's email to the store page with #191 for Meta/GA4
+       identify; the code does not, and it conflicts with "no personal data in events". Not built until Jason decides.

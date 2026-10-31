@@ -1,3 +1,5 @@
+> **HQ, 10-31:** superseded by `ui-design.md` and `marketing-integration.md` (#196). Kept as the base; the 冰钓 id `local_2b04f455…` in it is retired.
+
 # Handover: 手机网页端 (mobile-web) — 写于 2026-10-31，Lab HQ 的 “B 收+换新” 方案
 
 写的人：旧 app 里的 “手机网页端” 窗口（session `local_b65bc15d-…`，我的记忆到 10-29 为止，之后由新 app 里的同名窗口接着做，那个窗口的记录是

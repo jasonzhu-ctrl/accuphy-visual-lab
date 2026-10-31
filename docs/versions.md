@@ -35,12 +35,14 @@ but is published nowhere and is redundant since #170.
 |---|---|---|---|
 | shop.accuphy.com/pages/lab and /fr/pages/lab | customers | an iframe of lab.accuphy.ca/ (not `/embed/`) | **5c2e69a, newest** |
 | lab.accuphy.ca = accuphy-lab.vercel.app (one deployment) | anyone with the link | `/`, `/mini/`, `/ice/`, `/embed/` | **5c2e69a, newest** |
-| Friends' test link jasonzhu-ctrl.github.io/accuphy-lab-test | friends, Jason | `/`, `/mini/`, `/ice/`; `/jig/`, `/pano/` forward to `/` | **5c2e69a, newest** |
+| Friends' test link jasonzhu-ctrl.github.io/accuphy-lab-test | friends, Jason | `/`, `/mini/`, `/ice/`; `/jig/`, `/pano/` forward to `/` | **5764b06** (test repo 7d52e0c; #191–#193 on top of live) |
 | claude.ai private previews | — | **none**: the four old ones (RnCB, VxxnV fish test, G5uZ ice, 4GdHH) were deleted 2026-10-27 at Jason's word ("如果是现在项目需要的话留一个就行了"; the test link does the job) | — |
 | The v3 ad film | Meta, from 11/2 | recorded | lake 1abeedf (before #178; its shots show no Panoramic sonar) |
 | Colleague branches (not merged): PR #30 `codex/lab-clarity-optics` (AJ-nb, 10-28), PR #31 `codex/blue-hour-lake` (Codex agent, 10-29; private preview on accuphy-blue-hour-lake-20261029.accuphy-1012.chatgpt.site, owner-only) | the colleague, Jason | their own builds | not in main, not on any Lab link |
 
 ## Current lake (one version, #176)
+
+> **10-31:** lab.accuphy.ca = **5c2e69a**; test links = **5764b06**. The lines below this note are history from 10-27.
 
 - **lab.accuphy.ca (+ `/embed/`) and the friends' test links** `/`, `/mini/`, `/ice/`: all built from **9ed9341** (2026-10-27; adds #180 load plan B and #181 to 283ecb9). Vercel deployment `dpl_55e9zvQmcqfEw3HhmKMK4UTaTAJN`, embed `lab-eddff42d53.js`; Jason said 动. Before that, both were built from **283ecb9**
   (2026-10-27). That build has the round wake rings (#175), fish round 3 (#173), no lake jig and three lake trout in the

@@ -1,5 +1,7 @@
 # Chat handover note: 冰钓版本视觉效果 (slug ice-lake), 2026-10-31
 
+> **HQ, 10-31 after the switch:** this chat is now "Lab 场景和声纳画面Base" (#195). The page chat was split (#196): `index.jsx` / `SonarChrome.jsx` are shared with 界面设计 (look) and 营销和外部系统对接 (events, locks, Mini-only US); range/depth logic stays yours. Load-speed plan C is yours. `boat.js`, `obstacles.js`, `logo.js` are yours too. Latest decision is #196+.
+
 Written by the old-app chat of that name (the "twin" did the 10-29 to 10-31 work in the new app; I read its transcript `18b64069-afb6-4a22-a04e-1803cc956c09.jsonl` to the end, 10-31 13:26, 5764b06). A fresh replacement chat starts from this note alone. Facts here were checked on main `6d4c9f8`/`5e3d706` on 10-31.
 
 ## 1. Lane

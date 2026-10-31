@@ -12,7 +12,7 @@
 - `index.jsx` 的界面部分：面板、行、按钮、步骤卡、手机 dock、视图切换的样子。
 - `ViewIcon.jsx`、`SonarFan.jsx`（选中格的小声纳）、`GlassLayer.jsx`（玻璃试验）。
 - `home/AppHome.jsx`、`home/*.jpg`（手机 App 首页和缩略图）。
-- `logo.js`、`public/brand/`、`src/index.css`。
+- `public/brand/`（logo 图片、字体）、`src/index.css`。（`logo.js` 是湖底那块立体 ACCUPHY 雕塑，归 Base。）
 - `scripts/build-share.mjs`、`vite.share.config.js`（打包页面，跟加载速度有关）。
 - `SonarChrome.jsx` 的按钮样子；刻度、range、深度逻辑归 Base。
 

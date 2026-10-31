@@ -25,7 +25,7 @@ Run all of it; report what failed and fix it. Details and history: `docs/lessons
    device/view switching keeps the bottom height between Down and Forward.
 6. **Reachability:** drive the boat by setting only `__sonarState.target` (clamped to ±58 m, like a drag) to the
    lockup line and the wreck; they must image.
-7. **Gate + mobile:** tap `.ph-ctl` → sign-up gate opens, email focused, page inert (main page only; the share build
+7. **Gate + mobile:** (since #191 the gate is the subscribe card: pick Live Combo or another locked view → `UnlockCard` opens; the old `.ph-ctl` gate below is history) tap `.ph-ctl` → sign-up gate opens, email focused, page inert (main page only; the share build
    has no gate). Resize to 375×812: layout intact, no console errors.
 8. **Console:** `read_console_messages` onlyErrors after the whole run.
 9. Record the result as a decision (re-read the last number first) and reset the viewport.

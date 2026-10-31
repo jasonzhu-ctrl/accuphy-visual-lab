@@ -127,13 +127,18 @@ anyone's memory.
   - "accuphy-visual-lab HQ" (`local_1022478a-b63a-4fff-8403-7c58646dab95`) — the Lab's lead: keeps `docs/backlog.md` and its status bar,
     dispatches work, checks what comes back, reports to "项目总管 | CHIEF Agent". Live changes
     need Jason's "动" said in the HQ chat.
-  - "Lab 场景和声纳画面Base" (formerly "冰钓版本视觉效果"; `local_9a5a9e56-c21c-4be3-8006-c552790ba7ce`) — the base of the Lab: the lake scene (summer and ice), the fish and the sonar picture. Every change to the scene itself goes to it.
-  - "手机网页端" (`local_b65bc15d-3054-4549-9298-9596369bf98a`) — the phone web page.
-  - "广告视频制作" (`local_8de4116d-a73b-4628-851e-62336f9c6bae`; #179; narrowed by #183 and #185 on 10-28) — paused. No ad versions; at most the ONE film Jason names,
-    only to run the funnel and ad tests (vertical + horizontal), with the `ad-video` skill. It never changes the lake or
-    the sonar.
-  - "LiveScope 研究" (`local_ce7fb092-4fb2-432f-b84f-0a40dcb566b5`) — the LiveScope reference study (`docs/livescope-study.md`).
-  - "案例工具调研" (`local_b990e94b-aaf7-4c2f-9836-d2a99b953856`) — research on case studies and tools.
+  - "Lab 场景和声纳画面Base" (`local_58ac0683-ca1d-4c0a-a52c-a929d7f92ed8`; formerly "冰钓版本视觉效果", #195) — the base of
+    the Lab: the lake scene (summer and ice), terrain, fish, boat and beams, and the sonar picture with its range/depth logic.
+    Every change to the scene itself goes to it. Handover note `docs/handover/chats/ice-lake.md`.
+  - "界面设计" (`local_ddf2aa3f-7edc-4186-a7ee-d5091b880578`, #196) — what visitors see and click: panels, buttons, view tiles,
+    step cards, the phone's app Home, motion, brand images and fonts, load speed. Note `docs/handover/chats/ui-design.md`.
+  - "营销和外部系统对接" (`local_e14cb86c-9b2f-4431-a4c5-78c2d8d323c7`, #196) — what takes visitors to the store and records
+    data: the store bridge (`embed.js`), Klaviyo (`signup.js`), all visitor text (`i18n.js`) and its French review, share,
+    shop links by market, badges, tracking. Note `docs/handover/chats/marketing-integration.md`.
+  - Shared files (`index.jsx`, `SonarChrome.jsx`, `ShareButton.jsx`, `UnlockCard.jsx`, `ShopButton.jsx`, `AppBadges.jsx`): look →
+    界面设计, behaviour/events/locks → 对接, scene/range/depth → Base. Tell the others and HQ before editing; say "freed" after.
+  - Opened on request, then archived after a handover note: ad films (paused, #183/#185, `ad-video` skill and
+    `docs/handover/chats/ad-video.md`), research (LiveScope, case tools, lite section: notes in `docs/handover/chats/`).
 - **The name:** "visual lab" and "Accuphy Lab" are the same project; Jason dropped "visual"
   because the Lab is more than visuals. The folder keeps its name.
 
