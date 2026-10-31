@@ -31,16 +31,17 @@ not to add fish or widen the beam.
 
 ## Proposal
 
-**Target per view** (a judgement from beam size and Jason's #173 round: 8–9 fish within 14 m was fine, more read as crowded):
+**Target per view** (Jason 2026-10-31):
 
 | View | Target |
 |---|---|
-| Mini Down, Combo Down | 1–3 |
-| Mini Forward, Combo Forward | 2–5 |
-| PingLive Down | 3–6 |
-| PingLive Forward | 3–6 |
-| Mini Panoramic | 2–5 |
-| PingLive Panoramic | 4–8 |
+| Mini Down | 3–5 |
+| Mini Combo Down | at least 3 (upper limit taken as 5) |
+| Mini Forward, Combo Forward | 3–5 |
+| PingLive Down | 4–8 |
+| PingLive Forward | 4–8 |
+| Mini Panoramic | 4–8 |
+| PingLive Panoramic | 6–10 |
 
 **How it works:**
 
@@ -61,4 +62,5 @@ Keeps: fish species, sizes, behaviours and rises, the jig under the ice, true be
 - Lake and ice share this code (#94), so both need a QA pass.
 - If it runs too often, fish look like they follow the boat. The slow speed, the 25 m limit and the small numbers guard against that.
 - New ad captures would show more fish. Finished films do not change.
-- The targets are a starting point; Jason judges them by eye on a test link.
+- Within 10 m of the Down beam the median is only 2 fish, so the first fish comes in about 10 s and the rest of a minimum of 3 takes longer.
+- Jason judges them by eye on a test link.
