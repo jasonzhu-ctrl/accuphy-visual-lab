@@ -118,7 +118,7 @@ anyone's memory.
 - **Git in a shared working copy:** run `git status` before editing. Leave files alone that
   another chat has uncommitted changes in. Stage only your own files by path, never
   `git add -A`. Commit with `git commit -- <your paths>` (a plain `git commit` also sweeps in files another chat has
-  staged; Lab HQ did that in 914c570 on 2026-10-26). Commit and push right after each change. For multi-file work, tell the other
+  staged; Lab HQ did that in 914c570 on 2026-10-26). Commit and push right after each change. `git push` goes to both GitHub copies, jasonzhu-ctrl and the company organization accuphy-marketing (#194); both must show the same main. For multi-file work, tell the other
   chats which files you are taking (cross-session message) and free them when done.
 - **Go-ahead:** build only after Jason explicitly says to start ("我没说动不要动"). Plans,
   proposals and options are not approval; offer them, then wait.

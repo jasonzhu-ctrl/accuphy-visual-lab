@@ -3433,3 +3433,13 @@ Numbered log. Newest at the bottom.
        (desktop headless); stepped drag 7 stops: no fish came twice; sonar-qa 6 × 6 grid on and off, histograms within 3 %,
        0 errors, ice views 0 errors. The 110 ft spot for email e01 still holds: Combo [3, 6–7].
      - Sheet: `docs/2026-10-31-fish-in-beam-sheet.jpg`.
+
+194. **2026-10-31** — **The company GitHub copy is kept current again; every push goes to both** (Jason in Lab HQ:
+     "同步到公司组织", answering whether the organization copy should catch up).
+     - From 10-29 (Jason: "抓回到 jasonzhu-ctrl") all Lab commits went to `jasonzhu-ctrl/accuphy-visual-lab` only, and
+       `accuphy-marketing/accuphy-visual-lab` stopped at be9b66e. His colleague 孙英杰 (AJ-nb, #183) works from the
+       organization copy, so he saw 10-29 code.
+     - HQ pushed main to the organization (be9b66e..9ca3f99, a fast-forward, 48 commits). The local `origin` now has two
+       push addresses, jasonzhu-ctrl and accuphy-marketing, so a plain `git push` from any chat in this folder updates
+       both. Fetch stays on jasonzhu-ctrl. Check with `git ls-remote company refs/heads/main`.
+     - Unchanged: 孙英杰 works on his own branch with a pull request; Jason reviews before merging (#183).

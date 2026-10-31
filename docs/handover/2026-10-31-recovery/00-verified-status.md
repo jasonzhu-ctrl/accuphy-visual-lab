@@ -43,7 +43,7 @@
 | 2 | #193 没达标的地方接不接受 | 待批准 | Jason | 看测试链接 |
 | 3 | 追踪：CAPI 选 A/B/C，app_badge、UTM、identify | 待批准 | Jason（网站 HQ 牵头） | `accuphy-website/docs/2026-10-30-lab-tracking-check.md` |
 | 4 | 玻璃效果、确认提醒方式、版本管理、LiveScope 7 问、删 pr30/pr31、Combo 手机放平 | 待批准，不急 | Jason | 见 backlog |
-| 5 | 公司组织仓库落后 | **冲突，要 Jason 定** | Jason → Lab HQ | 见第 4 节 |
+| 5 | 公司组织仓库落后 | ✅ Jason 10-31“同步到公司组织”：已推到 9ca3f99，以后 `git push` 两边一起推（#194） | Lab HQ | 完成 |
 | 6 | 总管 `_handoff/…/feedback/` 里 Lab 那份 | 缺 | 总管 | Lab 这边的内容就是本文件和 01 |
 | 7 | 干活窗口在哪个 app 继续 | 缺 | Jason | 新 app 回来以后，新 app 的 HQ 读本文件接着做 |
 
