@@ -3473,3 +3473,14 @@ Numbered log. Newest at the bottom.
        (directly or through HQ); going live still needs his "动" in Lab HQ.
      - Same chat and id (local_9a5a9e56-…) until plan B replaces it; the replacement keeps this name.
      - Updated: CLAUDE.md, the ad-video skill, docs/lake-canon.md. Older notes and the backlog keep the old name as history.
+
+196. **2026-10-31** — **The page chat is split in two: "界面设计" and "营销和外部系统对接"** (Jason in Lab HQ: "我觉得有必要拆，但是规划一定要规划好…名字的话，我觉得一个是叫界面设计，另外一个是叫营销和外部系统对接", then "动" on `docs/2026-10-31-split-page-window-plan.md`).
+     - **界面设计:** what visitors see and click: panels, buttons, view tiles, step cards, the phone's app Home, motion
+       (`SonarFan`, `GlassLayer`, `ViewIcon`), logo and fonts, load speed, `build-share.mjs`, the button look in `SonarChrome.jsx`.
+     - **营销和外部系统对接:** what takes visitors to the store and records data: `embed.js` (bridge, events, markets, shop
+       and share URLs, Mini-only US), `signup.js` (Klaviyo), `i18n.js` (all visitor text and French review), the embed
+       build, the URL / signup / store-frame tests, handoff drafts to the website and Klaviyo.
+     - **Shared files** (`ShareButton`, `UnlockCard`, `ShopButton`, `AppBadges`, `index.jsx`): the look belongs to 界面设计,
+       the behaviour to 对接. Tell the other chat and HQ before editing, and say "freed" after the commit.
+     - Handover notes: `docs/handover/chats/ui-design.md`, `marketing-integration.md`, split by HQ from `mobile-web.md`
+       (kept as the base). The old "手机网页端" chat is archived once both new chats have reported back.
