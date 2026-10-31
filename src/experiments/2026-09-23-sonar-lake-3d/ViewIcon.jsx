@@ -1,9 +1,9 @@
 // The view icons of the desktop panel: a boat and its beam, so a beginner sees where the sonar looks. Drawn for the Lab, copied from no one.
 // Sound leaves the transducer as a fan that fades out, with three thin arcs; nothing is cut off. The angle is the device's own (specs.md:
-// PingLive 135°, Mini 39°), and Forward's leading edge lies on the surface as in the lake (wedge.js, #7). The selected tile's fan is a live
-// dithered sonar ripple instead (DitherFan.jsx; Jason 2026-10-30 turned down the blue gradient: "太AI了").
+// PingLive 135°, Mini 39°), and Forward's leading edge lies on the surface as in the lake (wedge.js, #7). The selected tile's fan is a small
+// live sonar picture instead (SonarFan.jsx).
 import { useId } from 'react'
-import DitherFan from './DitherFan'
+import SonarFan from './SonarFan'
 
 const W = 88, H = 56, SEA = 12
 const rad = (a) => (a * Math.PI) / 180
@@ -56,7 +56,7 @@ export default function ViewIcon({ view, deg, active = false, live = false }) {
   }
   return (
     <span className="ac-view-art">
-      {active && <DitherFan beams={beams} live={live} width={W} height={H} />}
+      {active && <SonarFan beams={beams} live={live} width={W} height={H} />}
       <svg className="ac-view-icon" viewBox={`0 0 ${W} ${H}`} aria-hidden="true">
         {!active && beams.map((b) => <Beam key={b.aim} {...b} />)}
         {art}

@@ -17,7 +17,6 @@
     "vite": "^8.3.0"
   },
   "dependencies": {
-    "@paper-design/shaders": "0.0.82",
     "@react-three/fiber": "^9.8.0",
     "framer-motion": "^13.4.2",
     "qrcode-generator": "^1.5.2",

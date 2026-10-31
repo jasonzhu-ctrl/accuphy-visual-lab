@@ -228,18 +228,18 @@
 .ac-card { border-radius: 12px; }
 .ac-card.is-active .ac-num { box-shadow: none; }
 
-/* view tiles: the icon is the tile (Jason 2026-10-30: "只保留下半部分icon吧"). Quiet by default; the selected tile's fan is a live dithered sonar ripple (DitherFan.jsx). */
+/* view tiles: the icon is the tile (Jason 2026-10-30: "只保留下半部分icon吧"). Quiet by default; the selected tile's fan is a small live sonar picture (SonarFan.jsx). */
 .ac-views { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 6px; }
 .ac-views.is-4 { grid-template-columns: repeat(4, 1fr); }
 .ac-views.is-5 { grid-template-columns: repeat(5, 1fr); gap: 4px; }
 .ac-view { --beam: #fff; --beam-hot: #fff; --beam-a0: 0.3; --beam-a1: 0.12; --arc: rgba(255,255,255,0.86); position: relative; display: block; min-width: 0; padding: 8px 5px 6px; border: 0; border-radius: 6px; background: rgba(4,14,20,0.26); color: rgba(255,255,255,0.82); text-align: center; cursor: pointer; transition: background .15s, color .15s; }
 .ac-view:hover { --beam-a0: 0.44; --beam-a1: 0.2; background: rgba(4,14,20,0.42); color: #fff; }
-.ac-view.is-active { --arc: #4dbcff; background: rgba(4,14,20,0.5); color: #fff; box-shadow: inset 0 0 0 1.5px #028cdf; }
+.ac-view.is-active { --arc: #ca7d2c; background: rgba(4,14,20,0.5); color: #fff; box-shadow: inset 0 0 0 1.5px #028cdf; }
 .ac-view-art { position: relative; display: block; width: min(100%, 72px); aspect-ratio: 88 / 56; margin: 0 auto; }
 .ac-views.is-5 .ac-view-art { width: min(100%, 58px); }
 .ac-view-icon { position: relative; display: block; width: 100%; height: 100%; }
-.ac-dither { position: absolute; inset: 0; overflow: hidden; background: #028cdf; }
-.ac-dither-host { position: absolute; width: 200%; aspect-ratio: 1; transform: translate(-50%, -50%); }
+.ac-fan-live, .ac-fan-plain { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
+.ac-fan-plain { background: #ca7d2c; }
 .ac-arc { fill: none; stroke: var(--arc); stroke-width: 1.1; stroke-linecap: round; opacity: 0.8; }
 .ac-arc-1 { opacity: 0.56; } .ac-arc-2 { opacity: 0.34; }
 .ac-ring { fill: none; stroke: var(--arc); stroke-width: 3; opacity: 0.8; }
