@@ -101,10 +101,10 @@ Jason 的要求（10-31）：“不要掉东西 … 要丝滑不能卡不能掉�
   分享弹窗：二维码 168 CSS px（SVG，页面内 `qrcode-generator` 生成，MIT，纠错 M，四模块留白）+ 只读链接 + Copy link；不调 `navigator.share`，没有 WhatsApp/短信（Jason 10-29：“手机也用二维码和copy”）；
   复制三级退路：`clipboard.writeText` → `execCommand('copy')` → 文字保持选中 + “Press ⌘C”（从不用 `window.prompt`）。手机弹窗通过 portal 挂到 `<body>`（在有 transform 的手机 dock 里 `position: fixed` 会错位）。
   网站要给 iframe 加 `allow="clipboard-write; web-share"`（随 #229 的桥上线）。
-- App 徽章：官方图原样，≥40 px，谷歌 PNG 已裁掉透明边（不裁会显得比苹果小）；链接 App Store id6743123048、Play `com.accuphy.sonar`（带 `referrer=utm_source=accuphy-lab…`）；App Store 的 campaign 参数要 provider token，Jason 还没给。
+- App 徽章：官方图原样，≥40 px，谷歌 PNG 已裁掉透明边（不裁会显得比苹果小）；链接 App Store id6743123048、Play `com.accuphy.sonar`（带 `referrer=utm_source=accuphy-lab…`）；App Store 的 campaign 参数要 provider token，截至 10-29 Jason 还没给（HQ 在问他）。
 
 ### 5b. 测试（在仓库里，能跑）
-- 单元：`node scripts/dev/shop-url-test.mjs`（26 条：去商店地址、市场、miniOnly）、`node scripts/dev/share-url-test.mjs`（16 条：每个市场的分享链接，二维码用 jsQR 解回来必须一字不差，1–3 px/模块三档都要能解）、
+- 单元（10-31 在当前 main 上跑过，全过）：`node scripts/dev/shop-url-test.mjs`（26 条：去商店地址、市场、miniOnly）、`node scripts/dev/share-url-test.mjs`（16 条：每个市场的分享链接，二维码用 jsQR 解回来必须一字不差，1–3 px/模块三档都要能解）、
   `node scripts/dev/signup-guard-test.mjs`（订阅守卫：真实域名拒绝、测试域名解锁、`lab_unlock=sub`）。几秒钟，纯 node。改 `embed.js` / `signup.js` 必跑。
 - 打包页 + 假店铺页（今天重写的，我旧的 scratchpad 脚本 10-31 已经没了）：`node scripts/build-share.mjs && node scripts/dev/store-frame/run.mjs`，细节见 `scripts/dev/store-frame/README.md`。
   6 个场景（回执 / 无回执 / 来源不对 / 类型不对 / 电脑分享弹窗 / 手机分享弹窗）**今天对当前 main 全 PASS**（无回执时点后 1018–1022 ms 才发商品页请求）。
@@ -131,7 +131,7 @@ Jason 的要求（10-31）：“不要掉东西 … 要丝滑不能卡不能掉�
   复杂了先问他（2026-10-25 “问我 问我 问我”）；问题用可点击卡片（2026-10-30）。
 - 设计：**不要“太 AI”**——玻璃胶囊/渐变/发光被他否：2026-10-28 “要的，但是按钮徽章设计做的太ai了”；他选店铺风格：“方案一我推荐的，推 store 那些，你看一下是不是有必要，看看大公司怎么干的”；
   2026-10-31 否掉蓝渐变和 ping（“太AI了”）。高级感/科技感优先，不用画面换字节或帧率（记忆 `visual-premium-tech-feel`，决定 #50）。
-- 手机菜单（2026-10 初）：“noise reject这些功能不要加进去”，又 “把color map也去掉 这三个点的设置灰色按钮不让进”。
+- 手机菜单（约 2026-10-26，具体日期我没记）：“noise reject这些功能不要加进去”，又 “把color map也去掉 这三个点的设置灰色按钮不让进”。
 - 分享（2026-10-29）：“开搞 要做到丝滑 顺畅 无误 的”；“手机也用二维码和copy”（不要系统分享）。电脑上 macOS 分享面板（AirDrop、备忘录）他觉得不对。
 - 修复授权：去商店跳错市场（2026-10-28 对网站 HQ：“修复”），店铺页自己跳（2026-10-29 对网站 HQ：“好的”）。
 - 加载提速（2026-10-27 对 HQ：“没问题”）。
