@@ -122,19 +122,18 @@ anyone's memory.
   chats which files you are taking (cross-session message) and free them when done.
 - **Go-ahead:** build only after Jason explicitly says to start ("我没说动不要动"). Plans,
   proposals and options are not approval; offer them, then wait.
-- **Chats as of 2026-10-29** (three layers, Jason 2026-10-25; rules in
-  `IT/CHIEF Agent/docs/protocol.md`). All reopened in the new desktop app on 2026-10-29 (Jason: "五个全开"); the five
-  working chats were started from the HQ and sit under it. Message each by its session id, not by name:
-  - "accuphy-visual-lab HQ" (`local_47bc36c3-192b-4ff2-aa76-ae959edc1444`) — the Lab's lead: keeps `docs/backlog.md` and its status bar,
+- **Chats as of 2026-10-31** (Jason 2026-10-31 via CHIEF: this app is the one; the second app's Lab chats are retired) (three layers, Jason 2026-10-25; rules in
+  `IT/CHIEF Agent/docs/protocol.md`). Workers run on Sonnet (protocol §0). Message each by its session id, not by name:
+  - "accuphy-visual-lab HQ" (`local_1022478a-b63a-4fff-8403-7c58646dab95`) — the Lab's lead: keeps `docs/backlog.md` and its status bar,
     dispatches work, checks what comes back, reports to "项目总管 | CHIEF Agent". Live changes
     need Jason's "动" said in the HQ chat.
-  - "冰钓版本视觉效果" (`local_2b04f455-ba66-4d88-998a-d43f17bcfcba`) — the working chat for the sonar picture, the lake and the ice page.
-  - "手机网页端" (`local_d6ee53cb-0892-4172-a2e4-d7a91e8ec750`) — the phone web page.
-  - "广告视频制作" (`local_4a14ee51-48a4-4e60-a0e4-f447f92e57fe`; #179; narrowed by #183 and #185 on 10-28) — paused. No ad versions; at most the ONE film Jason names,
+  - "冰钓版本视觉效果" (`local_9a5a9e56-c21c-4be3-8006-c552790ba7ce`) — the working chat for the sonar picture, the lake and the ice page.
+  - "手机网页端" (`local_b65bc15d-3054-4549-9298-9596369bf98a`) — the phone web page.
+  - "广告视频制作" (`local_8de4116d-a73b-4628-851e-62336f9c6bae`; #179; narrowed by #183 and #185 on 10-28) — paused. No ad versions; at most the ONE film Jason names,
     only to run the funnel and ad tests (vertical + horizontal), with the `ad-video` skill. It never changes the lake or
     the sonar.
-  - "LiveScope 研究" (`local_a8d1c270-c01a-4acd-ad53-7af620282803`) — the LiveScope reference study (`docs/livescope-study.md`).
-  - "案例工具调研" (`local_6918c0f4-f62a-4ee1-891e-d59efc1b1083`) — research on case studies and tools.
+  - "LiveScope 研究" (`local_ce7fb092-4fb2-432f-b84f-0a40dcb566b5`) — the LiveScope reference study (`docs/livescope-study.md`).
+  - "案例工具调研" (`local_b990e94b-aaf7-4c2f-9836-d2a99b953856`) — research on case studies and tools.
 - **The name:** "visual lab" and "Accuphy Lab" are the same project; Jason dropped "visual"
   because the Lab is more than visuals. The folder keeps its name.
 
