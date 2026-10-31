@@ -1,5 +1,7 @@
 # reference/
 
+> **Backup (2026-10-31, Jason: “好”):** the whole folder (1607 files, 1.3 GB, without the `node_modules` links of the two ad lake checkouts) is copied to the shared drive **Accuphy Public Drive → Marketing → 01_Website → Accuphy Lab → reference（参考素材，2026-10-31 备份）**. File count matched; `recordings/` checked byte by byte. New material added here later must be copied there too.
+
 Input material for experiments — not code. **Everything here except this
 README is gitignored** (videos and large PNGs); the originals live in Jason's
 Google Drive and are copied in from the local Drive sync folder
