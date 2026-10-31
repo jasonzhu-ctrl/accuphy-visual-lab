@@ -3,7 +3,7 @@
 > 状态（2026-10-31，Lab HQ；10-27～10-29 的长版原文在下面“明细”里）
 > 阶段：X-6L Lab 上线后收尾，11-02 广告开投（加拿大 + 美国）；lab.accuphy.ca 现在是 5c2e69a（10-30 Jason 动）
 > 进行中：#192 电脑版面板改版 + 分享改版 · d8b411c（视图格只留图标，选中格是动态小声纳图）、测试链接 ba71f8a、HQ 看过对比图 · 等 Jason 看；#191 模糊视图订阅后打开 · 测试版已看待定；上线前：填 W24Qdc、核法文、Klaviyo 文字、真机、Klaviyo 关 20 秒表单。注意：#191 若先于 #192 上线，要从 c91bf7e 构建
-> 等 Jason：⓪a 确认提醒方案（mods 调研，推荐输入框上方横幅）· 10-30；⓪b 看 #191、#192 测试版、选玻璃（?glass=shu / rdev）· 10-30；⓪c 版本管理方案；⓪d 追踪：登录 Meta / GA4 / Shopify，CAPI 选 A/B/C，第 2、3 条说动（accuphy-website/docs/2026-10-30-lab-tracking-check.md）；① PR #30/#31；② LiveScope 7 问；③ 旧事项
+> 等 Jason：⓪a 确认提醒方案（mods 调研，推荐输入框上方横幅）· 10-30；⓪b 看 #191、#192 测试版、选玻璃（?glass=shu / rdev）· 10-30；⓪c 版本管理方案；⓪d 追踪：登录 Meta / GA4 / Shopify，CAPI 选 A/B/C，第 2、3 条说动（accuphy-website/docs/2026-10-30-lab-tracking-check.md）；① PR #30/#31；② LiveScope 7 问（LiveScope 聊天 10-31 建议：1–6 问的是别人视频里的东西，Jason 答不了，作废；第 7 问前提已过期，#137 已定中间色，除非 Jason 觉得颜色不对）；③ 旧事项
 > 上线后要做：#191 解锁弹窗上线当天告诉网站 HQ（local_2f48043d-43bf-440c-ba78-2f53beaa0a5a），网站 03 再测真实弹窗（#233 桥已核 9a182111，真实流程没走过）。
 > 等 Jason：看 #193 波束里鱼数测试版（5764b06，测试链接 7d52e0c），判断游动是否自然，是否接受未达标的位置（docs/2026-10-31-fish-in-beam-sheet.jpg，docs/decisions.md #193）· 10-31
 > 卡住：无。同事 PR #30、#31 只作参考，不合并（Jason 10-30：不要拉进主线）；测试页 pr30/、pr31/ 等 Jason 看完删。待补：#228 第 4 条德/荷/波兰/拉脱维亚界面（不急）
@@ -80,7 +80,7 @@ it is done. ✅ done · 🔧 in progress · ⬜ open.
 - ⬜ #120 follow-ups if Jason wants more: per-species looks (walleye hump, musky torpedo, bait sparkle cloud with crisp herded edges), fish fading as they cross the slab is already physical (slab weight) but untested against a recording
 - ⏸ Bake-off with another vendor's AI (Codex / Cursor / Gemini) on a clean copy of the Lab — plan archived in `docs/bakeoff-plan.md`, not started (Jason 2026-10-23: 先存档不做). Do nothing until he says go
 - ✅ Sonar picture measured against LiveScope and the app; water-column specks; fish cores smoother (decision #129, `sonar-style.md` §7.20)
-- ⬜ Study LiveScope video directly: the cloud container blocks YouTube (www.youtube.com, *.googlevideo.com, i.ytimg.com) — allow those hosts in the environment's network settings, or do it on the Mac; watch-list in `docs/livescope-fish-research.md`
+- ✅ Study LiveScope video directly — done 2026-10-23 on the Mac (11 recordings, 44 frames, `docs/livescope-study.md`). Still missing: no MEGA Live 2 / LVS62 / LVS32 recordings found (LiveScope chat, re-checked 10-31).
 - ✅ Panoramic wreck: the 40 m cargo ship (decision #38) now shows hatches, masts and deck gear from above like the app's 35 m wreck. It lies at ~36 m; moving it shallower stays Jason's call
 - ⬜ Small far fish still show a faint dot grid inside the blob: the 24 sampled thickness rows miss a 4-row-tall bait fish depending on where it sits → fix with a column-reduction pre-pass (per angle column: fish coverage + nearest fish depth over all 128 rows), then one fetch per tap
 - ✅ Public UI trimmed to Device / View / Range; colour map, gain, contrast, noise, depth axis are `?dev` only (decision #34). No TVG, no tuning controls on the page
@@ -383,6 +383,7 @@ the cheapest Android phone class). Phone size was emulated at 360×800.
 - ✅ (#148) the grain rule: every return is a short arc across the beam — bottom, insides and outlines ("这版纹理做得非常的好")
 - ✅ (#149) big hulls get bright middles; the steel wreck no longer dark and even ("钢船这样对了")
 - ⬜ From the LiveScope session's check (2026-10-24), not yet done: ping-to-ping life (app hull |ΔL|/L 0.46 vs Lab 0.17,
+  - **Re-measured on main 835b6b5 (LiveScope chat, 10-31):** still true: ping-to-ping life (hull 0.46 vs 0.17), edge 0–2 in too bright (L 174 vs 268), Combo / phone Forward too white (14.3 % / 11.9 %, target 6–10 %), ice Forward far band breaks into fine curves. Partly: Down band ~22 % too thick, too few white specks (colour otherwise fixed). Void: the water-column specks (the #155 work boat sits in the old box; clean box shows both clean) and the Panoramic dotted columns (Panoramic redone in #171/#178). The hull dark-share / CoV numbers no longer compare (#155 wreck). Owner: 冰钓 (#176); acting on them is Jason's call.
   band 64 % vs 43 % class change); rim 0–2 in too bright (app L 174 vs 236); Down band ~25 % thicker than the app's and
   without its white points; Down water column lit 0.79 % vs 0.04 %; Combo / phone Forward white 10–15 % (target 6–10 %);
   the far ice Forward band frays into thin wavy threads; a dotted vertical bar in PL Panoramic at deep / lockup
