@@ -3488,3 +3488,9 @@ Numbered log. Newest at the bottom.
        belong to Base; load-speed plan C is Base's. Open question for Jason (from 对接's read-back): the tracking plan
        (`docs/2026-10-30-tracking-plan.md` §3) has Lab post the visitor's email to the store page with #191 for Meta/GA4
        identify; the code does not, and it conflicts with "no personal data in events". Not built until Jason decides.
+
+197. **2026-10-31** — **The Mini beam is written 39° × 20° everywhere; 18° is never shown** (Jason in Lab HQ: "18度不提了 听起来太小了").
+     - Visitor text follows specs.md (39° live view × 20°) on the summer lake, Mini and ice pages. The summer panel showed
+       39° × 18° (X-27); `index.jsx:443` becomes `${device.beamDeg}° × ${device.id === 'PLM' ? 20 : device.thickDeg}°`.
+     - The engine's drawn thickness (`devices.js` `thickDeg: 18`, Jason 09-23) is not text and stays as it is.
+     - No copy, ad or email mentions 18°. Done by 界面设计 with the step-card test version; live needs Jason's 动.
