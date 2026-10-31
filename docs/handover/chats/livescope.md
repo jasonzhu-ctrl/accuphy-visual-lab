@@ -79,13 +79,13 @@ change 44 %, grain 87° vs app 89°).
   the app crop; keep UI text out of the boxes; never judge from stills by eye (Jason rejected that in #128). Method also in
   `docs/lessons.md` ("Tune the engine against a real recording, like for like").
 - **What failed:** WebFetch and the cloud container cannot reach YouTube; `yt-dlp` is forbidden by the brief; adb is at
-  `~/android-sdk/platform-tools/adb`, the V10 tablet was not connected on 10-24 and 10-31 (real-device fps after #145 is only measured on the vivo fold: 60 fps).
+  `~/android-sdk/platform-tools/adb`, the V10 tablet was not connected on 10-24 (not checked again on 10-31); real-device fps after #145 is only measured on the vivo fold (60 fps, backlog).
 - **Never found:** screen recordings of LVS62 and LVS32, and of MEGA Live 2 (one MEGA Live video sampled was deck camera only);
   ActiveTarget 2 only as one small inset. No Perspective footage of the original LVS32. No own LiveScope recording from Jason.
-  **Candidates never opened** (all in `reference/livescope/candidates.md`): Milliken "Live Screen Footage Catching Bass"
-  (`TyZARN6Ian0`, 55 min), Austin Cranford "SCREEN FOOTAGE" (`u4bi1T_s1AM`), Joey Johnson timber (`I2jqPOjiLTA`), TJ Erickson
-  Perspective (`JeH4XbJBeZM`), InDepth Sonar Perspective (`HC9UtCwsskE`), Bend It Fishing XR LVS62 vs LVS34 (`wMr-FiTp4fY`),
-  Big Time Alaskan LVS62 ocean (`TeLif02o8pM`), 3 Pound Crappie Brushpiles (`aILjqFiVua0`).
+  **Candidates never opened** (from the 2026-10-23 search results; the ones not in `reference/livescope/candidates.md` are marked *): Milliken "Live Screen Footage Catching Bass"
+  (`TyZARN6Ian0`, 55 min)*, Austin Cranford "SCREEN FOOTAGE" (`u4bi1T_s1AM`)*, Joey Johnson timber (`I2jqPOjiLTA`)*, TJ Erickson
+  Perspective (`JeH4XbJBeZM`)*, InDepth Sonar Perspective (`HC9UtCwsskE`), Bend It Fishing XR LVS62 vs LVS34 (`wMr-FiTp4fY`),
+  Big Time Alaskan LVS62 ocean (`TeLif02o8pM`), 3 Pound Crappie Brushpiles (`aILjqFiVua0`)*.
 
 ## 6. Jason's preferences I learned
 - "42 或 44 的画面" (2026-10-23, via the ice window): he means LiveScope 2 (LVS42HD, LVS44). Only screen-recorded footage, not a camera pointed at a screen.
