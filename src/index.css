@@ -228,31 +228,27 @@
 .ac-card { border-radius: 12px; }
 .ac-card.is-active .ac-num { box-shadow: none; }
 
-/* view tiles: the icon is the tile (Jason 2026-10-30: "只保留下半部分icon吧"). Quiet by default; on the selected tile the beam goes Accuphy blue with a
-   soft glow and a slow ping along its arcs. Only that tile animates, opacity only; the glow sits on the static fan, so it is not repainted. */
+/* view tiles: the icon is the tile (Jason 2026-10-30: "只保留下半部分icon吧"). Quiet by default; the selected tile's fan is a live dithered sonar ripple (DitherFan.jsx). */
 .ac-views { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 6px; }
 .ac-views.is-4 { grid-template-columns: repeat(4, 1fr); }
 .ac-views.is-5 { grid-template-columns: repeat(5, 1fr); gap: 4px; }
 .ac-view { --beam: #fff; --beam-hot: #fff; --beam-a0: 0.3; --beam-a1: 0.12; --arc: rgba(255,255,255,0.86); position: relative; display: block; min-width: 0; padding: 8px 5px 6px; border: 0; border-radius: 6px; background: rgba(4,14,20,0.26); color: rgba(255,255,255,0.82); text-align: center; cursor: pointer; transition: background .15s, color .15s; }
 .ac-view:hover { --beam-a0: 0.44; --beam-a1: 0.2; background: rgba(4,14,20,0.42); color: #fff; }
-.ac-view.is-active { --beam: #028cdf; --beam-hot: #6cc4f7; --beam-a0: 0.95; --beam-a1: 0.55; --arc: #8fd3fa; background: rgba(4,14,20,0.5); color: #fff; box-shadow: inset 0 0 0 1.5px #028cdf; }
-.ac-view-icon { display: block; width: 100%; height: 46px; }
-.ac-views.is-5 .ac-view-icon { height: 38px; }
-.ac-beam { transition: fill-opacity .2s; }
-.ac-view.is-active .ac-beam { filter: drop-shadow(0 0 4px rgba(2,140,223,0.75)); }
+.ac-view.is-active { --arc: #4dbcff; background: rgba(4,14,20,0.5); color: #fff; box-shadow: inset 0 0 0 1.5px #028cdf; }
+.ac-view-art { position: relative; display: block; width: min(100%, 72px); aspect-ratio: 88 / 56; margin: 0 auto; }
+.ac-views.is-5 .ac-view-art { width: min(100%, 58px); }
+.ac-view-icon { position: relative; display: block; width: 100%; height: 100%; }
+.ac-dither { position: absolute; inset: 0; overflow: hidden; background: #028cdf; }
+.ac-dither-host { position: absolute; width: 200%; aspect-ratio: 1; transform: translate(-50%, -50%); }
 .ac-arc { fill: none; stroke: var(--arc); stroke-width: 1.1; stroke-linecap: round; opacity: 0.8; }
 .ac-arc-1 { opacity: 0.56; } .ac-arc-2 { opacity: 0.34; }
 .ac-ring { fill: none; stroke: var(--arc); stroke-width: 3; opacity: 0.8; }
-.ac-view.is-active .ac-arc { animation: ac-ping 3s ease-out infinite; }
-.ac-view.is-active .ac-arc-1 { animation-delay: .35s; } .ac-view.is-active .ac-arc-2 { animation-delay: .7s; }
-@keyframes ac-ping { 0%, 62%, 100% { opacity: 0.3; } 18% { opacity: 1; } }
 .ac-view-name { display: block; margin-top: 3px; font-weight: 600; font-size: 12px; line-height: 1.2; overflow-wrap: anywhere; }
 .ac-views.is-5 .ac-view-name { font-size: 11px; }
 .ac-view.is-locked .ac-view-icon { opacity: 0.6; }
 .ac-view.is-locked:hover .ac-view-icon { opacity: 0.85; }
 .ac-view-lock { position: absolute; z-index: 1; top: 4px; right: 4px; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; border-radius: 4px; color: #fff; background: rgba(4,14,20,0.72); }
 .ac-view.is-locked:hover .ac-view-lock { color: #6cc4f7; }
-@media (prefers-reduced-motion: reduce) { .ac-view.is-active .ac-arc { animation: none; opacity: 0.8; } }
 
 /* the glass trial on the step cards (GlassLayer.jsx): a tint keeps the text readable on bright water */
 .ac-card.is-glass { -webkit-backdrop-filter: none; backdrop-filter: none; background: none; text-shadow: 0 1px 2px rgba(0,20,30,0.6); }

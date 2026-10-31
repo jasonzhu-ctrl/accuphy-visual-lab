@@ -64,3 +64,13 @@ Copyright (c) 2009 Kazuhiko Arase. MIT License — https://github.com/kazuhikoar
 The idea and SVG filter structure are adapted, no package is installed. Both MIT; licence texts checked 2026-10-30.
 - https://github.com/shuding/liquid-glass — MIT License, Copyright (c) 2025 Shu Ding
 - https://github.com/rdev/liquid-glass-react — MIT, Copyright 2025 Max Rovensky
+
+## @paper-design/shaders 0.0.82 (npm) — Apache-2.0
+
+The dithered ripple on the selected view tile (`DitherFan.jsx`). LICENSE read in the package 2026-10-30. Its NOTICE:
+
+    Paper Shaders
+    Copyright 2026 Paper
+
+    Powered by Paper Shaders:
+    https://shaders.paper.design
