@@ -1,8 +1,8 @@
-# Fish in the beam: findings and proposal (not built)
+# Fish in the beam: findings and proposal (test version built: 5764b06, #193)
 
 Lab HQ, 2026-10-31. Jason asked for a conclusion on how to make sure a reasonable number of fish is in the beam when the
 transducer looks at a spot, for PingLive and Mini and each view, without changing fish that are already there.
-Nothing is built. The owner is the lake chat (#176), and building waits for Jason's "动".
+Built as a test version on Jason's "动" (5764b06, #193). The owner is the lake chat (#176). Going live needs Jason's "动" in Lab HQ.
 
 ## 方案（中文版，Jason 2026-10-31 确认的规则）
 
@@ -34,7 +34,7 @@ Nothing is built. The owner is the lake chat (#176), and building waits for Jaso
 
 **影响：** 夏天湖和冰面共用这段代码，两边都要检查；之后新录的广告鱼会更多，已录好的片子不变。
 
-**状态：** 还没做。Jason 说“动”后，由“冰钓版本视觉效果”做测试版；线上要 Jason 在 Lab HQ 另说“动”。
+**状态：** 测试版已做（5764b06，#193）。线上要 Jason 在 Lab HQ 另说“动”。
 
 ## What the lake does today
 

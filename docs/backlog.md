@@ -1,11 +1,11 @@
 # Backlog — Sonar Beam Visualizer (kept current every round)
 
-> 状态（2026-10-30，Lab HQ；10-27～10-29 的长版原文在下面“明细”里）
+> 状态（2026-10-31，Lab HQ；10-27～10-29 的长版原文在下面“明细”里）
 > 阶段：X-6L Lab 上线后收尾，11-02 广告开投（加拿大 + 美国）；lab.accuphy.ca 现在是 5c2e69a（10-30 Jason 动）
 > 进行中：#192 电脑版面板改版 + 分享改版 · d8b411c（视图格只留图标，选中格是动态小声纳图）、测试链接 ba71f8a、HQ 看过对比图 · 等 Jason 看；#191 模糊视图订阅后打开 · 测试版已看待定；上线前：填 W24Qdc、核法文、Klaviyo 文字、真机、Klaviyo 关 20 秒表单。注意：#191 若先于 #192 上线，要从 c91bf7e 构建
 > 等 Jason：⓪a 确认提醒方案（mods 调研，推荐输入框上方横幅）· 10-30；⓪b 看 #191、#192 测试版、选玻璃（?glass=shu / rdev）· 10-30；⓪c 版本管理方案；⓪d 追踪：登录 Meta / GA4 / Shopify，CAPI 选 A/B/C，第 2、3 条说动（accuphy-website/docs/2026-10-30-lab-tracking-check.md）；① PR #30/#31；② LiveScope 7 问；③ 旧事项
 > 上线后要做：#191 解锁弹窗上线当天告诉网站 HQ（local_2f48043d-43bf-440c-ba78-2f53beaa0a5a），网站 03 再测真实弹窗（#233 桥已核 9a182111，真实流程没走过）。
-> 等 Jason：波束里鱼数方案（docs/2026-10-31-fish-in-beam-plan.md），要他说“动”；做的是冰钓版本视觉效果 · 10-31
+> 等 Jason：看 #193 波束里鱼数测试版（5764b06，测试链接 7d52e0c），判断游动是否自然，是否接受未达标的位置（docs/2026-10-31-fish-in-beam-sheet.jpg，docs/decisions.md #193）· 10-31
 > 卡住：无。同事 PR #30、#31 只作参考，不合并（Jason 10-30：不要拉进主线）；测试页 pr30/、pr31/ 等 Jason 看完删。待补：#228 第 4 条德/荷/波兰/拉脱维亚界面（不急）
 > 本周做完：#190 美国只出 Mini · 线上 5c2e69a，网站 03 复查 310dedd1 · 已核（别的聊天）；#187/#188/#189 线上复查 · 网站 03 3dbfbec5（accuphy-website/docs/verification/2026-10-30-lab-a1fd3ee/result.md）· 已核（别的聊天）；#189 Mini Combo 前后 range + #188 分享改版 · lab.accuphy.ca a1fd3ee（docs/versions.md 10-30 行）· HQ 核过（md5 同测试链接、线上 Combo 两条滑杆、二维码弹框、0 报错）；#173 鱼群第 3 轮、#175 圆形水纹船迹、#178 新全景并进湖面 · 已在线上 8c15c20（/jig/、/pano/ 已下线）· 冰钓窗口核过；#182/#184/#186/#187 去商店按市场、GA4、分享徽章、商店页跳转 · lab.accuphy.ca 8c15c20 · HQ 核过；#185 Mini 测试片 · docs/2026-10-28-ad-mini-test-*-sheet.jpg · HQ 核过；#189 · docs/2026-10-29-plm-combo-two-ranges.jpg · HQ 核过
 
