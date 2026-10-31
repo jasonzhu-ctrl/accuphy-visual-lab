@@ -3465,3 +3465,11 @@ Numbered log. Newest at the bottom.
        push addresses, jasonzhu-ctrl and accuphy-marketing, so a plain `git push` from any chat in this folder updates
        both. Fetch stays on jasonzhu-ctrl. Check with `git ls-remote company refs/heads/main`.
      - Unchanged: 孙英杰 works on his own branch with a pull request; Jason reviews before merging (#183).
+
+195. **2026-10-31** — **The lake-and-sonar chat is renamed "Lab 场景和声纳画面Base"** (Jason in Lab HQ: "那你给它改名字，改成叫Lab 场景和声纳画面Base").
+     - It was "冰钓版本视觉效果", a name from its first job (the ice page, #94). Since #176 it owns the whole scene:
+       summer lake and ice page, terrain, fish, the boat and beams, and the sonar picture with its range and depth
+       logic. Jason 10-31: "基于这个场景本身的改动我都是应该跟它做的" — yes: every change to the scene itself goes to it
+       (directly or through HQ); going live still needs his "动" in Lab HQ.
+     - Same chat and id (local_9a5a9e56-…) until plan B replaces it; the replacement keeps this name.
+     - Updated: CLAUDE.md, the ad-video skill, docs/lake-canon.md. Older notes and the backlog keep the old name as history.

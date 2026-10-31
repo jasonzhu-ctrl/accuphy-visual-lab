@@ -3,7 +3,7 @@
 Jason, 2026-10-27: the lake scene (boat and lake), its effects, the sonar picture and the imaging logic behind it exist as
 **one version only**. The ice scene is separate but runs on the same engine (#94). Decision #176.
 
-- **Owner:** the chat "冰钓版本视觉效果" is the only chat that changes the lake scene or the sonar imaging. Other chats
+- **Owner:** the chat "Lab 场景和声纳画面Base" is the only chat that changes the lake scene or the sonar imaging. Other chats
   (Lab HQ, 手机网页端, 电脑端完整版, ad work) send it what they need. They never edit the lake folder themselves.
 - **This list is the canon.** One line per element, with the decision behind it. A change to the lake updates its line in the
   same commit. An element marked **OPEN** waits for Jason.

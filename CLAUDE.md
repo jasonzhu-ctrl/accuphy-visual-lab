@@ -105,7 +105,7 @@ anyone's memory.
 - **Decision numbers:** re-read the last number in `docs/decisions.md` right before appending, and again
   after `git fetch` just before the commit (renumber if another chat took it meanwhile). Two chats wrote #69
   twice and #102 twice (Jason 2026-10-18: 以后注意避免).
-- **One lake, one owner (#176, Jason 2026-10-27):** only "冰钓版本视觉效果" changes the lake scene and the sonar imaging
+- **One lake, one owner (#176, Jason 2026-10-27):** only "Lab 场景和声纳画面Base" (formerly "冰钓版本视觉效果", renamed by Jason 2026-10-31, #195) changes the lake scene and the sonar imaging
   (ice included). Other chats send it what they need. The canon is `docs/lake-canon.md`; every link is built from one commit.
 - **The colleague 孙英杰 (GitHub AJ-nb, #183, Jason 2026-10-28):** works on his own branch and opens a pull request that
   Jason reviews before it is merged into main. He may change and optimize the lake scene, and pick scenes and sonar pictures
@@ -127,7 +127,7 @@ anyone's memory.
   - "accuphy-visual-lab HQ" (`local_1022478a-b63a-4fff-8403-7c58646dab95`) — the Lab's lead: keeps `docs/backlog.md` and its status bar,
     dispatches work, checks what comes back, reports to "项目总管 | CHIEF Agent". Live changes
     need Jason's "动" said in the HQ chat.
-  - "冰钓版本视觉效果" (`local_9a5a9e56-c21c-4be3-8006-c552790ba7ce`) — the working chat for the sonar picture, the lake and the ice page.
+  - "Lab 场景和声纳画面Base" (formerly "冰钓版本视觉效果"; `local_9a5a9e56-c21c-4be3-8006-c552790ba7ce`) — the base of the Lab: the lake scene (summer and ice), the fish and the sonar picture. Every change to the scene itself goes to it.
   - "手机网页端" (`local_b65bc15d-3054-4549-9298-9596369bf98a`) — the phone web page.
   - "广告视频制作" (`local_8de4116d-a73b-4628-851e-62336f9c6bae`; #179; narrowed by #183 and #185 on 10-28) — paused. No ad versions; at most the ONE film Jason names,
     only to run the funnel and ad tests (vertical + horizontal), with the `ad-video` skill. It never changes the lake or

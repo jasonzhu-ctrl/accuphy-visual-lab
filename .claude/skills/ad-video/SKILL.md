@@ -23,7 +23,7 @@ Jason, 2026-10-28: "广告我们目前为止先不做了，孙英杰那边在优
 
 - **Yours:** `scripts/dev/ads/`, `reference/ads/` (git-ignored, see Storage), ad briefs and boards in `docs/` (`*-ad-*`).
 - **Never yours: the lake scene and the sonar** (`src/experiments/2026-09-23-sonar-lake-3d/`, #176). Only
-  "冰钓版本视觉效果" (`local_9a5a9e56-c21c-4be3-8006-c552790ba7ce`) changes them. If a shot needs a new dev hook, a camera
+  "Lab 场景和声纳画面Base" (`local_9a5a9e56-c21c-4be3-8006-c552790ba7ce`) changes them. If a shot needs a new dev hook, a camera
   knob, a fish placed or a look changed, send it the request (copy HQ) and wait. The canon is `docs/lake-canon.md`.
 - Existing dev-only hooks (they never reach a built page): `__sonarState.camOverride` (`noLogo`), `fanOpen`, `adClean`,
   `adBeam`, `adFlash`, `window.__camera`, `__lakeSnap()`, `__sonarFlat(w, h)`, `__chase`, `__jig` (ice page).
