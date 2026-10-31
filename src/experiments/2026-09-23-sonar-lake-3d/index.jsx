@@ -240,6 +240,7 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
     rigCam: import.meta.env.DEV && /rigcam/.test(window.location.search), // ice: the hole kit up close
   })
   state.current.specs = liveSpecs
+  state.current.ice = ICE
   state.current.specKey = specKey
   state.current.rangeM = effRangeFt * FT
   state.current.depthM = depthFt * FT

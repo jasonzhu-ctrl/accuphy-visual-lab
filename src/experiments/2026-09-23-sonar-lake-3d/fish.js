@@ -277,6 +277,7 @@ function burstPhase(b, t, w) {
 }
 export function fishPose(f, t, out) {
   if (f.script) return f.script(t, out) // dev ?fishlab
+  if (f.act?.kind === 'visit' && t >= f.act.t0) return visitPose(f, f.act, t, out) // fish in the beam (fishBeam.js)
   const w = f.speed
   const a = f.phase + t * w + (f.burst ? burstPhase(f.burst, t, w) : 0)
   const wk = f.burst && t > f.burst.t0 && t < f.burst.t0 + f.burst.D ? 1 + (f.burst.k - 1) * Math.sin((Math.PI * (t - f.burst.t0)) / f.burst.D) ** 2 : 1
@@ -304,6 +305,64 @@ export function fishPose(f, t, out) {
   out.heading = f.heading != null ? f.heading : Math.atan2(-(dz + hz), dx + hx)
   out.pitch = f.heading != null ? 0 : Math.max(-0.6, Math.min(0.8, Math.atan2(dy, Math.hypot(dx, dz) + 0.05))) // nose up on a rise
   return out
+}
+
+// ---------- a visit to the beam (fishBeam.js decides who and where) ----------
+// A cubic Bézier that leaves along the way the fish is swimming and arrives along its slow loop, walked by arc length: the
+// speed eases over TA seconds from v0 up to a cruise of at most 1 m/s, and down to v1. Closed in t, like the rest of the pose.
+const TA = 2, VISIT_MAX = 1
+const bez = (P, u, k) => { const m = 1 - u; return m * m * m * P[0][k] + 3 * m * m * u * P[1][k] + 3 * m * u * u * P[2][k] + u * u * u * P[3][k] }
+const bezD = (P, u, k) => { const m = 1 - u; return 3 * m * m * (P[1][k] - P[0][k]) + 6 * m * u * (P[2][k] - P[1][k]) + 3 * u * u * (P[3][k] - P[2][k]) }
+export function makeVisitPath(p, dir, T, dirEnd, bend, v0, v1, vMax = VISIT_MAX) {
+  const dx = T.x - p.x, dy = T.y - p.y, dz = T.z - p.z, D = Math.hypot(dx, dy, dz), nh = Math.hypot(dx, dz) || 1
+  const a = Math.min(0.35 * D, 4), b = Math.min(0.3 * D, 3), sx = (-dz / nh) * bend * D, sz = (dx / nh) * bend * D
+  const P = [[p.x, p.y, p.z], [p.x + dir[0] * a + sx, p.y + dir[1] * a, p.z + dir[2] * a + sz], [T.x - dirEnd[0] * b + sx, T.y - dirEnd[1] * b, T.z - dirEnd[2] * b + sz], [T.x, T.y, T.z]]
+  const lens = new Float32Array(33), points = []
+  let x0 = P[0][0], y0 = P[0][1], z0 = P[0][2]
+  for (let i = 1; i <= 32; i++) { const u = i / 32, x = bez(P, u, 0), y = bez(P, u, 1), z = bez(P, u, 2); lens[i] = lens[i - 1] + Math.hypot(x - x0, y - y0, z - z0); x0 = x; y0 = y; z0 = z; if (i % 2 === 0) points.push([x, y, z]) }
+  const L = lens[32], k = Math.min(1, (0.5 * L) / Math.max((TA * (v0 + v1)) / 2, 1e-6)) // (a very short way: slower ends)
+  v0 *= k; v1 *= k
+  const area = (TA * (v0 + v1)) / 2 // what the two ramps add up to, on top of the cruise
+  const cT = Math.max((L - area) / vMax + TA, 6) // never quicker than 6 s: no darting in over a short way
+  return { P, lens, L, T: cT, v0, v1, v: (L - area) / (cT - TA), points }
+}
+const ramp = (a, b, s) => a * s + (b - a) * (s / 2 - (TA / (2 * Math.PI)) * Math.sin((Math.PI * s) / TA)) // distance over a ramp from speed a to b, after s seconds
+const rampV = (a, b, s) => a + (b - a) * Math.sin((Math.PI * s) / (2 * TA)) ** 2
+function pathPose(pa, tau, out) {
+  const { P, lens, L, T, v0, v, v1 } = pa
+  const up = ramp(v0, v, TA), s = tau < TA ? ramp(v0, v, tau) : tau < T - TA ? up + v * (tau - TA) : L - (ramp(v, v1, TA) - ramp(v, v1, Math.max(0, tau - (T - TA))))
+  const sp = tau < TA ? rampV(v0, v, tau) : tau < T - TA ? v : rampV(v, v1, Math.min(TA, tau - (T - TA)))
+  let lo = 0, hi = 32; const ss = Math.max(0, Math.min(L, s))
+  while (hi - lo > 1) { const m = (lo + hi) >> 1; if (lens[m] < ss) lo = m; else hi = m }
+  const u = (lo + (ss - lens[lo]) / Math.max(lens[hi] - lens[lo], 1e-6)) / 32
+  const dx = bezD(P, u, 0), dy = bezD(P, u, 1), dz = bezD(P, u, 2), n = Math.hypot(dx, dy, dz) || 1
+  out.x = bez(P, u, 0); out.y = bez(P, u, 1); out.z = bez(P, u, 2)
+  return [(dx / n) * sp, (dy / n) * sp, (dz / n) * sp]
+}
+export const makeVisit = (t, path, stay, T, fan, spec, until, apex) => ({ kind: 'visit', t0: path ? t : t - 1, t1: path ? t + path.T : t, t2: Infinity, in: path, stay, T, fan, spec, until, apex: { x: apex.x, z: apex.z }, back: null })
+export const visitInBeamPhase = (a, t) => (t < a.t1 ? 'in' : t < a.t2 ? 'stay' : 'back')
+function stayPose(a, t, out) {
+  const { ax, az, ay, w } = a.stay, s = t - a.t1
+  out.x = a.T.x + ax * Math.sin(w * s); out.y = a.T.y + ay * Math.sin(1.3 * w * s); out.z = a.T.z + az * Math.sin(0.7 * w * s)
+  return [ax * w * Math.cos(w * s), ay * 1.3 * w * Math.cos(1.3 * w * s), az * 0.7 * w * Math.cos(0.7 * w * s)]
+}
+function visitPose(f, a, t, out) {
+  const v = t < a.t1 ? pathPose(a.in, t - a.t0, out) : t < a.t2 ? stayPose(a, t, out) : pathPose(a.back, t - a.t2, out)
+  out.speed = Math.hypot(v[0], v[1], v[2])
+  out.heading = Math.atan2(-v[2], v[0])
+  out.pitch = Math.max(-0.6, Math.min(0.8, Math.atan2(v[1], Math.hypot(v[0], v[2]) + 0.05)))
+  return out
+}
+// the way home: from where it circles to where its own loop will be by then, joining that loop along its direction
+export function startVisitBack(f, t, vMax) {
+  const a = f.act, q = {}, v = stayPose(a, t, q), n = Math.hypot(...v) || 1
+  a.t2 = t
+  const act = f.act; f.act = null
+  const dirOf = (tt) => { const p0 = fishPose(f, tt, {}), p1 = fishPose(f, tt + 0.05, {}), d = [p1.x - p0.x, p1.y - p0.y, p1.z - p0.z], m = Math.hypot(...d) || 1; return [p0, d.map((c) => c / m), m / 0.05] }
+  let T = Math.hypot(q.x - a.T.x, q.z - a.T.z) + 8, path = null
+  for (let i = 0; i < 3; i++) { const [p, d, sp] = dirOf(t + T); path = makeVisitPath(q, v.map((c) => c / n), p, d, 0.08, n, Math.min(sp, 0.5), vMax); T = path.T }
+  f.act = act
+  return path
 }
 
 // ---------- behaviours (Jason 2026-09-25) ----------
@@ -458,7 +517,7 @@ export function stepBehaviours(pop, t, dt, apex, circles, bedY, jig = null) {
   let atJig = 0
   if (jig) for (const f of pop) if (f.act && (f.act.kind === 'jig' || f.act.kind === 'bite')) atJig++
   for (const f of pop) {
-    if (!f.radius) continue // dev test fish stay put
+    if (!f.radius || f.act?.kind === 'visit') continue // dev test fish stay put; a fish on its way to the beam or in it has no other business (fishBeam.js)
     if (f.act && t > actEnd(f.act)) { f.act = null; f.until = t + (f.coolNext || 0) }
     if (f.burst && t > f.burst.t0 + f.burst.D) { f.phase += burstPhase(f.burst, f.burst.t0 + f.burst.D, f.speed); f.burst = null }
     if (jig && jigStep(f, t, dt, jig, popNow, atJig, circles, bedY, pose)) { atJig++; continue }

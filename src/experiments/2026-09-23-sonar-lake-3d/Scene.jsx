@@ -7,6 +7,7 @@ import { mergeGeometries as _merge } from 'three/addons/utils/BufferGeometryUtil
 const mergeGeometries = (parts) => _merge(parts.map((g) => (g.index ? g.toNonIndexed() : g)))
 import { HALF, SEG, bedY, fbm, depthAt, ROCK_HUMPS } from './terrain'
 import { SPECIES, makePopulation, fishPose, stepBehaviours, forceRise, forceJig, winterCamp, rnd, drawnLen } from './fish'
+import { seedBeamFish, stepBeamFish } from './fishBeam'
 import { makeLakeMaterial, setBeamUniforms, LAKE_TIME } from './lakeMaterial'
 import { wedgeGeometry } from '../2026-09-23-beam-shapes-3d/wedge'
 import { makeTallTree, makeBushTree, makeStump, makeLog, makeWeedTuft, placeAll } from './vegetation'
@@ -23,7 +24,7 @@ import { makeIceMaterial } from './iceSheet'
 import { bakeTerrain } from './sonarMarks'
 import lakeSkyUrl from './assets/lake-sky.jpg?inline' // the sky mirrored in the summer lake (#162): a CC0 photo, see assets/LICENSES.md
 import { makeLakeFFT, FFT_L } from './lakeFFT' // the waves: a wind-sea spectrum by FFT (#165, after ABYSSAL, MIT, see assets/LICENSES.md)
-import { iceParams, ICE_CAM_T, ICE_CAM_D, ICE_LAKE_W, ICE_FOG, UNDER_CAM, SECTION_CAM, SECTION_CAM_PHONE, ICE_T, dir } from './iceScene'
+import { APEX_Y, iceParams, ICE_CAM_T, ICE_CAM_D, ICE_LAKE_W, ICE_FOG, UNDER_CAM, SECTION_CAM, SECTION_CAM_PHONE, ICE_T, dir } from './iceScene'
 
 // ---------- lakebed ----------
 function Lakebed({ mat }) {
@@ -234,6 +235,13 @@ function FishGroup({ mat, body, fish }) {
 function Fish({ mat, state }) {
   const circles = useMemo(() => toCircles(buildObstacles()), [])
   const pop = useMemo(() => makePopulation(bedY, circles), [circles]) // swim loops routed around structure
+  const beamOff = /fishtest|fishlab/.test(window.location.search) || (import.meta.env.DEV && /beamfish=off/.test(window.location.search)) // dev: no beam visitors
+  const beamTop = state.current.ice ? -2.5 : -1.6 // no visitor above this (the sheet, the surface)
+  useMemo(() => { // the opening spot has its fish before the first frame (fishBeam.js)
+    if (beamOff) return
+    const s = state.current, a = s.ice ? { x: s.boat.x, y: APEX_Y, z: s.boat.z } : { x: s.boat.x + TRANSDUCER_OFFSET.x, y: TRANSDUCER_OFFSET.y, z: s.boat.z + TRANSDUCER_OFFSET.z }
+    seedBeamFish(pop, 0, a, !!s.ice, beamTop, depthAt(a.x, a.z), circles, bedY)
+  }, [pop]) // eslint-disable-line react-hooks/exhaustive-deps
   if (import.meta.env.DEV) {
     window.__fish = pop // dev: fish population for scene lookups
     window.__jig = () => state.current.jig ? forceJig(pop, window.__lakeClock?.elapsedTime ?? 0, state.current.jig, circles, bedY) : 'no jig' // dev: the nearest fish comes to the jig now
@@ -251,6 +259,7 @@ function Fish({ mat, state }) {
     }
     // ice page: s.jig (IceCamp) draws fish to the lure (the lake's own jig, #172, was removed in #174)
     stepBehaviours(pop, clock.elapsedTime, Math.min(dt, 0.1), state.current.apex, circles, bedY, state.current.holes ? state.current.jig || null : null)
+    if (!beamOff) stepBeamFish(pop, clock.elapsedTime, s.specs, s.deviceId, s.mode, s.apex, s.dragging || s.noSignal, beamTop, circles, bedY)
   }, -1)
   const groups = useMemo(() => {
     const by = {}
