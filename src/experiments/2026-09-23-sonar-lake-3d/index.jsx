@@ -383,11 +383,8 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
             const locked = isLocked(deviceId, m) && !unlocked, active = mode === m
             return (
               <button key={m} type="button" className={`ac-view ${active ? 'is-active' : ''} ${locked ? 'is-locked' : ''}`} aria-pressed={active} aria-label={locked ? t('unlock_locked', { view: t(LOCKED_NAME[m]) }) : undefined} onClick={() => pickView(deviceId, m, 'panel')}>
-                <span className="ac-view-pic">
-                  <img src={viewThumb(deviceId, m)} alt="" draggable={false} />
-                  {locked && <span className="ac-view-lock"><LockIcon size={10} /></span>}
-                </span>
-                <ViewIcon view={m === 'liveice' || m === 'ice' ? 'down' : m} deg={m === 'combo' ? 39 : device.beamDeg} active={active} />
+                {locked && <span className="ac-view-lock"><LockIcon size={10} /></span>}
+                <ViewIcon view={m} deg={device.beamDeg} />
                 <span className="ac-view-name">{t('mode_' + m)}</span>
               </button>
             )
