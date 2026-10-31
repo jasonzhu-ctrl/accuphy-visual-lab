@@ -10,9 +10,9 @@
 - **说话要实在：** 客户公认 Garmin 的画面稍清楚一点，所以不说“一样清楚”“最好”这类话。
 - 来源：Drive `Market Research/2026-09-24 Users and market - first principles (EN).md` §1、§3、§7，以及 `docs/market/README.md`。
 - **数字只用 `accuphy-website/docs/specs.md` 里的：**
-  - PingLive 波束 135° × 20°；
   - PingLive Mini 重 0.6 kg（1.31 lb）；
   - Mini 的 Live Combo 能同时看前方和正下方。
+- 波束角度不写进文字，等 Jason 确认数字（HQ 10-31）。
 - 没用的说法：最大量程、“唯一”、“比某某清楚”、价格。价格按市场不一样，归店铺页。
 
 ## 写法规矩（HQ 给的，我照做）
@@ -34,7 +34,7 @@
 |---|---|---|---|
 | 1 | Down | Your sonar beam, under the boat | Drag the boat anywhere on the lake. Whatever the beam touches shows up on your phone, live. |
 | 2 | Forward，对着立木和鱼 | Fish ahead, on your phone | This is the Accuphy Sonar app’s Forward View: timber and fish in front of the boat. |
-| 3 | Panoramic | Panoramic: a wide scan for fish | 135° wide, to find fish and structure fast. It runs on the phone or tablet you already own. **［按钮：Shop PingLive］** |
+| 3 | Panoramic | Panoramic: a wide scan for fish | Sweep a wide arc to find fish and structure fast. It runs on the phone or tablet you already own. **［按钮：Shop PingLive］** |
 
 ### Mini（`/mini/`，美国店也是这页）
 
@@ -62,7 +62,7 @@
 | 湖 / Mini 2 标题 | This is what your phone shows | Fish ahead, on your phone | 说出屏幕上是什么（前方的鱼），不是空泛的“手机上看到的” |
 | 湖 / Mini 2 正文 | This is what {device} sees, live on your phone in the Accuphy Sonar app: the bottom, timber and fish. | This is the Accuphy Sonar app’s Forward View: timber and fish in front of the boat. | 点名 Forward 视图，访客才知道现在在看哪种视图；“the bottom” 删掉，这一站的重点是前方 |
 | 湖 3 标题 | Which view, when | Panoramic: a wide scan for fish | 旧卡讲了 3 个视图，只切到 1 个。现在只讲屏幕上的 Panoramic |
-| 湖 3 正文 | Panoramic scans wide…; Forward to cast…; Down to fish straight below. | 135° wide, to find fish and structure fast. It runs on the phone or tablet you already own. | 第 1 行只讲 Panoramic，用 specs 的 135°；第 2 行是最打动买家的那句，接着就是去商店按钮 |
+| 湖 3 正文 | Panoramic scans wide…; Forward to cast…; Down to fish straight below. | Sweep a wide arc to find fish and structure fast. It runs on the phone or tablet you already own. | 第 1 行只讲 Panoramic，不写波束角度（见下面“10-31 加的用词规矩”）；第 2 行是最打动买家的那句，接着就是去商店按钮 |
 | Mini 3 已订阅 | Combo shows Down and Forward side by side; … | Live Combo shows Forward and Down together, split on one screen. At 0.6 kg (1.3 lb)… | 去掉错的 “side by side”；第 2 行讲便携（0.6 kg 来自 specs），对的是冰钓和小船的人 |
 | Mini 3 没订阅 | …Combo shows both side by side: subscribe to unlock it. | Forward View finds the fish in front of you. Live Combo adds Down on the same screen: unlock it with your email. | 去掉 “side by side”；“unlock it” 做成能点的（见下面问题 2），不再是卡片里点不了的一句话 |
 | 冰 1 | …Tap the ice anywhere to drill a new hole — whatever the beam touches lights up. | …Tap the ice to drill a new hole. | 删掉和面板描述重复的半句，变成两短行 |
@@ -72,6 +72,27 @@
 | 冰 3 正文 | Forward View turns the beam sideways: fish and structure out ahead, under ice you never cut. | …under ice you haven’t drilled. At 0.6 kg (1.3 lb), it moves hole to hole with you. | 第 2 行加便携，对着换洞的冰钓人（P1）；然后是去商店按钮 |
 
 长度：最长的标题 6 个词（“Your sonar beam, under the boat”“Panoramic: a wide scan for fish”）。最长的一行正文约 13 个词。界面设计出图时，卡片宽度如果放不下，告诉我，我再砍。
+
+## 10-31 加的用词规矩（Klaviyo HQ 转 Jason 的决定，HQ 10-31 转来）
+
+- 波束不说 “thin”（薄），也不说 “curtain”（帘子）。
+- 波束角度先不写进文字，等 Jason 确认数字。
+
+查了这份草稿（ad012c7）、`i18n.js` 和湖文件夹里所有文件：
+
+| 在哪 | 找到的 | 访客看得到吗 | 建议 |
+|---|---|---|---|
+| 本草稿，湖第 3 站 | “135° wide, …” | 草稿，还没上 | **已改成** “Sweep a wide arc to find fish and structure fast.”，不带数字 |
+| 本草稿，依据一节 | “PingLive 波束 135° × 20°” | 不是访客文字 | 已删 |
+| `i18n.js` 的 `desc_lake`、`desc_ice` + `index.jsx` 第 443 行 | 面板下面那行描述带角度，`{device} · {beam} beam`。`{beam}` 由代码拼：湖上 PingLive 是 “135° × 20°”，Mini 是 **“39° × 18°”**，冰上 Mini 是 “39° × 20°” | **看得到，线上就有** | 见下面 |
+| 全部访客文字里的 “thin” / “curtain” / “mince” / “rideau” | 没有。只在代码注释里有（`Scene.jsx` 说 Forward 的 “curtain” 形状、`sonarShader.js` 的 “thin line” 等），访客看不到 | 看不到 | 不用改。注释归 Base 和界面设计，我不碰 |
+
+**面板描述那行的建议（只是草稿，代码没动）：**
+- 现在：“PingLive Mini · 39° × 18° beam. Drag the boat — whatever the beam touches lights up.”
+- 去掉角度：“PingLive Mini. Drag the boat — whatever the beam touches lights up.”（冰上：“PingLive Mini, through the ice. Tap the ice to drill a new hole — whatever the beam touches lights up.”）
+- 法文：只是把 “· faisceau de {beam}” 这一段去掉，剩下的句子网站已经核过，应该不用再核；交网站时注明。
+- 顺带发现：湖上 Mini 显示的是 18°，`specs.md` 写 39° × 20°。代码注释说文字该按 specs，但湖上的拼法用了引擎的 18°。去掉角度，这个不一致就跟着没了；不去的话，Jason 确认数字后要改成一致。
+- 改动的位置：`i18n.js` 两个键归我；`index.jsx` 第 443 行是共用文件，传 `beam` 的那一行要改，改之前先告诉界面设计和 HQ。
 
 ## 第 3 站按钮
 
