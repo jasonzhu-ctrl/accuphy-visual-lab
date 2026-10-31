@@ -70,7 +70,7 @@
 - 手机分享弹窗在 390×844 时离去商店胶囊约 15 px（截图实测，旧数据写的是约 6 px）。
 
 **已知问题：**
-- **#197（Jason 10-31 更正：“正确的是20 但是不要提 因为听起来很小”）：访客文字不写厚度，两台设备都一样。排队：跟步骤卡测试版一起出，不能提前**：`index.jsx:443` 的 beam 改成 `` `${device.beamDeg}°` ``，去掉 “× …°” 和 ICE 分支；面板读作 “PingLive Mini · 39° beam”、“PingLive · 135° beam”，法文 “faisceau de 39°”。`i18n.js` 不改，`devices.js`（thickDeg 18）和引擎不动。见 `handoffs/2026-10-31-mini-beam-text-summer.md`；共用文件，改之前先通知。
+- **暂停（HQ 10-31 晚）：Jason 给总管的答案不同（“Mini 39° × 19°, Combo 78° × 19°, PingLive 135° × 20°”），HQ 在跟 Jason 核；HQ 说定之前不碰 `index.jsx:443`。** 之前的版本：**#197（Jason 10-31 更正：“正确的是20 但是不要提 因为听起来很小”）：访客文字不写厚度，两台设备都一样。排队：跟步骤卡测试版一起出，不能提前**：`index.jsx:443` 的 beam 改成 `` `${device.beamDeg}°` ``，去掉 “× …°” 和 ICE 分支；面板读作 “PingLive Mini · 39° beam”、“PingLive · 135° beam”，法文 “faisceau de 39°”。`i18n.js` 不改，`devices.js`（thickDeg 18）和引擎不动。见 `handoffs/2026-10-31-mini-beam-text-summer.md`；共用文件，改之前先通知。
 - 冰钓页步骤卡叠在面板下面，屏幕高度低于约 890 px 时最后一张出屏（实测最后一张底边在 888 px；720 高时第 1 张就被切）。修法提议（三张卡缩成一行放右上角天空）已给 HQ，图 `2026-10-31-ice-step-cards-proposal.jpg`；Jason 说要之前不写代码。
 - Mini Forward 的 1.0x 按钮（App 有，Lab 没有）：没做，要和 Base 商量，等 HQ 派。
 - 加载提速 C（冻屏 2.6–2.9 s，地形噪声和着色器）归 Base，黑五后。
