@@ -9,6 +9,10 @@ with the source commit it was built from, so anyone can tell which version a lin
 sign-up and Combo stays shut for everyone (no fake success). Test links show "Test mode: nothing is sent." The consent wording
 (`unlock_consent` in i18n.js) is Klaviyo HQ's draft and waits for Jason.
 
+## 2026-10-31: test links at d8b411c (test repo ba71f8a)
+
+Selected view tile: small live sonar picture Jason approved; Paper Shaders removed (#192). lab.accuphy.ca stays at 5c2e69a. fx/, pr30/ and pr31/ stay in the test repo as reference.
+
 ## 2026-10-30: test links at 84a05f9 (test repo 476eb73)
 
 Desktop view tiles icon only, new sonar shape, blue ping on the selected tile (#192). lab.accuphy.ca stays at 5c2e69a. pr30/ and pr31/ stay in the test repo as reference until Jason has looked.
