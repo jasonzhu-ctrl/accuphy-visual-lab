@@ -3434,6 +3434,28 @@ Numbered log. Newest at the bottom.
        0 errors, ice views 0 errors. The 110 ft spot for email e01 still holds: Combo [3, 6–7].
      - Sheet: `docs/2026-10-31-fish-in-beam-sheet.jpg`.
 
+     - **Desktop rerun after the last tightening of fish targets (2026-10-31 14:00–14:30, main 6d4c9f8, real desktop page, headless
+       1400×900).** Seconds to reach the minimum fish count after the boat stops, 30 s per spot; — = not reached, count at 30 s in
+       brackets. Every view started the opening spot at or above its minimum. Minimums: PL Forward 4, PL Down 4, PL Pano 6, Mini Pano
+       4, Mini Down 3, Mini Forward 3, Mini Combo 3 per beam.
+
+       | spot | PL Fwd | PL Down | PL Pano | Mini Pano | Mini Down | Mini Fwd | Mini Combo* |
+       |---|---|---|---|---|---|---|---|
+       | (6,-6) | 24 | 19 | 23 | — (2) | 17 | 29 | 18 |
+       | (18,18) | 11 | 23 | 0 | 17 | 26 | 15 | 7 |
+       | (-24,-45) | 5 | 0 | 25 | 24 | 0 | 8 | 0 |
+       | (30,-6) | — (1) | — (1) | 27 | — (2) | — (2) | — (0) | — (2) |
+       | (42,-6) | — (0) | — (1) | — (0) | — (0) | — (0) | — (0) | — (0) |
+
+       Minimum reached within 30 s at 3 of 5 spots for PL Forward, PL Down, Mini Down, Mini Forward and Mini Combo, 4 of 5 for PL
+       Panoramic, 2 of 5 for Mini Panoramic. The two sparse spots (30,-6) and (42,-6) fail for almost every view. Same shape as the
+       earlier table (13:02–13:05); no case got worse.
+       - **Caveat 1:** *Mini Combo: after the opening spot the page read as Forward, so only the opening spot (4 and 5 fish) is valid for
+         the two Combo beams. The cause is unchecked (perhaps Combo is behind the #191 gate in the script).
+       - **Caveat 2:** three cases (PL Down, PL Pano, Mini Forward) failed on the first try when two browsers ran at once and were rerun
+         alone; the table uses the reruns.
+       - **Caveat 3:** headless desktop, not a phone: no fps claim, and the swim is still judged by numbers and still pictures, not by eye.
+       - Scripts and raw logs: `scripts/dev/qa/fish-beam/` (README there).
 194. **2026-10-31** — **The company GitHub copy is kept current again; every push goes to both** (Jason in Lab HQ:
      "同步到公司组织", answering whether the organization copy should catch up).
      - From 10-29 (Jason: "抓回到 jasonzhu-ctrl") all Lab commits went to `jasonzhu-ctrl/accuphy-visual-lab` only, and
