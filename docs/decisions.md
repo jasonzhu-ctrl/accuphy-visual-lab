@@ -3490,6 +3490,9 @@ Numbered log. Newest at the bottom.
        identify; the code does not, and it conflicts with "no personal data in events". Not built until Jason decides.
 
 197. **2026-10-31** — **The Mini beam is written 39° × 20° everywhere; 18° is never shown** (Jason in Lab HQ: "18度不提了 听起来太小了").
+     - **Corrected the same day** (Jason: "正确的是20 但是不要提 因为听起来很小"): 20° is the right thickness, but visitor
+       text names **no thickness at all**, neither 18° nor 20°. The panel line shows only the wide angle (PingLive 135°, Mini
+       39°). HQ applies the same to PingLive (its 20° sounds just as small). The bullets below are superseded where they say "× 20°".
      - Visitor text follows specs.md (39° live view × 20°) on the summer lake, Mini and ice pages. The summer panel showed
        39° × 18° (X-27); `index.jsx:443` becomes `${device.beamDeg}° × ${device.id === 'PLM' ? 20 : device.thickDeg}°`.
      - The engine's drawn thickness (`devices.js` `thickDeg: 18`, Jason 09-23) is not text and stays as it is.
