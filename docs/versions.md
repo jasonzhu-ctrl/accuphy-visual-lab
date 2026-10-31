@@ -9,6 +9,10 @@ with the source commit it was built from, so anyone can tell which version a lin
 sign-up and Combo stays shut for everyone (no fake success). Test links show "Test mode: nothing is sent." The consent wording
 (`unlock_consent` in i18n.js) is Klaviyo HQ's draft and waits for Jason.
 
+## 2026-10-30: test links at 9869b3f (test repo 37b03b1)
+
+#192 desktop panel, view tiles, fishing buddy share. Glass stays off unless `?glass=shu` or `?glass=rdev`. lab.accuphy.ca stays 5c2e69a. A #191 go-live before Jason decides on #192 must be built from c91bf7e.
+
 ## Where the Lab lives (inventory, Lab HQ 2026-10-27)
 
 Newest code: **a1fd3ee**. Page types in the code: Both `/`, Mini `/mini/`, Ice `/ice/`, the store embed `/embed/`
