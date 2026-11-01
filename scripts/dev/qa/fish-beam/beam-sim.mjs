@@ -9,9 +9,10 @@ function specsFor(dev,mode,rFt,x,z){const d=depthAt(x,z),D=[20,25,30,35,40,45,50
  if(mode==='panoramic'){const s=wedgeSpecs(dv,'panoramic',R);s[0]={...s[0],R:1.6*R,box:{xMin:-1e5,xMax:R,yMax:1e5,zMax:.936*R}};return s}
  const rr=[...[20,30,40,50,60,70,80,100,120,150,180,200,240]].filter(v=>v<=Math.min(160,Math.max(40,3*D))).at(-1)*FT,hF=Math.max(D*FT,Math.min(.7*rr,Math.sqrt(.7*rr*1.3*D*FT)));const s=wedgeSpecs(dv,'combo',rr);s[1]={...s[1],R:Math.hypot(rr,hF)*1.001,box:{xMin:-.25*rr,xMax:rr,yMax:hF}};return s}
 const min=(dev,m)=>m==='panoramic'?(dev==='PL'?6:4):dev==='PL'?4:3
-const spots=[];for(let x=-54;x<=54;x+=12)for(let z=-54;z<=30;z+=12)if(depthAt(x+3,z+.5)>=4)spots.push([x,z])
+const spots=[];if(process.env.SPOTS)spots.push(...JSON.parse(process.env.SPOTS));else for(let x=-54;x<=54;x+=12)for(let z=-54;z<=30;z+=12)if(depthAt(x+3,z+.5)>=4)spots.push([x,z])
+const only=process.env.VIEWS?process.env.VIEWS.split(','):null
 const pct=(a,p)=>{a=a.slice().sort((x,y)=>x-y);return a[Math.min(a.length-1,Math.floor(a.length*p))]}
-for(const [dev,m] of [['PLM','down'],['PLM','forward'],['PLM','combo'],['PL','down'],['PL','forward'],['PL','panoramic'],['PLM','panoramic']]){
+for(const [dev,m] of [['PLM','down'],['PLM','forward'],['PLM','combo'],['PL','down'],['PL','forward'],['PL','panoramic'],['PLM','panoramic']]){if(only&&!only.includes(dev+'-'+m))continue;const per=[]
  const first=[],full=[];let nofull=0,viol=0,maxv=0;const nearby=[]
  for(const [bx,bz] of spots){let tries=0
   const {makePopulation}=F;const pop=makePopulation(bedY,circles);const apex={x:bx+2.99,y:-.95,z:bz+.47};const specs=specsFor(dev,m,80,apex.x,apex.z),o={};const K=specs.length
@@ -22,6 +23,9 @@ for(const [dev,m] of [['PLM','down'],['PLM','forward'],['PLM','combo'],['PL','do
      if(k==0&&f.act?.kind==='visit'){maxv=Math.max(maxv,o.speed);if(o.y-.12*F.drawnLen(f)-bedY(o.x,o.z)<.05||o.y>-1)viol++}}
     if(n>=1&&tF[k]==null)tF[k]=t-5;if(n>=mn&&tM[k]==null)tM[k]=t-5}}
   for(let k=0;k<K;k++){first.push(tF[k]??99);if(tM[k]==null)nofull++;else full.push(tM[k])}
+  per.push(bx+','+bz+':'+tM.map(v=>v==null?'—':v.toFixed(0)).join('/'))
  }
- console.log(dev,m,'fans',first.length,'first p50',pct(first,.5).toFixed(1),'p90',pct(first,.9).toFixed(1),'| min reached',full.length,'/',first.length,'within60s; p50',(pct(full,.5)||0).toFixed(1),'p90',(pct(full,.9)||0).toFixed(1),'| maxV',maxv.toFixed(2),'viol',viol)
+ const all=first.length,w10=[...full].filter(v=>v<=10).length,w15=[...full].filter(v=>v<=15).length,w30=[...full].filter(v=>v<=30).length
+ console.log(dev,m,'| ≤10s',(100*w10/all).toFixed(0)+'%','≤15s',(100*w15/all).toFixed(0)+'%','≤30s',(100*w30/all).toFixed(0)+'%','|',first.length,'first p50',pct(first,.5).toFixed(1),'p90',pct(first,.9).toFixed(1),'| min reached',full.length,'/',first.length,'within60s; p50',(pct(full,.5)||0).toFixed(1),'p90',(pct(full,.9)||0).toFixed(1),'| maxV',maxv.toFixed(2),'viol',viol)
+ if(process.env.SPOTS)console.log('   ',per.join('  '))
 }

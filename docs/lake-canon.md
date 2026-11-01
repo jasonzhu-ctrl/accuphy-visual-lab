@@ -23,7 +23,7 @@ Jason, 2026-10-27: the lake scene (boat and lake), its effects, the sonar pictur
 | Terrain | deep floor 24 m (79 ft); a 110 ft hole at (−22, −45) | #64, #172, #174 |
 | Rocks | Shield boulders, six shapes | #131 |
 | Wrecks | small wreck = workboat with three decks and a wheelhouse | #155 |
-| Fish | bodies by species, spread realistically (#173 round 3: between rounds 1 and 2); bass drawn 1.5×; three lake trout at ~92–99 ft in the 110 ft hole; nearby fish swim into a beam below its minimum (test version) | #170, #173, #174, #193 |
+| Fish | bodies by species, spread realistically (#173 round 3: between rounds 1 and 2); bass drawn 1.5×; three lake trout at ~92–99 ft in the 110 ft hole; nearby fish swim into a beam below its minimum, in by about 10 s (test version; the yellow perch and one crappie group moved from the west shelf to the empty east flat) | #170, #173, #174, #193, #198 |
 | Lake jig | **none** on the summer lake | #174 |
 
 ## Sonar imaging

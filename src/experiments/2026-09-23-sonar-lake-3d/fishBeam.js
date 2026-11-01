@@ -1,6 +1,6 @@
 // Fish in the beam (Jason 2026-10-31, docs/2026-10-31-fish-in-beam-plan.md): the transducer looks somewhere and a reasonable
 // number of fish is in the beam. No fish is added and nothing about the beam or the picture changes: while the boat is
-// still, when the active beam holds fewer than its minimum, the nearest free fish swim over, about 10 s, ≤ 1 m/s, on a gentle
+// still, when the active beam holds fewer than its minimum, the nearest free fish swim over, in by about 10 s, ≤ 2 m/s with eased ends, on a gentle
 // curve that starts along the way the fish is already swimming. A visitor circles inside the beam for 30–60 s, and leaves
 // only if the beam stays at its minimum without it. Fish already in the beam are never touched, nothing is pushed out above
 // the maximum, nothing is called during a drag. The opening spot gets its minimum before the first frame (seedBeamFish).
@@ -11,8 +11,11 @@ import { wedgeSpecs } from '../2026-09-23-beam-shapes-3d/wedge'
 
 // the minimum per fan (Jason's table). The maxima (Mini 5, PingLive 8, Panoramic 8 / 10) only matter in that nothing is called above the minimum
 const beamMin = (deviceId, mode) => (mode === 'panoramic' ? (deviceId === 'PL' ? 6 : 4) : deviceId === 'PL' ? 4 : 3)
-const REACH = 25 // m: a fish further off does not come
+const REACH = 35 // m: a fish further off does not come (25 → 35, #193 10 s round)
 const MAX_CLIMB = 7 // m: a fish keeps roughly to its own depth
+// the 10 s round (Jason 2026-10-31: "二三十秒好像稍微有点久 … 十秒左右 … 不能直接冲进来"): calls start 0.5 s after the boat
+// stops (was 1.2 s) and are checked twice a second; a long way is swum a little faster so the fish is in by about T_GOAL
+const SETTLE = 0.5, T_GOAL = 7
 const pick = (a, b) => a + (b - a) * Math.random()
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v))
 const dot = (v, x, y, z) => v.x * x + v.y * y + v.z * z
@@ -75,7 +78,7 @@ function pathIn(f, t, T, sp, apex, top, circles, bedY) {
   const nd = Math.hypot(...dir) || 1; dir = dir.map((d) => d / nd)
   const v0 = nd / 0.05, stay = makeStay(sp, T, p, apex)
   for (const b of [0.12 * (Math.random() < 0.5 ? 1 : -1), -0.12, 0.03]) {
-    const path = makeVisitPath(p, dir, T, stay.dir, b, Math.min(v0, 0.5), stay.speed)
+    const path = makeVisitPath(p, dir, T, stay.dir, b, Math.min(v0, 0.5), stay.speed, undefined, T_GOAL)
     if (path.points.every((q) => clearPoint(f, q[0], q[1], q[2], 0.15, top, circles, bedY))) return { path, stay, v0 }
   }
   return null
@@ -143,7 +146,7 @@ export function stepBeamFish(pop, t, specs, deviceId, mode, apex, busy, top, cir
   if (moved || busy) b.still = t
   for (const f of pop) if (live(f) && f.act.back && t > f.act.t2 + f.act.back.T) { f.act = null; f.beamCool = t + pick(20, 40) } // home again; a fish does not follow the boat from spot to spot
   if (t < b.next) return
-  b.next = t + 1
+  b.next = t + 0.5
   const o = {}, min = beamMin(deviceId, mode), [n, going] = specs.length ? counts(pop, t, specs, apex, o) : [[], []]
   for (const f of pop) {
     if (!live(f) || f.act.back || visitInBeamPhase(f.act, t) !== 'stay') continue
@@ -155,7 +158,7 @@ export function stepBeamFish(pop, t, specs, deviceId, mode, apex, busy, top, cir
     release(f, t, top, circles, bedY)
     if (f.act?.back) fans.forEach((k) => n[k]--)
   }
-  if (t - b.still < 1.2 || !specs.length) return // the boat has settled first
+  if (t - b.still < SETTLE || !specs.length) return // the boat has settled first
   const taken = []
   specs.forEach((_, k) => { const need = min - n[k] - going[k]; if (need > 0) call(pop, t, specs, k, need, apex, top, circles, bedY, o, taken) })
 }

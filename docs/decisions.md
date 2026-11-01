@@ -3500,3 +3500,52 @@ Numbered log. Newest at the bottom.
        39° × 18° (X-27); `index.jsx:443` becomes `${device.beamDeg}° × ${device.id === 'PLM' ? 20 : device.thickDeg}°`.
      - The engine's drawn thickness (`devices.js` `thickDeg: 18`, Jason 09-23) is not text and stays as it is.
      - No copy, ad or email mentions 18°. Done by 界面设计 with the step-card test version; live needs Jason's 动.
+
+198. **2026-10-31** — **Fish in the beam: in by about 10 s (#193, second round, test version)** (Jason in Lab HQ: "二三十秒好像稍微有点久，
+     我觉得可以在十秒左右，但是旁边的鱼游过来的时候要自然一点，不能直接冲进来", "改到那个十秒到位，我觉得是 OK 的", then "先做吧").
+     - **Changed (`fishBeam.js`, `fish.js`):**
+       - Calls start 0.5 s after the boat stops (was 1.2 s) and are checked twice a second (was once).
+       - A fish comes from up to 35 m (was 25 m).
+       - The way in aims to be done in about 7 s: a long way cruises faster, up to 2 m/s (was at most 1 m/s). The two
+         2-second ramps stay eased, so every fish still starts along its own heading, on the same curve, and slows gently
+         into its loop. Nothing is quicker than 6 s.
+       - The east flat ((30,−6), (42,−6)) had no fish within 25 m to call. Two groups moved there from the crowded west
+         shelf: the yellow perch school (−46, 4) → (36, −8), spread 9 → 12 m, and one crappie group (−38, −6) → (46, −2). Same
+         counts and the same draws, so no other fish moves.
+       - **Not changed:** the number of fish, species, sizes, beams, the sonar imaging, the minima and maxima, the rest
+         rule (20–40 s), the stay (30–60 s), "nothing called during a drag".
+     - **Browser, desktop dev page 1400×900, seconds to the minimum after the boat stops** (30 s per spot; `—` = not reached;
+       before = main 8637499, after = this change). Each build was served from its own scratch copy, and the view was
+       re-selected at every spot, so the Combo column is valid this time:
+
+       | View (minimum) | open | (6,−6) | (18,18) | (−24,−45) | (30,−6) | (42,−6) |
+       |---|---|---|---|---|---|---|
+       | PL Down (4) | 0 → 0 | 21 → 8 | 8 → 7 | 0 → 0 | — → 1 | — → 0 |
+       | PL Forward (4) | 0 → 0 | 19 → 1 | 10 → 8 | 0 → 0 | — → 0 | — → 5 |
+       | PL Panoramic (6) | 0 → 0 | 19 → 0 | 0 → 0 | 29 → 10 | — → 7 | — → 12 |
+       | Mini Down (3) | 0 → 0 | 22 → 8 | 26 → 8 | 0 → 0 | — → 4 | — → 5 |
+       | Mini Forward (3) | 0 → 0 | 27 → 0 | 16 → 5 | 4 → 2 | — → 3 | — → 6 |
+       | Mini Combo, each side (3) | 0 → 0 | — → 8 | 26 → 15 | 0 → 0 | — → 4 | — → 12 |
+       | Mini Panoramic (4) | 0 → 0 | — → 0 | 18 → 18 | 19 → 10 | — → 5 | — → 12 |
+       | Ice Live Ice (3) | 0 → 0 | 12 → 9 | 13 → 11 | 1 → 1 | 12 → 10 | 16 → 9 |
+       | Ice Forward (3) | 0 → 0 | 18 → 9 | — → 28 | 13 → 11 | 26 → 7 | 29 → 9 |
+
+     - **Node, 80 spots, 60 s, share reaching the minimum within 10 s (before → after):** Mini Down 23 → 56 %, Mini Forward
+       28 → 75 %, Combo 31 → 62 %, PL Down 34 → 74 %, PL Forward 40 → 71 %, PL Panoramic 38 → 69 %, Mini Panoramic 19 → 53 %.
+       Median 6–8 s (was 9–17 s). Top speed of a visitor 2.00 m/s, 0 bottom or surface hits.
+     - **Still over 10 s, and why:**
+       - (18, 18) on the rock hump, 5.5 m of water: Combo 15 s, Mini Panoramic 18 s, ice Forward 28 s. Fish are close (2–15 m)
+         but the beams there are tiny: Mini Down covers ±2 m at that depth, and the Panoramic slab needs water deeper than
+         the hump has, so few target points fit. Faster swimming does not help (a longer try list was tested: no change).
+       - (42, −6): PL and Mini Panoramic 12 s, Combo 12 s: the nearest fish are 15–20 m off; at 2 m/s that is 10–12 s.
+       - Ice: Live Ice 10–11 s at three spots, ice Forward 11 s in the deep hole.
+       - Lake corners and the west slope between shelf and basin (80-spot grid) stay slow: no fish within 35 m.
+       - A cap of 2.5 m/s instead of 2 gained 1–2 s at (6,−6) and (18,18) in Node. It was not kept: Jason asked that the fish
+         not rush in.
+     - **Checked:** fish-sim 15 min: 0 violations, lowest gap 0.42 m. sonar-qa grid (lake 6 spots × 6 views + ice 4 views)
+       against main 8637499: all 44 tiles within 0.4 mean luma and 0.4 % lit, 0 console errors. No mode switch in any browser
+       case. Headless desktop only: no phone or fps run, and the swim is judged by numbers, not by eye yet.
+     - **Side effect:** the west shelf has 15 fewer fish (perch and crappie). The PingLive Panoramic step stop (−24, 6) had
+       14–17 fish there before; it stays well above 6, but the picture there is a little emptier.
+     - Sheet: `docs/2026-10-31-fish-in-beam-10s.jpg`. Logs: `scripts/dev/qa/fish-beam/rerun-2026-10-31-10s/`. Test version only;
+       lab.accuphy.ca needs Jason's own 动.

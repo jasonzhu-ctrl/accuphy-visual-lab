@@ -1,0 +1,7 @@
+PLM down | ≤10s 23% ≤15s 38% ≤30s 76% | 80 first p50 10.7 p90 99.0 | min reached 65 / 80 within60s; p50 15.9 p90 28.4 | maxV 1.00 viol 0
+PLM forward | ≤10s 28% ≤15s 48% ≤30s 81% | 80 first p50 7.1 p90 21.5 | min reached 68 / 80 within60s; p50 12.8 p90 26.9 | maxV 1.00 viol 0
+PLM combo | ≤10s 31% ≤15s 43% ≤30s 73% | 160 first p50 7.5 p90 49.5 | min reached 126 / 160 within60s; p50 13.6 p90 28.6 | maxV 1.00 viol 0
+PL down | ≤10s 34% ≤15s 51% ≤30s 81% | 80 first p50 4.8 p90 22.9 | min reached 70 / 80 within60s; p50 12.7 p90 27.5 | maxV 1.00 viol 0
+PL forward | ≤10s 40% ≤15s 50% ≤30s 80% | 80 first p50 1.1 p90 22.0 | min reached 68 / 80 within60s; p50 10.4 p90 26.3 | maxV 1.00 viol 0
+PL panoramic | ≤10s 38% ≤15s 46% ≤30s 65% | 80 first p50 0.0 p90 18.0 | min reached 57 / 80 within60s; p50 9.7 p90 29.3 | maxV 1.00 viol 0
+PLM panoramic | ≤10s 19% ≤15s 33% ≤30s 58% | 80 first p50 7.9 p90 24.3 | min reached 59 / 80 within60s; p50 18.5 p90 44.0 | maxV 1.00 viol 0

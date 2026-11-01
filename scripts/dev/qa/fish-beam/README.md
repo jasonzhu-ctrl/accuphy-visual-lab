@@ -10,3 +10,9 @@ They were written by the 冰钓 chat's twin and used for the #193 test version (
 - `rerun-2026-10-31/`: logs of the full desktop rerun after the last tightening (7 of 7 views; three views were rerun alone). Numbers are in `docs/handover/chats/ice-lake.md`.
 
 How they find playwright: `createRequire('/Users/jason_zhujishuaihotmail.com/.npm/_npx/e41f203b7505f1fb/node_modules/playwright/package.json')` and Google Chrome at `/Applications/Google Chrome.app`. If that npx cache is gone, run `npx playwright --version` once to refill it, or change the path to your own `playwright-core`.
+
+Added 2026-10-31 for the 10 s round (#198):
+- `matrix2.mjs`: `matrix.mjs` with `PORT=` (serve a scratch copy of a commit, so another chat's file edits cannot reload the page mid-run) and the view re-selected at every spot. That re-selection fixes the Combo column: in the old run the page had reloaded (a Vite full reload from a file edit in this shared folder), which brought it back to Forward at 80 ft. `all.json` = the 7 lake views plus ice Live Ice and ice Forward.
+- `grid2.mjs`: `grid.mjs` with `PORT=`.
+- `beam-sim.mjs` now prints the share within 10 / 15 / 30 s; `SPOTS='[[x,z],…]'` and `VIEWS=PLM-down,…` narrow it.
+- `rerun-2026-10-31-10s/`: browser and Node results before (main 8637499) and after, and the sonar-qa grid logs.

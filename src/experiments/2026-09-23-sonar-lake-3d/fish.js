@@ -70,7 +70,7 @@ export function makePopulation(bedY, obstacles) {
   add('crappie', -52, -8, 2.0, 8, 11) // (-54, 4) → off the perch line (#173)
   add('smelt', -58, 14, 2.0, 25, 6)
   add('smelt', -38, 2, 3.0, 30, 6)
-  add('crappie', -46, 20, 1.5, 6, 9); add('crappie', -38, -6, 1.5, 6, 9) // one school of 12 → two groups, 9 m each (#173)
+  add('crappie', -46, 20, 1.5, 6, 9); add('crappie', 46, -2, 1.5, 6, 9) // one school of 12 → two groups, 9 m each (#173); the second (-38, -6) → the east flat (#193)
   add('largemouth', -35, 9, 1.0, 4, 10)
   // smelt: two tight bait balls in open water
   add('smelt', 10, -6, 7.0, 60, 4)
@@ -93,7 +93,7 @@ export function makePopulation(bedY, obstacles) {
   add('walleye', -14, 2, 0.6, 4, 14) // 12 → 14 m (#173)
   add('walleye', 4, -20, 0.8, 3, 12)
   add('walleye', 10, 24, 0.7, 3, 16) // (14, 20) spread 10 → (10, 24) 16 m: off the phone start (#173)
-  add('yellowperch', -46, 4, 1.2, 9, 9) // spread 6–7 → 9 m (#173)
+  add('yellowperch', 36, -8, 1.2, 9, 12) // (-46, 4) → the empty east flat, spread 9 → 12 m (#193: nothing to call there)
   add('yellowperch', -30, 28, 1.0, 8, 9) // (-32, 16) → off the crappie and the shelf's z ≈ 5 line (#173)
   add('yellowperch', -31, -13, 1.4, 8, 9) // (-24, -8) → onto the shelf: it sat on top of the crappie school (#173)
   addOne('pike', -52, 9, 1.4, 0.62); addOne('pike', -40, -3, 1.6, 0.8); addOne('pike', -30, 22, 1.4, 0.55); addOne('pike', 34, 25, 1.8, 0.86)
@@ -310,10 +310,12 @@ export function fishPose(f, t, out) {
 // ---------- a visit to the beam (fishBeam.js decides who and where) ----------
 // A cubic Bézier that leaves along the way the fish is swimming and arrives along its slow loop, walked by arc length: the
 // speed eases over TA seconds from v0 up to a cruise of at most 1 m/s, and down to v1. Closed in t, like the rest of the pose.
-const TA = 2, VISIT_MAX = 1
+// A beam visit passes tGoal (Jason 2026-10-31: "改到那个十秒到位", "不能直接冲进来"): a long way cruises faster, up to
+// VISIT_FAST, so the fish is in by about tGoal; the ramps stay eased, so it still starts and stops gently.
+const TA = 2, VISIT_MAX = 1, VISIT_FAST = 2
 const bez = (P, u, k) => { const m = 1 - u; return m * m * m * P[0][k] + 3 * m * m * u * P[1][k] + 3 * m * u * u * P[2][k] + u * u * u * P[3][k] }
 const bezD = (P, u, k) => { const m = 1 - u; return 3 * m * m * (P[1][k] - P[0][k]) + 6 * m * u * (P[2][k] - P[1][k]) + 3 * u * u * (P[3][k] - P[2][k]) }
-export function makeVisitPath(p, dir, T, dirEnd, bend, v0, v1, vMax = VISIT_MAX) {
+export function makeVisitPath(p, dir, T, dirEnd, bend, v0, v1, vMax = VISIT_MAX, tGoal = 0) {
   const dx = T.x - p.x, dy = T.y - p.y, dz = T.z - p.z, D = Math.hypot(dx, dy, dz), nh = Math.hypot(dx, dz) || 1
   const a = Math.min(0.35 * D, 4), b = Math.min(0.3 * D, 3), sx = (-dz / nh) * bend * D, sz = (dx / nh) * bend * D
   const P = [[p.x, p.y, p.z], [p.x + dir[0] * a + sx, p.y + dir[1] * a, p.z + dir[2] * a + sz], [T.x - dirEnd[0] * b + sx, T.y - dirEnd[1] * b, T.z - dirEnd[2] * b + sz], [T.x, T.y, T.z]]
@@ -323,6 +325,7 @@ export function makeVisitPath(p, dir, T, dirEnd, bend, v0, v1, vMax = VISIT_MAX)
   const L = lens[32], k = Math.min(1, (0.5 * L) / Math.max((TA * (v0 + v1)) / 2, 1e-6)) // (a very short way: slower ends)
   v0 *= k; v1 *= k
   const area = (TA * (v0 + v1)) / 2 // what the two ramps add up to, on top of the cruise
+  if (tGoal > TA) vMax = Math.min(VISIT_FAST, Math.max(vMax, (L - area) / (tGoal - TA)))
   const cT = Math.max((L - area) / vMax + TA, 6) // never quicker than 6 s: no darting in over a short way
   return { P, lens, L, T: cT, v0, v1, v: (L - area) / (cT - TA), points }
 }
