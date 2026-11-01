@@ -1,5 +1,7 @@
 # App 下载二维码：/app 页和文字方案（营销和外部系统对接，2026-11-01，只是方案，没改代码）
 
+> **11-01 改（见文末）：** Jason 改了做法，/app 页不做了，第 1–5 节搁置，只留作参考。现在的做法在最后一节“11-01 改”。
+
 HQ 派活 A8。Jason 11-01 在 Lab HQ 说“可以”，定了做法：
 - **电脑：** 面板里不再放徽章，改成手机画面上方一个二维码加一句话。
 - **手机：** 照旧两个徽章，上方一句 “Tap to download Accuphy Sonar App”（Jason 原文）。
@@ -131,3 +133,64 @@ HQ 派活 A8。Jason 11-01 在 Lab HQ 说“可以”，定了做法：
 - **界面设计：** 电脑二维码卡片和手机徽章的样子、/app 后备页的样子；`AppBadges.jsx` 是共用文件，改之前互相说一声。
 - **HQ：** 上传时把 `app/` 一起传；问 Jason 统计选 A 还是 C；provider token 到了告诉我。
 - **网站：** 无（`app_badge` 进桥是另一件欠着的事）。
+
+## 11-01 改：徽章点开弹二维码，码直接指向商店（HQ 转 Jason 11-01）
+
+**新做法：**
+- 电脑：手机画面上方放两个小徽章，点哪个就弹出哪个商店的二维码，码直接指向那个商店的 App 页，不经过 /app。
+- 手机：不再放徽章。底部两个按钮改成 “Learn More →” 和 “Share to a Fishing Buddy”。
+- 电脑面板上的按钮不改。
+- 统计：电脑上点徽章照旧发 `app_badge { store }`，能知道多少人想下载。扫码这件事不另外统计，也先不问 Jason。
+
+### 两个商店直达链接（二维码里装的就是这两个）
+
+| 商店 | 英文 | 法文 |
+|---|---|---|
+| App Store | `https://apps.apple.com/app/id6743123048` | `https://apps.apple.com/app/id6743123048?l=fr-CA` |
+| Google Play | `https://play.google.com/store/apps/details?id=com.accuphy.sonar&hl=en_CA&referrer=utm_source%3Daccuphy-lab%26utm_medium%3Dqr` | 同左，`hl=fr_CA` |
+
+- **App Store 不带国家：** iPhone 会打开用户自己国家的 App Store，美国用户不会被带到加拿大店。现在 `AppBadges.jsx` 里写的是 `/ca/`，做的时候一起改。
+- **App Store 的来源标记（`pt` / `ct`）：** 还是等 provider token（HQ 列表 C8），先不加。
+- **Google Play 的 referrer：** `utm_medium` 从现在的 `referral` 改成 `qr`，能和以前的点击分开。要是想少一个改动，也可以保持 `referral`，两个都行。referrer 让二维码稍微密一点，168 px 的码照样能扫；做的时候用现有的二维码测试（jsQR 解回原文，1–3 px 每格）确认。
+- 法文按 Lab 当前语言（`LANG`）选链接，和徽章图片用同一个判断。
+
+### i18n 键：加、改、删
+
+| 键 | 英文 | 法文草稿（交网站核） | 用在哪 | 状态 |
+|---|---|---|---|---|
+| `learn_more` | Learn More | En savoir plus | 手机底部左边的按钮，取代 “Shop {name}”；箭头 → 是按钮自带的图标，不放进文字 | 新加 |
+| `share_buddy_phone` | Share to a Fishing Buddy | Partager | 手机底部右边的按钮，取代 `share_short`（“Share”） | 新加 |
+| `app_qr_caption` | Scan to download Accuphy Sonar App | Scannez pour télécharger l’application Accuphy Sonar | 电脑上点徽章后弹框里的那句 | 新加，英文已定稿 |
+| `app_qr_open` | Show the {store} QR code | Afficher le code QR {store} | 电脑徽章的读屏标签（徽章现在是“打开弹框”，不再是链接）；{store} = App Store / Google Play，不翻译 | 新加，建议 |
+| `get_app` | Get the Accuphy Sonar app | Télécharger l’application Accuphy Sonar | 现在是两处徽章上方的小标题 | **删**：手机不放徽章；电脑只有两个小徽章，没有标题。界面设计的图里要是还放一行标题，就留着它 |
+| `share_short` | Share | Partager | 现在的手机分享按钮 | **删**（被 `share_buddy_phone` 取代）；只有它一处在用 |
+| `share` | Send to a fishing buddy | Partager | 电脑面板的分享按钮 | 不变（电脑按钮不改） |
+| `shop` | Shop {name} | Achetez le {name} | 电脑面板的去商店按钮 | 不变；手机上不再用它 |
+| `share_close` | Close | Fermer | 二维码弹框的关闭按钮，沿用 | 不变 |
+
+法文说明：
+- `share_buddy_phone` 写 “Partager”，是照网站 #198 的定法：“Partager” 是所有分享位置的法文，“Send to a friend” 也算。要是 Jason 想让法文也说出“钓友”，备选 “Partager avec un ami pêcheur”，按钮会长很多，要界面设计确认放得下。由网站定。
+- `learn_more`：“En savoir plus” 是店铺 /fr 的常见说法，以网站核定为准。
+- 二维码弹框里 “QR code” 的读屏文字现在是写死的英文（`ShareButton.jsx` 的 `aria-label="QR code"`），法文写 “code QR”，做的时候一起放进 i18n。
+
+### 要 HQ 确认的一点
+
+- **“Learn More →” 点了去哪？** 我的理解：去当前设备的商品页，和现在手机上的去商店胶囊完全一样（按市场、等 1 秒、发 `shop_click`，`placement` 仍是 `frame-top`），只是换了文字。
+  - 如果 Jason 想让它去别的页（比如介绍页、Lab 说明），告诉我。
+  - 去商店期间显示的 “Opening the store…” 照旧。
+
+### 影响
+
+- **事件：**
+  - 电脑：点徽章发 `app_badge { store: 'app_store' | 'google_play' }`。意思从“去了商店”变成“打开了二维码”。桥现在还没接这个事件（网站欠着，见上文第 2 节）。
+  - 手机：不再有 `app_badge`。
+  - 手机的 `shop_click`、`share` 不变。
+- **共用文件：**
+  - `AppBadges.jsx`：徽章变成按钮加弹框，样子归界面设计，链接和事件归我；
+  - `index.jsx` 第 360、446 行：手机徽章去掉，电脑徽章换位置；
+  - `ShopButton.jsx` 手机那处换文字；
+  - `ShareButton.jsx` 手机那处换文字。
+
+  做的时候先和界面设计、HQ 说好谁改哪几行。
+- **二维码：** 沿用 `ShareButton.jsx` 里的 `qrSvgPath()`（qrcode-generator，页面内生成，不经第三方，不过期）。分享弹框和 App 弹框长得像，各自那句说明要清楚（这句已定稿）。
+- 网站、店铺页、#191 订阅：都不受影响。
