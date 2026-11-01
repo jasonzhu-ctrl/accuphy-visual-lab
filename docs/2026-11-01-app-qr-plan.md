@@ -173,11 +173,15 @@ HQ 派活 A8。Jason 11-01 在 Lab HQ 说“可以”，定了做法：
 - `learn_more`：“En savoir plus” 是店铺 /fr 的常见说法，以网站核定为准。
 - 二维码弹框里 “QR code” 的读屏文字现在是写死的英文（`ShareButton.jsx` 的 `aria-label="QR code"`），法文写 “code QR”，做的时候一起放进 i18n。
 
-### 要 HQ 确认的一点
+### “Learn More →” 点了去哪（HQ 11-01 定）
 
-- **“Learn More →” 点了去哪？** 我的理解：去当前设备的商品页，和现在手机上的去商店胶囊完全一样（按市场、等 1 秒、发 `shop_click`，`placement` 仍是 `frame-top`），只是换了文字。
-  - 如果 Jason 想让它去别的页（比如介绍页、Lab 说明），告诉我。
-  - 去商店期间显示的 “Opening the store…” 照旧。
+- 只换文字，行为和现在手机上的 Shop 按钮完全一样：
+  - 按市场去当前设备的商品页；
+  - 等 1 秒，显示 “Opening the store…”；
+  - 发 `shop_click`，`placement` 仍是 `frame-top`；
+  - 美国只出 Mini。
+- HQ 说这和 Jason 当时说的“点了照旧去商店产品页”一致。
+- 所以 `embed.js` 不用改，只是手机那处 `ShopButton` 显示 `learn_more`，电脑面板照旧显示 `shop`。
 
 ### 影响
 
