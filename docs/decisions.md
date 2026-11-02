@@ -3658,4 +3658,4 @@ Numbered log. Newest at the bottom.
        - Tour on the lake and Mini pages, desktop and phone: the 4 s drag and 5 s holds as before, the boat dragged 8–11 m in a hold.
        - Ice page unchanged (3 cards, no tour; its section camera already follows the hole, and taps drill holes).
        - 0 errors.
-       - sonar-qa grid: running at commit time; the result follows in this entry.
+       - sonar-qa grid (lake 6 × 6 + ice 4) against 9992bf2: 44 tiles within 0.31 luma and 0.28 % lit, 0 errors: the sonar picture is unchanged.
