@@ -14,7 +14,7 @@ at ~1 s), `shop-wrong-source` (a sibling frame sends the receipt → ignored), `
 `share-desktop` (QR ≥ 168 px, Copy → "Copied ✓", Esc closes, events qr_shown + copy), `share-phone` (390×844, same popover,
 clear of the Shop pill; the pill reads "Learn More" and there are no store badges, #200), `app-badges-desktop` (#200: two
 badges, each opens its store's QR ≥ 160 px with "Scan to download Accuphy Sonar App", one `app_badge` { store } per click,
-the share popover closes the QR). They cover #184 / #187 (shop click, receipt), #188 / #192 (share popover) and #200 (A8).
+the share popover closes the QR). `no-lock-desktop` (#202: the live base has no subscribe lock — Mini → Combo opens with no lock icon and no card, a `view` event, no `signup`; a `VITE_COMBO_LOCK=1` build fails it on purpose). They cover #184 / #187 (shop click, receipt), #188 / #192 (share popover) #200 (A8) and #202 (lock off).
 The fake store page passes `?shop=/de-de` like the real bridge, plus `tour=off`: the entry tour (#199) dims the Shop,
 badge and share buttons while it runs. A wrong-ORIGIN receipt cannot be staged (the parent's origin is what the Lab trusts).
 Software WebGL is slow: allow ~15 s per scenario. Unit tests are separate: `shop-url-test.mjs`, `share-url-test.mjs`,

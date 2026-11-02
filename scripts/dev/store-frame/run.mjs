@@ -117,6 +117,21 @@ scenarios['app-badges-desktop'] = async () => {
   return { ok, detail: `badges=${badges} first=${a?.store} second=${b?.store} qr=${a?.qr}px caption="${a?.cap}" app/share after Share=${both} events=${evs}` }
 }
 
+// #202: the live base is built without VITE_COMBO_LOCK, so nothing is locked: Mini → Combo opens at once, no card, a `view` event.
+// (A build with VITE_COMBO_LOCK=1 would fail this on purpose: that is the marketing version, #191.)
+scenarios['no-lock-desktop'] = async () => {
+  const tab = await openTab(1280, 800)
+  if (!(await tab.open('mode=none'))) return { ok: false, detail: 'Lab did not start' }
+  await tab.lab("(w.__evs = [], w.addEventListener('accuphy-lab', e => { if (e.detail.event === 'view' || e.detail.event === 'signup') w.__evs.push(e.detail.event + ':' + (e.detail.data.view || '')) }), true)")
+  await tab.lab("([...d.querySelectorAll('.ac-btn')].find(b => b.textContent.trim() === 'PingLive Mini').click(), true)"); await sleep(600)
+  const locks = await tab.lab("d.querySelectorAll('.ac-view.is-locked, .ac-view-lock').length")
+  await tab.lab("([...d.querySelectorAll('.ac-view')].find(b => b.querySelector('.ac-view-name').textContent.trim() === 'Combo').click(), true)"); await sleep(800)
+  const o = JSON.parse(await tab.lab("JSON.stringify({ card: d.querySelectorAll('.ac-unlock').length, active: [...d.querySelectorAll('.ac-view.is-active .ac-view-name')].map(e => e.textContent.trim()).join(), evs: w.__evs })"))
+  await tab.close()
+  const ok = locks === 0 && o.card === 0 && o.active === 'Combo' && o.evs.includes('view:combo') && !o.evs.some((e) => e.startsWith('signup'))
+  return { ok, detail: `locks=${locks} card=${o.card} active=${o.active} events=${JSON.stringify(o.evs)}` }
+}
+
 let failed = 0
 for (const [name, fn] of Object.entries(scenarios)) {
   if (wanted.length && !wanted.includes(name)) continue
