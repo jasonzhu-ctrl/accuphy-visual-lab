@@ -7,14 +7,15 @@ import fs from 'node:fs'
 import path from 'node:path'
 
 const outDir = path.resolve(process.argv[2] || 'dist-share')
-const variant = process.env.VITE_LAB === 'fish' ? 'fish' : process.env.VITE_SCENE === 'ice' ? 'ice' : process.env.VITE_DEVICES === 'PLM' ? 'mini' : 'both' // pages (Jason 2026-10-16): PingLive + Mini, Mini only, and the ice-fishing page
-const title = variant === 'fish' ? 'Accuphy Lab · Fish test' : variant === 'ice' ? 'Accuphy Lab · Ice' : variant === 'mini' ? 'Accuphy Lab · PingLive Mini' : 'Accuphy Lab'
+const variant = process.env.VITE_LAB === 'tour' ? 'tour' : process.env.VITE_LAB === 'fish' ? 'fish' : process.env.VITE_SCENE === 'ice' ? 'ice' : process.env.VITE_DEVICES === 'PLM' ? 'mini' : 'both' // pages (Jason 2026-10-16): PingLive + Mini, Mini only, and the ice-fishing page; tour = the entry-tour prototype (2026-11-01), with VITE_DEVICES=PLM for the Mini script
+const title = variant === 'tour' ? 'Accuphy Lab · Tour' : variant === 'fish' ? 'Accuphy Lab · Fish test' : variant === 'ice' ? 'Accuphy Lab · Ice' : variant === 'mini' ? 'Accuphy Lab · PingLive Mini' : 'Accuphy Lab'
 const tmp = path.join(outDir, 'vite')
 await build({ configFile: 'vite.share.config.js', logLevel: 'warn', build: { outDir: tmp, emptyOutDir: true } })
 
-const html = fs.readFileSync(path.join(tmp, 'share/index.html'), 'utf8')
+const htmlRel = variant === 'tour' ? 'src/experiments/2026-11-01-tour-proto/share/index.html' : 'share/index.html' // the tour page has its own entry (vite.share.config.js)
+const html = fs.readFileSync(path.join(tmp, htmlRel), 'utf8')
 const jsRel = /<script[^>]*src="([^"]+\.js)"/.exec(html)[1], cssRel = /<link[^>]*href="([^"]+\.css)"/.exec(html)[1]
-const fromHtml = (rel) => path.resolve(path.join(tmp, 'share'), rel)
+const fromHtml = (rel) => path.resolve(path.dirname(path.join(tmp, htmlRel)), rel)
 let js = fs.readFileSync(fromHtml(jsRel), 'utf8'), css = fs.readFileSync(fromHtml(cssRel), 'utf8')
 const dataUri = (file, mime) => `data:${mime};base64,${fs.readFileSync(path.join('public', file)).toString('base64')}`
 

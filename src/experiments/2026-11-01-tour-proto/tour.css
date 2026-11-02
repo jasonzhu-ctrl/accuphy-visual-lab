@@ -1,0 +1,53 @@
+/* The entry tour prototype (TourProto.jsx). Store style, nothing glowing or gradient (#186): white Eurostile titles over
+   a dimmed lake, the one tile to press lit in Accuphy blue, a thin pulse ring on the boat. */
+
+/* the prototype page is the lock-free base (Jason 11-01): the store pieces are hidden here, the page itself unchanged */
+body.lab-tour-page .ac-shop, body.lab-tour-page .ac-share-wrap, body.lab-tour-page .ac-badges-wrap, body.lab-tour-page .ac-view-lock { display: none !important; }
+
+/* while the tour runs (class set on <body>): the lake dimmed, the page's own cue and step cards away, the panel locked */
+body.lab-tour main > div:first-child { filter: brightness(0.72) saturate(0.92); transition: filter 0.6s; }
+body.lab-tour main > div.pointer-events-none.absolute.left-0.top-0.whitespace-nowrap { opacity: 0 !important; }
+body.lab-tour .ac-card { opacity: 0; pointer-events: none; transition: opacity 0.4s; }
+body.lab-tour .ac-panel .ac-seg, body.lab-tour .ac-panel .ac-range, body.lab-tour .ac-panel .ac-value,
+body.lab-tour .ac-views .ac-view { pointer-events: none; opacity: 0.38; transition: opacity 0.3s; }
+/* the tile the stop asks for (the exact one is picked by TourProto with :nth-child) */
+@keyframes lab-tour-pulse {
+  0% { box-shadow: inset 0 0 0 1.5px #028cdf, 0 0 0 2px #028cdf, 0 0 0 4px rgba(2,140,223,0.35); }
+  100% { box-shadow: inset 0 0 0 1.5px #028cdf, 0 0 0 2px #028cdf, 0 0 0 12px rgba(2,140,223,0); }
+}
+
+.lab-tour-layer { position: fixed; inset: 0; z-index: 60; pointer-events: none; color: #fff; font-family: 'Instrument Sans', system-ui, sans-serif; }
+
+/* the stop: a big title, one line, three dots. Centred over the lake, right of the panel */
+.lab-tour-card { position: absolute; left: 432px; right: 16px; top: 17%; padding: 0 24px; text-align: center;
+  opacity: 0; transform: translateY(12px); transition: opacity calc(0.42s * var(--tour-k, 1)) ease, transform calc(0.42s * var(--tour-k, 1)) ease; }
+.lab-tour-card.is-in, .lab-tour-card.is-check { opacity: 1; transform: none; }
+.lab-tour-card.is-out { opacity: 0; transform: translateY(-10px); transition-duration: calc(0.3s * var(--tour-k, 1)); }
+.lab-tour-title { font-family: 'Eurostile Heavy', 'Instrument Sans', sans-serif; font-weight: 800; font-size: clamp(30px, 3.6vw, 46px); line-height: 1.08;
+  letter-spacing: 0.04em; text-transform: uppercase; text-shadow: 0 2px 4px rgba(0,16,24,0.45), 0 10px 32px rgba(0,16,24,0.4); }
+.lab-tour-text { margin: 12px auto 0; max-width: 460px; font-size: 15.5px; line-height: 1.4; font-weight: 500; color: rgba(255,255,255,0.86);
+  text-shadow: 0 1px 2px rgba(0,16,24,0.55), 0 0 14px rgba(0,16,24,0.4); }
+.lab-tour-dots { display: flex; justify-content: center; gap: 8px; margin-top: 18px; }
+.lab-tour-dots i { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,0.35); transition: background 0.25s, transform 0.25s; }
+.lab-tour-dots i.is-on { background: #fff; transform: scale(1.25); }
+.lab-tour-dots i.is-done { background: #028cdf; }
+
+/* --tour-k: dev ?tourslow=k, the same fades k× slower so a frame can be caught mid-fade */
+/* the pulse ring on the boat (stop 1): positioned every frame by TourProto */
+.lab-tour-ring { position: absolute; left: 0; top: 0; width: 56px; height: 56px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,0.85);
+  box-shadow: 0 0 0 1px rgba(0,16,24,0.25); transition: opacity 0.4s; }
+.lab-tour-ring::after { content: ''; position: absolute; inset: -1.5px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,0.9); animation: lab-tour-ring 1.7s ease-out infinite; }
+@keyframes lab-tour-ring { 0% { transform: scale(0.9); opacity: 0.9; } 100% { transform: scale(1.7); opacity: 0; } }
+
+/* Skip while it runs, Replay afterwards: one quiet line in the corner */
+.lab-tour-corner { position: absolute; left: 20px; bottom: 18px; pointer-events: auto; border: 0; background: none; padding: 6px 0; cursor: pointer;
+  color: rgba(255,255,255,0.72); font: 600 12.5px/1.2 'Instrument Sans', system-ui, sans-serif; text-decoration: underline; text-decoration-color: rgba(255,255,255,0.35); text-underline-offset: 3px; text-shadow: 0 1px 2px rgba(0,16,24,0.5); }
+.lab-tour-corner:hover { color: #fff; text-decoration-color: #fff; }
+
+/* phones: no panel, so the card sits under the safe area, Skip top right, and stops 2–3 go on with Next */
+.lab-tour-layer.is-phone .lab-tour-card { left: 0; right: 0; top: calc(env(safe-area-inset-top) + 64px); padding: 0 20px; }
+.lab-tour-layer.is-phone .lab-tour-title { font-size: 30px; }
+.lab-tour-layer.is-phone .lab-tour-text { font-size: 14.5px; max-width: 320px; }
+.lab-tour-layer.is-phone .lab-tour-corner { left: auto; right: 16px; bottom: auto; top: calc(env(safe-area-inset-top) + 14px); }
+.lab-tour-next { pointer-events: auto; margin-top: 16px; height: 40px; padding: 0 18px; border: 0; border-radius: 6px; background: #028cdf; color: #fff; cursor: pointer;
+  font: 700 13.5px 'Instrument Sans', system-ui, sans-serif; }

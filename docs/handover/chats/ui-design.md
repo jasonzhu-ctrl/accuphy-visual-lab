@@ -56,6 +56,15 @@
 - **图：** `docs/2026-10-31-sonar-tiles.jpg`、`docs/2026-10-30-glass-trials.jpg`、`docs/2026-10-30-panel-redesign.jpg`。
 - **上线配方：** 要 Jason 说“动”，HQ 打包上传。如果 #191 先上线，HQ 会从 c91bf7e 构建，不带 #192。
 
+## 3b. 进行中：三步入场教程小样（A9，Jason 11-01 在 Lab HQ：“动，先做小样”）
+
+- 代码在 `src/experiments/2026-11-01-tour-proto/`（`index.jsx` 包装页、`TourProto.jsx`、`tour.css`、`share/` 打包入口），**默认页面没改**：教程靠页面已有的 window 事件（`ready`、`view`）和面板按钮的 DOM 接上，锁面板是 `body.lab-tour` + 自己的 CSS。
+- 本地地址：`http://localhost:5173/?lab_unlock=sub#2026-11-01-tour-proto`（Mini 脚本：Combo → Forward → Down；`&tour=pl` 是 PingLive 脚本：Down → Forward → Panoramic）。`lab_unlock=sub` 只因为 Combo 现在还在订阅锁后面（#191）；无锁基础版出来后不用。
+- 打包：`VITE_LAB=tour VITE_DEVICES=PLM node scripts/build-share.mjs <out>`（`build-share.mjs` 和 `vite.share.config.js` 加了 tour 变体，其他变体不变）。
+- 开发辅助：`?tourslow[=k]` 把停顿和淡入淡出放慢 k 倍（默认 4），截中间帧用；只在开发环境生效。
+- 文字都是占位；手机版只做到够截图（选完视图后出，第 1 步点湖面，第 2、3 步按 Next，不换视图）；看过一次下次不弹还没做。
+- 等 Jason 看小样（经 HQ）；HQ 核过后放到测试链接单独一页。
+
 ## 4. 等人
 
 **等 Jason**（HQ 会放进他的卡片，你不要自己问他）：
