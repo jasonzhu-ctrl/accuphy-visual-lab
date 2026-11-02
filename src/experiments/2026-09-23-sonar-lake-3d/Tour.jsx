@@ -1,8 +1,8 @@
 // The entry tour (Jason 2026-11-02 in Lab HQ, plan docs/2026-11-02-entry-tour-into-base-plan.md; prototype
 // 2026-11-01-tour-proto): three stops, one action each, the same words and order on desktop and phones. It replaces the
 // three step cards on the lake pages (the ice page keeps its cards for now). A stop names the action ("Drag the boat",
-// "Tap Forward"), not the view still to come; it goes on only when the visitor has done it: dragged the boat for 2 s, or
-// switched to the view it asks for. Then it holds (3.5 s; 5 s after a tile), and the next fades in (timings below). "Skip tour" at any time,
+// "Tap Forward"), not the view still to come; it goes on only when the visitor has done it: dragged the boat for 4 s, or
+// switched to the view it asks for. Then it holds 3.5 s, and the next fades in (timings below). "Skip tour" at any time,
 // "Replay tour" afterwards; once seen (finished or skipped) it does not start by
 // itself again on this device. The page (index.jsx) owns the views: the tour only asks for them through `onShow`, and
 // tells the page which tile to light (`onState`). The base version has no lock: Combo shows during the tour.
@@ -30,9 +30,9 @@ const SLOW = import.meta.env.DEV ? +((/[?&]tourslow(?:=(\d+))?\b/.exec(q) || [, 
 // Round 3 (Jason 2026-11-02 in Lab HQ: there was not enough time to try each step): stop 1 is done after dragging a while in
 // all (stop-and-go counts); every done stop then holds on its own view with its dot blue, nothing to press; a stop
 // with no action waits. Fades 0.4 s out, 0.5 s in. Taps in the first 0.6 s of a new card do not count (a stray double tap).
-// Jason 2026-11-02, later: "第一步 Drag the boat 的整体时间可以减少 2 秒，forward 和 down 用户操作船的时间多 1.5 秒" — the drag
-// is done after 2 s (was 4) and keeps its 3.5 s hold; a tile stop holds 5 s (was 3.5). The boat can be dragged during a hold.
-const START_MS = 700, IN_DELAY = 80, OUT_MS = 400 * SLOW, HOLD_DRAG_MS = 3500 * SLOW, HOLD_TILE_MS = 5000 * SLOW, DRAG_S = 2 * SLOW, GUARD_MS = 600
+// Drag 4 s, every hold 3.5 s (round 3). Round 4's 2 s / 5 s was taken back (Lab HQ 11-02: Jason will explain the timing again).
+// The boat can be dragged during a hold.
+const START_MS = 700, IN_DELAY = 80, OUT_MS = 400 * SLOW, HOLD_DRAG_MS = 3500 * SLOW, HOLD_TILE_MS = 3500 * SLOW, DRAG_S = 4 * SLOW, GUARD_MS = 600
 
 export default function Tour({ script, auto, phone, mode, deviceId, state, onShow, onState }) {
   const sc = TOUR_SCRIPTS[script]
@@ -76,7 +76,7 @@ export default function Tour({ script, auto, phone, mode, deviceId, state, onSho
   // a tile stop is done when the page shows its view (the visitor tapped the lit tile)
   useEffect(() => { if (phase === 'running' && vis === 'in' && stop.action === 'tile' && mode === stop.view && deviceId === sc.device) complete() }, [phase, vis, i, mode, deviceId]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // the drag stop: done after 2 s of the lake's own drag in all (mouse or finger; stop-and-go adds up), shown by the ring
+  // the drag stop: done after 4 s of the lake's own drag in all (mouse or finger; stop-and-go adds up), shown by the ring
   // filling round the boat. The cue sits on the boat: the lake moves its caption there every frame (Scene.jsx), so the cue
   // follows the caption's anchor.
   const dragT = useRef(0)

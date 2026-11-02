@@ -3604,6 +3604,8 @@ Numbered log. Newest at the bottom.
        stays 3.5 s; a tile stop holds 5 s. The boat can be dragged during every hold (the guard covers only a new card's first
        0.6 s). Checked on lake and Mini, desktop and phone: drag 2.03–2.07 s; next card 3.88–3.92 s after stop 1, 5.35–5.43 s
        after a tile (the hold + the 0.4 s fade); a drag during the hold moved the boat 8–10 m; 0 errors.
+       - **Timing taken back the same day** (Lab HQ: Jason says the 2 s / 5 s reading was wrong and will explain again): the drag
+         is 4 s and every hold 3.5 s again, as in round 3. The "Tap … View" titles stay.
 
 200. **2026-11-02** — **A8 in the base version: the app badges with a QR popover on desktop, Learn More and Share to a Fishing Buddy on
      phones (test version)** (Jason 11-01 on the look; 11-02 in Lab HQ: "徽章、二维码、Learn More、分享这些属于基础版本的", so the
