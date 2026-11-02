@@ -37,8 +37,6 @@ const S = {
   hint_ice: { en: 'Tap the ice to drill a hole', fr: 'Touchez la glace pour percer un trou' },
   toast_phone: { en: 'These are the app’s own controls — Home, range, gain and pause work.', fr: 'Ce sont les commandes de l’application : Accueil, portée, gain et pause fonctionnent.' },
   toast_desktop: { en: 'These are the app’s own controls — use the panel to change the view.', fr: 'Ce sont les commandes de l’application : changez de vue dans le panneau.' },
-  // the step cards
-  step: { en: 'Step', fr: 'Étape' },
   // the entry tour (Tour.jsx, Jason 2026-11-02; replaces the lake's s1–s3 step cards): placeholder English from the prototype,
   // the real words and the French come later with Jason and the website's review (French falls back to English until then)
   tour_drag_title: { en: 'Drag the boat' },
@@ -49,15 +47,14 @@ const S = {
   tour_down_text: { en: 'The beam points straight under the boat — see what’s right below.' },
   tour_pano_title: { en: 'Tap Panoramic View' },
   tour_pano_text: { en: 'A wide sweep ahead of the boat — to find fish and structure.' },
+  // the ice page's tour (2026-11-02, replaces its cards i1–i3): English placeholders from Base; every FR is a draft for the website's review
+  tour_drill_title: { en: 'Tap the ice', fr: 'Touchez la glace' }, // FR draft, for the website's review
+  tour_drill_text: { en: 'Drill a new hole where you tap — the PingLive Mini drops in and pings straight down.', fr: 'Percez un nouveau trou là où vous touchez : le PingLive Mini y descend et sonde droit vers le bas.' }, // FR draft, for the website's review
+  tour_ice_fwd_text: { en: 'The beam turns sideways under the ice — fish out ahead, where you never drilled.', fr: 'Le faisceau se tourne sur le côté sous la glace : les poissons plus loin, là où vous n’avez pas percé.' }, // FR draft, for the website's review
+  tour_ice_down_text: { en: 'The beam points straight down the hole — your bait and every fish that rises to it.', fr: 'Le faisceau pointe droit sous le trou : votre leurre et chaque poisson qui monte vers lui.' }, // FR draft, for the website's review
   tour_tap: { en: 'Tap' },
   tour_skip: { en: 'Skip tour' },
   tour_replay: { en: 'Replay tour' },
-  i1_title: { en: 'The beam under the ice', fr: 'Le faisceau sous la glace' },
-  i1_text: { en: 'The PingLive Mini hangs in the hole and pings straight down. Tap the ice anywhere to drill a new hole — whatever the beam touches lights up.', fr: 'Le PingLive Mini est suspendu dans le trou et émet droit vers le bas. Touchez la glace n’importe où pour percer un nouveau trou : tout ce que le faisceau touche s’allume.' },
-  i2_title: { en: 'Watch them come in', fr: 'Regardez-les arriver' },
-  i2_text: { en: 'The flasher is the dial: the bottom, your bait and every fish that rises, by depth around the ring. The panel beside it draws the same fish as marks.', fr: 'Le flasheur, c’est le cadran : le fond, votre appât et chaque poisson qui monte s’affichent selon leur profondeur, tout autour de l’anneau. Le panneau à côté montre les mêmes poissons sous forme d’échos.' },
-  i3_title: { en: 'Look ahead without drilling', fr: 'Voir devant sans percer' },
-  i3_text: { en: 'Forward View turns the beam sideways: fish and structure out ahead, under ice you never cut.', fr: 'La vue avant tourne le faisceau sur le côté : poissons et structures plus loin devant, sous une glace que vous n’avez jamais percée.' },
   // the lost-WebGL card (in-app browsers)
   gl_lost_title: { en: 'The 3D view stopped', fr: 'La vue 3D s’est arrêtée' },
   gl_lost_text: { en: 'Your browser freed the graphics memory. Tap to reload the lake.', fr: 'Votre navigateur a libéré la mémoire graphique. Touchez pour recharger le lac.' },

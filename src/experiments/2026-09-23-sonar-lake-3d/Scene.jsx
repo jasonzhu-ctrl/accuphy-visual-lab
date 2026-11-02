@@ -615,6 +615,7 @@ function Rig({ state, sonarRect, fogMats, cam = LAKE_CAM }) {
         s.hintAnchor.x = s.boat.x - (k > 1 ? 1.5 : 2.6); s.hintAnchor.z = s.boat.z + (k > 1 ? 3.8 : 2.2)
         tmp.set(s.hintAnchor.x, 0, s.hintAnchor.z).project(camera)
       } else { s.hintAnchor = null; tmp.set(s.boat.x, 0.05, s.boat.z - 5.3).project(camera) } // the lake: just above the far edge of the water reticle (#132)
+      s.tapAt = [((tmp.x + 1) / 2) * size.width, ((1 - tmp.y) / 2) * size.height] // where the ice page's tour asks for a tap (Tour.jsx drill stop): the reticle
       const hw = (s.hintEl.offsetWidth || 160) / 2 + 8
       const minX = iceSec && size.width >= 1024 ? 440 + hw : hw // desktop: clear of the glass panel and the step cards
       const px = Math.min(size.width - hw, Math.max(minX, ((tmp.x + 1) / 2) * size.width))

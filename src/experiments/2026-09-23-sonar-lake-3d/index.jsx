@@ -12,7 +12,6 @@ import { screenLayout } from './SonarScreen'
 import UnlockCard, { LockIcon } from './UnlockCard'
 import AppHome, { isLocked, viewThumb, VIEW_IMG } from './home/AppHome'
 import ViewIcon from './ViewIcon'
-import GlassLayer, { GLASS } from './GlassLayer' // the app's Home (view selection) page inside the phone, phones only (2026-10-16)
 import { isSignedUp } from './signup'
 import { iceUrl, labEvent, miniOnly, PRODUCT, sentEvents } from './embed'
 import ShopButton from './ShopButton' // the one link to the store (X-6L, 2026-10-25; placement B, Jason)
@@ -79,21 +78,12 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
   const SHOWN_DEVICES = ONLY ? [DEVICES[ONLY]] : Object.values(DEVICES)
   // the entry tour (Tour.jsx, Jason 2026-11-02) on the lake pages: the Mini's script on a Mini-only page, PingLive's otherwise.
   // When it will start by itself, the page opens on its first stop's view (phones skip the app's Home until it ends)
-  const TOUR = ICE ? null : ONLY === 'PLM' ? 'mini' : 'pl'
-  const [tourAuto] = useState(() => !!TOUR && !tourOff && (tourForced || !tourSeen()))
+  const TOUR = ICE ? 'ice' : ONLY === 'PLM' ? 'mini' : 'pl'
+  const [tourAuto] = useState(() => !!TOUR && !tourOff && (tourForced || !tourSeen(TOUR)))
   const [tour, setTour] = useState({ on: false, tile: null }) // the tour is running; the view whose tile it lights
   const [deviceId, setDeviceId] = useState(ONLY || 'PL')
   const [mode, setMode] = useState(tourAuto ? TOUR_SCRIPTS[TOUR].stops[0].view : ICE ? (/[?&]view=ice\b/.test(window.location.search) && (!COMBO_LOCK || isSignedUp()) ? 'ice' : 'liveice') : 'forward') // ?view=ice: the Ice Fishing tile from the lake (#191)
   const [view, setView] = useState(ICE ? iceParams().view : 'top') // ice page cameras: top / under the ice / section (docs/ice-relationship-study.md)
-  // the ice page: the step cards stack under the control panel, so the ice band across the top stays open for taps
-  const panelRef = useRef(null)
-  const [cardsTop, setCardsTop] = useState(340)
-  useEffect(() => {
-    if (!ICE) return
-    const m = () => { const el = panelRef.current; if (el) setCardsTop(el.offsetTop + el.offsetHeight + 12) }
-    m(); const id = setTimeout(m, 400); window.addEventListener('resize', m)
-    return () => { clearTimeout(id); window.removeEventListener('resize', m) }
-  }, [ICE, view, mode])
   const [rangeFt, setRangeFt] = useState(80)       // the visitor's own range (slider)
   // dev: ?gain=0.4&contrast=0.47&noise=0.25&depth=80 set the calibration knobs from the URL (like-for-like comparisons
   // with app recordings, 2026-10-23); production ignores them
@@ -349,20 +339,6 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
     if (i >= 0) setComboDownFt(steps[i])
   }
 
-  // the three-step guide (docs/3d-beam-reference.md §3): each step is a preset. Only the ice page keeps it; on the lake the
-  // entry tour replaces it (Jason 2026-11-02)
-  const [step, setStep] = useState(0)
-  const STEPS = ICE ? [
-    { n: 1, title: t('i1_title'), text: t('i1_text'), device: 'PLM', mode: 'liveice', range: 60, boat: ICE_START },
-    { n: 2, title: t('i2_title'), text: t('i2_text'), device: 'PLM', mode: 'liveice', range: 60, boat: [-8, -10] },
-    { n: 3, title: t('i3_title'), text: t('i3_text'), device: 'PLM', mode: 'forward', range: 60, boat: [16, 11] },
-  ] : []
-  const goStep = (i) => {
-    const st = STEPS[i]; setStep(i); pickView(st.device, st.mode, 'step'); setRangeFt(st.range)
-    state.current.target.x = st.boat[0]; state.current.target.z = st.boat[1]
-    state.current.frameX = st.boat[0] + 14 // phones: re-centre the zoomed-out view on the preset (boat left, beam right)
-  }
-
   return (
     <>
     <main ref={mainRef} inert={!!unlock} aria-hidden={unlock ? true : undefined} className={`font-brand fixed inset-x-0 top-0 select-none overflow-hidden bg-[#9cc1cf] text-white ${tour.on ? 'is-touring' : ''}`} style={{ height: 'var(--lab-h, 100%)', ...(ICE ? { background: iceParams().T.bg } : null) }} onPointerMove={onMove}>
@@ -381,7 +357,7 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
       )}
 
       {/* ---- control panel — Apple-style frosted glass over the lake (Jason 2026-09-24) ---- */}
-      <motion.div ref={(el) => { panelRef.current = el; state.current.panelEl = el }} data-hint-avoid initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+      <motion.div ref={(el) => { state.current.panelEl = el }} data-hint-avoid initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
         className={`ac-panel pointer-events-auto absolute flex flex-col gap-3 max-sm:hidden sm:left-4 sm:top-14 sm:w-[400px] sm:p-4 ${tour.on ? 'is-touring' : ''}`} style={land ? { display: 'none' } : undefined}>
         {/* logo | LAB (Jason 2026-11-02: LAB too big; 界面设计 option A, docs/2026-11-02-base-ui-round3-design-handover.md §4) */}
         <div className="ac-lab-head flex items-start px-1 pt-0.5">
@@ -547,17 +523,6 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
         </div>
       )}
 
-      {/* ---- guide strip (the ice page; the lake has the entry tour) ---- */}
-      {ICE && <div data-hint-avoid className={ICE ? 'pointer-events-auto absolute hidden flex-col gap-2 md:flex' : 'pointer-events-auto absolute right-[28px] top-4 hidden w-[min(620px,44vw)] items-stretch gap-2.5 md:flex'} style={ICE ? { left: 16, top: cardsTop, width: 400 } : land ? { display: 'none' } : undefined}>
-        {STEPS.map((st, i) => (
-          <button key={st.n} onClick={() => goStep(i)} className={`ac-card flex-1 text-left ${ICE ? 'px-3.5 py-2.5' : 'px-3.5 py-3'} ${step === i ? 'is-active' : ''} ${GLASS ? 'is-glass' : ''}`}>
-            {GLASS && <GlassLayer kind={GLASS} />}
-            <div className="flex items-center gap-2"><span className="ac-num">0{st.n}</span><span className="ac-label">{t('step')}</span></div>
-            <div className="mt-1.5 text-[13.5px] font-semibold leading-tight">{st.title}</div>
-            {step === i && <div className="ac-body mt-1.5 text-[11.5px] leading-snug">{st.text}</div>}
-          </button>
-        ))}
-      </div>}
       {import.meta.env.DEV && window.location.search.includes('debug') && (
         <pre ref={(el) => { state.current.debugEl = el }} className="pointer-events-none absolute left-2 top-1/2 rounded bg-black/60 p-1 text-[10px] text-lime-300" />
       )}

@@ -3681,3 +3681,37 @@ Numbered log. Newest at the bottom.
        - The entry tour still starts (desktop PL, phone Mini).
        - With `VITE_COMBO_LOCK=1`: locks and the card come back (Combo and Mini Panoramic open the card), so the switch works.
        - Production build OK; no page errors (only the dev server's usual favicon 404, the same with the lock on).
+
+203. **2026-11-02** — **The ice page gets the entry tour too; its three step cards are gone (test version)** (Jason in Lab HQ:
+     "Do the ice-fishing version with the same logic; it's also the base version").
+     - **Three stops** (`Tour.jsx` script `ice`, device PLM; the page opens on Combo when the tour starts):
+       1. **Combo View, "Tap the ice"** (title a placeholder): the ice has no boat to drag, so the action is a tap on the ice.
+          The cue is the lake's blue ring with the tile stops' tapping finger in it, on the spot the page marks for a tap
+          (`Scene.jsx` `s.tapAt`: the reticle in the section camera, just past the hole in the other two). The tap is done
+          at once (dot blue, the ring fills and pops) and stop 2 fades straight in, no pause (Jason's timing, as the lake's drag
+          stop; HQ 11-02). The hole is still drilling meanwhile (~3–4 s), so a very quick Forward tap shows the picture
+          coming back as the Mini drops in.
+       2. **Tap Forward View**, 3. **Tap Down View**: as on the Mini page — the tile lit, TAP bubble, a 5 s hold on the new view
+          in which the ice can be tapped (a hole drills); the tour ends after stop 3.
+       - Spotlight, Skip / Replay, phone auto-start and the phone tile under the words: the lake's, unchanged.
+     - **Seen once** has its own mark on the ice page, `accuphy_lab_tour_ice_v1` (the lake pages share
+       `accuphy_lab_tour_v1`): the ice tour teaches a different action, and a visitor who did the lake's tour reaches the ice
+       page through its Ice Fishing tiles. A visitor who arrives from the lake's Ice Fishing tile (`?view=ice`) on a first
+       visit sees the tour first (it opens on Combo); after it, the view is theirs.
+     - **Removed:** the ice page's cards (`STEPS`, `goStep`, the card strip and its placement under the panel) and their
+       keys `i1_*`–`i3_*` and `step`; the now unused `GlassLayer` import in `index.jsx`.
+     - **New keys** (i18n.js; English placeholders, every FR a draft for the website's review): `tour_drill_title`,
+       `tour_drill_text`, `tour_ice_fwd_text`, `tour_ice_down_text`. Stops 2–3 reuse `tour_fwd_title` / `tour_down_title`,
+       which have no French yet, as on the lake.
+     - The ice page has no lock either (#202).
+     - QA scripts `matrix2.mjs` / `grid2.mjs` also preset the ice tour's seen mark.
+     - **Checked** on scratch copies:
+       - Ice page, desktop (section and top cameras) and phone: 1 → 2 → 3 walked. The cue sits on the reticle (to the
+         pixel); a tap there is done in < 0.1 s and stop 2 is in 0.55–0.6 s later. Forward and Down tiles 5.4–5.5 s each to
+         the next / the end. The ice drills in the hold; Replay afterwards; after a reload it does not start again. The old
+         cards: 0. 0 errors.
+       - Lake and Mini pages, desktop and phone: their tours as before (4 s drag, 5 s holds), QR badges and phone dock as
+         before, 0 errors.
+       - sonar-qa grid (lake 6 × 6 on/off + ice 4 on/off) against 6b5a225: ice tiles within 0.43 luma; lake tiles within
+         1.16 luma and 0.98 % lit, the largest at spot 5 with the boat still on its way after 1.8 s (the same picture, a
+         step along the path); 0 errors. Production build of the ice page OK.

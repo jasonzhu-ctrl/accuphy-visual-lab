@@ -7,7 +7,7 @@ const b=await chromium.launch({headless:true,executablePath:'/Applications/Googl
 const countFn=async()=>{const m=await import('/src/experiments/2026-09-23-sonar-lake-3d/fish.js'),B=await import('/src/experiments/2026-09-23-sonar-lake-3d/fishBeam.js');const s=window.__sonarState,pop=window.__fish,t=window.__lakeClock.elapsedTime,o={},a=s.apex;const n=s.specs.map(()=>0);let visit=0;for(const f of pop){if(f.act?.kind==='visit')visit++;if(f.species==='smelt'||!f.radius)continue;m.fishPose(f,t,o);s.specs.forEach((sp,k)=>{if(B.inFan(sp,o.x-a.x,o.y-a.y,o.z-a.z))n[k]++})}return {n,visit,t,mode:s.mode,dev:s.deviceId,range:Math.round(s.rangeM/.3048)}}
 for(const c of cfg.cases){
  const ctx=await b.newContext(c.phone?{viewport:{width:390,height:844},deviceScaleFactor:2,isMobile:true,hasTouch:true}:{viewport:{width:1400,height:900}})
- await ctx.addInitScript(()=>{try{localStorage.setItem('accuphy_sonar_signup_v1','1');localStorage.setItem('accuphy_lab_tour_v1','1')}catch{}})
+ await ctx.addInitScript(()=>{try{localStorage.setItem('accuphy_sonar_signup_v1','1');localStorage.setItem('accuphy_lab_tour_v1','1');localStorage.setItem('accuphy_lab_tour_ice_v1','1')}catch{}})
  const p=await ctx.newPage();const errs=[];p.on('pageerror',e=>errs.push(e.message))
  await p.goto(`http://localhost:${process.env.PORT||5173}/?${c.q||''}#${c.ice?'2026-10-16-sonar-ice-3d':'2026-09-23-sonar-lake-3d'}`);await p.waitForFunction(()=>window.__lakeClock&&window.__sonarState&&window.__fish,null,{timeout:60000});await p.waitForTimeout(2500)
  try{

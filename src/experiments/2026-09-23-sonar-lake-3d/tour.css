@@ -74,6 +74,11 @@ main.is-touring .ac-shop, main.is-touring .ac-badges-wrap, main.is-touring .ac-s
 /* done: a bluer fill and one pop, then the cue goes */
 .ac-tour-cue.is-complete .ac-tour-cue-ring { opacity: 1; background: rgba(2, 140, 223, 0.5); animation: ac-tour-done 0.36s ease-out 1; }
 .ac-tour-cue.is-complete { opacity: 0; transition: opacity 0.5s ease 0.6s; }
+/* the ice page's first stop (Tour.jsx drill): the same ring on the spot to tap, the tile stops' tapping finger in it, no arrows
+   and no progress arc (one tap does it) */
+.ac-tour-cue.is-tap .ac-tour-tap { position: absolute; left: 0; top: 0; transition: opacity 0.2s ease; }
+.ac-tour-cue.is-tap.is-complete .ac-tour-tap { opacity: 0; }
+.ac-tour-cue.is-tap.is-complete .ac-tour-tap * { animation: none; }
 @keyframes ac-tour-done { 0% { transform: scale(1); } 45% { transform: scale(1.14); } 100% { transform: scale(1); } }
 
 @media (prefers-reduced-motion: reduce) {
