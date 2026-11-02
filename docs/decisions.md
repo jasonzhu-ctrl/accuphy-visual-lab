@@ -3606,6 +3606,12 @@ Numbered log. Newest at the bottom.
        after a tile (the hold + the 0.4 s fade); a drag during the hold moved the boat 8–10 m; 0 errors.
        - **Timing taken back the same day** (Lab HQ: Jason says the 2 s / 5 s reading was wrong and will explain again): the drag
          is 4 s and every hold 3.5 s again, as in round 3. The "Tap … View" titles stay.
+       - **Timing as Jason confirmed it (2026-11-02, via Lab HQ):** the drag stop is done after **4 s** and goes straight on (its
+         dot turns blue, the card fades out, **no hold**); a tile stop **holds 5 s** on the new view with the boat free to drag;
+         the tour ends after stop 3's hold. Fades 0.4 s out, 0.5 s in; the 0.6 s guard stays.
+         Checked on lake and Mini, desktop and phone: drag done at 4.04 s, stop 2 fading in from 4.52 s (fully in ~0.9 s after
+         the drag); its dot stays blue through the fade; tile stops 5.35–5.45 s to the next card or the end (5 s + the fade); a
+         drag in the hold moved the boat 8–10 m; ice page unchanged; 0 errors.
 
 200. **2026-11-02** — **A8 in the base version: the app badges with a QR popover on desktop, Learn More and Share to a Fishing Buddy on
      phones (test version)** (Jason 11-01 on the look; 11-02 in Lab HQ: "徽章、二维码、Learn More、分享这些属于基础版本的", so the

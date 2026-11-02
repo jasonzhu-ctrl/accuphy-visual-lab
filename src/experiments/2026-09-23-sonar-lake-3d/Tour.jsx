@@ -2,7 +2,7 @@
 // 2026-11-01-tour-proto): three stops, one action each, the same words and order on desktop and phones. It replaces the
 // three step cards on the lake pages (the ice page keeps its cards for now). A stop names the action ("Drag the boat",
 // "Tap Forward"), not the view still to come; it goes on only when the visitor has done it: dragged the boat for 4 s, or
-// switched to the view it asks for. Then it holds 3.5 s, and the next fades in (timings below). "Skip tour" at any time,
+// switched to the view it asks for. A tile stop then holds 5 s, and the next fades in (timings below). "Skip tour" at any time,
 // "Replay tour" afterwards; once seen (finished or skipped) it does not start by
 // itself again on this device. The page (index.jsx) owns the views: the tour only asks for them through `onShow`, and
 // tells the page which tile to light (`onState`). The base version has no lock: Combo shows during the tour.
@@ -30,9 +30,10 @@ const SLOW = import.meta.env.DEV ? +((/[?&]tourslow(?:=(\d+))?\b/.exec(q) || [, 
 // Round 3 (Jason 2026-11-02 in Lab HQ: there was not enough time to try each step): stop 1 is done after dragging a while in
 // all (stop-and-go counts); every done stop then holds on its own view with its dot blue, nothing to press; a stop
 // with no action waits. Fades 0.4 s out, 0.5 s in. Taps in the first 0.6 s of a new card do not count (a stray double tap).
-// Drag 4 s, every hold 3.5 s (round 3). Round 4's 2 s / 5 s was taken back (Lab HQ 11-02: Jason will explain the timing again).
-// The boat can be dragged during a hold.
-const START_MS = 700, IN_DELAY = 80, OUT_MS = 400 * SLOW, HOLD_DRAG_MS = 3500 * SLOW, HOLD_TILE_MS = 3500 * SLOW, DRAG_S = 4 * SLOW, GUARD_MS = 600
+// Round 4 timing as Jason confirmed it (2026-11-02 via Lab HQ): the drag stop is done after 4 s and goes straight on (its dot
+// turns blue, then the card fades out, no hold); a tile stop holds 5 s on the new view, the boat free to drag, then the next
+// card (after the last, the tour ends).
+const START_MS = 700, IN_DELAY = 80, OUT_MS = 400 * SLOW, HOLD_DRAG_MS = 0, HOLD_TILE_MS = 5000 * SLOW, DRAG_S = 4 * SLOW, GUARD_MS = 600
 
 export default function Tour({ script, auto, phone, mode, deviceId, state, onShow, onState }) {
   const sc = TOUR_SCRIPTS[script]
@@ -48,7 +49,7 @@ export default function Tour({ script, auto, phone, mode, deviceId, state, onSho
 
   const enter = (k) => {
     const st = sc.stops[k]
-    setI(k); setVis('hidden'); setArmed(false)
+    setI(k); setVis('hidden'); setArmed(false); doneRef.current = false
     if (st.action === 'drag') onShow(sc.device, st.view, false) // the stop's own view is on before its title appears
     onState({ on: true, tile: st.action === 'tile' ? st.view : null })
     later(() => setVis('in'), IN_DELAY)
@@ -57,7 +58,9 @@ export default function Tour({ script, auto, phone, mode, deviceId, state, onSho
   const start = () => { timers.current.forEach(clearTimeout); timers.current = []; setPhase('running'); enter(0) }
   const finish = () => { markSeen(); setPhase('done'); setVis('hidden'); onState({ on: false, tile: null }) }
   const skip = () => { setVis('out'); later(finish, OUT_MS) }
+  const doneRef = useRef(false) // the current stop was done (not skipped): its dot stays blue while the card fades out
   const complete = () => {
+    doneRef.current = true
     setVis('check')
     later(() => { setVis('out'); later(() => (i + 1 < sc.stops.length ? enter(i + 1) : finish()), OUT_MS) }, stop.action === 'drag' ? HOLD_DRAG_MS : HOLD_TILE_MS)
   }
@@ -145,7 +148,7 @@ export default function Tour({ script, auto, phone, mode, deviceId, state, onSho
         <div className={`ac-tour-card is-${vis}`}>
           <div className="ac-tour-title">{t(`tour_${k}_title`)}</div>
           <div className="ac-tour-text">{t(`tour_${k}_text`)}</div>
-          <div className="ac-tour-dots">{sc.stops.map((_, n) => <i key={n} className={n < i || (n === i && vis === 'check') ? 'is-done' : n === i ? 'is-on' : ''} />)}</div>
+          <div className="ac-tour-dots">{sc.stops.map((_, n) => <i key={n} className={n < i || (n === i && (vis === 'check' || (vis === 'out' && phase === 'running' && doneRef.current))) ? 'is-done' : n === i ? 'is-on' : ''} />)}</div>
           {phone && stop.action === 'tile' && (
             <button ref={ptile} type="button" className={`ac-view ac-tour-ptile is-tour-target ${mode === stop.view ? 'is-active' : ''}`} onClick={() => onShow(sc.device, stop.view, true)}>
               <ViewIcon view={stop.view} deg={sc.device === 'PLM' ? 39 : 135} active={mode === stop.view} />
