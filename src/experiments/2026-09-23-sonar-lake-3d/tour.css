@@ -10,6 +10,8 @@ main.is-touring > div:first-child { filter: brightness(0.72) saturate(0.92); tra
 main.is-touring .lab-hint { opacity: 0 !important; }
 .ac-panel.is-touring .ac-seg, .ac-panel.is-touring .ac-range, .ac-panel.is-touring .ac-value,
 .ac-panel.is-touring .ac-view { pointer-events: none; opacity: 0.38; transition: opacity 0.3s; }
+/* the store pieces too, desktop panel and phone dock alike (Lab HQ 11-02, from 界面设计's look check): back after the tour */
+main.is-touring .ac-shop, main.is-touring .ac-badges-wrap, main.is-touring .ac-share-wrap { pointer-events: none; opacity: 0.38; transition: opacity 0.3s; }
 /* the tile asked for (the panel's on desktop, the one under the words on phones): full, a thick blue edge, a glow */
 .ac-view.is-tour-target, .ac-panel.is-touring .ac-view.is-tour-target { pointer-events: auto; opacity: 1;
   box-shadow: 0 0 0 3px #028cdf, 0 0 22px 3px rgba(2, 140, 223, 0.75); }
