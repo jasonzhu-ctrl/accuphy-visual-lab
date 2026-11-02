@@ -3599,19 +3599,16 @@ Numbered log. Newest at the bottom.
        - Phones: with the badges gone (#200) the card is back at the design's safe area + 64 px, and Skip/Replay top right.
        - Checked: walk 1→2→3 at 1280×720 and 390×844, lake and Mini page. Drag 4.04–4.07 s to done; hold to the next card
          3.87–3.94 s (3.5 s + the 0.4 s fade); an early tap does not count; 0 errors.
-     - **Round 4 (Jason 2026-11-02: "第一步 Drag the boat 的整体时间可以减少 2 秒，forward 和 down 用户操作船的时间多 1.5 秒"; titles
-       "Tap Forward View", "Tap Down View", "Tap Panoramic View"):** the drag is done after 2 s (the ring fills in 2 s), its hold
-       stays 3.5 s; a tile stop holds 5 s. The boat can be dragged during every hold (the guard covers only a new card's first
-       0.6 s). Checked on lake and Mini, desktop and phone: drag 2.03–2.07 s; next card 3.88–3.92 s after stop 1, 5.35–5.43 s
-       after a tile (the hold + the 0.4 s fade); a drag during the hold moved the boat 8–10 m; 0 errors.
-       - **Timing taken back the same day** (Lab HQ: Jason says the 2 s / 5 s reading was wrong and will explain again): the drag
-         is 4 s and every hold 3.5 s again, as in round 3. The "Tap … View" titles stay.
-       - **Timing as Jason confirmed it (2026-11-02, via Lab HQ):** the drag stop is done after **4 s** and goes straight on (its
-         dot turns blue, the card fades out, **no hold**); a tile stop **holds 5 s** on the new view with the boat free to drag;
-         the tour ends after stop 3's hold. Fades 0.4 s out, 0.5 s in; the 0.6 s guard stays.
-         Checked on lake and Mini, desktop and phone: drag done at 4.04 s, stop 2 fading in from 4.52 s (fully in ~0.9 s after
-         the drag); its dot stays blue through the fade; tile stops 5.35–5.45 s to the next card or the end (5 s + the fade); a
-         drag in the hold moved the boat 8–10 m; ice page unchanged; 0 errors.
+     - **Round 4 (Jason 2026-11-02, timing as he confirmed it via Lab HQ; titles "Tap Forward View", "Tap Down View", "Tap Panoramic View"):**
+       - **Stop 1:** done after **4 s** of dragging in all (the ring fills in 4 s), then straight on: its dot turns blue and stays
+         blue while the card fades out, **no hold**; stop 2 is fully in about 0.9 s after the drag is done.
+       - **Stops 2–3:** a **5 s hold** after the tap on the new view, the boat free to drag; the tour ends after stop 3's hold.
+       - Unchanged: fades 0.4 s out, 0.5 s in; the 0.6 s guard.
+       - On the way: bde106f first had a 2 s drag with a 3.5 s hold (HQ's first reading), 0dc0c3d put 4 s / 3.5 s back while
+         Jason explained again, 9c3fcb5 is the confirmed timing above.
+       - Checked (9c3fcb5) on lake and Mini, desktop and phone: drag done at 4.04 s, stop 2 fading in from 4.52 s; tile stops
+         5.35–5.45 s to the next card or the end (5 s + the fade); a drag in the hold moved the boat 8–10 m; ice page
+         unchanged; 0 errors.
 
 200. **2026-11-02** — **A8 in the base version: the app badges with a QR popover on desktop, Learn More and Share to a Fishing Buddy on
      phones (test version)** (Jason 11-01 on the look; 11-02 in Lab HQ: "徽章、二维码、Learn More、分享这些属于基础版本的", so the
