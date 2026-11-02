@@ -62,3 +62,10 @@
 @media (max-width: 369px) { .ac-phone-dock .ac-share { font-size: 13px; padding: 0 10px; } .ac-phone-dock .ac-shop { padding: 0 12px 0 14px; } }
 /* the share popover on phones keeps its place but sits at 40 % (it must clear the taller dock) */
 body .ac-share-pop.is-phone { top: 40%; } /* body: wins over src/index.css whatever the load order */
+
+/* The panel title, logo | LAB (Jason 2026-11-02: "LAB" too big; 界面设计 option A, handover §4). LAB's cap height is 60 % of the
+   logo's letters and its baseline sits on theirs; a thin rule between. Overrides src/index.css's 24 px Eurostile LAB. */
+.ac-panel .ac-lab-head { gap: 11px; }
+.ac-panel .ac-lab-rule { flex: none; width: 1px; height: 15px; margin-top: 0.43px; background: rgba(255, 255, 255, 0.3); }
+.ac-panel .ac-lab-title { margin-top: 4.66px; margin-right: -0.3em; font: 600 12.46px/1 'Instrument Sans', system-ui, sans-serif; letter-spacing: 0.3em;
+  text-transform: uppercase; color: rgba(255, 255, 255, 0.72); }

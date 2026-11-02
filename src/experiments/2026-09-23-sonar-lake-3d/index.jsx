@@ -380,8 +380,10 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
       {/* ---- control panel — Apple-style frosted glass over the lake (Jason 2026-09-24) ---- */}
       <motion.div ref={(el) => { panelRef.current = el; state.current.panelEl = el }} data-hint-avoid initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
         className={`ac-panel pointer-events-auto absolute flex flex-col gap-3 max-sm:hidden sm:left-4 sm:top-14 sm:w-[400px] sm:p-4 ${tour.on ? 'is-touring' : ''}`} style={land ? { display: 'none' } : undefined}>
-        <div className="flex items-center gap-2.5 px-1 pt-0.5">
+        {/* logo | LAB (Jason 2026-11-02: LAB too big; 界面设计 option A, docs/2026-11-02-base-ui-round3-design-handover.md §4) */}
+        <div className="ac-lab-head flex items-start px-1 pt-0.5">
           <img src="/brand/logo/White Accuphy Logo.png" alt="Accuphy" className="h-[21px] w-auto" draggable={false} />
+          <i className="ac-lab-rule" aria-hidden="true" />
           <span className="ac-lab-title">Lab</span>
         </div>
         <div className="ac-divider" />
