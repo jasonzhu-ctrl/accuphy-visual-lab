@@ -10,7 +10,7 @@ Jason 2026-11-02：“你记住，或者搞一个 sheet 把各种版本做好管
 |---|---|---|---|---|
 | **标准 Base 版（PingLive + PingLive Mini）** | Jason 11-02 定的标准基础版，见下面的清单 | main 4c3fc61（+ bab2364，只改了记录） | 测试链接：`/`（PingLive，可切 Mini）、`/mini/`（只有 Mini） | Jason 说可以上线，上线前还有一件事要定（见最后一节） |
 | 线上版 | 店铺页里嵌的、广告点进来看到的 | 5c2e69a（10-29） | lab.accuphy.ca | 旧版，等标准 Base 版换上去 |
-| 冰钓页 | 冰面，只有 Mini | 和 Base 同一份代码 | 测试链接 `/ice/` | 还是旧的三张步骤卡，没有入场教程，以后另定 |
+| 冰钓页 | 冰面，只有 Mini | 和 Base 同一份代码 | 测试链接 `/ice/` | 还是旧的三张步骤卡；Jason 11-02：也做成基础版入场教程（Combo → Forward → Down，点冰打洞），Base 在做 |
 | 营销版 | 只有“锁视图”（订阅才能看 Combo 等，#191） | 现在混在 main 里，还没拆出来 | — | Base 版上线后再拆、再做 |
 
 测试链接：https://jasonzhu-ctrl.github.io/accuphy-lab-test/
