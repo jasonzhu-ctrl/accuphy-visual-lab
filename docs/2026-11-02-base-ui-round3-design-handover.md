@@ -107,3 +107,23 @@ When Base says it is done, I will take these frames from a clean build of HEAD a
   no longer has the badges.
 - Phone 390 × 844 on the same three pages: the two buttons, and the share popover open.
 - The tour's stop 1 at each state: before the drag, mid-drag, released and done.
+
+## 4. Panel title "ACCUPHY LAB" (Jason 11-02: "LAB 太大了，视觉高级一点规范一点")
+
+Options: `docs/2026-11-02-lab-title-options.jpg`. **Recommended: option A**, a standard sub-brand lockup: logo, a hairline
+rule, then a small, tracked "LAB". The logo leads; LAB reads as the product name under the brand.
+
+The logo PNG is shown 21 px high. Its letters are 14.96 px tall, top at 0.43 px, letter baseline at 15.39 px from the
+image top (measured from the artwork). LAB sits on that baseline.
+
+| Part | Value |
+|---|---|
+| Header row | `display: flex; align-items: flex-start; gap: 11px` (today: items-center, gap 10 px) |
+| Rule | A 1 px × 15 px block (the logo's letter height), white at 30 %, `margin-top: 0.43px` (level with the letter tops), between logo and LAB |
+| LAB font | Instrument Sans 600, 12.46 px (cap height 8.97 px = 60 % of the logo's letters), line-height 1, uppercase |
+| LAB spacing | `letter-spacing: 0.3em`, with `margin-right: -0.3em` so the last letter's tracking doesn't widen the row |
+| LAB colour | White at 72 % |
+| LAB position | `margin-top: 4.66px`, which puts its baseline on the logo's letter baseline |
+
+Where it shows: only the desktop panel. The lake, Mini and ice pages share it; the image shows lake and ice. Phones hide the
+panel. The ACCUPHY LAB letters standing in the lake are the 3D scene and are not touched.
