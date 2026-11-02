@@ -22,7 +22,7 @@ window.addEventListener('message', (e) => {
   if (mode === 'badtype') lab.postMessage({ type: 'something_else' }, e.origin)
   if (mode === 'wrong') document.getElementById('sib').contentWindow.postMessage({ cmd: 'ack-the-lab', origin: e.origin }, '*') // a sibling frame answers: wrong source
 })
-document.write('<iframe id="lab" src="/lab/?shop=' + (q.get('shop') || '/de-de') + (q.get('lang') ? '&lang=' + q.get('lang') : '') + '"' + (q.get('allow') ? ' allow="clipboard-write; web-share"' : '') + '></iframe><iframe id="sib" src="sibling.html" style="width:1px;height:1px;position:absolute"></iframe>')
+document.write('<iframe id="lab" src="/lab/?tour=off&shop=' + (q.get('shop') || '/de-de') + (q.get('lang') ? '&lang=' + q.get('lang') : '') + '"' + (q.get('allow') ? ' allow="clipboard-write; web-share"' : '') + '></iframe><iframe id="sib" src="sibling.html" style="width:1px;height:1px;position:absolute"></iframe>')
 </script>`)
 fs.writeFileSync(path.join(tmp, 'sibling.html'), `<!doctype html><script>window.addEventListener('message', (e) => { if (e.data && e.data.cmd === 'ack-the-lab') parent.frames[0].postMessage({ type: 'shop_click_ack' }, e.data.origin) })</script>`)
 fs.symlinkSync(dist, path.join(tmp, 'lab'))
@@ -91,15 +91,32 @@ for (const [name, w, h] of [['share-desktop', 1280, 800], ['share-phone', 390, 8
     }
     await tab.lab("(w.__evs = [], w.addEventListener('accuphy-lab', e => { if (e.detail.event === 'share') w.__evs.push(e.detail.data.channel) }), true)")
     await tab.tap(btn); await sleep(600)
-    const o = JSON.parse(await tab.lab("JSON.stringify((() => { const p = d.querySelector('.ac-share-pop'); if (!p) return { pops: 0 }; const r = p.getBoundingClientRect(); const pill = d.querySelector('.ac-shop:not(.ac-shop-wide)'); return { pops: d.querySelectorAll('.ac-share-pop').length, qr: Math.round(p.querySelector('.ac-share-qr svg').getBoundingClientRect().width), clearOfPill: pill ? r.bottom <= pill.getBoundingClientRect().top : true, field: p.querySelector('.ac-share-field').value } })())"))
+    const o = JSON.parse(await tab.lab("JSON.stringify((() => { const p = d.querySelector('.ac-share-pop'); if (!p) return { pops: 0 }; const r = p.getBoundingClientRect(); const pill = d.querySelector('.ac-shop:not(.ac-shop-wide)'); return { pill: pill ? pill.textContent.trim() : '', badges: d.querySelectorAll('.ac-badge-btn').length, pops: d.querySelectorAll('.ac-share-pop').length, qr: Math.round(p.querySelector('.ac-share-qr svg').getBoundingClientRect().width), clearOfPill: pill ? r.bottom <= pill.getBoundingClientRect().top : true, field: p.querySelector('.ac-share-field').value } })())"))
     await tab.tap('.ac-share-copy'); await sleep(300)
     const label = await tab.lab("d.querySelector('.ac-share-copy').textContent"); const evs = await tab.lab('JSON.stringify(w.__evs)')
     await tab.esc(); await sleep(400); const after = await tab.lab("d.querySelectorAll('.ac-share-pop').length")
     await tab.close()
-    const ok = o.pops === 1 && o.qr >= 160 && o.clearOfPill && /\/de-de\/pages\/lab\?utm_source=lab_share&utm_medium=referral&utm_content=copy/.test(o.field || '') && label === 'Copied ✓' && after === 0 && /qr_shown/.test(evs) && /copy/.test(evs)
-    return { ok, detail: `popover=${o.pops} qr=${o.qr}px clearOfShopPill=${o.clearOfPill} copy→"${label}" events=${evs} afterEsc=${after}` }
+    const phoneOk = !phone || (o.pill === 'Learn More' && o.badges === 0) // #200: phones show Learn More and no store badges
+    const ok = phoneOk && o.pops === 1 && o.qr >= 160 && o.clearOfPill && /\/de-de\/pages\/lab\?utm_source=lab_share&utm_medium=referral&utm_content=copy/.test(o.field || '') && label === 'Copied ✓' && after === 0 && /qr_shown/.test(evs) && /copy/.test(evs)
+    return { ok, detail: `${phone ? `pill="${o.pill}" badges=${o.badges} ` : ''}popover=${o.pops} qr=${o.qr}px clearOfShopPill=${o.clearOfPill} copy→"${label}" events=${evs} afterEsc=${after}` }
   }
 }
+// #200 (A8): desktop store badges open that store's QR; app_badge { store } per click; never together with the share popover
+scenarios['app-badges-desktop'] = async () => {
+  const tab = await openTab(1280, 800)
+  if (!(await tab.open('mode=none'))) return { ok: false, detail: 'Lab did not start' }
+  await tab.lab("(w.__evs = [], w.addEventListener('accuphy-lab', e => { if (e.detail.event === 'app_badge') w.__evs.push(JSON.stringify(e.detail.data)) }), true)")
+  const pop = () => tab.lab("JSON.stringify((() => { const p = d.querySelector('.ac-app-pop'); return p ? { store: p.querySelector('.ac-app-pop-store').textContent, qr: Math.round(p.querySelector('.ac-app-pop-qr svg').getBoundingClientRect().width), cap: p.querySelector('.ac-app-pop-cap').textContent, share: d.querySelectorAll('.ac-share-pop').length } : null })())").then(JSON.parse)
+  const badges = await tab.lab("d.querySelectorAll('.ac-badge-btn').length")
+  await tab.tap('.ac-badge-btn:nth-child(1)'); await sleep(500); const a = await pop()
+  await tab.tap('.ac-badge-btn:nth-child(2)'); await sleep(500); const b = await pop()
+  await tab.tap('.ac-share'); await sleep(500); const both = await tab.lab("[d.querySelectorAll('.ac-app-pop').length, d.querySelectorAll('.ac-share-pop').length].join('/')")
+  await tab.esc(); await sleep(300)
+  const evs = await tab.lab('JSON.stringify(w.__evs)'); await tab.close()
+  const ok = badges === 2 && a?.store === 'App Store' && b?.store === 'Google Play' && a.qr >= 160 && a.cap === 'Scan to download Accuphy Sonar App' && both === '0/1' && evs === JSON.stringify([JSON.stringify({ store: 'app_store' }), JSON.stringify({ store: 'google_play' })])
+  return { ok, detail: `badges=${badges} first=${a?.store} second=${b?.store} qr=${a?.qr}px caption="${a?.cap}" app/share after Share=${both} events=${evs}` }
+}
+
 let failed = 0
 for (const [name, fn] of Object.entries(scenarios)) {
   if (wanted.length && !wanted.includes(name)) continue
