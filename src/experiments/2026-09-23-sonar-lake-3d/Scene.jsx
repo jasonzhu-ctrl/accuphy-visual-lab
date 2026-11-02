@@ -562,7 +562,7 @@ const BOAT_CAMS = { // camera offset from the boat, look-at offset from the boat
 }
 function Rig({ state, sonarRect, fogMats, cam = LAKE_CAM }) {
   const { camera, size, scene } = useThree()
-  const tmp = useMemo(() => new THREE.Vector3(), [])
+  const tmp = useMemo(() => new THREE.Vector3(), []), tmp2 = useMemo(() => new THREE.Vector3(), [])
   const look = useMemo(() => new THREE.Vector3(), [])
   const k0 = useRef(0)
   useFrame(({ clock }, dt) => {
@@ -766,10 +766,36 @@ function Rig({ state, sonarRect, fogMats, cam = LAKE_CAM }) {
     if (camera.fov !== 38) { camera.fov = 38; camera.updateProjectionMatrix() }
     // view from the south (desktop exactly as before); phones: pulled back, re-centred on a step preset's boat
     const fx = k > 1 && s.frameX != null ? s.frameX : cam.T.x
-    s.camX = s.camX == null ? fx : s.camX + (fx - s.camX) * Math.min(1, dt * 2.5)
+    // Portrait phones on the lake: the view follows the boat (Jason 2026-11-02: "When operating on the phone, once the boat
+    // slides to the edge of the screen, it should still have room to go to other areas"). The 50 m-wide band showed x ≈ −8…35
+    // of the ±58 m lake and nothing could reach the rest. Now, when the boat comes within the margins of the band above the
+    // phone, the focus moves just enough to keep it inside, and the camera eases after it; a finger held at the edge keeps
+    // pushing (every move puts the target under it again). The focus stops where the lake's edge reaches the band's edge.
+    // Desktop, sideways phones (both reach the edges already) and the ice page are unchanged.
+    const follow = k > 1 && !s.ice
+    if (!follow || s.camFX == null) { s.camFX = fx; s.camFZ = 0 }
+    if (follow && s.boat) {
+      tmp.set(s.boat.x, 0.5, s.boat.z).project(camera)
+      const bx = ((tmp.x + 1) / 2) * size.width, by = ((1 - tmp.y) / 2) * size.height
+      const mx = 0.2 * size.width, top = 0.16 * bandBottom, bot = 0.76 * bandBottom // the boat stays in the middle 60 % across, 16–76 % down the band
+      const ex = bx < mx ? bx - mx : bx > size.width - mx ? bx - (size.width - mx) : 0
+      const ey = by < top ? by - top : by > bot ? by - bot : 0
+      if (ex || ey) {
+        // pixels per metre at the boat, across (x) and along the lake (z: up the screen is −z)
+        tmp2.set(s.boat.x + 1, 0.5, s.boat.z).project(camera); const ppx = Math.abs(((tmp2.x - tmp.x) / 2) * size.width) || 1
+        tmp2.set(s.boat.x, 0.5, s.boat.z + 1).project(camera); const ppz = Math.abs(((tmp.y - tmp2.y) / 2) * size.height) || 1
+        s.camFX = THREE.MathUtils.clamp(s.camFX + ex / ppx, -40, 46)
+        s.camFZ = THREE.MathUtils.clamp(s.camFZ + ey / ppz, -48, 40)
+      }
+    }
+    // eased, and never faster than 12 m/s, so a quick flick across the screen pans calmly rather than whipping the view
+    const ef = Math.min(1, dt * 2.2), vmax = follow ? 12 * Math.min(dt, 0.05) : Infinity
+    const ease = (cur, to) => (cur == null ? to : cur + THREE.MathUtils.clamp((to - cur) * ef, -vmax, vmax))
+    s.camX = ease(s.camX, s.camFX)
+    s.camZ = ease(s.camZ, s.camFZ)
     const pk = k > 1 || s.land ? 0 : 1 // no pointer parallax on phones (a dragging finger would shake the view), sideways ones too
-    look.set(s.camX + px * 2 * pk, cam.T.y, cam.T.z)
-    camera.position.set(look.x + cam.D.x * k + px * 2 * pk, cam.T.y + cam.D.y * k + py * 2 * pk, cam.T.z + cam.D.z * k + px * 2 * pk)
+    look.set(s.camX + px * 2 * pk, cam.T.y, cam.T.z + s.camZ)
+    camera.position.set(look.x + cam.D.x * k + px * 2 * pk, cam.T.y + cam.D.y * k + py * 2 * pk, look.z + cam.D.z * k + px * 2 * pk)
     camera.lookAt(look)
   })
   return null

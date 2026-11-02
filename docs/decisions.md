@@ -3638,3 +3638,24 @@ Numbered log. Newest at the bottom.
          since #199: the tour runs in the harness's frame and dims the share button. With `?tour=off` in the frame's address
          all 6 pass. The harness is 对接's to update.
        - sonar-qa grid against main: 44 tiles within 0.55 luma and 0.31 % lit, 0 errors.
+
+201. **2026-11-02** — **Portrait phones: the view follows the boat, so every part of the lake can be reached (test version)** (Jason in
+     Lab HQ: "When operating on the phone, once the boat slides to the edge of the screen, it should still have room to go to
+     other areas").
+     - **Found (HEAD 9992bf2, dragging toward each edge and corner six times):** on a portrait phone (390×844) the camera never
+       moved, so the boat reached only x ≈ −8…35 m across the ±58 m lake; southward it slid under the phone picture, out of
+       sight. A sideways phone (lake enlarged) and the desktop already reach the edges (desktop W −58, E +58), so they are unchanged.
+     - **Changed (`Scene.jsx` Rig, the lake's top camera, portrait phones only, not the ice page):**
+       - When the boat leaves the middle 60 % across or 16–76 % down the band above the phone, the camera's focus moves just
+         enough to bring it back. A finger held at the edge keeps pushing: each move puts the boat under it again.
+       - The camera eases after the focus (2.2/s) and never moves faster than 12 m/s, so a quick flick pans calmly.
+       - The focus stops where the lake's edge reaches the band's edge (x −40…46, z −48…+40 from the start).
+       - The boat's own limits (±58 m, shore, rocks, obstacles) are untouched.
+     - **Checked** on scratch copies:
+       - Portrait phone, all four edges and four corners: W −58, E +58, N −58, S +58, corners at the lake's limits.
+       - Sideways phone and desktop: the same reach as before, to the decimal.
+       - Camera step at most 0.33 m per frame.
+       - Tour on the lake and Mini pages, desktop and phone: the 4 s drag and 5 s holds as before, the boat dragged 8–11 m in a hold.
+       - Ice page unchanged (3 cards, no tour; its section camera already follows the hole, and taps drill holes).
+       - 0 errors.
+       - sonar-qa grid: running at commit time; the result follows in this entry.
