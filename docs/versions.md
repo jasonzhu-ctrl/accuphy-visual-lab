@@ -9,6 +9,10 @@ with the source commit it was built from, so anyone can tell which version a lin
 sign-up and Combo stays shut for everyone (no fake success). Test links show "Test mode: nothing is sent." The consent wording
 (`unlock_consent` in i18n.js) is Klaviyo HQ's draft and waits for Jason.
 
+## 2026-11-02: test links at ea3fde8
+
+Tour round 3 (4 s drag with progress ring, 3.5 s holds), #197 beam text, #200 app badges above the phone with QR popovers, phone Learn More / Share to a Fishing Buddy. Built from one commit; Base walked it on scratch copies. lab.accuphy.ca stays at 5c2e69a.
+
 ## 2026-11-02: test links at c164893 (test repo bd9a78e)
 
 Entry tour in the base version (#199), replacing the lake step cards; /tour/ mock removed. HQ walked the built /mini/ on desktop (drag → Tap Forward → done, no step cards, Replay) and phone (auto start, tile under the words). lab.accuphy.ca stays at 5c2e69a.
@@ -47,7 +51,7 @@ but is published nowhere and is redundant since #170.
 |---|---|---|---|
 | shop.accuphy.com/pages/lab and /fr/pages/lab | customers | an iframe of lab.accuphy.ca/ (not `/embed/`) | **5c2e69a, newest** |
 | lab.accuphy.ca = accuphy-lab.vercel.app (one deployment) | anyone with the link | `/`, `/mini/`, `/ice/`, `/embed/` | **5c2e69a, newest** |
-| Friends' test link jasonzhu-ctrl.github.io/accuphy-lab-test | friends, Jason | `/`, `/mini/`, `/ice/`; `/jig/`, `/pano/` forward to `/` | **c164893** (test repo bd9a78e; #191–#193, #198, #199 on top of live) |
+| Friends' test link jasonzhu-ctrl.github.io/accuphy-lab-test | friends, Jason | `/`, `/mini/`, `/ice/`; `/jig/`, `/pano/` forward to `/` | **ea3fde8** (#191–#193, #197–#200 on top of live) |
 | claude.ai private previews | — | **none**: the four old ones (RnCB, VxxnV fish test, G5uZ ice, 4GdHH) were deleted 2026-10-27 at Jason's word ("如果是现在项目需要的话留一个就行了"; the test link does the job) | — |
 | The v3 ad film | Meta, from 11/2 | recorded | lake 1abeedf (before #178; its shots show no Panoramic sonar) |
 | Colleague branches (not merged): PR #30 `codex/lab-clarity-optics` (AJ-nb, 10-28), PR #31 `codex/blue-hour-lake` (Codex agent, 10-29; private preview on accuphy-blue-hour-lake-20261029.accuphy-1012.chatgpt.site, owner-only) | the colleague, Jason | their own builds | not in main, not on any Lab link |
