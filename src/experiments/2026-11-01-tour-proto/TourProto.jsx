@@ -4,7 +4,7 @@
 // is lit. Between stops the card fades out (300 ms) and the next fades in (420 ms). The panel is locked while the tour
 // runs (tour.css, a class on <body>), except the tile the stop asks for. "Skip" at any time; "Replay tour" afterwards.
 // `relock`: a FAKE lock for the mock only (Jason 2026-11-02: 入场给看，入场结束以后就锁 — 做假锁看流程): after the tour that tile is greyed
-// with a padlock and clicks do nothing. The real lock is a marketing-version requirement (HQ 11-02), not built here.
+// with a padlock and clicks do nothing. Only with `?demo=marketing-lock` (HQ 11-02: the base has no lock). The real lock is a marketing-version requirement, not built here.
 // Copy is placeholder (HQ: 真文字之后和 Jason 定). A stop's title names the action, not the view (Jason 2026-11-02: at stop 2 the
 // lake still shows Combo until the visitor taps Forward, so the words must not say "Forward View" yet). Nothing is remembered between visits yet (HQ: 小样里可以先不记).
 // Phones (and a phone held sideways): no panel, so the tour starts after the Home pick, stop 1 is a tap on the lake, stops 2–3
@@ -33,6 +33,8 @@ const SCRIPTS = {
 const SLOW = import.meta.env.DEV ? +((/[?&]tourslow(?:=(\d+))?\b/.exec(window.location.search) || [, 1])[1] || 4) : 1 // dev: ?tourslow[=k] runs the holds and fades k× slower (default 4), for screenshots
 // a small white padlock (the fake lock after the tour)
 const LOCK = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><rect x="3" y="7" width="10" height="8" rx="1.8" fill="#fff"/><path d="M5 7V5.2a3 3 0 0 1 6 0V7" fill="none" stroke="#fff" stroke-width="1.8"/></svg>')
+// the fake lock is OFF by default: the mock is the lock-free base (HQ 11-02, Jason: base has no lock at all). `?demo=marketing-lock` turns it on, kept for the marketing version
+const DEMO_LOCK = /[?&]demo=marketing-lock\b/.test(window.location.search)
 const OUT_MS = 300 * SLOW, CHECK_MS = 700 * SLOW, DRAG_PX = 14
 
 // the panel's own buttons (the page's DOM): nothing here changes the page's code
@@ -69,7 +71,7 @@ export default function TourProto({ variant = 'mini' }) {
     later(() => setVis('in'), 80)
   }
   const start = () => { setPhase('running'); setRelockIdx(0); if (!phone) pressDevice(script.device); later(() => enter(0), 60) } // the panel redraws its tiles for the device first
-  const finish = () => { setPhase('done'); setVis('hidden'); setTileIdx(0); setRelockIdx(script.relock && !phone ? tiles().indexOf(tileFor(script.relock)) + 1 : 0) }
+  const finish = () => { setPhase('done'); setVis('hidden'); setTileIdx(0); setRelockIdx(DEMO_LOCK && script.relock && !phone ? tiles().indexOf(tileFor(script.relock)) + 1 : 0) }
   const skip = () => { setVis('out'); later(finish, OUT_MS) }
   const complete = () => {
     setVis('check')
