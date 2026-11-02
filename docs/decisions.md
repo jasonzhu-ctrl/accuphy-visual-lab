@@ -3600,6 +3600,11 @@ Numbered log. Newest at the bottom.
        - Checked: walk 1→2→3 at 1280×720 and 390×844, lake and Mini page. Drag 4.04–4.07 s to done; hold to the next card
          3.87–3.94 s (3.5 s + the 0.4 s fade); an early tap does not count; 0 errors.
 
+     - **Round 4 (Jason 2026-11-02: "第一步 Drag the boat 的整体时间可以减少 2 秒，forward 和 down 用户操作船的时间多 1.5 秒"; titles
+       "Tap Forward View", "Tap Down View", "Tap Panoramic View"):** the drag is done after 2 s (the ring fills in 2 s), its hold
+       stays 3.5 s; a tile stop holds 5 s. The boat can be dragged during every hold (the guard covers only a new card's first
+       0.6 s). Checked on lake and Mini, desktop and phone: drag 2.03–2.07 s; next card 3.88–3.92 s after stop 1, 5.35–5.43 s
+       after a tile (the hold + the 0.4 s fade); a drag during the hold moved the boat 8–10 m; 0 errors.
 200. **2026-11-02** — **A8 in the base version: the app badges with a QR popover on desktop, Learn More and Share to a Fishing Buddy on
      phones (test version)** (Jason 11-01 on the look; 11-02 in Lab HQ: "徽章、二维码、Learn More、分享这些属于基础版本的", so the
      marketing version keeps only the view locks; plan `docs/2026-11-01-app-qr-plan.md` "11-01 改" by 对接, design
