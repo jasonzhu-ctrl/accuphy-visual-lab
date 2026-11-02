@@ -1,0 +1,41 @@
+/* Entry tour round 3: the 4-second drag progress ring on the boat cue (界面设计 11-02, for Base).
+   Class names follow Base's Tour.jsx / tour.css (.ac-tour-cue …). Restrained: one thin white arc, no numbers.
+
+   Markup, inside .ac-tour-cue (the zero-size anchor on the boat), drawn first so the ring and finger sit on top:
+     <svg class="ac-tour-prog" viewBox="0 0 84 84" aria-hidden="true">
+       <circle class="ac-tour-prog-track" cx="42" cy="42" r="39" />
+       <circle class="ac-tour-prog-arc" cx="42" cy="42" r="39" pathLength="100" style="stroke-dashoffset: {100 - p * 100}" />
+     </svg>
+   p = drag time so far / 4 s (0 … 1), set by Tour.jsx every frame. No CSS transition on the offset: it moves with the drag.
+
+   States on .ac-tour-cue (Tour.jsx toggles them):
+     (none)          before the first drag: exactly round 2 (ring, wave, finger, arrows flashing). No progress ring yet.
+     .is-dragging    pointer down and dragging: finger, arrows and wave fade out (0.2 s), the blue ring holds still at full
+                     strength, the track and arc show and the arc grows clockwise from 12 o'clock.
+     .has-progress   released before 4 s: finger, arrows and wave come back; the track and arc stay where they got to
+                     (no draining back), so the visitor sees how much is left.
+     .is-complete    4 s reached: the arc closes, the ring fills a little bluer and pops once (1 → 1.14 → 1, 0.36 s), then the
+                     whole cue fades out (0.5 s, starting 0.6 s later) and the card ticks and holds 3.5 s over the open lake. */
+
+.ac-tour-prog { position: absolute; left: calc(-42px * var(--s)); top: calc(-42px * var(--s)); width: calc(84px * var(--s)); height: calc(84px * var(--s));
+  transform: rotate(-90deg); overflow: visible; opacity: 0; transition: opacity 0.2s ease; pointer-events: none; }
+.ac-tour-prog circle { fill: none; }
+.ac-tour-prog-track { stroke: rgba(255, 255, 255, 0.22); stroke-width: 2.5; }
+.ac-tour-prog-arc { stroke: #fff; stroke-width: 3; stroke-linecap: round; stroke-dasharray: 100 100; filter: drop-shadow(0 0 3px rgba(2, 140, 223, 0.9)); }
+
+.ac-tour-cue.is-dragging .ac-tour-prog, .ac-tour-cue.has-progress .ac-tour-prog, .ac-tour-cue.is-complete .ac-tour-prog { opacity: 1; }
+
+/* while dragging: only the ring and the progress — the "how to" marks step aside */
+.ac-tour-cue-finger, .ac-tour-cue-arrow, .ac-tour-cue-wave { transition: opacity 0.2s ease; }
+.ac-tour-cue.is-dragging .ac-tour-cue-finger, .ac-tour-cue.is-dragging .ac-tour-cue-arrow, .ac-tour-cue.is-dragging .ac-tour-cue-wave,
+.ac-tour-cue.is-complete .ac-tour-cue-finger, .ac-tour-cue.is-complete .ac-tour-cue-arrow, .ac-tour-cue.is-complete .ac-tour-cue-wave { animation: none; opacity: 0; }
+.ac-tour-cue.is-dragging .ac-tour-cue-ring { animation: none; opacity: 1; }
+
+/* done: a bluer fill and one pop, then the cue goes */
+.ac-tour-cue.is-complete .ac-tour-cue-ring { opacity: 1; background: rgba(2, 140, 223, 0.5); animation: ac-tour-done 0.36s ease-out 1; }
+.ac-tour-cue.is-complete { opacity: 0; transition: opacity 0.5s ease 0.6s; }
+@keyframes ac-tour-done { 0% { transform: scale(1); } 45% { transform: scale(1.14); } 100% { transform: scale(1); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .ac-tour-cue.is-complete .ac-tour-cue-ring { animation: none; }
+}
