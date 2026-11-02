@@ -3,6 +3,8 @@
 // action), and goes on only when the visitor has done the action — dragged the boat, or clicked the one panel tile that
 // is lit. Between stops the card fades out (300 ms) and the next fades in (420 ms). The panel is locked while the tour
 // runs (tour.css, a class on <body>), except the tile the stop asks for. "Skip" at any time; "Replay tour" afterwards.
+// `relock`: a FAKE lock for the mock only (Jason 2026-11-02: 入场给看，入场结束以后就锁 — 做假锁看流程): after the tour that tile is greyed
+// with a padlock and clicks do nothing. The real lock is a marketing-version requirement (HQ 11-02), not built here.
 // Copy is placeholder (HQ: 真文字之后和 Jason 定). A stop's title names the action, not the view (Jason 2026-11-02: at stop 2 the
 // lake still shows Combo until the visitor taps Forward, so the words must not say "Forward View" yet). Nothing is remembered between visits yet (HQ: 小样里可以先不记).
 // Phones (and a phone held sideways): no panel, so the tour starts after the Home pick, stop 1 is a tap on the lake, stops 2–3
@@ -17,7 +19,7 @@ import './tour.css'
 // Placeholder scripts. `device` = the panel's device button to press first; `view` = the view the stop shows or asks for.
 // action: drag = drag the boat (tap on phones), tile = click that view's tile on the panel (a "Next" button on phones).
 const SCRIPTS = {
-  mini: { device: 'PingLive Mini', stops: [
+  mini: { device: 'PingLive Mini', relock: 'combo', stops: [
     { view: 'combo', action: 'drag', title: 'Drag the boat', phoneTitle: 'Tap the boat', text: 'Whatever the beam touches shows up live in the Accuphy Sonar app.' },
     { view: 'forward', action: 'tile', title: 'Tap Forward', phoneTitle: 'Forward View', text: 'The beam turns to look ahead of the boat — where you cast.' },
     { view: 'down', action: 'tile', title: 'Tap Down', phoneTitle: 'Down View', text: 'The beam points straight under the boat — see what’s right below.' },
@@ -29,6 +31,8 @@ const SCRIPTS = {
   ] },
 }
 const SLOW = import.meta.env.DEV ? +((/[?&]tourslow(?:=(\d+))?\b/.exec(window.location.search) || [, 1])[1] || 4) : 1 // dev: ?tourslow[=k] runs the holds and fades k× slower (default 4), for screenshots
+// a small white padlock (the fake lock after the tour)
+const LOCK = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><rect x="3" y="7" width="10" height="8" rx="1.8" fill="#fff"/><path d="M5 7V5.2a3 3 0 0 1 6 0V7" fill="none" stroke="#fff" stroke-width="1.8"/></svg>')
 const OUT_MS = 300 * SLOW, CHECK_MS = 700 * SLOW, DRAG_PX = 14
 
 // the panel's own buttons (the page's DOM): nothing here changes the page's code
@@ -48,6 +52,7 @@ export default function TourProto({ variant = 'mini' }) {
   const [i, setI] = useState(0)
   const [vis, setVis] = useState('hidden') // hidden | in | check | out
   const [tileIdx, setTileIdx] = useState(0) // 1-based nth-child of the tile to click, 0 = none
+  const [relockIdx, setRelockIdx] = useState(0) // the tile faked shut after the tour (relock), 0 = none
   const ring = useRef(null)
   const timers = useRef([])
   const later = (fn, ms) => { const id = setTimeout(fn, ms); timers.current.push(id); return id }
@@ -63,8 +68,8 @@ export default function TourProto({ variant = 'mini' }) {
     setTileIdx(!phone && st.action === 'tile' ? tiles().indexOf(tileFor(st.view)) + 1 : 0)
     later(() => setVis('in'), 80)
   }
-  const start = () => { setPhase('running'); if (!phone) pressDevice(script.device); later(() => enter(0), 60) } // the panel redraws its tiles for the device first
-  const finish = () => { setPhase('done'); setVis('hidden'); setTileIdx(0) }
+  const start = () => { setPhase('running'); setRelockIdx(0); if (!phone) pressDevice(script.device); later(() => enter(0), 60) } // the panel redraws its tiles for the device first
+  const finish = () => { setPhase('done'); setVis('hidden'); setTileIdx(0); setRelockIdx(script.relock && !phone ? tiles().indexOf(tileFor(script.relock)) + 1 : 0) }
   const skip = () => { setVis('out'); later(finish, OUT_MS) }
   const complete = () => {
     setVis('check')
@@ -128,6 +133,7 @@ export default function TourProto({ variant = 'mini' }) {
   if (phase === 'idle') return null
   return (
     <div className={`lab-tour-layer ${phone ? 'is-phone' : ''}`} style={SLOW > 1 ? { '--tour-k': SLOW } : undefined} aria-live="polite">
+      {phase === 'done' && relockIdx > 0 && <style>{`body.lab-tour-page .ac-views .ac-view:nth-child(${relockIdx}){pointer-events:none;opacity:.45}body.lab-tour-page .ac-views .ac-view:nth-child(${relockIdx})::after{content:'';position:absolute;top:4px;right:4px;width:13px;height:13px;background:url("${LOCK}") center/contain no-repeat}`}</style>}
       {tileIdx > 0 && <style>{`body.lab-tour .ac-views .ac-view:nth-child(${tileIdx}){pointer-events:auto;opacity:1;animation:lab-tour-pulse 1.6s ease-out infinite}`}</style>}
       {phase === 'running' && (<>
         <div className={`lab-tour-card is-${vis}`}>
