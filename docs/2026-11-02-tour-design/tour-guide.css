@@ -1,0 +1,83 @@
+/* Entry tour, round 2 — reference CSS for Base (界面设计 11-02). Copy the values; class names are only a suggestion.
+   Jason 11-02: make it obvious, game-tutorial style. The "no glow" rule (#186) does not apply to these guide marks.
+   One blue: #028CDF. One beat: the boat cue runs on 1.2 s, the tile tap on 2.0 s. */
+
+:root { --tg-blue: #028cdf; }
+
+/* ---------- 1. Boat cue (stop 1, "Drag the boat") ----------
+   A zero-size anchor placed on the boat each frame (same anchor as the old ring). --s = 1 desktop, 1.25 phone. */
+.tg-cue { position: absolute; left: 0; top: 0; width: 0; height: 0; --s: 1; pointer-events: none; }
+.tg-cue.is-phone { --s: 1.25; }
+.tg-cue-ring, .tg-cue-wave { position: absolute; left: calc(-32px * var(--s)); top: calc(-32px * var(--s)); width: calc(64px * var(--s)); height: calc(64px * var(--s)); border-radius: 50%; box-sizing: border-box; }
+.tg-cue-ring { border: 3px solid var(--tg-blue); background: rgba(2, 140, 223, 0.24);
+  box-shadow: 0 0 18px 3px rgba(2, 140, 223, 0.7), inset 0 0 12px rgba(2, 140, 223, 0.45);
+  animation: tg-flash 1.2s ease-in-out infinite, tg-pop 1.2s ease-in-out infinite; }
+.tg-cue-wave { border: 2px solid var(--tg-blue); animation: tg-wave 1.2s ease-out infinite; }
+/* finger: its tip sits on the centre of the ring */
+.tg-cue-finger { position: absolute; width: calc(30px * var(--s)); left: calc(-12px * var(--s)); top: calc(-1px * var(--s));
+  filter: drop-shadow(0 2px 3px rgba(0, 16, 24, 0.5)); animation: tg-flash 1.2s ease-in-out infinite; }
+/* arrows: centres 58 px either side of the ring centre, swing 7 px outwards and back */
+.tg-cue-arrow { position: absolute; width: calc(26px * var(--s)); top: calc(-13px * var(--s));
+  filter: drop-shadow(0 0 6px rgba(2, 140, 223, 0.95)); }
+.tg-cue-arrow.is-left { left: calc(-71px * var(--s)); animation: tg-flash 1.2s ease-in-out infinite, tg-swing-l 1.2s ease-in-out infinite; }
+.tg-cue-arrow.is-right { left: calc(45px * var(--s)); animation: tg-flash 1.2s ease-in-out infinite, tg-swing-r 1.2s ease-in-out infinite; }
+
+@keyframes tg-flash { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+@keyframes tg-pop { 0%, 100% { transform: scale(0.92); } 50% { transform: scale(1.06); } }
+@keyframes tg-wave { 0% { transform: scale(1); opacity: 0.85; } 100% { transform: scale(2); opacity: 0; } }
+@keyframes tg-swing-l { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(calc(-7px * var(--s))); } }
+@keyframes tg-swing-r { 0%, 100% { transform: scaleX(-1) translateX(0); } 50% { transform: scaleX(-1) translateX(calc(-7px * var(--s))); } }
+
+/* ---------- 2. Tile spotlight (stops 2–3, desktop panel tile or the phone's tile under the text) ----------
+   .tg-spot is a hole the size of the tile + 6 px; its huge shadow darkens everything else (lake, panel, phone screen).
+   The tour title sits ABOVE it, so the words stay bright. Fades in with the stop (0.42 s). */
+.tg-spot { position: fixed; border-radius: 12px; pointer-events: none; box-shadow: 0 0 0 200vmax rgba(0, 10, 16, 0.6);
+  transition: left 0.42s ease, top 0.42s ease, width 0.42s ease, height 0.42s ease, opacity 0.42s ease; }
+/* the tile itself: full opacity, thick blue edge, glow */
+.tg-hi { opacity: 1 !important; pointer-events: auto !important; box-shadow: 0 0 0 3px var(--tg-blue), 0 0 22px 3px rgba(2, 140, 223, 0.75) !important; }
+/* two rings spreading out from the tile edge, half a beat apart */
+.tg-tile-wave { position: fixed; border-radius: 8px; pointer-events: none; outline: 2.5px solid var(--tg-blue); animation: tg-tile-wave 1.6s ease-out infinite; }
+.tg-tile-wave.is-late { animation-delay: 0.8s; }
+@keyframes tg-tile-wave { 0% { outline-offset: 0; outline-color: rgba(2, 140, 223, 0.95); } 100% { outline-offset: 20px; outline-color: rgba(2, 140, 223, 0); } }
+
+/* ---------- 3. Finger tap on the tile (2.0 s loop) ----------
+   Placed so its tip is on the tile centre, 8 px below the middle (the icon stays visible). Slides in from bottom right,
+   presses (shrinks to 0.86), a white dot flashes at the tip, holds, fades. --f = 44 px desktop, 52 px phone. */
+.tg-tap { position: fixed; width: 0; height: 0; pointer-events: none; --f: 44px; }
+.tg-tap.is-phone { --f: 52px; }
+.tg-tap-finger { position: absolute; width: var(--f); left: calc(var(--f) * -0.396); top: calc(var(--f) * -0.052);
+  transform-origin: 39.6% 5.2%; filter: drop-shadow(0 3px 5px rgba(0, 16, 24, 0.55));
+  animation: tg-tap 2s cubic-bezier(0.25, 0.8, 0.3, 1) infinite; }
+.tg-tap-dot { position: absolute; left: -10px; top: -10px; width: 20px; height: 20px; border-radius: 50%; background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 10px rgba(2, 140, 223, 0.9); animation: tg-tap-dot 2s ease-out infinite; }
+@keyframes tg-tap {
+  0% { transform: translate(64px, 72px) scale(1); opacity: 0; }
+  12% { opacity: 1; }
+  40% { transform: translate(0, 0) scale(1); }
+  48% { transform: translate(0, 0) scale(0.86); }
+  58% { transform: translate(0, 0) scale(1); }
+  82% { transform: translate(0, 0) scale(1); opacity: 1; }
+  100% { transform: translate(0, 0) scale(1); opacity: 0; }
+}
+@keyframes tg-tap-dot { 0%, 46% { transform: scale(0.3); opacity: 0; } 49% { transform: scale(0.6); opacity: 0.95; } 72%, 100% { transform: scale(2.4); opacity: 0; } }
+
+/* ---------- 4. "TAP" bubble ----------
+   Desktop: centred above the tile, 12 px gap, pointer down. Phone: right of the tile, pointer left (above it are the words).
+   Bobs 4 px towards the tile, 1 s each way. */
+.tg-bubble { position: fixed; pointer-events: none; padding: 5px 11px; border-radius: 999px; background: var(--tg-blue); color: #fff;
+  font: 700 12.5px/1.2 'Instrument Sans', system-ui, sans-serif; letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0, 16, 24, 0.45); transform: translate(-50%, -100%); animation: tg-bob-up 1s ease-in-out infinite alternate; }
+.tg-bubble::after { content: ''; position: absolute; left: 50%; bottom: -5px; margin-left: -6px; border: 6px solid transparent; border-bottom: 0; border-top-color: var(--tg-blue); }
+.tg-bubble.is-right { transform: translate(0, -50%); animation-name: tg-bob-left; }
+.tg-bubble.is-right::after { left: -5px; top: 50%; bottom: auto; margin: -6px 0 0; border: 6px solid transparent; border-left: 0; border-right-color: var(--tg-blue); }
+@keyframes tg-bob-up { from { transform: translate(-50%, -100%); } to { transform: translate(-50%, calc(-100% + 4px)); } }
+@keyframes tg-bob-left { from { transform: translate(0, -50%); } to { transform: translate(-4px, -50%); } }
+
+/* ---------- 5. Phone: the tile under the words (stops 2–3) ----------
+   Same look as the desktop panel tile (.ac-view: view art + name), one tile, centred 22 px under the dots, 120 × 96 px.
+   Tapping it switches the view for real, then the stop completes. No Next button. */
+.tg-phone-tile { display: block; width: 120px; margin: 22px auto 0; pointer-events: auto; }
+
+@media (prefers-reduced-motion: reduce) {
+  .tg-cue *, .tg-tile-wave, .tg-tap *, .tg-bubble { animation: none !important; }
+}

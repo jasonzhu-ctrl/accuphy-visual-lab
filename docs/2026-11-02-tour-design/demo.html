@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tour guide motion</title>
+<!-- Open this file in a browser to see the motion live (界面设计 11-02). Uses tour-guide.css, finger.svg and arrow.svg next to it. -->
+<link rel="stylesheet" href="tour-guide.css">
+<style>
+  body { margin: 0; min-height: 100vh; background: #13232d; color: #fff; font: 14px/1.4 system-ui, sans-serif; display: flex; flex-wrap: wrap; gap: 40px; padding: 40px; box-sizing: border-box; }
+  .box { position: relative; width: 420px; height: 300px; border-radius: 10px; background: radial-gradient(ellipse at 50% 60%, #29485a, #142631); overflow: hidden; }
+  .box h2 { position: absolute; left: 16px; top: 10px; margin: 0; font-size: 13px; font-weight: 600; opacity: 0.7; z-index: 2; }
+  .boat { position: absolute; left: 190px; top: 140px; width: 46px; height: 16px; border-radius: 8px 3px 3px 8px; background: #2b3036; transform: rotate(-12deg); }
+  .tile { position: absolute; left: 160px; top: 150px; width: 88px; height: 76px; border: 0; border-radius: 6px; background: rgba(4,14,20,0.5); color: #fff; font: 600 13px system-ui; padding-top: 48px; box-sizing: border-box; }
+  .box .tg-spot, .box .tg-tile-wave, .box .tg-tap, .box .tg-bubble { position: absolute; }
+</style>
+</head>
+<body>
+  <div class="box">
+    <h2>1 · Boat cue (desktop size; phone = ×1.25)</h2>
+    <div class="boat"></div>
+    <div class="tg-cue" style="transform: translate(213px, 148px)">
+      <div class="tg-cue-wave"></div><div class="tg-cue-ring"></div>
+      <img class="tg-cue-arrow is-left" src="arrow.svg" alt=""><img class="tg-cue-arrow is-right" src="arrow.svg" alt="">
+      <img class="tg-cue-finger" src="finger.svg" alt="">
+    </div>
+  </div>
+  <div class="box">
+    <h2>2 · Tile spotlight + finger tap + bubble</h2>
+    <div class="tg-spot" style="left:154px; top:144px; width:100px; height:88px"></div>
+    <button class="tile tg-hi" type="button">Forward</button>
+    <div class="tg-tile-wave" style="left:160px; top:150px; width:88px; height:76px"></div>
+    <div class="tg-tile-wave is-late" style="left:160px; top:150px; width:88px; height:76px"></div>
+    <div class="tg-tap" style="left:204px; top:196px"><div class="tg-tap-dot"></div><img class="tg-tap-finger" src="finger.svg" alt=""></div>
+    <div class="tg-bubble" style="left:204px; top:138px">Tap</div>
+  </div>
+</body>
+</html>
