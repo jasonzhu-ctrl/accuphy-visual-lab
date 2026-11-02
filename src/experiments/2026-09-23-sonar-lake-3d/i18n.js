@@ -51,7 +51,7 @@ const S = {
   tour_drill_title: { en: 'Tap the ice', fr: 'Touchez la glace' }, // FR draft, for the website's review
   tour_drill_text: { en: 'Drill a new hole where you tap — the PingLive Mini drops in and pings straight down.', fr: 'Percez un nouveau trou là où vous touchez : le PingLive Mini y descend et sonde droit vers le bas.' }, // FR draft, for the website's review
   tour_ice_fwd_text: { en: 'The beam turns sideways under the ice — fish out ahead, where you never drilled.', fr: 'Le faisceau se tourne sur le côté sous la glace : les poissons plus loin, là où vous n’avez pas percé.' }, // FR draft, for the website's review
-  tour_ice_down_text: { en: 'The beam points straight down the hole — your bait and every fish that rises to it.', fr: 'Le faisceau pointe droit sous le trou : votre leurre et chaque poisson qui monte vers lui.' }, // FR draft, for the website's review
+  tour_ice_down_text: { en: 'The beam points straight down the hole — your bait and every fish that rises to it.', fr: 'Le faisceau pointe droit sous le trou : votre appât et chaque poisson qui monte vers lui.' }, // FR draft, for the website's review
   tour_tap: { en: 'Tap' },
   tour_skip: { en: 'Skip tour' },
   tour_replay: { en: 'Replay tour' },

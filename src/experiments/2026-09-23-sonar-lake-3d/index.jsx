@@ -431,7 +431,7 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
         </Row>
         </>)}
         <div className="ac-soft hidden px-1 text-[11.5px] leading-snug sm:block">
-          {t(ICE ? 'desc_ice' : 'desc_lake', { device: device.name, beam: deviceId === 'PLM' ? `${combo ? 2 * device.beamDeg : device.beamDeg}° × 19°` : `${device.beamDeg}° × ${device.thickDeg}°` })} {/* text only (#197, Jason 2026-10-31: "写 39×19 / 78×19 / 135×20"): the Mini 39° × 19°, its Combo 78° × 19°, PingLive 135° × 20°; the engine's drawn 18° stays (Jason 2026-09-23) */}
+          {t(ICE ? 'desc_ice' : 'desc_lake', { device: device.name, beam: `${combo ? 2 * device.beamDeg : device.beamDeg}°` })} {/* the width only (#197; Jason 2026-11-02: "Remove thickness"): the Mini 39°, its Combo 78°, PingLive 135°; text only, the engine's beam is unchanged */}
         </div>
         <ShopButton deviceId={deviceId} placement="panel" wide />
         <div className="pt-1"><ShareButton thumb={viewThumb(deviceId, mode)} /></div>

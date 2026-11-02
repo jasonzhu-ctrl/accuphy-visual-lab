@@ -3495,6 +3495,11 @@ Numbered log. Newest at the bottom.
        Open, for Jason: should the engine's drawn Mini thickness (18°) become 19°? (Base checks the effect on lake and ice.)
      - **Done (2026-11-02, Base, test version):** `index.jsx` panel line: Mini 39° × 19°, Mini Combo 78° × 19°, PingLive 135° × 20°;
        the ice page reads like the Mini (39° × 19°, its Combo 78° × 19°). Text only: `devices.js` `thickDeg: 18` and the engine untouched.
+     - **Latest (Jason in Lab HQ, 11-02: "Remove thickness"; the website had said earlier the Mini's thickness should not be on
+       the website): no thickness is shown.** The panel line names the width only: **Mini 39°, Mini Combo 78°, PingLive 135°**;
+       the ice page reads like the Mini. Supersedes every "× 19°" / "× 20°" above. `desc_lake` / `desc_ice` keep their wording
+       ("{device} · 39° beam. …"). Text only (`index.jsx`); `devices.js` and the engine untouched. Test version; live needs
+       Jason's 动.
      - **Corrected the same day** (Jason: "正确的是20 但是不要提 因为听起来很小"): 20° is the right thickness, but visitor
        text names **no thickness at all**, neither 18° nor 20°. The panel line shows only the wide angle (PingLive 135°, Mini
        39°). HQ applies the same to PingLive (its 20° sounds just as small). The bullets below are superseded where they say "× 20°".
