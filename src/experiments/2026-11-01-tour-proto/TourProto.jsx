@@ -4,11 +4,13 @@
 // is lit. Between stops the card fades out (300 ms) and the next fades in (420 ms). The panel is locked while the tour
 // runs (tour.css, a class on <body>), except the tile the stop asks for. "Skip" at any time; "Replay tour" afterwards.
 // Copy is placeholder (HQ: 真文字之后和 Jason 定). Nothing is remembered between visits yet (HQ: 小样里可以先不记).
-// Phones: no panel, so the tour starts after the Home pick, stop 1 is a tap on the lake, stops 2–3 go on with "Next".
+// Phones (and a phone held sideways): no panel, so the tour starts after the Home pick, stop 1 is a tap on the lake, stops 2–3
+// go on with "Next". The layout is read again on resize: a page that loads in a small or hidden pane and grows later
+// (Lab HQ 2026-11-01: the tour never started in the browser pane) must still begin on the desktop path.
 import { useEffect, useRef, useState } from 'react'
 import { sentEvents } from '../2026-09-23-sonar-lake-3d/embed'
 import { t } from '../2026-09-23-sonar-lake-3d/i18n'
-import { isPhoneLayout } from '../2026-09-23-sonar-lake-3d/SonarScreen'
+import { isLandscapePhone, isPhoneLayout } from '../2026-09-23-sonar-lake-3d/SonarScreen'
 import './tour.css'
 
 // Placeholder scripts. `device` = the panel's device button to press first; `view` = the view the stop shows or asks for.
@@ -35,9 +37,11 @@ const pressDevice = (name) => [...document.querySelectorAll('.ac-panel .ac-seg .
 // the "Drag the boat" caption the lake keeps over the boat: its transform is the boat's place on screen (Scene.jsx)
 const cueEl = () => document.querySelector('main > div.pointer-events-none.absolute.left-0.top-0.whitespace-nowrap')
 const onCanvas = (e) => e.target?.tagName === 'CANVAS'
+const phoneNow = () => isPhoneLayout() || isLandscapePhone() // the lake's own layouts without a panel (SonarScreen.jsx)
 
 export default function TourProto({ variant = 'mini' }) {
-  const phone = isPhoneLayout()
+  const [phone, setPhone] = useState(phoneNow)
+  useEffect(() => { const on = () => setPhone(phoneNow()); window.addEventListener('resize', on); return () => window.removeEventListener('resize', on) }, [])
   const script = SCRIPTS[variant] || SCRIPTS.mini
   const [phase, setPhase] = useState('idle') // idle | running | done
   const [i, setI] = useState(0)
@@ -49,10 +53,12 @@ export default function TourProto({ variant = 'mini' }) {
   useEffect(() => () => timers.current.forEach(clearTimeout), [])
   const stop = script.stops[i]
 
+  // the panel may still be redrawing (device just pressed, or a pane that just grew): try again for a moment
+  const showTile = (view, tries = 12) => { const el = tileFor(view); if (el) el.click(); else if (tries > 0) later(() => showTile(view, tries - 1), 150) }
   const enter = (k) => {
     const st = script.stops[k]
     setI(k); setVis('hidden')
-    if (!phone && st.action === 'drag') tileFor(st.view)?.click() // the stop's own view is on before the title appears
+    if (!phone && st.action === 'drag') showTile(st.view) // the stop's own view is on before the title appears
     setTileIdx(!phone && st.action === 'tile' ? tiles().indexOf(tileFor(st.view)) + 1 : 0)
     later(() => setVis('in'), 80)
   }
@@ -64,14 +70,20 @@ export default function TourProto({ variant = 'mini' }) {
     later(() => { setVis('out'); later(() => (i + 1 < script.stops.length ? enter(i + 1) : finish()), OUT_MS) }, CHECK_MS)
   }
 
-  // the tour begins once the lake is on screen (desktop: the page's `ready`; phones: after the Home pick)
+  // the tour begins once the lake is on screen: desktop 0.7 s after the page's `ready`; a phone layout after its Home pick.
+  // Which of the two is decided when `ready` arrives and again on resize, not once at mount.
   useEffect(() => {
-    const begin = () => later(start, phone ? 300 : 700)
-    const want = phone ? (d) => d.event === 'view' && d.data?.source === 'home' : (d) => d.event === 'ready'
-    if (!phone && sentEvents.has('ready')) { begin(); return }
-    const on = (e) => { if (e.detail && want(e.detail)) { window.removeEventListener('accuphy-lab', on); begin() } }
-    window.addEventListener('accuphy-lab', on)
-    return () => window.removeEventListener('accuphy-lab', on)
+    let ready = sentEvents.has('ready'), begun = false
+    const begin = (ms) => { if (begun) return; begun = true; later(start, ms) }
+    const arm = () => { if (ready && !begun && !phoneNow()) begin(700) }
+    const on = (e) => {
+      const d = e.detail; if (!d) return
+      if (d.event === 'ready') { ready = true; arm() }
+      if (d.event === 'view' && d.data?.source === 'home' && ready) begin(300)
+    }
+    window.addEventListener('accuphy-lab', on); window.addEventListener('resize', arm)
+    arm()
+    return () => { window.removeEventListener('accuphy-lab', on); window.removeEventListener('resize', arm) }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   // the panel is locked while the tour runs (tour.css), the lake dimmed
