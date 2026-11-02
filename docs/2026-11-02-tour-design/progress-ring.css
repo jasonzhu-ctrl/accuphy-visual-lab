@@ -15,7 +15,8 @@
      .has-progress   released before 4 s: finger, arrows and wave come back; the track and arc stay where they got to
                      (no draining back), so the visitor sees how much is left.
      .is-complete    4 s reached: the arc closes, the ring fills a little bluer and pops once (1 → 1.14 → 1, 0.36 s), then the
-                     whole cue fades out (0.5 s, starting 0.6 s later) and the card ticks and holds 3.5 s over the open lake. */
+                     whole cue fades out (0.5 s, starting 0.6 s later) and the tour goes straight on to stop 2, no hold
+                     (Jason 11-02 via HQ; stops 2–3 hold 5 s after their tap). */
 
 .ac-tour-prog { position: absolute; left: calc(-42px * var(--s)); top: calc(-42px * var(--s)); width: calc(84px * var(--s)); height: calc(84px * var(--s));
   transform: rotate(-90deg); overflow: visible; opacity: 0; transition: opacity 0.2s ease; pointer-events: none; }

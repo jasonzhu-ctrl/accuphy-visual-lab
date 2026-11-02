@@ -94,7 +94,7 @@ The arc follows the drag time every frame (`p` = drag time / 4 s), with no easin
 | Before the first drag | Exactly round 2: ring, wave, finger and arrows flashing. No track or arc yet. |
 | Dragging (`.is-dragging`) | Finger, arrows and wave fade out in 0.2 s. The blue ring holds still at full strength. Track and arc fade in. |
 | Released early (`.has-progress`) | Finger, arrows and wave come back. Track and arc stay where they got to, with no draining back. |
-| Done (`.is-complete`) | The arc closes. The ring fills bluer (#028CDF at 50 %) and pops once, 1 → 1.14 → 1 in 0.36 s. After 0.6 s the whole cue fades out in 0.5 s. The card ticks and holds 3.5 s over the open lake. |
+| Done (`.is-complete`) | The arc closes. The ring fills bluer (#028CDF at 50 %) and pops once, 1 → 1.14 → 1 in 0.36 s. After 0.6 s the whole cue fades out in 0.5 s. Then the tour goes straight on to stop 2, with no hold (Jason 11-02 via HQ; stops 2–3 hold 5 s after their tap). |
 
 Markup and every value are in `progress-ring.css`; the image shows all four states on the real page.
 
