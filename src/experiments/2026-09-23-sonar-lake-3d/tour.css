@@ -1,0 +1,110 @@
+/* The entry tour (Tour.jsx). The card is the prototype's (2026-11-01-tour-proto/tour.css): white Eurostile titles over a
+   dimmed lake. The guide marks are 界面设计's design handover (docs/2026-11-02-entry-tour-design-handover.md,
+   docs/2026-11-02-tour-design/tour-guide.css), values copied as they are. Jason 11-02: make the guide obvious, like a game
+   tutorial; the "no glow" rule (#186) does not apply to these marks. One blue, #028CDF; the boat cue beats every 1.2 s,
+   the tile tap every 2.0 s. */
+
+/* while the tour runs (index.jsx: .is-touring on <main> and the panel): the lake dimmed, the drag caption away, the panel
+   locked except the tile the stop asks for (.is-tour-target) */
+main.is-touring > div:first-child { filter: brightness(0.72) saturate(0.92); transition: filter 0.6s; }
+main.is-touring .lab-hint { opacity: 0 !important; }
+.ac-panel.is-touring .ac-seg, .ac-panel.is-touring .ac-range, .ac-panel.is-touring .ac-value,
+.ac-panel.is-touring .ac-view { pointer-events: none; opacity: 0.38; transition: opacity 0.3s; }
+/* the tile asked for (the panel's on desktop, the one under the words on phones): full, a thick blue edge, a glow */
+.ac-view.is-tour-target, .ac-panel.is-touring .ac-view.is-tour-target { pointer-events: auto; opacity: 1;
+  box-shadow: 0 0 0 3px #028cdf, 0 0 22px 3px rgba(2, 140, 223, 0.75); }
+
+.ac-tour-layer { position: fixed; inset: 0; z-index: 60; pointer-events: none; color: #fff; font-family: 'Instrument Sans', system-ui, sans-serif; }
+
+/* ---- the stop: a big title, one line, three dots. Centred over the lake, right of the panel ---- */
+.ac-tour-card { position: absolute; left: 432px; right: 16px; top: 17%; padding: 0 24px; text-align: center;
+  opacity: 0; transform: translateY(12px); transition: opacity calc(0.42s * var(--tour-k, 1)) ease, transform calc(0.42s * var(--tour-k, 1)) ease; }
+.ac-tour-card.is-in, .ac-tour-card.is-check { opacity: 1; transform: none; }
+.ac-tour-card.is-out { opacity: 0; transform: translateY(-10px); transition-duration: calc(0.3s * var(--tour-k, 1)); }
+.ac-tour-title { font-family: 'Eurostile Heavy', 'Instrument Sans', sans-serif; font-weight: 800; font-size: clamp(30px, 3.6vw, 46px); line-height: 1.08;
+  letter-spacing: 0.04em; text-transform: uppercase; text-shadow: 0 2px 4px rgba(0,16,24,0.45), 0 10px 32px rgba(0,16,24,0.4); }
+.ac-tour-tick { display: inline-block; margin-left: 0.35em; color: #028cdf; text-shadow: none; }
+.ac-tour-text { margin: 12px auto 0; max-width: 460px; font-size: 15.5px; line-height: 1.4; font-weight: 500; color: rgba(255,255,255,0.86);
+  text-shadow: 0 1px 2px rgba(0,16,24,0.55), 0 0 14px rgba(0,16,24,0.4); }
+.ac-tour-dots { display: flex; justify-content: center; gap: 8px; margin-top: 18px; }
+.ac-tour-dots i { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,0.35); transition: background 0.25s, transform 0.25s; }
+.ac-tour-dots i.is-on { background: #fff; transform: scale(1.25); }
+.ac-tour-dots i.is-done { background: #028cdf; }
+
+/* Tailwind's preflight gives every img max-width: 100%: inside a zero-width anchor the art would shrink to nothing */
+.ac-tour-cue img, .ac-tour-tap img { max-width: none; }
+
+/* ---- 1. the boat cue (stop 1): a zero-size anchor put on the boat every frame; --s = 1 desktop, 1.25 phone ---- */
+.ac-tour-cue { position: absolute; left: 0; top: 0; width: 0; height: 0; --s: 1; transition: opacity calc(0.42s * var(--tour-k, 1)); }
+.ac-tour-cue.is-phone { --s: 1.25; }
+.ac-tour-cue.is-hidden, .ac-tour-cue.is-out { opacity: 0; transition-duration: calc(0.3s * var(--tour-k, 1)); }
+.ac-tour-cue-ring, .ac-tour-cue-wave { position: absolute; left: calc(-32px * var(--s)); top: calc(-32px * var(--s)); width: calc(64px * var(--s)); height: calc(64px * var(--s)); border-radius: 50%; box-sizing: border-box; }
+.ac-tour-cue-ring { border: 3px solid #028cdf; background: rgba(2, 140, 223, 0.24);
+  box-shadow: 0 0 18px 3px rgba(2, 140, 223, 0.7), inset 0 0 12px rgba(2, 140, 223, 0.45);
+  animation: ac-tour-flash 1.2s ease-in-out infinite, ac-tour-pop 1.2s ease-in-out infinite; }
+.ac-tour-cue-wave { border: 2px solid #028cdf; animation: ac-tour-wave 1.2s ease-out infinite; }
+.ac-tour-cue-finger { position: absolute; width: calc(30px * var(--s)); left: calc(-12px * var(--s)); top: calc(-1px * var(--s)); /* its tip on the ring centre */
+  filter: drop-shadow(0 2px 3px rgba(0, 16, 24, 0.5)); animation: ac-tour-flash 1.2s ease-in-out infinite; }
+.ac-tour-cue-arrow { position: absolute; width: calc(26px * var(--s)); top: calc(-13px * var(--s)); filter: drop-shadow(0 0 6px rgba(2, 140, 223, 0.95)); }
+.ac-tour-cue-arrow.is-left { left: calc(-71px * var(--s)); animation: ac-tour-flash 1.2s ease-in-out infinite, ac-tour-swing-l 1.2s ease-in-out infinite; }
+.ac-tour-cue-arrow.is-right { left: calc(45px * var(--s)); animation: ac-tour-flash 1.2s ease-in-out infinite, ac-tour-swing-r 1.2s ease-in-out infinite; }
+@keyframes ac-tour-flash { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+@keyframes ac-tour-pop { 0%, 100% { transform: scale(0.92); } 50% { transform: scale(1.06); } }
+@keyframes ac-tour-wave { 0% { transform: scale(1); opacity: 0.85; } 100% { transform: scale(2); opacity: 0; } }
+@keyframes ac-tour-swing-l { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(calc(-7px * var(--s))); } }
+@keyframes ac-tour-swing-r { 0%, 100% { transform: scaleX(-1) translateX(0); } 50% { transform: scaleX(-1) translateX(calc(-7px * var(--s))); } }
+
+/* ---- 2–4. a tile stop: spotlight, two rings, the tapping finger, the TAP bubble (placed every frame by Tour.jsx) ---- */
+.ac-tour-marks { opacity: 0; transition: opacity calc(0.42s * var(--tour-k, 1)) ease; }
+.ac-tour-marks.is-in, .ac-tour-marks.is-check { opacity: 1; }
+.ac-tour-marks.is-out { transition-duration: calc(0.3s * var(--tour-k, 1)); }
+/* a hole the size of the tile + 6 px; its huge shadow darkens everything else. The card is drawn after it, so the words stay bright */
+.ac-tour-spot { position: fixed; border-radius: 12px; box-shadow: 0 0 0 200vmax rgba(0, 10, 16, 0.6); }
+.ac-tour-wave { position: fixed; border-radius: 8px; outline: 2.5px solid #028cdf; animation: ac-tour-tile-wave 1.6s ease-out infinite; }
+.ac-tour-wave.is-late { animation-delay: 0.8s; }
+@keyframes ac-tour-tile-wave { 0% { outline-offset: 0; outline-color: rgba(2, 140, 223, 0.95); } 100% { outline-offset: 20px; outline-color: rgba(2, 140, 223, 0); } }
+/* the finger: its tip 20 px right of and 10 px above the tile centre, on the view art; slides in, presses (0.86), a white dot flashes, holds, fades */
+.ac-tour-tap { position: fixed; width: 0; height: 0; --f: 44px; }
+.ac-tour-tap.is-phone { --f: 52px; }
+.ac-tour-tap-finger { position: absolute; width: var(--f); left: calc(var(--f) * -0.396); top: calc(var(--f) * -0.052);
+  transform-origin: 39.6% 5.2%; filter: drop-shadow(0 3px 5px rgba(0, 16, 24, 0.55)); animation: ac-tour-tap 2s cubic-bezier(0.25, 0.8, 0.3, 1) infinite; }
+.ac-tour-tap-dot { position: absolute; left: -10px; top: -10px; width: 20px; height: 20px; border-radius: 50%; background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 10px rgba(2, 140, 223, 0.9); animation: ac-tour-tap-dot 2s ease-out infinite; }
+@keyframes ac-tour-tap {
+  0% { transform: translate(64px, 72px) scale(1); opacity: 0; }
+  12% { opacity: 1; }
+  40% { transform: translate(0, 0) scale(1); }
+  48% { transform: translate(0, 0) scale(0.86); }
+  58% { transform: translate(0, 0) scale(1); }
+  82% { transform: translate(0, 0) scale(1); opacity: 1; }
+  100% { transform: translate(0, 0) scale(1); opacity: 0; }
+}
+@keyframes ac-tour-tap-dot { 0%, 46% { transform: scale(0.3); opacity: 0; } 49% { transform: scale(0.6); opacity: 0.95; } 72%, 100% { transform: scale(2.4); opacity: 0; } }
+/* TAP: above the tile on desktop (pointer down), right of it on phones (pointer left); bobs 4 px towards it */
+.ac-tour-bubble { position: fixed; padding: 5px 11px; border-radius: 999px; background: #028cdf; color: #fff;
+  font: 700 12.5px/1.2 'Instrument Sans', system-ui, sans-serif; letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0, 16, 24, 0.45); transform: translate(-50%, -100%); animation: ac-tour-bob-up 1s ease-in-out infinite alternate; }
+.ac-tour-bubble::after { content: ''; position: absolute; left: 50%; bottom: -5px; margin-left: -6px; border: 6px solid transparent; border-bottom: 0; border-top-color: #028cdf; }
+.ac-tour-bubble.is-right { transform: translate(0, -50%); animation-name: ac-tour-bob-left; }
+.ac-tour-bubble.is-right::after { left: -5px; top: 50%; bottom: auto; margin: -6px 0 0; border: 6px solid transparent; border-left: 0; border-right-color: #028cdf; }
+@keyframes ac-tour-bob-up { from { transform: translate(-50%, -100%); } to { transform: translate(-50%, calc(-100% + 4px)); } }
+@keyframes ac-tour-bob-left { from { transform: translate(0, -50%); } to { transform: translate(-4px, -50%); } }
+
+/* the tile under the words on phones (stops 2–3): the panel's own tile look, 120 px, 22 px under the dots */
+.ac-tour-ptile { display: block; width: 120px; margin: 22px auto 0; pointer-events: auto; }
+
+/* Skip while it runs, Replay afterwards: one quiet line, bottom left under the panel */
+.ac-tour-corner { position: absolute; left: 20px; bottom: 18px; pointer-events: auto; border: 0; background: none; padding: 6px 0; cursor: pointer;
+  color: rgba(255,255,255,0.72); font: 600 12.5px/1.2 'Instrument Sans', system-ui, sans-serif; text-decoration: underline; text-decoration-color: rgba(255,255,255,0.35); text-underline-offset: 3px; text-shadow: 0 1px 2px rgba(0,16,24,0.5); }
+.ac-tour-corner:hover { color: #fff; text-decoration-color: #fff; }
+
+/* phones: no panel. The card sits under the store badges (top right, to ~72 px), Skip and Replay top left */
+.ac-tour-layer.is-phone .ac-tour-card { left: 0; right: 0; top: calc(env(safe-area-inset-top) + 96px); padding: 0 20px; }
+.ac-tour-layer.is-phone .ac-tour-title { font-size: 30px; }
+.ac-tour-layer.is-phone .ac-tour-text { font-size: 14.5px; max-width: 320px; }
+.ac-tour-layer.is-phone .ac-tour-corner { left: 16px; bottom: auto; top: calc(env(safe-area-inset-top) + 14px); }
+
+/* dev ?tourslow=k: the same fades k× slower (--tour-k) so a frame can be caught mid-fade. Reduced motion: the marks stand still */
+@media (prefers-reduced-motion: reduce) {
+  .ac-tour-cue *, .ac-tour-wave, .ac-tour-tap *, .ac-tour-bubble { animation: none !important; }
+}

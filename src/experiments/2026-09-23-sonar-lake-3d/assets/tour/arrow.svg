@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><!-- points left; the right arrow is the same file mirrored (transform: scaleX(-1)) -->
+<path d="M20 12H5M11 5.5 4.5 12 11 18.5" fill="none" stroke="#0a1a24" stroke-opacity="0.5" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M20 12H5M11 5.5 4.5 12 11 18.5" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

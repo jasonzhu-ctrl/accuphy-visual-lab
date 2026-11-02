@@ -3549,3 +3549,41 @@ Numbered log. Newest at the bottom.
        14–17 fish there before; it stays well above 6, but the picture there is a little emptier.
      - Sheet: `docs/2026-10-31-fish-in-beam-10s.jpg`. Logs: `scripts/dev/qa/fish-beam/rerun-2026-10-31-10s/`. Test version only;
        lab.accuphy.ca needs Jason's own 动.
+
+199. **2026-11-02** — **The entry tour is part of the base version and replaces the lake's step cards (test version)** (Jason in Lab HQ:
+     "我觉得提议不错 还有我们在做的这些应该是基于 base 的 不是分支版 只有锁 view 的部分是做完这个 base 以后单独要去做的分支"; plan
+     `docs/2026-11-02-entry-tour-into-base-plan.md`, design `docs/2026-11-02-entry-tour-design-handover.md` by 界面设计).
+     - **Three stops, the same on desktop and phones:**
+       - Mini page: Drag the boat (Combo) → Tap Forward → Tap Down;
+       - PingLive lake page: Drag the boat (Down) → Tap Forward → Tap Panoramic;
+       - ice page: unchanged this round, it keeps its three cards.
+     - **Built:** `Tour.jsx`, `tour.css`, `assets/tour/` (finger and arrow from 界面设计) in the lake folder, wired into `index.jsx`.
+       - Start 0.7 s after `ready`, fade in 0.42 s, tick held 0.7 s, fade out 0.3 s; "Skip tour" throughout, "Replay tour" after.
+       - Once finished or skipped it does not start by itself again on this device (localStorage `accuphy_lab_tour_v1`, wrapped in
+         try/catch). `?tour=1` always runs it, `?tour=off` never.
+       - A tour that will run opens the page on stop 1's view. On phones the app's Home is skipped until the tour ends or is skipped;
+         after that Home works as before.
+       - The page switches the views itself (no simulated clicks): stop 1's view without a `view` event (not a visitor's pick, #139);
+         a tap on the lit tile sends `view` with source 'tour' (the store bridge drops `source`, 对接 checked).
+       - Stop 1 is done when the visitor drags the boat 1 m; stops 2–3 when the page shows the asked-for view.
+       - Desktop: the panel is locked except the asked-for tile. Phones: that tile sits under the words. Both get the design's
+         spotlight, rings, tapping finger and TAP bubble, and the boat gets the blue ring with a finger and ← →.
+       - The lake's three step cards, `s1_*`–`s3_*` (also the French) and the lake branch of `STEPS` are gone; `goStep` stays for the ice page.
+       - New keys in `i18n.js`: `tour_drag_*`, `tour_fwd_*`, `tour_down_*`, `tour_pano_*` (`_title`, `_text`), `tour_tap`,
+         `tour_skip`, `tour_replay`. English placeholders from the prototype; no French yet (falls back to English). The real
+         words come later with Jason and the website's review.
+     - **Combo during the tour:** the base version has no lock, so while the tour runs Combo shows without the subscribe card
+       (`pickView` skips the #191 lock while `tour.on`). After the tour the page runs as before, #191 lock included. The
+       marketing version decides later how to lock after the tour. If a version with the #191 lock keeps this tour, visitors
+       see Combo once without subscribing; that is for Jason to decide (对接 flagged it).
+     - **Not changed:** the boat's place, fish, the sonar imaging, embed.js, signup.js, UnlockCard.jsx.
+     - **Phone layout differs from the design** (it has no store badges): the badges sit top right to ~72 px, so the card sits at
+       the safe area + 96 px (design + 64) and Skip/Replay top left (design top right). In the dev gallery only, the "← Lab" link
+       sits under Skip.
+     - **Checked** on scratch copies (main 1e21d90 + this change, own dev servers):
+       - Walked 1→2→3 at 1280×720 and 390×844 on the PingLive lake and the Mini page (`VITE_DEVICES=PLM`). Each stop shows the
+         right view; Replay is there after the tour; a reload does not restart it (phones open on Home).
+       - Ice page desktop and phone: 3 cards, no tour, 0 errors.
+       - sonar-qa grid (lake 6 × 6 + ice 4) against main: 44 tiles within 0.36 luma and 0.25 % lit, 0 errors.
+       - Console: only the dev server's favicon 404.
+       - Not run: a real phone, Safari, the store iframe.

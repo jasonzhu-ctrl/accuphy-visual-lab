@@ -19,6 +19,7 @@ import ShopButton from './ShopButton' // the one link to the store (X-6L, 2026-1
 import { t } from './i18n' // every visitor-visible string, English or French (?lang=fr; X-6L-fr)
 import ShareButton from './ShareButton'
 import AppBadges from './AppBadges'
+import Tour, { TOUR_SCRIPTS, tourForced, tourOff, tourSeen } from './Tour'
 // BF funnel items 1–2 (handoff 2026-10-26): two placements for Jason to pick (HQ: 先出 2 个样子，不直接定); off until he does
 import { depthAt } from './terrain'
 import { panoHalfWidth } from './sonarMarks'
@@ -73,8 +74,13 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
   const ICE = scene === 'ice'
   const ONLY = ICE || miniOnly() ? 'PLM' : ONLY_ENV // on the ice the Mini is the device: the app's ice views are the Mini's; the store's US market too (#190)
   const SHOWN_DEVICES = ONLY ? [DEVICES[ONLY]] : Object.values(DEVICES)
+  // the entry tour (Tour.jsx, Jason 2026-11-02) on the lake pages: the Mini's script on a Mini-only page, PingLive's otherwise.
+  // When it will start by itself, the page opens on its first stop's view (phones skip the app's Home until it ends)
+  const TOUR = ICE ? null : ONLY === 'PLM' ? 'mini' : 'pl'
+  const [tourAuto] = useState(() => !!TOUR && !tourOff && (tourForced || !tourSeen()))
+  const [tour, setTour] = useState({ on: false, tile: null }) // the tour is running; the view whose tile it lights
   const [deviceId, setDeviceId] = useState(ONLY || 'PL')
-  const [mode, setMode] = useState(ICE ? (/[?&]view=ice\b/.test(window.location.search) && isSignedUp() ? 'ice' : 'liveice') : 'forward') // ?view=ice: the Ice Fishing tile from the lake (#191)
+  const [mode, setMode] = useState(tourAuto ? TOUR_SCRIPTS[TOUR].stops[0].view : ICE ? (/[?&]view=ice\b/.test(window.location.search) && isSignedUp() ? 'ice' : 'liveice') : 'forward') // ?view=ice: the Ice Fishing tile from the lake (#191)
   const [view, setView] = useState(ICE ? iceParams().view : 'top') // ice page cameras: top / under the ice / section (docs/ice-relationship-study.md)
   // the ice page: the step cards stack under the control panel, so the ice band across the top stays open for taps
   const panelRef = useRef(null)
@@ -132,8 +138,8 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
   // Phones (lake scene) open ON the app's Home page and nothing starts until a view is picked (Jason 2026-10-16:
   // 显示首页选视图 而且应该必须先选才能开始): no beam, no sonar picture, no capsules until the first pick.
   const homeFirst = (isPhoneLayout() || isLandscapePhone()) && !ICE
-  const [home, setHome] = useState(homeFirst)      // the app's Home page is open inside the phone display
-  const [started, setStarted] = useState(!homeFirst) // a view has been picked (always true on desktop and on the ice page)
+  const [home, setHome] = useState(homeFirst && !tourAuto)      // the app's Home page is open inside the phone display
+  const [started, setStarted] = useState(!homeFirst || tourAuto) // a view has been picked (always true on desktop and on the ice page; the tour picks its own)
   const toastT = useRef(0)
   const [imperial, setImperial] = useState(true)
   const [colormap, setColormap] = useState('accuphy_mid') // halfway between the app 2.0.0 'orange' map measured on its own recording and the LiveScope amber (Jason 2026-10-23: 折中); 'garmin_amber' was the LiveScope-measured amber (§7.7)
@@ -281,8 +287,9 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
   // button, guide step), never for the default view on load (#139); `source` says where the pick came from
   const showView = (d, m, source) => { setDeviceId(d); setMode(m); labEvent('view', { view: m, product: PRODUCT[d] || PRODUCT.PLM, source }) }
   // every pick passes here, so nothing reaches Combo before subscribing (#191): the card opens and the view stays as it was
+  // The entry tour belongs to the base version, which has no lock: while it runs every view opens (Jason 2026-11-02)
   const pickView = (d, m, source, name) => {
-    if (isLocked(d, m) && !unlocked) { setUnlock({ d, m, source, name: name || t(LOCKED_NAME[m]) }); return false }
+    if (isLocked(d, m) && !unlocked && !tour.on) { setUnlock({ d, m, source, name: name || t(LOCKED_NAME[m]) }); return false }
     showView(d, m, source); return true
   }
   const goIce = (view) => { window.location.href = iceUrl(view) }
@@ -293,6 +300,13 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
     if (ice) { goIce(m); return }
     showView(d, m, source)
     if (source === 'home') { setHome(false); setStarted(true) }
+  }
+
+  // the tour shows a stop's view: by itself (stop 1, no `view` event: not a visitor's pick, #139) or for the visitor's tap
+  // (stops 2–3, source 'tour'). On phones that also leaves the app's Home.
+  const tourShow = (d, m, byVisitor) => {
+    if (byVisitor) showView(d, m, 'tour'); else { setDeviceId(d); setMode(m) }
+    if (phone) { setHome(false); setStarted(true) }
   }
 
   // the app's buttons are display-only: only a short hint (Jason 2026-10-24: no sign-up gate on them)
@@ -332,17 +346,14 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
     if (i >= 0) setComboDownFt(steps[i])
   }
 
-  // the three-step guide (docs/3d-beam-reference.md §3): each step is a preset
+  // the three-step guide (docs/3d-beam-reference.md §3): each step is a preset. Only the ice page keeps it; on the lake the
+  // entry tour replaces it (Jason 2026-11-02)
   const [step, setStep] = useState(0)
   const STEPS = ICE ? [
     { n: 1, title: t('i1_title'), text: t('i1_text'), device: 'PLM', mode: 'liveice', range: 60, boat: ICE_START },
     { n: 2, title: t('i2_title'), text: t('i2_text'), device: 'PLM', mode: 'liveice', range: 60, boat: [-8, -10] },
     { n: 3, title: t('i3_title'), text: t('i3_text'), device: 'PLM', mode: 'forward', range: 60, boat: [16, 11] },
-  ] : [
-    { n: 1, title: t('s1_title', { device: device.name }), text: t('s1_text'), device: 'PL', mode: 'down', range: 80, boat: [-20, 6] },
-    { n: 2, title: t('s2_title'), text: t('s2_text', { device: device.name }), device: 'PL', mode: 'forward', range: 60, boat: [16, 11] }, // standing timber + bass 8–15 m ahead on the 7 m flat
-    { n: 3, title: t('s3_title'), text: t('s3_text'), device: 'PL', mode: 'panoramic', range: 70, boat: [-50, 8] }, // on the 5 m shelf, scanning toward the drop-off: the flat fan paints the bottom
-  ].map((st) => (ONLY ? { ...st, device: ONLY, ...(st.mode === 'panoramic' ? (unlocked ? { mode: 'combo', text: t('s3_text_combo') } : { mode: 'forward', text: t('s3_text_locked') }) : {}) } : st)) // before subscribing step 3 stays out of Combo (#191)
+  ] : []
   const goStep = (i) => {
     const st = STEPS[i]; setStep(i); pickView(st.device, st.mode, 'step'); setRangeFt(st.range)
     state.current.target.x = st.boat[0]; state.current.target.z = st.boat[1]
@@ -351,7 +362,7 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
 
   return (
     <>
-    <main ref={mainRef} inert={!!unlock} aria-hidden={unlock ? true : undefined} className="font-brand fixed inset-x-0 top-0 select-none overflow-hidden bg-[#9cc1cf] text-white" style={{ height: 'var(--lab-h, 100%)', ...(ICE ? { background: iceParams().T.bg } : null) }} onPointerMove={onMove}>
+    <main ref={mainRef} inert={!!unlock} aria-hidden={unlock ? true : undefined} className={`font-brand fixed inset-x-0 top-0 select-none overflow-hidden bg-[#9cc1cf] text-white ${tour.on ? 'is-touring' : ''}`} style={{ height: 'var(--lab-h, 100%)', ...(ICE ? { background: iceParams().T.bg } : null) }} onPointerMove={onMove}>
       <div className="absolute inset-0 touch-none">
         {mount3d && !glLost && <LakeScene key={glKey} state={state} sonarRect={sonarRect} paused={paused} scene={scene} />}
       </div>
@@ -369,7 +380,7 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
 
       {/* ---- control panel — Apple-style frosted glass over the lake (Jason 2026-09-24) ---- */}
       <motion.div ref={(el) => { panelRef.current = el; state.current.panelEl = el }} data-hint-avoid initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-        className="ac-panel pointer-events-auto absolute flex flex-col gap-3 max-sm:hidden sm:left-4 sm:top-14 sm:w-[400px] sm:p-4" style={land ? { display: 'none' } : undefined}>
+        className={`ac-panel pointer-events-auto absolute flex flex-col gap-3 max-sm:hidden sm:left-4 sm:top-14 sm:w-[400px] sm:p-4 ${tour.on ? 'is-touring' : ''}`} style={land ? { display: 'none' } : undefined}>
         <div className="flex items-center gap-2.5 px-1 pt-0.5">
           <img src="/brand/logo/White Accuphy Logo.png" alt="Accuphy" className="h-[21px] w-auto" draggable={false} />
           <span className="ac-lab-title">Lab</span>
@@ -381,9 +392,9 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
         <div>
           <span className="ac-label">{t('view')}</span>
           <div className={`ac-views is-${modes.length}`}>{modes.map((m) => {
-            const locked = isLocked(deviceId, m) && !unlocked, active = mode === m
+            const locked = isLocked(deviceId, m) && !unlocked && !tour.on, active = mode === m
             return (
-              <button key={m} type="button" className={`ac-view ${active ? 'is-active' : ''} ${locked ? 'is-locked' : ''}`} aria-pressed={active} aria-label={locked ? t('unlock_locked', { view: t(LOCKED_NAME[m]) }) : undefined} onClick={() => pickView(deviceId, m, 'panel')}>
+              <button key={m} type="button" className={`ac-view ${active ? 'is-active' : ''} ${locked ? 'is-locked' : ''} ${tour.tile === m ? 'is-tour-target' : ''}`} aria-pressed={active} aria-label={locked ? t('unlock_locked', { view: t(LOCKED_NAME[m]) }) : undefined} onClick={() => pickView(deviceId, m, 'panel')}>
                 {locked && <span className="ac-view-lock"><LockIcon size={10} /></span>}
                 <ViewIcon view={m} deg={device.beamDeg} active={active} live={!phone} />
                 <span className="ac-view-name">{t('mode_' + m)}</span>
@@ -451,7 +462,7 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
       {/* ---- the cue caption, shown until the first drag / tap (position set by the render loop). The ice page: under the
            reticle on the ice (IceCamp.jsx, #123); the lake: above the water reticle round the boat (Scene.jsx Boat, #132).
            Plain text, no glass pill, no dot (Jason 2026-10-23: 看着太 AI 了) ---- */}
-      <div ref={(el) => { state.current.hintEl = el }} className="pointer-events-none absolute left-0 top-0 whitespace-nowrap" style={{ opacity: 0, transition: 'opacity .6s', color: 'rgba(255,255,255,0.92)', fontSize: 13, fontWeight: 500, letterSpacing: '0.01em', textShadow: '0 1px 2px rgba(0,0,0,0.55), 0 0 12px rgba(0,0,0,0.45)' }}>{t(ICE ? 'hint_ice' : 'hint_boat')}</div>
+      <div ref={(el) => { state.current.hintEl = el }} className="lab-hint pointer-events-none absolute left-0 top-0 whitespace-nowrap" style={{ opacity: 0, transition: 'opacity .6s', color: 'rgba(255,255,255,0.92)', fontSize: 13, fontWeight: 500, letterSpacing: '0.01em', textShadow: '0 1px 2px rgba(0,0,0,0.55), 0 0 12px rgba(0,0,0,0.45)' }}>{t(ICE ? 'hint_ice' : 'hint_boat')}</div>
 
       {/* ---- iPhone Pro Max, landscape, turned slightly in 3D (same pose as the GL picture).
            Proportions from the 15/16 Pro Max: body 2.08:1, corner radius ≈ 14 % of the short side,
@@ -531,8 +542,8 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
         </div>
       )}
 
-      {/* ---- guide strip ---- */}
-      <div data-hint-avoid className={ICE ? 'pointer-events-auto absolute hidden flex-col gap-2 md:flex' : 'pointer-events-auto absolute right-[28px] top-4 hidden w-[min(620px,44vw)] items-stretch gap-2.5 md:flex'} style={ICE ? { left: 16, top: cardsTop, width: 400 } : land ? { display: 'none' } : undefined}>
+      {/* ---- guide strip (the ice page; the lake has the entry tour) ---- */}
+      {ICE && <div data-hint-avoid className={ICE ? 'pointer-events-auto absolute hidden flex-col gap-2 md:flex' : 'pointer-events-auto absolute right-[28px] top-4 hidden w-[min(620px,44vw)] items-stretch gap-2.5 md:flex'} style={ICE ? { left: 16, top: cardsTop, width: 400 } : land ? { display: 'none' } : undefined}>
         {STEPS.map((st, i) => (
           <button key={st.n} onClick={() => goStep(i)} className={`ac-card flex-1 text-left ${ICE ? 'px-3.5 py-2.5' : 'px-3.5 py-3'} ${step === i ? 'is-active' : ''} ${GLASS ? 'is-glass' : ''}`}>
             {GLASS && <GlassLayer kind={GLASS} />}
@@ -541,11 +552,12 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
             {step === i && <div className="ac-body mt-1.5 text-[11.5px] leading-snug">{st.text}</div>}
           </button>
         ))}
-      </div>
+      </div>}
       {import.meta.env.DEV && window.location.search.includes('debug') && (
         <pre ref={(el) => { state.current.debugEl = el }} className="pointer-events-none absolute left-2 top-1/2 rounded bg-black/60 p-1 text-[10px] text-lime-300" />
       )}
     </main>
+    {TOUR && <Tour script={TOUR} auto={tourAuto} phone={phone} mode={mode} deviceId={deviceId} state={state} onShow={tourShow} onState={setTour} />}
     <AnimatePresence>{unlock && <UnlockCard key="unlock" name={unlock.name} img={VIEW_IMG[unlock.m]} product={PRODUCT[unlock.d] || PRODUCT.PLM} view={unlock.m} onClose={() => setUnlock(null)} onDone={onUnlocked} />}</AnimatePresence>
     </>
   )

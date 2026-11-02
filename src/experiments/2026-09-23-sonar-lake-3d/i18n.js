@@ -39,14 +39,19 @@ const S = {
   toast_desktop: { en: 'These are the app’s own controls — use the panel to change the view.', fr: 'Ce sont les commandes de l’application : changez de vue dans le panneau.' },
   // the step cards
   step: { en: 'Step', fr: 'Étape' },
-  s1_title: { en: 'The {device} sonar beam', fr: 'Le faisceau du sonar {device}' }, // FR of s1 and s2 reviewed by the website HQ 2026-10-31 (#191, accuphy-website/handoffs/2026-10-31-lab-191-fr-review.md)
-  s1_text: { en: 'Drag the boat — anything inside the beam appears on your phone.', fr: 'Faites glisser le bateau : tout ce qui entre dans le faisceau apparaît sur votre téléphone.' },
-  s2_title: { en: 'This is what your phone shows', fr: 'Voici ce qu’affiche votre téléphone' },
-  s2_text: { en: 'This is what {device} sees, live on your phone in the Accuphy Sonar app: the bottom, timber and fish.', fr: 'Voici ce que voit le {device}, en direct sur votre téléphone dans l’application Accuphy Sonar : le fond, les arbres immergés et les poissons.' },
-  s3_title: { en: 'Which view, when', fr: 'Quelle vue choisir, et quand' },
-  s3_text: { en: 'Panoramic scans wide to find fish and structure; Forward to cast at them; Down to fish straight below.', fr: 'La vue panoramique scanne de larges zones pour repérer poissons et structures ; la vue avant, pour lancer dessus ; la vue vers le bas, pour pêcher à la verticale.' },
-  s3_text_combo: { en: 'Combo shows Down and Forward side by side; Forward to cast at fish ahead; Down to fish straight below.', fr: 'La vue combinée montre le bas et l’avant côte à côte : la vue avant pour lancer sur les poissons devant vous, la vue vers le bas pour pêcher à la verticale.' },
-  s3_text_locked: { en: 'Forward to cast at fish ahead; Down to fish straight below. Combo shows both side by side: subscribe to unlock it.', fr: 'La vue avant pour lancer sur les poissons devant vous, la vue vers le bas pour pêcher à la verticale. La vue combinée montre les deux côte à côte : abonnez-vous pour la débloquer.' }, // FR reviewed 2026-10-31 (#191)
+  // the entry tour (Tour.jsx, Jason 2026-11-02; replaces the lake's s1–s3 step cards): placeholder English from the prototype,
+  // the real words and the French come later with Jason and the website's review (French falls back to English until then)
+  tour_drag_title: { en: 'Drag the boat' },
+  tour_drag_text: { en: 'Whatever the beam touches shows up live in the Accuphy Sonar app.' },
+  tour_fwd_title: { en: 'Tap Forward' },
+  tour_fwd_text: { en: 'The beam turns to look ahead of the boat — where you cast.' },
+  tour_down_title: { en: 'Tap Down' },
+  tour_down_text: { en: 'The beam points straight under the boat — see what’s right below.' },
+  tour_pano_title: { en: 'Tap Panoramic' },
+  tour_pano_text: { en: 'A wide sweep ahead of the boat — to find fish and structure.' },
+  tour_tap: { en: 'Tap' },
+  tour_skip: { en: 'Skip tour' },
+  tour_replay: { en: 'Replay tour' },
   i1_title: { en: 'The beam under the ice', fr: 'Le faisceau sous la glace' },
   i1_text: { en: 'The PingLive Mini hangs in the hole and pings straight down. Tap the ice anywhere to drill a new hole — whatever the beam touches lights up.', fr: 'Le PingLive Mini est suspendu dans le trou et émet droit vers le bas. Touchez la glace n’importe où pour percer un nouveau trou : tout ce que le faisceau touche s’allume.' },
   i2_title: { en: 'Watch them come in', fr: 'Regardez-les arriver' },

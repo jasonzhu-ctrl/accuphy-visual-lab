@@ -5,7 +5,7 @@ import fs from 'node:fs'
 const out=process.argv[2];fs.mkdirSync(out,{recursive:true})
 const b=await chromium.launch({headless:true,executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',args:['--ignore-gpu-blocklist','--use-angle=metal']})
 const ctxOf=(ph)=>b.newContext(ph?{viewport:{width:390,height:844},deviceScaleFactor:2,isMobile:true,hasTouch:true}:{viewport:{width:1728,height:1000}})
-const load=async(q,ph,ice)=>{const c=await ctxOf(ph);await c.addInitScript(()=>{try{localStorage.setItem('accuphy_sonar_signup_v1','1')}catch{}});const p=await c.newPage();const e=[];p.on('pageerror',x=>e.push(x.message));await p.goto(`http://localhost:${process.env.PORT||5173}/?${q}#${ice?'2026-10-16-sonar-ice-3d':'2026-09-23-sonar-lake-3d'}`);await p.waitForTimeout(6000);return{c,p,e}}
+const load=async(q,ph,ice)=>{const c=await ctxOf(ph);await c.addInitScript(()=>{try{localStorage.setItem('accuphy_sonar_signup_v1','1');localStorage.setItem('accuphy_lab_tour_v1','1')}catch{}});const p=await c.newPage();const e=[];p.on('pageerror',x=>e.push(x.message));await p.goto(`http://localhost:${process.env.PORT||5173}/?${q}#${ice?'2026-10-16-sonar-ice-3d':'2026-09-23-sonar-lake-3d'}`);await p.waitForTimeout(6000);return{c,p,e}}
 const snap=async(p,f)=>{const d=await p.evaluate(()=>window.__sonarSnap(768,384));fs.writeFileSync(f,Buffer.from(d.split(',')[1],'base64'))}
 const spots=[[-6,4],[-40,-5],[22,8],[4,-40],[-14,-52.5],[-3,-14]],views=[['PingLive','Down'],['PingLive','Forward'],['PingLive','Panoramic'],['PingLive Mini','Down'],['PingLive Mini','Forward'],['PingLive Mini','Combo']]
 for(const [tag,q] of [['off','beamfish=off'],['on','']]){const {c,p,e}=await load(q);
