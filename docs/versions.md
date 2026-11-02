@@ -9,6 +9,10 @@ with the source commit it was built from, so anyone can tell which version a lin
 sign-up and Combo stays shut for everyone (no fake success). Test links show "Test mode: nothing is sent." The consent wording
 (`unlock_consent` in i18n.js) is Klaviyo HQ's draft and waits for Jason.
 
+## 2026-11-01: test link /tour/ at 6e47345 (test repo d47b869)
+
+Entry-tour prototype (A9): Mini script; `?tour=pl` for PingLive. Lock-free look, marketing hidden on this page only. Other pages unchanged.
+
 ## 2026-11-01: test links at 730e5cf (test repo c92001b)
 
 Fish in the beam in by about 10 s (#198, second round of #193), plus the #191 French final. Built from one commit, `/`, `/mini/`, `/ice/` opened locally with 0 errors, live md5 matches. lab.accuphy.ca stays at 5c2e69a.
