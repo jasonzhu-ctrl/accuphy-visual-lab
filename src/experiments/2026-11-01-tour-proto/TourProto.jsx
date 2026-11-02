@@ -3,7 +3,8 @@
 // action), and goes on only when the visitor has done the action — dragged the boat, or clicked the one panel tile that
 // is lit. Between stops the card fades out (300 ms) and the next fades in (420 ms). The panel is locked while the tour
 // runs (tour.css, a class on <body>), except the tile the stop asks for. "Skip" at any time; "Replay tour" afterwards.
-// Copy is placeholder (HQ: 真文字之后和 Jason 定). Nothing is remembered between visits yet (HQ: 小样里可以先不记).
+// Copy is placeholder (HQ: 真文字之后和 Jason 定). A stop's title names the action, not the view (Jason 2026-11-02: at stop 2 the
+// lake still shows Combo until the visitor taps Forward, so the words must not say "Forward View" yet). Nothing is remembered between visits yet (HQ: 小样里可以先不记).
 // Phones (and a phone held sideways): no panel, so the tour starts after the Home pick, stop 1 is a tap on the lake, stops 2–3
 // go on with "Next". The layout is read again on resize: a page that loads in a small or hidden pane and grows later
 // (Lab HQ 2026-11-01: the tour never started in the browser pane) must still begin on the desktop path.
@@ -18,13 +19,13 @@ import './tour.css'
 const SCRIPTS = {
   mini: { device: 'PingLive Mini', stops: [
     { view: 'combo', action: 'drag', title: 'Drag the boat', phoneTitle: 'Tap the boat', text: 'Whatever the beam touches shows up live in the Accuphy Sonar app.' },
-    { view: 'forward', action: 'tile', title: 'PingLive Mini Forward View', text: 'Tap Forward on the panel — the beam looks ahead of the boat, where you cast.' },
-    { view: 'down', action: 'tile', title: 'See what’s right below', text: 'Tap Down — the beam points straight under the boat.' },
+    { view: 'forward', action: 'tile', title: 'Tap Forward', phoneTitle: 'Forward View', text: 'The beam turns to look ahead of the boat — where you cast.' },
+    { view: 'down', action: 'tile', title: 'Tap Down', phoneTitle: 'Down View', text: 'The beam points straight under the boat — see what’s right below.' },
   ] },
   pl: { device: 'PingLive', stops: [
     { view: 'down', action: 'drag', title: 'Drag the boat', phoneTitle: 'Tap the boat', text: 'Whatever the beam touches shows up live in the Accuphy Sonar app.' },
-    { view: 'forward', action: 'tile', title: 'PingLive Forward View', text: 'Tap Forward on the panel — the beam looks ahead of the boat, where you cast.' },
-    { view: 'panoramic', action: 'tile', title: 'Scan wide', text: 'Tap Panoramic — a wide sweep ahead of the boat to find fish and structure.' },
+    { view: 'forward', action: 'tile', title: 'Tap Forward', phoneTitle: 'Forward View', text: 'The beam turns to look ahead of the boat — where you cast.' },
+    { view: 'panoramic', action: 'tile', title: 'Tap Panoramic', phoneTitle: 'Panoramic View', text: 'A wide sweep ahead of the boat — to find fish and structure.' },
   ] },
 }
 const SLOW = import.meta.env.DEV ? +((/[?&]tourslow(?:=(\d+))?\b/.exec(window.location.search) || [, 1])[1] || 4) : 1 // dev: ?tourslow[=k] runs the holds and fades k× slower (default 4), for screenshots
