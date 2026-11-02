@@ -8,8 +8,8 @@ Jason 2026-11-02：“你记住，或者搞一个 sheet 把各种版本做好管
 
 | 版本 | 是什么 | 代码版本 | 在哪里看 | 状态 |
 |---|---|---|---|---|
-| **标准 Base 版（PingLive + PingLive Mini）** | Jason 11-02 定的标准基础版，见下面的清单 | main 4c3fc61（+ bab2364，只改了记录） | 测试链接：`/`（PingLive，可切 Mini）、`/mini/`（只有 Mini） | Jason 说可以上线，上线前还有一件事要定（见最后一节） |
-| 线上版 | 店铺页里嵌的、广告点进来看到的 | 5c2e69a（10-29） | lab.accuphy.ca | 旧版，等标准 Base 版换上去 |
+| **标准 Base 版（PingLive + PingLive Mini）** | Jason 11-02 定的标准基础版，见下面的清单 | main 6b5a225（4c3fc61 + 关锁 #202） | lab.accuphy.ca `/`（PingLive，可切 Mini）、`/mini/`（只有 Mini）；测试链接同一版 | **11-02 已上线**（Jason：“Lock off, go live”） |
+| 线上版 | 店铺页里嵌的、广告点进来看到的 | **6b5a225（11-02）** = 标准 Base 版 | lab.accuphy.ca、shop.accuphy.com/pages/lab | 已换成标准 Base 版，锁关闭 |
 | 冰钓页 | 冰面，只有 Mini | 和 Base 同一份代码 | 测试链接 `/ice/` | 还是旧的三张步骤卡；Jason 11-02：也做成基础版入场教程（Combo → Forward → Down，点冰打洞），Base 在做 |
 | 营销版 | 只有“锁视图”（订阅才能看 Combo 等，#191） | 现在混在 main 里，还没拆出来 | — | Base 版上线后再拆、再做 |
 
@@ -45,9 +45,9 @@ Jason 2026-11-02：“你记住，或者搞一个 sheet 把各种版本做好管
 - 上线 lab.accuphy.ca 要 Jason 在 Lab HQ 说“动”。
 - 每次上线或换测试链接，HQ 更新这一页和 `docs/versions.md`。
 
-## 上线前要定的（11-02）
+## 上线时定的（11-02，已处理）
 
-1. **Combo 订阅锁：** 现在 main 里还带着营销版的锁（#191）。直接上线的话，Klaviyo 名单编号（W24Qdc）还没填，所有访客的 Combo 都会锁死、也解不开。
+1. **Combo 订阅锁（Jason 选了“Lock off, go live”，已关，#202，开关 VITE_COMBO_LOCK）：** 现在 main 里还带着营销版的锁（#191）。直接上线的话，Klaviyo 名单编号（W24Qdc）还没填，所有访客的 Combo 都会锁死、也解不开。
    - 要么上线时把锁关掉，就是纯 Base 版；
    - 要么先把锁需要的东西配齐。
-2. **法文：** 入场教程和新按钮的法文还没翻、还没经网站核。法文页上这些地方会显示英文。
+2. **法文（还没做）：** 入场教程和新按钮的法文还没翻、还没经网站核。法文页上这些地方会显示英文。
