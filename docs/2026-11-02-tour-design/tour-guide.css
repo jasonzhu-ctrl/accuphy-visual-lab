@@ -13,6 +13,8 @@
   box-shadow: 0 0 18px 3px rgba(2, 140, 223, 0.7), inset 0 0 12px rgba(2, 140, 223, 0.45);
   animation: tg-flash 1.2s ease-in-out infinite, tg-pop 1.2s ease-in-out infinite; }
 .tg-cue-wave { border: 2px solid var(--tg-blue); animation: tg-wave 1.2s ease-out infinite; }
+/* Tailwind's preflight sets img { max-width: 100% }: inside a zero-size anchor that shrinks the icons to nothing */
+.tg-cue img, .tg-tap img { max-width: none; height: auto; }
 /* finger: its tip sits on the centre of the ring */
 .tg-cue-finger { position: absolute; width: calc(30px * var(--s)); left: calc(-12px * var(--s)); top: calc(-1px * var(--s));
   filter: drop-shadow(0 2px 3px rgba(0, 16, 24, 0.5)); animation: tg-flash 1.2s ease-in-out infinite; }
@@ -41,7 +43,7 @@
 @keyframes tg-tile-wave { 0% { outline-offset: 0; outline-color: rgba(2, 140, 223, 0.95); } 100% { outline-offset: 20px; outline-color: rgba(2, 140, 223, 0); } }
 
 /* ---------- 3. Finger tap on the tile (2.0 s loop) ----------
-   Placed so its tip is on the tile centre, 8 px below the middle (the icon stays visible). Slides in from bottom right,
+   Placed so its tip is 20 px right of and 10 px above the tile centre: it taps the view art and leaves the name readable. Slides in from bottom right,
    presses (shrinks to 0.86), a white dot flashes at the tip, holds, fades. --f = 44 px desktop, 52 px phone. */
 .tg-tap { position: fixed; width: 0; height: 0; pointer-events: none; --f: 44px; }
 .tg-tap.is-phone { --f: 52px; }

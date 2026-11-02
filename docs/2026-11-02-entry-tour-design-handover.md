@@ -59,8 +59,8 @@ Four marks together, all fading in with the card (0.42 s):
    | 1.16–1.64 s | Hold. |
    | 1.64–2.0 s | Fade out, then start again. |
 
-   The finger is 44 px wide on desktop and 52 px on phones. Its tip rests on the tile centre, 8 px below the middle, so
-   the view icon stays visible.
+   The finger is 44 px wide on desktop and 52 px on phones. Its tip rests 20 px right of and 10 px above the tile centre:
+   it taps the view art and leaves the view name readable.
 4. **"TAP" bubble.** A #028CDF pill with white text, Instrument Sans 700 12.5 px, uppercase, letter-spacing 0.1em,
    padding 5 × 11 px, and a 6 px pointer. On desktop it sits centred above the tile with a 12 px gap and points down. On
    phones it sits right of the tile with a 14 px gap and points left, because the words are above. It bobs 4 px toward
@@ -90,6 +90,8 @@ desktop, top right on phones.
 
 - **Reduced motion.** If the visitor's system asks for reduced motion, show the marks still, without animation (the last
   rule in `tour-guide.css`).
+- **Tailwind trap.** Preflight sets `img { max-width: 100% }`. Inside the zero-size anchors the finger and arrows shrink to
+  nothing unless they get `max-width: none` (in `tour-guide.css`).
 - **Clicks.** The marks never take clicks (`pointer-events: none`); only the tile does.
 - **Ice page.** It keeps its current cards this round; check it is unchanged.
 
