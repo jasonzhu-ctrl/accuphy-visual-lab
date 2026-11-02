@@ -20,12 +20,11 @@ main.is-touring .ac-shop, main.is-touring .ac-badges-wrap, main.is-touring .ac-s
 
 /* ---- the stop: a big title, one line, three dots. Centred over the lake, right of the panel ---- */
 .ac-tour-card { position: absolute; left: 432px; right: 16px; top: 17%; padding: 0 24px; text-align: center;
-  opacity: 0; transform: translateY(12px); transition: opacity calc(0.42s * var(--tour-k, 1)) ease, transform calc(0.42s * var(--tour-k, 1)) ease; }
+  opacity: 0; transform: translateY(12px); transition: opacity calc(0.5s * var(--tour-k, 1)) ease, transform calc(0.5s * var(--tour-k, 1)) ease; }
 .ac-tour-card.is-in, .ac-tour-card.is-check { opacity: 1; transform: none; }
-.ac-tour-card.is-out { opacity: 0; transform: translateY(-10px); transition-duration: calc(0.3s * var(--tour-k, 1)); }
+.ac-tour-card.is-out { opacity: 0; transform: translateY(-10px); transition-duration: calc(0.4s * var(--tour-k, 1)); }
 .ac-tour-title { font-family: 'Eurostile Heavy', 'Instrument Sans', sans-serif; font-weight: 800; font-size: clamp(30px, 3.6vw, 46px); line-height: 1.08;
   letter-spacing: 0.04em; text-transform: uppercase; text-shadow: 0 2px 4px rgba(0,16,24,0.45), 0 10px 32px rgba(0,16,24,0.4); }
-.ac-tour-tick { display: inline-block; margin-left: 0.35em; color: #028cdf; text-shadow: none; }
 .ac-tour-text { margin: 12px auto 0; max-width: 460px; font-size: 15.5px; line-height: 1.4; font-weight: 500; color: rgba(255,255,255,0.86);
   text-shadow: 0 1px 2px rgba(0,16,24,0.55), 0 0 14px rgba(0,16,24,0.4); }
 .ac-tour-dots { display: flex; justify-content: center; gap: 8px; margin-top: 18px; }
@@ -37,9 +36,9 @@ main.is-touring .ac-shop, main.is-touring .ac-badges-wrap, main.is-touring .ac-s
 .ac-tour-cue img, .ac-tour-tap img { max-width: none; }
 
 /* ---- 1. the boat cue (stop 1): a zero-size anchor put on the boat every frame; --s = 1 desktop, 1.25 phone ---- */
-.ac-tour-cue { position: absolute; left: 0; top: 0; width: 0; height: 0; --s: 1; transition: opacity calc(0.42s * var(--tour-k, 1)); }
+.ac-tour-cue { position: absolute; left: 0; top: 0; width: 0; height: 0; --s: 1; transition: opacity calc(0.5s * var(--tour-k, 1)); }
 .ac-tour-cue.is-phone { --s: 1.25; }
-.ac-tour-cue.is-hidden, .ac-tour-cue.is-out { opacity: 0; transition-duration: calc(0.3s * var(--tour-k, 1)); }
+.ac-tour-cue.is-hidden, .ac-tour-cue.is-out { opacity: 0; transition-duration: calc(0.4s * var(--tour-k, 1)); }
 .ac-tour-cue-ring, .ac-tour-cue-wave { position: absolute; left: calc(-32px * var(--s)); top: calc(-32px * var(--s)); width: calc(64px * var(--s)); height: calc(64px * var(--s)); border-radius: 50%; box-sizing: border-box; }
 .ac-tour-cue-ring { border: 3px solid #028cdf; background: rgba(2, 140, 223, 0.24);
   box-shadow: 0 0 18px 3px rgba(2, 140, 223, 0.7), inset 0 0 12px rgba(2, 140, 223, 0.45);
@@ -56,10 +55,35 @@ main.is-touring .ac-shop, main.is-touring .ac-badges-wrap, main.is-touring .ac-s
 @keyframes ac-tour-swing-l { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(calc(-7px * var(--s))); } }
 @keyframes ac-tour-swing-r { 0%, 100% { transform: scaleX(-1) translateX(0); } 50% { transform: scaleX(-1) translateX(calc(-7px * var(--s))); } }
 
+/* the 4 s drag progress (界面设计's docs/2026-11-02-tour-design/progress-ring.css, as given): a thin white arc round the ring,
+   the how-to marks step aside while dragging, a pop when done, then the cue fades during the hold */
+.ac-tour-prog { position: absolute; left: calc(-42px * var(--s)); top: calc(-42px * var(--s)); width: calc(84px * var(--s)); height: calc(84px * var(--s));
+  transform: rotate(-90deg); overflow: visible; opacity: 0; transition: opacity 0.2s ease; pointer-events: none; }
+.ac-tour-prog circle { fill: none; }
+.ac-tour-prog-track { stroke: rgba(255, 255, 255, 0.22); stroke-width: 2.5; }
+.ac-tour-prog-arc { stroke: #fff; stroke-width: 3; stroke-linecap: round; stroke-dasharray: 100 100; filter: drop-shadow(0 0 3px rgba(2, 140, 223, 0.9)); }
+
+.ac-tour-cue.is-dragging .ac-tour-prog, .ac-tour-cue.has-progress .ac-tour-prog, .ac-tour-cue.is-complete .ac-tour-prog { opacity: 1; }
+
+/* while dragging: only the ring and the progress — the "how to" marks step aside */
+.ac-tour-cue-finger, .ac-tour-cue-arrow, .ac-tour-cue-wave { transition: opacity 0.2s ease; }
+.ac-tour-cue.is-dragging .ac-tour-cue-finger, .ac-tour-cue.is-dragging .ac-tour-cue-arrow, .ac-tour-cue.is-dragging .ac-tour-cue-wave,
+.ac-tour-cue.is-complete .ac-tour-cue-finger, .ac-tour-cue.is-complete .ac-tour-cue-arrow, .ac-tour-cue.is-complete .ac-tour-cue-wave { animation: none; opacity: 0; }
+.ac-tour-cue.is-dragging .ac-tour-cue-ring { animation: none; opacity: 1; }
+
+/* done: a bluer fill and one pop, then the cue goes */
+.ac-tour-cue.is-complete .ac-tour-cue-ring { opacity: 1; background: rgba(2, 140, 223, 0.5); animation: ac-tour-done 0.36s ease-out 1; }
+.ac-tour-cue.is-complete { opacity: 0; transition: opacity 0.5s ease 0.6s; }
+@keyframes ac-tour-done { 0% { transform: scale(1); } 45% { transform: scale(1.14); } 100% { transform: scale(1); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .ac-tour-cue.is-complete .ac-tour-cue-ring { animation: none; }
+}
+
 /* ---- 2–4. a tile stop: spotlight, two rings, the tapping finger, the TAP bubble (placed every frame by Tour.jsx) ---- */
-.ac-tour-marks { opacity: 0; transition: opacity calc(0.42s * var(--tour-k, 1)) ease; }
-.ac-tour-marks.is-in, .ac-tour-marks.is-check { opacity: 1; }
-.ac-tour-marks.is-out { transition-duration: calc(0.3s * var(--tour-k, 1)); }
+.ac-tour-marks { opacity: 0; transition: opacity calc(0.5s * var(--tour-k, 1)) ease; }
+.ac-tour-marks.is-in { opacity: 1; } /* off during the hold, so the new view is seen undimmed */
+.ac-tour-marks.is-out { transition-duration: calc(0.4s * var(--tour-k, 1)); }
 /* a hole the size of the tile + 6 px; its huge shadow darkens everything else. The card is drawn after it, so the words stay bright */
 .ac-tour-spot { position: fixed; border-radius: 12px; box-shadow: 0 0 0 200vmax rgba(0, 10, 16, 0.6); }
 .ac-tour-wave { position: fixed; border-radius: 8px; outline: 2.5px solid #028cdf; animation: ac-tour-tile-wave 1.6s ease-out infinite; }
@@ -95,16 +119,19 @@ main.is-touring .ac-shop, main.is-touring .ac-badges-wrap, main.is-touring .ac-s
 /* the tile under the words on phones (stops 2–3): the panel's own tile look, 120 px, 22 px under the dots */
 .ac-tour-ptile { display: block; width: 120px; margin: 22px auto 0; pointer-events: auto; }
 
+/* the first 0.6 s of a new card: a clear sheet that swallows taps and drags (a stray double tap does not count) */
+.ac-tour-guard { position: fixed; inset: 0; pointer-events: auto; }
+
 /* Skip while it runs, Replay afterwards: one quiet line, bottom left under the panel */
 .ac-tour-corner { position: absolute; left: 20px; bottom: 18px; pointer-events: auto; border: 0; background: none; padding: 6px 0; cursor: pointer;
   color: rgba(255,255,255,0.72); font: 600 12.5px/1.2 'Instrument Sans', system-ui, sans-serif; text-decoration: underline; text-decoration-color: rgba(255,255,255,0.35); text-underline-offset: 3px; text-shadow: 0 1px 2px rgba(0,16,24,0.5); }
 .ac-tour-corner:hover { color: #fff; text-decoration-color: #fff; }
 
-/* phones: no panel. The card sits under the store badges (top right, to ~72 px), Skip and Replay top left */
-.ac-tour-layer.is-phone .ac-tour-card { left: 0; right: 0; top: calc(env(safe-area-inset-top) + 96px); padding: 0 20px; }
+/* phones: no panel and, since A8, no badges: the card under the safe area + 64 px, Skip and Replay top right (design handover §4) */
+.ac-tour-layer.is-phone .ac-tour-card { left: 0; right: 0; top: calc(env(safe-area-inset-top) + 64px); padding: 0 20px; }
 .ac-tour-layer.is-phone .ac-tour-title { font-size: 30px; }
 .ac-tour-layer.is-phone .ac-tour-text { font-size: 14.5px; max-width: 320px; }
-.ac-tour-layer.is-phone .ac-tour-corner { left: 16px; bottom: auto; top: calc(env(safe-area-inset-top) + 14px); }
+.ac-tour-layer.is-phone .ac-tour-corner { left: auto; right: 16px; bottom: auto; top: calc(env(safe-area-inset-top) + 14px); }
 
 /* dev ?tourslow=k: the same fades k× slower (--tour-k) so a frame can be caught mid-fade. Reduced motion: the marks stand still */
 @media (prefers-reduced-motion: reduce) {

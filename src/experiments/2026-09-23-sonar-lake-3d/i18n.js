@@ -77,8 +77,13 @@ const S = {
   // the preview card (brief part 5): drafts until Jason picks them; French after the website's review, so no line in French yet
   share_title: { en: 'Show a buddy what’s under the boat', fr: 'Partager' },
   share_line: { en: 'Drag the boat. Watch the sonar light up.', fr: '' },
-  share_short: { en: 'Share', fr: 'Partager' }, // the phone dock beside the Shop pill: no room for the long label (FR passes, #198)
-  get_app: { en: 'Get the Accuphy Sonar app', fr: 'Télécharger l’application Accuphy Sonar' }, // the caption over the store badges (Jason 2026-10-28; the badges themselves say "Download on the App Store" / "Get it on Google Play"). FR reviewed by the website HQ 2026-10-28 (#198): the infinitive, as the store's /fr footer
+  get_app: { en: 'Get Accuphy Sonar App', fr: 'Télécharger l’application Accuphy Sonar' }, // the faint line over the desktop badges above the phone (A8 design 2026-11-01; HQ 11-02: no "the", App capitalised). FR draft, for the website's review
+  // A8 (Jason 11-01; base version 11-02). Keys and FR drafts from 对接 (docs/2026-11-01-app-qr-plan.md "11-01 改"); every FR is a draft for the website's review
+  app_qr_caption: { en: 'Scan to download Accuphy Sonar App', fr: 'Scannez pour télécharger l’application Accuphy Sonar' }, // under the store's QR code (desktop). FR draft, for the website's review
+  app_qr_open: { en: 'Show the {store} QR code', fr: 'Afficher le code QR {store}' }, // the badge button's screen-reader label; {store} = App Store / Google Play, not translated. FR draft, for the website's review
+  qr_label: { en: 'QR code', fr: 'code QR' }, // the screen-reader name of every QR picture. FR draft, for the website's review
+  learn_more: { en: 'Learn More', fr: 'En savoir plus' }, // the phone's store button (was "Shop {name}"); the arrow is the button's icon. FR draft, for the website's review
+  share_buddy_phone: { en: 'Share to a Fishing Buddy', fr: 'Partager' }, // the phone's share button (was "Share"); FR follows the website's #198 "Partager". FR draft, for the website's review
   // the Shop button
   shop: { en: 'Shop {name}', fr: 'Achetez le {name}' }, // after the store's own "Achetez maintenant →" (shop.accuphy.com/fr); the arrow is the button's icon
   shop_opening: { en: 'Opening the store…', fr: 'Ouverture de la boutique…' }, // shown for the 1 s before the page leaves (website #228). FR reviewed by the website HQ 2026-10-28 (#198)

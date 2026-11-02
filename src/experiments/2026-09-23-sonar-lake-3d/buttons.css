@@ -1,0 +1,64 @@
+/* A8 (Jason 11-01; base version 11-02): the store badges above the phone with their QR popover on desktop, two buttons in the
+   phone dock. Values as given by 界面设计 (docs/2026-11-02-tour-design/a8-look.css, handover
+   docs/2026-11-02-base-ui-round3-design-handover.md); class names are theirs. The popover's place is set here (left of the
+   badge group, its bottom 6 px below the badges'). */
+
+/* ================= DESKTOP ================= */
+
+/* 1. The panel no longer carries the badges or their caption (the panel keeps Shop + Send to a fishing buddy). */
+
+/* 2. The badge group: right-aligned to the phone frame's right edge, its bottom 12 px above the frame's top edge.
+      One quiet line above the badges, the two official badges 40 px high (Apple's minimum), 10 px apart. */
+.ac-app-dock { position: absolute; z-index: 15; display: inline-flex; flex-direction: column; align-items: flex-end; gap: 6px; pointer-events: auto; }
+.ac-app-dock .ac-cap { text-transform: none; letter-spacing: 0.01em; font: 600 11.5px/1.2 'Instrument Sans', system-ui, sans-serif; color: rgba(255, 255, 255, 0.6);
+  text-shadow: 0 1px 2px rgba(0, 20, 30, 0.35); }                                   /* "Get Accuphy Sonar App" */
+.ac-app-dock .ac-badges { gap: 10px; }
+.ac-app-dock .ac-badges img { height: 40px; }
+/* the badges are now buttons that open the popover: no button chrome, the artwork as shipped; a focus ring for keyboards */
+.ac-app-dock .ac-badges button { display: block; padding: 0; border: 0; background: none; line-height: 0; cursor: pointer; border-radius: 7px; }
+.ac-app-dock .ac-badges button:hover img { filter: brightness(1.12); }
+.ac-app-dock .ac-badges button:focus-visible { outline: 2px solid #028cdf; outline-offset: 2px; }
+.ac-app-dock .ac-badges button[aria-expanded="true"] { outline: 2px solid rgba(255, 255, 255, 0.85); outline-offset: 2px; }
+
+/* 3. The QR popover: the share popover's family (same dark glass, border, shadow, radius) so it reads as Lab UI, but
+      clearly not the share one: a store name on top, no link field or copy button, one line under the code.
+      Placed to the LEFT of the badge group: its right edge 14 px left of the group, its bottom 6 px below the badges' bottom;
+      the pointer on its right edge, 22 px up from the bottom, points at the badges. */
+.ac-app-pop { position: absolute; right: calc(100% + 14px); bottom: -6px; z-index: 70; width: 244px; padding: 14px 14px 12px; border-radius: 10px; box-sizing: border-box;
+  background: rgba(14, 28, 36, 0.96); border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 16px 40px rgba(2, 20, 30, 0.45), 0 1px 0 rgba(255, 255, 255, 0.08) inset;
+  color: #fff; font: 500 12.5px/1.4 'Instrument Sans', system-ui, sans-serif; text-align: center; }
+.ac-app-pop::after { content: ''; position: absolute; right: -7px; bottom: 22px; width: 12px; height: 12px; background: rgba(14, 28, 36, 0.96);
+  border-right: 1px solid rgba(255, 255, 255, 0.14); border-top: 1px solid rgba(255, 255, 255, 0.14); transform: rotate(45deg); }
+/* store name row: the store's glyph 13 px + "APP STORE" / "GOOGLE PLAY" */
+.ac-app-pop-store { display: flex; align-items: center; justify-content: center; gap: 7px; margin: 0 0 10px;
+  font: 600 11px/1 'Instrument Sans', system-ui, sans-serif; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255, 255, 255, 0.65); }
+.ac-app-pop-store svg { width: 13px; height: 13px; }
+/* close: the share popover's ×  (.ac-share-x is fine to reuse) */
+/* the code: 168 px of code + 16 px white quiet zone = a 200 px tile. (The 11-01 image drew 148 px; 168 is the share popover's
+   rule from HQ 10-29 — scannable off a screen — and the Play link with its referrer is dense, so use 168.) */
+.ac-app-pop-qr { display: block; width: 200px; height: 200px; margin: 0 auto 10px; padding: 16px; background: #fff; border-radius: 6px; box-sizing: border-box; }
+.ac-app-pop-qr svg { display: block; width: 100%; height: 100%; shape-rendering: crispEdges; }
+/* "SCAN TO DOWNLOAD ACCUPHY SONAR APP" */
+.ac-app-pop-cap { font: 800 13px/1.25 'Eurostile Heavy', 'Instrument Sans', sans-serif; letter-spacing: 0.03em; text-transform: uppercase; }
+/* opens with a short fade-up: opacity 0 → 1, translateY(6px) → 0, 0.18 s ease-out. Closes on ×, a click outside, Esc, or a click
+   on the same badge; a click on the other badge swaps the store in place. Never open together with the share popover. */
+.ac-app-pop { animation: ac-app-pop-in 0.18s ease-out; }
+@keyframes ac-app-pop-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+/* ================= PHONE (390 × 844 reference) ================= */
+
+/* No badges on phones. The dock above the phone frame (12 px above it, centred) holds two buttons of the same height:
+   "Learn More →" (primary, solid blue) and "Share to a Fishing Buddy" (secondary, outlined dark glass). Each is as wide as
+   its words (≈ 128 px and ≈ 204 px at 390 px), 10 px apart, both on one line. */
+.ac-phone-dock { display: flex; align-items: center; justify-content: center; gap: 10px; }
+.ac-phone-dock .ac-shop, .ac-phone-dock .ac-share { height: 46px; border-radius: 10px; box-sizing: border-box; display: inline-flex; align-items: center;
+  justify-content: center; gap: 7px; white-space: nowrap; font: 600 14px/1.15 'Instrument Sans', system-ui, sans-serif; letter-spacing: 0.01em; }
+.ac-phone-dock .ac-shop { padding: 0 16px 0 18px; background: #028cdf; box-shadow: 0 6px 18px rgba(0, 25, 40, 0.35); }      /* text, then the → icon */
+.ac-phone-dock .ac-share { padding: 0 12px; color: #fff; text-decoration: none; text-shadow: none; background: rgba(8, 22, 30, 0.55);
+  border: 1.5px solid rgba(255, 255, 255, 0.55); backdrop-filter: blur(14px) saturate(1.3); -webkit-backdrop-filter: blur(14px) saturate(1.3); } /* paper-plane icon, then text */
+.ac-phone-dock .ac-share svg, .ac-phone-dock .ac-shop svg { flex: none; filter: none; }
+/* narrow phones (the pair needs ≈ 342 px + 24 px gutters): at < 370 px the secondary drops to 13 px and 10 px padding */
+@media (max-width: 369px) { .ac-phone-dock .ac-share { font-size: 13px; padding: 0 10px; } .ac-phone-dock .ac-shop { padding: 0 12px 0 14px; } }
+/* the share popover on phones keeps its place but sits at 40 % (it must clear the taller dock) */
+body .ac-share-pop.is-phone { top: 40%; } /* body: wins over src/index.css whatever the load order */

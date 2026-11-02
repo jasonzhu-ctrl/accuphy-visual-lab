@@ -367,8 +367,7 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
         {mount3d && !glLost && <LakeScene key={glKey} state={state} sonarRect={sonarRect} paused={paused} scene={scene} />}
       </div>
       {ICE && /[?&]from=lake\b/.test(window.location.search) && <button type="button" className="ac-back-lake" onClick={() => window.history.back()}>← {t('back_to_lake')}</button>}
-      {/* the store badges on phones (Jason 2026-10-28: store style, decision #185): top left over the lake, 40 px (Apple's minimum) */}
-      {phone && !land && started && !home && <AppBadges height={40} className="absolute z-20 items-end" style={{ right: 12, top: 'calc(12px + env(safe-area-inset-top))' }} />}
+      {/* phones show no store badges (A8, Jason 11-01): the dock's Learn More and Share do the work */}
       {glLost && (
         <div role="alert" className="pointer-events-auto absolute inset-0 z-50 flex items-center justify-center p-6" style={{ background: 'rgba(3,18,26,0.55)' }}>
           <button type="button" className="ac-card px-5 py-4 text-left" onClick={() => window.location.reload()}>
@@ -451,10 +450,9 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
         </Row>
         </>)}
         <div className="ac-soft hidden px-1 text-[11.5px] leading-snug sm:block">
-          {t(ICE ? 'desc_ice' : 'desc_lake', { device: device.name, beam: `${device.beamDeg}° × ${ICE ? 20 : device.thickDeg}°` })} {/* text only: specs say 39° × 20° for the Mini; the engine's 18° stays (Jason 2026-09-23) */}
+          {t(ICE ? 'desc_ice' : 'desc_lake', { device: device.name, beam: deviceId === 'PLM' ? `${combo ? 2 * device.beamDeg : device.beamDeg}° × 19°` : `${device.beamDeg}° × ${device.thickDeg}°` })} {/* text only (#197, Jason 2026-10-31: "写 39×19 / 78×19 / 135×20"): the Mini 39° × 19°, its Combo 78° × 19°, PingLive 135° × 20°; the engine's drawn 18° stays (Jason 2026-09-23) */}
         </div>
         <ShopButton deviceId={deviceId} placement="panel" wide />
-        <AppBadges height={40} className="pt-2" />
         <div className="pt-1"><ShareButton thumb={viewThumb(deviceId, mode)} /></div>
       </motion.div>
       {/* B: a glass strip top-right (desktop: under the step cards' row; phones: under the safe area) with share + badges */}
@@ -508,13 +506,15 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
         {/* phones: the View capsule sits on the phone frame's top edge (Jason 2026-10-03) — the big panel is gone */}
         {/* Shop button on phones: docked on the frame's top edge (the dock also feeds the camera's view offset) */}
         {phone && !land && started && !home && (
-          <div ref={(el) => { sonarRect.current.dock = el }} className="pointer-events-auto absolute bottom-full left-1/2 mb-3 flex -translate-x-1/2 items-center gap-2">
+          <div ref={(el) => { sonarRect.current.dock = el }} className="ac-phone-dock pointer-events-auto absolute bottom-full left-1/2 mb-3 -translate-x-1/2">
             <ShopButton deviceId={deviceId} placement="frame-top" />
             <ShareButton compact thumb={viewThumb(deviceId, mode)} />
           </div>
         )}
-        {/* after sign-up the app buttons stay display-only: a short hint above the phone instead of the gate */}
-        <div role="status" aria-live="polite" className={`ac-hint absolute bottom-full right-0 mb-3 max-sm:mb-16 whitespace-nowrap px-3.5 py-2 text-[12px] font-medium transition-opacity duration-300 ${toast ? 'opacity-100' : 'opacity-0'}`}>
+        {/* desktop: the store badges above the phone, right-aligned, 12 px up; a badge opens its store's QR code (A8, AppBadges.jsx) */}
+        {!phone && <AppBadges height={40} className="ac-app-dock bottom-full right-0 mb-3" />}
+        {/* after sign-up the app buttons stay display-only: a short hint above the phone instead of the gate (left of the badges) */}
+        <div role="status" aria-live="polite" className={`ac-hint absolute bottom-full right-0 sm:left-0 sm:right-auto mb-3 max-sm:mb-16 whitespace-nowrap px-3.5 py-2 text-[12px] font-medium transition-opacity duration-300 ${toast ? 'opacity-100' : 'opacity-0'}`}>
           {t(phone ? 'toast_phone' : 'toast_desktop')}
         </div>
       </div>

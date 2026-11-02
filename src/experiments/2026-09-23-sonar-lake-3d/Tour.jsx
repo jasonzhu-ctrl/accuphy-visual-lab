@@ -1,9 +1,9 @@
 // The entry tour (Jason 2026-11-02 in Lab HQ, plan docs/2026-11-02-entry-tour-into-base-plan.md; prototype
 // 2026-11-01-tour-proto): three stops, one action each, the same words and order on desktop and phones. It replaces the
 // three step cards on the lake pages (the ice page keeps its cards for now). A stop names the action ("Drag the boat",
-// "Tap Forward"), not the view still to come; it goes on only when the visitor has done it: dragged the boat, or switched
-// to the view it asks for. Between stops the card fades out (0.3 s) and the next fades in (0.42 s); a done stop holds its
-// tick for 0.7 s. "Skip tour" at any time, "Replay tour" afterwards; once seen (finished or skipped) it does not start by
+// "Tap Forward"), not the view still to come; it goes on only when the visitor has done it: dragged the boat for 4 s, or
+// switched to the view it asks for. Then it holds 3.5 s, and the next fades in (timings below). "Skip tour" at any time,
+// "Replay tour" afterwards; once seen (finished or skipped) it does not start by
 // itself again on this device. The page (index.jsx) owns the views: the tour only asks for them through `onShow`, and
 // tells the page which tile to light (`onState`). The base version has no lock: Combo shows during the tour.
 import { useEffect, useRef, useState } from 'react'
@@ -27,13 +27,17 @@ export const tourOff = /[?&]tour=off\b/.test(q)
 export function tourSeen() { try { return localStorage.getItem(SEEN) === '1' } catch { return false } }
 const markSeen = () => { try { localStorage.setItem(SEEN, '1') } catch { /* private mode: it may show again next time */ } }
 const SLOW = import.meta.env.DEV ? +((/[?&]tourslow(?:=(\d+))?\b/.exec(q) || [, 1])[1] || 4) : 1 // dev: ?tourslow[=k] runs the holds and fades k× slower, for screenshots
-const START_MS = 700, IN_DELAY = 80, OUT_MS = 300 * SLOW, CHECK_MS = 700 * SLOW, DRAG_M = 1 // a drag counts once the boat is asked to go 1 m
+// Round 3 (Jason 2026-11-02 in Lab HQ: there was not enough time to try each step): stop 1 is done after 4 s of dragging in
+// all (stop-and-go counts); every done stop then holds 3.5 s on its own view with its dot blue, nothing to press; a stop
+// with no action waits. Fades 0.4 s out, 0.5 s in. Taps in the first 0.6 s of a new card do not count (a stray double tap).
+const START_MS = 700, IN_DELAY = 80, OUT_MS = 400 * SLOW, HOLD_MS = 3500 * SLOW, DRAG_S = 4 * SLOW, GUARD_MS = 600
 
 export default function Tour({ script, auto, phone, mode, deviceId, state, onShow, onState }) {
   const sc = TOUR_SCRIPTS[script]
   const [phase, setPhase] = useState('idle') // idle | running | done
   const [i, setI] = useState(0)
-  const [vis, setVis] = useState('hidden') // hidden | in | check | out
+  const [vis, setVis] = useState('hidden') // hidden | in | check (the hold) | out
+  const [armed, setArmed] = useState(false) // past the 0.6 s guard of a new card
   const ring = useRef(null), marks = useRef({}), ptile = useRef(null)
   const timers = useRef([])
   const later = (fn, ms) => { const id = setTimeout(fn, ms); timers.current.push(id); return id }
@@ -42,17 +46,18 @@ export default function Tour({ script, auto, phone, mode, deviceId, state, onSho
 
   const enter = (k) => {
     const st = sc.stops[k]
-    setI(k); setVis('hidden')
+    setI(k); setVis('hidden'); setArmed(false)
     if (st.action === 'drag') onShow(sc.device, st.view, false) // the stop's own view is on before its title appears
     onState({ on: true, tile: st.action === 'tile' ? st.view : null })
     later(() => setVis('in'), IN_DELAY)
+    later(() => setArmed(true), IN_DELAY + GUARD_MS)
   }
   const start = () => { timers.current.forEach(clearTimeout); timers.current = []; setPhase('running'); enter(0) }
   const finish = () => { markSeen(); setPhase('done'); setVis('hidden'); onState({ on: false, tile: null }) }
   const skip = () => { setVis('out'); later(finish, OUT_MS) }
   const complete = () => {
     setVis('check')
-    later(() => { setVis('out'); later(() => (i + 1 < sc.stops.length ? enter(i + 1) : finish()), OUT_MS) }, CHECK_MS)
+    later(() => { setVis('out'); later(() => (i + 1 < sc.stops.length ? enter(i + 1) : finish()), OUT_MS) }, HOLD_MS)
   }
 
   // it begins 0.7 s after the lake is on screen (the page's `ready`), on desktop and phones alike
@@ -69,16 +74,28 @@ export default function Tour({ script, auto, phone, mode, deviceId, state, onSho
   // a tile stop is done when the page shows its view (the visitor tapped the lit tile)
   useEffect(() => { if (phase === 'running' && vis === 'in' && stop.action === 'tile' && mode === stop.view && deviceId === sc.device) complete() }, [phase, vis, i, mode, deviceId]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // the drag stop: done once the visitor drags the boat a little (the lake's own drag, mouse or finger). The ring sits on the
-  // boat: the lake moves its cue caption there every frame (Scene.jsx), so the ring follows the caption's anchor.
+  // the drag stop: done after 4 s of the lake's own drag in all (mouse or finger; stop-and-go adds up), shown by the ring
+  // filling round the boat. The cue sits on the boat: the lake moves its caption there every frame (Scene.jsx), so the cue
+  // follows the caption's anchor.
+  const dragT = useRef(0)
   useEffect(() => {
     if (phase !== 'running' || stop.action !== 'drag' || vis === 'hidden') return
-    const s = state.current, from = { x: s.target.x, z: s.target.z }
-    let raf = 0, done = false
+    const s = state.current
+    if (vis === 'in' && !armed) dragT.current = 0
+    let raf = 0, done = false, last = performance.now()
     const tick = () => {
       raf = requestAnimationFrame(tick)
-      if (vis === 'in' && !done && s.dragging && Math.hypot(s.target.x - from.x, s.target.z - from.z) > DRAG_M) { done = true; complete() }
-      const cue = s.hintEl, el = ring.current
+      const now = performance.now(), dt = Math.min(0.1, (now - last) / 1000); last = now
+      const el = ring.current, dragging = vis === 'in' && armed && !done && s.dragging
+      if (dragging) {
+        dragT.current += dt
+        if (marks.current.prog) marks.current.prog.style.strokeDashoffset = `${(100 - 100 * Math.min(1, dragT.current / DRAG_S)).toFixed(2)}`
+        if (dragT.current >= DRAG_S) { done = true; complete() }
+      }
+      // the cue's states (design progress-ring.css): dragging = only the ring and the arc; released early = the marks back,
+      // the arc stays where it got to
+      if (el) { el.classList.toggle('is-dragging', dragging); el.classList.toggle('has-progress', !dragging && dragT.current > 0) }
+      const cue = s.hintEl
       if (!cue || !el) return
       const m = /translate\((-?[\d.]+)px,\s*(-?[\d.]+)px\)/.exec(cue.style.transform)
       if (!m) return
@@ -86,7 +103,7 @@ export default function Tour({ script, auto, phone, mode, deviceId, state, onSho
     }
     tick()
     return () => cancelAnimationFrame(raf)
-  }, [phase, vis, i]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [phase, vis, i, armed]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // a tile stop: the spotlight, the two rings, the tapping finger and the TAP bubble follow the tile (the panel's tile on
   // desktop, the one under the words on phones); read every frame, so a resize or the card's fade-in is followed
@@ -124,7 +141,7 @@ export default function Tour({ script, auto, phone, mode, deviceId, state, onSho
           </div>
         )}
         <div className={`ac-tour-card is-${vis}`}>
-          <div className="ac-tour-title">{t(`tour_${k}_title`)}{vis === 'check' && <span className="ac-tour-tick" aria-hidden="true">✓</span>}</div>
+          <div className="ac-tour-title">{t(`tour_${k}_title`)}</div>
           <div className="ac-tour-text">{t(`tour_${k}_text`)}</div>
           <div className="ac-tour-dots">{sc.stops.map((_, n) => <i key={n} className={n < i || (n === i && vis === 'check') ? 'is-done' : n === i ? 'is-on' : ''} />)}</div>
           {phone && stop.action === 'tile' && (
@@ -135,13 +152,15 @@ export default function Tour({ script, auto, phone, mode, deviceId, state, onSho
           )}
         </div>
         {stop.action === 'drag' && (
-          <div ref={ring} className={`ac-tour-cue is-${vis} ${phone ? 'is-phone' : ''}`} aria-hidden="true">
+          <div ref={ring} className={`ac-tour-cue ${vis === 'check' ? 'is-complete' : `is-${vis}`} ${phone ? 'is-phone' : ''}`} aria-hidden="true">
+            <svg className="ac-tour-prog" viewBox="0 0 84 84"><circle className="ac-tour-prog-track" cx="42" cy="42" r="39" /><circle className="ac-tour-prog-arc" cx="42" cy="42" r="39" pathLength="100" style={{ strokeDashoffset: 100 }} ref={(el) => { marks.current.prog = el }} /></svg>
             <i className="ac-tour-cue-wave" /><i className="ac-tour-cue-ring" />
             <img src={arrow} alt="" className="ac-tour-cue-arrow is-left" draggable={false} />
             <img src={finger} alt="" className="ac-tour-cue-finger" draggable={false} />
             <img src={arrow} alt="" className="ac-tour-cue-arrow is-right" draggable={false} />
           </div>
         )}
+        {(vis === 'in' || vis === 'hidden') && !armed && <div className="ac-tour-guard" />} {/* from the moment a card is chosen, before it fades in */}
         <button type="button" className="ac-tour-corner" onClick={skip}>{t('tour_skip')}</button>
       </>)}
       {phase === 'done' && <button type="button" className="ac-tour-corner" onClick={start}>↻ {t('tour_replay')}</button>}

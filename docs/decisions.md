@@ -3493,6 +3493,8 @@ Numbered log. Newest at the bottom.
      - **Final, same day** (Jason at CHIEF: "算了 还是写吧", "mini是19 combo 78*19"; confirmed in Lab HQ: "写 39×19 / 78×19 / 135×20"):
        visitor text says **Mini 39° × 19°, Mini Combo 78° × 19°, PingLive 135° × 20°**. The two bullets below are superseded.
        Open, for Jason: should the engine's drawn Mini thickness (18°) become 19°? (Base checks the effect on lake and ice.)
+     - **Done (2026-11-02, Base, test version):** `index.jsx` panel line: Mini 39° × 19°, Mini Combo 78° × 19°, PingLive 135° × 20°;
+       the ice page reads like the Mini (39° × 19°, its Combo 78° × 19°). Text only: `devices.js` `thickDeg: 18` and the engine untouched.
      - **Corrected the same day** (Jason: "正确的是20 但是不要提 因为听起来很小"): 20° is the right thickness, but visitor
        text names **no thickness at all**, neither 18° nor 20°. The panel line shows only the wide angle (PingLive 135°, Mini
        39°). HQ applies the same to PingLive (its 20° sounds just as small). The bullets below are superseded where they say "× 20°".
@@ -3587,3 +3589,42 @@ Numbered log. Newest at the bottom.
        - sonar-qa grid (lake 6 × 6 + ice 4) against main: 44 tiles within 0.36 luma and 0.25 % lit, 0 errors.
        - Console: only the dev server's favicon 404.
        - Not run: a real phone, Safari, the store iframe.
+     - **Round 3 (Jason 2026-11-02 in Lab HQ: not enough time to try each step; plan `docs/2026-11-02-tour-round3-and-base-ui-plan.md`):**
+       - Stop 1 is done after **4 s of dragging in all** (stop-and-go adds up), shown by 界面设计's progress ring
+         (`docs/2026-11-02-tour-design/progress-ring.css`: a thin white arc round the blue ring; the how-to marks step aside
+         while dragging, a pop when done).
+       - Every done stop **holds 3.5 s** on its own view with its dot blue and nothing to press; the spotlight and cue are off
+         during the hold. A stop with no action waits. Fades 0.4 s out, 0.5 s in. The tick on the title is gone.
+       - **A 0.6 s guard:** a tap or drag from the moment a card is chosen until 0.6 s after it shows does not count.
+       - Phones: with the badges gone (#200) the card is back at the design's safe area + 64 px, and Skip/Replay top right.
+       - Checked: walk 1→2→3 at 1280×720 and 390×844, lake and Mini page. Drag 4.04–4.07 s to done; hold to the next card
+         3.87–3.94 s (3.5 s + the 0.4 s fade); an early tap does not count; 0 errors.
+
+200. **2026-11-02** — **A8 in the base version: the app badges with a QR popover on desktop, Learn More and Share to a Fishing Buddy on
+     phones (test version)** (Jason 11-01 on the look; 11-02 in Lab HQ: "徽章、二维码、Learn More、分享这些属于基础版本的", so the
+     marketing version keeps only the view locks; plan `docs/2026-11-01-app-qr-plan.md` "11-01 改" by 对接, design
+     `docs/2026-11-02-base-ui-round3-design-handover.md` + `docs/2026-11-02-tour-design/a8-look.css` by 界面设计).
+     - **Desktop:** the badges and their caption leave the panel (which keeps Shop and Send to a fishing buddy). The group sits
+       right-aligned 12 px above the phone, caption "Get Accuphy Sonar App" (`get_app`, HQ 11-02: no "the", App capitalised).
+       - A badge is a button: it opens that store's QR code to the left, 244 px, store glyph and name, a 168 px code, "Scan to
+         download Accuphy Sonar App". × / click outside / Esc / the same badge close it; the other badge swaps the store.
+       - Never open with the share popover (a page-wide `ac-popover` event, `ShareButton.jsx`). Same on the ice page.
+       - The codes go straight to the stores: App Store `https://apps.apple.com/app/id6743123048` (no country; `?l=fr-CA` in
+         French), Google Play `…details?id=com.accuphy.sonar&hl=en_CA|fr_CA&referrer=utm_source=accuphy-lab&utm_medium=qr`.
+         No App Store campaign parameter until the provider token (C8).
+       - A badge click still sends `app_badge` { store }, now meaning "opened the code".
+     - **Phones:** no badges. The dock's two buttons, 46 px high, on one row: "Learn More →" (`learn_more`; the Shop button's
+       own behaviour, placement `frame-top`, `shop_click` unchanged) and "Share to a Fishing Buddy" (`share_buddy_phone`;
+       the share button as before). The share popover sits at 40 %.
+     - **i18n:** new keys `learn_more`, `share_buddy_phone`, `app_qr_caption`, `app_qr_open`, `qr_label` (every QR picture's
+       screen-reader name); `get_app` reworded; `share_short` removed. French: 对接's drafts, marked for the website's review.
+     - **During the tour** the badges, Learn More and Share are dimmed and not clickable (58543a1, the same rule).
+     - **Checked** on scratch copies:
+       - Both QR codes are exactly the codes of the two links (path compared with `qrSvgPath`); exclusivity and Esc work.
+       - Dock 131×46 and 195×46 at 390 px (界面设计's padding rule); share popover top 40 %.
+       - Ice page: 3 cards, no tour, badges above the phone.
+       - Unit tests: shop-url 26/26, share-url 16/16, signup-guard all passed.
+       - Store-frame harness (`scripts/dev/store-frame/run.mjs`): 4 shop cases pass. The 2 share cases fail on HEAD too,
+         since #199: the tour runs in the harness's frame and dims the share button. With `?tour=off` in the frame's address
+         all 6 pass. The harness is 对接's to update.
+       - sonar-qa grid against main: 44 tiles within 0.55 luma and 0.31 % lit, 0 errors.

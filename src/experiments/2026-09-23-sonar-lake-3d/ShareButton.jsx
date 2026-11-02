@@ -13,6 +13,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import qrcode from 'qrcode-generator'
 import { labEvent, shareUrl, shareMarket } from './embed'
 import { t } from './i18n'
+import './buttons.css'
 
 // the QR as an SVG path: crisp at any DPR, no canvas, no network (qrcode-generator, MIT — assets/LICENSES.md)
 export function qrSvgPath(text) {
@@ -23,8 +24,11 @@ export function qrSvgPath(text) {
 }
 function QR({ text }) {
   const { n, d } = qrSvgPath(text)
-  return <svg viewBox={`0 0 ${n} ${n}`} role="img" aria-label="QR code"><path d={d} fill="#000" /></svg>
+  return <svg viewBox={`0 0 ${n} ${n}`} role="img" aria-label={t('qr_label')}><path d={d} fill="#000" /></svg>
 }
+// one popover at a time on the page (A8, 2026-11-02): the share popover and the app badges' QR never show together
+export function popoverOpened(id) { window.dispatchEvent(new CustomEvent('ac-popover', { detail: id })) }
+export function onPopover(id, close) { const on = (e) => { if (e.detail !== id) close() }; window.addEventListener('ac-popover', on); return () => window.removeEventListener('ac-popover', on) }
 
 const isMac = () => { try { return /Mac|iPhone|iPad/.test(navigator.platform || '') } catch { return false } }
 
@@ -38,8 +42,9 @@ export default function ShareButton({ compact = false, thumb, className = '', st
   const market = shareMarket()
   useEffect(() => () => clearTimeout(timer.current), [])
 
-  const close = () => { setOpen(false); setCopied(false); setPressHint(false); opener.current?.focus() }
-  const show = (channel) => { setOpen(true); labEvent('share', { channel, market }) }
+  const close = (refocus = true) => { setOpen(false); setCopied(false); setPressHint(false); if (refocus) opener.current?.focus() }
+  const show = (channel) => { setOpen(true); popoverOpened(id); labEvent('share', { channel, market }) }
+  useEffect(() => onPopover(id, () => close(false)), []) // eslint-disable-line react-hooks/exhaustive-deps
 
   // close on Esc and on a click outside; move focus in
   useEffect(() => {
@@ -66,9 +71,9 @@ export default function ShareButton({ compact = false, thumb, className = '', st
   const selectKeepStart = (e) => { const el = e.target; el.select(); requestAnimationFrame(() => { el.scrollLeft = 0 }) }
   return (
     <span ref={wrap} className={`ac-share-wrap ${className}`} style={style} onPointerDown={(e) => e.stopPropagation()}>
-      <button ref={opener} type="button" className={`ac-share ${compact ? 'is-compact' : 'is-panel'}`} aria-label={t(compact ? 'share_short' : 'share')} aria-expanded={open} aria-controls={id} onClick={onClick}>
+      <button ref={opener} type="button" className={`ac-share ${compact ? 'is-compact' : 'is-panel'}`} aria-label={t(compact ? 'share_buddy_phone' : 'share')} aria-expanded={open} aria-controls={id} onClick={onClick}>
         <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M14 2 1.8 7l4.7 2.3M14 2 11 14.2 6.5 9.3M14 2 6.5 9.3" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" /></svg>
-        <span>{t(compact ? 'share_short' : 'share')}</span>
+        <span>{t(compact ? 'share_buddy_phone' : 'share')}</span>
       </button>
       {/* the phone popover goes to <body>: inside the phone dock (a transformed element) position: fixed would be relative to the dock */}
       {(phone ? (n) => createPortal(n, document.body) : (n) => n)(<AnimatePresence>

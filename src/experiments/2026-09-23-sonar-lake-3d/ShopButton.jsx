@@ -14,7 +14,8 @@ export default function ShopButton({ deviceId, placement, wide = false, classNam
   const name = DEVICES[deviceId]?.name || 'PingLive'
   const [opening, setOpening] = useState(isOpeningShop)
   useEffect(() => onOpeningShop(setOpening), [])
-  const label = opening ? t('shop_opening') : t('shop', { name })
+  // phones (the dock on the frame, placement frame-top) say "Learn More" (A8, Jason 11-01); same link, wait and event
+  const label = opening ? t('shop_opening') : placement === 'frame-top' ? t('learn_more') : t('shop', { name })
   return (
     <button type="button" data-hint-avoid className={`ac-shop ${wide ? 'ac-shop-wide' : ''} ${opening ? 'is-opening' : ''} ${className}`} style={style} aria-label={label} aria-busy={opening || undefined} aria-disabled={opening || undefined}
       onPointerDown={(e) => e.stopPropagation()} onClick={(e) => { e.stopPropagation(); if (!opening) openShop(deviceId, placement) }}>
