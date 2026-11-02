@@ -29,7 +29,7 @@ Jason 2026-11-02：“你记住，或者搞一个 sheet 把各种版本做好管
 - **面板：**
   - 新标题 “ACCUPHY | LAB”；
   - 视图格只有图标，选中的那格有小声纳；
-  - 波束文字：Mini 39°×19°、Combo 78°×19°、PingLive 135°×20°。
+  - 波束文字：线上现在是 Mini 39°×19°、Combo 78°×19°、PingLive 135°×20°；Jason 11-02 定去掉厚度，只写 39° / 78° / 135°（在改，未上线）。
 - **去商店和分享：**
   - 电脑：Shop 按钮、Send to a fishing buddy；
   - 手机：Learn More →、Share to a Fishing Buddy。
