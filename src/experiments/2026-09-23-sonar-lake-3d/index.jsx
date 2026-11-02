@@ -28,6 +28,9 @@ const BIG_PHONE = import.meta.env.DEV && window.location.search.includes('bigpho
 // Build variant (Jason 2026-10-16): VITE_DEVICES='PLM' makes a PingLive Mini-only page — no device switch, the
 // Mini is the device, the step presets use its views. Unset: both devices (the default Lab).
 const LOCKED_NAME = { combo: 'tile_live_combo', panoramic: 'tile_live_panoramic', ice: 'tile_ice' }
+// The subscribe lock (#191) is a build switch (#202, Jason 2026-11-02: the live base has no lock). Unset: every view open,
+// no lock icons, no subscribe card, ?lab_unlock=sub ignored. VITE_COMBO_LOCK=1 (the marketing version) turns #191 back on.
+const COMBO_LOCK = import.meta.env.VITE_COMBO_LOCK === '1'
 const ONLY_ENV = import.meta.env.VITE_DEVICES === 'PLM' ? 'PLM' : null
 // Scene (Jason 2026-10-16: 做一个冰钓的版本): 'lake' = the boat; 'ice' = the frozen lake with the PingLive Mini in an auger hole
 // (IceCamp.jsx). The ice page is its own gallery entry (2026-10-16-sonar-ice-3d) and a build variant, VITE_SCENE=ice.
@@ -80,7 +83,7 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
   const [tourAuto] = useState(() => !!TOUR && !tourOff && (tourForced || !tourSeen()))
   const [tour, setTour] = useState({ on: false, tile: null }) // the tour is running; the view whose tile it lights
   const [deviceId, setDeviceId] = useState(ONLY || 'PL')
-  const [mode, setMode] = useState(tourAuto ? TOUR_SCRIPTS[TOUR].stops[0].view : ICE ? (/[?&]view=ice\b/.test(window.location.search) && isSignedUp() ? 'ice' : 'liveice') : 'forward') // ?view=ice: the Ice Fishing tile from the lake (#191)
+  const [mode, setMode] = useState(tourAuto ? TOUR_SCRIPTS[TOUR].stops[0].view : ICE ? (/[?&]view=ice\b/.test(window.location.search) && (!COMBO_LOCK || isSignedUp()) ? 'ice' : 'liveice') : 'forward') // ?view=ice: the Ice Fishing tile from the lake (#191)
   const [view, setView] = useState(ICE ? iceParams().view : 'top') // ice page cameras: top / under the ice / section (docs/ice-relationship-study.md)
   // the ice page: the step cards stack under the control panel, so the ice band across the top stays open for taps
   const panelRef = useRef(null)
@@ -98,7 +101,7 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
   const [depthFt, setDepthFt] = useState(Number.isFinite(devNum('depth')) ? devNum('depth') : 70) // depth range (PL Forward; every PLM view) — driven by AUTO below
   const [autoDepth, setAutoDepth] = useState(!Number.isFinite(devNum('depth'))) // off only when the dev Depth slider is touched (or ?depth=)
   const [unlock, setUnlock] = useState(null)       // the subscribe card is open: { d, m, name, source } of the pick it holds, or { ice } (#191)
-  const [unlocked, setUnlocked] = useState(isSignedUp) // the locked views open after subscribing, remembered on this device (signup.js)
+  const [unlocked, setUnlocked] = useState(() => !COMBO_LOCK || isSignedUp()) // the locked views open after subscribing, remembered on this device (signup.js); always open without the lock (#202)
   // In-app browsers (BF funnel handoff 2026-10-26, item 3). (1) The 3D mounts one frame AFTER the page so the static cover
   // (#lab-cover, share build) is on screen while the scene builds; the cover fades after the lake's first frames.
   // (2) A lost WebGL context (Meta's browser drops it when memory is short) shows a tap-to-reload card instead of a frozen

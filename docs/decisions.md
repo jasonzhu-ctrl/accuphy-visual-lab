@@ -3659,3 +3659,25 @@ Numbered log. Newest at the bottom.
        - Ice page unchanged (3 cards, no tour; its section camera already follows the hole, and taps drill holes).
        - 0 errors.
        - sonar-qa grid (lake 6 × 6 + ice 4) against 9992bf2: 44 tiles within 0.31 luma and 0.28 % lit, 0 errors: the sonar picture is unchanged.
+
+202. **2026-11-02** — **The live base has the subscribe lock off; #191 stays in the code behind a build switch** (Jason in Lab HQ:
+     "Lock off, go live"; earlier "PL and PLM are now the standard base version, OK to go live").
+     - **The switch:** `VITE_COMBO_LOCK` (read once in `index.jsx` as `COMBO_LOCK`). Unset, as in every normal build
+       (`node scripts/build-share.mjs`, `npm run dev`): the lock is off.
+       - Every view on every page opens: Combo, Mini Panoramic, the ice tiles, `?view=ice` on the ice page.
+       - No lock icons on the panel tiles or the phone's app Home, no subscribe card.
+       - `?lab_unlock=sub` does nothing: `isSignedUp()` is not called, so nothing is stored either.
+     - **Turning it back on (the marketing version):** build with `VITE_COMBO_LOCK=1` (for example
+       `VITE_COMBO_LOCK=1 node scripts/build-share.mjs <out>`, with `VITE_DEVICES=PLM` or `VITE_SCENE=ice` as usual). Everything
+       of #191 then works as before; the checklist in `docs/versions.md` ("Before any lab.accuphy.ca release that includes
+       #191") still applies to that version. `signup.js`, `UnlockCard.jsx`, `AppHome.jsx` (`isLocked`, `locked`) are unchanged.
+     - Down Scan / Chirp "not available in this simulation" notices are not locks and stay.
+     - **Checked** on scratch copies (lock off unless said):
+       - Desktop `/`, `/mini/`, `/ice/`: every view tile on every device (and on the ice page under every camera) opens its
+         view; 0 lock icons, 0 subscribe cards.
+       - Phone `/`, `/mini/`, `/ice/`: every live tile on the app's Home opens its view (the lake's two ice tiles go to the
+         ice page); 0 lock icons, 0 cards.
+       - `?lab_unlock=sub`: the same, and nothing written to the sign-up key.
+       - The entry tour still starts (desktop PL, phone Mini).
+       - With `VITE_COMBO_LOCK=1`: locks and the card come back (Combo and Mini Panoramic open the card), so the switch works.
+       - Production build OK; no page errors (only the dev server's usual favicon 404, the same with the lock on).
