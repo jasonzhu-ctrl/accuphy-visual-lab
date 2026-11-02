@@ -71,14 +71,15 @@ When the visitor taps the tile, the view switches, the card checks and fades out
 ## 3. After the tour
 
 The three step cards in the top right do not come back (desktop and phone). Only "Replay tour" stays, bottom left on
-desktop, top right on phones.
+desktop, top left on phones.
 
 ## 4. Phone layout (390 × 844 reference)
 
 - **No App Home first.** The tour starts by itself 0.7 s after the lake is ready, on the stop's own view (Mini page:
   Combo). After Skip or the end, App Home works as now.
-- **Card.** Under the safe area + 64 px, centred, 20 px side gutters. Title 30 px, text 14.5 px, at most 320 px wide.
-  Skip sits top right.
+- **Card.** Under the safe area + 96 px, centred, 20 px side gutters. Title 30 px, text 14.5 px, at most 320 px wide.
+  Skip sits top left. (Base c164893 moved both from + 64 px / top right so they clear the store badges top right;
+  界面设计 agreed 11-02.)
 - **Stop 1.** The words are "Drag the boat", the same as desktop (not "Tap the boat"). The boat cue is shown at × 1.25.
   Dragging the boat completes the stop. A plain tap on the boat may also count, Base's choice.
 - **Stops 2 and 3.** One view tile centred 22 px under the dots, 120 px wide. It looks the same as the desktop panel tile
