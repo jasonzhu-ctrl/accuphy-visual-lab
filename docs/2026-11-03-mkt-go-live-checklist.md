@@ -1,5 +1,13 @@
 # MKT 版（带锁版 = 投放版）上线清单（Lab 营销版维护，2026-11-03）
 
+> **硬规则（#232，Jason 定，每次都要记住）：店铺页只是“相框”，Lab 本身放在 lab.accuphy.ca 上。**
+> - 客人、广告、邮件只拿**店铺链接**（`shop.accuphy.com/<市场>/pages/…`）。lab.accuphy.ca 的地址只在后台用，不给客人。
+> - 每个店铺页的框里只显示一个 lab.accuphy.ca 地址：
+>   - `/pages/lab` 嵌 `lab.accuphy.ca/`（Base，不带锁）；
+>   - `/pages/sonarlab-mktbf2026` 嵌 `lab.accuphy.ca/bf/`（MKT 版，带锁）。
+> - Lab 的程序不放进 Shopify。
+> - 清单里每一项都写清楚是哪一层：**客人看到的店铺页**，还是**它后面的 lab.accuphy.ca 地址**。
+
 MKT 版归 “Lab 营销版” 窗口负责（#231）。HQ 管它，和网站、Klaviyo 的往来都经 HQ。
 
 **全部打勾才上线，缺一样就不上。** 每完成一样，营销版在这里打勾、写日期和证据，然后告诉 HQ。
@@ -17,10 +25,10 @@ MKT 版归 “Lab 营销版” 窗口负责（#231）。HQ 管它，和网站、
 
 ## 一、Jason 要说的两个“动”
 
-- [ ] **lab.accuphy.ca/bf/ 上线：** Jason 在 **Lab HQ** 说“动”。
+- [ ] **后面那一层 lab.accuphy.ca/bf/ 上线：** Jason 在 **Lab HQ** 说“动”。
   - HQ 用上线包部署。上线包是填了名单号的那份，见第二节。
   - `/`、`/mini/`、`/ice/` 仍是 Base，部署前用 md5 证明和当时的线上一样（#228：营销版不覆盖 Base）。
-- [ ] **店铺 MKT 页上线：** Jason 在 **网站 HQ** 说“动”。
+- [ ] **客人看到的那一层，店铺 MKT 页 /pages/sonarlab-mktbf2026 上线：** Jason 在 **网站 HQ** 说“动”。
   - 网站方案：`accuphy-website/docs/plans/2026-11-03-lab-mkt-store-page.md`。
   - 复制 `page.lab.json`，嵌入地址改成 `https://lab.accuphy.ca/bf/`；新页面 handle 是 `sonarlab-mktbf2026`；不放进菜单；`/pages/lab` 不动。
   - 页面可以先建好；/bf/ 上线前，这批链接不给广告。
