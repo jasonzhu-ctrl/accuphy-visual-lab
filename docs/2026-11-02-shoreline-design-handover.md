@@ -35,8 +35,13 @@ shore on both pages; winter only adds snow. The detail is to be done properly wh
 
 ## 1. The shoreline
 
-- **One curve** for both pages, in metres from the lake centre (t = angle around the lake):
-  `R(t) = 59.5 + 1.4·sin(3t + 0.7) + 0.7·sin(7t + 2.1)`, which runs 57.4–61.6 m.
+- **The shape (changed 11-02, Jason chose A via HQ):** a rounded square, about 62 m from the centre along the sides and
+  about 78 m at the corners, with the wreck's corner bulging out. A round shore would have put the big wreck on land and
+  pushed the lakebed lettering and the deep hole into the shallows. Base owns the exact outline. My mock's round curve,
+  `R(t) = 59.5 + 1.4·sin(3t + 0.7) + 0.7·sin(7t + 2.1)`, no longer applies. Keep a little irregularity along the sides,
+  a few metres of wobble at long wavelengths, so the sides don't read as ruled lines.
+- **The same outline** serves both pages. Everything below is measured from it (d = distance from the waterline), so
+  the profile, trees, rocks and cue values carry over unchanged.
 - **The stop:** the boat (summer) and the hole or aim ring (ice) stop 1.5 m inside this curve. This replaces the ±58 m
   square on both pages. The drag target, the drill hop and any tap clamp all use the same curve.
 - **The land** reaches from the curve out into the fog (beyond about 190 m), so no water or ice shows behind the trees.
