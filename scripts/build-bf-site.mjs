@@ -1,11 +1,12 @@
-// Builds the Black Friday site (#213) from clean git checkouts, never the working copy (other chats edit it):
-//   /        the locked version (src/experiments/2026-11-03-sonar-lake-bf, lock always on)
-//   /base/   the clean base, as the normal build
-//   /mini/, /ice/   base, as before; /base/ice/ = a copy of /ice/ (the base's phone ice tiles go to <its path>/ice/)
+// Builds the Lab site with the Black Friday locked version beside the base (#213, layout #228: the marketing version never
+// replaces the base), from clean git checkouts, never the working copy (other chats edit it):
+//   /, /mini/, /ice/   the base, as the normal builds
+//   /bf/               the locked version (src/experiments/2026-11-03-sonar-lake-bf, lock always on)
+//   /bf/ice/           a copy of the base's /ice/ (the locked page's phone ice tiles go to <its path>/ice/)
 // Usage: node scripts/build-bf-site.mjs <outDir> [ref]      (ref of the locked version, default HEAD)
-//   BASE_REF=<ref>      the commit for /base/, /mini/, /ice/ (default: the same ref)
+//   BASE_REF=<ref>      the commit for /, /mini/, /ice/ (default: the same ref)
 //   VITE_BF_LIST_ID=W24Qdc   only for HQ's go-live build: the Klaviyo list of the lock (#191). Unset (test links): nothing is sent.
-// /embed/ (scripts/build-embed.mjs) is not built here: the store frames lab.accuphy.ca/ itself.
+// /embed/ (scripts/build-embed.mjs) is not built here.
 import { execSync } from 'node:child_process'
 import fs from 'node:fs'
 import os from 'node:os'
@@ -39,15 +40,14 @@ fs.rmSync(outDir, { recursive: true, force: true })
 fs.mkdirSync(outDir, { recursive: true })
 const bfDir = checkout(ref)
 if (!fs.existsSync(path.join(bfDir, 'src/experiments/2026-11-03-sonar-lake-bf'))) throw new Error(`no locked version at ${ref}`)
-const baseDir = baseRef === ref ? bfDir : checkout(baseRef)
+const baseDir = checkout(baseRef) // its own checkout even at the same ref, so the base pages are built as on their own
 const list = process.env.VITE_BF_LIST_ID
-if (!list) delete process.env.VITE_BF_LIST_ID
-buildPage(bfDir, { VITE_LAB: 'bf', ...(list ? { VITE_BF_LIST_ID: list } : {}) }, '') // root: its robots.txt, .nojekyll and vercel.json serve the whole site
 delete process.env.VITE_BF_LIST_ID
-buildPage(baseDir, {}, 'base')
+buildPage(baseDir, {}, '') // root: its robots.txt, .nojekyll and vercel.json serve the whole site
 buildPage(baseDir, { VITE_DEVICES: 'PLM' }, 'mini')
 buildPage(baseDir, { VITE_SCENE: 'ice' }, 'ice')
-fs.cpSync(path.join(outDir, 'ice'), path.join(outDir, 'base/ice'), { recursive: true })
-for (const sub of ['base', 'mini', 'ice', 'base/ice']) for (const f of ['vercel.json', 'robots.txt', '.nojekyll']) fs.rmSync(path.join(outDir, sub, f), { force: true })
-for (const d of new Set([bfDir, baseDir])) fs.rmSync(d, { recursive: true, force: true })
-console.log(`${outDir}: / = locked ${commit(ref)}${list ? ' (list ' + list + ')' : ' (no list: test mode / not open)'}; /base/, /mini/, /ice/, /base/ice/ = base ${commit(baseRef)}`)
+buildPage(bfDir, { VITE_LAB: 'bf', ...(list ? { VITE_BF_LIST_ID: list } : {}) }, 'bf')
+fs.cpSync(path.join(outDir, 'ice'), path.join(outDir, 'bf/ice'), { recursive: true })
+for (const sub of ['mini', 'ice', 'bf', 'bf/ice']) for (const f of ['vercel.json', 'robots.txt', '.nojekyll']) fs.rmSync(path.join(outDir, sub, f), { force: true })
+for (const d of [bfDir, baseDir]) fs.rmSync(d, { recursive: true, force: true })
+console.log(`${outDir}: /, /mini/, /ice/, /bf/ice/ = base ${commit(baseRef)}; /bf/ = locked ${commit(ref)}${list ? ' (list ' + list + ')' : ' (no list: test mode / not open)'}`)
