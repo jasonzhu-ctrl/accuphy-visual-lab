@@ -240,7 +240,7 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
   })
   usePanelLabels(state) // the panel's label column, one width per language (界面设计 11-03)
   const viewsEl = useRef(null)
-  useViewNames(viewsEl, modes.join())
+  useViewNames(viewsEl, `${deviceId} ${modes.join()} ${view}`) // the language is fixed for the page
   state.current.specs = liveSpecs
   state.current.ice = ICE
   state.current.specKey = specKey
@@ -576,8 +576,10 @@ function usePanelLabels(state) {
     return () => { on = false }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 }
-// The view tiles' names (界面设计 11-03): they break between words only (buttons.css); if a word is still wider than its tile, the
-// whole row's names shrink together, 0.5 px a step, down to 10 px. English fits, so it keeps the CSS size (12 px, 11 px in a row of five).
+// The view tiles' names (界面设计 11-03): they break between words only (buttons.css). The longest word of each name is measured
+// on its own (a Range over that word); if one is wider than its tile's text box, the whole row's names shrink together, 0.5 px a
+// step, down to 10 px, so a row keeps one size. Measured after the fonts load and whenever the row changes (device, views, camera).
+// English never shrinks: it keeps the CSS size (12 px; 11 px in a row of five).
 function useViewNames(ref, key) {
   useLayoutEffect(() => {
     const fit = () => {
@@ -585,7 +587,18 @@ function useViewNames(ref, key) {
       if (!names.length) return
       for (const n of names) n.style.fontSize = ''
       let size = parseFloat(getComputedStyle(names[0]).fontSize)
-      const over = () => names.some((n) => n.scrollWidth > n.clientWidth + 0.5)
+      const longestWord = (n) => {
+        const node = n.firstChild
+        if (!node || node.nodeType !== 3) return 0
+        let w = 0
+        for (const m of node.data.matchAll(/\S+/g)) {
+          const r = document.createRange()
+          r.setStart(node, m.index); r.setEnd(node, m.index + m[0].length)
+          w = Math.max(w, r.getBoundingClientRect().width)
+        }
+        return w
+      }
+      const over = () => names.some((n) => longestWord(n) > n.clientWidth)
       while (over() && size > 10) { size = Math.max(10, size - 0.5); for (const n of names) n.style.fontSize = size + 'px' }
     }
     fit()

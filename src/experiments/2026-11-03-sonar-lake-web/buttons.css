@@ -75,7 +75,7 @@ body .ac-share-pop.is-phone { top: 40%; } /* body: wins over src/index.css whate
    View tiles: names break between words only (src/index.css has overflow-wrap: anywhere: "Panoramiczn|y", "Kombinētai|s");
    a word that still doesn't fit shrinks the whole row's names together (index.jsx, down to 10 px). The ice page's row of five:
    3 px side padding instead of 5. */
-.ac-views-fit .ac-view-name { overflow-wrap: normal; }
+.ac-views-fit .ac-view-name { overflow-wrap: normal; word-break: normal; hyphens: manual; text-wrap: balance; }
 .ac-views-fit.is-5 .ac-view { padding-left: 3px; padding-right: 3px; }
 /* Desktop share box beside the panel, not above its button (it ran 46–75 px off the top at 1280×800): 14 px right of the panel,
    its bottom on the button's, kept 16 px inside the window; ShareButton.jsx places it. The arrow on the left points at the
