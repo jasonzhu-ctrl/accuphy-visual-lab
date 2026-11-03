@@ -28,7 +28,8 @@ MKT 版归 “Lab 营销版” 窗口负责（#231）。HQ 管它，和网站、
 - [ ] **后面那一层 lab.accuphy.ca/mktbf2026/ 上线：** Jason 在 **Lab HQ** 说“动”。
   - HQ 用上线包部署。上线包是填了名单号的那份，见第二节。
   - `/`、`/mini/`、`/ice/` 仍是网站嵌入版，部署前用 md5 证明和当时的线上一样（#228：营销版不覆盖不带锁的那一份）。
-- [ ] **客人看到的那一层，店铺 MKT 页 /pages/sonarlab-mktbf2026 上线：** Jason 在 **网站 HQ** 说“动”。
+- [x] **客人看到的那一层，店铺 MKT 页 /pages/sonarlab-mktbf2026：** Jason 11-03 在 **网站 HQ** 说了“动”（网站 #241），网站 00 正在建，框指向 `https://lab.accuphy.ca/mktbf2026/`。
+  - **注意：** 后面那一层 /mktbf2026/ 上线以前，这个店铺页的框里是空的（404）。页面不在菜单里，客人找不到，但**不能拿去投广告**。
   - 网站方案：`accuphy-website/docs/plans/2026-11-03-lab-mkt-store-page.md`。
   - 复制 `page.lab.json`，嵌入地址改成 `https://lab.accuphy.ca/mktbf2026/`；新页面 handle 是 `sonarlab-mktbf2026`；不放进菜单；`/pages/lab` 不动。
   - 页面可以先建好；/mktbf2026/ 上线前，这批链接不给广告。
@@ -65,7 +66,9 @@ MKT 版归 “Lab 营销版” 窗口负责（#231）。HQ 管它，和网站、
   - Combo 打开了；
   - 店铺这边算一次 Meta Lead / GA4 generate_lead（form = lab_unlock），事件里不带邮箱；
   - 没有 Klaviyo 弹窗。
-- [ ] **各国 IP 测试：** `accuphy-website/handoffs/2026-11-03-lab-ad-landing-links-check.md`，网站还没写答复。
+- [ ] **各国 IP 测试：** `accuphy-website/handoffs/2026-11-03-lab-ad-landing-links-check.md`。
+  - **测完的（HQ 11-03 转来）：** 加拿大、美国、法国、比利时（荷、法）、德国、奥地利，共 16 个链接，加不加 utm/fbclid 都测了。全部返回 200，没有跳转，参数照常传过去。
+  - **还在测（约 18:30 出结果）：** 瑞士、波兰、拉脱维亚、澳洲，以及浏览器那一轮（JS 跳转、弹窗、框的地址、货币）。测不到的国家会标“没测到”。
   - 写完后，营销版把结果整理进 `docs/lab-links-sheet.md` 第一节：每个市场留下来还是被转走、`?lang=` 还在不在、奥地利和瑞士用哪个链接、加上 UTM 和 fbclid 后是否正常。
   - 地理转址按网址前缀走，所以 `/pages/lab` 的结果同样适用于 MKT 链接。
   - 澳洲已加进那份表（第 10 行 `/en-au/pages/lab`，网站 e947b900），03 用澳洲 IP 测。
