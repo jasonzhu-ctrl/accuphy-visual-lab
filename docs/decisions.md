@@ -3903,6 +3903,10 @@ Numbered log. Newest at the bottom.
        English tiles for nl / lv, Map). The 30 keys outside the table are untouched; the tour comment says “English final (#215)”.
        Checked: every key × language shows the table's words; `/?lang=` en fr de nl pl lv on desktop and phone, the ice page in de / pl —
        0 errors; English page text identical to the commit before. The website-embed copy puts its own in (#233).
+     - **Panel labels fit the language** (界面设计's spec, 11-03; Base built it in `index.jsx` Row + a measuring effect): the label column is
+       as wide as the widest label of the rows on screen (min 56 px, wide rows min 96 px; normal rows capped at 104 px, longer ones would
+       wrap), the same for every row, measured again on device / view / camera change and on font load. English is identical to the
+       commit before (every label and control rect, lake / Combo / ice). de pl lv: ≥ 16 px between each label and its control.
      Plan: `docs/2026-11-03-multilang-base-plan.md`.
 
 213. **2026-11-03** — **Black Friday locked version: a copy of the base with the #191 lock on, and it takes over the store's Lab**
