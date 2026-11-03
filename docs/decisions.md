@@ -3946,3 +3946,9 @@ Numbered log. Newest at the bottom.
        needs Jason's own word in its HQ before anything goes live. Until then the Polish Lab is on the main store, `?lang=pl`.
      - Latvian: `shop.accuphy.com/pages/lab?lang=lv`. Its shop button goes to the main (Canadian) store.
      - Replaces #217's `/en-pl` and `/en-ro` links. Sheet: `docs/lab-links-sheet.md`.
+
+219. **2026-11-03** — **In ad shots the phone must not cover the sonar beam; place the boat first** (Jason to "Lab video creation":
+     “手机不要挡住声纳照射区域 尽量哦 也就是船所在位置很重要”). Every shot with the phone is framed boat-first so the boat and its
+     beam sit clear of the phone and the captions; stills and previews are checked for it. The 10-28 Mini film's deep-water shot
+     broke this (the Down beam ran behind the phone); the base brief `docs/2026-11-03-ad-base-brief.md` reframes it from almost
+     straight above.
