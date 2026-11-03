@@ -3919,3 +3919,7 @@ Numbered log. Newest at the bottom.
      - Address: German Sie, Dutch je (measured on the live product pages). Inside the phone: the app's own de/pl words (website
        table in `accuphy-website/handoffs/2026-11-03-lab-multilang-questions.md`); nl and lv stay English; Map is never translated.
      - HQ shows Jason the reviewed table before Base puts it in; live still needs his 动.
+
+215. **2026-11-03** — **The tour's description lines are final as they are** (Jason in Lab HQ: “用现在的”, on the four lines in
+     `i18n.js`: `tour_drag_text`, `tour_fwd_text`, `tour_down_text`, `tour_pano_text`). They are no longer placeholders; "Lab 多语言"
+     translates them with the rest (#212, #214). The ice page's tour lines are not part of this.
