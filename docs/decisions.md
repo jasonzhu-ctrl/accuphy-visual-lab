@@ -3923,3 +3923,7 @@ Numbered log. Newest at the bottom.
 215. **2026-11-03** — **The tour's description lines are final as they are** (Jason in Lab HQ: “用现在的”, on the four lines in
      `i18n.js`: `tour_drag_text`, `tour_fwd_text`, `tour_down_text`, `tour_pano_text`). They are no longer placeholders; "Lab 多语言"
      translates them with the rest (#212, #214). The ice page's tour lines are not part of this.
+
+216. **2026-11-03** — **The multi-language work goes into the locked copy once it is finished** (Jason in Lab HQ, card on how base
+     changes reach the #213 copy: “等多语言做完你再搞呗”). Until #212 is reviewed and in the base, the copy stays at 86bf80e; then
+     "Lab 营销版" brings #212 over and the tests run again. Other later base changes: HQ asks Jason then.
