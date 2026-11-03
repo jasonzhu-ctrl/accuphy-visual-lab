@@ -3892,3 +3892,15 @@ Numbered log. Newest at the bottom.
        /nl-benelux Lab automatically, so review comes first.
      - Still to settle with Jason: who reviews Polish and Latvian; the final English of the tour's three lines.
      Plan: `docs/2026-11-03-multilang-base-plan.md`.
+
+213. **2026-11-03** — **Black Friday locked version: a copy of the base with the #191 lock on, and it takes over the store's Lab**
+     (Jason in 对接, relayed: “要锁 但是不是直接在 base 上做 是用之前锁的方式直接把 base 复制出来单独做带锁的版本 这个要 hq 安排”;
+     in Lab HQ, card on where it goes: “店铺页换成带锁版”). Replaces the 11-01 idea of one folder with a build switch.
+     - The lake folder at 86bf80e is copied to `src/experiments/2026-11-03-sonar-lake-bf/` with the lock always on; the base folder
+       stays lock-free and only Base changes it. A new "Lab 营销版" chat changes only the copy. Base's later work is copied over
+       only when Jason says.
+     - During BF, lab.accuphy.ca `/` (the page the store frames) is the locked version; the clean base moves to `/base/`;
+       `/mini/` and `/ice/` stay base for now.
+     - Not live until: W24Qdc in the copy's `signup.js`, Jason has read the consent and "unlocked" lines, Klaviyo's VpD3CV is off
+       on the store Lab page, and the website has checked a real sign-up. Building waits for Jason's 动.
+     Plan: `docs/2026-11-03-bf-locked-version-plan.md`.
