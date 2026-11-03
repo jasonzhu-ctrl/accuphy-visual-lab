@@ -4001,3 +4001,7 @@ Numbered log. Newest at the bottom.
      - Captions redesigned (eye-catching, premium, never over the beam). Length not fixed (replaces #223's 20 s). Camera moves
        after film practice. PingLive waits until the Mini film is done.
      - Change list: `docs/2026-11-03-ad-base-feedback-round1.md`.
+
+226. **2026-11-03** — **The ice page's 120 ft framing (#224) goes into the locked copy together with the multi-language work**
+     (Jason in Lab HQ, card “冰钓页这个改动，要不要也搬进黑五带锁版？”: “和多语言一起搬”). Adds to #216: when #212 is reviewed and in the
+     base, "Lab 营销版" brings #212 and #224 over in one go and reruns its tests.
