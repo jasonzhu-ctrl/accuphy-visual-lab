@@ -4017,3 +4017,7 @@ Numbered log. Newest at the bottom.
 226. **2026-11-03** — **The ice page's 120 ft framing (#224) goes into the locked copy together with the multi-language work**
      (Jason in Lab HQ, card “冰钓页这个改动，要不要也搬进黑五带锁版？”: “和多语言一起搬”). Adds to #216: when #212 is reviewed and in the
      base, "Lab 营销版" brings #212 and #224 over in one go and reruns its tests.
+
+227. **2026-11-03** — **Latvian: the Lab page has it; email, sign-up forms and ads don't** (Jason in Lab HQ, card on the conflict with
+     his 10-28 word in Klaviyo HQ “拉脱维亚语就不要做了”: “Lab 做，邮件广告不做”). #212 keeps lv (`shop.accuphy.com/pages/lab?lang=lv`, #218);
+     Klaviyo's five languages (EN FR DE NL PL) stand. Told the BF funnel window.
