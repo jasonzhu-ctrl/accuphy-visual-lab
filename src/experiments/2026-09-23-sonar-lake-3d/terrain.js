@@ -23,15 +23,41 @@ function shoreRise(x, z, d) {
   const k = smooth(-W, 0, dist)
   return d + (0.1 - d) * k
 }
-// The boat (summer) and a hole (ice) stop 1.5 m inside the shore, on the way from where they are toward where they were
-// sent (handover §1; this replaces the ±58 m square of #204). Returns the stop, or null when the target is on the water.
-export const SHORE_INSET = 1.5
-const inLake = (x, z, inset) => Math.hypot(x, z) <= shoreR(Math.atan2(z, x)) - inset
-export function shoreStop(x0, z0, x1, z1, inset = SHORE_INSET) {
-  if (inLake(x1, z1, inset)) return null
-  if (!inLake(x0, z0, inset)) { const r = Math.hypot(x1, z1) || 1, R = shoreR(Math.atan2(z1, x1)) - inset; return { x: (x1 * R) / r, z: (z1 * R) / r } } // already at the shore: along the radius
-  let lo = 0, hi = 1
-  for (let i = 0; i < 22; i++) { const m = (lo + hi) / 2; if (inLake(x0 + (x1 - x0) * m, z0 + (z1 - z0) * m, inset)) lo = m; else hi = m }
+// The boat (summer) and a hole (ice) stop where the water is 5 ft deep (Jason 2026-11-02, #208: "Stop at 5 ft depth"; was
+// 1.5 m inside the shore, #206, where the sonar went black at 0.3–1.6 ft), on the way from where they are toward where they
+// were sent. Returns the stop, or null when the way is open. Only the shore's slope counts (the last 20 m), so nothing out
+// in the lake ever stops them. The depth is read where the sonar is: the hole on the ice; on the lake the transducer (`boat`:
+// its offset from the boat's centre, and the hull's half length and beam, which must stay afloat — 1.5 ft under every corner).
+export const STOP_DEPTH = 1.524 // m (5 ft)
+const shoreDist = (x, z) => Math.hypot(x, z) - shoreR(Math.atan2(z, x))
+const HULL_DEPTH = 0.45 // m (1.5 ft)
+let probe = null
+const open = (x, z) => {
+  const d = shoreDist(x, z)
+  if (d < -20) return true
+  if (!probe) return d < 0 && depthAt(x, z) >= STOP_DEPTH
+  const { ox, oz, hl, hb } = probe
+  if (shoreDist(x + ox, z + oz) >= 0 || depthAt(x + ox, z + oz) < STOP_DEPTH) return false
+  for (const [dx, dz] of [[-hl, -hb], [-hl, hb], [hl, -hb], [hl, hb]]) if (shoreDist(x + dx, z + dz) >= 0 || depthAt(x + dx, z + dz) < HULL_DEPTH) return false
+  return true
+}
+export function shoreStop(x0, z0, x1, z1, boat = null) {
+  probe = boat
+  try { return stopAlong(x0, z0, x1, z1) } finally { probe = null }
+}
+function stopAlong(x0, z0, x1, z1) {
+  if (open(x1, z1) && shoreDist(x1, z1) < -20) return null
+  const L = Math.hypot(x1 - x0, z1 - z0), n = Math.max(1, Math.ceil(L / 0.25))
+  if (!open(x0, z0)) { // already in the shallows: back along the radius to the 5 ft line
+    const r = Math.hypot(x1, z1) || 1; let q = r
+    while (q > 0 && !open((x1 * q) / r, (z1 * q) / r)) q -= 0.25
+    return { x: (x1 * q) / r, z: (z1 * q) / r }
+  }
+  let last = 0
+  for (let i = 1; i <= n; i++) { const f = i / n; if (!open(x0 + (x1 - x0) * f, z0 + (z1 - z0) * f)) break; last = f }
+  if (last === 1) return null
+  let lo = last, hi = Math.min(1, last + 1 / n) // finer, to the centimetre
+  for (let i = 0; i < 10; i++) { const m = (lo + hi) / 2; if (open(x0 + (x1 - x0) * m, z0 + (z1 - z0) * m)) lo = m; else hi = m }
   return { x: x0 + (x1 - x0) * lo, z: z0 + (z1 - z0) * lo }
 }
 export const SEG = 160  // 2 m spacing

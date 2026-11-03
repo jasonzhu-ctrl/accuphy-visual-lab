@@ -844,13 +844,15 @@ function Rig({ state, sonarRect, fogMats, cam = LAKE_CAM }) {
   })
   return null
 }
+// the boat's sonar and hull for the shore stop (terrain.js shoreStop): the transducer's offset, the hull's half length and beam
+const BOAT_PROBE = { ox: TRANSDUCER_OFFSET.x, oz: TRANSDUCER_OFFSET.z, hl: 3.32, hb: 1.22 }
 function PickPlane({ state }) {
   const onDown = (e) => { e.stopPropagation(); state.current.dragging = true; state.current.hasDragged = true; state.current.shoreCued = false; labEvent('first_drag', {}, { once: true }); e.target.setPointerCapture?.(e.pointerId); move(e) }
   const move = (e) => {
     const s = state.current
     if (!s.dragging) return
-    // the boat stops 1.5 m inside the shore (terrain.js shoreStop); the first time in a drag, one quiet line says why
-    const stop = shoreStop(s.boat.x, s.boat.z, e.point.x, e.point.z)
+    // the boat stops where the water is 5 ft deep (terrain.js shoreStop); the first time in a drag, one quiet line says why
+    const stop = shoreStop(s.boat.x, s.boat.z, e.point.x, e.point.z, BOAT_PROBE)
     s.target.x = stop ? stop.x : e.point.x
     s.target.z = stop ? stop.z : e.point.z
     if (stop && !s.shoreCued) { s.shoreCued = true; s.shoreCue = { x: stop.x, z: stop.z, t0: performance.now(), ring: false } }

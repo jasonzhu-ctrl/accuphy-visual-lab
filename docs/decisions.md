@@ -3805,3 +3805,21 @@ Numbered log. Newest at the bottom.
      - **Checked** on a scratch copy: top camera with the hole at the N, NE (the cove), E, S and W shores on desktop, portrait
        and sideways phones: the bank and trees in view each time; holes still reach the shore; the ice tour as before; 0
        errors; production builds OK. The sand on the summer phone view: narrow, wide and no-sand stretches.
+
+208. **2026-11-02** — **The boat and the hole stop where the water is 5 ft deep; a tree-density switch for the phone test (test
+     version)** (Jason in Lab HQ: "Stop at 5 ft depth"; 界面设计's look check ①: 1.5 m inside the shore the sonar went black at
+     0.3–1.6 ft).
+     - **The stop** (`terrain.js` `shoreStop`): along the way to where the boat or hole was sent, the last point where the
+       sonar reads 5 ft (1.524 m). Ice: the hole itself (the flasher reads 5.0 ft at every edge). Summer: the transducer, 3 m
+       ahead of the boat's centre (the boat always faces east), and every corner of the hull keeps 1.5 ft of water under it.
+       Only the last 20 m before the shore count. The cue line is unchanged.
+     - **Measured** at the four edges and the wreck's cove (desktop and phone alike; sheet `docs/2026-11-02-shore-5ft-check.jpg`):
+       - Ice: N, NE cove, E, S, W — the flasher 5.0 ft, the hole 1.8–2.05 m from the waterline, the Live Ice picture lit as in
+         open water (21 %).
+       - Summer, the app's readout: E 5.0, S 5.0, NE cove 5.0, N 8.5, W 18.4 ft (W and N: the hull's west / north corners reach
+         the 1.5 ft line first, while the transducer still sits over the shelf or the slope).
+       - Summer, the picture: facing the shore (E, NE cove; the boat faces east) PingLive Forward shows only the slope rising to
+         the surface ahead and Panoramic little or nothing — true to a boat nosed onto a beach; Down shows the bottom at 5 ft.
+         Open for HQ / Jason: keep that, or stop the boat further out on the shores it faces.
+     - **Tree density** (`Shore.jsx`): `?trees=0.3 … 1` on any build sets it (default: desktop 1, phones 0.6), so the same test
+       link can be compared on a real phone at two densities before go-live; e.g. `?trees=0.35` ≈ 0.33 M triangles on a phone.

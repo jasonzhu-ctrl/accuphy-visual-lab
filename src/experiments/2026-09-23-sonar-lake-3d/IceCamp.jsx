@@ -318,7 +318,7 @@ export function IceWalls({ state, iceMat }) {
 // dropped). Now every tap counts: a far tap walks HOP_MAX in that direction, and the aim ring shows where the hole will be.
 const HOP_MAX = 25
 export function IcePick({ state }) {
-  // the shore (terrain.js shoreStop): the ring stops 1.5 m inside it on the way there; s.aimPast keeps where the finger was
+  // the shore (terrain.js shoreStop): the ring stops where the water is 5 ft deep on the way there; s.aimPast keeps where the finger was
   const clampXZ = (s, p) => { const st = shoreStop(s.boat.x, s.boat.z, p.x, p.z); s.aimPast = st ? { x: p.x, z: p.z } : null; return st || p }
   const clampHop = (s, p) => {
     let dx = p.x - s.boat.x, dz = p.z - s.boat.z

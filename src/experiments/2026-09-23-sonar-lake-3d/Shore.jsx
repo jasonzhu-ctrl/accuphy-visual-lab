@@ -12,6 +12,9 @@ import { placeTrees, makeGround, makeShoreIce, makeConifer, makeNeedleTexture, m
 
 const VARIANTS = 4
 const phoneLike = () => typeof window !== 'undefined' && Math.min(window.innerWidth, window.innerHeight) < 600
+// tree density: phones 60 % of a desktop's (#50: fewer trees, each as fine). ?trees=0.3 … 1 sets it on any build, so the
+// same test link can be compared on a real phone at two densities (HQ 11-02, before go-live)
+const treeDensity = () => { const m = /[?&]trees=([\d.]+)/.exec(typeof window !== 'undefined' ? window.location.search : ''); return m ? Math.min(1, Math.max(0.1, +m[1])) : phoneLike() ? 0.6 : 1 }
 
 function Instances({ geo, mat, items, place, clip }) {
   const ref = useRef()
@@ -29,7 +32,7 @@ function Instances({ geo, mat, items, place, clip }) {
 export default function Shore({ state, winter = false }) {
   const clip = useMemo(() => [new THREE.Plane(new THREE.Vector3(0, 0, -1), 1e5)], [])
   const built = useMemo(() => {
-    const trees = placeTrees(phoneLike() ? 0.6 : 1)
+    const trees = placeTrees(treeDensity())
     const tex = makeNeedleTexture()
     const mats = { ground: makeGroundMaterial(winter), tree: makeTreeMaterial(tex, winter), rock: makeRockMaterial(winter), grass: makeTuftMaterial('grass', winter), reed: makeTuftMaterial('reed', winter), ice: winter ? makeShoreIceMaterial() : null }
     for (const k in mats) if (mats[k]) mats[k].clippingPlanes = clip
