@@ -23,10 +23,9 @@ no email in it; then `?lab_unlock=sub` (passed through the fake store page as `e
 The unit tests take the folder too: `LAB_DIR=2026-11-03-sonar-lake-bf node scripts/dev/signup-guard-test.mjs` (also
 `shop-url-test.mjs`, `app-qr-test.mjs`). signup-guard checks the list id comes only from the build's `VITE_BF_LIST_ID` (base: never).
 
-**Expected failures on the copy, waiting for HQ (2026-11-03):** the BF copy stays at 86bf80e (#213) and does not have #212's
+**Expected failures on the copy, until #212 moves in (#216, Jason 2026-11-03: the languages move into the locked version once they are done):** the BF copy stays at 86bf80e (#213) and does not have #212's
 languages. So on `LAB_DIR=2026-11-03-sonar-lake-bf`, `share-url-test.mjs` fails its 4 de/nl/pl/lv cases, and in a locked run
-`share-de` fails. Do not change the tests or sync the copy: HQ asks Jason whether the locked version takes #212 and how base
-changes reach it. They cover #184 / #187 (shop click, receipt), #188 / #192 (share popover) #200 (A8) and #202 (lock off). `share-de` (#212: on a German store page the copied share link ends with `&lang=de` and the Shop click stays on `/de-de/products/`).
+`share-de` fails. Do not change the tests or sync the copy before then; once #212 is moved in, these must pass. They cover #184 / #187 (shop click, receipt), #188 / #192 (share popover) #200 (A8) and #202 (lock off). `share-de` (#212: on a German store page the copied share link ends with `&lang=de` and the Shop click stays on `/de-de/products/`).
 The fake store page passes `?shop=/de-de` like the real bridge, plus `tour=off`: the entry tour (#199) dims the Shop,
 badge and share buttons while it runs. A wrong-ORIGIN receipt cannot be staged (the parent's origin is what the Lab trusts).
 Software WebGL is slow: allow ~15 s per scenario. Unit tests are separate: `shop-url-test.mjs`, `share-url-test.mjs`,
