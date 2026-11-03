@@ -7,7 +7,7 @@ import { depthAt } from './terrain'
 import { bakeTerrain, makeMarksTexture, computeMarks } from './sonarMarks'
 import { logoFrame, makeLogoSdf, LOGO_SDF_MAX, LOCKUP, LOCKUP_SVG } from './logo'
 import { niceStep } from './SonarChrome'
-import { FT } from '../2026-09-23-sonar-beam/devices'
+import { FT } from './devices'
 
 // CSS 3D pose of the phone (index.jsx applies the same transform to the DOM frame)
 export const PHONE_POSE = { perspective: 1400, rotY: -16, rotX: 6 }

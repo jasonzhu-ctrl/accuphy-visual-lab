@@ -3,7 +3,7 @@
 // Placement (Jason 2026-10-25 in the Lab HQ chat: "用方案 B 吧"): desktop a full-width button at the foot of the control
 // panel; phones a pill docked on the phone frame's top edge. (Option A, a pill on the lake, was removed.)
 import { useEffect, useState } from 'react'
-import { DEVICES } from '../2026-09-23-sonar-beam/devices'
+import { DEVICES } from './devices'
 import { openShop, isOpeningShop, onOpeningShop } from './embed'
 import { t } from './i18n'
 
