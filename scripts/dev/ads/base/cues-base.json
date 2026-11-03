@@ -1,0 +1,23 @@
+{
+  "_what": "the Base Mini film's sound cues (#225): synthesized by sfx.py, no music yet (its slot stays empty); times are film seconds",
+  "duration": 33,
+  "cues": [
+    { "t": 0.4, "kind": "ping", "gain": 0.9 },
+    { "t": 4.4, "kind": "water", "dur": 3.4, "gain": 0.28 },
+    { "t": 5.6, "kind": "ping", "gain": 0.45 },
+    { "t": 7.0, "kind": "ping", "gain": 0.45 },
+    { "t": 8.6, "kind": "pop", "gain": 0.8 },
+    { "t": 9.6, "kind": "ping", "gain": 0.6 },
+    { "t": 10.9, "kind": "ping", "gain": 0.6 },
+    { "t": 12.9, "kind": "whoosh", "gain": 0.5 },
+    { "t": 13.7, "kind": "ping", "gain": 0.7 },
+    { "t": 15.0, "kind": "ping", "gain": 0.8 },
+    { "t": 16.3, "kind": "pingLong", "gain": 0.8 },
+    { "t": 18.3, "kind": "ping", "gain": 0.6 },
+    { "t": 19.7, "kind": "ping", "gain": 0.6 },
+    { "t": 21.7, "kind": "ping", "gain": 0.7 },
+    { "t": 24.3, "kind": "ping", "gain": 0.6 },
+    { "t": 26.6, "kind": "ping", "gain": 0.6 },
+    { "t": 29.3, "kind": "pingLong", "gain": 0.8 }
+  ]
+}
