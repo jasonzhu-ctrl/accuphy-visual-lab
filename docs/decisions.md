@@ -3823,3 +3823,18 @@ Numbered log. Newest at the bottom.
          Open for HQ / Jason: keep that, or stop the boat further out on the shores it faces.
      - **Tree density** (`Shore.jsx`): `?trees=0.3 … 1` on any build sets it (default: desktop 1, phones 0.6), so the same test
        link can be compared on a real phone at two densities before go-live; e.g. `?trees=0.35` ≈ 0.33 M triangles on a phone.
+
+209. **2026-11-02** — **Summer lake: where the bow points at the shore, the boat stops farther out (test version)** (Jason in Lab
+     HQ: "B, stop a bit further out"; after #208 the boat nosed onto the east beach at 5 ft and Forward showed only the slope,
+     mostly black). Not the boat's heading and not the sonar engine (the boat faces east as always); the ice page is unchanged.
+     - **The rule** (`terrain.js` `shoreStop`, summer only): on top of #208 (the transducer reads ≥ 5 ft, 1.5 ft under every
+       corner of the hull), the transducer keeps 15 m of water ahead of it, the way the Forward beam looks. It bites only where
+       the shore lies ahead (the east side, the wreck's cove, the south-east and north-east); elsewhere #208 stands.
+     - **Measured** (desktop and phone alike; sheet `docs/2026-11-02-shore-bow-check.jpg`), stop: distance from the waterline,
+       the app's readout, lit share of PingLive Forward / Panoramic / Down:
+       - E: 18.5 m, 37.7 ft, 7.7 / 8.6 / 7.4 % (was 5.0 ft and 0.8 % Forward): the bottom runs ahead and rises to the beach.
+       - NE (the cove): 20 m, 78.8 ft, 6.4 / 5.8 / 13.4 % — Down shows the wreck under the boat.
+       - SE: 18 m, 21.0 ft, 5.9 / 11.8 / 5.1 %.
+       - S: 2.4 m, 5.0 ft; SW 4.3 m, 17.8 ft; W 4.3 m, 18.4 ft; NW 4.6 m, 43.4 ft; N 5.4 m, 23.5 ft — all pictures lit
+         (2.8–38 %).
+       - The shore and its trees in view at every stop, desktop and phone; 0 errors.

@@ -27,10 +27,12 @@ function shoreRise(x, z, d) {
 // 1.5 m inside the shore, #206, where the sonar went black at 0.3–1.6 ft), on the way from where they are toward where they
 // were sent. Returns the stop, or null when the way is open. Only the shore's slope counts (the last 20 m), so nothing out
 // in the lake ever stops them. The depth is read where the sonar is: the hole on the ice; on the lake the transducer (`boat`:
-// its offset from the boat's centre, and the hull's half length and beam, which must stay afloat — 1.5 ft under every corner).
+// its offset from the boat's centre, and the hull's half length and beam, which must stay afloat — 1.5 ft under every corner —
+// and, where the bow points at the shore, 15 m of water ahead).
 export const STOP_DEPTH = 1.524 // m (5 ft)
 const shoreDist = (x, z) => Math.hypot(x, z) - shoreR(Math.atan2(z, x))
 const HULL_DEPTH = 0.45 // m (1.5 ft)
+const AHEAD = 15 // m of water ahead of the boat's transducer (its Forward beam points east)
 let probe = null
 const open = (x, z) => {
   const d = shoreDist(x, z)
@@ -39,6 +41,9 @@ const open = (x, z) => {
   const { ox, oz, hl, hb } = probe
   if (shoreDist(x + ox, z + oz) >= 0 || depthAt(x + ox, z + oz) < STOP_DEPTH) return false
   for (const [dx, dz] of [[-hl, -hb], [-hl, hb], [hl, -hb], [hl, hb]]) if (shoreDist(x + dx, z + dz) >= 0 || depthAt(x + dx, z + dz) < HULL_DEPTH) return false
+  // bow to the shore (Jason 2026-11-02, #209: "B, stop a bit further out"): Forward looks east, the way the bow points; it keeps
+  // AHEAD m of water in front of the transducer, so its picture shows the bottom running toward the beach, not a black screen
+  for (let a = 3; a <= AHEAD; a += 3) if (shoreDist(x + ox + a, z + oz) >= -0.5) return false
   return true
 }
 export function shoreStop(x0, z0, x1, z1, boat = null) {
