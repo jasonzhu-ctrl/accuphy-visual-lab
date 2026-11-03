@@ -1,5 +1,14 @@
 // The Combo lock's sign-up (#191): without a Klaviyo list id no real host may unlock. node scripts/dev/signup-guard-test.mjs
 const DIR = process.env.LAB_DIR || '2026-09-23-sonar-lake-3d' // the lake folder under test; the BF locked copy: LAB_DIR=2026-11-03-sonar-lake-bf (#213)
+import fs from 'fs'
+import os from 'os'
+import path from 'path'
+// signup.js may read the build's environment (the BF copy takes its list id from VITE_BF_LIST_ID, #213), which plain node lacks:
+// load a copy of the file with import.meta.env swapped for globalThis.__LAB_ENV (signup.js imports nothing, so a copy runs as is)
+const SRC = fs.readFileSync(new URL(`../../src/experiments/${DIR}/signup.js`, import.meta.url), 'utf8').replaceAll('import.meta.env', 'globalThis.__LAB_ENV')
+const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'signup-guard-')); let k = 0
+globalThis.__LAB_ENV = {}
+const load = () => { const f = path.join(TMP, `signup-${++k}.mjs`); fs.writeFileSync(f, SRC); return import(f) }
 const store = {}
 globalThis.localStorage = { getItem: (k) => store[k] ?? null, setItem: (k, v) => { store[k] = v } }
 const posts = [], bodies = []; globalThis.fetch = async (u, o) => { posts.push(u); bodies.push(JSON.parse(o.body)); return { ok: true } }
@@ -16,7 +25,7 @@ let fail = 0, n = 0
 for (const c of cases) {
   for (const k in store) delete store[k]; posts.length = 0
   globalThis.window = { location: { hostname: c.host } }
-  const m = await import(`../../src/experiments/${DIR}/signup.js?case=${++n}`)
+  const m = await load()
   m.KLAVIYO.listId = c.list
   let refused = false
   try { await m.submitSignup({ email: 'a@example.com' }) } catch (e) { refused = e.message === 'not_ready' }
@@ -27,7 +36,7 @@ for (const c of cases) {
 // what Klaviyo receives (#191)
 {
   globalThis.window = { location: { hostname: 'lab.accuphy.ca', search: '' } }; bodies.length = 0
-  const m = await import(`../../src/experiments/${DIR}/signup.js?case=${++n}`)
+  const m = await load()
   m.KLAVIYO.listId = 'W24Qdc'
   await m.submitSignup({ email: 'a@example.com', language: 'fr', market: 'us', view: 'combo', product: 'pinglive-mini' })
   const a = bodies[0].data.attributes, pr = a.profile.data.attributes.properties
@@ -39,7 +48,7 @@ for (const c of cases) {
 for (const c of [{ q: '?lab_unlock=sub', want: true }, { q: '?market=us&lab_unlock=sub', want: true }, { q: '?lab_unlock=1', want: false }, { q: '', want: false }]) {
   for (const k in store) delete store[k]; posts.length = 0
   globalThis.window = { location: { hostname: 'lab.accuphy.ca', search: c.q } }
-  const m = await import(`../../src/experiments/${DIR}/signup.js?case=${++n}`)
+  const m = await load()
   const got = m.isSignedUp()
   globalThis.window.location.search = ''
   const kept = m.isSignedUp() // remembered once the parameter is gone
@@ -47,13 +56,18 @@ for (const c of [{ q: '?lab_unlock=sub', want: true }, { q: '?market=us&lab_unlo
   if (!ok) fail++
   console.log(`${ok ? 'OK  ' : 'FAIL'} email link ${JSON.stringify(c.q)} → ${got}, then ${kept}`)
 }
-// the list id as shipped in this folder: the base keeps null (nothing is ever sent); the BF locked copy ships W24Qdc (#213).
-// LAB_LIST=W24Qdc says what to expect; without it, null.
+// the list id as built: never in the source. The base has no way to set it (always null); the BF copy takes it only from the
+// build's VITE_BF_LIST_ID, and only a 6-character Klaviyo id (#213)
 {
   globalThis.window = { location: { hostname: 'localhost', search: '' } }
-  const m = await import(`../../src/experiments/${DIR}/signup.js?case=${++n}`)
-  const want = process.env.LAB_LIST || null, got = m.KLAVIYO.listId
-  const ok = got === want; if (!ok) fail++
-  console.log(`${ok ? 'OK  ' : 'FAIL'} ${DIR}/signup.js ships listId=${JSON.stringify(got)}${ok ? '' : '   expected ' + JSON.stringify(want)}`)
+  const usesEnv = SRC.includes('globalThis.__LAB_ENV.VITE_BF_LIST_ID')
+  for (const [env, want] of [[{}, null], [{ VITE_BF_LIST_ID: 'W24Qdc' }, usesEnv ? 'W24Qdc' : null], [{ VITE_BF_LIST_ID: 'not an id' }, null]]) {
+    globalThis.__LAB_ENV = env
+    const got = (await load()).KLAVIYO.listId
+    const ok = got === want; if (!ok) fail++
+    console.log(`${ok ? 'OK  ' : 'FAIL'} ${DIR}/signup.js built with ${JSON.stringify(env)} → listId=${JSON.stringify(got)}${ok ? '' : '   expected ' + JSON.stringify(want)}`)
+  }
+  globalThis.__LAB_ENV = {}
 }
+fs.rmSync(TMP, { recursive: true, force: true })
 console.log(fail ? `${fail} FAILED` : 'all passed'); process.exit(fail ? 1 : 0)
