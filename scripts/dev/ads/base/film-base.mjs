@@ -31,9 +31,10 @@ const BACK = CAM.back || { pos: [-4, 82, 92], look: [22, -8, 30], fov: 48 }     
 const LOW1 = CAM.low1 || { pos: [0, 12, 24], look: [28, -6, 8], fov: 52 }            // the angle beat: low beside the boat (el ~29°: lower, the water mirrors the sky), the beam big in the frame
 const LOW2 = CAM.low2 || { pos: [10, 16, 32], look: [26, -5, 10], fov: 50 }          // ...rising a little as Combo opens
 const TOP = CAM.top || { pos: [24, 95, 46], look: [24, -10, 22], fov: 40 }            // the combo phone beat (storyboard shot 4)
-// the orbit round the hole. PLACEHOLDER: the ice page's section cut is fixed in the world, so the arc stays near the page's
-// own Section view (az 90 = the +z side the page looks from) until Base's cut-follows-camera switch; near → far as it swings
-const ICE = CAM.ice || { r0: 20, r1: 30, el: 17, az0: 62, az1: 118, lookY: -4 }
+// the orbit round the hole, left to right, near → far, at the page's own Section elevation. Base's c8ace42 turns the Section
+// cut to face the camera every frame (adIce.cutAz = 'cam'); the shelter is not cut, so it is kept 8 m on the far side of the
+// hole from the camera, a little to the side (adIce.shelter set per frame). az 90 = the +z side the page looks from.
+const ICE = CAM.ice || { r0: 19, r1: 30, el: 17, az0: 30, az1: 150, lookY: -4, shelterR: 8, shelterSide: 3 }
 const shot = {
   open: (t) => { const u = smoother(span(t, 0, 4)); return { cam: { pos: lerp3(WIDE.pos, OPEN1.pos, u), look: lerp3(WIDE.look, OPEN1.look, u), fov: lerp(WIDE.fov, OPEN1.fov, u) } } },
   drag: (t) => { const u = smoother(span(t, 4, 8.5)); return { cam: { pos: lerp3(OPEN1.pos, F5.pos, u * 0.9), look: lerp3(OPEN1.look, F5.look, u * 0.9), fov: 48 }, target: [lerp(16, 23, smoother(span(t, 4.4, 7.6))), 11] } },
@@ -42,7 +43,8 @@ const shot = {
   angle: (t) => { const u = smoother(span(t, 15.0, 18)); return { cam: { pos: lerp3(LOW1.pos, LOW2.pos, u), look: lerp3(LOW1.look, LOW2.look, u), fov: lerp(LOW1.fov, LOW2.fov, u) }, view: t < 15.0 ? 'Forward' : 'Combo', fanOpen: t < 15.0 ? 1 : lerp(0.03, 1, easeOut(span(t, 15.0, 16.3))) } },
   combo: (t) => { const u = span(t, 18, 21.5); return { cam: { pos: [TOP.pos[0], TOP.pos[1] - 6 * u, TOP.pos[2] + 2 * u], look: TOP.look, fov: TOP.fov }, lift: -215 } },
   ice: (t, s) => { const u = smoother(span(t, 21.8, 28.5)), az = lerp(ICE.az0, ICE.az1, u) * Math.PI / 180, el = ICE.el * Math.PI / 180, r = lerp(ICE.r0, ICE.r1, u)
-    return { cam: { pos: [s.hole[0] + r * Math.cos(el) * Math.cos(az), r * Math.sin(el) + 0.5, s.hole[1] + r * Math.cos(el) * Math.sin(az)], look: [s.hole[0], ICE.lookY, s.hole[1]], fov: 46 } } },
+    const shelter = [-ICE.shelterR * Math.cos(az) - ICE.shelterSide * Math.sin(az), -ICE.shelterR * Math.sin(az) + ICE.shelterSide * Math.cos(az)]
+    return { cam: { pos: [s.hole[0] + r * Math.cos(el) * Math.cos(az), r * Math.sin(el) + 0.5, s.hole[1] + r * Math.cos(el) * Math.sin(az)], look: [s.hole[0], ICE.lookY, s.hole[1]], fov: 46 }, shelter } },
 }[pass]
 const calls = { open: [], drag: [[4.5, 'largemouth'], [6.3, 'largemouth']], phone: [[8.9, 'largemouth'], [10.6, 'largemouth']], angle: [[14.0, 'largemouth'], [16.4, 'largemouth']], combo: [[18.3, 'largemouth']], ice: [] }[pass]
 
@@ -83,9 +85,9 @@ await p.evaluate(([phone]) => {
   }
 }, [phone])
 const hole = ice ? await p.evaluate(() => [window.__sonarState.boat?.x ?? 0, window.__sonarState.boat?.z ?? 0]) : null
-if (ice) { // Base's #225 hooks (322f47f, "ad-lake-ice" port 5193): the shelter and sled on the far side of the hole, 2 + 3 fish held
+if (ice) { // Base's #225 hooks (322f47f + c8ace42, "ad-lake-ice" port 5193): the shelter and sled on the far side of the hole, 2 + 3 fish held
   // in the Combo beam; the fish need ~15 s to swim in before rolling (Base's measurement)
-  await p.evaluate((a) => { window.__sonarState.adIce = a }, JSON.parse(process.env.ADICE || '{"shelter":[-3,-9],"sled":[1.5,-11,20],"fish":[2,3]}'))
+  await p.evaluate((a) => { window.__sonarState.adIce = a }, JSON.parse(process.env.ADICE || '{"cutAz":"cam","shelter":[-3,-9],"sled":[1.5,-11,20],"fish":[2,3]}'))
   await p.waitForTimeout(+(process.env.ICE_WAIT || 15000))
   console.log('beam fish', JSON.stringify(await p.evaluate(() => (window.__beamFish ? window.__beamFish() : null))))
 }
@@ -99,6 +101,7 @@ const apply = async (t) => {
     if (st.target) { s.target.x = st.target[0]; s.target.z = st.target[1] }
     if (st.fanOpen != null) s.fanOpen = st.fanOpen
     if (st.lift != null) document.getElementById('__lift').textContent = `[data-hint-avoid][style*="aspect-ratio"]{transform:translateY(${st.lift}px)}`
+    if (st.shelter && s.adIce) { s.adIce.shelter = st.shelter; s.adIce.sled = [st.shelter[0] + 2, st.shelter[1] - 1.5, 20] }
   }, [st])
   return st
 }
