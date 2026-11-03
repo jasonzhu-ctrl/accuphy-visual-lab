@@ -18,6 +18,7 @@ Jason 11-03：“一定要搞个文档，专门把这些不同的版本啊，那
 | 加拿大 英 | https://shop.accuphy.com/pages/sonarlab-mktbf2026 | 英 |
 | 加拿大 法 | https://shop.accuphy.com/fr/pages/sonarlab-mktbf2026 | 法 |
 | 美国（只出 Mini） | https://shop.accuphy.com/en-us/pages/sonarlab-mktbf2026 | 英 |
+| 澳洲（Jason 11-03 加进投放，#230） | https://shop.accuphy.com/en-au/pages/sonarlab-mktbf2026 | 英 |
 | 法国 | https://shop.accuphy.com/fr-fr/pages/sonarlab-mktbf2026 | 法 |
 | 比荷卢 荷兰语 | https://shop.accuphy.com/nl-benelux/pages/sonarlab-mktbf2026 | 荷 |
 | 比荷卢 法语 | https://shop.accuphy.com/fr-benelux/pages/sonarlab-mktbf2026 | 法 |
@@ -64,6 +65,7 @@ Jason 11-03：“一定要搞个文档，专门把这些不同的版本啊，那
 ## 改动记录
 
 - 2026-11-03 HQ：建表（Jason 11-03）。
+- 2026-11-03 HQ：加澳洲（Jason：“加进去”；之前漏了）。
 - 2026-11-03 HQ：合并第一节和第一点五节：投放链接只有一批，就是 MKT（Jason：“MKT 和投放的是一回事”）。
 - 2026-11-03 HQ：#228 营销版不覆盖 Base：首页留 Base，带锁版放 /bf/。
 - 2026-11-03 HQ：波兰、拉脱维亚改按 #218 的规矩（拉脱维亚放主站；波兰等网站加波兰语）。

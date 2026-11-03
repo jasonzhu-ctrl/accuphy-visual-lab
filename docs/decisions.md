@@ -4036,3 +4036,8 @@ Numbered log. Newest at the bottom.
        src lab.accuphy.ca/bf/) is made by the website on Jason's 动 there. Poland and Latvia: main store + `?lang=` (#218).
      - The Lab path stays `/bf/` (HQ's call; no rename). Klaviyo's 20 s box goes off only on the MKT page.
      - Sheet: `docs/lab-links-sheet.md` §1.5; proposal `docs/2026-11-03-mkt-link-rule-proposal.md`.
+
+230. **2026-11-03** — **Australia joins the BF ads** (Jason in Lab HQ, after “澳洲呢 链接没有”, on the card “澳洲加进这次的投放吗？”: “加进去”).
+     The Australia market (/en-au, live since 10-12, English, AUD) was missing from HQ's list. Ad link by #229:
+     https://shop.accuphy.com/en-au/pages/sonarlab-mktbf2026 (English); the base page /en-au/pages/lab exists (200). Told the website (page,
+     geo test) and the BF funnel (ads, email). Which products Australia sells in the ads is for the BF funnel to confirm with Jason.
