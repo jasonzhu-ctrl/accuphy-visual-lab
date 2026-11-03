@@ -545,9 +545,10 @@ function ring(pad) {
   return { position: 'absolute', inset: 0, padding: pad, WebkitMask: 'linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)', WebkitMaskComposite: 'xor', mask: 'linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0)' }
 }
 // The panel's label column (界面设计 11-03, for de / pl / lv): one width per language = its widest label + 4 px, the same on every
-// row so the controls start on one line, never narrower than the old 56 px (96 px for the two Combo ranges, `wide`), at most 104 px;
-// a label still longer wraps to two lines (line-height 1.15). All the labels a panel can show are measured once (lake, Mini Combo,
-// ice), so the width doesn't move when the rows change; again when the fonts arrive. English stays at 56 / 96 px.
+// row so the controls start on one line, never narrower than the old 56 px, at most 104 px; a label still longer wraps to two lines
+// (line-height 1.15). The two Combo ranges (`wide`) take max(96, widest + 4) with no cap and stay on one line (as Base 12f5918;
+// French reaches ~146 px). All the labels a panel can show are measured once (lake, Mini Combo, ice), so the width doesn't move when
+// the rows change; again when the fonts arrive. English stays at 56 / 96 px.
 const LABEL_KEYS = ['device', 'range', 'camera'], WIDE_KEYS = ['range_fwd', 'range_down']
 function usePanelLabels(state) {
   useLayoutEffect(() => {
@@ -567,8 +568,8 @@ function usePanelLabels(state) {
       const fitW = (w, min) => Math.min(104, Math.max(min, w + 4))
       const w = widest(LABEL_KEYS), wide = widest(WIDE_KEYS)
       el.style.setProperty('--ac-label-w', fitW(w, 56) + 'px')
-      el.style.setProperty('--ac-label-wide', fitW(wide, 96) + 'px')
-      if (w + 4 > 104 || wide + 4 > 104) el.style.setProperty('--ac-label-lh', '1.15'); else el.style.removeProperty('--ac-label-lh') // unset: the inherited line-height, as before
+      el.style.setProperty('--ac-label-wide', Math.max(96, wide + 4) + 'px')
+      if (w + 4 > 104) el.style.setProperty('--ac-label-lh', '1.15'); else el.style.removeProperty('--ac-label-lh') // unset: the inherited line-height, as before
     }
     fit()
     let on = true
@@ -610,7 +611,7 @@ function useViewNames(ref, key) {
 function Row({ label, children, wide = false }) {
   return (
     <div className="flex flex-wrap items-center gap-3">
-      <span className="ac-label" style={{ width: wide ? 'var(--ac-label-wide, 96px)' : 'var(--ac-label-w, 56px)', flex: 'none', lineHeight: 'var(--ac-label-lh)' }}>{label}</span>
+      <span className="ac-label" style={wide ? { width: 'var(--ac-label-wide, 96px)', flex: 'none', whiteSpace: 'nowrap' } : { width: 'var(--ac-label-w, 56px)', flex: 'none', lineHeight: 'var(--ac-label-lh)' }}>{label}</span>
       {children}
     </div>
   )
