@@ -23,6 +23,9 @@ MKT 版归 “Lab 营销版” 窗口负责（#231）。HQ 管它，和网站、
 - **投放链接：** 10 个市场，每个市场主页网址 + `/pages/sonarlab-mktbf2026`，页面里嵌 lab.accuphy.ca/mktbf2026/（#229、#230）。见 `docs/lab-links-sheet.md` 第一节。
 - **还没上线：** lab.accuphy.ca/mktbf2026/ 没上，店铺 MKT 页也没建。
 
+> **上线时间（#234，Jason 11-03：“等多语言一起上”）：** 后面那一层 lab.accuphy.ca/mktbf2026/ 要等多语言 #212 核完、搬进复制件以后才上（第六节）。
+> Klaviyo 关弹窗、Lab HQ 的“动”，都到那时候再问 Jason。上线顺序照旧：先上 /mktbf2026/（店铺链接先不投）→ 网站 03 测一次真实订阅 → 都过了再交给广告。
+
 ## 一、Jason 要说的两个“动”
 
 - [ ] **后面那一层 lab.accuphy.ca/mktbf2026/ 上线：** Jason 在 **Lab HQ** 说“动”。
@@ -47,10 +50,8 @@ MKT 版归 “Lab 营销版” 窗口负责（#231）。HQ 管它，和网站、
   - 英：“By subscribing, you agree to receive marketing emails from Accuphy. Unsubscribe anytime.”
   - 法：“En vous abonnant, vous acceptez de recevoir des courriels marketing d’Accuphy. Désabonnement en tout temps.”
   - 后面接 Privacy Policy / Politique de confidentialité 链接；一行小字，11 px，灰色。
-- [ ] **unlock_done**（订阅成功后显示 1.1 秒）：**等 Jason 确认**，HQ 问他。
-  - 推荐：英文不改，“You’re in. {view} is unlocked.”；法文改成 “C’est fait. La vue {view} est débloquée.”。
-  - 复制件现在的法文是 “C’est fait. {view} est débloquée.”。
-  - Jason 确认后由营销版改进复制件，跑测试，报 HQ。
+- [x] **unlock_done**（订阅成功后显示 1.1 秒）：Jason 11-03 确认（经 HQ，“可以”），已放进复制件。
+  - 英：“You’re in. {view} is unlocked.”（不改）；法：“C’est fait. La vue {view} est débloquée.”。
 
 ## 四、Klaviyo（经 HQ，Klaviyo HQ 做）
 
@@ -81,7 +82,7 @@ MKT 版归 “Lab 营销版” 窗口负责（#231）。HQ 管它，和网站、
 
 ## 六、Base 的改动搬进复制件（#216、#226）
 
-- [ ] **多语言 #212 和冰钓 #224 一起搬：** 等多语言核完、放进 Base，HQ 通知后，营销版一次搬这两样。
+- [ ] **多语言 #212 和冰钓 #224 一起搬（#234：这一项做完，MKT 版才上线）：** 等多语言核完、放进 Base，HQ 通知后，营销版一次搬这两样。
   - #212：`embed.js`、`i18n.js` 等文件，066623a 及以后。
   - #224：99e15c8，冰钓页前视 120 ft 进画面。要搬的只是复制件里湖页那部分代码（#226）。
   - 搬完要做的：
@@ -108,3 +109,4 @@ MKT 版归 “Lab 营销版” 窗口负责（#231）。HQ 管它，和网站、
 | 2026-11-03 | 改名 #233：/bf/ → /mktbf2026/ | 63862df；`BASE_REF=96fdc22` 打包，`/`、`/mini/`、`/ice/` md5 = 线上 96fdc22；/mktbf2026/ 带锁场景 PASS |
 | 2026-11-03 | 网站嵌入版接手 /、/mini/、/ice/（5171be3） | 从 5171be3 打包：`/`、`/mini/`、`/ice/` md5 = 线上；/mktbf2026/ 还是 475bf95f；/mktbf2026/ice/ = /ice/；假店铺页带锁场景 PASS，只剩 share-de（多语言，预料中） |
 | 2026-11-03 | 复制件自带 devices.js、wedge.js（9e96e0d，取自 86bf80e） | /mktbf2026/ md5 还是 475bf95f；假店铺页带锁场景 PASS |
+| 2026-11-03 | unlock_done 法文（bab47fc） | 打包页里有 “C’est fait. La vue {view} est débloquée.”；`/`、`/mini/`、`/ice/` md5 = 线上；单元测试和假店铺页带锁场景通过，只剩多语言用例（预料中） |
