@@ -5,7 +5,7 @@
 
 **状态（11-03 核完）：Lab 自己核（#214，Jason 11-03）。** 能核的都标了 “Lab 已核”，每条写了依据。
 拿不准的 3 条单独列在第七节，**没有硬定**，表里写“拿不准”，给了几个备选。
-教程三句说明（`tour_*_text`）和分享框标题、下面那句（`share_title`、`share_line`）的英文还没定，照旧空着。
+教程四句说明（`tour_*_text`）的英文 Jason 11-03 定了用现在的（#215），已翻已核；分享框标题和下面那句（`share_title`、`share_line`）的英文还没定，照旧空着。
 下一步：HQ 先给 Jason 看，再交给 Base 放进 `i18n.js`。这份表本身不改任何代码。
 
 ## 怎么核的（#214）
@@ -77,18 +77,18 @@
 ## 三、入场教程（三站）
 
 PingLive：拖船（Down）→ 点 Forward → 点 Panoramic；Mini：拖船（Combo）→ 点 Forward → 点 Down。
-标题的英文也是原型里来的；Jason 定说明文字时如果也改标题，这几行跟着重翻。
+说明文字的英文 Jason 11-03 定了就用现在的（#215），标题照旧。冰钓的教程句子不做。
 
 | key | 位置 | en | fr | de | nl | pl | lv | 类别 | 状态 | 依据 |
 |---|---|---|---|---|---|---|---|---|---|---|
 | tour_drag_title | 第 1 站标题 | Drag the boat | Faites glisser le bateau | Ziehen Sie das Boot | Versleep de boot | Przeciągnij łódź | Velciet laivu | 翻 | 全部 Lab 已核 | 同 hint_boat |
-| tour_drag_text | 第 1 站说明 | （占位）Whatever the beam touches shows up live in the Accuphy Sonar app. | — | — | — | — | — | 翻 | **等 Jason 定英文** | — |
+| tour_drag_text | 第 1 站说明 | Whatever the beam touches shows up live in the Accuphy Sonar app. | Tout ce que le faisceau touche apparaît en direct dans l’application Accuphy Sonar. | Alles, was der Kegel erfasst, erscheint live in der Accuphy Sonar-App. | Alles wat de bundel raakt, zie je live in de Accuphy Sonar-app. | Wszystko, czego dotknie wiązka, widać na żywo w aplikacji Accuphy Sonar. | Viss, ko skar stars, reāllaikā parādās lietotnē Accuphy Sonar. | 翻 | 全部 Lab 已核（英文 Jason 11-03 定，#215） | fr：已核 s2_text “en direct … dans l’application Accuphy Sonar”、desc_lake “tout ce que le faisceau touche”；de：desc_lake 的 Kegel、店de Mini 页 “mit der Accuphy Sonar-App”“Live-Bild”；nl：店nl “met de Accuphy Sonar-app”“live beelden”；pl：PP “Widok na żywo”“aplikacji Accuphy Sonar”；lv：G-LV “reāllaikā skatīt”、garmin.com/lv-LV “Aplūkojiet zemūdens pasauli reāllaikā” |
 | tour_fwd_title | 第 2 站标题 | Tap Forward View | Touchez la vue avant | Tippen Sie auf „Vorwärtsansicht“ | Tik op Voorwaartse weergave | Dotknij widoku do przodu | Pieskarieties skatam uz priekšu | 翻 | 全部 Lab 已核 | 店fr “Vue avant”；店de “Vorwärtsansicht”（GL 写 Sicht nach vorne，照线上）；店nl “Voorwaartse weergave”、G-NL “Tik op”；PP “Widok do przodu”；G-LV “skats uz priekšu”“pieskarieties + 与格” |
-| tour_fwd_text | 第 2 站说明 | （占位）The beam turns to look ahead of the boat — where you cast. | — | — | — | — | — | 翻 | **等 Jason 定英文** | — |
+| tour_fwd_text | 第 2 站说明 | The beam turns to look ahead of the boat — where you cast. | Le faisceau se tourne vers l’avant du bateau : là où vous lancez. | Der Kegel dreht sich und blickt vor das Boot – dorthin, wo Sie auswerfen. | De bundel draait naar voren, voor de boot – daar waar je werpt. | Wiązka obraca się i patrzy przed łódź – tam, gdzie zarzucasz. | Stars pagriežas uz priekšu, laivas priekšā – tur, kur metat ēsmu. | 翻 | 全部 Lab 已核（英文 Jason 11-03 定，#215） | fr：已核步骤 3 “la vue avant, pour lancer dessus”、已核步骤 2 “l’oriente devant le bateau”；de：店de “Frontansicht für verschiedene Angelszenarien”，auswerfen = 抛竿；nl：店nl “Kijk in realtime voor uw boot”，werpen = 抛竿；pl：PP “Obserwuj obszar przed łodzią”，zarzucać = 抛竿；lv：G-LV “laivas priekšā vai zem laivas”，抛竿 Garmin 没有，用常用的 mest ēsmu（抛饵） |
 | tour_pano_title | PingLive 第 3 站标题 | Tap Panoramic View | Touchez la vue panoramique | 拿不准 | Tik op Panoramische weergave | Dotknij widoku panoramicznego | Pieskarieties panorāmas skatam | 翻 | fr nl pl lv Lab 已核；**de 拿不准，见第七节第 2 条** | 店fr “Vue panoramique”；店nl “Panoramische weergave”；PP “Widok panoramiczny” |
-| tour_pano_text | PingLive 第 3 站说明 | （占位）A wide sweep ahead of the boat — to find fish and structure. | — | — | — | — | — | 翻 | **等 Jason 定英文** | — |
+| tour_pano_text | PingLive 第 3 站说明 | A wide sweep ahead of the boat — to find fish and structure. | Un large balayage devant le bateau : pour repérer poissons et structures. | Ein breiter Scan vor dem Boot – um Fische und Strukturen zu erkennen. | Een brede scan voor de boot – om vissen en structuren te spotten. | Szerokie skanowanie przed łodzią – do odnajdywania ryb i struktur. | Plaša skenēšana laivas priekšā – lai atrastu zivis un struktūras. | 翻 | 全部 Lab 已核（英文 Jason 11-03 定，#215） | fr：已核步骤 3 “scanne de larges zones pour repérer poissons et structures”；de：店de “scannt große Bereiche, um Strukturen und Fische leicht zu erkennen”；nl：店nl “scan grote gebieden om gemakkelijk structuren en vissen te spotten”；pl：PP “skanowanie dużego obszaru i łatwiejsze odnajdywanie ryb”“podwodne struktury”；lv：G-LV “skenēšana”“struktūra un zivis” |
 | tour_down_title | Mini 第 3 站标题 | Tap Down View | Touchez la vue vers le bas | Tippen Sie auf „Abwärtsansicht“ | Tik op Neerwaartse weergave | Dotknij widoku w dół | Pieskarieties skatam uz leju | 翻 | 全部 Lab 已核 | 店fr “Vue vers le bas”；店de “Abwärtsansicht”；店nl “Neerwaartse weergave”；PP “Widok w dół”；G-LV “skats uz leju” |
-| tour_down_text | Mini 第 3 站说明 | （占位）The beam points straight under the boat — see what’s right below. | — | — | — | — | — | 翻 | **等 Jason 定英文** | — |
+| tour_down_text | Mini 第 3 站说明 | The beam points straight under the boat — see what’s right below. | Le faisceau pointe droit sous le bateau : voyez ce qui se trouve juste en dessous. | Der Kegel zeigt direkt unter das Boot – Sie sehen, was genau darunter ist. | De bundel wijst recht onder de boot – zie wat er direct onder je zit. | Wiązka skierowana jest prosto pod łódź – zobacz, co jest tuż pod nią. | Stars vērsts taisni zem laivas – redziet, kas atrodas tieši apakšā. | 翻 | 全部 Lab 已核（英文 Jason 11-03 定，#215） | fr：已核 “pêcher à la verticale”、店fr “Vue vers le bas … sous votre bateau”；de：店de “die Aktivität unter Ihrem Boot … direkt unter einem Eisloch”；nl：店nl “direct onder uw vaartuig”“de activiteit onder je boot”；pl：PP “bezpośrednio pod łodzią”、G-PL “wiązką skierowaną w dół”；lv：G-LV “zem laivas” |
 | tour_tap | 手指旁的小气泡 | Tap | Touchez | Tippen | Tik | Dotknij | Pieskarieties | 翻 | 全部 Lab 已核 | G-FR / G-DE / G-NL / G-PL / G-LV 的“点屏幕”都是这个词 |
 | tour_skip | 右上角 | Skip tour | Passer la visite | Einführung überspringen | Rondleiding overslaan | Pomiń samouczek | Izlaist pamācību | 翻 | 全部 Lab 已核 | 主题fr “Passer au contenu”、主题de “Zum Inhalt springen” 的动词；“tour” 照 App 常见叫法：de Einführung、pl samouczek、lv pamācība（Garmin 没有入场教程） |
 | tour_replay | 教程走完后右上角 | Replay tour | Revoir la visite | Einführung wiederholen | Rondleiding opnieuw bekijken | Powtórz samouczek | Atkārtot pamācību | 翻 | 全部 Lab 已核 | 同上 |
@@ -166,6 +166,10 @@ nl、lv 的 App 没有这两种语言，留英文。de、pl 是 App 原字（网
 | tour_fwd_title | Tap Forward View | Dotknij widoku do przodu | Tap the forward view | Pieskarieties skatam uz priekšu | Tap the forward view | = |
 | tour_pano_title | Tap Panoramic View | Dotknij widoku panoramicznego | Tap the panoramic view | Pieskarieties panorāmas skatam | Tap the panorama view | = |
 | tour_down_title | Tap Down View | Dotknij widoku w dół | Tap the down view | Pieskarieties skatam uz leju | Tap the down view | = |
+| tour_drag_text | Whatever the beam touches shows up live in the Accuphy Sonar app. | Wszystko, czego dotknie wiązka, widać na żywo w aplikacji Accuphy Sonar. | Everything the beam touches is visible live in the Accuphy Sonar app. | Viss, ko skar stars, reāllaikā parādās lietotnē Accuphy Sonar. | Everything the beam touches appears in real time in the Accuphy Sonar app. | = |
+| tour_fwd_text | The beam turns to look ahead of the boat — where you cast. | Wiązka obraca się i patrzy przed łódź – tam, gdzie zarzucasz. | The beam turns and looks ahead of the boat – where you cast. | Stars pagriežas uz priekšu, laivas priekšā – tur, kur metat ēsmu. | The beam turns forward, ahead of the boat – where you cast the bait. | = |
+| tour_down_text | The beam points straight under the boat — see what’s right below. | Wiązka skierowana jest prosto pod łódź – zobacz, co jest tuż pod nią. | The beam is pointed straight under the boat – see what is right under it. | Stars vērsts taisni zem laivas – redziet, kas atrodas tieši apakšā. | The beam points straight under the boat – see what is right below. | = |
+| tour_pano_text | A wide sweep ahead of the boat — to find fish and structure. | Szerokie skanowanie przed łodzią – do odnajdywania ryb i struktur. | A wide scan ahead of the boat – for finding fish and structures. | Plaša skenēšana laivas priekšā – lai atrastu zivis un struktūras. | A wide scan ahead of the boat – to find fish and structures. | = |
 | tour_tap | Tap | Dotknij | Tap | Pieskarieties | Tap | = |
 | tour_skip | Skip tour | Pomiń samouczek | Skip the tutorial | Izlaist pamācību | Skip the tutorial | 故意用“教程”，比“导览”好懂 |
 | tour_replay | Replay tour | Powtórz samouczek | Repeat the tutorial | Atkārtot pamācību | Repeat the tutorial | 同上 |
@@ -252,3 +256,5 @@ App Store、Google Play、“ACCUPHY | LAB” 标题、AUTO、数字和单位、
   get_app 照页脚 “Accuphy Sonar App herunterladen”、combo 小字 VORWÄRTS / ABWÄRTS；pl Panorama → Panoramiczny、przewodnik →
   samouczek、pauza → wstrzymanie、PRZÓD / DÓŁ → DO PRZODU / W DÓŁ；lv “staru kūlis” → “stars”、Krasts → Krasta līnija、
   Noskenējiet → Skenējiet、ceļvedis → pamācība、Iegādāties → Pirkt。
+- 2026-11-03 Lab 多语言：#215 教程四句说明（tour_drag_text、tour_fwd_text、tour_down_text、tour_pano_text）翻成 5 种并核过，
+  依据同上（法语照已核的旧步骤卡句子，德、荷照店铺产品页的视图说明，波兰语照 PP），波兰语、拉脱维亚语翻回英文对过。
