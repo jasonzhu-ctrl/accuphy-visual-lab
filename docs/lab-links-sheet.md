@@ -29,13 +29,20 @@ Jason 11-03：“一定要搞个文档，专门把这些不同的版本啊，那
 | 法国 | https://shop.accuphy.com/fr-fr/pages/sonarlab-mktbf2026 | 法 |
 | 比荷卢 荷兰语 | https://shop.accuphy.com/nl-benelux/pages/sonarlab-mktbf2026 | 荷 |
 | 比荷卢 法语 | https://shop.accuphy.com/fr-benelux/pages/sonarlab-mktbf2026 | 法 |
-| 德国（奥地利、瑞士等网站 03 测完再定） | https://shop.accuphy.com/de-de/pages/sonarlab-mktbf2026 | 德 |
-| 波兰 | https://shop.accuphy.com/pages/sonarlab-mktbf2026?lang=pl（网站给波兰市场加了波兰语以后，换成波兰页） | 波兰语 |
-| 拉脱维亚 | https://shop.accuphy.com/pages/sonarlab-mktbf2026?lang=lv（Jason 选了主站） | 拉脱维亚语 |
+| 德国（含奥地利、瑞士：网站 03 测过，打开不跳转，看到德国市场、欧元） | https://shop.accuphy.com/de-de/pages/sonarlab-mktbf2026 | 德 |
+| 波兰 | https://shop.accuphy.com/pages/sonarlab-mktbf2026?lang=pl（波兰客人会被 302 转到 /en-pl/…?lang=pl，店铺那层是英文，Lab 还是波兰语，能用；网站给波兰市场加了波兰语以后，换成波兰页） | 波兰语 |
+| 拉脱维亚 | **待定**（HQ 在问 Jason）。现在的 https://shop.accuphy.com/pages/sonarlab-mktbf2026?lang=lv 会被 302 转到 /ro-ro/…?lang=lv，店铺那层是罗马尼亚语，Lab 还是拉脱维亚语；网站给的另一个选择是 /en-ro/pages/sonarlab-mktbf2026?lang=lv，店铺那层是英文（没测过） | 拉脱维亚语 |
 
-- 状态：还没建。店铺页要 Jason 在网站 HQ 说“动”；lab.accuphy.ca/mktbf2026/ 要 Jason 在 Lab HQ 说“动”。网站提醒：/mktbf2026/ 上线前，这批链接不要给广告。
+- 状态：【客人看到的店铺页】Jason 已在网站 HQ 说“动”（网站 #241），网站 00 在建。【后面那一层】lab.accuphy.ca/mktbf2026/ 等多语言一起上（#234），要 Jason 在 Lab HQ 说“动”。在那之前店铺页的框是空的（404），**这批链接不要给广告**。
 - 德、荷、波、拉的 Lab 文字要等译文放进去才是那种语言（现在显示英文、用米）。
-- 网站 03 正在用各国 IP 测这些市场前缀（同样适用这批链接），结果出来再更新这一节。
+- **各国 IP 测试（网站 03，11-03，194a98c0；测的是 `/pages/lab`，市场前缀一样，所以结果也适用于这批链接）：**
+  - 加拿大英、加拿大法、美国、法国、比荷卢荷、比荷卢法、德国、澳洲：都不跳转，框里 lang、shop、market 都对；加上 utm 和 fbclid 也能传到框里。
+  - 奥地利、瑞士：打开 /de-de 不跳转，没有选国家的弹窗，看到德国市场（欧元）。
+  - 波兰：302 转到 /en-pl，lang=pl 还在；去商店进 /en-pl/products/pinglive-sonar，能打开。
+  - 拉脱维亚：302 转到 /ro-ro（有一次是 /en-ro），lang=lv 还在；去商店进 /ro-ro/products/…，能打开。
+  - 只有浏览器带着语言信息才会 302，光用 curl 不会跳。
+  - 没测：下单、加购物车，以及各国客人点 Lab 里的按钮。
+  - 网站还看到：德国 IP 打开 /de-de 时，Klaviyo 的全屏订阅弹窗会盖住 Lab。MKT 页上要靠关掉 VpD3CV 解决（上线清单第四节）。
 - 规矩（#218）：“有网站 market 的就放网站，没有的就放在主站下，不懂问我。” 带 `?lang=` 的链接只换 Lab 的语言，店铺页其他地方还是英文。
 
 **店铺原来的 `/pages/lab`**（各市场都有）：嵌的是网站嵌入版（#233），不带锁，**不用来投放**。它照旧留在店里（#228：营销版不覆盖它）。链接见下面第一点五节。
