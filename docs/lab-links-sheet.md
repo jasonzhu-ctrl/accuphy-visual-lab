@@ -60,14 +60,15 @@ Jason 11-03：“一定要搞个文档，专门把这些不同的版本啊，那
 - 11-03 核对：8 个市场前缀都 200，框里是 lab.accuphy.ca/。
 - 德、荷、波、拉的文字等译文放进复制件才是那种语言（现在显示英文、用米）。
 
-## 二、Lab 自己的地址
+## 二、lab.accuphy.ca 上的地址（后台那一层，#232：不给客人）
 
-| 地址 | 现在是什么 | 黑五带锁版上线后（#213） |
-|---|---|---|
-| https://lab.accuphy.ca/ | 标准 Base 96fdc22（11-03 晚），无锁；店铺所有 Lab 页嵌的都是它 | 照旧是 Base（#228：营销版绝不覆盖 Base） |
-| https://lab.accuphy.ca/mktbf2026/ | （还没有） | 黑五带锁版（店铺 Lab 页要不要指向它，等 Jason 定） |
-| https://lab.accuphy.ca/mini/ | 只有 Mini 的 Base | 照旧 Base |
-| https://lab.accuphy.ca/ice/ | 冰钓页 Base | 照旧 Base |
+| 地址 | 是哪个版本 | 现在 | 被哪个店铺页的框显示 |
+|---|---|---|---|
+| https://lab.accuphy.ca/ | 网站嵌入版（无锁） | 96fdc22（11-03 晚上线） | 各市场 `/pages/lab` |
+| https://lab.accuphy.ca/mini/ | 网站嵌入版，只有 Mini | 96fdc22 | — |
+| https://lab.accuphy.ca/ice/ | 网站嵌入版，冰钓页 | 96fdc22 | — |
+| https://lab.accuphy.ca/mktbf2026/ | MKT 版（带锁） | 还没上线 | 各市场 `/pages/sonarlab-mktbf2026`（还没建） |
+| https://lab.accuphy.ca/mktbf2026/ice/ | MKT 版里冰钓格子去的页，是网站嵌入版冰钓页的拷贝 | 还没上线 | — |
 
 直接打开 lab.accuphy.ca（不经过店铺）时，Lab 不发统计事件，“去商店”进加拿大店。广告请用第一节的投放链接。
 
@@ -82,12 +83,15 @@ Jason 11-03：“一定要搞个文档，专门把这些不同的版本啊，那
 
 测试链接后面加 `?lang=de`（或 fr、nl、pl、lv）可以看那种语言。只有核好的字放进去以后，才看得出区别。
 
-## 四、两个版本
+## 四、三个版本（#233）
 
-| 版本 | 代码在哪 | 谁改 | 多语言 |
+| 版本 | 代码在哪 | 谁改 | 网址 |
 |---|---|---|---|
-| 标准 Base（无锁） | `src/experiments/2026-09-23-sonar-lake-3d/` | 只有 “Lab 场景和声纳画面Base” | 先做在这里（#212） |
-| 黑五带锁版 | `src/experiments/2026-11-03-sonar-lake-bf/`（复制自 86bf80e） | 只有 “Lab 营销版” | 多语言做完再搬进来（#216） |
+| Base（本体，无锁） | `src/experiments/2026-09-23-sonar-lake-3d/` | “Lab 场景和声纳画面Base” | 测试链接首页、/mini/、/ice/ |
+| 网站嵌入版（无锁） | `src/experiments/2026-11-03-sonar-lake-web/`（复制自 96fdc22） | “Lab 网站嵌入版” | lab.accuphy.ca/、/mini/、/ice/ |
+| MKT 版（带锁） | `src/experiments/2026-11-03-sonar-lake-bf/`（复制自 86bf80e） | “Lab 营销版” | lab.accuphy.ca/mktbf2026/ |
+
+Base 的改进要不要搬进两份复制件，HQ 问 Jason，他说了才搬（多语言 #212、冰钓 120 ft #224 已定：多语言做完一起搬进 MKT 版）。
 
 ## 改动记录
 
