@@ -11,10 +11,18 @@ import { t } from './i18n'
 import { placeTrees, makeGround, makeShoreIce, makeConifer, makeNeedleTexture, makeTuft, placeTufts, ROCK_GEOS, placeShoreRocks, makeGroundMaterial, makeShoreIceMaterial, makeTreeMaterial, makeRockMaterial, makeTuftMaterial, landY } from './shoreModels'
 
 const VARIANTS = 4
-const phoneLike = () => typeof window !== 'undefined' && Math.min(window.innerWidth, window.innerHeight) < 600
-// tree density: phones 60 % of a desktop's (#50: fewer trees, each as fine). ?trees=0.3 … 1 sets it on any build, so the
-// same test link can be compared on a real phone at two densities (HQ 11-02, before go-live)
-const treeDensity = () => { const m = /[?&]trees=([\d.]+)/.exec(typeof window !== 'undefined' ? window.location.search : ''); return m ? Math.min(1, Math.max(0.1, +m[1])) : phoneLike() ? 0.6 : 1 }
+// The tree budget (Jason 2026-11-02, #210: "OK, auto-adjust"): every device starts with all the trees; under the loading
+// cover the page measures its own frame rate and, below 45 fps, keeps fewer trees — never a lesser tree, nor any less shore,
+// snow or sonar (#50, #205). Tiers: all, 60 %, 35 %, 20 % (a tree stays or goes by its rank, so each tier is a thinning of
+// the one above). 45 fps: below it a drag visibly stutters on a 60 Hz screen, and it leaves room for a phone that warms
+// up. Later, if the page falls under 30 fps for 6 s (heat), one more tier goes, the trees shrinking away over 1.2 s.
+// ?trees=0.1 … 1 fixes the density on any build (testing).
+const TIERS = [1, 0.6, 0.35, 0.2], FPS_OK = 45, FPS_HOT = 30
+const fixedDensity = () => { const m = /[?&]trees=([\d.]+)/.exec(typeof window !== 'undefined' ? window.location.search : ''); return m ? Math.min(1, Math.max(0.1, +m[1])) : null }
+// dev: ?slowms=N adds N ms of work to every frame (a slow phone in the self-check; headless Chrome never slows its frame
+// loop for a slow GPU), ?slowafter=S only from S seconds on (a phone warming up)
+const SLOW = import.meta.env.DEV ? (() => { const q = typeof window !== 'undefined' ? window.location.search : ''; return { ms: +((/[?&]slowms=(\d+)/.exec(q) || [])[1] || 0), after: +((/[?&]slowafter=(\d+)/.exec(q) || [])[1] || 0) } })() : { ms: 0, after: 0 }
+const median = (a) => { const b = [...a].sort((x, y) => x - y); return b[Math.floor(b.length / 2)] || 0 }
 
 function Instances({ geo, mat, items, place, clip }) {
   const ref = useRef()
@@ -29,10 +37,36 @@ function Instances({ geo, mat, items, place, clip }) {
   return <instancedMesh ref={ref} args={[geo, mat, items.length]} onUpdate={(o) => o.layers.set(SONAR_HIDE_LAYER)} />
 }
 
+// the conifers by variant, each list sorted by rank: a density shows a prefix of every list (mesh.count); trees fading out
+// shrink to nothing over 1.2 s before the count drops
+function Trees({ geos, mat, groups, place, budget }) {
+  const refs = useRef([])
+  const tmp = useMemo(() => ({ m: new THREE.Matrix4(), q: new THREE.Quaternion(), e: new THREE.Euler(), p: new THREE.Vector3(), s: new THREE.Vector3() }), [])
+  const upto = (items, d) => { let lo = 0, hi = items.length; while (lo < hi) { const m = (lo + hi) >> 1; if (items[m].rank < d) lo = m + 1; else hi = m } return lo }
+  const setAt = (mesh, it, i, k) => { place(it, tmp.p, tmp.e, tmp.s); tmp.s.multiplyScalar(Math.max(1e-3, k)); tmp.q.setFromEuler(tmp.e); tmp.m.compose(tmp.p, tmp.q, tmp.s); mesh.setMatrixAt(i, tmp.m) }
+  useEffect(() => {
+    groups.forEach((items, k) => { const mesh = refs.current[k]; if (!mesh) return; items.forEach((it, i) => setAt(mesh, it, i, 1)); mesh.instanceMatrix.needsUpdate = true; mesh.computeBoundingSphere() })
+  }, [groups, place]) // eslint-disable-line react-hooks/exhaustive-deps
+  const shown = useRef(-1)
+  useFrame(() => {
+    const b = budget.current
+    if (b.from != null) {
+      const f = Math.min(1, (performance.now() - b.t0) / 1200), k = 1 - f * f * (3 - 2 * f)
+      groups.forEach((items, g) => { const mesh = refs.current[g]; if (!mesh) return; const a = upto(items, b.d), z = upto(items, b.from); for (let i = a; i < z; i++) setAt(mesh, items[i], i, k); mesh.count = f < 1 ? z : a; mesh.instanceMatrix.needsUpdate = true })
+      if (f >= 1) { b.from = null; shown.current = b.d }
+      return
+    }
+    if (shown.current === b.d) return
+    shown.current = b.d
+    groups.forEach((items, g) => { const mesh = refs.current[g]; if (mesh) mesh.count = upto(items, b.d) })
+  })
+  return geos.map((geo, k) => groups[k].length ? <instancedMesh key={k} ref={(el) => { refs.current[k] = el }} args={[geo, mat, groups[k].length]} onUpdate={(o) => o.layers.set(SONAR_HIDE_LAYER)} /> : null)
+}
+
 export default function Shore({ state, winter = false }) {
   const clip = useMemo(() => [new THREE.Plane(new THREE.Vector3(0, 0, -1), 1e5)], [])
   const built = useMemo(() => {
-    const trees = placeTrees(treeDensity())
+    const trees = placeTrees(fixedDensity() ?? 1) // all of them; the budget shows those with rank < density
     const tex = makeNeedleTexture()
     const mats = { ground: makeGroundMaterial(winter), tree: makeTreeMaterial(tex, winter), rock: makeRockMaterial(winter), grass: makeTuftMaterial('grass', winter), reed: makeTuftMaterial('reed', winter), ice: winter ? makeShoreIceMaterial() : null }
     for (const k in mats) if (mats[k]) mats[k].clippingPlanes = clip
@@ -50,7 +84,41 @@ export default function Shore({ state, winter = false }) {
   // the section view's wall (the lake's own cut, Scene.jsx SectionCut): keep what lies behind it
   useFrame(() => { const s = state.current; clip[0].constant = s.ice && s.view === 'section' ? s.boat.z + SECTION_CAM.cutZ : 1e5 })
 
-  const byVariant = useMemo(() => Array.from({ length: VARIANTS * 2 }, (_, k) => built.trees.filter((t) => Math.floor(t.k * VARIANTS) === k % VARIANTS && (t.d >= 24) === (k >= VARIANTS))), [built])
+  const byVariant = useMemo(() => Array.from({ length: VARIANTS * 2 }, (_, k) => built.trees.filter((t) => Math.floor(t.k * VARIANTS) === k % VARIANTS && (t.d >= 24) === (k >= VARIANTS)).sort((a, b) => a.rank - b.rank)), [built])
+  // the budget: { d: shown density, from: density being faded out (or null), t0 } — measured here, drawn by <Trees>
+  const budget = useRef({ d: 1, from: null, t0: 0 })
+  const probe = useRef({ phase: fixedDensity() != null ? 'fixed' : 'warm', t: 0, n: 0, dts: [], tier: 0, hot: [], dropped: 0, shade: null })
+  useEffect(() => { const s = state.current; s.treesSettled = probe.current.phase === 'fixed'; s.treeDensity = 1; return () => { s.treesSettled = undefined } }, [state])
+  const setTier = (tier, fade) => {
+    const P = probe.current, b = budget.current, d = TIERS[tier]
+    P.tier = tier; state.current.treeDensity = d
+    if (fade) { b.from = b.d; b.t0 = performance.now() } else b.from = null
+    b.d = d
+    P.shade = { i: 0, trees: built.trees.filter((t) => t.rank < d) } // the contact shade under the trees that went, recoloured over a few frames
+  }
+  const tMount = useRef(performance.now())
+  useFrame((_, dt) => {
+    const P = probe.current, s = state.current
+    if (SLOW.ms && performance.now() - tMount.current > SLOW.after * 1000) { const e = performance.now() + SLOW.ms; while (performance.now() < e) { /* dev: a slow device */ } }
+    if (P.shade) { const i0 = P.shade.i, i1 = Math.min(1400, i0 + 70); makeGround(P.shade.trees, winter, undefined, 1400, built.ground, i0, i1); P.shade.i = i1 + 1; if (P.shade.i > 1400) P.shade = null }
+    if (P.phase === 'fixed' || dt > 1 || dt <= 0) return // a hidden tab says nothing about this device's speed (a very slow one still counts)
+    P.t += dt; P.n++
+    if (P.phase === 'warm') { if (P.n > 6 && P.t > 0.4) { P.phase = 'probe'; P.t = 0; P.dts = [] } return } // shaders compiled, first frames past
+    if (P.phase === 'probe') { // under the loading cover: 1.2 s, then once more for 0.8 s after a step down
+      P.dts.push(dt)
+      if (P.t < (P.tier ? 0.8 : 1.2)) return
+      const fps = 1 / median(P.dts)
+      s.treeFps = Math.round(fps) // dev: what it measured
+      if (fps >= FPS_OK || P.tier === TIERS.length - 1 || P.tier >= 2) { P.phase = 'watch'; P.t = 0; P.dts = []; s.treesSettled = true; return }
+      setTier(Math.min(TIERS.length - 1, P.tier + (fps < 15 ? 3 : fps < 25 ? 2 : 1)), false); P.t = 0; P.dts = []
+      return
+    }
+    // watching: a phone that warms up and slows down loses one more tier, gently
+    P.hot.push(dt); P.hotT = (P.hotT || 0) + dt
+    if (P.hotT < 6) return // judged every 6 s
+    const fpsNow = 1 / median(P.hot); P.hot = []; P.hotT = 0
+    if (P.dropped < 1 && P.tier < TIERS.length - 1 && fpsNow < FPS_HOT) { P.dropped++; setTier(P.tier + 1, true); s.treeFps = Math.round(fpsNow) }
+  })
   const placeTree = useMemo(() => (it, p, e, s) => { p.set(it.x, landY(it.d, it.t, winter) - 0.06 * it.h, it.z); e.set(it.lean[0], it.rot, it.lean[1]); s.set(it.h * it.w, it.h, it.h * it.w * 0.95) }, [winter])
   const placeRock = useMemo(() => (it, p, e, s) => { const y = it.d < 0 ? bedY(it.x, it.z) : landY(it.d, it.t, winter); p.set(it.x, y - it.s * (winter ? 0.32 : 0.18), it.z); e.set(it.tilt, it.rot, it.tilt * 0.6); s.set(it.s * 1.1, it.s * 0.62, it.s) }, [winter])
   const placeTuft = useMemo(() => (it, p, e, s) => { const y = it.d < 0 ? bedY(it.x, it.z) : landY(it.d, it.t, winter); p.set(it.x, y - 0.02, it.z); e.set(0, it.rot, 0); s.set(it.s, it.s * (winter ? 0.6 : 1), it.s) }, [winter])
@@ -59,7 +127,7 @@ export default function Shore({ state, winter = false }) {
     <group>
       <mesh geometry={built.ground} material={built.mats.ground} onUpdate={(o) => o.layers.set(SONAR_HIDE_LAYER)} />
       {built.shoreIce && <mesh geometry={built.shoreIce} material={built.mats.ice} onUpdate={(o) => o.layers.set(SONAR_HIDE_LAYER)} />}
-      {built.conifers.map((g, k) => <Instances key={'t' + k} geo={g} mat={built.mats.tree} items={byVariant[k]} place={placeTree} />)}
+      <Trees geos={built.conifers} mat={built.mats.tree} groups={byVariant} place={placeTree} budget={budget} />
       {built.rocks.map((g, k) => <Instances key={'r' + k} geo={g} mat={built.mats.rock} items={rocksBy[k]} place={placeRock} />)}
       <Instances geo={built.grass} mat={built.mats.grass} items={built.tufts.grass} place={placeTuft} />
       <Instances geo={built.reed} mat={built.mats.reed} items={built.tufts.reed} place={placeTuft} />

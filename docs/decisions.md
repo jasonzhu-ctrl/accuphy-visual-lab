@@ -3838,3 +3838,23 @@ Numbered log. Newest at the bottom.
        - S: 2.4 m, 5.0 ft; SW 4.3 m, 17.8 ft; W 4.3 m, 18.4 ft; NW 4.6 m, 43.4 ft; N 5.4 m, 23.5 ft — all pictures lit
          (2.8–38 %).
        - The shore and its trees in view at every stop, desktop and phone; 0 errors.
+
+210. **2026-11-02** — **The shore's trees adapt to the device: its own frame rate decides how many it draws (test version)**
+     (Jason in Lab HQ: "OK, auto-adjust"). Only the number of trees changes — never a tree's detail, the shore, the sand or
+     snow, or the sonar (#50, #205).
+     - **How** (`Shore.jsx`): every device starts with all the trees. Once the first frames are past (shaders compiled), it
+       measures 1.2 s of frames (the median frame time). At ≥ 45 fps it keeps them all; below, it steps down — one tier, two
+       under 25 fps, three under 15 — and measures 0.8 s once more (one more step if still slow). Tiers: all, 60 %, 35 %, 20 %;
+       a tree stays or goes by a fixed rank, so each tier thins the one above evenly. The contact shade under trees that went
+       is redrawn over ~20 frames (5 ms each).
+     - **Why 45 fps:** on a 60 Hz screen a drag below ~45 fps visibly stutters; 45 also leaves room for a phone that warms up.
+     - **Under the cover:** the loading cover (`index.jsx`) and the tour (`Tour.jsx`) wait until the budget has settled, at
+       most 3 s after the scene's first frames, so no visitor sees a tree go. Cost on a fast machine: the cover lifts at
+       ~3.8 s instead of ~2.0 s (share build, measured).
+     - **Later:** judged every 6 s; under 30 fps one more tier goes, once, the trees shrinking away over 1.2 s (not a jump).
+     - **Triangles** (trees): all 0.96 M (1,886 trees), 60 % 0.58 M, 35 % 0.34 M, 20 % 0.19 M.
+     - `?trees=0.1 … 1` still fixes the density (testing). Dev only: `?slowms=N` adds N ms to every frame and `?slowafter=S`
+       starts it after S s (a slow or warming phone; headless Chrome never slows its frame loop for a slow GPU).
+     - **Checked:** a fast machine keeps all (60 fps); +12 ms a frame: keeps all; +25 ms (37 fps): 60 % then 35 %; +60 ms
+       (16 fps): 35 % at once; warming (+45 ms after 8 s): one tier down at 22 fps, the trees shrinking away; the tours on the
+       lake, Mini and ice pages as before; production builds of all three pages; 0 errors. Not measured on a real phone.

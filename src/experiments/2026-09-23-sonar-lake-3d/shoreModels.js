@@ -57,9 +57,10 @@ export function placeTrees(n = 1, R = shoreR) {
     const h = lerp(2.2 + rnd() * 2.8, 5 + rnd() * 8, near) * (0.78 + 0.45 * grp)
     const k = rnd(), w = 0.72 + rnd() * 0.56
     if (fbm(t * 5 + 2, d * 0.04, 3) < 0.38) continue // clearings
-    if (rnd() > n) continue // density (phones: fewer trees, each as fine)
+    const rank = rnd() // the density budget keeps the trees with rank < density (the same set ?trees= always chose)
+    if (rank > n) continue
     const r = R(t) + d
-    out.push({ t, d, x: r * Math.cos(t), z: r * Math.sin(t), h, w, k, rot: rnd() * TAU, lean: [(rnd() - 0.5) * 0.07, (rnd() - 0.5) * 0.07] })
+    out.push({ t, d, x: r * Math.cos(t), z: r * Math.sin(t), h, w, k, rank, rot: rnd() * TAU, lean: [(rnd() - 0.5) * 0.07, (rnd() - 0.5) * 0.07] })
   }
   return out
 }
@@ -67,9 +68,11 @@ export function placeTrees(n = 1, R = shoreR) {
 // ---- the ground strip round the lake: from just under the waterline out into the fog ----
 // vertex colour = the zone (wet sand, sand, grass, forest floor; or ice rim, snow, shaded snow), times baked contact shade
 // under the trees; aZone (x: wet band, y: shade) feeds the material's fine detail.
-export function makeGround(trees, winter, R = shoreR, N = 1400) {
+// target, i0, i1: recolour that ground over strips i0…i1 only (the contact shade after the tree budget drops some trees;
+// Shore.jsx spreads it over a few frames)
+export function makeGround(trees, winter, R = shoreR, N = 1400, target = null, i0 = 0, i1 = N) {
   const M = PROF.length, cnt = (N + 1) * M
-  const pos = new Float32Array(cnt * 3), col = new Float32Array(cnt * 3), zone = new Float32Array(cnt * 2)
+  const pos = target ? target.attributes.position.array : new Float32Array(cnt * 3), col = target ? target.attributes.color.array : new Float32Array(cnt * 3), zone = target ? target.attributes.aZone.array : new Float32Array(cnt * 2)
   // trees binned by angle, for the contact shade
   const BINS = 720, bins = Array.from({ length: BINS }, () => [])
   for (const tr of trees) bins[Math.floor((tr.t / TAU) * BINS) % BINS].push(tr)
@@ -77,14 +80,13 @@ export function makeGround(trees, winter, R = shoreR, N = 1400) {
     ? { rim: C('#c4d6e6'), rim2: C('#e2ecf6'), snow: C('#eef2f8'), shade: C('#c8d4e6'), forest: C('#b9c6da') }
     : { wet: C('#5e5544'), sand: C('#b2a484'), sand2: C('#9c8f70'), grass: C('#566e40'), grass2: C('#687a48'), floor: C('#3a4630'), floor2: C('#4a4a34') }
   const c = new THREE.Color()
-  for (let i = 0; i <= N; i++) {
+  for (let i = i0; i <= i1; i++) {
     const t = (i / N) * TAU, r0 = R(t), cs = Math.cos(t), sn = Math.sin(t)
     for (let j = 0; j < M; j++) {
       const jit = j > 2 && j < M - 1 ? (fbm(t * 30, j * 0.7, 3) - 0.5) * 0.3 * Math.min(1, PROF[j] / 3) : 0
       const d = PROF[j] + jit, r = r0 + d, k = i * M + j
       const x = r * cs, z = r * sn
-      let y = d < 0 ? bedY(x, z) + 0.015 : landY(d, t, winter) // under the water: on the lakebed's own rise (terrain.js)
-      pos[k * 3] = x; pos[k * 3 + 1] = y; pos[k * 3 + 2] = z
+      if (!target) { pos[k * 3] = x; pos[k * 3 + 1] = d < 0 ? bedY(x, z) + 0.015 : landY(d, t, winter); pos[k * 3 + 2] = z } // under the water: on the lakebed's own rise (terrain.js)
       const n1 = fbm(t * 60, d * 0.4, 3), n2 = fbm(t * 13 + 5, d * 0.08, 3)
       // contact shade (soft AO) from the trees near this point, darkest at the trunk
       let ao = 0
@@ -113,6 +115,7 @@ export function makeGround(trees, winter, R = shoreR, N = 1400) {
       zone[k * 2] = wet; zone[k * 2 + 1] = ao
     }
   }
+  if (target) { target.attributes.color.needsUpdate = true; target.attributes.aZone.needsUpdate = true; return target }
   const idx = []
   for (let i = 0; i < N; i++) for (let j = 0; j < M - 1; j++) { const a = i * M + j, b = (i + 1) * M + j; idx.push(a, b, a + 1, b, b + 1, a + 1) }
   const g = new THREE.BufferGeometry()

@@ -75,7 +75,8 @@ export default function Tour({ script, auto, phone, mode, deviceId, state, onSho
   useEffect(() => {
     if (!auto) { setPhase('done'); return }
     let begun = false
-    const begin = () => { if (!begun) { begun = true; later(start, START_MS) } }
+    const settled = (fn) => (state.current.treesSettled === false ? later(() => settled(fn), 100) : fn()) // the shore's tree budget is still measuring under the cover (#210)
+    const begin = () => { if (!begun) { begun = true; settled(() => later(start, START_MS)) } }
     if (sentEvents.has('ready')) begin()
     const on = (e) => { if (e.detail?.event === 'ready') begin() }
     window.addEventListener('accuphy-lab', on)
