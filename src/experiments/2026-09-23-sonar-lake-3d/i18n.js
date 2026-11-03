@@ -1,11 +1,16 @@
-// The Lab's two languages (X-6L-fr, 2026-10-25; Jason 2026-10-17: 做法语版，魁北克也投). Only `?lang=fr` on the Lab's own
+// The Lab's languages (X-6L-fr, 2026-10-25; Jason 2026-10-17: 做法语版，魁北克也投). Only `?lang=fr` on the Lab's own
 // URL switches to French — the store's French page puts it on the iframe address; nothing is read from the parent page
 // or the browser. Default English. Terms follow accuphy-website/docs/glossary.csv (fr column); PingLive, PingLive Mini,
 // Down Scan and CHIRP are never translated. Every string a visitor can see lives here; numbers and units stay as they are.
 // The French was reviewed by the website HQ on 2026-10-26 (accuphy-website/handoffs/2026-10-26-lab-fr-strings-review.md):
 // store wording outside the phone (Vue avant, vue vers le bas, Faites glisser…), the real app's French inside the phone
 // (Vue inférieure, Paramètres / Accueil / Map, Panoramique en direct…). Table: docs/2026-10-25-lab-fr-strings.md.
-export const LANG = (() => { try { return new URLSearchParams(window.location.search).get('lang') === 'fr' ? 'fr' : 'en' } catch { return 'en' } })()
+// Base multilingual (#212, Jason 11-03): `?lang=` also takes de / nl / pl / lv — the store's bridge sends the same six (website #228).
+// Anything else is English, and a line with no text in that language falls back to English (t() below).
+export const LANGS = ['en', 'fr', 'de', 'nl', 'pl', 'lv']
+export const LANG = (() => { try { const l = (new URLSearchParams(window.location.search).get('lang') || '').trim().toLowerCase(); return LANGS.includes(l) ? l : 'en' } catch { return 'en' } })()
+// Metres first for the European languages (#212); the visitor can still tap a value to switch. en and fr (Canada) stay in feet.
+export const METRIC_FIRST = ['de', 'nl', 'pl', 'lv'].includes(LANG)
 
 const S = {
   // control panel

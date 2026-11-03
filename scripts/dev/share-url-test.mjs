@@ -17,6 +17,13 @@ const cases = [
   { shop: null, lang: 'fr', expect: 'https://shop.accuphy.com/fr/pages/lab?utm_source=lab_share&utm_medium=referral&utm_content=qr&utm_campaign=bf2026_lab_ca', note: 'no shop, ?lang=fr' },
   { shop: null, expect: 'https://shop.accuphy.com/pages/lab?utm_source=lab_share&utm_medium=referral&utm_content=qr&utm_campaign=bf2026_lab_ca', note: 'nothing: Canada' },
   { shop: '/en-us', medium: 'copy', expect: 'https://shop.accuphy.com/en-us/pages/lab?utm_source=lab_share&utm_medium=referral&utm_content=copy&utm_campaign=bf2026_lab_us' },
+  // #212: the share carries the visitor's language for de / nl / pl / lv; en and fr links are unchanged
+  { shop: '/de-de', lang: 'de', expect: 'https://shop.accuphy.com/de-de/pages/lab?utm_source=lab_share&utm_medium=referral&utm_content=qr&utm_campaign=bf2026_lab_de&lang=de' },
+  { shop: '/nl-benelux', lang: 'nl', expect: 'https://shop.accuphy.com/nl-benelux/pages/lab?utm_source=lab_share&utm_medium=referral&utm_content=qr&utm_campaign=bf2026_lab_be&lang=nl' },
+  { shop: '/en-pl', lang: 'pl', expect: 'https://shop.accuphy.com/en-pl/pages/lab?utm_source=lab_share&utm_medium=referral&utm_content=qr&utm_campaign=bf2026_lab_pl&lang=pl', note: 'Polish ad' },
+  { shop: null, lang: 'lv', expect: 'https://shop.accuphy.com/pages/lab?utm_source=lab_share&utm_medium=referral&utm_content=qr&utm_campaign=bf2026_lab_ca&lang=lv', note: 'opened on its own' },
+  { shop: '/fr', lang: 'fr', expect: 'https://shop.accuphy.com/fr/pages/lab?utm_source=lab_share&utm_medium=referral&utm_content=qr&utm_campaign=bf2026_lab_ca', note: 'fr unchanged' },
+  { shop: '/de-de', lang: 'es', expect: 'https://shop.accuphy.com/de-de/pages/lab?utm_source=lab_share&utm_medium=referral&utm_content=qr&utm_campaign=bf2026_lab_de', note: 'unknown language → English, no lang' },
 ]
 const decode = (text, s = 4) => { // the same encoder as the page, rendered to pixels with a 4-module quiet zone, read back with jsQR
   const qr = qrcode(0, 'M'); qr.addData(text); qr.make(); const n = qr.getModuleCount(), q = 4 * s, w = n * s + 2 * q

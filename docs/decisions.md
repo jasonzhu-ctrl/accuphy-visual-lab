@@ -3891,6 +3891,12 @@ Numbered log. Newest at the bottom.
        Machine translation is a draft only. Live needs Jason's 动 in Lab HQ; going live also changes the store's /de-de and
        /nl-benelux Lab automatically, so review comes first.
      - Still to settle with Jason: who reviews Polish and Latvian; the final English of the tour's three lines.
+     - **Code done (Base, 11-03; no strings yet, not live):** `i18n.js` `LANGS` = en fr de nl pl lv, anything else → English, a line
+       without that language → English. `METRIC_FIRST` (de nl pl lv) starts the page in metres (`index.jsx`); tapping a value still
+       switches; en and fr stay in feet. `embed.js` reads the same six; the share link adds `&lang=` for de nl pl lv only, so en and fr
+       links are byte-for-byte as before (`scripts/dev/share-url-test.mjs`, 22 cases). The store paths (`LANG_PATH`) still change for
+       fr only. Fonts: both woff2 subsets add Latin Extended-A U+0100–017F (#180 recipe): Instrument Sans 36.0 → 40.5 KB, Eurostile
+       Heavy 17.9 → 22.5 KB (+9.2 KB). `public/brand/fonts/` and `src/index.css` serve every page, so `/mini/`, `/ice/` get the letters too.
      Plan: `docs/2026-11-03-multilang-base-plan.md`.
 
 213. **2026-11-03** — **Black Friday locked version: a copy of the base with the #191 lock on, and it takes over the store's Lab**

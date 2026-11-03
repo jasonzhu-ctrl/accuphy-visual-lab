@@ -33,8 +33,8 @@ export function isEmbedded() {
 // fbclid and such from the ad; they are never read here except to pass along when the Lab is opened on its own.
 const STORE = 'https://shop.accuphy.com'
 export const PRODUCT = { PL: 'pinglive-sonar', PLM: 'pinglive-mini' }
-const LANG = (() => { try { return new URLSearchParams(window.location.search).get('lang') === 'fr' ? 'fr' : 'en' } catch { return 'en' } })() // ?lang=fr → the store's French pages (/fr/products/…), X-6L-fr
-export const LANG_PATH = LANG === 'fr' ? '/fr' : ''
+const LANG = (() => { try { const l = (new URLSearchParams(window.location.search).get('lang') || '').trim().toLowerCase(); return ['en', 'fr', 'de', 'nl', 'pl', 'lv'].includes(l) ? l : 'en' } catch { return 'en' } })() // the same six as i18n.js (#212); only fr picks a store path below
+export const LANG_PATH = LANG === 'fr' ? '/fr' : '' // ?lang=fr → the store's French pages (/fr/products/…), X-6L-fr
 
 // The market root (website #228, handoffs/2026-10-28-lab-shop-prefix-from-website.md; Jason 2026-10-28 to the website HQ: "修复"):
 // the store's bridge passes `shop` = Liquid routes.root_url — "/" (Canada, English), "/fr", "/en-us", "/de-de", "/fr-benelux",
@@ -81,6 +81,9 @@ export function shareUrl(medium) {
   const root = shopRoot(); const path = (root !== null ? root : LANG_PATH) + '/pages/lab'
   const u = new URL(path, STORE)
   u.searchParams.set('utm_source', 'lab_share'); u.searchParams.set('utm_medium', 'referral'); u.searchParams.set('utm_content', medium); u.searchParams.set('utm_campaign', 'bf2026_lab_' + shareMarket())
+  // the friend sees the same language (#212): the store's bridge passes the page's ?lang= into the Lab (website #228). en and fr
+  // links stay as they were — fr already comes from the /fr root — so only de / nl / pl / lv add it.
+  if (['de', 'nl', 'pl', 'lv'].includes(LANG)) u.searchParams.set('lang', LANG)
   return u.href
 }
 
