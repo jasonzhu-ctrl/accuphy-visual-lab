@@ -70,3 +70,7 @@ Jason 看了静帧，说片子有问题，给了新方向（11-03，Lab HQ）：
 
 - 分镜图每格都有编号、时间、字幕、声音四样，Mini 和 PingLive 各一排。
 - 所有字都在红线中间。
+
+## 反馈页（11-03）
+
+Jason 要每张分镜下面能直接打字反馈：https://claude.ai/artifact/WSZb4nFQxdTqwFsaytmLa6 （私人页，意见存在页面数据库 `feedback` 里，一格一条，HQ 用 ArtifactData 读）。图片从 `docs/2026-11-03-ad-base-script.jpg` 裁出。
