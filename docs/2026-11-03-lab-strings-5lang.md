@@ -4,7 +4,10 @@
 `src/experiments/2026-09-23-sonar-lake-3d/i18n.js` 里的键（来源：i18n.js @ e715574，每个键都在代码里查过用在哪）。
 
 **状态：除了标“已核”的法语，全部是草稿，待核。** 草稿是机器翻的，只能当草稿用，要有人核过才能放进代码（#212）。
-法、德、荷由网站核；波兰语、拉脱维亚语由谁核还没定（问题已交 HQ 转给网站）。核好的字由 HQ 交给 Base 放进 `i18n.js`。
+谁来核还在等 Jason 定：网站 11-03 回答，按 #238 网站不核 Lab 的字（Jason 要网站核，得在 Lab HQ 说一句）；
+波兰语网站 #178 的做法是先内部对照 Prime Power 波兰语网店审、反译回英文，拉脱维亚语网站没有人也没有路子。
+**先别开始核。** 核好的字由 HQ 交给 Base 放进 `i18n.js`。核的时候照这个顺序：线上已核原文（德语看 /de-de，荷兰语看
+/nl-benelux，法语看 /fr）→ glossary.csv → 大品牌。
 这份表本身不改任何代码。
 
 ## 怎么读
@@ -16,11 +19,14 @@
   i18n.js 里标着 “FR draft” 的、或找不到核过记录的，fr 也算草稿。
 - `{device}`、`{view}`、`{beam}`、`{name}`、`{store}`、`{keys}` 是程序代进去的词，不翻，位置可以挪。
   `{view}` 代进去的是 App 格子名（照 App），`{name}` 是 PingLive / PingLive Mini。
-- **称呼（待网站定）**：德语草稿用 “Sie”（店铺主题 de.json 是 Sie），荷兰语用 “je”，波兰语用界面常见的第二人称命令式，
-  拉脱维亚语用敬称复数（Velciet…）。网站定了别的，草稿跟着改。
-- App 有哪些语言：网站 10-26 解析安装包（0615 dev 版）记在 glossary.csv 的 `app-view-names` 一行，写的是
-  “the app has de/fr/ja/pl/ru/zh, no nl/ro/es”。所以 **de、pl 的“照 App”格子要从 App 抄原字（下表先空着，写“待取 App 原字”）；
-  nl、lv 先照规矩留英文**。这一条已在问网站确认（安装包新版有没有加语言）。
+- **称呼（定了）**：德语用 Sie，荷兰语用 je，跟线上店铺一致（网站 11-03 数过线上 PingLive 页：/de-de 全是 Sie / Ihr，
+  /nl-benelux 基本是 je）。波兰语用界面常见的第二人称命令式，拉脱维亚语用敬称复数（Velciet…），这两种跟着核的人定。
+- App 有哪些语言（网站 11-03 重读安装包 0615 dev 版，唯一的安装包）：App 自己的字只有 de / fr / ja / pl / ru / zh，
+  **没有 nl、lv**。所以 **de、pl 的“照 App”格子抄 App 原字（已填）；nl、lv 手机框里留英文**（网站同意）。
+  Map 哪种语言都不翻。App 里没有 “FORWARD / DOWN” 这类小字，combo_fwd / combo_down 按“翻”处理。
+  注意：这是 6 月的 dev 版，正式版 App 还没在平板上核过（网站 T-066）；App 的说法和店铺不一定一样
+  （德语 App 的 Down View 叫 “Boden-Scan-Ansicht”，Chirp Sonar 德、波都叫“经典声纳”）。手机框里照 App，手机外面照店铺。
+  出处：`accuphy-website/handoffs/2026-11-03-lab-multilang-questions.md` 的回答。
 
 ## 一、控制面板（电脑左边）
 
@@ -46,7 +52,7 @@
 |---|---|---|---|---|---|---|---|---|---|
 | hint_boat | 船上方的提示 | Drag the boat to move it | Faites glisser le bateau pour le déplacer | Ziehen Sie das Boot, um es zu bewegen | Sleep de boot om hem te verplaatsen | Przeciągnij łódź, aby ją przesunąć | Velciet laivu, lai to pārvietotu | 翻 | fr 已核；de/nl/pl/lv 草稿，待核 |
 | shore_edge | 船或点击碰到岸边 | Shoreline — the lake ends here | La rive : le lac s’arrête ici | Ufer – hier endet der See | Oever – hier eindigt het meer | Brzeg – tu kończy się jezioro | Krasts – šeit ezers beidzas | 翻 | 全部草稿，待核 |
-| toast_phone | 手机：点了 App 控件 | These are the app’s own controls — Home, range, gain and pause work. | Ce sont les commandes de l’application : Accueil, portée, gain et pause fonctionnent. | Das sind die Bedienelemente der App – Home, Reichweite, Verstärkung und Pause funktionieren. | Dit zijn de eigen knoppen van de app – Home, bereik, versterking en pauze werken. | To są przyciski samej aplikacji – działają Home, zasięg, wzmocnienie i pauza. | Šīs ir lietotnes pašas vadīklas – darbojas Home, diapazons, pastiprinājums un pauze. | 翻 | fr 已核；de/nl/pl/lv 草稿，待核。“Home” 要跟 App 底栏同一个字（de、pl 用 App 原字） |
+| toast_phone | 手机：点了 App 控件 | These are the app’s own controls — Home, range, gain and pause work. | Ce sont les commandes de l’application : Accueil, portée, gain et pause fonctionnent. | Das sind die Bedienelemente der App – Startseite, Reichweite, Verstärkung und Pause funktionieren. | Dit zijn de eigen knoppen van de app – Home, bereik, versterking en pauze werken. | To są przyciski samej aplikacji – działają: Strona główna, zasięg, wzmocnienie i pauza. | Šīs ir lietotnes pašas vadīklas – darbojas Home, diapazons, pastiprinājums un pauze. | 翻 | fr 已核；de/nl/pl/lv 草稿，待核。“Home” 跟 App 底栏同一个字：de Startseite、pl Strona główna（App 原字），nl、lv 留 Home |
 | toast_desktop | 电脑：点了 App 控件 | These are the app’s own controls — use the panel to change the view. | Ce sont les commandes de l’application : changez de vue dans le panneau. | Das sind die Bedienelemente der App – die Ansicht wechseln Sie im Bedienfeld. | Dit zijn de eigen knoppen van de app – wissel van weergave in het paneel. | To są przyciski samej aplikacji – widok zmienisz w panelu. | Šīs ir lietotnes pašas vadīklas – skatu mainiet panelī. | 翻 | fr 已核；de/nl/pl/lv 草稿，待核 |
 | gl_lost_title | 3D 停了的卡片 | The 3D view stopped | La vue 3D s’est arrêtée | Die 3D-Ansicht wurde angehalten | De 3D-weergave is gestopt | Widok 3D się zatrzymał | 3D skats apstājās | 翻 | 全部草稿，待核（fr 没见核过记录） |
 | gl_lost_text | 同上 | Your browser freed the graphics memory. Tap to reload the lake. | Votre navigateur a libéré la mémoire graphique. Touchez pour recharger le lac. | Ihr Browser hat den Grafikspeicher freigegeben. Tippen Sie, um den See neu zu laden. | Je browser heeft het grafische geheugen vrijgegeven. Tik om het meer opnieuw te laden. | Przeglądarka zwolniła pamięć graficzną. Dotknij, aby ponownie wczytać jezioro. | Jūsu pārlūks atbrīvoja grafikas atmiņu. Pieskarieties, lai vēlreiz ielādētu ezeru. | 翻 | 全部草稿，待核（fr 没见核过记录） |
@@ -96,21 +102,21 @@ PingLive 的三站：拖船（Down）→ 点 Forward → 点 Panoramic；Mini �
 
 | key | 位置 | en | fr | de | nl | pl | lv | 类别 | 状态 |
 |---|---|---|---|---|---|---|---|---|---|
-| tile_panoramic | PingLive 格子 | Panoramic View | Vue panoramique | 待取 App 原字 | Panoramic View | 待取 App 原字 | Panoramic View | 照 App | fr 已核（App 原字）；de/pl 等网站从安装包取；nl/lv 留英文，待网站确认 App 没这两种语言 |
-| tile_forward | PingLive 格子 | Forward View | Vue avant | 待取 App 原字 | Forward View | 待取 App 原字 | Forward View | 照 App | 同上 |
-| tile_down | PingLive 格子 | Down View | Vue inférieure | 待取 App 原字 | Down View | 待取 App 原字 | Down View | 照 App | 同上 |
-| tile_live_panoramic | Mini 格子 | Live Panoramic | Panoramique en direct | 待取 App 原字 | Live Panoramic | 待取 App 原字 | Live Panoramic | 照 App | 同上 |
-| tile_live_forward | Mini 格子 | Live Forward | Avant en direct | 待取 App 原字 | Live Forward | 待取 App 原字 | Live Forward | 照 App | 同上 |
-| tile_live_down | Mini 格子 | Live Down | Dessous en direct | 待取 App 原字 | Live Down | 待取 App 原字 | Live Down | 照 App | 同上 |
-| tile_live_combo | Mini 格子 | Live Combo | Combinée en direct | 待取 App 原字 | Live Combo | 待取 App 原字 | Live Combo | 照 App | 同上 |
-| tile_downscan | Mini 格子（点了出 na_moving） | Down Scan | Balayage vers le bas | 待取 App 原字 | Down Scan | 待取 App 原字 | Down Scan | 照 App | 同上 |
-| tile_chirp | Mini 格子（点了出 na_moving） | Chirp Sonar | Sondeur CHIRP | 待取 App 原字 | Chirp Sonar | 待取 App 原字 | Chirp Sonar | 照 App | 同上 |
-| tile_ice | Mini 格子（通往冰钓页，格子在 `/` 上看得到） | Ice Fishing | Pêche sur glace | 待取 App 原字 | Ice Fishing | 待取 App 原字 | Ice Fishing | 照 App | 同上 |
-| tile_live_ice | Mini 格子（同上） | Live Ice Fishing | Pêche sur glace en direct | 待取 App 原字 | Live Ice Fishing | 待取 App 原字 | Live Ice Fishing | 照 App | 同上 |
-| tab_setting | 底栏 | Setting | Paramètres | 待取 App 原字 | Setting | 待取 App 原字 | Setting | 照 App | 同上 |
-| tab_home | 底栏 | Home | Accueil | 待取 App 原字 | Home | 待取 App 原字 | Home | 照 App | 同上 |
-| tab_map | 底栏 | Map | Map | 待取 App 原字 | Map | 待取 App 原字 | Map | 照 App | 同上（法语 App 也没翻 Map） |
-| combo_fwd | 手机里 Combo 两个量程上的小字 | FORWARD | AVANT | VORNE | VOORUIT | PRZÓD | PRIEKŠĀ | 翻（若 App 自己有这两个字就改照 App） | 全部草稿，待核（fr 没见核过记录）；网站取 App 原字时顺便看 App 有没有 |
+| tile_panoramic | PingLive 格子 | Panoramic View | Vue panoramique | Panoramablick | Panoramic View | Widok panoramiczny | Panoramic View | 照 App | de/pl 照 App 原字（网站 11-03 读安装包）；nl/lv 留英文（App 没这两种语言，网站同意）；fr 已核 |
+| tile_forward | PingLive 格子 | Forward View | Vue avant | Vorwärtsansicht | Forward View | Widok przedni | Forward View | 照 App | de/pl 照 App 原字（网站 11-03 读安装包）；nl/lv 留英文（App 没这两种语言，网站同意）；fr 已核 |
+| tile_down | PingLive 格子 | Down View | Vue inférieure | Boden-Scan-Ansicht | Down View | Widok skanowania dna | Down View | 照 App | de/pl 照 App 原字（网站 11-03 读安装包）；nl/lv 留英文（App 没这两种语言，网站同意）；fr 已核 |
+| tile_live_panoramic | Mini 格子 | Live Panoramic | Panoramique en direct | Live-Panorama | Live Panoramic | Panorama Live | Live Panoramic | 照 App | de/pl 照 App 原字（网站 11-03 读安装包）；nl/lv 留英文（App 没这两种语言，网站同意）；fr 已核 |
+| tile_live_forward | Mini 格子 | Live Forward | Avant en direct | Live-Voraus | Live Forward | W przód Live | Live Forward | 照 App | de/pl 照 App 原字（网站 11-03 读安装包）；nl/lv 留英文（App 没这两种语言，网站同意）；fr 已核 |
+| tile_live_down | Mini 格子 | Live Down | Dessous en direct | Live-Unten | Live Down | W dół Live | Live Down | 照 App | de/pl 照 App 原字（网站 11-03 读安装包）；nl/lv 留英文（App 没这两种语言，网站同意）；fr 已核 |
+| tile_live_combo | Mini 格子 | Live Combo | Combinée en direct | Live-Kombi | Live Combo | Combo Live | Live Combo | 照 App | de/pl 照 App 原字（网站 11-03 读安装包）；nl/lv 留英文（App 没这两种语言，网站同意）；fr 已核 |
+| tile_downscan | Mini 格子（点了出 na_moving） | Down Scan | Balayage vers le bas | Boden-Scan | Down Scan | Skanowanie dna | Down Scan | 照 App | de/pl 照 App 原字（网站 11-03 读安装包）；nl/lv 留英文（App 没这两种语言，网站同意）；fr 已核。App 德语写 Boden-Scan，手机外面仍是 Down Scan |
+| tile_chirp | Mini 格子（点了出 na_moving） | Chirp Sonar | Sondeur CHIRP | Klassisches Sonar | Chirp Sonar | Klasyczny sonar | Chirp Sonar | 照 App | de/pl 照 App 原字（网站 11-03 读安装包）；nl/lv 留英文（App 没这两种语言，网站同意）；fr 已核。App 德、波都写“经典声纳”，不是 CHIRP，照 App |
+| tile_ice | Mini 格子（通往冰钓页，格子在 `/` 上看得到） | Ice Fishing | Pêche sur glace | Eisangel | Ice Fishing | Podlodowe | Ice Fishing | 照 App | de/pl 照 App 原字（网站 11-03 读安装包）；nl/lv 留英文（App 没这两种语言，网站同意）；fr 已核 |
+| tile_live_ice | Mini 格子（同上） | Live Ice Fishing | Pêche sur glace en direct | Live-Eisangeln | Live Ice Fishing | Podlodowe Live | Live Ice Fishing | 照 App | de/pl 照 App 原字（网站 11-03 读安装包）；nl/lv 留英文（App 没这两种语言，网站同意）；fr 已核 |
+| tab_setting | 底栏 | Setting | Paramètres | Einstellungen | Setting | Ustawienia | Setting | 照 App | de/pl 照 App 原字（网站 11-03 读安装包）；nl/lv 留英文（App 没这两种语言，网站同意）；fr 已核 |
+| tab_home | 底栏 | Home | Accueil | Startseite | Home | Strona główna | Home | 照 App | de/pl 照 App 原字（网站 11-03 读安装包）；nl/lv 留英文（App 没这两种语言，网站同意）；fr 已核 |
+| tab_map | 底栏 | Map | Map | Map | Map | Map | Map | 照 App | Map 哪种语言都不翻（App 各语言都显示 Map） |
+| combo_fwd | 手机里 Combo 两个量程上的小字 | FORWARD | AVANT | VORNE | VOORUIT | PRZÓD | PRIEKŠĀ | 翻（App 里没有这两个字，网站 11-03 查过） | 全部草稿，待核（fr 没见核过记录） |
 | combo_down | 同上 | DOWN | BAS | UNTEN | OMLAAG | DÓŁ | LEJĀ | 同上 | 同上 |
 | na_moving | 点 Down Scan / Chirp 后的提示 | {view} needs the boat moving slowly, so it isn’t available in this simulation yet. | {view} exige que le bateau avance lentement : cette vue n’est donc pas encore disponible dans cette simulation. | {view} braucht ein langsam fahrendes Boot und ist in dieser Simulation deshalb noch nicht verfügbar. | {view} vraagt om een langzaam varende boot en is daarom nog niet beschikbaar in deze simulatie. | Tryb {view} wymaga powoli płynącej łodzi, dlatego nie jest jeszcze dostępny w tej symulacji. | Skatam {view} vajadzīga lēni braucoša laiva, tāpēc šajā simulācijā tas vēl nav pieejams. | 翻（{view} 照 App） | fr 已核；de/nl/pl/lv 草稿，待核 |
 
@@ -144,3 +150,6 @@ App Store、Google Play、“ACCUPHY | LAB” 标题、AUTO、数字和单位、
 
 - 2026-11-03 Lab 多语言：建表。字来自 i18n.js @ e715574；法语“已核”对照网站 10-26、10-31 两张单子和 #198 / #186 / #184 的记录。
   其余全部是机器草稿，待核。
+- 2026-11-03 Lab 多语言：照网站 11-03 的回答更新（HQ 转）：填 de、pl 的 App 原字（12 个首页格子 + 底栏），Map 不翻；
+  combo_fwd / combo_down 改成“翻”；称呼定为德 Sie、荷 je；toast_phone 里的 “Home” 换成 App 底栏的字（de Startseite，
+  pl Strona główna）。谁来核还在等 Jason，先不核。
