@@ -15,7 +15,7 @@ const clamp = (u) => Math.min(1, Math.max(0, u)), lerp = (a, b, u) => a + (b - a
 const CAM = JSON.parse(process.env.CAMS || '{}')
 // step 1 (cap8.mjs 'rec', the move Jason likes): bx 8, bz 5; pos [bx+6+(k−1)·3, 11k, bz+26k], look [bx+13, −7, bz], fov 42, k 1 → 1.6
 const bx = 8, bz = 5
-const step1 = (u) => { const k = 1 + 0.6 * sstep(u); return { cam: { pos: [bx + 6 + (k - 1) * 3, 11 * k, bz + 26 * k], look: [bx + 13, -7, bz], fov: 42 }, target: [lerp(8, 15, smoother(clamp((u - 0.08) / 0.84))), 5] } }
+const step1 = (u) => { const k = 1 + 0.6 * sstep(u); return { cam: { pos: [bx + 6 + (k - 1) * 3, 11 * k, bz + 26 * k], look: [bx + 13, -7, bz], fov: 42 }, target: [lerp(8, 12.5, smoother(clamp((u - 0.08) / 0.84))), 5] } } // r2 (Jason 11-03): the boat stops before the shallows, 12.5 not 15
 // step 2 (cap8.mjs 's3' R1, the angle of the 10-30 still, mirrored to the −z side so the beam opens bottom-left, away from the
 // phone bottom right): the boat on the edge at x 31 → 37, the camera following
 const S2 = CAM.s2 || { dx: 26, y: 9, dz: -14, lx: -4, ly: -9, lz: 2, fov: 40 }

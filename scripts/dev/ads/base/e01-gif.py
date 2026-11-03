@@ -13,6 +13,22 @@ step = int(sys.argv[6]) if len(sys.argv) > 6 else 1
 dither = Image.Dither.FLOYDSTEINBERG if len(sys.argv) > 7 and sys.argv[7] == '1' else Image.Dither.NONE
 files = sorted(f for f in os.listdir(src) if f.endswith('.png'))[::step]
 frames = [np.asarray(Image.open(os.path.join(src, f)).convert('RGB').resize((600, 338), Image.LANCZOS)).astype(np.int16) for f in files]
+# the phone's sonar picture, brighter and punchier (Jason 11-03: steps 1–2 looked much paler than the ice Combo GIF, whose
+# phone was enlarged and recorded at a closer range): contrast ×1.35, brightness ×1.25, saturation ×1.3 on the phone's box
+# the screen is found on the first frame: the near-black box in the bottom-right quarter (the water never gets that dark)
+def screen_box(a):
+    q = a[169:, 300:]; dark = q.mean(axis=2) < 22
+    ys, xs = np.where(dark)
+    y0, y1 = np.percentile(ys, 1) + 169, np.percentile(ys, 99) + 169; x0, x1 = np.percentile(xs, 1) + 300, np.percentile(xs, 99) + 300
+    return (slice(int(y0) + 2, int(y1) - 1), slice(int(x0) + 2, int(x1) - 1))
+PHONE = screen_box(frames[0])
+def boost(a):
+    p = a[PHONE].astype(np.float32)
+    g = p.mean(axis=2, keepdims=True); p = g + (p - g) * 1.3           # saturation
+    p = (p - 128) * 1.35 + 128; p = p * 1.25                           # contrast, brightness
+    a = a.copy(); a[PHONE] = np.clip(p, 0, 255).astype(np.int16); return a
+frames = [boost(fr) for fr in frames]
+print('phone screen box', PHONE)
 # hold: where a pixel moved less than `hold` (sum of channel differences) since the kept previous frame, keep the old value
 kept = [frames[0]]
 for fr in frames[1:]:
@@ -23,7 +39,7 @@ for fr in frames[1:]:
 # one palette from a strip of several frames, so colours do not flicker between frames; the phone (bottom right) is added
 # four times enlarged so its oranges get their share of the palette (they were lost to the water's blues otherwise)
 picks = [k.astype(np.uint8) for k in kept[::max(1, len(kept) // 6)]]
-phones = [np.asarray(Image.fromarray(k[220:338, 380:600]).resize((600, 322), Image.NEAREST)) for k in picks[::2]]
+phones = [np.asarray(Image.fromarray(k[PHONE]).resize((600, 322), Image.NEAREST)) for k in picks]  # every pick: the phone is half the palette's input
 strip = Image.fromarray(np.concatenate(picks + phones, axis=0))
 pal = strip.quantize(colors=colors, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.NONE)
 q = [Image.fromarray(k.astype(np.uint8)).quantize(colors=colors, palette=pal, dither=dither) for k in kept]
