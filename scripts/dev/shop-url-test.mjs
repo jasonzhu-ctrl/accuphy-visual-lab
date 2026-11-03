@@ -1,5 +1,6 @@
 // The Shop link by market (website #228): node scripts/dev/shop-url-test.mjs
 // Stubs the browser globals embed.js reads, then builds the link for each market root the store can pass.
+const DIR = process.env.LAB_DIR || '2026-09-23-sonar-lake-3d' // the lake folder under test; the BF locked copy: LAB_DIR=2026-11-03-sonar-lake-bf (#213)
 const cases = [
   { shop: '/', lang: '', expect: 'https://shop.accuphy.com/products/pinglive-sonar' },
   { shop: '/fr', lang: '', expect: 'https://shop.accuphy.com/fr/products/pinglive-sonar' },
@@ -25,7 +26,7 @@ for (const c of cases) {
   w.self = w; w.top = w; w.parent = w
   if (!c.standalone) w.Shopify = { analytics: { publish() {} } } // theme-mounted = in the store, no utm
   globalThis.window = w; globalThis.document = { referrer: '' }
-  const m = await import(`../../src/experiments/2026-09-23-sonar-lake-3d/embed.js?case=${++n}`)
+  const m = await import(`../../src/experiments/${DIR}/embed.js?case=${++n}`)
   if (c.mount) m.setEmbedOptions({ shop: c.shop })
   const got = m.shopUrl(c.device || 'PL')
   const ok = got === c.expect; if (!ok) fail++
@@ -49,7 +50,7 @@ for (const c of only) {
   w.self = w; w.top = c.framed ? {} : w; w.parent = w.top
   if (c.mount) w.Shopify = { analytics: { publish() {} } }
   globalThis.window = w; globalThis.document = { referrer: '' }
-  const m = await import(`../../src/experiments/2026-09-23-sonar-lake-3d/embed.js?case=${++n}`)
+  const m = await import(`../../src/experiments/${DIR}/embed.js?case=${++n}`)
   if (c.mount) m.setEmbedOptions(c.mount)
   const got = m.miniOnly()
   if (got !== c.expect) fail++

@@ -1,7 +1,10 @@
 // Fake store page + built Lab in headless Chrome. See README.md. Usage: node run.mjs [distDir] [scenario ...]
 import http from 'node:http'; import fs from 'node:fs'; import os from 'node:os'; import path from 'node:path'; import zlib from 'node:zlib'; import { spawn } from 'node:child_process'
-const dist = path.resolve(process.argv[2] && !/^(shop|share)-/.test(process.argv[2]) ? process.argv[2] : 'dist-share/pages')
-const wanted = process.argv.slice(2).filter((a) => /^(shop|share)-/.test(a))
+const NAME = /^(shop|share|app|no-lock|lock)-/
+const dist = path.resolve(process.argv[2] && !NAME.test(process.argv[2]) ? process.argv[2] : 'dist-share/pages')
+const wanted = process.argv.slice(2).filter((a) => NAME.test(a))
+// LAB_LOCKED=1: the page under test is the BF locked version (#213): run lock-desktop instead of no-lock-desktop
+const LOCKED = process.env.LAB_LOCKED === '1'
 const CHROME = process.env.CHROME || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
 const PORT_DBG = 9333
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
@@ -22,7 +25,7 @@ window.addEventListener('message', (e) => {
   if (mode === 'badtype') lab.postMessage({ type: 'something_else' }, e.origin)
   if (mode === 'wrong') document.getElementById('sib').contentWindow.postMessage({ cmd: 'ack-the-lab', origin: e.origin }, '*') // a sibling frame answers: wrong source
 })
-document.write('<iframe id="lab" src="/lab/?tour=off&shop=' + (q.get('shop') || '/de-de') + (q.get('lang') ? '&lang=' + q.get('lang') : '') + '"' + (q.get('allow') ? ' allow="clipboard-write; web-share"' : '') + '></iframe><iframe id="sib" src="sibling.html" style="width:1px;height:1px;position:absolute"></iframe>')
+document.write('<iframe id="lab" src="/lab/?tour=off&shop=' + (q.get('shop') || '/de-de') + (q.get('lang') ? '&lang=' + q.get('lang') : '') + (q.get('extra') ? '&' + q.get('extra') : '') + '"' + (q.get('allow') ? ' allow="clipboard-write; web-share"' : '') + '></iframe><iframe id="sib" src="sibling.html" style="width:1px;height:1px;position:absolute"></iframe>')
 </script>`)
 fs.writeFileSync(path.join(tmp, 'sibling.html'), `<!doctype html><script>window.addEventListener('message', (e) => { if (e.data && e.data.cmd === 'ack-the-lab') parent.frames[0].postMessage({ type: 'shop_click_ack' }, e.data.origin) })</script>`)
 fs.symlinkSync(dist, path.join(tmp, 'lab'))
@@ -121,7 +124,7 @@ scenarios['app-badges-desktop'] = async () => {
 
 // #202: the live base is built without VITE_COMBO_LOCK, so nothing is locked: Mini → Combo opens at once, no card, a `view` event.
 // (A build with VITE_COMBO_LOCK=1 would fail this on purpose: that is the marketing version, #191.)
-scenarios['no-lock-desktop'] = async () => {
+if (!LOCKED) scenarios['no-lock-desktop'] = async () => {
   const tab = await openTab(1280, 800)
   if (!(await tab.open('mode=none'))) return { ok: false, detail: 'Lab did not start' }
   await tab.lab("(w.__evs = [], w.addEventListener('accuphy-lab', e => { if (e.detail.event === 'view' || e.detail.event === 'signup') w.__evs.push(e.detail.event + ':' + (e.detail.data.view || '')) }), true)")
@@ -132,6 +135,38 @@ scenarios['no-lock-desktop'] = async () => {
   await tab.close()
   const ok = locks === 0 && o.card === 0 && o.active === 'Combo' && o.evs.includes('view:combo') && !o.evs.some((e) => e.startsWith('signup'))
   return { ok, detail: `locks=${locks} card=${o.card} active=${o.active} events=${JSON.stringify(o.evs)}` }
+}
+
+// #213 (BF locked version, LAB_LOCKED=1): Combo is locked until the visitor subscribes. The frame's fetch is stubbed first, so a
+// test never sends a real sign-up to Klaviyo even when the build carries the list id. Then: an email link (?lab_unlock=sub)
+// opens it with no card and no `signup`. The sign-up mark is cleared before and after, so other scenarios start locked.
+if (LOCKED) scenarios['lock-desktop'] = async () => {
+  const tab = await openTab(1280, 800)
+  if (!(await tab.open('mode=none'))) return { ok: false, detail: 'Lab did not start' }
+  await tab.lab("(w.localStorage.removeItem('accuphy_sonar_signup_v1'), true)")
+  if (!(await tab.open('mode=none'))) return { ok: false, detail: 'Lab did not restart' }
+  const listen = "(w.__evs = [], w.__posts = [], w.fetch = (u, o) => { w.__posts.push({ u: String(u), body: o && o.body }); return Promise.resolve({ ok: true }) }, w.addEventListener('accuphy-lab', e => { if (e.detail.event === 'view' || e.detail.event === 'signup') w.__evs.push({ e: e.detail.event, d: e.detail.data }) }), true)"
+  const mini = "([...d.querySelectorAll('.ac-btn')].find(b => b.textContent.trim() === 'PingLive Mini').click(), true)"
+  const combo = "([...d.querySelectorAll('.ac-view')].find(b => b.querySelector('.ac-view-name').textContent.trim() === 'Combo').click(), true)"
+  const state = "JSON.stringify({ locks: d.querySelectorAll('.ac-view.is-locked').length, card: d.querySelectorAll('.ac-unlock').length, active: [...d.querySelectorAll('.ac-view.is-active .ac-view-name')].map(e => e.textContent.trim()).join(), evs: w.__evs, posts: w.__posts })"
+  await tab.lab(listen); await tab.lab(mini); await sleep(600); await tab.lab(combo); await sleep(800)
+  const a = JSON.parse(await tab.lab(state))
+  await tab.lab("(() => { const i = d.querySelector('.ac-unlock input[type=email]'); Object.getOwnPropertyDescriptor(w.HTMLInputElement.prototype, 'value').set.call(i, 'lab-test@example.com'); i.dispatchEvent(new w.Event('input', { bubbles: true })); d.querySelector('.ac-unlock button[type=submit]').click(); return true })()")
+  await sleep(2600)
+  const b = JSON.parse(await tab.lab(state))
+  const sign = b.evs.filter((x) => x.e === 'signup'), post = b.posts[0]
+  const list = post ? (() => { try { return JSON.parse(post.body).data.relationships.list.data.id } catch { return '?' } })() : null
+  await tab.lab("(w.localStorage.removeItem('accuphy_sonar_signup_v1'), true)")
+  // the subscribers' email link
+  if (!(await tab.open('mode=none&extra=lab_unlock%3Dsub'))) return { ok: false, detail: 'Lab did not start (email link)' }
+  await tab.lab(listen); await tab.lab(mini); await sleep(600); await tab.lab(combo); await sleep(800)
+  const c = JSON.parse(await tab.lab(state))
+  await tab.lab("(w.localStorage.removeItem('accuphy_sonar_signup_v1'), true)"); await tab.close()
+  const ok = a.locks > 0 && a.card === 1 && a.active !== 'Combo'
+    && b.card === 0 && b.active === 'Combo' && sign.length === 1 && sign[0].d.source === 'unlock' && sign[0].d.view === 'combo' && sign[0].d.product === 'pinglive-mini' && !JSON.stringify(sign[0].d).includes('@')
+    && b.posts.every((x) => /a\.klaviyo\.com\/client\/subscriptions/.test(x.u))
+    && c.locks === 0 && c.card === 0 && c.active === 'Combo' && !c.evs.some((x) => x.e === 'signup')
+  return { ok, detail: `before: locks=${a.locks} card=${a.card} active=${a.active} | after subscribe: card=${b.card} active=${b.active} signup=${JSON.stringify(sign.map((x) => x.d))} klaviyoPosts=${b.posts.length}${list ? ` list=${list}` : ' (test mode, nothing sent)'} (stubbed) | email link: locks=${c.locks} card=${c.card} active=${c.active} signup=${c.evs.filter((x) => x.e === 'signup').length}` }
 }
 
 let failed = 0

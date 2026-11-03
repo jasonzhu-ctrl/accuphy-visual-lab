@@ -2,10 +2,11 @@
 // Reads the two link lines from AppBadges.jsx (the .jsx cannot be imported in node), builds them for en and fr, checks them
 // against the plan, and decodes each QR (the page's encoder, qrcode-generator level M) at 3, 2 and 1 px per module.
 // node scripts/dev/app-qr-test.mjs
+const DIR = process.env.LAB_DIR || '2026-09-23-sonar-lake-3d' // the lake folder under test; the BF locked copy: LAB_DIR=2026-11-03-sonar-lake-bf (#213)
 import fs from 'fs'
 import jsQR from 'jsqr'
 import qrcode from 'qrcode-generator'
-const src = fs.readFileSync(new URL('../../src/experiments/2026-09-23-sonar-lake-3d/AppBadges.jsx', import.meta.url), 'utf8')
+const src = fs.readFileSync(new URL(`../../src/experiments/${DIR}/AppBadges.jsx`, import.meta.url), 'utf8')
 const line = (name) => (src.match(new RegExp(`export const ${name} = (\`[^\\n]*\`)`)) || [])[1]
 const build = (name, LANG) => Function('LANG', `return ${line(name)}`)(LANG)
 const expect = {

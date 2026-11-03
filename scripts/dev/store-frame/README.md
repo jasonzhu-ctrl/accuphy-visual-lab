@@ -14,7 +14,14 @@ at ~1 s), `shop-wrong-source` (a sibling frame sends the receipt → ignored), `
 `share-desktop` (QR ≥ 168 px, Copy → "Copied ✓", Esc closes, events qr_shown + copy), `share-phone` (390×844, same popover,
 clear of the Shop pill; the pill reads "Learn More" and there are no store badges, #200), `app-badges-desktop` (#200: two
 badges, each opens its store's QR ≥ 160 px with "Scan to download Accuphy Sonar App", one `app_badge` { store } per click,
-the share popover closes the QR). `no-lock-desktop` (#202: the live base has no subscribe lock — Mini → Combo opens with no lock icon and no card, a `view` event, no `signup`; a `VITE_COMBO_LOCK=1` build fails it on purpose). They cover #184 / #187 (shop click, receipt), #188 / #192 (share popover) #200 (A8) and #202 (lock off).
+the share popover closes the QR). `no-lock-desktop` (#202: the live base has no subscribe lock — Mini → Combo opens with no lock icon and no card, a `view` event, no `signup`; a `VITE_COMBO_LOCK=1` build fails it on purpose).
+
+**BF locked version (#213):** `LAB_LOCKED=1 node scripts/dev/store-frame/run.mjs <its dist>/pages` runs `lock-desktop` instead of
+`no-lock-desktop`: Mini → Combo is locked and opens the subscribe card; a test email (fetch stubbed inside the frame, so nothing
+ever reaches Klaviyo, whatever list id the build carries) opens Combo and sends one `signup` { source unlock, product, view } with
+no email in it; then `?lab_unlock=sub` (passed through the fake store page as `extra=`) opens Combo with no card and no `signup`.
+The unit tests take the folder too: `LAB_DIR=2026-11-03-sonar-lake-bf LAB_LIST=W24Qdc node scripts/dev/signup-guard-test.mjs`
+(also `shop-url-test.mjs`, `app-qr-test.mjs`; `LAB_LIST` = the list id the folder must ship, base: none). They cover #184 / #187 (shop click, receipt), #188 / #192 (share popover) #200 (A8) and #202 (lock off).
 The fake store page passes `?shop=/de-de` like the real bridge, plus `tour=off`: the entry tour (#199) dims the Shop,
 badge and share buttons while it runs. A wrong-ORIGIN receipt cannot be staged (the parent's origin is what the Lab trusts).
 Software WebGL is slow: allow ~15 s per scenario. Unit tests are separate: `shop-url-test.mjs`, `share-url-test.mjs`,
