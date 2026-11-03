@@ -16,6 +16,11 @@ clear of the Shop pill; the pill reads "Learn More" and there are no store badge
 badges, each opens its store's QR ≥ 160 px with "Scan to download Accuphy Sonar App", one `app_badge` { store } per click,
 the share popover closes the QR). `no-lock-desktop` (#202: the live base has no subscribe lock — Mini → Combo opens with no lock icon and no card, a `view` event, no `signup`; a `VITE_COMBO_LOCK=1` build fails it on purpose).
 
+**Three versions (#233, 2026-11-03):** Base `2026-09-23-sonar-lake-3d` (the source, the default here), the website-embed copy
+`2026-11-03-sonar-lake-web` (lab.accuphy.ca `/`, `/mini/`, `/ice/`, no lock) and the MKT copy `2026-11-03-sonar-lake-bf`
+(`/mktbf2026/`, locked). The unit tests take any of them with `LAB_DIR=<folder>`; run the store frame against each built page
+(`LAB_LOCKED=1` only for MKT).
+
 **BF locked version (#213):** `LAB_LOCKED=1 node scripts/dev/store-frame/run.mjs <its dist>/pages` runs `lock-desktop` instead of
 `no-lock-desktop`: Mini → Combo is locked and opens the subscribe card; a test email (fetch stubbed inside the frame, so nothing
 ever reaches Klaviyo, whatever list id the build carries) opens Combo and sends one `signup` { source unlock, product, view } with
