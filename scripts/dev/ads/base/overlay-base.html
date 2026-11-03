@@ -95,7 +95,7 @@
       const [x, y] = info.boat, k = ((t - 4.3) % 1.2) / 1.2, o = ease(span(t, 4.3, 4.8)) * (1 - ease(span(t, 8.8, 9.2)))
       // r3 (Jason): the arc and the boat move together — the arc is the boat's own progress along the path (bx logged by
       // film-base.mjs, 4.4 → 18.4), full when the boat has all but arrived; time-based only when bx is missing
-      const prog = info.bx != null ? clamp((info.bx - 4.4) / 14 / 0.985) : span(t, 4.4, 8.6)
+      const prog = info.prog != null ? clamp(info.prog / 0.985) : info.bx != null ? clamp((info.bx - 4.4) / 14 / 0.985) : span(t, 4.4, 8.6) // r5: prog logged by film-base.mjs
       $('#cue .arc').setAttribute('stroke-dasharray', `${100 * prog} 100`)
       $('#cue').style.transform = `translate(${x}px, ${y}px)`; $('#cue').style.opacity = o
       $('#cue .wave').style.transform = `scale(${1 + k * 0.9})`; $('#cue .wave').style.opacity = 1 - k

@@ -1,10 +1,11 @@
 // The Base Mini film (#225, Jason's round-1 feedback): records one pass on the virtual clock of ../rec.mjs, from the clean
-// 86bf80e checkout served by "ad-lake-base" (port 5192; no VITE_DEVICES: the Mini is picked with the device switch).
+// checkout served by "ad-lake-base" (port 5192; rounds 1–4 86bf80e, round 5 on the latest base 96fdc22 — HQ 11-03, Jason: 都用最新版本;
+// no VITE_DEVICES: the Mini is picked with the device switch).
 //   node film-base.mjs <pass> <outDir> [port=5192] [fps=30]
 // Passes (film seconds), 9:16 only for now:
 //   open   0–4      the whole lake, a slow cinematic push toward the boat (lake context 1080×1920, __lakeSnap frames)
-//   drag   4–9.5    the boat dragged bow-first, the Forward beam over the timber; the finger cue is drawn by the comp from
-//                   the boat's screen position logged here (lake context); the hold's arc follows the boat's own progress (bx)
+//   drag   4–9.5    the boat dragged bow-first along Jason's route toward the island's timber; the finger cue is drawn by the
+//                   comp from the boat's screen position logged here (lake context); the hold's arc follows the boat's own progress
 //   phone  8.5–13.5 the phone slides up from below while the camera pulls back and tilts down (phone layout 360×640 @3,
 //                   page.screenshot); Live Forward, fish light up; the phone slides out at the end
 //   angle  14.5–19  3D only, high behind the boat at the small wreck: Combo opens from a slit to its full width (fanOpen); the
@@ -27,12 +28,15 @@ const span = (t, a, b) => clamp((t - a) / (b - a))
 const CAM = JSON.parse(process.env.CAMS || '{}') // per-pass camera overrides while fitting
 // ---- cameras ----
 const WIDE = CAM.wide || { pos: [-40, 95, 150], look: [10, -10, 0], fov: 48 }        // the whole lake (storyboard shot 1)
-const OPEN1 = CAM.open1 || { pos: [-19, 40, 84], look: [15, -8, 8], fov: 48 }        // the push lands here: the boat and the beam readable (r3: 7 m left with the path)
-const F5 = CAM.f5 || { pos: [-11, 27, 62], look: [19, -6, 8], fov: 48 }              // the drag framing (the v3 opening, a little back for the longer path)
-// r3 (Jason): the round-2 path was x 16 → 23 (7 m); the end moves 15 ft (4.6 m) back toward the start, the start sits twice the
-// round-2 distance (14 m) behind the new end: 4.4 → 18.4. (Round 3 had moved the path the other way, 11.4 → 25.4.)
-const DRAG0 = CAM.drag0 ?? 4.4, DRAG1 = CAM.drag1 ?? 18.4                              // the boat's path on the drag (bow-first, +x)
-const BACK = CAM.back || { pos: [-11, 120, 112], look: [15, -8, 22], fov: 48 }       // r2: the pull-back as the phone comes up, higher still: the boat and beam sit in y ~600–740, between the caption and the phone (748); r3: 7 m left with the path
+// r5 (Jason's own recording of the route, reference/ads/2026-11-bf/base/jason/2026-11-03-drag-route-jason.mov, 11-03): the drag
+// runs from open water left of centre, 19.8 ft under the boat on the west shelf's edge, to 29.1 ft with the island's timber
+// ahead — unprojected from his frames and matched on depth and the phone picture: (−21, 16) → (8, 14), 29 m; then both points
+// 15 ft (4.6 m) back along the route on his word ("再往回一点", 11-03): (−25.6, 16.3) → (3.4, 14.3). This replaces the round 2/3
+// rule (2× round 2's distance, 15 ft back: 4.4 → 18.4). The cameras sit farther back for the longer path and moved with it.
+const DRAG0 = CAM.drag0 || [-25.6, 16.3], DRAG1 = CAM.drag1 || [3.4, 14.3]             // the boat's path on the drag (bow-first, +x)
+const OPEN1 = CAM.open1 || { pos: [-40.6, 40, 86.3], look: [-12.6, -8, 16.3], fov: 48 } // the push lands here: the boat at the start and its beam readable
+const F5 = CAM.f5 || { pos: [-34.6, 36, 88.3], look: [-4.6, -6, 15.3], fov: 48 }     // the drag framing: the whole 29 m path in the band under the caption
+const BACK = CAM.back || { pos: [-26, 130, 124.3], look: [0, -8, 36.3], fov: 48 }    // r2: the pull-back as the phone comes up, higher still: the boat and beam sit in y ~600–740, between the caption and the phone (748); r5: moved with the end point
 // r3 (Jason): the angle beat and the combo phone sit at the SMALL wreck of the reference (wreck.js SMALL_WRECK x 16, z −26, the
 // 10 m workboat; docs/2026-11-03-ad-r2-shot4-reference.webp): the boat at WRECK_BOAT facing +x with the wreck ~30 m ahead inside the
 // forward fan, Combo with forward 155 ft / down 100 ft, the camera high behind-left of the boat looking along the beam as in
@@ -49,7 +53,7 @@ const shot = {
   open: (t) => { const u = smoother(span(t, 0, 4)); return { cam: { pos: lerp3(WIDE.pos, OPEN1.pos, u), look: lerp3(WIDE.look, OPEN1.look, u), fov: lerp(WIDE.fov, OPEN1.fov, u) } } },
   // r3 (Jason): the boat must move the moment the hold's arc starts, so the target leaves at once (sine ease-out from 4.4 s; the
   // boat closes on it at 4/s, Scene.jsx) instead of the slow smoother start; the comp's arc follows the boat's own x (bx)
-  drag: (t) => { const u = smoother(span(t, 4, 9.5)); return { cam: { pos: lerp3(OPEN1.pos, F5.pos, u * 0.9), look: lerp3(OPEN1.look, F5.look, u * 0.9), fov: 48 }, target: [lerp(DRAG0, DRAG1, Math.sin(span(t, 4.4, 8.7) * Math.PI / 2)), 11] } },
+  drag: (t) => { const u = smoother(span(t, 4, 9.5)); return { cam: { pos: lerp3(OPEN1.pos, F5.pos, u * 0.9), look: lerp3(OPEN1.look, F5.look, u * 0.9), fov: 48 }, target: lerp3(DRAG0, DRAG1, Math.sin(span(t, 4.4, 8.7) * Math.PI / 2)) } },
   phone: (t) => { const u = easeOut(span(t, 9.6, 10.5)); const A = { pos: lerp3(OPEN1.pos, F5.pos, 0.9), look: lerp3(OPEN1.look, F5.look, 0.9), fov: 48 }
     return { cam: { pos: lerp3(A.pos, BACK.pos, u), look: lerp3(A.look, BACK.look, u), fov: 48 }, lift: lerp(720, -215, easeOut(span(t, 9.6, 10.3))) + lerp(0, 900, easeIn(span(t, 13.9, 14.5))) } },
   // r3: no Forward opening; Combo from the first frame, its fans a slit that opens over 14.8–16.1 s while the camera rises
@@ -76,7 +80,7 @@ await ctx.addInitScript(() => { // the virtual clock of ../rec.mjs
 })
 const p = await ctx.newPage()
 p.on('pageerror', (e) => console.log('[pageerror]', e.message.slice(0, 200)))
-const boat0 = pass === 'open' || pass === 'drag' ? `${DRAG0},11` : pass === 'phone' ? `${DRAG1},11` : pass === 'angle' || pass === 'combo' ? `${WRECK_BOAT[0]},${WRECK_BOAT[1]}` : '16,11' // r3: the open lands on the drag's start (it used to sit at 16)
+const boat0 = pass === 'open' || pass === 'drag' ? `${DRAG0[0]},${DRAG0[1]}` : pass === 'phone' ? `${DRAG1[0]},${DRAG1[1]}` : pass === 'angle' || pass === 'combo' ? `${WRECK_BOAT[0]},${WRECK_BOAT[1]}` : '16,11' // r3: the open lands on the drag's start
 await p.goto(`http://localhost:${port}/?boat=${boat0}&tour=off#${ice ? '2026-10-16-sonar-ice-3d' : '2026-09-23-sonar-lake-3d'}`); await p.waitForTimeout(7000)
 const click = async (n) => { // the Mini's tiles sit in the hidden desktop panel on the phone layout: press through the DOM then
   const l = p.getByRole('button', { name: n, exact: true })
@@ -131,12 +135,12 @@ for (let i = 0; i < N; i++) {
   const name = `f${String(Math.round(t * 30)).padStart(5, '0')}`
   if (phone) await p.screenshot({ path: `${out}/${name}.png`, timeout: 60000 })
   else { const url = await p.evaluate(() => window.__lakeSnap()); fs.writeFileSync(`${out}/${name}.png`, Buffer.from(url.split(',')[1], 'base64')) }
-  const info = await p.evaluate(([W, H]) => { // the boat on screen (for the finger cue) and the read-out
+  const info = await p.evaluate(([W, H, D0, D1]) => { // the boat on screen (for the finger cue) and the read-out
     const s = window.__sonarState, cam = window.__camera
     let boat = null
     if (cam && s.boat) { const v = new cam.position.constructor(s.boat.x, 0.2, s.boat.z).project(cam); boat = [+((v.x + 1) / 2 * W).toFixed(1), +((1 - v.y) / 2 * H).toFixed(1)] }
-    return { depth: s.depthEl?.textContent || null, boat, bx: s.boat ? +s.boat.x.toFixed(2) : null, fan: s.fanOpen ?? null }
-  }, [1080, 1920])
+    return { depth: s.depthEl?.textContent || null, boat, bx: s.boat ? +s.boat.x.toFixed(2) : null, prog: s.boat ? +((s.boat.x - D0) / (D1 - D0)).toFixed(4) : null, fan: s.fanOpen ?? null } // prog: the boat's progress along the drag path, for the comp's arc
+  }, [1080, 1920, DRAG0[0], DRAG1[0]])
   log.push({ name, t: +t.toFixed(4), lift: st.lift ?? null, view, ...info })
   if (i % 30 === 0) console.log(pass, name, t.toFixed(2), info.depth || '', info.boat ? `boat ${info.boat}` : '')
 }
