@@ -3897,6 +3897,12 @@ Numbered log. Newest at the bottom.
        links are byte-for-byte as before (`scripts/dev/share-url-test.mjs`, 22 cases). The store paths (`LANG_PATH`) still change for
        fr only. Fonts: both woff2 subsets add Latin Extended-A U+0100–017F (#180 recipe): Instrument Sans 36.0 → 40.5 KB, Eurostile
        Heavy 17.9 → 22.5 KB (+9.2 KB). `public/brand/fonts/` and `src/index.css` serve every page, so `/mini/`, `/ice/` get the letters too.
+     - **Strings in (Base, 11-03; HQ relayed Jason's “动，放进去”):** the 64 lines of `docs/2026-11-03-lab-strings-5lang.md` (aa64746) are in
+       Base's `i18n.js` in fr de nl pl lv; English unchanged (all 64 matched the table). 14 French lines changed: the tour's 12 and
+       `share_title` / `share_line` new, `range_down` Garmin's (#221). A language equal to English is left out (falls back: the app's
+       English tiles for nl / lv, Map). The 30 keys outside the table are untouched; the tour comment says “English final (#215)”.
+       Checked: every key × language shows the table's words; `/?lang=` en fr de nl pl lv on desktop and phone, the ice page in de / pl —
+       0 errors; English page text identical to the commit before. The website-embed copy puts its own in (#233).
      Plan: `docs/2026-11-03-multilang-base-plan.md`.
 
 213. **2026-11-03** — **Black Friday locked version: a copy of the base with the #191 lock on, and it takes over the store's Lab**
