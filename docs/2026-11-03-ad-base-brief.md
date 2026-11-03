@@ -1,5 +1,8 @@
 # 广告片 brief：用标准 Base 版重做那一条测试片（2026-11-03，第一轮：只到静帧）
 
+> **已被取代（同一天）：** Jason 11-03 给了新方向（两条片、约 20 秒、有声音、手机弹上来），见分镜
+> `docs/2026-11-03-ad-base-script.md` 和 `docs/2026-11-03-ad-base-script.jpg`。这一页只留着作参考，深水机位那条规矩照旧有效。
+
 窗口 "Lab video creation"，挂在 Lab HQ 下。Jason 11-03："base 版本还需要参照之前做视频广告的模式做视频"。
 静帧板：`docs/2026-11-03-ad-base-stills.jpg`。**片子要等 Jason 认可静帧以后才做。**
 

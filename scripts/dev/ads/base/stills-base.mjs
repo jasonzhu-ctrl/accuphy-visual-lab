@@ -1,5 +1,6 @@
 // Base ad stills (2026-11-03, brief docs/2026-11-03-ad-base-brief.md): raw frames from the standard Base 86bf80e
-// ("ad-lake-base", port 5192, a clean git archive, built Mini-only like /mini/ through the checkout's .env.local).
+// ("ad-lake-base", port 5192, a clean git archive). Round 1 ran it Mini-only (VITE_DEVICES=PLM in the checkout's .env.local,
+// like /mini/); that file was removed for the storyboard (script-shots.mjs), so set it again before re-running this.
 // usage: node stills-base.mjs <outDir> <shot> [port=5192]; shot = open | combo | wide | tour | deep | desk
 // env CAM='{"pos":[..],"look":[..],"fov":..}' overrides a lake camera; BOAT='x,z' the boat; WAIT=ms before the shot
 import { chromium } from 'playwright-core'
