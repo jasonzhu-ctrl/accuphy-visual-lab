@@ -137,6 +137,8 @@ anyone's memory.
     shop links by market, badges, tracking. Note `docs/handover/chats/marketing-integration.md`.
   - "Lab 多语言" (`local_acdc8fc8-45fe-4009-9b82-503697a24c3f`, #212, Jason 2026-11-03) — the base page `/` in fr / de / nl / pl / lv:
     the strings table, the website's review, follow-up. Writes no code; Base puts the reviewed text into `i18n.js`.
+  - "Lab 营销版" (`local_5d3f1b7f-3e66-4a16-b3f1-2729d56f75f0`, #213, Jason 2026-11-03) — the Black Friday locked version: a copy of
+    the base at `src/experiments/2026-11-03-sonar-lake-bf/` with the #191 lock always on. Changes only that copy; never the base folder.
   - Shared files (`index.jsx`, `SonarChrome.jsx`, `ShareButton.jsx`, `UnlockCard.jsx`, `ShopButton.jsx`, `AppBadges.jsx`): look →
     界面设计, behaviour/events/locks → 对接, scene/range/depth → Base. Tell the others and HQ before editing; say "freed" after.
   - Opened on request, then archived after a handover note: ad films (paused, #183/#185, `ad-video` skill and
