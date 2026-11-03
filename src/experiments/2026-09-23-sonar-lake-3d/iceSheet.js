@@ -22,7 +22,8 @@ export function makeIceMaterial(terrain) {
     uWind: { value: WIND.clone() },
     uHighlight: { value: new THREE.Color('#7fe6ff') },
     uGlow: { value: new THREE.Color('#e08a5e') }, uGlowDir: { value: new THREE.Vector3(-0.8, 0, -0.45).normalize() }, // the afterglow, mirrored in the ice
-    uClip: { value: new THREE.Vector2(0, 0) }, // section view: x = on, y = world z of the cut wall
+    uClip: { value: new THREE.Vector2(0, 0) }, // section view: x = on, y = d of the cut wall (n·(x, z) > d is cut away)
+    uClipN: { value: new THREE.Vector2(0, 1) }, // the wall's normal (iceScene.js sectionCut)
     uCenter: { value: new THREE.Vector2(0, 0) }, // where the near (displaced) sheet is centred
     // the cutaway: pool centre, its radius, the island's radius, and up to two beam boxes (xMin, xMax, zHalf, on) from the centre
     uCutOn: { value: 1 }, uCutC: { value: new THREE.Vector2(1e4, 1e4) }, uCutR: { value: 5.5 }, uIsland: { value: 1.9 },
@@ -93,7 +94,7 @@ export function makeIceMaterial(terrain) {
       uniform float uCover; uniform float uClear; uniform float uWindow;
       uniform vec4 uHoles[MAXH]; uniform int uHoleCount; uniform float uBeamOn;
       uniform vec4 uLamp; uniform vec3 uLampColor;
-      uniform sampler2D uTerrain; uniform float uTerrainHalf; uniform vec2 uWind; uniform vec3 uHighlight; uniform vec3 uGlow; uniform vec3 uGlowDir; uniform vec2 uClip;
+      uniform sampler2D uTerrain; uniform float uTerrainHalf; uniform vec2 uWind; uniform vec3 uHighlight; uniform vec3 uGlow; uniform vec3 uGlowDir; uniform vec2 uClip; uniform vec2 uClipN;
       uniform float uCutOn; uniform vec2 uCutC; uniform float uCutR; uniform float uIsland; uniform vec4 uCutBox[MB]; uniform vec2 uCenter;
       uniform int uBeamCount;
       uniform vec3 uApex[MB]; uniform vec3 uC[MB]; uniform vec3 uH[MB]; uniform vec3 uN[MB];
@@ -217,7 +218,7 @@ export function makeIceMaterial(terrain) {
       }
       void main() {
         vec2 P = vWorld.xz;
-        if (uClip.x > 0.5 && P.y > uClip.y) discard; // the section cut
+        if (uClip.x > 0.5 && dot(P, uClipN) > uClip.y) discard; // the section cut
         vec3 V = normalize(cameraPosition - vWorld);
         // ---- the holes ----
         float hole = 0.0, oldHole = 0.0, clear = 0.0, slush = 0.0, chips = 0.0, glow = 0.0;

@@ -4007,6 +4007,12 @@ Numbered log. Newest at the bottom.
        is set, fish passing through not counted, the extras sent home at once — set it ~15 s before recording. `__beamFish()` returns
        the fish in each fan now. `adIce = null` puts everything back. Measured, Combo `fish: [2, 3]`: 2 + 3 held from 15 s to 73 s; without
        it the opening fish leave at ~60 s (1–2 left). Without the hooks nothing changes (lake and ice, desktop and phone, 0 errors).
+     - **Third hook, the turning cut** (HQ, 11-03): `adIce.cutAz` = degrees from +z toward +x, or `'cam'` to face `camOverride`'s
+       camera every frame, turns the Section cut round the hole. Every part of the cut follows one plane (`iceScene.js sectionCut`):
+       the lakebed and fish, ice sheet, snowfall and water snow, beam and shore clips, the slab / waterline / water face / soil, and
+       the tap check. Off, the plane is the old one (n = (0, 1), d = hole z + 6.5): the Section view matches 322f47f on desktop and
+       phone (only fish and snow moved), the ice tour walks through, summer lake 0 errors; none of it is in a build. Props are not
+       cut: keep the shelter on the far side of the hole from the camera.
 
 226. **2026-11-03** — **The ice page's 120 ft framing (#224) goes into the locked copy together with the multi-language work**
      (Jason in Lab HQ, card “冰钓页这个改动，要不要也搬进黑五带锁版？”: “和多语言一起搬”). Adds to #216: when #212 is reviewed and in the

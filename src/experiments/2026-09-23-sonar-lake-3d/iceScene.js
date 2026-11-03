@@ -70,6 +70,21 @@ export const SECTION_CAM = { pos: [-3, 7, 26], look: [2, -2.65, 0], cutZ: 6.5, s
 // phones (portrait, the app frame covers the lower half): closer, looking further down, so the ice band, the slab and the
 // cone with the lit bottom all sit in the band above the frame
 export const SECTION_CAM_PHONE = { pos: [-1, 8, 22], look: [1.5, -6.5, 0], cutZ: 6.5, slab: 0.8, fov: 50 } // cutZ: the wall, this far in front of the hole; slab: the ice edge as drawn (0.5 m real, a little taller to read from 25 m)
+// The section cut as a plane in the world: what lies on the camera's side, n·(x, z) > d, is cut away; the faces stand on the
+// line through (cx, cz) along (ax, az). Normally n = (0, 1) and d = hole z + cutZ. Dev only (ads, #225): s.adIce.cutAz turns
+// it round the hole — degrees from +z toward +x, or 'cam' to face camOverride's camera every frame — so an orbit keeps the
+// section look. inset moves the wall toward the hole.
+const CUT0 = { nx: 0, nz: 1, ax: 1, az: 0, yaw: 0 }
+export function sectionCut(s, inset = 0) {
+  let c = CUT0
+  if (import.meta.env.DEV && s.adIce?.cutAz != null) {
+    const v = s.adIce.cutAz, p = s.camOverride?.pos
+    const yaw = v === 'cam' ? (p ? Math.atan2(p[0] - s.boat.x, p[2] - s.boat.z) : 0) : (+v * Math.PI) / 180
+    if (Number.isFinite(yaw)) c = { nx: Math.sin(yaw), nz: Math.cos(yaw), ax: Math.cos(yaw), az: -Math.sin(yaw), yaw }
+  }
+  const off = SECTION_CAM.cutZ - inset
+  return { ...c, d: c.nx * s.boat.x + c.nz * s.boat.z + off, cx: s.boat.x + c.nx * off, cz: s.boat.z + c.nz * off }
+}
 export function iceParams() {
   const q = typeof window !== 'undefined' ? window.location.search : ''
   const time = (/[?&]time=(dusk|day|night)/.exec(q) || [])[1] || 'dusk'

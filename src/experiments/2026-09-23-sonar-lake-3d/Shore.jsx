@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { SONAR_HIDE_LAYER } from './SonarScreen'
-import { SECTION_CAM } from './iceScene'
+import { sectionCut } from './iceScene'
 import { bedY } from './terrain'
 import { t } from './i18n'
 import { placeTrees, makeGround, makeShoreIce, makeConifer, makeNeedleTexture, makeTuft, placeTufts, ROCK_GEOS, placeShoreRocks, makeGroundMaterial, makeShoreIceMaterial, makeTreeMaterial, makeRockMaterial, makeTuftMaterial, landY } from './shoreModels'
@@ -88,7 +88,7 @@ export default function Shore({ state, winter = false }) {
   }, [winter, clip])
   useEffect(() => () => { for (const k in built.mats) built.mats[k]?.dispose(); built.ground.dispose(); built.shoreIce?.dispose(); built.conifers.forEach((g) => g.dispose()) }, [built])
   // the section view's wall (the lake's own cut, Scene.jsx SectionCut): keep what lies behind it
-  useFrame(() => { const s = state.current; clip[0].constant = s.ice && s.view === 'section' ? s.boat.z + SECTION_CAM.cutZ : 1e5 })
+  useFrame(() => { const s = state.current, cut = sectionCut(s); clip[0].normal.set(-cut.nx, 0, -cut.nz); clip[0].constant = s.ice && s.view === 'section' ? cut.d : 1e5 })
 
   const byVariant = useMemo(() => Array.from({ length: VARIANTS * 2 }, (_, k) => built.trees.filter((t) => Math.floor(t.k * VARIANTS) === k % VARIANTS && (t.d >= 24) === (k >= VARIANTS)).sort((a, b) => a.o - b.o)), [built])
   // the budget: { d: shown density, from: density being faded out (or null), t0 } — measured here, drawn by <Trees>

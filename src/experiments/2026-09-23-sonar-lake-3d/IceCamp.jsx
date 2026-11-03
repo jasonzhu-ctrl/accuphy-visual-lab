@@ -12,7 +12,7 @@ import { setHoles } from './iceSheet'
 import { makeHoleKit, makeShelter, makeSled, makeAimRing, KIT_SCALE } from './iceProps'
 import { makeSnowfall } from './snow'
 import { makeSkyDome } from './iceSky'
-import { ICE_T, MINI_DROP, APEX_Y, HOLE_DRAW_R, MAX_HOLES, ICE_CAMP, CUT_R, ISLAND_R, SECTION_CAM, WIND, col, dir, iceParams } from './iceScene'
+import { ICE_T, MINI_DROP, APEX_Y, HOLE_DRAW_R, MAX_HOLES, ICE_CAMP, CUT_R, ISLAND_R, SECTION_CAM, WIND, col, dir, iceParams, sectionCut } from './iceScene'
 import { setBeamUniforms } from './lakeMaterial'
 import { SONAR_HIDE_LAYER } from './SonarScreen'
 import { HALF, depthAt, shoreStop } from './terrain'
@@ -79,7 +79,7 @@ export function Snowfall({ state, T }) {
     u.uPixelRatio.value = gl.getPixelRatio()
     const s = state.current
     u.uCenter.value.set(s.camX ?? s.boat.x, 0, 0)
-    u.uClipZ.value = s.view === 'section' ? s.boat.z + SECTION_CAM.cutZ : 1e5
+    const cut = sectionCut(s); u.uClipZ.value = s.view === 'section' ? cut.d : 1e5; u.uClipN.value.set(cut.nx, cut.nz)
   })
   return <primitive object={snow} onUpdate={(o) => o.layers.set(SONAR_HIDE_LAYER)} />
 }
@@ -334,7 +334,7 @@ export function IcePick({ state }) {
   }
   // the section view: the ice in front of the wall is cut away, so a tap counts only on the ice behind it (a ray that
   // meets the sheet's plane in front of the wall came through the water column or the empty cut — ignored)
-  const onIce = (s, p) => s.view !== 'section' || p.z < s.boat.z + SECTION_CAM.cutZ - 0.4
+  const onIce = (s, p) => { if (s.view !== 'section') return true; const c = sectionCut(s, 0.4); return c.nx * p.x + c.nz * p.z < c.d }
   const onDown = (e) => { e.stopPropagation(); const s = state.current; if (!onIce(s, e.point)) { s.aiming = false; s.aim = null; return } s.aiming = true; s.aim = clampHop(s, e.point); e.target.setPointerCapture?.(e.pointerId) }
   const onMove = (e) => { const s = state.current; if (!s.aiming) return; if (!onIce(s, e.point)) { s.aim = null; return } s.aim = clampHop(s, e.point) }
   const onUp = () => {
@@ -404,7 +404,7 @@ export function MarineSnow({ state }) {
     const u = pts.userData.uniforms
     u.uTime.value = clock.elapsedTime; u.uAmount.value = s.view === 'section' ? 0.7 : 0.9; u.uPixelRatio.value = gl.getPixelRatio()
     u.uCenter.value.set(s.boat.x, -11.4, s.boat.z)
-    u.uClipZ.value = s.view === 'section' ? s.boat.z + SECTION_CAM.cutZ - 0.2 : 1e5
+    const cut = sectionCut(s, 0.2); u.uClipZ.value = s.view === 'section' ? cut.d : 1e5; u.uClipN.value.set(cut.nx, cut.nz)
   })
   return <primitive object={pts} onUpdate={(o) => o.layers.set(SONAR_HIDE_LAYER)} />
 }
@@ -417,9 +417,9 @@ export function SectionFaces({ state }) {
     // layers from the freeze-up, a few bubbles caught in it (colours are display values)
     const slabMat = new THREE.ShaderMaterial({
       transparent: true,
-      uniforms: { uT: { value: slabT }, uWind: { value: WIND.clone() }, uCover: { value: 0.27 }, uHole: { value: new THREE.Vector2(1e4, 1e4) } },
+      uniforms: { uT: { value: slabT }, uWind: { value: WIND.clone() }, uCover: { value: 0.27 }, uHole: { value: new THREE.Vector2(1e4, 1e4) }, uAlong: { value: new THREE.Vector2(1, 0) } },
       vertexShader: /* glsl */ `varying vec3 vW; void main() { vec4 w = modelMatrix * vec4(position, 1.0); vW = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }`,
-      fragmentShader: /* glsl */ `precision highp float; varying vec3 vW; uniform float uT; uniform vec2 uWind; uniform float uCover; uniform vec2 uHole;
+      fragmentShader: /* glsl */ `precision highp float; varying vec3 vW; uniform float uT; uniform vec2 uWind; uniform float uCover; uniform vec2 uHole; uniform vec2 uAlong;
         float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
         float vnoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f); return mix(mix(hash(i), hash(i + vec2(1, 0)), f.x), mix(hash(i + vec2(0, 1)), hash(i + vec2(1, 1)), f.x), f.y); }
         float fbm3(vec2 p) { return 0.5 * vnoise(p) + 0.25 * vnoise(p * 2.1 + 1.3) + 0.125 * vnoise(p * 4.3 + 2.7); }
@@ -443,19 +443,19 @@ export function SectionFaces({ state }) {
           // black ice that reads dark blue-grey and glassy (you see the dark water through it), grown in vertical columns
           // ("candles") with strings of tiny bubbles rising through it; the cut edge catches the sky; a rough, darker
           // underside. No horizontal stripes — lake ice grows down, so its texture is vertical.
-          float d = clamp(-vW.y / uT, 0.0, 1.0);
+          float d = clamp(-vW.y / uT, 0.0, 1.0), X = dot(vW.xz, uAlong); // X: along the wall (= x unless an ad shot turns the cut)
           float snow = snowAt(vW.xz);
-          float crust = 1.0 - smoothstep(0.08, 0.16, d + 0.04 * (vnoise(vec2(vW.x * 3.0, 1.0)) - 0.5));
+          float crust = 1.0 - smoothstep(0.08, 0.16, d + 0.04 * (vnoise(vec2(X * 3.0, 1.0)) - 0.5));
           vec3 clear = mix(vec3(0.24, 0.38, 0.48), vec3(0.11, 0.21, 0.30), smoothstep(0.1, 1.0, d));
-          float candle = vnoise(vec2(vW.x * 7.0, vW.y * 0.9)) * 0.6 + vnoise(vec2(vW.x * 19.0, vW.y * 2.0)) * 0.4;
+          float candle = vnoise(vec2(X * 7.0, vW.y * 0.9)) * 0.6 + vnoise(vec2(X * 19.0, vW.y * 2.0)) * 0.4;
           clear *= 0.86 + 0.28 * candle;
-          float str = smoothstep(0.9, 0.97, vnoise(vec2(vW.x * 26.0, 3.0)));
-          float bub = str * smoothstep(0.55, 0.8, vnoise(vec2(vW.x * 26.0, vW.y * 30.0)));
+          float str = smoothstep(0.9, 0.97, vnoise(vec2(X * 26.0, 3.0)));
+          float bub = str * smoothstep(0.55, 0.8, vnoise(vec2(X * 26.0, vW.y * 30.0)));
           clear = mix(clear, vec3(0.78, 0.88, 0.95), bub * 0.55);
-          vec3 white = vec3(0.86, 0.9, 0.94) * (0.94 + 0.08 * vnoise(vW.xy * vec2(40.0, 60.0)));
+          vec3 white = vec3(0.86, 0.9, 0.94) * (0.94 + 0.08 * vnoise(vec2(X, vW.y) * vec2(40.0, 60.0)));
           vec3 c = mix(clear, white, crust);
           c += vec3(0.16, 0.18, 0.2) * (1.0 - smoothstep(0.0, 0.035, d)); // the cut edge catching the sky
-          c *= 1.0 - 0.35 * smoothstep(0.82, 1.0, d + 0.06 * (vnoise(vec2(vW.x * 2.5, 7.0)) - 0.5)); // the rough underside
+          c *= 1.0 - 0.35 * smoothstep(0.82, 1.0, d + 0.06 * (vnoise(vec2(X * 2.5, 7.0)) - 0.5)); // the rough underside
           float cap = snow * (1.0 - smoothstep(0.02, 0.16, d)); // the snow lying on the slab, seen on its cut edge
           c = mix(c, vec3(0.97, 0.98, 1.0), cap * 0.95);
           gl_FragColor = vec4(c, mix(0.96, 0.84, smoothstep(0.1, 0.25, d)));
@@ -465,21 +465,24 @@ export function SectionFaces({ state }) {
     const line = new THREE.Mesh(new THREE.BoxGeometry(240, 0.05, 0.05), new THREE.MeshBasicMaterial({ color: '#a9d8ec', transparent: true, opacity: 0.55 })) // the waterline under the slab
     const waterMat = new THREE.ShaderMaterial({
       transparent: true, depthWrite: false, side: THREE.DoubleSide,
-      uniforms: { uTop: { value: -slabT }, uTime: { value: 0 }, uCam: { value: new THREE.Vector3() }, uHole: { value: new THREE.Vector3(0, 0, 1e4) }, uIceT: { value: ICE_T }, uSky: { value: { dusk: 1, day: 1.3, night: 0.3 }[iceParams().time] ?? 1 } },
+      uniforms: { uTop: { value: -slabT }, uTime: { value: 0 }, uCam: { value: new THREE.Vector3() }, uHole: { value: new THREE.Vector3(0, 0, 1e4) }, uAlong: { value: new THREE.Vector2(1, 0) }, uIceT: { value: ICE_T }, uSky: { value: { dusk: 1, day: 1.3, night: 0.3 }[iceParams().time] ?? 1 } },
       vertexShader: /* glsl */ `varying vec3 vW; void main() { vec4 w = modelMatrix * vec4(position, 1.0); vW = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }`,
-      fragmentShader: /* glsl */ `precision highp float; varying vec3 vW; uniform float uTop; uniform float uTime; uniform vec3 uCam; uniform vec3 uHole; uniform float uIceT; uniform float uSky;
+      fragmentShader: /* glsl */ `precision highp float; varying vec3 vW; uniform float uTop; uniform float uTime; uniform vec3 uCam; uniform vec3 uHole; uniform vec2 uAlong; uniform float uIceT; uniform float uSky;
+        // into the wall's frame round the hole: x along the wall, y up, z toward the camera (world x, y, z minus the hole unless an ad turns the cut)
+        vec3 toWall(vec3 p) { vec2 q = p.xz - uHole.xz; return vec3(dot(q, uAlong), p.y, dot(q, vec2(-uAlong.y, uAlong.x))); }
         void main() { float d = clamp((uTop - vW.y) / 24.0, 0.0, 1.0);
+          vec3 cam = toWall(uCam), wp = toWall(vW);
           vec3 c = mix(vec3(0.05, 0.24, 0.32), vec3(0.008, 0.04, 0.07), pow(d, 0.7));
           // what lies behind this pixel at the hole's distance: follow the view ray from the face back to z = hole.z
-          float t = (uCam.z - uHole.z) / max(0.1, uCam.z - vW.z);
-          vec2 q = uCam.xy + (vW.xy - uCam.xy) * t; // (x, y) on the hole's plane
+          float t = cam.z / max(0.1, cam.z - wp.z);
+          vec2 q = cam.xy + (wp.xy - cam.xy) * t; // (along, y) on the hole's plane, the hole at along = 0
           float below = max(0.0, -uIceT - q.y);    // metres under the ice
           // the light shaft: daylight through the open hole, a soft column widening and fading with depth, faint rays
           float w = 0.45 + 0.14 * below;
-          float rays = 0.8 + 0.2 * sin((q.x - uHole.x) * 9.0 / w + uTime * 0.6);
-          float shaft = exp(-pow((q.x - uHole.x) / w, 2.0)) * exp(-below / 7.0) * step(0.0, -uIceT - q.y + 0.05) * rays * uSky; // daylight: faint at night
+          float rays = 0.8 + 0.2 * sin(q.x * 9.0 / w + uTime * 0.6);
+          float shaft = exp(-pow(q.x / w, 2.0)) * exp(-below / 7.0) * step(0.0, -uIceT - q.y + 0.05) * rays * uSky; // daylight: faint at night
           // the ice underside lit around the hole
-          float under = exp(-pow((q.x - uHole.x) / 5.0, 2.0)) * exp(-below / 0.5) * step(0.0, -uIceT - q.y + 0.05);
+          float under = exp(-pow(q.x / 5.0, 2.0)) * exp(-below / 0.5) * step(0.0, -uIceT - q.y + 0.05);
           vec3 lit = vec3(0.42, 0.62, 0.66) * shaft + vec3(0.2, 0.36, 0.4) * under * 0.6;
           c += lit;
           // the face is only ~30 % opaque, so the light has to bring its own coverage or it vanishes in the blend
@@ -499,19 +502,22 @@ export function SectionFaces({ state }) {
     wu.uCam.value.copy(camera.position); wu.uHole.value.set(s.boat.x, 0, s.boat.z); wu.uTime.value = clock.elapsedTime
     parts.slab.visible = parts.water.visible = parts.soil.visible = parts.line.visible = on
     if (!on) return
-    const cz = s.boat.z + SECTION_CAM.cutZ, cx = s.boat.x
-    parts.slab.position.set(cx, -parts.slabT / 2, cz + 0.02)
+    const cut = sectionCut(s), { cx, cz, nx, nz } = cut // the wall's line (turned round the hole only in a dev ad shot)
+    parts.slab.position.set(cx + 0.02 * nx, -parts.slabT / 2, cz + 0.02 * nz)
     parts.slab.material.uniforms.uHole.value.set(s.boat.x, s.boat.z)
-    parts.line.position.set(cx, -parts.slabT - 0.02, cz + 0.04)
-    parts.water.position.set(cx, -parts.slabT, cz + 0.01)
-    const key = `${cx.toFixed(0)}|${cz.toFixed(1)}`
+    parts.line.position.set(cx + 0.04 * nx, -parts.slabT - 0.02, cz + 0.04 * nz)
+    parts.water.position.set(cx + 0.01 * nx, -parts.slabT, cz + 0.01 * nz)
+    parts.soil.position.set(cx, 0, cz)
+    for (const m of [parts.slab, parts.line, parts.water, parts.soil]) m.rotation.y = cut.yaw
+    parts.slab.material.uniforms.uAlong.value.set(cut.ax, cut.az); wu.uAlong.value.set(cut.ax, cut.az)
+    const key = `${cx.toFixed(0)}|${cz.toFixed(1)}|${cut.yaw.toFixed(3)}`
     if (key !== parts.key) { // the soil's top edge follows the lakebed along the cut
       parts.key = key
       const N = 241, pos = new Float32Array(N * 9), colr = new Float32Array(N * 9), idx = []
       const sed = new THREE.Color('#262216'), mid = new THREE.Color('#4a3b26'), bot = new THREE.Color('#16110a') // sediment, brown, dark
       for (let i = 0; i < N; i++) {
-        const x = cx - 120 + i, y = -depthAt(x, cz) - 0.05
-        pos.set([x, y, cz, x, y - 0.45, cz, x, -48, cz], i * 9); colr.set([sed.r, sed.g, sed.b, mid.r, mid.g, mid.b, bot.r, bot.g, bot.b], i * 9)
+        const u = i - 120, x = cx + u * cut.ax, z = cz + u * cut.az, y = -depthAt(x, z) - 0.05 // in the soil's own frame (rotation.y), along x
+        pos.set([u, y, 0, u, y - 0.45, 0, u, -48, 0], i * 9); colr.set([sed.r, sed.g, sed.b, mid.r, mid.g, mid.b, bot.r, bot.g, bot.b], i * 9)
         if (i < N - 1) { const a = i * 3, b = a + 3; idx.push(a, a + 1, b, b, a + 1, b + 1, a + 1, a + 2, b + 1, b + 1, a + 2, b + 2) }
       }
       const g = new THREE.BufferGeometry()

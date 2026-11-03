@@ -16,10 +16,10 @@ export function makeSnowfall(count = 2600, box = new THREE.Vector3(110, 34, 110)
   geo.setAttribute('aSeed', new THREE.BufferAttribute(seed, 1))
   const mat = new THREE.ShaderMaterial({
     transparent: true, depthWrite: false,
-    uniforms: { uTime: { value: 0 }, uWind: { value: WIND.clone() }, uCenter: { value: new THREE.Vector3() }, uBox: { value: box }, uAmount: { value: 0.6 }, uColor: { value: new THREE.Color(color) }, uPixelRatio: { value: 1 }, uSpeed: { value: speed }, uSize: { value: size }, uAlphaMul: { value: alpha }, uClipZ: { value: 1e5 } },
+    uniforms: { uTime: { value: 0 }, uWind: { value: WIND.clone() }, uCenter: { value: new THREE.Vector3() }, uBox: { value: box }, uAmount: { value: 0.6 }, uColor: { value: new THREE.Color(color) }, uPixelRatio: { value: 1 }, uSpeed: { value: speed }, uSize: { value: size }, uAlphaMul: { value: alpha }, uClipZ: { value: 1e5 }, uClipN: { value: new THREE.Vector2(0, 1) } },
     vertexShader: /* glsl */ `
       attribute float aSeed; uniform float uTime; uniform vec2 uWind; uniform vec3 uCenter; uniform vec3 uBox; uniform float uAmount; uniform float uPixelRatio; uniform float uSpeed; uniform float uSize; uniform float uAlphaMul;
-      varying float vAlpha; varying float vZ;
+      varying float vAlpha; varying vec2 vXZ;
       void main() {
         float s = aSeed;
         vec3 p = position;
@@ -30,7 +30,7 @@ export function makeSnowfall(count = 2600, box = new THREE.Vector3(110, 34, 110)
         p.z += uTime * uWind.y * w + cos(uTime * (0.7 + s * 1.3) + s * 17.0) * 0.5;
         p.x = mod(p.x + uBox.x * 0.5, uBox.x) - uBox.x * 0.5;
         p.z = mod(p.z + uBox.z * 0.5, uBox.z) - uBox.z * 0.5;
-        vZ = p.z + uCenter.z;
+        vXZ = p.xz + uCenter.xz;
         vec4 mv = modelViewMatrix * vec4(p + uCenter, 1.0);
         float dist = -mv.z;
         gl_PointSize = clamp((2.6 + 4.5 * s) * uSize * uPixelRatio * (48.0 / dist), 1.0, 16.0);
@@ -39,8 +39,8 @@ export function makeSnowfall(count = 2600, box = new THREE.Vector3(110, 34, 110)
       }
     `,
     fragmentShader: /* glsl */ `
-      precision mediump float; uniform vec3 uColor; uniform float uClipZ; varying float vAlpha; varying float vZ;
-      void main() { if (vZ > uClipZ) discard; float d = length(gl_PointCoord - 0.5); float a = (1.0 - smoothstep(0.18, 0.5, d)) * vAlpha; if (a < 0.01) discard; gl_FragColor = vec4(pow(uColor, vec3(1.0 / 2.2)), a); }
+      precision mediump float; uniform vec3 uColor; uniform float uClipZ; uniform vec2 uClipN; varying float vAlpha; varying vec2 vXZ;
+      void main() { if (dot(vXZ, uClipN) > uClipZ) discard; /* the section cut: dot(n, xz) > d (iceScene.js sectionCut) */ float d = length(gl_PointCoord - 0.5); float a = (1.0 - smoothstep(0.18, 0.5, d)) * vAlpha; if (a < 0.01) discard; gl_FragColor = vec4(pow(uColor, vec3(1.0 / 2.2)), a); }
     `,
   })
   const pts = new THREE.Points(geo, mat)

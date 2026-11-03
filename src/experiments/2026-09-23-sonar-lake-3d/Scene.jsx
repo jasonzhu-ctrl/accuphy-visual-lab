@@ -25,7 +25,7 @@ import Shore, { ShoreCue } from './Shore'
 import { bakeTerrain } from './sonarMarks'
 import lakeSkyUrl from './assets/lake-sky.jpg?inline' // the sky mirrored in the summer lake (#162): a CC0 photo, see assets/LICENSES.md
 import { makeLakeFFT, FFT_L } from './lakeFFT' // the waves: a wind-sea spectrum by FFT (#165, after ABYSSAL, MIT, see assets/LICENSES.md)
-import { APEX_Y, iceParams, ICE_START, ICE_CAM_T, ICE_CAM_D, ICE_LAKE_W, ICE_FOG, UNDER_CAM, SECTION_CAM, SECTION_CAM_PHONE, ICE_T, dir } from './iceScene'
+import { APEX_Y, iceParams, ICE_START, ICE_CAM_T, ICE_CAM_D, ICE_LAKE_W, ICE_FOG, UNDER_CAM, SECTION_CAM, SECTION_CAM_PHONE, ICE_T, dir, sectionCut } from './iceScene'
 
 // ---------- lakebed ----------
 function Lakebed({ mat }) {
@@ -518,7 +518,7 @@ function Beams({ state, ice = false }) {
         g.children[1].geometry.dispose(); g.children[1].geometry = new THREE.EdgesGeometry(geo, 25)
       })
     }
-    clip[0].constant = ice && s.view === 'section' ? s.boat.z + SECTION_CAM.cutZ : 1e5
+    const cut = sectionCut(s); clip[0].normal.set(-cut.nx, 0, -cut.nz); clip[0].constant = ice && s.view === 'section' ? cut.d : 1e5
     // the ice signal gate (IceCamp.jsx s.signal; undefined on the summer lake → 1): the wedge goes out with the Mini.
     // The materials are found by walking the group every frame, so a keyed remount (specKey) can never leave stale refs
     const sig = s.signal ?? 1
@@ -929,8 +929,8 @@ function PickPlane({ state }) {
 function SectionCut({ state, mats }) {
   useFrame(() => {
     const s = state.current
-    const on = s.view === 'section' ? 1 : 0, z = s.boat.z + SECTION_CAM.cutZ
-    for (const m of mats) m.userData.uniforms.uClip.value.set(on, z)
+    const on = s.view === 'section' ? 1 : 0, cut = sectionCut(s)
+    for (const m of mats) { const u = m.userData.uniforms; u.uClip.value.set(on, cut.d); u.uClipN.value.set(cut.nx, cut.nz) }
   })
   return null
 }

@@ -29,7 +29,8 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
     uFishEchoSize: { value: 1.0 }, // the fish-echo test page's ?fishsize= (#153)
     uHighlight: { value: new THREE.Color('#7fe6ff') },
     uRevealGain: { value: 1.0 }, // ice scene: a stronger lift inside the beam (the window in the snow must read lit)
-    uClip: { value: new THREE.Vector2(0, 0) }, // ice section view: x = on, y = world z of the cut wall; fragments beyond it are cut away in the main view
+    uClip: { value: new THREE.Vector2(0, 0) }, // ice section view: x = on, y = d of the cut wall (n·(x, z) > d is cut away in the main view; iceScene.js sectionCut)
+    uClipN: { value: new THREE.Vector2(0, 1) }, // the wall's normal n — (0, 1) unless a dev ad shot turns the cut
     uOutGamma: { value: 1.0 },   // ice scene: < 1 brightens the dark water world a little (main view only)
     uAirView: { value: 0.0 },    // the summer lake (Scene.jsx): seen from above the water, the water column over each point tints it — shallows clear, deep water dark — and light patterns play on the shallows; 0 (the ice page, any camera under water): fog by distance as before
     uTime: LAKE_TIME,
@@ -148,7 +149,7 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
       uniform vec3 uApex[${MAX_BEAMS}]; uniform vec3 uC[${MAX_BEAMS}]; uniform vec3 uH[${MAX_BEAMS}]; uniform vec3 uN[${MAX_BEAMS}];
       uniform vec4 uAng[${MAX_BEAMS}]; uniform vec2 uRT[${MAX_BEAMS}]; uniform vec4 uBox[${MAX_BEAMS}];
       uniform vec4 uSplatBig; uniform vec2 uPanoLobe; uniform vec3 uSplat;
-      uniform float uReveal; uniform vec3 uHighlight; uniform float uSonarPass; uniform float uRevealGain; uniform float uOutGamma; uniform vec2 uClip; uniform float uBeamGain; uniform vec3 uFarFlash;
+      uniform float uReveal; uniform vec3 uHighlight; uniform float uSonarPass; uniform float uRevealGain; uniform float uOutGamma; uniform vec2 uClip; uniform vec2 uClipN; uniform float uBeamGain; uniform vec3 uFarFlash;
       uniform float uAirView; uniform float uTime;
       float lhash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
       float lnoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
@@ -270,7 +271,7 @@ export function makeLakeMaterial({ fish = false, structure = false, steel = fals
           discard;
       #endif
         }
-        if (uClip.x > 0.5 && uSonarPass < 0.5 && vWorld.z > uClip.y) discard; // the section cut (the sonar still sees the whole lake)
+        if (uClip.x > 0.5 && uSonarPass < 0.5 && dot(vWorld.xz, uClipN) > uClip.y) discard; // the section cut (the sonar still sees the whole lake)
       #ifndef STRUCTURE
         if (uSonarPass > 1.5) discard; // the far-face pass (back faces, sonarShader uDepthB): only structure has a far side
       #endif
