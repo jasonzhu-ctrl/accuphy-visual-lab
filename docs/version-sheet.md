@@ -8,9 +8,9 @@ Jason 2026-11-02：“你记住，或者搞一个 sheet 把各种版本做好管
 
 | 版本 | 是什么 | 代码版本 | 在哪里看 | 状态 |
 |---|---|---|---|---|
-| **标准 Base 版（PingLive + PingLive Mini）** | Jason 11-02 定的标准基础版，见下面的清单 | main 6b5a225（4c3fc61 + 关锁 #202） | lab.accuphy.ca `/`（PingLive，可切 Mini）、`/mini/`（只有 Mini）；测试链接同一版 | **11-02 已上线**（Jason：“Lock off, go live”） |
-| 线上版 | 店铺页里嵌的、广告点进来看到的 | **6b5a225（11-02）** = 标准 Base 版 | lab.accuphy.ca、shop.accuphy.com/pages/lab | 已换成标准 Base 版，锁关闭 |
-| 冰钓页 | 冰面，只有 Mini | 和 Base 同一份代码 | 测试链接 `/ice/` | 还是旧的三张步骤卡；入场教程（#203：点冰打洞 → Tap Forward View → Tap Down View）已做好；俯视机位跟随冰洞、边界统一 ±58 米（#204）；测试链接 86bf80e；湖岸（#206–#211，树按手机快慢自动调，夏天湖和冰钓页同一条，停在约 5 ft 深处，船头对岸处停远一点）已做；等 Jason 看、说“动” |
+| **标准 Base 版（PingLive + PingLive Mini）** | Jason 11-02 定的标准基础版，见下面的清单 | main 86bf80e（6b5a225 + 冰钓教程、去厚度、湖岸、树自动调） | lab.accuphy.ca `/`（PingLive，可切 Mini）、`/mini/`（只有 Mini）、`/ice/`；测试链接同一版 | **11-03 已上线**（Jason：“动”） |
+| 线上版 | 店铺页里嵌的、广告点进来看到的 | **86bf80e（11-03）** = 标准 Base 版 | lab.accuphy.ca、shop.accuphy.com/pages/lab | 标准 Base 版，锁关闭 |
+| 冰钓页 | 冰面，只有 Mini | 和 Base 同一份代码 | lab.accuphy.ca/ice/ | **11-03 已上线**：入场教程（点冰打洞 → Tap Forward View → Tap Down View）、俯视跟随冰洞、和夏天湖同一条湖岸 |
 | 营销版 | 只有“锁视图”（订阅才能看 Combo 等，#191） | 现在混在 main 里，还没拆出来 | — | Base 版上线后再拆、再做 |
 
 测试链接：https://jasonzhu-ctrl.github.io/accuphy-lab-test/
@@ -29,7 +29,7 @@ Jason 2026-11-02：“你记住，或者搞一个 sheet 把各种版本做好管
 - **面板：**
   - 新标题 “ACCUPHY | LAB”；
   - 视图格只有图标，选中的那格有小声纳；
-  - 波束文字：线上现在是 Mini 39°×19°、Combo 78°×19°、PingLive 135°×20°；Jason 11-02 定去掉厚度，只写 39° / 78° / 135°（测试链接 6fe4b4b 已改，未上线）。
+  - 波束文字：只写宽度：Mini 39°、Combo 78°、PingLive 135°（Jason 11-02 去掉厚度，11-03 上线）。
 - **去商店和分享：**
   - 电脑：Shop 按钮、Send to a fishing buddy；
   - 手机：Learn More →、Share to a Fishing Buddy。
@@ -37,6 +37,7 @@ Jason 2026-11-02：“你记住，或者搞一个 sheet 把各种版本做好管
   - 电脑：徽章在手机画面上方，点了出二维码；
   - 手机：不放徽章。
 - **手机：** 船拖到屏幕边，画面会跟着走，湖的每个角落都能到。
+- **湖岸（11-03 上线）：** 夏天湖和冰钓页同一条圆角方形湖岸（沙、草、石头、针叶林；冬天有雪和岸冰）；船/冰洞停在约 5 ft 深处，船头对岸的地方停远一点；提示 “Shoreline — the lake ends here”；树的数量按手机快慢自动调。
 
 ## 改版本的规矩
 
