@@ -3913,6 +3913,13 @@ Numbered log. Newest at the bottom.
        same size and lines as the commit before (1280, 1440, 390).
        Then (界面设计): one desktop size per language for the whole tour — the smallest the page's three titles need, measured in a hidden
        twin (1280: de 40.9, nl 44.6, pl 41.7, lv 41.8 px; English and French 46). The phone keeps its per-title rule.
+     - **View-tile names and the desktop share box** (HQ ③ ④, 11-03, 界面设计's spec; Base's own `buttons.css`, since `src/index.css` is
+       shared by every copy): a tile name breaks only between words; a row whose longest word does not fit shrinks together by 0.5 px
+       steps to ≥ 10 px (`index.jsx`: Mini row in pl 11.5 px, ice row in lv 10.5 px, the rest unchanged); the ice row's tiles get 3 px side
+       padding. No name breaks inside a word in any of the six languages; English names identical to the commit before. The desktop
+       share box opens beside the panel on `<body>` (fixed, 14 px right of it, its bottom on the button's, ≥ 16 px inside the window;
+       the arrow on the left at the button, `--ac-arrow-y`, the same rule as the website-embed copy): at 1280×800, 1280×720, 1440×900
+       and 1920×1080 it sits 16–475 px (de 499) with the arrow on the button. Phone box unchanged (same rect as before).
      Plan: `docs/2026-11-03-multilang-base-plan.md`.
 
 213. **2026-11-03** — **Black Friday locked version: a copy of the base with the #191 lock on, and it takes over the store's Lab**

@@ -62,6 +62,16 @@
 @media (max-width: 369px) { .ac-phone-dock .ac-share { font-size: 13px; padding: 0 10px; } .ac-phone-dock .ac-shop { padding: 0 12px 0 14px; } }
 /* the share popover on phones keeps its place but sits at 40 % (it must clear the taller dock) */
 body .ac-share-pop.is-phone { top: 40%; } /* body: wins over src/index.css whatever the load order */
+/* the desktop share box beside the panel (HQ / 界面设计 11-03): fixed on <body>, placed by ShareButton.jsx; its arrow on the left
+   points at the share button and moves with it (--ac-arrow-y; the same rule as the website-embed copy's) */
+body .ac-share-pop.is-side { position: fixed; bottom: auto; }
+.ac-share-pop.is-side::before { content: ''; position: absolute; left: -7px; top: var(--ac-arrow-y, 50%); width: 12px; height: 12px; margin-top: -6px;
+  background: rgba(14, 28, 36, 0.96); border-left: 1px solid rgba(255, 255, 255, 0.14); border-bottom: 1px solid rgba(255, 255, 255, 0.14); transform: rotate(45deg); }
+/* the panel's view tiles (11-03, the long de / pl / lv names): a name breaks only between words — index.jsx shrinks a row whose
+   longest word does not fit, 0.5 px at a time, down to 10 px; the ice row's five tiles get 3 px side padding (was 5).
+   Base's own overrides of src/index.css, which every copy shares */
+body .ac-view-name { overflow-wrap: normal; }
+body .ac-views.is-5 .ac-view { padding-left: 3px; padding-right: 3px; }
 
 /* The panel title, logo | LAB (Jason 2026-11-02: "LAB" too big; 界面设计 option A, handover §4). LAB's cap height is 60 % of the
    logo's letters and its baseline sits on theirs; a thin rule between. Overrides src/index.css's 24 px Eurostile LAB. */

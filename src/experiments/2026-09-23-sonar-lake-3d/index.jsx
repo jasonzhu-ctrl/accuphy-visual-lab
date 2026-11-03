@@ -233,6 +233,21 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
       el.style.setProperty('--ac-label-w', `${Math.min(104, Math.max(56, w))}px`)
       el.style.setProperty('--ac-label-wide', `${Math.max(96, wide)}px`)
       if (w > 104) for (const n of labels) if (!n.hasAttribute('data-wide')) { n.style.whiteSpace = 'normal'; n.style.lineHeight = '1.15' }
+      // the view tiles' names break only between words (buttons.css); when a row's longest word is wider than its tile, the whole
+      // row's names shrink together, 0.5 px at a time, to no less than 10 px (HQ / 界面设计 11-03)
+      for (const row of el.querySelectorAll('.ac-views')) {
+        const names = [...row.querySelectorAll('.ac-view-name')]
+        if (!names.length) continue
+        for (const n of names) n.style.fontSize = ''
+        const cs = getComputedStyle(names[0]), base = parseFloat(cs.fontSize), ctx = (fit.ctx ||= document.createElement('canvas').getContext('2d'))
+        ctx.font = `${cs.fontWeight} ${base}px ${cs.fontFamily}`
+        let k = 1
+        for (const n of names) {
+          const tile = n.closest('.ac-view'), ts = getComputedStyle(tile), room = tile.clientWidth - parseFloat(ts.paddingLeft) - parseFloat(ts.paddingRight)
+          for (const word of n.textContent.split(/\s+/)) if (word) k = Math.min(k, room / ctx.measureText(word).width)
+        }
+        if (k < 1) { const size = Math.max(10, Math.floor(base * k * 2) / 2); for (const n of names) n.style.fontSize = `${size}px` }
+      }
     }
     fit()
     let live = true

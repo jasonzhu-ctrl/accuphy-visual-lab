@@ -7,7 +7,7 @@
 // own address. Each send reports `share` { channel, market }. No reward wording anywhere (Meta forbids it).
 // Copy inside the store's iframe: clipboard.writeText needs allow="clipboard-write"; else execCommand('copy') on the
 // selected field; else the text stays selected with a "Press ⌘C" hint. Never window.prompt.
-import { useEffect, useId, useRef, useState } from 'react'
+import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import qrcode from 'qrcode-generator'
@@ -58,6 +58,25 @@ export default function ShareButton({ compact = false, thumb, className = '', st
 
   const onClick = (e) => { e.stopPropagation(); if (open) close(); else show('qr_shown') }
 
+  // desktop (HQ / 界面设计 11-03: at 1280 × 800 the box ran off the top): it opens beside the panel — 14 px to its right, its bottom
+  // level with the share button, kept 16 px inside the window top and bottom — with the arrow on its left pointing at the button.
+  // It lives on <body> (the panel's glass would hold a fixed box). No room on the right (a narrow window): above the button, as before.
+  const [side, setSide] = useState(null)
+  useLayoutEffect(() => {
+    if (!open || phone) { setSide(null); return }
+    const place = () => {
+      const b = opener.current?.getBoundingClientRect(), el = pop.current, panel = opener.current?.closest('.ac-panel')?.getBoundingClientRect()
+      if (!b || !el) return
+      const w = el.offsetWidth, h = el.offsetHeight, left = (panel ? panel.right : b.right) + 14
+      if (left + w > window.innerWidth - 16) { setSide(false); return }
+      const top = Math.max(16, Math.min(b.bottom - h, window.innerHeight - 16 - h))
+      setSide({ left, top, arrow: Math.max(18, Math.min(h - 18, b.top + b.height / 2 - top)) })
+    }
+    place()
+    window.addEventListener('resize', place)
+    return () => window.removeEventListener('resize', place)
+  }, [open, phone]) // eslint-disable-line react-hooks/exhaustive-deps
+
   const copy = async () => {
     const url = shareUrl('copy')
     const done = () => { setCopied(true); setPressHint(false); clearTimeout(timer.current); timer.current = setTimeout(() => setCopied(false), 1500); labEvent('share', { channel: 'copy', market }) }
@@ -75,10 +94,11 @@ export default function ShareButton({ compact = false, thumb, className = '', st
         <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M14 2 1.8 7l4.7 2.3M14 2 11 14.2 6.5 9.3M14 2 6.5 9.3" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" /></svg>
         <span>{t(compact ? 'share_buddy_phone' : 'share')}</span>
       </button>
-      {/* the phone popover goes to <body>: inside the phone dock (a transformed element) position: fixed would be relative to the dock */}
-      {(phone ? (n) => createPortal(n, document.body) : (n) => n)(<AnimatePresence>
+      {/* the popover goes to <body>: inside the phone dock (a transformed element) or the panel's glass, position: fixed would be
+          relative to them. Desktop falls back into the panel (above the button) only when there is no room beside it */}
+      {(side === false ? (n) => n : (n) => createPortal(n, document.body))(<AnimatePresence>
         {open && (
-          <motion.div ref={pop} key="pop" id={id} role="dialog" aria-modal="false" aria-labelledby={`${id}-t`} className={`ac-share-pop ${phone ? 'is-phone' : ''}`}
+          <motion.div ref={pop} key="pop" id={id} role="dialog" aria-modal="false" aria-labelledby={`${id}-t`} className={`ac-share-pop ${phone ? 'is-phone' : side === false ? '' : 'is-side'}`} style={phone || side === false ? undefined : side ? { left: side.left, top: side.top, '--ac-arrow-y': `${side.arrow}px` } : { visibility: 'hidden' }}
             initial={phone ? { opacity: 0 } : { opacity: 0, y: 6, scale: 0.98 }} animate={phone ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }} exit={phone ? { opacity: 0 } : { opacity: 0, y: 4, scale: 0.98 }} transition={{ duration: 0.18, ease: 'easeOut' }}
             onPointerDown={(e) => e.stopPropagation()}> {/* phones: opacity only — the centring transform is the CSS's (.is-phone) */}
             <h3 id={`${id}-t`}>{t('share_title')}</h3>
