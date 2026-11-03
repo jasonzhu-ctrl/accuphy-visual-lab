@@ -36,7 +36,7 @@ const S = {
   mode_down: { en: 'Down', fr: 'Bas', de: 'Abwärts', nl: 'Omlaag', pl: 'W dół', lv: 'Uz leju' },
   mode_forward: { en: 'Forward', fr: 'Avant', de: 'Vorwärts', nl: 'Vooruit', pl: 'Do przodu', lv: 'Uz priekšu' },
   mode_panoramic: { en: 'Panoramic', fr: 'Panoramique', de: 'Panorama', nl: 'Panoramisch', pl: 'Panoramiczny', lv: 'Panorāma' },
-  mode_combo: { en: 'Combo', fr: 'Combinée', de: 'Kombi', pl: 'Łączony', lv: 'Kombinētais' }, // the app's "Vue combinée"
+  mode_combo: { en: 'Combo', fr: 'Combinée', de: 'Kombi', pl: 'Łączony', lv: 'Kombo' }, // the app's "Vue combinée"
   mode_liveice: { en: 'Live Ice', fr: 'Live Ice' },
   mode_ice: { en: 'Ice Fishing', fr: 'Pêche sur glace' },
   // the one-line description under the panel: "{device} · {beam} beam. Drag the boat — …"

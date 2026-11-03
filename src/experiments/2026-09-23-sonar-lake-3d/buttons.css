@@ -70,7 +70,7 @@ body .ac-share-pop.is-side { position: fixed; bottom: auto; }
 /* the panel's view tiles (11-03, the long de / pl / lv names): a name breaks only between words — index.jsx shrinks a row whose
    longest word does not fit, 0.5 px at a time, down to 10 px; the ice row's five tiles get 3 px side padding (was 5).
    Base's own overrides of src/index.css, which every copy shares */
-body .ac-view-name { overflow-wrap: normal; }
+body .ac-view-name { overflow-wrap: normal; word-break: normal; hyphens: manual; text-wrap: balance; }
 body .ac-views.is-5 .ac-view { padding-left: 3px; padding-right: 3px; }
 
 /* The panel title, logo | LAB (Jason 2026-11-02: "LAB" too big; 界面设计 option A, handover §4). LAB's cap height is 60 % of the

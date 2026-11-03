@@ -239,12 +239,12 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
         const names = [...row.querySelectorAll('.ac-view-name')]
         if (!names.length) continue
         for (const n of names) n.style.fontSize = ''
-        const cs = getComputedStyle(names[0]), base = parseFloat(cs.fontSize), ctx = (fit.ctx ||= document.createElement('canvas').getContext('2d'))
-        ctx.font = `${cs.fontWeight} ${base}px ${cs.fontFamily}`
+        const base = parseFloat(getComputedStyle(names[0]).fontSize)
         let k = 1
-        for (const n of names) {
+        for (const n of names) { // each word's own width, a Range over it in the name's text
           const tile = n.closest('.ac-view'), ts = getComputedStyle(tile), room = tile.clientWidth - parseFloat(ts.paddingLeft) - parseFloat(ts.paddingRight)
-          for (const word of n.textContent.split(/\s+/)) if (word) k = Math.min(k, room / ctx.measureText(word).width)
+          const tn = n.firstChild, txt = tn?.textContent || ''
+          for (const m of txt.matchAll(/\S+/g)) { const r = document.createRange(); r.setStart(tn, m.index); r.setEnd(tn, m.index + m[0].length); k = Math.min(k, room / r.getBoundingClientRect().width) }
         }
         if (k < 1) { const size = Math.max(10, Math.floor(base * k * 2) / 2); for (const n of names) n.style.fontSize = `${size}px` }
       }

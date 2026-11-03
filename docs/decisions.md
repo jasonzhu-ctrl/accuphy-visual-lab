@@ -3920,6 +3920,9 @@ Numbered log. Newest at the bottom.
        share box opens beside the panel on `<body>` (fixed, 14 px right of it, its bottom on the button's, ≥ 16 px inside the window;
        the arrow on the left at the button, `--ac-arrow-y`, the same rule as the website-embed copy): at 1280×800, 1280×720, 1440×900
        and 1920×1080 it sits 16–475 px (de 499) with the arrow on the button. Phone box unchanged (same rect as before).
+       Then (HQ, 界面设计's detail): the names also get `word-break: normal; hyphens: manual; text-wrap: balance`, and the words are
+       measured with a Range. Latvian Combo is now "Kombo" (strings table f907323), so the lv ice row needs no shrink (11 px);
+       the only shrunk row left is pl Mini (11.5 px).
      Plan: `docs/2026-11-03-multilang-base-plan.md`.
 
 213. **2026-11-03** — **Black Friday locked version: a copy of the base with the #191 lock on, and it takes over the store's Lab**
