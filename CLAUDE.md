@@ -107,7 +107,7 @@ anyone's memory.
   twice and #102 twice (Jason 2026-10-18: 以后注意避免).
 - **Store page = frame, Lab = lab.accuphy.ca (#232, Jason 2026-11-03, hard rule, repeat it):** customers, ads and emails only get
   store links (shop.accuphy.com/<market>/pages/…). Each store page frames one lab.accuphy.ca address (`/pages/lab` → `/`, no lock;
-  `/pages/sonarlab-mktbf2026` → `/bf/`, MKT). The Lab's code never goes into Shopify. HQ and "Lab 营销版" keep and restate this.
+  `/pages/sonarlab-mktbf2026` → `/mktbf2026/`, MKT; #233). The Lab's code never goes into Shopify. HQ and "Lab 营销版" keep and restate this.
 - **One lake, one owner (#176, Jason 2026-10-27):** only "Lab 场景和声纳画面Base" (formerly "冰钓版本视觉效果", renamed by Jason 2026-10-31, #195) changes the lake scene and the sonar imaging
   (ice included). Other chats send it what they need. The canon is `docs/lake-canon.md`; every link is built from one commit.
 - **The colleague 孙英杰 (GitHub AJ-nb, #183, Jason 2026-10-28):** works on his own branch and opens a pull request that
@@ -146,6 +146,9 @@ anyone's memory.
     checklist. HQ manages it and does all coordination with the website / Klaviyo.
   - "Lab video creation" (`local_575bc8a6-28cd-4cfb-b367-63a0c78c335d`, Jason 2026-11-03: base 版本还需要参照之前做视频广告的模式做视频) —
     films from the standard base (86bf80e), by the `ad-video` skill; #185 still applies unless Jason widens it.
+  - "Lab 网站嵌入版" (#233, Jason 2026-11-03) — the website-embed version: its own copy `src/experiments/2026-11-03-sonar-lake-web/`
+    (from live 96fdc22) that serves lab.accuphy.ca `/`, `/mini/`, `/ice/` inside every store `/pages/lab`; its links, its store bridge
+    copy, its go-live checklist. Three versions: Base (source) → 网站嵌入版 / MKT 版 (copies; Base changes move over only on Jason's word).
   - Shared files (`index.jsx`, `SonarChrome.jsx`, `ShareButton.jsx`, `UnlockCard.jsx`, `ShopButton.jsx`, `AppBadges.jsx`): look →
     界面设计, behaviour/events/locks → 对接, scene/range/depth → Base. Tell the others and HQ before editing; say "freed" after.
   - Opened on request, then archived after a handover note: ad films (paused, #183/#185, `ad-video` skill and

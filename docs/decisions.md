@@ -4059,3 +4059,14 @@ Numbered log. Newest at the bottom.
        their frame address (website, Jason's 动 in website HQ).
      - HQ and "Lab 营销版" keep this rule: in `CLAUDE.md`, at the top of `docs/lab-links-sheet.md` and the MKT go-live checklist,
        and they restate it whenever links, pages or a release are discussed.
+
+233. **2026-11-03** — **Three versions, three copies; the MKT address behind the store page becomes `/mktbf2026/`** (Jason in Lab HQ,
+     on HQ's plan `docs/2026-11-03-three-versions-plan.md` and the question "后台地址 /bf/ 要不要改成 /mktbf2026/？": “好的，可以的。可以”;
+     earlier: “命名 明确 lab叫网站嵌入版 … 单独开个窗口专门弄”, card: “单独复制一份”).
+     - **Base**: the source (`2026-09-23-sonar-lake-3d/`, "Lab 场景和声纳画面Base"); seen on the test link; videos and new work start here.
+     - **网站嵌入版** (website-embed version): a new copy `src/experiments/2026-11-03-sonar-lake-web/` taken from live 96fdc22; serves
+       lab.accuphy.ca `/`, `/mini/`, `/ice/`, framed by every store `/pages/lab`; new chat "Lab 网站嵌入版".
+     - **MKT 版**: the copy `2026-11-03-sonar-lake-bf/` ("Lab 营销版"); behind-the-scenes address renamed `/bf/` → **`/mktbf2026/`**,
+       framed by `/pages/sonarlab-mktbf2026` (#229). Same name front and back.
+     - Base changes reach the two copies only when Jason says so (as #216). Neither copy covers the base (#228). #232 holds.
+     - Supersedes #228's "base keeps lab.accuphy.ca /": lab.accuphy.ca `/` now serves the website-embed copy (today identical to 96fdc22).
