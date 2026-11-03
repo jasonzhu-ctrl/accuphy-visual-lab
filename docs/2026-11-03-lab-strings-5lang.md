@@ -4,8 +4,8 @@
 `src/experiments/2026-09-23-sonar-lake-3d/i18n.js` 里的键（来源：i18n.js @ e715574，每个键都在代码里查过用在哪）。
 
 **状态（11-03 核完）：Lab 自己核（#214，Jason 11-03）。** 能核的都标了 “Lab 已核”，每条写了依据。
-拿不准的 3 条都定了（第七节：#220、#221），表里已经没有空格，只剩分享框两句等英文，**没有硬定**，表里写“拿不准”，给了几个备选。
-教程四句说明（`tour_*_text`）的英文 Jason 11-03 定了用现在的（#215），已翻已核；分享框标题和下面那句（`share_title`、`share_line`）的英文还没定，照旧空着。
+拿不准的 3 条都定了（第七节：#220、#221）。**整张表齐了：每条都是“Lab 已核”（法语部分是网站已核），没有空格，没有拿不准的。**
+教程四句说明（`tour_*_text`）的英文 Jason 11-03 定了用现在的（#215），已翻已核；分享框两句（`share_title`、`share_line`）的英文 Jason 11-03 定了（#235），已翻已核；法语标题原来显示 “Partager”，按新英文重翻了。
 下一步：HQ 先给 Jason 看，再由 HQ 放进各版本（#233）：
 - 放进“网站嵌入版”（`src/experiments/2026-11-03-sonar-lake-web/`，就是客人在店铺里看到的那份）；
 - Base 也留一份；
@@ -104,8 +104,8 @@ PingLive：拖船（Down）→ 点 Forward → 点 Panoramic；Mini：拖船（C
 |---|---|---|---|---|---|---|---|---|---|---|
 | share | 电脑面板的分享按钮 | Send to a fishing buddy | Partager | Teilen | Delen | Udostępnij | Kopīgot | 翻 | fr 网站已核（#198）；de nl pl lv Lab 已核 | 照法语的做法用短词。主题de “Dieses Produkt teilen”；主题nl “Deel dit product”；PP “Udostępniaj obraz”；G-LV “kopīgošana” |
 | share_buddy_phone | 手机底部的分享按钮 | Share to a Fishing Buddy | Partager | Teilen | Delen | Udostępnij | Kopīgot | 翻 | 全部 Lab 已核（fr 照 #198 “所有分享处都用 Partager”） | 同上 |
-| share_title | 分享框标题 | （草稿）Show a buddy what’s under the boat | （现在显示 Partager） | — | — | — | — | 翻 | **等 Jason 定英文**；定之前可临时用上一行的短词 | — |
-| share_line | 分享框预览图下一句 | （草稿）Drag the boat. Watch the sonar light up. | （空，不显示） | — | — | — | — | 翻 | **等 Jason 定英文**；定之前留空 | — |
+| share_title | 分享框标题 | Show a buddy what’s under the boat | Montrez à un ami ce qu’il y a sous le bateau | Zeigen Sie einem Angelfreund, was unter dem Boot ist | Laat een vismaat zien wat er onder de boot zit | Pokaż znajomemu, co jest pod łodzią | Parādiet draugam, kas ir zem laivas | 翻 | 全部 Lab 已核（英文 Jason 11-03 定，#235） | buddy：fr、pl、lv 跟已核的二维码小字用同一个“朋友”（un ami / znajomy / draugs）；de Angelfreund、nl vismaat 是钓友的常用说法（二维码小字写 Freund / vriend，这里标题点出“钓友”，跟英文 buddy 一样）；“under the boat”：已核 fr “sous le bateau”、店de “unter Ihrem Boot”、店nl “onder je boot”、PP “pod łodzią”、G-LV “zem laivas” |
+| share_line | 分享框预览图下一句 | Drag the boat. Watch the sonar light up. | Faites glisser le bateau. Regardez le sondeur s’allumer. | Ziehen Sie das Boot. Sehen Sie, wie das Echolot aufleuchtet. | Versleep de boot. Kijk hoe de sonar oplicht. | Przeciągnij łódź. Zobacz, jak sonar się podświetla. | Velciet laivu. Vērojiet, kā sonārs izgaismojas. | 翻 | 全部 Lab 已核（英文 Jason 11-03 定，#235） | “Drag the boat” 同 hint_boat；sonar：GL fr sondeur、de Echolot、nl sonar，PP “sonar”，G-LV “sonārs”；“light up” 同 desc_lake（s’allume / leuchtet auf / licht op / podświetla się / izgaismojas） |
 | share_qr_caption | 电脑分享框二维码下 | Scan with your phone camera to open the Lab on your phone | Scannez avec l’appareil photo de votre téléphone pour ouvrir le Lab. | Mit der Smartphone-Kamera scannen, um das Lab auf dem Smartphone zu öffnen. | Scan met de camera van je smartphone om het Lab op je smartphone te openen. | Zeskanuj aparatem w telefonie, aby otworzyć Lab na telefonie. | Skenējiet ar tālruņa kameru, lai atvērtu Lab tālrunī. | 翻（Lab 不翻） | fr 网站已核；de nl pl lv Lab 已核 | GL tablet 一行（de/nl 用 Smartphone）、G-DE / G-NL “Smartphone”；主题de “scannen, um…”；主题nl “scan om…”；G-PL “kod QR możesz zeskanować”、PP “telefon”；G-LV “skenēt šo QR kodu”“tālrunis” |
 | share_qr_caption_phone | 手机分享框二维码下 | Let a friend scan this with their phone camera | Un ami peut scanner ce code avec l’appareil photo de son téléphone. | Ein Freund kann diesen Code mit der Smartphone-Kamera scannen. | Laat een vriend deze code scannen met de smartphonecamera. | Znajomy może zeskanować ten kod aparatem w telefonie. | Draugs var skenēt šo kodu ar tālruņa kameru. | 翻 | fr 网站已核；de nl pl lv Lab 已核 | 同上 |
 | share_link_label | 链接框（读屏用） | Link | Lien | Link | Link | Link | Saite | 翻 | fr 网站已核；de nl pl lv Lab 已核 | 主题de / 主题nl “Link”（share_url）；pl 通用 link；G-LV “saite / saiti” |
@@ -179,6 +179,8 @@ nl、lv 的 App 没有这两种语言，留英文。de、pl 是 App 原字（网
 | tour_tap | Tap | Dotknij | Tap | Pieskarieties | Tap | = |
 | tour_skip | Skip tour | Pomiń samouczek | Skip the tutorial | Izlaist pamācību | Skip the tutorial | 故意用“教程”，比“导览”好懂 |
 | tour_replay | Replay tour | Powtórz samouczek | Repeat the tutorial | Atkārtot pamācību | Repeat the tutorial | 同上 |
+| share_title | Show a buddy what’s under the boat | Pokaż znajomemu, co jest pod łodzią | Show a friend what is under the boat | Parādiet draugam, kas ir zem laivas | Show a friend what is under the boat | “buddy” 回成 friend，意思一样（钓友语气稍淡） |
+| share_line | Drag the boat. Watch the sonar light up. | Przeciągnij łódź. Zobacz, jak sonar się podświetla. | Drag the boat. See how the sonar lights up. | Velciet laivu. Vērojiet, kā sonārs izgaismojas. | Drag the boat. Watch how the sonar lights up. | = |
 | share / share_buddy_phone | Send to a fishing buddy / Share to a Fishing Buddy | Udostępnij | Share | Kopīgot | Share | 故意用短词，跟法语 #198 一样（按钮放得下） |
 | share_qr_caption | Scan with your phone camera to open the Lab on your phone | Zeskanuj aparatem w telefonie, aby otworzyć Lab na telefonie. | Scan with the phone camera to open the Lab on the phone. | Skenējiet ar tālruņa kameru, lai atvērtu Lab tālrunī. | Scan with the phone camera to open the Lab on the phone. | = |
 | share_qr_caption_phone | Let a friend scan this with their phone camera | Znajomy może zeskanować ten kod aparatem w telefonie. | A friend can scan this code with the phone camera. | Draugs var skenēt šo kodu ar tālruņa kameru. | A friend can scan this code with the phone camera. | = （跟法语已核的写法一样） |
@@ -270,3 +272,4 @@ App Store、Google Play、“ACCUPHY | LAB” 标题、AUTO、数字和单位、
 - 2026-11-03 Lab 多语言：Jason 定 range_down 照 Garmin；德语 Panoramic 名他让 Lab 定，定 Panoramablick（#221）。拿不准清零。
 - 2026-11-03 Lab 多语言：Jason：“你来定这些翻译 不确定就查一查”（#222）。英文 Down range 不改。
 - 2026-11-03 Lab 多语言：照 #233 改了交付去处（HQ 放进网站嵌入版，Base 留一份，MKT 版之后）。
+- 2026-11-03 Lab 多语言：#235 分享框两句翻成 5 种并核过（pl、lv 反译对过）。整张表齐了，没有拿不准的。
