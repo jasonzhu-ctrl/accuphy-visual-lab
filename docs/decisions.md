@@ -3927,3 +3927,14 @@ Numbered log. Newest at the bottom.
 216. **2026-11-03** — **The multi-language work goes into the locked copy once it is finished** (Jason in Lab HQ, card on how base
      changes reach the #213 copy: “等多语言做完你再搞呗”). Until #212 is reviewed and in the base, the copy stays at 86bf80e; then
      "Lab 营销版" brings #212 over and the tests run again. Other later base changes: HQ asks Jason then.
+
+217. **2026-11-03** — **Each market's store Lab page carries its language; markets without one add `?lang=`; one links sheet records
+     it all** (Jason in Lab HQ: “我们现有的网店的应该把 lab 做到这些网店的对应的链接里面去 … 没有的话 … 下面来个 slash，然后一个什么
+     语言版本就 OK 了。一定要搞个文档，专门把这些那个不同的版本啊，那些啥的都全都记下来”).
+     - No language switch inside the Lab. /fr, /fr-fr, /fr-benelux → French; /de-de, /de-benelux → German; /nl-benelux → Dutch, by
+       the store's own language through the frame (website #228). English pages stay English.
+     - Polish and Latvian (no store language): the market's own store link plus `?lang=` — `/en-pl/pages/lab?lang=pl`,
+       `/en-ro/pages/lab?lang=lv` (Latvia is in the Romania market). HQ used the markets' own links rather than the Canadian store,
+       so the shop button, retail pages and currency fit; Shopify cannot serve a `/pages/lab/pl` path.
+     - Romanian and Spanish store pages stay English in the Lab (not in #212).
+     - Sheet: `docs/lab-links-sheet.md` (all store Lab links checked 200 on 11-03, Lab addresses, test links, the two versions).

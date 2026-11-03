@@ -15,6 +15,8 @@ Jason 2026-11-02：“你记住，或者搞一个 sheet 把各种版本做好管
 
 测试链接：https://jasonzhu-ctrl.github.io/accuphy-lab-test/
 
+各市场、各语言的店铺 Lab 链接，见 `docs/lab-links-sheet.md`（链接总表）。
+
 ## 标准 Base 版里有什么（11-02 定）
 
 - **湖和声纳：**
