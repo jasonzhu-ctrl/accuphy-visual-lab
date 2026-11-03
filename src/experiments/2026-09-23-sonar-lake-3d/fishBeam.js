@@ -92,10 +92,10 @@ function makeStay(sp, T, p, apex) {
 }
 
 const live = (f) => f.act?.kind === 'visit'
-function counts(pop, t, specs, apex, o) {
+function counts(pop, t, specs, apex, o, hold) {
   const n = specs.map(() => 0), going = specs.map(() => 0)
   for (const f of pop) {
-    if (f.species === 'smelt' || !f.radius) continue
+    if (f.species === 'smelt' || !f.radius || (hold != null && !live(f))) continue // held: fish passing through do not count, they swim off
     const a = f.act
     if (live(f) && visitInBeamPhase(a, t) === 'in' && a.spec === specs) { if (specs[a.fan]) going[a.fan]++; continue }
     fishPose(f, t, o)
@@ -137,8 +137,9 @@ function release(f, t, top, circles, bedY) {
   else { f.act.t2 = Infinity; f.act.until = t + 4 } // nothing in the way next time, or it stays a little longer
 }
 
-// every frame, after the behaviours
-export function stepBeamFish(pop, t, specs, deviceId, mode, apex, busy, top, circles, bedY) {
+// every frame, after the behaviours. `hold` (dev only, ad shots: Scene.jsx s.adIce.fish): exactly this many visitors per fan — a
+// number, or [down, forward] for Combo — kept for as long as it is set; fish passing through do not count (a moved hole still sends them home)
+export function stepBeamFish(pop, t, specs, deviceId, mode, apex, busy, top, circles, bedY, hold) {
   if (!apex || apex.y === 0) return
   const b = pops.get(pop) || makeState(); pops.set(pop, b)
   const moved = b.ax === null || Math.hypot(apex.x - b.ax, apex.z - b.az) > 0.01
@@ -147,20 +148,21 @@ export function stepBeamFish(pop, t, specs, deviceId, mode, apex, busy, top, cir
   for (const f of pop) if (live(f) && f.act.back && t > f.act.t2 + f.act.back.T) { f.act = null; f.beamCool = t + pick(20, 40) } // home again; a fish does not follow the boat from spot to spot
   if (t < b.next) return
   b.next = t + 0.5
-  const o = {}, min = beamMin(deviceId, mode), [n, going] = specs.length ? counts(pop, t, specs, apex, o) : [[], []]
+  const o = {}, min0 = beamMin(deviceId, mode), [n, going] = specs.length ? counts(pop, t, specs, apex, o, hold) : [[], []]
+  const mins = specs.map((_, k) => (hold == null ? min0 : Array.isArray(hold) ? hold[k] ?? min0 : hold))
   for (const f of pop) {
     if (!live(f) || f.act.back || visitInBeamPhase(f.act, t) !== 'stay') continue
     const a = f.act, far = Math.hypot(a.apex.x - apex.x, a.apex.z - apex.z) > 1.5 // the boat moved off: it goes home now
-    if (!far && t < a.until) continue
+    if (!far && hold == null && t < a.until) continue // held: no timer — the extra visitors go at once, the ones the beam needs stay
     fishPose(f, t, o)
     const fans = specs.map((sp, k) => (inFan(sp, o.x - apex.x, o.y - apex.y, o.z - apex.z) ? k : -1)).filter((k) => k >= 0)
-    if (!far && fans.some((k) => n[k] <= min)) { a.until = t + 10; continue } // the beam needs it
+    if (!far && fans.some((k) => n[k] <= mins[k])) { a.until = t + 10; continue } // the beam needs it
     release(f, t, top, circles, bedY)
     if (f.act?.back) fans.forEach((k) => n[k]--)
   }
   if (t - b.still < SETTLE || !specs.length) return // the boat has settled first
   const taken = []
-  specs.forEach((_, k) => { const need = min - n[k] - going[k]; if (need > 0) call(pop, t, specs, k, need, apex, top, circles, bedY, o, taken) })
+  specs.forEach((_, k) => { const need = mins[k] - n[k] - going[k]; if (need > 0) call(pop, t, specs, k, need, apex, top, circles, bedY, o, taken) })
 }
 
 // the opening spot, before the first frame: whichever device and view the visitor picks first has its minimum. Fish are placed

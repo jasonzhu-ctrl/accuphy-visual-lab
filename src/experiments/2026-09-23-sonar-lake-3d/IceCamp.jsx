@@ -239,9 +239,15 @@ export function IceCamp({ state, beamMats, iceMat, T }) {
     aim.visible = !!s.aiming && !!s.aim
     if (s.aim) aim.position.set(s.aim.x, s.view === 'under' ? -ICE_T - 0.02 : 0.015, s.aim.z)
     // the section view keeps the camp beside the hole, inside the cut; the other views leave it where the visitor started
-    const c = s.view === 'section' ? campAt(s.boat.x, s.boat.z, 7.5, -3.0) : camp
+    // dev (ads, #225): s.adIce = { shelter: [dx, dz], sled: [dx, dz, yawDeg?] } — metres from the live hole; the shelter's door
+    // still faces the hole, the sled turns with yawDeg (else as the shelter). Not in builds.
+    const ad = import.meta.env.DEV ? s.adIce : null, adOk = (v) => Array.isArray(v) && Math.hypot(v[0], v[1]) > 0.5
+    const c = adOk(ad?.shelter) ? campAt(s.boat.x, s.boat.z, ad.shelter[0], ad.shelter[1]) : s.view === 'section' ? campAt(s.boat.x, s.boat.z, 7.5, -3.0) : camp
     if (campG.current) { campG.current.position.set(c.x, 0, c.z); campG.current.rotation.y = c.yaw }
-    if (sledG.current) { sledG.current.position.set(c.x + (s.view === 'section' ? 1.6 : -1.1), 0, c.z + (s.view === 'section' ? -2.2 : 2.3)); sledG.current.rotation.y = c.yaw + 0.5 }
+    if (sledG.current) {
+      if (adOk(ad?.sled)) { sledG.current.position.set(s.boat.x + ad.sled[0], 0, s.boat.z + ad.sled[1]); sledG.current.rotation.y = ad.sled[2] != null ? (ad.sled[2] * Math.PI) / 180 : c.yaw + 0.5 }
+      else { sledG.current.position.set(c.x + (s.view === 'section' ? 1.6 : -1.1), 0, c.z + (s.view === 'section' ? -2.2 : 2.3)); sledG.current.rotation.y = c.yaw + 0.5 }
+    }
     if (lampRef.current) lampRef.current.position.set(c.lamp.x, c.lamp.y + 0.2, c.lamp.z)
     u.uLamp.value.set(c.lamp.x, c.lamp.y, c.lamp.z, T.lamp)
   })

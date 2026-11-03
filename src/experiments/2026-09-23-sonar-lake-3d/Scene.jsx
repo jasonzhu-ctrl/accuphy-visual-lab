@@ -7,7 +7,7 @@ import { mergeGeometries as _merge } from 'three/addons/utils/BufferGeometryUtil
 const mergeGeometries = (parts) => _merge(parts.map((g) => (g.index ? g.toNonIndexed() : g)))
 import { HALF, SEG, bedY, fbm, depthAt, ROCK_HUMPS, shoreStop, shoreR } from './terrain'
 import { SPECIES, makePopulation, fishPose, stepBehaviours, forceRise, forceJig, winterCamp, rnd, drawnLen } from './fish'
-import { seedBeamFish, stepBeamFish } from './fishBeam'
+import { seedBeamFish, stepBeamFish, inFan } from './fishBeam'
 import { makeLakeMaterial, setBeamUniforms, LAKE_TIME } from './lakeMaterial'
 import { wedgeGeometry } from '../2026-09-23-beam-shapes-3d/wedge'
 import { makeTallTree, makeBushTree, makeStump, makeLog, makeWeedTuft, placeAll } from './vegetation'
@@ -247,6 +247,7 @@ function Fish({ mat, state }) {
     window.__fish = pop // dev: fish population for scene lookups
     window.__jig = () => state.current.jig ? forceJig(pop, window.__lakeClock?.elapsedTime ?? 0, state.current.jig, circles, bedY) : 'no jig' // dev: the nearest fish comes to the jig now
     window.__chase = (species = 'laketrout') => forceRise(pop, window.__lakeClock?.elapsedTime ?? 0, state.current.apex, species, circles, bedY) // dev: make the nearest fish rise now
+    window.__beamFish = () => { const s = state.current, t = window.__lakeClock?.elapsedTime ?? 0, o = {}; return s.specs.map((sp) => pop.filter((f) => f.species !== 'smelt' && f.radius && (fishPose(f, t, o), inFan(sp, o.x - s.apex.x, o.y - s.apex.y, o.z - s.apex.z))).length) } // dev: fish in each fan now ([down, forward] in Combo)
   }
   state.current.pop = pop
   // behaviours (fish.js): boat-triggered rises, bass strikes on bait, salmon bursts — before anything reads a pose
@@ -260,7 +261,7 @@ function Fish({ mat, state }) {
     }
     // ice page: s.jig (IceCamp) draws fish to the lure (the lake's own jig, #172, was removed in #174)
     stepBehaviours(pop, clock.elapsedTime, Math.min(dt, 0.1), state.current.apex, circles, bedY, state.current.holes ? state.current.jig || null : null)
-    if (!beamOff) stepBeamFish(pop, clock.elapsedTime, s.specs, s.deviceId, s.mode, s.apex, s.dragging || s.noSignal, beamTop, circles, bedY)
+    if (!beamOff) stepBeamFish(pop, clock.elapsedTime, s.specs, s.deviceId, s.mode, s.apex, s.dragging || s.noSignal, beamTop, circles, bedY, import.meta.env.DEV ? s.adIce?.fish : undefined) // dev (ads, #225): s.adIce.fish holds fish in the beam
   }, -1)
   const groups = useMemo(() => {
     const by = {}

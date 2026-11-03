@@ -4001,6 +4001,12 @@ Numbered log. Newest at the bottom.
      - Captions redesigned (eye-catching, premium, never over the beam). Length not fixed (replaces #223's 20 s). Camera moves
        after film practice. PingLive waits until the Mini film is done.
      - Change list: `docs/2026-11-03-ad-base-feedback-round1.md`.
+     - **Base's dev hooks for the ice orbit** (HQ, 11-03; dev server only, none in a build — `build-share` checked):
+       `__sonarState.adIce = { shelter: [dx, dz], sled: [dx, dz, yawDeg?], fish: n | [down, forward] }`. The shelter and sled offsets are
+       metres from the live hole (door still faces the hole); `fish` holds exactly that many fish per fan in the beam for as long as it
+       is set, fish passing through not counted, the extras sent home at once — set it ~15 s before recording. `__beamFish()` returns
+       the fish in each fan now. `adIce = null` puts everything back. Measured, Combo `fish: [2, 3]`: 2 + 3 held from 15 s to 73 s; without
+       it the opening fish leave at ~60 s (1–2 left). Without the hooks nothing changes (lake and ice, desktop and phone, 0 errors).
 
 226. **2026-11-03** — **The ice page's 120 ft framing (#224) goes into the locked copy together with the multi-language work**
      (Jason in Lab HQ, card “冰钓页这个改动，要不要也搬进黑五带锁版？”: “和多语言一起搬”). Adds to #216: when #212 is reviewed and in the
