@@ -9,6 +9,10 @@ with the source commit it was built from, so anyone can tell which version a lin
 sign-up and Combo stays shut for everyone (no fake success). Test links show "Test mode: nothing is sent." The consent wording
 (`unlock_consent` in i18n.js) is Klaviyo HQ's draft and waits for Jason.
 
+## 2026-11-02: test links at 6c803dd
+
+#206: one rounded-square shoreline for the lake and ice pages (E 65 / S 62 / W 61 / N ~76 m, wreck cove ~98 m), shore models out of the sonar, "Shoreline — the lake ends here"; summer desktop and landscape now follow the boat. Trees ~0.97 M triangles desktop / 0.56 M phone: real-phone fps not measured. lab.accuphy.ca stays at 6b5a225.
+
 ## 2026-11-02: test links at a8db17b
 
 #204: ice page Top camera follows the hole; one ±58 m edge for both pages. lab.accuphy.ca stays at 6b5a225.
@@ -75,7 +79,7 @@ but is published nowhere and is redundant since #170.
 |---|---|---|---|
 | shop.accuphy.com/pages/lab and /fr/pages/lab | customers | an iframe of lab.accuphy.ca/ (not `/embed/`) | **6b5a225, newest** |
 | lab.accuphy.ca = accuphy-lab.vercel.app (one deployment) | anyone with the link | `/`, `/mini/`, `/ice/`, `/embed/` | **6b5a225, newest** |
-| Friends' test link jasonzhu-ctrl.github.io/accuphy-lab-test | friends, Jason | `/`, `/mini/`, `/ice/`; `/jig/`, `/pano/` forward to `/` | **a8db17b** (live 6b5a225 + #203 ice tour, beam width only, #204) |
+| Friends' test link jasonzhu-ctrl.github.io/accuphy-lab-test | friends, Jason | `/`, `/mini/`, `/ice/`; `/jig/`, `/pano/` forward to `/` | **6c803dd** (live 6b5a225 + ice tour, beam width only, #204, #206 shoreline) |
 | claude.ai private previews | — | **none**: the four old ones (RnCB, VxxnV fish test, G5uZ ice, 4GdHH) were deleted 2026-10-27 at Jason's word ("如果是现在项目需要的话留一个就行了"; the test link does the job) | — |
 | The v3 ad film | Meta, from 11/2 | recorded | lake 1abeedf (before #178; its shots show no Panoramic sonar) |
 | Colleague branches (not merged): PR #30 `codex/lab-clarity-optics` (AJ-nb, 10-28), PR #31 `codex/blue-hour-lake` (Codex agent, 10-29; private preview on accuphy-blue-hour-lake-20261029.accuphy-1012.chatgpt.site, owner-only) | the colleague, Jason | their own builds | not in main, not on any Lab link |
