@@ -60,7 +60,7 @@ Jason 11-03：“一定要搞个文档，专门把这些不同的版本啊，那
 
 | 地址 | 现在是什么 | 黑五带锁版上线后（#213） |
 |---|---|---|
-| https://lab.accuphy.ca/ | 标准 Base 86bf80e，无锁；店铺所有 Lab 页嵌的都是它 | 照旧是 Base（#228：营销版绝不覆盖 Base） |
+| https://lab.accuphy.ca/ | 标准 Base 96fdc22（11-03 晚），无锁；店铺所有 Lab 页嵌的都是它 | 照旧是 Base（#228：营销版绝不覆盖 Base） |
 | https://lab.accuphy.ca/bf/ | （还没有） | 黑五带锁版（店铺 Lab 页要不要指向它，等 Jason 定） |
 | https://lab.accuphy.ca/mini/ | 只有 Mini 的 Base | 照旧 Base |
 | https://lab.accuphy.ca/ice/ | 冰钓页 Base | 照旧 Base |
@@ -71,10 +71,10 @@ Jason 11-03：“一定要搞个文档，专门把这些不同的版本啊，那
 
 | 地址 | 现在是什么（11-03） |
 |---|---|
-| https://jasonzhu-ctrl.github.io/accuphy-lab-test/ | Base 86bf80e（= 线上） |
+| https://jasonzhu-ctrl.github.io/accuphy-lab-test/ | Base 96fdc22（= 线上） |
 | https://jasonzhu-ctrl.github.io/accuphy-lab-test/bf/ | 黑五带锁版，测试模式，订阅不发出去（11-03 从首页挪到这里，#228） |
-| https://jasonzhu-ctrl.github.io/accuphy-lab-test/mini/ | Base 86bf80e |
-| https://jasonzhu-ctrl.github.io/accuphy-lab-test/ice/ | Base 65486b0（11-03：冰钓 Forward / Combo 的前视 120 ft 进画面，#224；还没上线） |
+| https://jasonzhu-ctrl.github.io/accuphy-lab-test/mini/ | Base 96fdc22（= 线上） |
+| https://jasonzhu-ctrl.github.io/accuphy-lab-test/ice/ | Base 96fdc22（= 线上） |
 
 测试链接后面加 `?lang=de`（或 fr、nl、pl、lv）可以看那种语言。只有核好的字放进去以后，才看得出区别。
 

@@ -9,6 +9,10 @@ with the source commit it was built from, so anyone can tell which version a lin
 sign-up and Combo stays shut for everyone (no fake success). Test links show "Test mode: nothing is sent." The consent wording
 (`unlock_consent` in i18n.js) is Klaviyo HQ's draft and waits for Jason.
 
+## 2026-11-03: LIVE lab.accuphy.ca at 96fdc22 (latest base)
+
+Jason said “动，更新” in Lab HQ (on “现在把 lab.accuphy.ca 三个页面更新到最新的 Base 吗？”; earlier: “很好 记住并且让他们都用最新版本的场景”). Base code = c8ace42 (no lake change after it). Adds to 86bf80e: #212 code (?lang= de/nl/pl/lv, metres first for them, share link keeps lang, Latin Extended-A fonts, `<html lang>`; no translations yet, so those languages show English text), #224 (ice Forward/Combo frame 120 ft), #225 dev hooks (not in builds). Built with `BASE_REF=96fdc22 node scripts/build-bf-site.mjs` (/bf/ dropped, not live) + `build-embed.mjs` from a clean checkout. Vercel inspect https://vercel.com/accuphy/accuphy-lab/7FSxmSUVX2bZYpTA2fpyanK9fiWx, embed `lab-0c39d390cc.js`. Checked: live md5 = build for `/` (afb82b9c), `/mini/` (26abb62f), `/ice/` (f22f445a); /embed/lab.js → new build (200); CSP frame-ancestors and noindex present; .env.local/.vercel 404; /bf/ 404 (not live); store /pages/lab 200. Smoke test on the test link first: `/`, `/?lang=de` (html lang de, metres), `/ice/` load with 0 errors. Test link `/`, `/mini/`, `/ice/`, `/bf/ice/` = the same build. Replaces 86bf80e. Not yet: website 03 recheck.
+
 ## 2026-11-03: test link /ice/ at 65486b0 (#224)
 
 Base 99e15c8 (Jason 动 in Base): ice Forward/Combo frame the forward beam to 120 ft on phone and desktop. Built with `BASE_REF=HEAD node scripts/build-bf-site.mjs`; only `/ice/` copied to the test repo (md5 checked live). `/`, `/base/`, `/mini/` unchanged. Not live.
