@@ -11,6 +11,8 @@ export const LANGS = ['en', 'fr', 'de', 'nl', 'pl', 'lv']
 export const LANG = (() => { try { const l = (new URLSearchParams(window.location.search).get('lang') || '').trim().toLowerCase(); return LANGS.includes(l) ? l : 'en' } catch { return 'en' } })()
 // Metres first for the European languages (#212); the visitor can still tap a value to switch. en and fr (Canada) stay in feet.
 export const METRIC_FIRST = ['de', 'nl', 'pl', 'lv'].includes(LANG)
+// the page says which language it is in, for screen readers and search (对接 11-03); index.html and the share build ship lang="en"
+try { document.documentElement.lang = LANG } catch { /* no document: node tests */ }
 
 const S = {
   // control panel
