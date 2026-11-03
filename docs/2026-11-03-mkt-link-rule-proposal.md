@@ -6,12 +6,12 @@
 ## 规则
 
 - **Base（不带锁）：**
-  - lab.accuphy.ca `/`（PingLive，能切 Mini）、`/mini/`、`/ice/`（Jason：“很好 记住”）；
+  - lab.accuphy.ca `/`（PingLive，能切 Mini）、`/mini/`、`/ice/`（Jason：“很好 记住”）；#233 起由“网站嵌入版”的复制件打包；
   - 店铺各市场的 `<市场主页>/pages/lab` 嵌 Base；
   - 不用来投放。
 - **MKT 版（带锁、投放用）：**
   - 店铺页面：`<市场主页网址>/pages/sonarlab-mktbf2026`；
-  - 页面里嵌：lab.accuphy.ca/bf/。
+  - 页面里嵌：lab.accuphy.ca/mktbf2026/。
 - **店铺没有这种语言的市场（波兰、拉脱维亚，#218）：** 主站加语言，`https://shop.accuphy.com/pages/sonarlab-mktbf2026?lang=pl` / `?lang=lv`。
   - 网站给波兰加了波兰语页以后，波兰换成那一页。
   - `?lang=` 只换 Lab 的语言，店铺页其他地方还是英文。
@@ -23,12 +23,12 @@
 - 规则只有一条，跟着店铺现有的市场前缀走。页面是全店共用的，建一次，每个市场前缀都自动有。
 - Base 的 `/pages/lab` 一点不动，两个版本同时在。广告投 MKT 链接；视频、素材、别的页面用 Base。
 - MKT 页也在店铺里，所以去商店按市场走、统计事件（Meta、GA4、Klaviyo）照常，和 Base 页一样。
-- Lab 的地址用 `/bf/`，不改名 `/mkt/`：店铺页面名里已经带 bf2026（HQ 定）。
+- Lab 的地址用 `/mktbf2026/`（#233，原来叫 /bf/），跟店铺页 `sonarlab-mktbf2026` 同一个名字，一看就知道是一对。
 
 ## 谁做（都经 HQ）
 
-- **网站：** 建 `sonarlab-mktbf2026` 页面，用和 `/pages/lab` 同一个嵌入区块，地址改成 lab.accuphy.ca/bf/，不放菜单。要 Jason 在网站 HQ 说“动”。
-- **Lab 营销版：** 打包 `/bf/`（`scripts/build-bf-site.mjs`）。lab.accuphy.ca/bf/ 上线要 Jason 在 Lab HQ 说“动”。
+- **网站：** 建 `sonarlab-mktbf2026` 页面，用和 `/pages/lab` 同一个嵌入区块，地址改成 lab.accuphy.ca/mktbf2026/，不放菜单。要 Jason 在网站 HQ 说“动”。
+- **Lab 营销版：** 打包 `/mktbf2026/`（`scripts/build-bf-site.mjs`）。lab.accuphy.ca/mktbf2026/ 上线要 Jason 在 Lab HQ 说“动”。
 - **Klaviyo：** 只在 `/pages/sonarlab-mktbf2026` 上关掉 20 秒弹窗 VpD3CV，`/pages/lab` 照旧。
 
 上线前要齐的全部东西：`docs/2026-11-03-mkt-go-live-checklist.md`。

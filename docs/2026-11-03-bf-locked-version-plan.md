@@ -21,16 +21,16 @@
    - 带 `?lab_unlock=sub` 的邮件链接直接解锁。
    - 名单号只从构建变量 `VITE_BF_LIST_ID` 来，只有上线包填 W24Qdc。没填时：真实域名上卡片说“暂未开放”；测试链接上是测试模式，什么都不发。
    - 同意文字是 Jason 定的那句（4d41681）。
-2. **网址**（`scripts/build-bf-site.mjs`，5c2178b）：
+2. **网址**（`scripts/build-bf-site.mjs`；#233：带锁版的地址从 /bf/ 改名成 /mktbf2026/，跟店铺页同名）：
 
    | 网址 | 是什么 |
    |---|---|
-   | `/`、`/mini/`、`/ice/` | Base（`BASE_REF` 那个版本），md5 和线上一样 |
-   | `/bf/` | 带锁版 |
-   | `/bf/ice/` | Base 冰钓页的复制（带锁版手机上的冰钓格子会跳到这里，不带锁） |
+   | `/`、`/mini/`、`/ice/` | 不带锁的那一份（`BASE_REF` 那个版本），md5 和线上一样；#233 起由“网站嵌入版”的复制件打包，打包脚本由它来改 |
+   | `/mktbf2026/` | 带锁版 |
+   | `/mktbf2026/ice/` | Base 冰钓页的复制（带锁版手机上的冰钓格子会跳到这里，不带锁） |
 
 3. **店铺 MKT 页**（网站做，方案 `accuphy-website/docs/plans/2026-11-03-lab-mkt-store-page.md`）：
-   - 新页面 `/pages/sonarlab-mktbf2026`，所有市场前缀自动都有，嵌 lab.accuphy.ca/bf/；
+   - 新页面 `/pages/sonarlab-mktbf2026`，所有市场前缀自动都有，嵌 lab.accuphy.ca/mktbf2026/；
    - 不放进菜单；`/pages/lab` 不动。
 4. **谁改：**
    - 营销版只改复制件和打包脚本；Base 只改原来的湖文件夹。
@@ -42,7 +42,7 @@
   - 单元测试 `LAB_DIR=2026-11-03-sonar-lake-bf`；
   - 假店铺页 `LAB_LOCKED=1` 的 lock-desktop。
 - 现在有 5 条失败，都是预料中的：share-url 4 条和 share-de 1 条，都是多语言的用例，等 #212 搬进来。
-- 测试链接：HQ 更新，`/bf/` 是测试模式。
+- 测试链接：HQ 更新，`/mktbf2026/` 是测试模式。
 
 ## 要知道的
 

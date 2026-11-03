@@ -4,7 +4,7 @@
 > - 客人、广告、邮件只拿**店铺链接**（`shop.accuphy.com/<市场>/pages/…`）。lab.accuphy.ca 的地址只在后台用，不给客人。
 > - 每个店铺页的框里只显示一个 lab.accuphy.ca 地址：
 >   - `/pages/lab` 嵌 `lab.accuphy.ca/`（Base，不带锁）；
->   - `/pages/sonarlab-mktbf2026` 嵌 `lab.accuphy.ca/bf/`（MKT 版，带锁）。
+>   - `/pages/sonarlab-mktbf2026` 嵌 `lab.accuphy.ca/mktbf2026/`（MKT 版，带锁）。
 > - Lab 的程序不放进 Shopify。
 > - 清单里每一项都写清楚是哪一层：**客人看到的店铺页**，还是**它后面的 lab.accuphy.ca 地址**。
 
@@ -17,28 +17,28 @@ MKT 版归 “Lab 营销版” 窗口负责（#231）。HQ 管它，和网站、
 - **复制件：** `src/experiments/2026-11-03-sonar-lake-bf/`，从 Base 86bf80e 复制，锁永远开着（#191、#213）。同意文字已经放进去（4d41681）。
 - **打包：** `BASE_REF=<Base 版本> node scripts/build-bf-site.mjs <out>`（#228 的布局）。
   - `/`、`/mini/`、`/ice/` 是 Base，md5 和线上一样；
-  - `/bf/` 是带锁版；
-  - `/bf/ice/` 是 Base 冰钓页的一份复制。
-- **测试链接：** HQ 已更新，`/bf/` 是测试模式，什么都不发。
-- **投放链接：** 10 个市场，每个市场主页网址 + `/pages/sonarlab-mktbf2026`，页面里嵌 lab.accuphy.ca/bf/（#229、#230）。见 `docs/lab-links-sheet.md` 第一节。
-- **还没上线：** lab.accuphy.ca/bf/ 没上，店铺 MKT 页也没建。
+  - `/mktbf2026/` 是带锁版；
+  - `/mktbf2026/ice/` 是 Base 冰钓页的一份复制。
+- **测试链接：** HQ 已更新，`/mktbf2026/` 是测试模式，什么都不发。
+- **投放链接：** 10 个市场，每个市场主页网址 + `/pages/sonarlab-mktbf2026`，页面里嵌 lab.accuphy.ca/mktbf2026/（#229、#230）。见 `docs/lab-links-sheet.md` 第一节。
+- **还没上线：** lab.accuphy.ca/mktbf2026/ 没上，店铺 MKT 页也没建。
 
 ## 一、Jason 要说的两个“动”
 
-- [ ] **后面那一层 lab.accuphy.ca/bf/ 上线：** Jason 在 **Lab HQ** 说“动”。
+- [ ] **后面那一层 lab.accuphy.ca/mktbf2026/ 上线：** Jason 在 **Lab HQ** 说“动”。
   - HQ 用上线包部署。上线包是填了名单号的那份，见第二节。
   - `/`、`/mini/`、`/ice/` 仍是 Base，部署前用 md5 证明和当时的线上一样（#228：营销版不覆盖 Base）。
 - [ ] **客人看到的那一层，店铺 MKT 页 /pages/sonarlab-mktbf2026 上线：** Jason 在 **网站 HQ** 说“动”。
   - 网站方案：`accuphy-website/docs/plans/2026-11-03-lab-mkt-store-page.md`。
-  - 复制 `page.lab.json`，嵌入地址改成 `https://lab.accuphy.ca/bf/`；新页面 handle 是 `sonarlab-mktbf2026`；不放进菜单；`/pages/lab` 不动。
-  - 页面可以先建好；/bf/ 上线前，这批链接不给广告。
+  - 复制 `page.lab.json`，嵌入地址改成 `https://lab.accuphy.ca/mktbf2026/`；新页面 handle 是 `sonarlab-mktbf2026`；不放进菜单；`/pages/lab` 不动。
+  - 页面可以先建好；/mktbf2026/ 上线前，这批链接不给广告。
 
 ## 二、名单号
 
 - [ ] **W24Qdc 只在上线包里填：** `VITE_BF_LIST_ID=W24Qdc BASE_REF=<Base 版本> node scripts/build-bf-site.mjs <out>`。
   - 测试链接不填，所以测试访客进不了真名单。
   - 没填时：真实域名上订阅卡说 “Subscribing isn’t open yet”、Combo 不开；测试链接上是 “Test mode: nothing is sent”。
-  - 部署后核一次：线上 `/bf/` 的页面里能找到 `W24Qdc`，`/` 里找不到。
+  - 部署后核一次：线上 `/mktbf2026/` 的页面里能找到 `W24Qdc`，`/` 里找不到。
 
 ## 三、文字
 
@@ -71,7 +71,7 @@ MKT 版归 “Lab 营销版” 窗口负责（#231）。HQ 管它，和网站、
   - 澳洲已加进那份表（第 10 行 `/en-au/pages/lab`，网站 e947b900），03 用澳洲 IP 测。
 - [ ] **MKT 页本身：** 店铺页建好后，03 核一次。
   - 每个市场前缀都能打开，含澳洲 `/en-au/pages/sonarlab-mktbf2026`；
-  - 框的地址是 `/bf/`；
+  - 框的地址是 `/mktbf2026/`；
   - `lang` / `shop` / `market` 照传；
   - 事件和 `/pages/lab` 一样；
   - 美国只出 Mini。
@@ -83,16 +83,16 @@ MKT 版归 “Lab 营销版” 窗口负责（#231）。HQ 管它，和网站、
   - #224：99e15c8，冰钓页前视 120 ft 进画面。
   - 搬完要做的：
     - 重跑四套单元测试，`LAB_DIR=2026-11-03-sonar-lake-bf`，share-url 那 4 条失败要变成通过；
-    - 重跑假店铺页：`/bf/` 用 `LAB_LOCKED=1`，含 share-de；
+    - 重跑假店铺页：`/mktbf2026/` 用 `LAB_LOCKED=1`，含 share-de；
     - 湖页和冰钓页各看一眼；
     - 报 HQ。
-  - `/ice/`、`/bf/ice/` 是用 BASE_REF 那个版本的 Base 打包的，所以只要 BASE_REF 含 99e15c8，它们就带上 #224。
+  - `/ice/`、`/mktbf2026/ice/` 是用 BASE_REF 那个版本的 Base 打包的，所以只要 BASE_REF 含 99e15c8，它们就带上 #224。
   - 没搬之前：德、荷、波、拉的访客在 MKT 页上看到英文，分享出去的链接也不带语言。
 
 ## 七、上线当天（HQ 做，营销版核）
 
 - [ ] 上线包和测试链接用同一个提交打包，写进 `docs/versions.md`、`docs/version-sheet.md`、`docs/lab-links-sheet.md`。
-- [ ] 线上 `/`、`/mini/`、`/ice/` 的 md5 = 部署前的线上（Base 没被覆盖）；`/bf/` 和 `/bf/ice/` 打开返回 200，0 报错。
+- [ ] 线上 `/`、`/mini/`、`/ice/` 的 md5 = 部署前的线上（Base 没被覆盖）；`/mktbf2026/` 和 `/mktbf2026/ice/` 打开返回 200，0 报错。
 - [ ] 通知网站 HQ：03 复测 MKT 页的真实订阅弹窗。
 
 ## 记录
@@ -101,4 +101,4 @@ MKT 版归 “Lab 营销版” 窗口负责（#231）。HQ 管它，和网站、
 |---|---|---|
 | 2026-11-03 | 复制件 + 打包脚本 | 6d65f00、dfa9a55；假店铺页带锁 8/8 |
 | 2026-11-03 | 同意文字 | 4d41681；卡片显示新句子，lock-desktop PASS |
-| 2026-11-03 | 布局 #228（/ = Base，/bf/ 带锁） | 5c2178b；`/`、`/mini/`、`/ice/` md5 = 线上 86bf80e |
+| 2026-11-03 | 布局 #228（/ = Base，/mktbf2026/ 带锁） | 5c2178b；`/`、`/mini/`、`/ice/` md5 = 线上 86bf80e |

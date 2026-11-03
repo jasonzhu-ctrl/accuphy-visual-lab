@@ -10,14 +10,14 @@ Jason 11-03：“一定要搞个文档，专门把这些不同的版本啊，那
 
 > **硬规则（#232，Jason 11-03，要反复提醒）：** 店铺页只是一个“相框”，Lab 本身放在 lab.accuphy.ca 上。
 > - 客人和广告、邮件只拿**店铺链接**（shop.accuphy.com/<市场>/pages/…），lab.accuphy.ca 的地址在后台，不给客人。
-> - 每个店铺页里的框只显示一个 lab.accuphy.ca 地址：`/pages/lab` → lab.accuphy.ca/（不带锁）；`/pages/sonarlab-mktbf2026` → lab.accuphy.ca/mktbf2026/（MKT 版，带锁；#233 起由 /bf/ 改名）。
+> - 每个店铺页里的框只显示一个 lab.accuphy.ca 地址：`/pages/lab` → lab.accuphy.ca/（不带锁）；`/pages/sonarlab-mktbf2026` → lab.accuphy.ca/mktbf2026/（MKT 版，带锁；#233 起由 /mktbf2026/ 改名）。
 > - Lab 的程序不放进 Shopify。Lab 更新只改 lab.accuphy.ca（Jason 在 Lab HQ 说“动”）；店铺页只改框里的地址（网站，Jason 在网站 HQ 说“动”）。
 
 ## 一、投放链接（= MKT 版，#229，Jason 11-03：“MKT 和投放的是一回事”）
 
 **这一节由 Lab 营销版维护（#231）**，其他几节照旧由 HQ 维护。
 
-只有这一批。规则：**每个市场的主页网址 + `/pages/sonarlab-mktbf2026`**，页面里嵌带锁版 lab.accuphy.ca/mktbf2026/（#233，原 /bf/）。
+只有这一批。规则：**每个市场的主页网址 + `/pages/sonarlab-mktbf2026`**，页面里嵌带锁版 lab.accuphy.ca/mktbf2026/（#233，原来叫 /bf/）。
 店铺没有这种语言的市场（波兰、拉脱维亚），照 #218 用主站 + `?lang=`。
 
 | 市场 | 投放链接 | Lab 语言 |
@@ -33,7 +33,7 @@ Jason 11-03：“一定要搞个文档，专门把这些不同的版本啊，那
 | 波兰 | https://shop.accuphy.com/pages/sonarlab-mktbf2026?lang=pl（网站给波兰市场加了波兰语以后，换成波兰页） | 波兰语 |
 | 拉脱维亚 | https://shop.accuphy.com/pages/sonarlab-mktbf2026?lang=lv（Jason 选了主站） | 拉脱维亚语 |
 
-- 状态：还没建。店铺页要 Jason 在网站 HQ 说“动”；lab.accuphy.ca/bf/ 要 Jason 在 Lab HQ 说“动”。网站提醒：/bf/ 上线前，这批链接不要给广告。
+- 状态：还没建。店铺页要 Jason 在网站 HQ 说“动”；lab.accuphy.ca/mktbf2026/ 要 Jason 在 Lab HQ 说“动”。网站提醒：/mktbf2026/ 上线前，这批链接不要给广告。
 - 德、荷、波、拉的 Lab 文字要等译文放进去才是那种语言（现在显示英文、用米）。
 - 网站 03 正在用各国 IP 测这些市场前缀（同样适用这批链接），结果出来再更新这一节。
 - 规矩（#218）：“有网站 market 的就放网站，没有的就放在主站下，不懂问我。” 带 `?lang=` 的链接只换 Lab 的语言，店铺页其他地方还是英文。
@@ -45,7 +45,7 @@ Jason 11-03：“一定要搞个文档，专门把这些不同的版本啊，那
 | 地址 | 现在是什么 | 黑五带锁版上线后（#213） |
 |---|---|---|
 | https://lab.accuphy.ca/ | 标准 Base 96fdc22（11-03 晚），无锁；店铺所有 Lab 页嵌的都是它 | 照旧是 Base（#228：营销版绝不覆盖 Base） |
-| https://lab.accuphy.ca/bf/ | （还没有） | 黑五带锁版（店铺 Lab 页要不要指向它，等 Jason 定） |
+| https://lab.accuphy.ca/mktbf2026/ | （还没有） | 黑五带锁版（店铺 Lab 页要不要指向它，等 Jason 定） |
 | https://lab.accuphy.ca/mini/ | 只有 Mini 的 Base | 照旧 Base |
 | https://lab.accuphy.ca/ice/ | 冰钓页 Base | 照旧 Base |
 
@@ -56,7 +56,7 @@ Jason 11-03：“一定要搞个文档，专门把这些不同的版本啊，那
 | 地址 | 现在是什么（11-03） |
 |---|---|
 | https://jasonzhu-ctrl.github.io/accuphy-lab-test/ | Base 96fdc22（= 线上） |
-| https://jasonzhu-ctrl.github.io/accuphy-lab-test/bf/ | 黑五带锁版，测试模式，订阅不发出去（11-03 从首页挪到这里，#228） |
+| https://jasonzhu-ctrl.github.io/accuphy-lab-test/mktbf2026/ | 黑五带锁版，测试模式，订阅不发出去（11-03 从首页挪到这里，#228） |
 | https://jasonzhu-ctrl.github.io/accuphy-lab-test/mini/ | Base 96fdc22（= 线上） |
 | https://jasonzhu-ctrl.github.io/accuphy-lab-test/ice/ | Base 96fdc22（= 线上） |
 
@@ -74,5 +74,5 @@ Jason 11-03：“一定要搞个文档，专门把这些不同的版本啊，那
 - 2026-11-03 HQ：建表（Jason 11-03）。
 - 2026-11-03 HQ：加澳洲（Jason：“加进去”；之前漏了）。
 - 2026-11-03 HQ：合并第一节和第一点五节：投放链接只有一批，就是 MKT（Jason：“MKT 和投放的是一回事”）。
-- 2026-11-03 HQ：#228 营销版不覆盖 Base：首页留 Base，带锁版放 /bf/。
+- 2026-11-03 HQ：#228 营销版不覆盖 Base：首页留 Base，带锁版放 /mktbf2026/。
 - 2026-11-03 HQ：波兰、拉脱维亚改按 #218 的规矩（拉脱维亚放主站；波兰等网站加波兰语）。

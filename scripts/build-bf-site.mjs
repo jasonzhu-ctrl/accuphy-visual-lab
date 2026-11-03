@@ -1,8 +1,8 @@
 // Builds the Lab site with the Black Friday locked version beside the base (#213, layout #228: the marketing version never
 // replaces the base), from clean git checkouts, never the working copy (other chats edit it):
 //   /, /mini/, /ice/   the base, as the normal builds
-//   /bf/               the locked version (src/experiments/2026-11-03-sonar-lake-bf, lock always on)
-//   /bf/ice/           a copy of the base's /ice/ (the locked page's phone ice tiles go to <its path>/ice/)
+//   /mktbf2026/        the locked version (#233: same name as the store page /pages/sonarlab-mktbf2026) (src/experiments/2026-11-03-sonar-lake-bf, lock always on)
+//   /mktbf2026/ice/    a copy of the base's /ice/ (the locked page's phone ice tiles go to <its path>/ice/)
 // Usage: node scripts/build-bf-site.mjs <outDir> [ref]      (ref of the locked version, default HEAD)
 //   BASE_REF=<ref>      the commit for /, /mini/, /ice/ (default: the same ref)
 //   VITE_BF_LIST_ID=W24Qdc   only for HQ's go-live build: the Klaviyo list of the lock (#191). Unset (test links): nothing is sent.
@@ -46,8 +46,8 @@ delete process.env.VITE_BF_LIST_ID
 buildPage(baseDir, {}, '') // root: its robots.txt, .nojekyll and vercel.json serve the whole site
 buildPage(baseDir, { VITE_DEVICES: 'PLM' }, 'mini')
 buildPage(baseDir, { VITE_SCENE: 'ice' }, 'ice')
-buildPage(bfDir, { VITE_LAB: 'bf', ...(list ? { VITE_BF_LIST_ID: list } : {}) }, 'bf')
-fs.cpSync(path.join(outDir, 'ice'), path.join(outDir, 'bf/ice'), { recursive: true })
-for (const sub of ['mini', 'ice', 'bf', 'bf/ice']) for (const f of ['vercel.json', 'robots.txt', '.nojekyll']) fs.rmSync(path.join(outDir, sub, f), { force: true })
+buildPage(bfDir, { VITE_LAB: 'bf', ...(list ? { VITE_BF_LIST_ID: list } : {}) }, 'mktbf2026')
+fs.cpSync(path.join(outDir, 'ice'), path.join(outDir, 'mktbf2026/ice'), { recursive: true })
+for (const sub of ['mini', 'ice', 'mktbf2026', 'mktbf2026/ice']) for (const f of ['vercel.json', 'robots.txt', '.nojekyll']) fs.rmSync(path.join(outDir, sub, f), { force: true })
 for (const d of [bfDir, baseDir]) fs.rmSync(d, { recursive: true, force: true })
-console.log(`${outDir}: /, /mini/, /ice/, /bf/ice/ = base ${commit(baseRef)}; /bf/ = locked ${commit(ref)}${list ? ' (list ' + list + ')' : ' (no list: test mode / not open)'}`)
+console.log(`${outDir}: /, /mini/, /ice/, /mktbf2026/ice/ = base ${commit(baseRef)}; /mktbf2026/ = locked ${commit(ref)}${list ? ' (list ' + list + ')' : ' (no list: test mode / not open)'}`)
