@@ -60,9 +60,9 @@ MKT 版归 “Lab 营销版” 窗口负责（#231）。HQ 管它，和网站、
 - [ ] **各国 IP 测试：** `accuphy-website/handoffs/2026-11-03-lab-ad-landing-links-check.md`，网站还没写答复。
   - 写完后，营销版把结果整理进 `docs/lab-links-sheet.md` 第一节：每个市场留下来还是被转走、`?lang=` 还在不在、奥地利和瑞士用哪个链接、加上 UTM 和 fbclid 后是否正常。
   - 地理转址按网址前缀走，所以 `/pages/lab` 的结果同样适用于 MKT 链接。
-  - 澳洲 `/en-au` 不在那份表里，店铺 MKT 页建好后 03 要一起核。
+  - 澳洲已加进那份表（第 10 行 `/en-au/pages/lab`，网站 e947b900），03 用澳洲 IP 测。
 - [ ] **MKT 页本身：** 店铺页建好后，03 核一次。
-  - 每个市场前缀都能打开；
+  - 每个市场前缀都能打开，含澳洲 `/en-au/pages/sonarlab-mktbf2026`；
   - 框的地址是 `/bf/`；
   - `lang` / `shop` / `market` 照传；
   - 事件和 `/pages/lab` 一样；
