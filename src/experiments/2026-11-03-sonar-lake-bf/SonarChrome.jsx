@@ -1,0 +1,179 @@
+// The real app's screen chrome, drawn over the GL picture inside the phone display
+// (measured on the tablet 2026-09-24 — docs/app-chrome.md). All sizes are in
+// container-query units of the display, so it scales with the phone frame.
+// The app's buttons are display-only here: dimmed like a disabled iOS control (values stay bright) and a tap
+// opens the sign-up gate (onLocked) — Jason 2026-09-24. The depth axis runs on AUTO.
+import { FT } from '../2026-09-23-sonar-beam/devices'
+
+const num = 'font-brand-body tabular-nums'
+
+export function niceStep(span) { // ruler step for ~5–8 labels over `span` display units
+  const raw = span / 6
+  const p = Math.pow(10, Math.floor(Math.log10(raw)))
+  const m = raw / p
+  return (m < 1.5 ? 1 : m < 3.5 ? 2 : m < 7.5 ? 5 : 10) * p
+}
+function ticks(from, to, step) {
+  const out = []
+  for (let v = Math.ceil(from / step) * step; v <= to + 1e-6; v += step) out.push(+v.toFixed(6))
+  return out
+}
+
+// a display-only app control: dimmed like a disabled iOS control, no hover state, a tap opens the sign-up gate.
+// Module-level so a re-render between pointer-down and click never swaps the element under the finger.
+// the app's back button is a solid white "reply" arrow — head to the left, the tail curving down to the right
+// (reference/app-study/2026-10-23/21-icefishing-12s.jpg). The text glyph it replaced fell back to a thin system arrow.
+function BackIcon({ size }) {
+  return <svg viewBox="0 0 24 24" aria-hidden="true" style={{ display: 'block', width: size, height: size }}><path fill="currentColor" d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z" /></svg>
+}
+
+function LockedCtl({ onLocked, children, style }) {
+  return (
+    <span className="ph-ctl" role="button" aria-disabled="true" tabIndex={-1} title="App control — shown for reference"
+      onPointerDown={(e) => e.stopPropagation()} onClick={(e) => { e.stopPropagation(); onLocked?.() }} style={style}>{children}</span>
+  )
+}
+
+// a live app control (phones: the range −/+ — Jason 2026-10-03: range 直接做到手机 APP 里面去): full brightness and a
+// finger-sized invisible hit area around the small ring
+function LiveCtl({ onPress, disabled, children, label, style }) {
+  return (
+    <button type="button" className="ph-live" aria-label={label} disabled={disabled} style={style}
+      onPointerDown={(e) => e.stopPropagation()} onClick={(e) => { e.stopPropagation(); if (!disabled) onPress() }}>{children}</button>
+  )
+}
+
+export default function SonarChrome({ layout, deviceId, mode, rangeFt, depthFt, imperial, gain, depthRef, onLocked, autoDepth = true, autoRange = false, onRange, onHome, phone = false, waterTempC = 21.8, app, noMark = false, combo }) {
+  // `app` (phones, Jason 2026-10-16: 这些控制都做在手机上 … 模拟真实的 Accuphy Sonar app 里面的功能): the app's own controls are
+  // live — gain −/+ (1 % a tap), pause and the depth-range −/+ (manual steps, AUTO off). The ⋯ settings button stays greyed and cannot be opened
+  // (Jason 2026-10-17/18: noise reject 这些功能不要加进去 … 把 color map 也去掉). Without `app` they stay display-only (desktop).
+  // water temperature readout: comes from the page (summer lake 21.8 °C; under ice about +1…+4 °C — the ice chat asked
+  // for this on 2026-10-16: −1.2 °C is physically impossible for liquid water)
+  const tempLabel = `${waterTempC.toFixed(1)} °C`
+  // phones: the whole control set is scaled up together (the app's proportions kept), and − / + sit further apart
+  // (Jason 2026-10-03: range 的按键稍微大一点 … 加号跟减号稍微分开一点 … 不要破坏原本 APP 的协调性)
+  const S = phone ? 1.55 : 1
+  const cq = (v) => `${+(v * S).toFixed(2)}cqh`
+  const gapPM = phone ? '6cqh' : '2.2cqh'
+  const unit = imperial ? FT : 1 // metres per display unit
+  const box = layout.box0
+  const lenLabel = (ft) => (imperial ? `${Math.round(ft)}ft` : `${Math.round(ft * FT)}m`)
+  const rangeLabel = lenLabel(rangeFt)
+  const depthLabel = imperial ? `${Math.round(depthFt ?? rangeFt)}ft` : `${Math.round((depthFt ?? rangeFt) * FT)}m`
+  const flat = mode === 'panoramic'
+  const split = layout.split
+  // rulers (display units)
+  const hx0 = box.x0 / unit, hx1 = (box.x0 + box.w) / unit
+  const hStep = niceStep(Math.abs(hx1 - hx0))
+  const top = ticks(hx0, hx1, hStep).filter((v) => v !== 0 || true)
+  const vStep = niceStep(box.h / unit)
+  const side = ticks(box.y0 / unit, (box.y0 + box.h) / unit, vStep).filter((v) => v > 0)
+  const leftBox = split ? layout.box1 : box
+  const lStep = niceStep(leftBox.h / unit)
+  const left = ticks(leftBox.y0 / unit, (leftBox.y0 + leftBox.h) / unit, lStep).filter((v) => v > 0)
+  const mini = deviceId === 'PLM'
+  const showDepthRange = !mini && mode === 'forward'
+  // PLM Live Forward has no depth readout, only the temperature and the voltage top-left where the depth would be
+  // (reference/app-study/plm-forward-fish-a.jpg; Jason 2026-10-27: PingLive Mini 的 forward 是不显示深度的)
+  const miniFwd = mini && mode === 'forward' && !split
+  const label = (v) => `${Math.abs(Math.round(v * 100) / 100)}`
+  // the Mini's ice views (reference/product-images/PingLive Mini Views.png): the flasher dial fills the left iceSplit of
+  // the display — depth labels round its ring, the big readout in its centre; the right panel keeps the depth ruler, the
+  // temperature and voltage sit at its top-right, the wordmark at its top-left. The Live Down fan still gets its top ruler.
+  const iceView = (layout.ice || 0) > 0, iceSplit = layout.iceSplit ?? 0.42, iceHistory = layout.ice === 2
+  const panelX = (x) => (iceView ? iceSplit * 100 + 0.6 + (100 - iceSplit * 100 - 0.6) * (x / 100) : x) // right-panel % → display %
+  const ringLabels = iceView ? ticks(0, box.h / unit, vStep).filter((v) => v < box.h / unit - 1e-6) : []
+  const ringR = 29.75, ringCy = 47, ringCx = iceSplit * 50 // cqh / cqw; the dial: outer 0.36, inner 0.235 of the height, centre 53 % up (sonarShader.js)
+  const Ring = ({ children, style }) => (children === '−' || children === '+') ? (
+    <svg viewBox="0 0 24 24" style={{ width: cq(7), height: cq(7), display: 'block', ...style }} aria-hidden="true">
+      <circle cx="12" cy="12" r="10.6" fill="none" stroke="#fff" strokeWidth="2" />
+      <path d={children === '+' ? 'M7 12h10M12 7v10' : 'M7 12h10'} stroke="#fff" strokeWidth="2.4" strokeLinecap="round" />
+    </svg>
+  ) : (
+    <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: cq(7), height: cq(7), borderRadius: '50%', border: `${cq(0.55)} solid #fff`, fontSize: cq(5.5), lineHeight: 1, ...style }}>{children}</span>
+  )
+  return (
+    <div className="absolute inset-0 select-none text-white" style={{ fontFamily: 'var(--font-body, "Instrument Sans", system-ui, sans-serif)' }}>
+      {/* rulers: italic numbers, no lines (orange mode has no grid) */}
+      {!iceHistory && top.map((v) => { const x = ((v - hx0) / (hx1 - hx0)) * 100; if (x < 1.5 || x > 98.5) return null; return <span key={`t${v}`} className={num} style={{ position: 'absolute', top: '1.5cqh', left: `${panelX(x)}%`, transform: 'translateX(-50%)', fontSize: '3.2cqh', fontStyle: 'italic', opacity: 0.9 }}>{label(v)}</span> })}
+      {side.map((v) => { const y = ((v * unit - box.y0) / box.h) * 100; const yy = flat ? 100 - y : y; if (yy < 4 || yy > 96) return null; return <span key={`r${v}`} className={num} style={{ position: 'absolute', right: '0.6%', top: `${yy}%`, transform: 'translateY(-50%)', fontSize: '3.2cqh', opacity: 0.9 }}>{label(v)}</span> })}
+      {!iceView && left.map((v) => { const y = ((v * unit - leftBox.y0) / leftBox.h) * 100; const yy = flat ? 100 - y : y; if (yy < 4 || yy > 96) return null; return <span key={`l${v}`} className={num} style={{ position: 'absolute', left: '0.6%', top: `${yy}%`, transform: 'translateY(-50%)', fontSize: '3.2cqh', opacity: 0.9 }}>{label(v)}</span> })}
+      {/* the flasher's dial labels: depth clockwise from the top */}
+      {ringLabels.map((v) => { const th = (v / (box.h / unit)) * 2 * Math.PI; return <span key={`f${v}`} className={num} style={{ position: 'absolute', left: `calc(${ringCx}cqw + ${(Math.sin(th) * ringR).toFixed(2)}cqh)`, top: `calc(${ringCy}cqh - ${(Math.cos(th) * ringR).toFixed(2)}cqh)`, transform: 'translate(-50%, -50%)', fontSize: '3.1cqh', fontWeight: 600, color: '#2a2e3a' }}>{label(v)}</span> })}
+
+      {/* depth readout + water temp + voltage (top-left; Combo: top-right; ice views: the readout in the dial, temp/volts top-right) */}
+      {iceView ? (<>
+        <div ref={depthRef} className={num} style={{ position: 'absolute', left: `${ringCx}cqw`, top: `${ringCy}cqh`, transform: 'translate(-50%, -50%)', fontSize: '9cqh', fontWeight: 700, lineHeight: 1, letterSpacing: '-0.02em', color: '#1b1e2a', whiteSpace: 'nowrap' }}>— —</div>
+        <div className={num} style={{ position: 'absolute', top: '6cqh', right: '4.5%', textAlign: 'right', fontSize: '4.2cqh', lineHeight: 1.5 }}>{tempLabel}<br />12.6 V</div>
+      </>) : (
+      <div style={{ position: 'absolute', top: miniFwd ? '8.5cqh' : '11cqh', ...(split ? { right: '5%', textAlign: 'left' } : { left: '4%' }) }}>
+        {!miniFwd && <div ref={depthRef} className={num} style={{ fontSize: '12cqh', fontWeight: 600, lineHeight: 1, letterSpacing: '-0.01em' }}>— —</div>}
+        <div className={num} style={{ fontSize: '4.2cqh', marginTop: miniFwd ? 0 : '3cqh', lineHeight: 1.5 }}>{tempLabel}<br />12.6 V</div>
+      </div>)}
+
+      {/* wordmark + resolution tag (top-right) — not in Combo, where the readout sits there; not under a sideways phone's
+          lake inset (noMark, #140), which sits in that corner */}
+      {!split && !noMark && (
+        <div style={{ position: 'absolute', ...(iceView ? { left: `${panelX(3)}%`, textAlign: 'left' } : { right: '3%', textAlign: 'right' }), top: '6cqh' }}>
+          <img src="/brand/logo/White Accuphy Logo.png" alt="" style={{ height: '4.2cqh', width: 'auto', opacity: 0.55, display: 'inline-block' }} draggable={false} />
+          <div className={num} style={{ fontSize: '2.8cqh', fontStyle: 'italic', opacity: 0.45, marginTop: '0.6cqh' }}>1440p (QHD)</div>
+        </div>
+      )}
+
+      {/* depth-range control on the right edge (PL Forward only) */}
+      {showDepthRange && (
+        <div style={{ position: 'absolute', right: '5.5%', top: '50%', transform: 'translateY(-50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: cq(2) }}>
+          {app ? <LiveCtl label="Depth range shallower" onPress={() => app.onDepth(-1)}><Ring>−</Ring></LiveCtl> : <LockedCtl onLocked={onLocked}><Ring>−</Ring></LockedCtl>}
+          <span style={{ textAlign: 'center', lineHeight: 1.05 }}>
+            {autoDepth && <span className={num} style={{ display: 'block', fontSize: cq(2.6), fontWeight: 700, letterSpacing: '0.12em', color: '#7fcfff' }}>AUTO</span>}
+            <span className={num} style={{ fontSize: cq(4.6), fontWeight: 500 }}>{depthLabel}</span>
+          </span>
+          {app ? <LiveCtl label="Depth range deeper" onPress={() => app.onDepth(1)}><Ring>+</Ring></LiveCtl> : <LockedCtl onLocked={onLocked}><Ring>+</Ring></LockedCtl>}
+        </div>
+      )}
+
+      {/* bottom bar: back · range −/+ · pause · gain −/+ · ⋯ */}
+      <div style={{ position: 'absolute', left: 0, right: 0, bottom: '2.5cqh', height: cq(9) }}>
+        {/* the app's back button: on phones it is live and opens the app's Home (view selection) page (Jason 2026-10-16) */}
+        {onHome
+          ? <LiveCtl label="Home" onPress={onHome} style={{ position: 'absolute', left: '2.5%', top: '50%', transform: 'translateY(-50%)', lineHeight: 0 }}><BackIcon size={cq(7.4)} /></LiveCtl>
+          : <LockedCtl onLocked={onLocked} style={{ position: 'absolute', left: '2.5%', top: '50%', transform: 'translateY(-50%)', lineHeight: 0 }}><BackIcon size={cq(7.4)} /></LockedCtl>}
+        {!split && (
+          <div style={{ position: 'absolute', left: phone ? '23%' : '19%', top: '50%', transform: 'translate(-50%, -50%)', display: 'flex', alignItems: 'center', gap: gapPM }}>
+            {onRange ? <LiveCtl label="Range shorter" disabled={autoRange} onPress={() => onRange(-1)}><Ring>−</Ring></LiveCtl> : <LockedCtl onLocked={onLocked}><Ring>−</Ring></LockedCtl>}
+            <span style={{ position: 'relative', lineHeight: 1.05 }}>
+              {autoRange && <span className={num} style={{ position: 'absolute', left: '50%', bottom: '100%', transform: 'translateX(-50%)', fontSize: cq(2.6), fontWeight: 700, letterSpacing: '0.12em', color: '#7fcfff' }}>AUTO</span>}
+              <span className={num} style={{ fontSize: cq(4.8), fontWeight: 500 }}>{rangeLabel}</span>
+            </span>
+            {onRange ? <LiveCtl label="Range longer" disabled={autoRange} onPress={() => onRange(1)}><Ring>+</Ring></LiveCtl> : <LockedCtl onLocked={onLocked}><Ring>+</Ring></LockedCtl>}
+          </div>
+        )}
+        {/* PLM Combo (#189, Jason 2026-10-29: forward 的 range 跟 down 的 range 可以分别的调): each panel's range under it —
+            Down lower-left, Forward lower-right clear of the panels' diagonal, a small caption naming the panel (the app sets them in its ⋯ menu) */}
+        {split && combo && [['down', combo.downFt, combo.onDown, combo.downLabel, phone ? '23%' : '19%'], ['fwd', combo.fwdFt, combo.onFwd, combo.fwdLabel, '80%']].map(([k, ft, on, cap, x]) => (
+          <div key={k} style={{ position: 'absolute', left: x, top: '50%', transform: 'translate(-50%, -50%)', display: 'flex', alignItems: 'center', gap: gapPM }}>
+            {on ? <LiveCtl label={`${cap} range shorter`} onPress={() => on(-1)}><Ring>−</Ring></LiveCtl> : <LockedCtl onLocked={onLocked}><Ring>−</Ring></LockedCtl>}
+            <span style={{ position: 'relative', lineHeight: 1.05 }}>
+              <span className={num} style={{ position: 'absolute', left: '50%', bottom: '100%', transform: 'translateX(-50%)', fontSize: cq(2.6), fontWeight: 700, letterSpacing: '0.12em', color: '#7fcfff', whiteSpace: 'nowrap' }}>{cap}</span>
+              <span className={num} style={{ fontSize: cq(4.8), fontWeight: 500 }}>{lenLabel(ft)}</span>
+            </span>
+            {on ? <LiveCtl label={`${cap} range longer`} onPress={() => on(1)}><Ring>+</Ring></LiveCtl> : <LockedCtl onLocked={onLocked}><Ring>+</Ring></LockedCtl>}
+          </div>
+        ))}
+        {(() => { const glyph = app && app.paused
+          ? <i style={{ display: 'block', width: 0, height: 0, marginLeft: cq(0.8), borderTop: `${cq(2)} solid transparent`, borderBottom: `${cq(2)} solid transparent`, borderLeft: `${cq(3.4)} solid #fff` }} />
+          : <><i style={{ display: 'block', width: cq(0.9), height: cq(3.6), background: '#fff', borderRadius: cq(0.3) }} /><i style={{ display: 'block', width: cq(0.9), height: cq(3.6), background: '#fff', borderRadius: cq(0.3) }} /></>
+          const ring = <Ring style={{ width: cq(9), height: cq(9), gap: cq(0.9) }}>{glyph}</Ring>
+          const st = { position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }
+          return app ? <LiveCtl label={app.paused ? 'Resume' : 'Pause'} onPress={app.onPause} style={st}>{ring}</LiveCtl> : <LockedCtl onLocked={onLocked} style={st}>{ring}</LockedCtl> })()}
+        {!split && (
+          <div style={{ position: 'absolute', left: phone ? '77%' : '75%', top: '50%', transform: 'translate(-50%, -50%)', display: 'flex', alignItems: 'center', gap: gapPM }}>
+            {app ? <LiveCtl label="Gain lower" onPress={() => app.onGain(-1)}><Ring>−</Ring></LiveCtl> : <LockedCtl onLocked={onLocked}><Ring>−</Ring></LockedCtl>}<span className={num} style={{ fontSize: cq(4.8), fontWeight: 500 }}>{Math.round(gain * 100)}%</span>{app ? <LiveCtl label="Gain higher" onPress={() => app.onGain(1)}><Ring>+</Ring></LiveCtl> : <LockedCtl onLocked={onLocked}><Ring>+</Ring></LockedCtl>}
+          </div>
+        )}
+        {/* ⋯ settings: always greyed; on phones a tap does nothing (Jason 2026-10-18: 这三个点的设置灰色按钮不让进) */}
+        <LockedCtl onLocked={app ? undefined : onLocked} style={{ position: 'absolute', right: '2.5%', top: '50%', transform: 'translateY(-50%)', fontSize: cq(7), lineHeight: 0.6, letterSpacing: '-0.05em' }}>•••</LockedCtl>
+      </div>
+    </div>
+  )
+}

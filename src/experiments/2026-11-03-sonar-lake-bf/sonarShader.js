@@ -1,0 +1,734 @@
+// The app-style sonar screen, computed from the 3D lake. Two imaging models (docs/sonar-style.md §7):
+//
+//  Down / Forward / Combo — a vertical slab (18–20° thick). For each fan a "sonar camera" at the
+//  transducer renders a DEPTH strip; for every screen pixel (angle, range) the shader asks which
+//  thickness rows hit something at that range → bottom band and structure faces.
+//
+//  Panoramic — a plan view (the fan lies almost flat and grazes the bottom): the picture is a
+//  photograph from above. Bottom depth comes from a baked terrain texture, structure from a top-down
+//  depth map rendered each frame; every point is lit only if nothing between it and the transducer
+//  sticks up into the ray → acoustic shadows behind structure, humps and fish (§7.13).
+//
+//  Fish in every view are MARKS drawn analytically from their real position and heading
+//  (sonarMarks.js): the body projected into the view, blurred by the pulse (along the ray) and the
+//  beam footprint (across it), brightest along the axis (§7.9).
+export const MAX_FANS = 2
+
+export const sonarVertex = /* glsl */ `
+  attribute float aW; // per-vertex clip w: corners are given as (x*w, y*w) for the phone's perspective
+  varying vec2 vUv0;
+  void main() { vUv0 = uv; gl_Position = vec4(position.xy, 0.0, aW); }
+`
+
+export const sonarFragment = /* glsl */ `
+  precision highp float;
+  varying vec2 vUv0;
+  uniform sampler2D uDepth0; uniform sampler2D uDepth1;
+  uniform sampler2D uDepthB0; uniform sampler2D uDepthB1; // the far side of structure (back-face strips)
+  uniform sampler2D uEcho0; uniform sampler2D uEcho1; uniform vec2 uFanR; uniform vec2 uEchoTex; // the echo splat of every structure surface (angle × range), per fan
+  uniform sampler2D uColor0; uniform sampler2D uColor1; // .a = tag: 0.75 steel (wrecks), 0.5 other structure, 0 bottom
+  uniform int uFanCount;
+  // per fan: x = centre angle from straight-down in the SCREEN plane (rad, +right),
+  //          y = half wide angle (rad), z = tanH = tan(half wide), w = tanV = tan(half thick)
+  uniform vec4 uFan[${MAX_FANS}];
+  uniform vec2 uNearFar;
+  uniform float uRange;       // display range (metres)
+  uniform float uReach;       // how far the sound reaches in the side views: the range, or (PL Forward) the far corner of the range × depth-range box
+  uniform vec4 uBox0;         // panel 0 screen box in metres: x0, y0, w, h (apex at 0,0)
+  uniform vec4 uBox1;         // panel 1 box (Combo's Down panel)
+  uniform float uSplit;       // 1 = Combo two-panel layout: fan 1 (forward) in panel 0, fan 0 (down) in panel 1
+  uniform float uApexU;
+  uniform float uTime;
+  uniform float uFlat;        // 1 = Panoramic: a sound picture, the vertical views' pipeline with the fan laid flat (#171, #178; the plan-view photograph is gone)
+  uniform float uPanoTilt;    // its strip camera's depression (rad); the rows span uPanoTilt ± atan(tanV) below the horizon
+  uniform vec4 uPanoK;        // Panoramic tuning (#178): x hard targets' level (rock, steel), y the field's floor where shadows fall, z hard targets' ceiling
+  uniform float uBedGain;     // extra near-range gain for the bottom + structure echo (PLM 0.62, PL 1)
+  uniform vec3 uCapDepth;     // the bottom's soft cap by depth below the transducer: from x to y metres, up to strength z
+  uniform float uStreak;      // 1 = radial streak texture, 0 = mottled speckle (PLM Down)
+  uniform float uDebug;
+  uniform sampler2D uLUT;
+  uniform float uGain; uniform float uDynRange; uniform float uContrast; uniform float uNoise; uniform float uGamma;
+  uniform vec4 uTune2; // dev only (window.__sonarTune.k2): structure rim level, core level, ring radius, inside threshold — all 1 in production
+  uniform vec4 uTune6; // dev only (window.__sonarTune.k6): steel ceiling, gap fill between rows, unused ×2 — all 1 in production
+  uniform vec4 uTune5; // dev only (window.__sonarTune.k5): structure grain contrast, bright share, arc size scale, outline arc length — all 1 in production
+  uniform vec4 uTune4; // dev only (window.__sonarTune.k4): structure hides the bottom, inside fill, wood core, rock core — all 1 in production
+  uniform vec4 uTune3; // dev only (window.__sonarTune.k3): bottom spread compensation, near-gain floor, structure cap, steel core — all 1 in production
+  uniform vec4 uTune; // dev only (window.__sonarTune.k): scales for the band's pulse, tail, peak+edge and integrated body, all 1 in production
+  // fish marks (sonarMarks.js): 64 × 4 float texture
+  uniform sampler2D uMarks; uniform int uMarkCount; uniform float uPulse; uniform float uBeamHalf;
+  // the baked terrain (Panoramic's floor, the far bottom of the vertical views)
+  uniform sampler2D uTerrain; uniform float uTerrainHalf;
+  uniform sampler2D uFishTex; // the fish bodies as the transducer sees them (#153, SonarScreen fishRT)
+  uniform vec2 uApexXZ; uniform float uApexDepth;
+  // the lakebed logo (logo.js): plane origin B (bottom of the outer arc), width axis U, face-up axis V, size R
+  uniform vec3 uLogoB; uniform vec3 uLogoU; uniform vec3 uLogoV;
+  uniform sampler2D uLogoSdf;  // signed distance to the lockup outline (8-bit, ±uLogoMap.w metres)
+  uniform vec4 uLogoMap;       // x = SVG units per metre, y = SVG x of the word's centre, z = SVG y of the fan's bottom, w = distance range (m)
+  uniform vec2 uLogoSvg;       // SVG width, height covered by the texture
+  uniform vec2 uLogoExt;       // half-width, height of the lockup in metres (quick reject)
+  // the Mini's ice views (2026-10-16): 1 = Live Ice (flasher + Live Down), 2 = Ice Fishing (flasher + 2D history)
+  uniform float uIce; uniform float uIceSplit; uniform float uAspect; uniform float uTicks; uniform sampler2D uLUT2;
+  uniform sampler2D uHist; uniform sampler2D uHistPrev; uniform float uHistPass; uniform float uHistFill; uniform float uIceAmber;
+  uniform float uFishMode; // 1 = fish drawn from their bodies (#153, every page since #170); the image is uFishTex (16 textures max)
+  uniform float uSignal; // the ice page's signal gate (IceCamp.jsx s.signal): 0 while the Mini is out of the water; always 1 on the summer lake
+
+  float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+  float vnoise(vec2 q) { vec2 i = floor(q), f = fract(q); f = f * f * (3.0 - 2.0 * f);
+    return mix(mix(hash(i), hash(i + vec2(1, 0)), f.x), mix(hash(i + vec2(0, 1)), hash(i + vec2(1, 1)), f.x), f.y); }
+  // The app's grain (sonar-style.md §10, the grain rule, measured on 1,782 patches of the two vivo bursts, 2026-10-24):
+  // every return is a short arc ACROSS the beam — fine arcs ~6 in across × ~2 in along the ray, grouped in ~10 × 4 in
+  // clusters, about the same at every range — on the bottom, hulls, rocks and trees alike, re-drawn every ping.
+  // s = metres along the arc (uTune5.z: dev size scale, 1 in production)
+  float arcGrain(float aWorld, float r, float png) {
+    float s = aWorld * r / uTune5.z, rr = r / uTune5.z;
+    float c = vnoise(vec2(s * 3.8 + png * 0.53, rr * 9.5 + png * 1.7));
+    float f = vnoise(vec2(s * 6.5 + 4.0 + png * 0.71, rr * 19.0 - png * 2.3));
+    return 0.45 * c + 0.55 * f;
+  }
+  float linearize(float d) {
+    float n = uNearFar.x, f = uNearFar.y;
+    float z = d * 2.0 - 1.0;
+    return (2.0 * n * f) / (f + n - z * (f - n));
+  }
+  float sampleDist(int k, vec2 uv, float rayLen) {
+    float d = (k == 0) ? texture2D(uDepth0, uv).r : texture2D(uDepth1, uv).r;
+    if (d >= 0.9999) return 1e9;
+    return linearize(d) * rayLen;
+  }
+  float sampleDistB(int k, vec2 uv, float rayLen) {
+    float d = (k == 0) ? texture2D(uDepthB0, uv).r : texture2D(uDepthB1, uv).r;
+    if (d >= 0.9999) return 1e9;
+    return linearize(d) * rayLen;
+  }
+  #define EDGE_T0 0.004
+  #define EDGE_T1 0.03
+  float sampleEcho(int k, float u, float rn) { return (k == 0) ? texture2D(uEcho0, vec2(u, rn)).r : texture2D(uEcho1, vec2(u, rn)).r; }
+  float sampleTag(int k, vec2 uv) { return (k == 0) ? texture2D(uColor0, uv).a : texture2D(uColor1, uv).a; }
+  vec4 markRow(int i, float row) { return texture2D(uMarks, vec2((float(i) + 0.5) / 64.0, (row + 0.5) / 5.0)); }
+
+  // ---- fish: analytic marks (sonarMarks.js) ----
+  // What a formed beam makes of one fish (decision #120, after LiveScope and the app's own recordings): every point
+  // of the body a → b (tail → head, screen metres, apex at 0) is smeared by the beam's point spread — thin along the
+  // ray (the pulse, sr), a fixed ANGLE across it (st grows with range). Far fish are needles along the arc, near ones
+  // show their own length and heading. The spindle tapers to points, trails a little in range behind the target, is
+  // brightest at the swim bladder, and is broken up by speckle on the beam grid that changes every ping (the rim much
+  // more than the core: never holes in the middle). Strong targets leak into the neighbouring beams (sidelobes): a
+  // faint ladder along the arc. Returns 0..1 (× the mark's strength outside).
+  float fishDash(vec2 p, vec4 seg, float bw, float seed, float ping, float lobe, float asp) {
+    vec2 a = seg.xy, b = seg.zw, c = 0.5 * (a + b);
+    float rc = max(length(c), 0.3);
+    vec2 rh = c / rc, th = vec2(rh.y, -rh.x);
+    float sr = 0.7 * uPulse + 0.25 * bw, st = uBeamHalf * rc + bw;
+    // into the mark's frame, in units of the spread: x across the ray, y along it
+    vec2 pa = p - a, ba = b - a;
+    vec2 qa = vec2(dot(pa, th) / st, dot(pa, rh) / sr), qb = vec2(dot(ba, th) / st, dot(ba, rh) / sr);
+    float h = clamp(dot(qa, qb) / max(dot(qb, qb), 1e-6), 0.0, 1.0);
+    vec2 q = qa - qb * h;
+    if (q.y * q.y > 16.0 || abs(q.x) > 9.0) return 0.0;
+    float tx = abs(q.x);
+    // range tail behind the target; the spindle narrows toward its ends
+    float qy = q.y / ((q.y > 0.0 ? 1.5 : 1.0) * mix(1.0, 0.6, smoothstep(0.3, 1.5, tx)));
+    float d2 = tx * tx + qy * qy;
+    if (d2 > 7.0 && lobe <= 0.0) return 0.0; // below 1e-4 even with the ragged rim
+    // speckle on the beam grid (angle × range) in cells of the mark's own spread, new every ping, the last ping
+    // still showing a little (persistence)
+    float ang = atan(p.x, p.y), rp = length(p);
+    vec2 nc = vec2(ang * rc / (0.55 * st), rp / (1.1 * sr)) + seed * 17.0;
+    vec2 o1 = vec2(fract(ping * 0.1731) * 97.0, fract(ping * 0.3117) * 89.0);
+    vec2 o0 = vec2(fract((ping - 1.0) * 0.1731) * 97.0, fract((ping - 1.0) * 0.3117) * 89.0);
+    float n = 0.65 * (0.6 * vnoise(nc + o1) + 0.4 * vnoise(nc * 2.3 + o1.yx)) + 0.35 * vnoise(nc + o0);
+    n = clamp(0.5 + (n - 0.5) * 2.6, 0.0, 1.0); // the averaged noise sits in 0.3–0.7: back to full contrast
+    d2 += (n - 0.5) * 1.3 * smoothstep(0.4, 2.5, d2);                     // ragged rim
+    // core ±20 %, rim much more: LiveScope's and the app's marks are smooth spindles inside (#123)
+    float tex = mix(0.8 + 0.4 * n, 0.12 + 1.75 * n, smoothstep(0.25, 1.6, d2));
+    // along the body (when it is longer than the spread): the swim bladder (~90 % of the echo) in the front half,
+    // weaker head and tail peaks; broadside the flank fills in between, head-on the peaks stand apart
+    float prof = max(max(exp(-30.0 * (h - 0.6) * (h - 0.6)), 0.45 * exp(-90.0 * (h - 0.93) * (h - 0.93))),
+                     max(0.4 * exp(-60.0 * (h - 0.08) * (h - 0.08)), mix(0.1, 0.55, asp)));
+    float body = mix(1.0, prof, smoothstep(0.6, 2.5, length(qb)));
+    // a second, weaker ridge just behind the first on bigger or nearer fish (the far side of the body / the swim bladder;
+    // LiveScope's close marks often show two parallel ridges along the arc)
+    float off = (0.9 * bw + 0.015) / sr;
+    float ridge2 = 0.55 * smoothstep(1.0, 1.6, off) * exp(-1.5 * (tx * tx + (q.y - off) * (q.y - off) / 1.2));
+    float e = max(exp(-1.5 * d2), ridge2) * tex * body;
+    // sidelobes: the next beams out along the arc, a few faint stripes fading away
+    float sx = tx - 1.5;
+    if (lobe > 0.0 && sx > 0.0) {
+      float rung = 0.5 + 0.5 * cos(6.2832 * sx / 1.6);
+      e = max(e, lobe * exp(-1.5 * q.y * q.y) * rung * rung * exp(-sx / 2.2) * (0.6 + 0.8 * n));
+    }
+    return e;
+  }
+  // ---- the fish-echo test page (#153): the fish as the transducer sees them ----
+  // lakeMaterial pass 4 draws every fish body from the apex into (angle across the fan × range), only the surfaces facing
+  // the sound (far fish: a sliver of back and flank; near and under the boat: the whole body). Here the beam images that:
+  // a fixed ANGLE across the ray (the beam pattern: a point target lights its neighbouring beams with the pattern's weight,
+  // so far fish smear into arcs and near ones keep their silhouette), the pulse and a short tail along it, and a speckle
+  // that drifts from one ping into the next instead of jumping (Jason 2026-10-24: 鱼还有不停的颤抖).
+  float sampleFish(int k, vec2 uv) { return texture2D(uFishTex, vec2(uv.x, 0.5 * (clamp(uv.y, 0.0, 0.999) + float(k)))).r; } // both fans in one image, fan k in rows k/2 … (k+1)/2
+  float fishImg(int k, float u, float rn, float r, float a, float aWorld) {
+    float duA = 0.5 / (uFan[k].z * cos(a) * cos(a)); // u per radian across the fan
+    // the beam pattern's spread (sigma), in u — never finer than ~5.5 cm across (Jason 2026-10-25: a near fish is a soft shape,
+    // no fins or tail; the beam is ~1° wide, so close in the blur is a few cm, not the 3D model's crisp edge)
+    float sA = max(0.6 * uBeamHalf, 0.055 / max(r, 0.5)) * duA;
+    float dR = 1.0 / 256.0; // the fish image's rows (SonarScreen FISH_H): about a pulse long, so the skin the sound sees reads as an echo, not a hairline
+    // the beam pattern as a smooth spindle: the strongest weighted neighbour (a far, thin fish keeps its peak and smears
+    // across) blended with the weighted mean (tapered ends, no stepped edges)
+    float eMax = 0.0, eSum = 0.0, wSum = 0.0;
+    if (uFlat > 0.5) {
+      // the flat fan (#178): its beam is wider (uBeamHalf 0.03), so 0.4 σ between taps was ~3 texels of the fish image and
+      // a fish only a texel or two wide came out as a comb of copies across the beam (stripes through every dash). Twice
+      // the taps at half the spacing, one row each (25 reads, fewer than below): one smooth dash
+      for (int i = -12; i <= 12; i++) {
+        float fi = float(i) * 0.2, w = exp(-0.5 * fi * fi), s = sampleFish(k, vec2(u + fi * sA, rn));
+        eMax = max(eMax, w * s); eSum += w * s; wSum += w;
+      }
+    } else for (int i = -6; i <= 6; i++) {
+      float fi = float(i) * 0.4, uu = u + fi * sA, w = exp(-0.5 * fi * fi);
+      // along the range: the row and its neighbours (a little more behind the target than in front: the echo's tail)
+      float s0 = sampleFish(k, vec2(uu, rn));
+      float s = max(s0, 1.3 * (s0 + 0.55 * sampleFish(k, vec2(uu, rn + dR)) + 0.7 * sampleFish(k, vec2(uu, rn - dR))) / 2.25);
+      eMax = max(eMax, w * s); eSum += w * s; wSum += w;
+    }
+    // far fish lean on the peak (the old marks' bright needle core, Jason 2026-10-25: 远处 … 老版本跟新版本的结合), near ones on the mean
+    float farF = smoothstep(6.0, 12.0, r);
+    float e = mix(0.6, 0.85, farF) * eMax + mix(0.4, 0.15, farF) * min(1.2, 2.5 * eSum / wSum);
+    // the texture is the grain rule, as on the bottom, trees, hulls and rocks (sonar-style §10, #148; Jason 2026-10-25: 纹理
+    // … 基本上可以作为一个死的规则): short arcs ACROSS the beam, ~6 in × 2 in in ~10 × 4 in clusters, the same arcGrain and the
+    // same centred contrast as structure. A fish moves, so its arcs crossfade from one ping into the next instead of
+    // re-forming at once (the trembling, #153); never below 0.35, so a fish is never cut into pieces.
+    float ping = uTime * 8.0, p0 = floor(ping);
+    float fs = mix(arcGrain(aWorld, r, p0), arcGrain(aWorld, r, p0 + 1.0), smoothstep(0.0, 1.0, ping - p0));
+    e *= max(1.0 + (0.9 * smoothstep(0.3, 0.85, fs) - 0.28) * 1.3 * uTune5.x, 0.35);
+    return 1.2 * mix(1.0, 1.2, farF) * (1.0 - exp(-1.8 * e)); // × the near-field 1.4 in fanEcho: cores as bright as the marks they replace; far needles a little hotter, like the old marks
+  }
+  // the old capsule mark (until #120), kept for the ice page's jig
+  float legacyMark(vec2 p, vec4 A, vec4 B, float rr, vec2 rh) {
+    vec2 pa = p - A.xy, ba = A.zw - A.xy;
+    float h = clamp(dot(pa, ba) / max(dot(ba, ba), 1e-6), 0.0, 1.0);
+    vec2 q = pa - ba * h;
+    float qr = dot(q, rh), qt = q.x * rh.y - q.y * rh.x;
+    // (the jig): deep, the beam smears it across to about its own width (~0.7° each side), so the lake's jig at 90–100 ft
+    // reads as a short dash, not a speck (#172); the ice page's jig (10–15 m) is as before
+    float dj = smoothstep(12.0, 26.0, rr);
+    float sr = 0.6 * B.x + 0.8 * uPulse + 0.12 * dj, st = B.x + rr * (0.004 + 0.016 * dj);
+    float d2 = qr * qr / (sr * sr) + qt * qt / (st * st);
+    if (d2 > 14.0) return 0.0;
+    d2 += (vnoise(p * 9.0 + B.w * 37.0) - 0.5) * 0.9 * smoothstep(0.6, 3.0, d2);
+    return B.y * exp(-1.5 * d2) * (0.35 + 0.65 * sin(3.14159 * h));
+  }
+  float fishEcho(vec2 p, int k) {
+    float e = 0.0;
+    float rr = max(length(p), 0.05);
+    vec2 rh = p / rr;
+    float ping = floor(uTime * 8.0);
+    for (int i = 0; i < 64; i++) {
+      if (i >= uMarkCount) break;
+      vec4 B = markRow(i, 1.0);
+      if (abs(B.z - float(k)) > 0.5) continue;
+      vec4 A = markRow(i, 0.0);
+      // quick reject: well clear of the body and its spread
+      vec2 pa = p - A.xy, ba = A.zw - A.xy;
+      float reach = length(ba) + 0.5 + B.x + 12.0 * uBeamHalf * rr;
+      if (dot(pa, pa) > reach * reach) continue;
+      vec4 F = markRow(i, 3.0);
+      if (F.x < -0.5) { e = max(e, legacyMark(p, A, B, rr, rh)); continue; }
+      // the whole echo flickers ping to ping: a calm fish is steady, a swimming or turning one swings widely, more so
+      // when it faces the beam (a small, changing target)
+      float fl = hash(vec2(B.w * 91.7, fract(ping * 0.0731) * 113.0));
+      float s = B.y * (1.0 + min(0.7, 0.06 + 0.4 * F.x + 0.25 * (1.0 - F.y)) * (fl - 0.5) * 2.0);
+      float lobe = 0.075 * smoothstep(0.75, 1.3, B.y);
+      e = max(e, s * fishDash(p, A, B.x, B.w, ping, lobe, F.y));
+      e = max(e, B.y * F.w * fishDash(p, markRow(i, 4.0), B.x, B.w + 0.5, ping - 1.0, 0.0, F.y));
+    }
+    return e;
+  }
+  // ---- the lakebed lockup (logo.js): drawn from its exact plane, like the fish ----
+  // A plate standing in the slice would only show its near edge in the depth strips (the rays across the
+  // 20° thickness hit it too sparsely), so the side views take the part of the plate inside this fan's slab
+  // and paint its outline from a signed-distance texture: ONE fetch per pixel, brightest at the edges.
+  float logoEcho(vec2 p, int k) {
+    vec2 w = vec2(uApexXZ.x + p.x, -uApexDepth - p.y);          // the pixel's point in the fan plane (world x, y)
+    vec2 d = w - uLogoB.xy;
+    float det = uLogoU.x * uLogoV.y - uLogoU.y * uLogoV.x;
+    float a = (d.x * uLogoV.y - d.y * uLogoV.x) / det;          // along the word from its centre (m)
+    float b = (uLogoU.x * d.y - uLogoU.y * d.x) / det;          // up the face from the fan's bottom (m)
+    if (abs(a) > uLogoExt.x || b < -0.3 || b > uLogoExt.y) return 0.0;
+    float zp = uLogoB.z + a * uLogoU.z + b * uLogoV.z;           // where that point of the plate is across the slab
+    float uc = p.x * sin(uFan[k].x) + p.y * cos(uFan[k].x);      // distance along the fan centre
+    float q = (zp - uApexXZ.y) / max(0.08, uc * uFan[k].w);
+    float wz = exp(-0.8 * q * q * q * q);                        // same flat-topped beam pattern as the fish marks
+    if (wz < 0.01) return 0.0;
+    vec2 svg = vec2(a * uLogoMap.x + uLogoMap.y, uLogoMap.z - b * uLogoMap.x);
+    float sd = (texture2D(uLogoSdf, vec2(svg.x / uLogoSvg.x, 1.0 - svg.y / uLogoSvg.y)).r - 0.5) * 2.0 * uLogoMap.w; // metres, < 0 inside
+    float inside = 1.0 - smoothstep(-0.04, 0.04, sd);
+    float rim = 1.0 - smoothstep(0.0, 0.25, -sd);                // edges and corners return strongest; flat faces less
+    return wz * inside * (0.48 + 0.72 * rim);
+  }
+  float capsuleDist(vec2 p, vec2 a, vec2 b) { vec2 pa = p - a, ba = b - a; float h = clamp(dot(pa, ba) / max(dot(ba, ba), 1e-6), 0.0, 1.0); return length(pa - ba * h); }
+
+  // ---- terrain ----
+  float terrainDepth(vec2 wxz) { return texture2D(uTerrain, (wxz + uTerrainHalf) / (2.0 * uTerrainHalf)).r; }
+  // the flat fan's coverage vs depression angle: 5°–25° with soft edges (sonarMarks.js panoLobe, same numbers)
+  // + a sidelobe from 25° down (≈ 0.8, gone by 60°), same numbers as sonarMarks.js
+  float panoLobe(float g) { return smoothstep(0.035, 0.105, g) * (1.0 - smoothstep(0.4, 0.49, g)) + 0.8 * smoothstep(0.4, 0.49, g) * (1.0 - smoothstep(0.62, 1.05, g)); }
+
+  // the weight of one thickness row v (0..1): the vertical slab's peaked main lobe; Panoramic as a sound picture: the flat
+  // fan's lobe by the row's depression (5°–25°, a sidelobe to ~60°, panoLobe), so the bottom fills in from the boat outward
+  float rowWeight(float v, float tanV) {
+    if (uFlat < 0.5) { float l = 1.0 - abs(v * 2.0 - 1.0); return 0.33 + 1.87 * pow(l, 1.8); }
+    float dep = uPanoTilt - atan((v * 2.0 - 1.0) * tanV);
+    return 0.15 + 2.2 * panoLobe(dep);
+  }
+  // ---- one fan's vertical-slab echo at p (metres: x along the screen, y down; r, aWorld its polar form), with the
+  //      pixel's texture terms. inFan = 1 when p lies inside the fan. Used by the picture and by the flasher.
+  float fanEcho(int k, vec2 p, float r, float aWorld, float tex, float filament, out float inFan) {
+    inFan = 0.0;
+    float a = aWorld - uFan[k].x;
+    if (abs(a) > uFan[k].y || r > uReach) return 0.0;
+    inFan = 1.0;
+    float u = 0.5 + 0.5 * tan(a) / uFan[k].z;
+    float acc = 0.0, peak = 0.0, spk = 0.0, edge = 0.0, solidAcc = 0.0;
+    // which thickness rows a pixel samples: the same set for a short run along the ray (0.08° × 0.67 m cells), not
+    // a fresh random set per pixel. Per-pixel sets turned big steel faces into salt-and-pepper dust (the wreck at
+    // 40 m, Jason 2026-09-25: 这个船的画面和 [app 的] 相差好远 结构和感觉完全不对); coherent sets draw them as the
+    // app does — solid masses with streaks along the beams (reference/app-study/pl-forward-wreck-*.jpg)
+    float jit = vnoise(vec2(aWorld * 50.0, r * 1.5) + 0.11); // the row set drifts smoothly along and across the beam (~1.2° × 0.67 m), no cell edges
+    // the bottom band as the 2.0.0 recordings draw it (PL Down, 80 ft, 2026-10-23: a 0.5 m body above 40 % of peak with a
+    // 0.6 m tail, not a thin line): a slightly longer pulse and tail than before (0.22 + 0.010 r / 0.35 + 0.015 r)
+    // measured on the 2.0.0 PL Down burst (2026-10-23, 20 frames, flat bottom 31–40 ft): the band above 40 % of its peak
+    // is 1.4–1.6 ft thick and does NOT grow with range (the pulse is a fixed length in time); ours was 3.9 ft
+    float sigma = 0.15 + 0.003 * r;
+    float tailLen = 0.28 + 0.008 * r;
+    // the grain of a real return (same recording, measured in the hull: cells ~0.6 m along the ray × 0.25 m across,
+    // re-drawn every ping, 18 % of the pixels change class between pings): structure faces and the mass behind them
+    // are built from it, instead of the thin radial filaments that drew a wreck as a line drawing
+    float png = floor(uTime * 8.0);
+    // measured in the recording's hull: grains ~0.6 m ACROSS the beam × 0.25 m along the ray (the beam's width smears
+    // across, the range cell is short), and about a fifth of them change between pings
+    float g2 = vnoise(vec2(aWorld * r * 2.0 + png * 0.37, r * 4.5 + png * 1.9));          // grains ~0.6 m across the beam × 0.25 m along the ray
+    float g3 = vnoise(vec2(aWorld * r * 7.0 + 3.0 + png * 0.9, r * 16.0 - png * 3.1));   // finer speckle, new every ping
+    float gh = vnoise(vec2(aWorld * r * 1.0 + 9.0, r * 1.2 + png * 0.23));              // slow patches, a little darker
+    float grainS = (0.3 + 1.0 * pow(0.45 * g2 + 0.55 * g3, 1.2)) * mix(0.8, 1.0, gh); // 0.25..1.3: dense speckle with red pits (the recording's faces are 85 % lit; its dark cavities are geometry)
+    // Structure as the app draws it (Jason 2026-10-23: 结构物的画面跟真实的声纳的画面差距还是比较远; references: the PL Forward
+    // wreck frames and the 2.0.0 Live Combo pilings, reference/app-study/2026-10-23/40-live-combo.jpg): a trunk or
+    // piling is a solid column with a hot core, and it throws a BLACK shadow — the bottom band breaks off behind it and
+    // comes back a few metres on. Two things make that: the beam's main lobe is peaked across the slab (the centre
+    // rows carry most of the energy, so a trunk on the centreline blocks most of it), and whatever the rows in front
+    // of a pixel hit as structure casts a shadow on the rows behind — wblk / wsum below, squared like the app's.
+    float duB = (uFlat > 0.5 ? 1.25 : 0.5) * 0.0105 / (uFan[k].z * cos(a) * cos(a)); // ±0.6° in u; Panoramic ±1.5°: the flat fan's beams are wider (§7.13), so a shadow's sides are soft, not cut (#178)
+    float strN = 0.0, rockN = 0.0; // Panoramic: the rows meeting structure near this range, and how many of those met rock
+    float wsum = 0.0, wblk = 0.0, bw = 0.0, bh = 0.0, bh2 = 0.0; // bw/bh/bh2: where the rows meet the bottom (its spread across the slab)
+    float prevB = -1.0; // the previous row's bottom hit (−1: none) — the band between neighbouring rows, below
+    for (int j = 0; j < 24; j++) {
+      float v = (float(j) + jit) / 24.0;
+      float ty = (v * 2.0 - 1.0) * uFan[k].w;
+      float wgt0 = rowWeight(v, uFan[k].w);
+      // each row looks a little to either side within the fan too: the beam is ~1.2° wide in the fan's own plane, so a
+      // grazing bottom (Forward, a plateau) reads as a band as thick as that beam at its range, not a hairline
+      // (Jason 2026-10-24: 底部太虚了，太薄了，应该厚一点). A bottom square to the rays (Down) hardly changes.
+      // (a sine of the drifting row phase, not fract(): fract jumped on the noise's level lines and drew fingerprint loops in the band)
+      float uj = u + duB * sin(6.2832 * (float(j) * 0.618034 + jit));
+      float rayLen = length(vec3(tan(a), ty, 1.0));
+      float hit = sampleDist(k, vec2(uj, v), rayLen);
+      // (no displacement of the bottom's edge: the burst's edge is flat — its fine texture is the fibres below, not bumps.
+      //  Jason 2026-10-24: 你的那种坑坑洼洼是一高一低 … 它是一种平整，但是上面有细腻的纹理)
+      float dr = r - hit;
+      float tag = sampleTag(k, vec2(uj, v));
+      float structure = step(0.25, tag), steel = step(0.62, tag), wood = step(0.55, tag) * (1.0 - steel); // 0.5 timber/rock · 0.6 wood · 0.75 steel
+      float hitS = sampleDist(k, vec2(uj, v), rayLen); hit = mix(hit, hitS, structure); dr = r - hit; // structure keeps its exact hit
+      if (uFlat > 0.5) { float nh = wgt0 * structure * step(-0.4, dr) * (1.0 - step(2.0, dr)); strN += nh; rockN += nh * (1.0 - step(0.48, tag)); } // rocks are tagged 0.45 (lakeMaterial ROCK)
+      // timber and rock faces are sharp (real pulse ≈ 0.1 m) and solid; the bottom band is wider with a tail.
+      // Steel (wrecks) is by far the strongest reflector: after the log compression its pulse skirts and the
+      // ringing inside the hull stay bright, so the app draws a wreck as thick glowing bands with long tails,
+      // not a line drawing (Jason 2026-09-25: 结构物的成像不对劲; PL Forward wreck recording, same depth and scale:
+      // reference/engine-compare/wreck-compare-*.png)
+      // timber and rock: a solid pulse ~0.3 m long (was 0.08 m — a line drawing), with some orange smear behind the
+      // face; steel keeps its wide bands and long tails (#63)
+      float sg = mix(sigma, mix((0.15 + 0.006 * r) * (1.0 + 1.0 * smoothstep(6.0, 30.0, r)), sigma, steel), structure);
+      // the bottom's pulse: a sharp onset (the burst's band rises over 0.5 ft) and a softer back; structure is painted by the echo splat below
+      // The slab is continuous, the 24 rows are samples of it: where neighbouring rows meet a rough or side-sloping bottom at
+      // ranges further apart than the pulse, each row drew its own thin line and the band became a net of crossing lines
+      // with dark holes (Jason 2026-10-24: 底部在某些区域很虚 — since the thin band of #140, made worse by #148's arcs). Each
+      // row now spreads its pulse over the stretch between its hit and the previous row's (centre halfway, width half
+      // the gap, the same energy), so the band stays one filled body; a flat bottom (no gap) is unchanged.
+      float prevB0 = prevB;
+      float gapB = (prevB > 0.0 && hit < 1e8 && structure < 0.5) ? abs(hit - prevB) : 0.0;
+      gapB *= step(0.02, gapB); // (below a couple of cm: the plain pulse)
+      float drB = (gapB > 0.0) ? r - 0.5 * (hit + prevB) * uTune6.y - hit * (1.0 - uTune6.y) : dr;
+      float sgF2 = sg * sg * (drB < 0.0 ? 0.36 : 1.0), sgE2 = sgF2 + 0.25 * gapB * gapB * uTune6.y;
+      // Panoramic (#171): the fan skims the bottom, so neighbouring rows meet it metres apart; the bottom between them is
+      // lit too (the slab is continuous): each row covers its whole stretch at full level instead of spreading its pulse
+      float pulse = sqrt(sgF2 / sgE2) * exp(-drB * drB / sgE2) * (1.0 - structure);
+      if (uFlat > 0.5 && gapB > 0.0) { float lo = min(hit, prevB0), hi = max(hit, prevB0); pulse = smoothstep(lo - sg, lo + sg, r) * (1.0 - smoothstep(hi - sg, hi + sg, r)) * (1.0 - structure); } // a flat-topped stretch, no seams between rows: neighbouring stretches meet with matching edges that add up to 1 (#178: the old offset edges overlapped into a bright line at every row's hit, and the lines followed the bottom's contours across the fan — wavy rings the app does not have)
+      if (hit < 1e8 && structure < 0.5) prevB = hit; // a row on a rock keeps the last bottom hit: the band is filled across it too
+      float tl = tailLen * (1.0 + 0.5 * steel);
+      float tail = dr > 0.0 ? (0.55 + 0.65 * steel) * exp(-dr / tl) * (1.0 - structure + steel) : 0.0; // the bottom's tail; steel keeps a long tail (#63)
+      if (gapB > 0.0) { // the tail too starts anywhere between the two rows' hits (its average over that stretch): no hard onset line per row
+        float ta = min(hit, prevB0), tb = max(hit, prevB0);
+        float tI = r < ta ? 0.0 : (r < tb ? 1.0 - exp(-(r - ta) / tl) : exp(-(r - tb) / tl) - exp(-(r - ta) / tl));
+        tail = 0.55 * tl / gapB * tI * uTune6.y + tail * (1.0 - uTune6.y);
+      }
+      // the far side of what this row hit (back-face strip): a hull's thickness, a trunk's diameter. No far face found
+      // (an open mesh, the lakebed lockup) → wood 2.5 m, timber 0.4 m
+      float hit2 = sampleDistB(k, vec2(uj, v), rayLen);
+      float th = (hit2 > 1e8) ? mix(0.4, 2.5, wood) : clamp(hit2 - hit, 0.15, 6.0);
+      // the body between the faces (Jason 2026-10-23: 石头太透明 … 从中间更亮往边上散发; 树和船都很透明): rock and timber are solid —
+      // brightest just inside the near face, fading toward the far one; a wooden hull is lit through a little weaker;
+      // steel reads solid too (its walls ring). This fills what the surface splat leaves hollow.
+      float insideB = step(0.0, dr) * (1.0 - step(th, dr));
+      solidAcc += wgt0 * insideB * structure * mix(1.0, 0.6, wood) * exp(-dr / max(0.5 * th, 0.15)) * (0.65 + 0.5 * grainS);
+
+      float second = 0.045 * exp(-(r - 2.0 * hit) * (r - 2.0 * hit) / (2.5 * sigma * sigma)) * (1.0 - uFlat); // the second echo under the bottom: small and faint (Jason 2026-10-23) (Panoramic: none — every row's own copy drew a ring along the bottom's contours, #178)
+      float wgt = wgt0; // the main lobe across the slab (same mean as the old triangle; Panoramic: by depression)
+      // the acoustic shadow starts behind the FAR face and fades over a few metres; a wooden hull hardly shades the bottom
+      // under it (the recording's bottom runs lit under the hull), timber and rock shade hard
+      float body = 0.0; // (structure is painted by the splat)
+      wsum += wgt; wblk += wgt * structure * mix(1.0, 0.3, wood) * smoothstep(th + 0.15, th + 0.6, dr) * exp(-max(dr - th - 0.6, 0.0) / 1.8);
+      if (hit < 1e8 && structure < 0.5) { bw += wgt; bh += wgt * hit; bh2 += wgt * hit * hit; }
+      acc += (1.15 * uTune.x * pulse + uTune.y * tail + body + second) * wgt; // a yellow core in the band, orange only at its top and bottom edges // the band's profile measured on the burst: peak 0.5 ft under the edge, 75 % width 1.1 ft, 15 % width 2.7 ft, orange body
+      peak = max(peak, pulse * (1.0 - structure));
+      edge = max(edge, exp(-dr * dr / (0.16 * sg * sg)) * (1.0 - structure) * (1.0 - uFlat)); // the first return: a thin hot line (Panoramic: the rows tile one field, no line per row, #178)
+      // (spk: the structure echo comes from the splat after the loop)
+
+    }
+    // The bottom keeps one brightness wherever it is (Jason 2026-10-24: the deep bottom under the workboat and the Forward
+    // bottoms looked faint and thin next to the close-up he approved). When the slab's rows meet the bottom over a spread
+    // of ranges (a deep bottom, a grazing Forward bottom) the same echo energy is smeared over that spread and every pixel
+    // got a fraction of it; scale the band back by sqrt(1 + spread² / pulse²), up to 3×: the band then reads as thick as
+    // its footprint and as bright as the close-up.
+    float bm = bh / max(bw, 1e-3), bs = sqrt(max(bh2 / max(bw, 1e-3) - bm * bm, 0.0));
+    if (uFlat < 0.5) acc *= 1.0 + (min(sqrt(1.0 + bs * bs / (sigma * sigma)), 3.0) - 1.0) * 0.8 * uTune3.x; // (Panoramic covers the gaps itself, above)
+    float shade = pow(1.0 - 0.45 * wblk / max(wsum, 1e-3), 1.6); // a notch behind structure, never a missing bottom (Jason 2026-10-24: 底部是消失了一样)
+    // structure from the echo splat: every surface the fan sees at this angle and range, all faces, both sides — the real
+    // picture of a wooden hull is its whole section (deck line, planking, ribs, far side). A 0.3 m pulse along the
+    // range (5 taps), the per-ping grain on top. Steel sums brighter (its amp in lakeMaterial) and keeps its row tail.
+    float rn = r / uFanR[k], dRn = 0.06 / uFanR[k]; // ±0.12 m along the range: the recording's range cells are sharp (Jason: 树的清晰度再提升一点)
+    float es = 0.0;
+    float duT = 0.5 * uEchoTex.x; // and half a cell either side across the fan: the cells blend into one smooth stroke (no mosaic)
+    for (int i = -2; i <= 2; i++) { float ri = rn + float(i) * dRn; es += exp(-0.9 * float(i * i)) * 0.5 * (sampleEcho(k, u - duT, ri) + sampleEcho(k, u + duT, ri)); }
+    es /= 1.87;
+    // A ragged outline made of the arcs themselves (Jason 2026-10-24: 外边缘太光滑 … 每个物体表面都会有纤维的; the grain rule,
+    // §10): each ~2 in slice along the ray lets the structure echo run on SIDEWAYS, across the beam, by its own length —
+    // the ends of across-beam arcs sticking out of a target, ~9 cm typical, up to ~20 cm, new every ping. Along the ray
+    // only the pulse softens the edge (the arcs above a hull top stick out ~2.6 in, measured). Every surface grows
+    // them, branches too; only the faintest speckle does not.
+    float duM = 0.5 / (uFan[k].z * cos(a) * cos(a) * max(r, 0.5)); // u per metre across the fan at this range
+    float fl = 1.7 * vnoise(vec2(r * 19.0 + 17.0, aWorld * r * 1.5 + png * 0.71)) * vnoise(vec2(r * 7.0 + 4.0, png * 1.3));
+    float Lx = 0.03 + 0.15 * min(fl, 1.2) * uTune5.w; // metres
+    float esX = 0.0;
+    for (int i = 1; i <= 4; i++) {
+      float f = float(i) * 0.25;
+      float el = sampleEcho(k, u - f * Lx * duM, rn), er = sampleEcho(k, u + f * Lx * duM, rn);
+      esX = max(esX, (1.0 - 0.8 * f) * max(el * smoothstep(EDGE_T0, EDGE_T1, el), er * smoothstep(EDGE_T0, EDGE_T1, er)));
+    }
+    es = max(es, 0.75 * esX);
+    float body = clamp(solidAcc / max(wsum, 1e-3), 0.0, 1.0);
+    spk = (1.0 - exp(-(es + 0.25 * body) * 9.0)) * 0.95 * (0.72 + 0.4 * grainS); // surfaces (splat) + the solid body between them, soft knee; a calmer grain so a rock reads solid, not see-through (Jason 2026-10-24)
+    // Core to rim (Jason 2026-09-24: 越靠近中心越亮 有这个逐步亮的过程 · 这种实心结构亮的 清晰的 是更好的; 2026-10-24: 中间最亮, 慢慢
+    // 发散到外面, 最外圈才接近橙色 — for fish, rocks, hulls and the bottom alike). Measured on the burst's hull (rim.py): L 160 in
+    // the outer 2 in, 250 at 2–4 in, 360 at 6–9 in, ~390 from 9 in inside with yellow 22 % and white 4 %; red only at the rim.
+    // How deep inside the silhouette a pixel lies: how many of 16 taps on two rings (0.12 m and 0.25 m in the picture's
+    // metres, rotated per pixel and ping) also land on structure. Deep inside → the core level, on the rim → the rim level.
+    float occ = 0.0; // how fully structure covers this pixel: a solid target hides the bottom band behind it
+    // Panoramic (#178, Jason: 石头的部分应该更亮 因为石头的echosound反射比较强): rock and steel are hard reflectors — in the app a hard
+    // target is the brightest thing in the fan, yellow to white; timber stays the soft patch of #171
+    float hardF = uFlat > 0.5 ? rockN / max(strN, 1e-3) : 0.0;
+    if (es > 0.002) {
+      float duR = 0.5 / (uFan[k].z * cos(a) * cos(a) * max(r, 0.5)); // u per metre across the fan at this range
+      float rot = hash(floor(vec2(aWorld * 900.0, r * 30.0)) + png * 0.73) * 6.2832;
+      float thr = 0.012 * uTune2.w, cov = 0.0, em = 0.0;
+      for (int q = 0; q < 8; q++) {
+        float an = float(q) * 0.7854 + rot;
+        vec2 o = vec2(cos(an), sin(an));
+        vec2 o1 = o * 0.12 * uTune2.z, o2 = o * 0.25 * uTune2.z;
+        float e1 = sampleEcho(k, u + o1.x * duR, rn + o1.y / uFanR[k]), e2 = sampleEcho(k, u + o2.x * duR, rn + o2.y / uFanR[k]);
+        cov += smoothstep(thr, 2.5 * thr, e1) + smoothstep(thr, 2.5 * thr, e2);
+        em += e1 + e2;
+      }
+      cov /= 16.0; em /= 16.0;
+      float inner = smoothstep(0.45, 0.95, cov);
+      // Solid, not see-through (Jason 2026-10-24: 石头的密度是高的, 所以它的透明度应该更低 … 实心不光有亮度, 还有透明度): deep
+      // inside the silhouette the gaps between the summed surfaces fill in from their neighbours (never darker), the
+      // grain there is calmer, and the target hides the bottom band behind it (occ, below) instead of the two adding up
+      float fill = inner * uTune4.y;
+      spk = (1.0 - exp(-(mix(es, max(es, em), fill) + 0.25 * body) * 9.0)) * 0.95 * mix(0.72 + 0.4 * grainS, 0.86 + 0.2 * grainS, fill);
+      occ = inner * smoothstep(thr, 2.5 * thr, es);
+      vec4 eg = (k == 0) ? texture2D(uEcho0, vec2(u, rn)) : texture2D(uEcho1, vec2(u, rn));
+      float steelF = clamp(eg.g / max(eg.r, 1e-3), 0.0, 1.0), woodF = clamp(eg.b / max(eg.r, 1e-3), 0.0, 1.0); // steel and wood shares of the splat (lakeMaterial writes them to g, b)
+      if (uFlat > 0.5) hardF = max(hardF, steelF);
+      // core levels (Jason 2026-10-24: 船这一轮亮度降低的有点过多了, 找上一轮跟这一轮在折中; rock is denser than wood, so rock a
+      // little brighter): wooden hull p90 ~515 (was 612, then 417), rocks and timber ~585, steel ~400 — with the fibres below
+      // steel 1.08 → 1.73 with its higher ceiling and the large-scale light and dark (Jason 2026-10-24: 钢船 … 偏暗, 暗很多; fit on
+      // the recording's Forward wreck: core p50 ~410, p90 555–656, yellow ~30 %, white ≤ 7 %, large-scale CoV 0.25–0.30)
+      float core = mix(mix(2.45 * uTune4.w, 2.1 * uTune4.z, woodF), 1.73 * uTune3.w, steelF); // rock and timber · wooden hull · steel
+      spk *= mix(0.82 * uTune2.x, core * uTune2.y, inner);
+      // large-scale light and dark on big hulls (lakeMaterial bigF, carried in a): bright regions ~1–2 m across in the middle
+      // of a large target, as on the recording's wreck (Jason 2026-10-24: 大面积的东西 … 中间一定是有亮的, 不可能那么均匀)
+      spk *= mix(1.0, clamp(2.0 * eg.a / max(eg.r, 1e-3), 0.3, 2.0), inner);
+      // a soft ceiling: solid cores sit at the approved bottom close-up's yellow, not white (Jason 2026-10-24: 钢船过亮,
+      // 应该均匀一点; 木船很亮 but wood and the bottom are about as dense, so about as bright)
+      // The inside carries the same grain as everything else (Jason 2026-10-24: 船跟石头的纹理 … 不是光滑的; the grain rule,
+      // §10): across-beam arcs, brighter yellow ones on an orange body. Full strength deep inside, half on the rim; centred
+      // so the level stays; never below 0.35 (gaps stay orange, the target stays solid).
+      float fs = arcGrain(aWorld, r, png);
+      float fib = 1.0 + (0.9 * smoothstep(0.3, 0.85, fs) - 0.28) * mix(0.5, 1.0, inner) * 1.3 * uTune5.x; // centred (mean ≈ 1): texture only, the level stays
+      spk *= max(fib > 1.0 ? 1.0 + (fib - 1.0) * uTune5.y : fib, 0.35);
+      float Ks = 2.2 * mix(1.0, 1.7 * uTune6.x, steelF) * uTune3.z * mix(1.0, uPanoK.z, hardF); // the soft ceiling holds the bright fibres at yellow; steel's higher so its bright regions reach yellow-white (Jason 2026-10-24: 钢船 … 偏暗, 太均匀)
+      spk = Ks * (1.0 - exp(-spk / Ks));
+    }
+    // Bottom brightness (Jason 2026-09-25: 画面特别是底部貌似还是太亮 深水也是 … 高亮的部分和桔红色的关系): over a flat
+    // bottom every row across the slab lands at one range and the integrated echo added up to a solid white band
+    // (38–44 % of the lit pixels white in PL scenes; the app's bottom scenes 6–7 %). Past the near range (where TVG
+    // already tames it) the integrated part saturates softly (K 0.4), so the body stays orange, and a thin
+    // first-return line brings back the app's hot leading edge.
+    // The cap also follows the depth below the transducer (#91, #92). The middle of the lake became shallower
+    // (Jason 2026-10-04: 最深的地方做30ft深, then 相对缓慢得向深水过度: a slope from ~30 to 80 ft), and those bottoms sit
+    // inside the 6–14 m range ramp while AUTO depth zooms them in: the default view went to 19–22 % white (PL) and
+    // 18–26 % (Mini, Down/Combo). PingLive caps from 5.5 m to 7.5 m below the transducer (~21–28 ft of water), full
+    // strength; the Mini from 7.5 m to 9.5 m (~28–34 ft) at 80 %, because its own near gain (uBedGain) already holds
+    // its 28–30 ft bottoms at 5–8 % and a full cap took its 36 ft bottom to 0 %. The shelf, the island and the deep
+    // floor keep their look.
+    float capR = smoothstep(6.0, 14.0, r), capD = uFlat > 0.5 ? 0.0 : uCapDepth.z * smoothstep(uCapDepth.x, uCapDepth.y, p.y); // (Panoramic: p.y is the range ahead, not a depth)
+    if (uFlat > 0.5) acc *= 1.12; // Panoramic: the app's field sits a step up (index 0.1–0.25, §7.12), the slab's wide lobe spreads it thinner
+    float accI = acc / 16.0, K = mix(3.0, 2.5, max(capR, capD)); // 0.8 → 2.5 (2026-10-23): the measured band peaks at LUT 0.62 (yellow-orange), ours sat at 0.42 // was 0.4: it held the band body at dark red; the 2.0.0 PL Down recording shows an orange body (2026-10-23) // (4–10 m on range tried: the Mini's calibrated shelf lost its hot edge, 6 → 0.3 % white)
+    accI = K * (1.0 - exp(-accI / K));
+    // no separate hot line at the first return any more: both the per-row peak and the edge line were a max over the 24 rows,
+    // which spread the band into a 2.4 ft plateau (switching them off reproduced the burst's profile: 75 % width 1.1 ft, a tail to 2.7 ft)
+    acc = (uTune.w * accI + uTune.z * 0.1 * edge * (0.55 + 0.6 * filament)) * shade * (1.0 - 0.92 * occ * uTune4.x) + spk * (uFlat > 0.5 ? mix(0.35, uPanoK.x, hardF) : 1.0); // (Panoramic: a target seen from above across a 60° slab sums far more surface than a vertical slice — toned to a soft patch, #171) structure (the splat) is not shaded by its own shadow, and hides the band behind it
+    // Bottoms past the cap depth are toned no nearer than 80 % of the range window (#92). With the middle sloping
+    // from 30 to 80 ft, Forward (the visitor's fixed range) drew its nearer bottom at 11–22 % white against the old
+    // plateau's 8 %; now 7–12 %. Down's AUTO range already puts the bottom at ~80 %, so Down barely changes
+    // (0.9 started to dim the deep floor in Down, 8 → 5 %).
+    float rT = mix(r, max(r, 0.8 * uRange), capD);
+    float atten = 1.0 - 0.4 * clamp(rT / uRange, 0.0, 1.0);
+    // near-range gain (TVG): close returns get less gain, like a real sonar's time-varying gain. In shallow
+    // water every ray across the slab hits the bottom at the same range, the band saturates to a solid white
+    // slab and AUTO depth then zooms it (Jason 2026-09-24: 浅水的时候 … 过爆感太强了 可以折中一点). Full gain
+    // again from ~11 m (≈ 0.9 at 9 m), so the calibrated deeper pictures barely change; fish marks keep their
+    // approved look. 5 m ≈ 0.43: the core just reaches white and keeps its streaks instead of a solid slab.
+    float tvg = mix(0.55 + 0.2 * (uTune3.y - 1.0), 1.0, smoothstep(3.0, 11.0, r)); // floor 0.32 → 0.55 (2026-10-24): the thin band no longer burns in shallow water; 0.32 left shallow bottoms faint
+    // PingLive Mini: its narrow 39° fan meets a shallow bottom at one range across the whole fan, and AUTO depth
+    // zooms that band in, so it still burnt to a yellow-white slab (Jason 2026-09-25: PingLive mini是不是在浅水太亮了
+    // 和之前pl一样的问题). Extra near gain for PLM only, back to full by 18 m: deep pictures keep their calibration.
+    tvg *= mix(uBedGain, 1.0, smoothstep(5.0, 18.0, r));
+    // near-field fish 40 % brighter, fading back to normal by 16 m (Jason 2026-09-27: 近场的鱼要亮40%)
+    float sMix = clamp(spk * 2.5, 0.0, 1.0); // structure carries its own grain (above), not the radial streaks of the water and the bottom
+    // the fish from their bodies (#153); with them the marks carry only the ice page's jig (SonarScreen), still drawn as its mark
+    float fe = uFishMode > 0.5 ? max(fishImg(k, u, rn, r, a, aWorld), fishEcho(p, k)) : fishEcho(p, k);
+    if (uFlat > 0.5) fe *= 2.4; // Panoramic (#171): fish are the picture in the app's lake frames — bright yellow dashes over the crimson field (§7.12)
+    float e = max(acc * atten * mix(tex, 1.0, sMix) * tvg, fe * mix(1.4, 1.0, smoothstep(8.0, 16.0, r)));
+    if (uFlat < 0.5) e = max(e, logoEcho(p, k) * atten * (0.7 + 0.55 * (filament - 0.8)) * (0.72 + 0.28 * tex));
+    // The far bottom (Jason 2026-10-25: 超过100 feet … 底基本上还是看得见的，就是慢慢会有点虚，慢慢会变弱 … 现在基本上消失了，
+    // 变成一大群鱼). Past ~60 ft the beam grazes the bottom: the rays skim the weed and the rocks on a hump and hit those
+    // first, and behind a hump the bottom falls into its shadow, so the traced band above broke into bright blobs with
+    // nothing under them (the island ahead of both start spots), then stopped. A real beam is wide at that range and
+    // still draws the bottom there, softer and weaker with distance. So from ~60 ft a band is laid along the real bottom
+    // under each pixel (the baked terrain: every vertical fan lies in the world x-y plane, +x ahead), never brighter
+    // than the traced one where that one is good: thicker and softer with range, fading to about two thirds by 200 ft, to
+    // 70 % of that where the terrain itself hides it, and shaded by structure like the traced band.
+    float wFar = uFlat > 0.5 ? 0.0 : smoothstep(18.0, 32.0, r); // (Panoramic: every row grazes the bottom already)
+    if (wFar > 0.0) {
+      float dy = p.y - (terrainDepth(uApexXZ + vec2(p.x, 0.0)) - uApexDepth); // below the real bottom line
+      float on = 0.04 + 0.008 * r, T = 0.15 + 0.012 * r; // the onset softens and the body thickens with range (the beam's width)
+      if (dy > -3.0 * on && dy < 3.0 * T) {
+        float prof = exp(-dy * dy / (dy < 0.0 ? on * on : T * T)); // a soft body ~T deep (an exponential tail sank under the black floor of the tone window: a hairline)
+        float rayC = length(vec2(tan(a), 1.0));
+        float hitC = sampleDist(k, vec2(u, 0.5), rayC), tagC = sampleTag(k, vec2(u, 0.5));
+        float hidden = step(hitC, r - max(0.6, 2.0 * T)) * (1.0 - step(0.25, tagC)); // the centre ray stops on nearer terrain: a hump's shadow
+        float patchF = 0.72 + 0.45 * vnoise(vec2(p.x * 0.4 + 5.0, 0.3)); // slow patches along the bottom, fixed to it
+        float lvl = 0.55 * uTune6.z * mix(1.0, 0.65, smoothstep(30.0, 62.0, r));
+        float eF = lvl * prof * mix(1.0, 0.7 * uTune6.w, hidden) * shade * (1.0 - 0.92 * occ) * atten * tex * patchF * wFar;
+        e = max(e, eF);
+      }
+    }
+    // Panoramic (#178, Jason: 画面还是有不少黑掉的地方): the app's fan is one even field, 0 % black inside it (sonar-style §7.12).
+    // Behind a rock, a trunk or the island the whole slab can be blocked (every row hits it) and the traced picture had
+    // nothing there: hard black lanes. Wherever this slant range reaches the bottom, a floor of the same grain holds a darker
+    // crimson: shadows soften to it and fade back as the rows over the top land, never black. Where the slant range is
+    // shorter than the water under the ground point the sound has not reached the bottom yet: dark, as in the app.
+    if (uFlat > 0.5) {
+      vec2 dw = vec2(p.y, p.x) / max(r, 1e-3); // the bearing in world (x, z): the flat fan looks along +x, starboard +z
+      float D = terrainDepth(uApexXZ) - uApexDepth, h = sqrt(max(r * r - D * D, 0.0));
+      for (int i = 0; i < 2; i++) { D = terrainDepth(uApexXZ + dw * h) - uApexDepth; h = sqrt(max(r * r - D * D, 0.0)); }
+      float reach = smoothstep(0.0, 0.8, r - D) * step(0.1, D); // (D ≤ 0: dry land, no echo)
+      float cov = max(min(panoLobe(atan(D, max(h, 1e-3))) / 0.8, 1.0), uPanoK.w); // the lobe; steep under the boat a weaker return
+      e = max(e, uPanoK.y * cov * reach * shade * (1.0 - 0.92 * occ) * atten * tex * sqrt(tvg)); // (half the near-range gain cut: the app's near field is darker, not black)
+    }
+    return e;
+  }
+  // the flasher: the echo at one depth straight under the transducer — the Down fan's middle beams (±7°), fish included
+  float flasherEcho(float depth) {
+    if (uFanCount < 1 || depth > uReach) return 0.0;
+    float e = 0.0;
+    for (int i = -2; i <= 2; i++) {
+      float a = float(i) * 0.06;
+      vec2 p = vec2(depth * sin(a), depth * cos(a));
+      float inF; e = max(e, fanEcho(0, p, depth, a, 1.0, 1.0, inF));
+    }
+    return e * uSignal; // no signal: the ring stays lit, no returns on it
+  }
+  // the app's tone curve (assets/aio_shader.glsl): log compression → gain / dynamic-range window → LUT index
+  float toneIdx(float echo) {
+    float raw = echo * 65535.0;
+    float bs = 4000.0;
+    float lv = log(1.0 + raw / bs) / log(1.0 + 65535.0 / bs);
+    float width = clamp(uDynRange, 0.05, 1.0);
+    // gain raises the picture (it used to lower it — the window's floor rose with uGain); 0.40 reproduces the look the old
+    // 0.57 gave, so the page's default label now reads like the app's recordings (40 %), 2026-10-23
+    float lo = (1.0 - width) * 0.5 + width * (0.47 - uGain) + 0.5 * width * uContrast;
+    float hi = lo + width * (1.0 - 0.45 * uContrast) * (uFlat > 0.5 ? 1.0 : 1.15);
+    float idx = echo > 0.0005 ? clamp((lv - lo) / (hi - lo), 0.0, 1.0) : 0.0;
+    return pow(idx, uGamma);
+  }
+  vec3 lut2(float idx) { return texture2D(uLUT2, vec2(idx * (255.0 / 256.0) + 0.5 / 256.0, 0.5)).rgb; }
+  // the flasher dial (the Mini's Ice Fishing views): depth runs clockwise from the top round a white ring; the
+  // returns paint the ring in the app's jet colours; the pale centre disc carries the DOM depth readout
+  vec3 flasherPixel(vec2 uv) {
+    vec2 q = vec2(uv.x * uAspect, uv.y);
+    vec2 c = vec2(uIceSplit * uAspect * 0.5, 0.53); // a little above centre: the app's bottom bar runs under the dial
+    float R1 = 0.36, R0 = 0.235;
+    vec2 d = q - c; float r = length(d);
+    vec3 panel = vec3(0.045, 0.05, 0.065);
+    if (r > R1 + 0.01) return panel;
+    if (r < R0 - 0.004) return vec3(0.74, 0.76, 0.86);
+    float th = atan(d.x, d.y); if (th < 0.0) th += 6.2831853;
+    float depth = th / 6.2831853 * uRange;
+    float idx = toneIdx(flasherEcho(depth));
+    vec3 ring = vec3(0.9, 0.91, 0.94);
+    float on = smoothstep(0.05, 0.16, idx);
+    // the band fades at the ring's edges, like a lamp seen through a slot
+    float across = smoothstep(R0, R0 + 0.025, r) * (1.0 - smoothstep(R1 - 0.025, R1, r));
+    vec3 col = mix(ring, lut2(idx), on * (0.75 + 0.25 * across));
+    // tick marks on the inner edge, one per major division
+    float seg = th * uTicks / 6.2831853;
+    float tf = abs(fract(seg + 0.5) - 0.5) * 6.2831853 / uTicks * r;
+    float tick = (1.0 - smoothstep(0.0025, 0.005, tf)) * (1.0 - smoothstep(R0 + 0.03, R0 + 0.045, r));
+    col = mix(col, vec3(0.25, 0.27, 0.34), tick * (1.0 - 0.7 * on));
+    float rim = max(1.0 - smoothstep(0.0, 0.005, abs(r - R1)), 1.0 - smoothstep(0.0, 0.005, abs(r - R0)));
+    col = mix(col, vec3(0.62, 0.64, 0.7), rim * 0.7);
+    float aa = (1.0 - smoothstep(R1, R1 + 0.006, r)) * smoothstep(R0 - 0.004, R0 + 0.002, r);
+    return mix(r < R0 ? vec3(0.74, 0.76, 0.86) : panel, col, aa);
+  }
+
+  // ---- small scatterers in the water column (#123) ----
+  // Bait, plankton and debris: the app's water carries short dim dashes on ~4 % of it (plm-forward-fish-a/c.jpg: ≈ 0.8°
+  // across × 5 cm along the ray, peak LUT ≈ 0.55, 1–2 per m², mostly in the upper few metres), LiveScope's too; the
+  // engine's water was empty. One possible scatterer per 0.55 m cell of the fan plane (world x × depth, so they stay put
+  // when the boat turns the picture), drawn with the fish marks' beam spread but smaller and dimmer, a few blinking out
+  // each ping; only in water (above the bottom under them), thinner with depth.
+  float waterSpecks(vec2 p, float r) {
+    vec2 w = vec2(uApexXZ.x + p.x, uApexDepth + p.y);            // world x, depth below the surface (m)
+    if (w.y > terrainDepth(vec2(w.x, uApexXZ.y)) - 0.25) return 0.0;
+    vec2 rh = p / max(r, 0.3);
+    float st = 0.8 * uBeamHalf * r + 0.012, sr = 0.5 * uPulse;
+    float ping = fract(floor(uTime * 8.0) * 0.0731) * 113.0;
+    const float CELL = 0.55;
+    vec2 c0 = floor(w / CELL);
+    float e = 0.0;
+    for (int i = -1; i <= 1; i++) {
+      for (int j = -1; j <= 1; j++) {
+        vec2 c = c0 + vec2(float(i), float(j));
+        float h = hash(c * 1.37 + 0.71);
+        float dens = 0.04 + 0.17 * (1.0 - smoothstep(2.5, 9.0, c.y * CELL)); // 60 % of #129's density (Jason 2026-10-23: 星星点点的噪声稍微减掉一点)
+        if (h > dens) continue;
+        vec2 sp = (c + vec2(hash(c + 3.1), hash(c + 7.7))) * CELL;
+        vec2 q = vec2(sp.x - uApexXZ.x, sp.y - uApexDepth) - p;   // screen metres, pixel → speck
+        float qr = dot(q, rh), qt = q.x * rh.y - q.y * rh.x;
+        float d2 = qr * qr / (sr * sr) + qt * qt / (st * st);
+        if (d2 > 6.0) continue;
+        float on = step(0.3, hash(c + ping));                     // ~70 % of pings
+        float amp = (0.16 + 0.2 * hash(c + 11.3) * hash(c + 5.9)) * (1.15 - 0.5 * uNoise);
+        e = max(e, amp * on * exp(-1.5 * d2));
+      }
+    }
+    return e * (1.0 - 0.3 * min(r / uRange, 1.0));
+  }
+  void main() {
+    vec2 vUv = vUv0;
+    // ---- the 2D history pass (Ice Fishing View): shift the record one column left, draw the newest ping at the right edge
+    if (uHistPass > 0.5) {
+      float W = 384.0;
+      // uHistFill: the first time the view opens, every column is written at once as a plausible recent record (the
+      // angler has sat on this hole a while): the same bottom with per-ping speckle and a hair of depth wobble, so the
+      // panel is never empty for its first 48 s (2026-10-17)
+      bool fill = uHistFill > 0.5;
+      if (!fill && vUv.x < 1.0 - 1.0 / W) { gl_FragColor = texture2D(uHistPrev, vUv + vec2(1.0 / W, 0.0)); return; }
+      float col = fill ? floor(vUv.x * W) : 0.0, cell = floor(vUv.y * 256.0);
+      float wob = fill ? 0.04 * sin(col * 0.05) + 0.025 * sin(col * 0.17 + 1.3) : 0.0;
+      float depth = (1.0 - vUv.y) * uRange + wob;
+      float n = hash(vec2(fill ? col * 1.37 + 11.0 : floor(uTime * 8.0), cell));
+      float floorN = max(0.0, 0.06 + 0.16 * n - 0.22 * uNoise) * 0.7 * (uFanCount > 0 ? 1.0 : 0.0) * uSignal; // no signal: the record scrolls a dark gap
+      float e = flasherEcho(depth) * (fill ? 0.82 + 0.36 * hash(vec2(col * 0.71, cell + 5.0)) : 1.0);
+      gl_FragColor = vec4(toneIdx(max(e, floorN)), 0.0, 0.0, 1.0); return;
+    }
+    // ---- the ice views: the flasher on the left, the Live Down fan or the 2D history on the right
+    if (uIce > 0.5) {
+      if (vUv.x < uIceSplit) { gl_FragColor = vec4(flasherPixel(vUv), 1.0); return; }
+      if (vUv.x < uIceSplit + 0.006) { gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0); return; }
+      vUv.x = (vUv.x - uIceSplit - 0.006) / (1.0 - uIceSplit - 0.006);
+      if (uIce > 1.5) {
+        if (vUv.x > 0.965) { gl_FragColor = vec4(lut2(vUv.y), 1.0); return; } // the colour bar at the edge
+        gl_FragColor = vec4(lut2(texture2D(uHist, vec2(vUv.x / 0.965, vUv.y)).r), 1.0); return;
+      }
+    }
+    float vyDown = 1.0 - vUv.y;
+    int panel = 0;
+    if (uSplit > 0.5) {
+      float dx = vUv.x - (uApexU + (0.8 - uApexU) * vyDown);
+      float gap = 0.012;
+      if (dx < -gap) panel = 1; else if (dx > gap) panel = 0; else {
+        float e = abs(dx) / gap;
+        gl_FragColor = vec4(vec3(0.62) * ((e > 0.55 && e < 0.85) ? 1.0 : 0.0), 1.0); return;
+      }
+    }
+    vec4 box = panel == 0 ? uBox0 : uBox1;
+    float vy = uFlat > 0.5 ? vUv.y : vyDown;
+    vec2 p = box.xy + vec2(vUv.x, vy) * box.zw; // metres; apex (0,0)
+    float r = length(p);
+    float aWorld = atan(p.x, p.y);
+    float echo = 0.0, inAny = 0.0;
+    float t = floor(uTime * 8.0);   // "pings": speckle changes 8× a second
+    float rays = vnoise(vec2(aWorld * 22.0 + 3.1, 0.5));
+
+    // ================= Down / Forward / Combo: vertical slab; Panoramic the same with the fan laid flat (uFlat: p is plan) =================
+    // the band's grain: the same across-beam arcs as every other return (the grain rule, §10; #143 had drawn fibres along
+    // the ray — the close-up's diagonal strokes are arcs crossing the band), a fresh pattern every ping
+    float streak = arcGrain(aWorld, r, t);
+    float mottle = vnoise(p * 9.0 + t * 0.5) * 0.7 + vnoise(p * 23.0 - t * 0.3) * 0.5;
+    float grain = hash(floor(vec2(aWorld * 600.0, r * 6.0)) + t);
+    float tex = uStreak > 0.5 ? 0.55 + 0.9 * smoothstep(0.15, 0.9, streak) : 0.35 + 0.9 * mottle + 0.2 * grain;
+    // Panoramic (#171): the app's field is an even crimson with a soft low-frequency mottle and faint beam streaks
+    // (sonar-style §7.12), not the band's bright arcs — the same arcs, much calmer, over slow patches
+    if (uFlat > 0.5) tex = (0.78 + 0.32 * smoothstep(0.15, 0.9, streak)) * (0.8 + 0.4 * vnoise(vec2(aWorld * 14.0, r * 0.35) + 2.7)); // (the hashed grain drew a dotted grid at 4×; gone from the streak branch)
+    float fil = vnoise(vec2(aWorld * 420.0, r * 9.0 + t * 0.13));
+    float fil2 = vnoise(vec2(aWorld * 900.0 + 7.0, r * 18.0 - t * 0.1));
+    float filament = 0.35 + 0.75 * fil + 0.35 * fil2 * fil;
+    float floorTex = uStreak > 0.5 ? 0.05 + 0.06 * rays + 0.04 * streak : 0.04 + 0.12 * mottle; // halved 2026-10-23: the 2.0.0 recordings' field is black at noise reject 25
+    floorTex = max(0.0, floorTex - 0.22 * uNoise) * (1.0 - 0.35 * min(r / uRange, 1.0));
+    int kFrom = 0, kTo = uFanCount;
+    if (uSplit > 0.5) { kFrom = panel == 0 ? 1 : 0; kTo = kFrom + 1; }
+    for (int k = 0; k < ${MAX_FANS}; k++) {
+      if (k < kFrom || k >= kTo) continue;
+      float inF;
+      float e = fanEcho(k, p, r, aWorld, tex, filament, inF);
+      inAny = max(inAny, inF);
+      echo = max(echo, e);
+    }
+    float near = 1.0 - smoothstep(0.0, 2.4, r);
+    echo = max(echo, inAny * near * near * (0.25 + 0.6 * rays) * tex * 0.5);
+    echo = max(echo, inAny * floorTex * 0.7);
+    if (uFlat < 0.5) echo = max(echo, inAny * waterSpecks(p, r)); // (its p is (across, depth))
+    // the signal gate: the fan keeps its shape but carries no returns (LUT index 0) while the Mini is out of the water,
+    // and the picture comes back through the tone window as the signal ramps up (the bottom, the strongest echo, first)
+    echo *= uSignal;
+
+    if (uDebug > 0.5) { float d = texture2D(uDepth0, vUv).r; gl_FragColor = vec4(vec3(d >= 0.9999 ? 0.0 : 1.0 - linearize(d) / 60.0), 1.0); return; }
+    float idx = toneIdx(echo) * inAny;
+    // the ice views draw their Live Down panel in the same jet map as the dial (the app's ice views, home-plm-row.jpg);
+    // ?icelut=amber keeps the Lab's amber there instead (for Jason to compare)
+    vec3 col = (uIce > 0.5 && uIceAmber < 0.5) ? lut2(idx) : texture2D(uLUT, vec2(idx * (255.0 / 256.0) + 0.5 / 256.0, 0.5)).rgb;
+    col *= inAny;
+    gl_FragColor = vec4(col, 1.0);
+  }
+`

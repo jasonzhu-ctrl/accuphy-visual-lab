@@ -7,12 +7,12 @@ import fs from 'node:fs'
 import path from 'node:path'
 
 const outDir = path.resolve(process.argv[2] || 'dist-share')
-const variant = process.env.VITE_LAB === 'tour' ? 'tour' : process.env.VITE_LAB === 'fish' ? 'fish' : process.env.VITE_SCENE === 'ice' ? 'ice' : process.env.VITE_DEVICES === 'PLM' ? 'mini' : 'both' // pages (Jason 2026-10-16): PingLive + Mini, Mini only, and the ice-fishing page; tour = the entry-tour prototype (2026-11-01), with VITE_DEVICES=PLM for the Mini script
+const variant = process.env.VITE_LAB === 'bf' ? 'bf' : process.env.VITE_LAB === 'tour' ? 'tour' : process.env.VITE_LAB === 'fish' ? 'fish' : process.env.VITE_SCENE === 'ice' ? 'ice' : process.env.VITE_DEVICES === 'PLM' ? 'mini' : 'both' // pages (Jason 2026-10-16): PingLive + Mini, Mini only, and the ice-fishing page; tour = the entry-tour prototype (2026-11-01), with VITE_DEVICES=PLM for the Mini script; bf = the Black Friday locked version (#213, its own folder, lock always on)
 const title = variant === 'tour' ? 'Accuphy Lab · Tour' : variant === 'fish' ? 'Accuphy Lab · Fish test' : variant === 'ice' ? 'Accuphy Lab · Ice' : variant === 'mini' ? 'Accuphy Lab · PingLive Mini' : 'Accuphy Lab'
 const tmp = path.join(outDir, 'vite')
 await build({ configFile: 'vite.share.config.js', logLevel: 'warn', build: { outDir: tmp, emptyOutDir: true } })
 
-const htmlRel = variant === 'tour' ? 'src/experiments/2026-11-01-tour-proto/share/index.html' : 'share/index.html' // the tour page has its own entry (vite.share.config.js)
+const htmlRel = variant === 'tour' ? 'src/experiments/2026-11-01-tour-proto/share/index.html' : variant === 'bf' ? 'src/experiments/2026-11-03-sonar-lake-bf/share/index.html' : 'share/index.html' // the tour and BF pages have their own entries (vite.share.config.js)
 const html = fs.readFileSync(path.join(tmp, htmlRel), 'utf8')
 const jsRel = /<script[^>]*src="([^"]+\.js)"/.exec(html)[1], cssRel = /<link[^>]*href="([^"]+\.css)"/.exec(html)[1]
 const fromHtml = (rel) => path.resolve(path.dirname(path.join(tmp, htmlRel)), rel)
