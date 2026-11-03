@@ -15,7 +15,8 @@ export const METRIC_FIRST = ['de', 'nl', 'pl', 'lv'].includes(LANG)
 try { document.documentElement.lang = LANG } catch { /* no document: node tests */ }
 
 // fr / de / nl / pl / lv of every key in the strings table come from docs/2026-11-03-lab-strings-5lang.md (aa64746, all reviewed:
-// French by the website, the rest by Lab 多语言, #214) — Jason 11-03 via Lab HQ: “动，放进去” (#233: into the website-embed copy).
+// French by the website, the rest by Lab 多语言, #214; lv mode_combo “Kombo” from f907323) — Jason 11-03 via Lab HQ: “动，放进去”
+// (#233: into the website-embed copy).
 // The per-line "FR draft" notes below predate that table. Keys not in it (ice page, lock) keep their English / French as before.
 const S = {
   // control panel
@@ -36,7 +37,7 @@ const S = {
   mode_down: { en: 'Down', fr: 'Bas', de: 'Abwärts', nl: 'Omlaag', pl: 'W dół', lv: 'Uz leju' },
   mode_forward: { en: 'Forward', fr: 'Avant', de: 'Vorwärts', nl: 'Vooruit', pl: 'Do przodu', lv: 'Uz priekšu' },
   mode_panoramic: { en: 'Panoramic', fr: 'Panoramique', de: 'Panorama', nl: 'Panoramisch', pl: 'Panoramiczny', lv: 'Panorāma' },
-  mode_combo: { en: 'Combo', fr: 'Combinée', de: 'Kombi', nl: 'Combo', pl: 'Łączony', lv: 'Kombinētais' }, // the app's "Vue combinée"
+  mode_combo: { en: 'Combo', fr: 'Combinée', de: 'Kombi', nl: 'Combo', pl: 'Łączony', lv: 'Kombo' }, // the app's "Vue combinée"
   mode_liveice: { en: 'Live Ice', fr: 'Live Ice' },
   mode_ice: { en: 'Ice Fishing', fr: 'Pêche sur glace' },
   // the one-line description under the panel: "{device} · {beam} beam. Drag the boat — …"
