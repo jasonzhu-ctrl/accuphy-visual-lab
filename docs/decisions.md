@@ -3858,3 +3858,20 @@ Numbered log. Newest at the bottom.
      - **Checked:** a fast machine keeps all (60 fps); +12 ms a frame: keeps all; +25 ms (37 fps): 60 % then 35 %; +60 ms
        (16 fps): 35 % at once; warming (+45 ms after 8 s): one tier down at 22 fps, the trees shrinking away; the tours on the
        lake, Mini and ice pages as before; production builds of all three pages; 0 errors. Not measured on a real phone.
+
+211. **2026-11-02** — **The tree budget no longer holds the loading cover: start conservative, then fill in or thin the far rows
+     (test version)** (界面设计 and Lab HQ, with Jason: ad visitors leave on the cover; #210 held it ~1.7 s longer). Replaces
+     #210's "under the cover" part; the tiers, the 45 fps line, the heat drop and `?trees=` stay.
+     - The cover lifts exactly as before (`index.jsx`, `Tour.jsx` back to their #209 state; the tour starts at its usual time).
+     - First view: 35 % of the trees on phones, 60 % on larger screens. After the first frames the page measures 1.2 s: at
+       ≥ 55 fps it adds a tier and measures again (0.8 s), up to all the trees, and takes the last step back at once if that
+       measure falls under 45; under 45 fps it goes to 35 % (20 % under 15 fps), never above where it is. The final tier is the
+       one #210 reached measuring from all the trees.
+     - Trees come and go in the far rows first (their order mixes chance with the distance back from the water), each growing
+       in or shrinking away over 0.6 s; the contact shade under them follows over ~20 frames. Heat: one tier more, once, after
+       6 s under 30 fps.
+     - **Checked** (scratch copies; sheet `docs/2026-11-02-tree-budget-check.jpg`): the share build's cover lifts at 2.14 s /
+       2.02 s (desktop / phone), the same as before #210 (2.15 / 2.02). Fast machine, desktop 60 % → all, phone 35 % → 60 % →
+       all; simulated slow (+25 ms a frame, 37 fps) desktop and phone → 35 %; +60 ms (16 fps) → 35 %; +80 ms (12 fps) → 20 %;
+       warming after 9 s → one tier down at 21 fps. The far rows filling in on the ice horizon and the summer phone are hard to
+       see. Tours on the lake, Mini and ice pages as before; production builds; 0 errors.

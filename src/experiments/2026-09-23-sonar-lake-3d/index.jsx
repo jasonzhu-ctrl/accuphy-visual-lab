@@ -103,7 +103,7 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
   useEffect(() => { let a = requestAnimationFrame(() => { a = requestAnimationFrame(() => setMount3d(true)) }); const t = setTimeout(() => setMount3d(true), 120); return () => { cancelAnimationFrame(a); clearTimeout(t) } }, []) // frames do not run in a background tab: the timeout mounts anyway
   useEffect(() => {
     if (!mount3d) return
-    let raf = 0, canvas = null, frames = 0, ready = false, timer = 0, tFirst = 0
+    let raf = 0, canvas = null, frames = 0, ready = false, timer = 0
     const cover = document.getElementById('lab-cover')
     const onLost = (e) => { e.preventDefault(); setGlLost(true) }
     const onRestored = () => { setGlLost(false); setGlKey((k) => k + 1) }
@@ -112,10 +112,7 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
     const tick = () => {                                                   // two frames come after the first render
       if (!canvas) canvas = mainRef.current?.querySelector('canvas')
       if (!ready && sentEvents.has('ready')) ready = true // `ready` can fire before this listener exists (R3F's onCreated timing)
-      // the cover also waits for the tree budget (Shore.jsx, #210: the device's own frame rate decides how many shore trees it
-      // draws, under the cover so no tree is seen to go), at most 3 s after the scene's first frames
-      if (canvas && ready && ++frames >= 2 && !tFirst) tFirst = performance.now()
-      if (tFirst && (state.current.treesSettled !== false || performance.now() - tFirst > 3000)) {
+      if (canvas && ready && ++frames >= 2) {
         if (cover) { cover.classList.add('is-done'); setTimeout(() => cover.remove(), 600) }
         canvas.addEventListener('webglcontextlost', onLost); canvas.addEventListener('webglcontextrestored', onRestored)
         return
