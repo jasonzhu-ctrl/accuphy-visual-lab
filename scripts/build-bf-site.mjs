@@ -27,11 +27,12 @@ const checkout = (r) => {
 }
 const env = (extra) => { const e = { ...process.env, ...extra }; for (const k of ['VITE_LAB', 'VITE_DEVICES', 'VITE_SCENE', 'VITE_COMBO_LOCK']) if (!(k in extra)) delete e[k]; return e }
 const buildPage = (dir, extra, sub) => {
-  const tmp = path.join(dir, '.out-' + (sub || 'root'))
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'lab-bf-out-')) // outside the checkout: Tailwind would scan a built page there into the next build's CSS
   sh(`node scripts/build-share.mjs "${tmp}"`, { cwd: dir, env: env(extra) })
   const dest = path.join(outDir, sub)
   fs.mkdirSync(dest, { recursive: true })
   fs.cpSync(path.join(tmp, 'pages'), dest, { recursive: true })
+  fs.rmSync(tmp, { recursive: true, force: true })
 }
 
 fs.rmSync(outDir, { recursive: true, force: true })
