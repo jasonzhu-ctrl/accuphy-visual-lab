@@ -5,6 +5,8 @@
 //   test.html         a stand-in store page for local checks
 // Vercel's headers for these (CORS, cache) are written by scripts/build-share.mjs into vercel.json.
 // Usage: node scripts/build-embed.mjs [outDir]
+// Source (#233): the website-embed version (src/experiments/2026-11-03-sonar-lake-web), the same copy as lab.accuphy.ca /, /mini/, /ice/,
+// whenever that folder exists; LAB_ENTRY=base builds the base folder instead (and a checkout from before #233 has only that).
 import { build } from 'vite'
 import fs from 'node:fs'
 import path from 'node:path'
@@ -12,6 +14,8 @@ import crypto from 'node:crypto'
 import { minify } from 'vite'
 
 const outDir = path.resolve(process.argv[2] || 'dist-share/pages')
+if (process.env.LAB_ENTRY === 'base') delete process.env.LAB_ENTRY
+else if (fs.existsSync('src/experiments/2026-11-03-sonar-lake-web/share/embed.jsx')) process.env.LAB_ENTRY = 'web'
 const tmp = path.resolve('dist-embed-tmp')
 await build({ configFile: 'vite.embed.config.js', logLevel: 'warn', build: { outDir: tmp, emptyOutDir: true } })
 
@@ -62,4 +66,4 @@ fs.writeFileSync(path.join(dir, 'test.html'), `<!doctype html>
 </html>
 `)
 fs.rmSync(tmp, { recursive: true, force: true })
-console.log(`${dir}: lab.js → lab-${hash}.js ${(app.length / 1e6).toFixed(2)} MB`)
+console.log(`${dir}: lab.js → lab-${hash}.js ${(app.length / 1e6).toFixed(2)} MB (${process.env.LAB_ENTRY === 'web' ? 'website-embed copy' : 'base folder'})`)

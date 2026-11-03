@@ -16,7 +16,9 @@
   - `/`、`/mini/`、`/ice/` 从复制件打（`LAB_ENTRY=web`，这个变量不进代码）；
   - `/mktbf2026/`、`/mktbf2026/ice/` 归营销版，不变；
   - `BASE_REF` 指向没有复制件的旧版本（如 96fdc22）时，照旧从 Base 文件夹打。
-- **证据（11-03）：** 复制件打出来的三页 md5 和线上 lab.accuphy.ca 一样：`/` afb82b9c、`/mini/` 26abb62f、`/ice/` f22f445a；11 张 App 首页小图也一样。故意把 Base 文件夹弄坏再打，复制件照样打出 afb82b9c，所以确实是从复制件打的。
+- **证据（11-03）：** 复制件打出来的三页 md5 和线上 lab.accuphy.ca 一样：`/` afb82b9c、`/mini/` 26abb62f、`/ice/` f22f445a；11 张 App 首页小图也一样。故意把 Base 文件夹和 devices.js、wedge.js 的 Base 原件都弄坏再打，复制件照样打出这三个 md5 和 lab-0c39d390cc.js，所以确实只用复制件自己的文件。
+- **自己的两个小文件（HQ 11-03）：** 设备参数 `devices.js`、波束形状 `wedge.js` 也各复制了一份进复制件（取自 96fdc22），不再和 Base 共用。
+- **`/embed/`（HQ 11-03 定：从复制件打包，照旧部署）：** `node scripts/build-embed.mjs <out>` 只要复制件在，就从复制件打（`LAB_ENTRY=base` 才打 Base）。打出来 `lab-0c39d390cc.js`，和线上逐字一样（md5 b22f7398），`lab.js` 也一样。
 - **冰钓格子：** 跳到“当前路径 + ice/”：`/` → `/ice/`，`/mini/` → `/ice/`，`/ice/` → `/ice/`，带上原来的 `?shop=`、`?lang=`，再加 `from=lake`。
 - **客人看到的没变：** 线上还是 96fdc22 打的那一版，内容一样。
 
@@ -58,14 +60,14 @@
 
 - [ ] Jason 在 Lab HQ 说了“动”（别的窗口转述的不算）。
 - [ ] 复制件的改动都写进了 `docs/decisions.md` / 本清单；Base 的改进只在 Jason 说“搬”之后才搬进来。
-- [ ] 打包用干净的 git 版本：`BASE_REF=<版本> node scripts/build-bf-site.mjs <out>`；打出来的 `/`、`/mini/`、`/ice/` 记下 md5。
+- [ ] 打包用干净的 git 版本：`BASE_REF=<版本> node scripts/build-bf-site.mjs <out>`，再在同一份干净代码里跑 `node scripts/build-embed.mjs <out>`（出 `/embed/`）；打出来的 `/`、`/mini/`、`/ice/` 和 `embed/lab-*.js` 记下 md5。
 - [ ] 先上测试链接试一遍：`/`、`/mini/`、`/ice/`、`/?lang=fr`、`/?lang=de` 都能打开，控制台 0 错误；冰钓格子跳到 `/ice/`；手机和电脑都看。
 - [ ] 对接窗口测过统计事件、去商店、分享（店里框着测）。
 - [ ] `/mktbf2026/` 没被这次打包改掉（营销版的那一页 md5 和它自己记的一样）。
 
 **上线后（HQ 部署之后）：**
 
-- [ ] 线上 `/`、`/mini/`、`/ice/` 的 md5 = 打包时记的 md5。
+- [ ] 线上 `/`、`/mini/`、`/ice/`、`/embed/lab-*.js` 的 md5 = 打包时记的 md5。
 - [ ] 第一节 10 个店铺链接都是 200，框里是 lab.accuphy.ca/。
 - [ ] 店铺页里：拖船、换视图、冰钓格子、去商店（进对的市场）、分享（是店铺链接）都正常。
 - [ ] 防嵌（frame-ancestors）和 noindex 还在；`.env.local`、`.vercel` 打不开（404）。
@@ -78,12 +80,13 @@
 - 放进去以后：测试链接上 `?lang=` 每种语言看一遍（文字不溢出、不缺字），再走第三节上线。
 - 现在：法文有；德、荷、波、拉还没放，显示英文、用米。
 
-## 五、还没定 / 要 HQ 问的
+## 五、已定 / 要记着的
 
-1. **`/embed/`（`scripts/build-embed.mjs`）还从 Base 文件夹打。** 这是“装进店铺页本身、不用框”的那种做法（#142），线上 lab.accuphy.ca/embed/ 有它。店铺现在用的是框，不用它。要不要也改从复制件打，还是以后不再部署它，由 HQ 定。
-2. **复制件还和 Base 共用两个小文件：** `2026-09-23-sonar-beam/devices.js`（设备参数）和 `2026-09-23-beam-shapes-3d/wedge.js`（波束形状）。Base 改了它们，网站嵌入版下次打包也会跟着变（MKT 版也一样）。11-03 这两个文件和 96fdc22 一样。要不要也复制一份进来，由 HQ 定。
+1. ~~`/embed/` 从哪打~~：HQ 11-03 定，从复制件打，照旧部署（见上面“现在是什么”）。
+2. ~~和 Base 共用的两个小文件~~：HQ 11-03 定，各复制一份进复制件，已做。
 3. 有人直接打开 `lab.accuphy.ca/index.html`（不是 `/`）时，冰钓格子会跳错。店铺框的是 `/`，客人碰不到；先记着。
 
 ## 改动记录
 
 - 2026-11-03 Lab 网站嵌入版：建清单；复制件从 96fdc22 取出；打包改成 `/`、`/mini/`、`/ice/` 从复制件打，md5 = 线上。
+- 2026-11-03 Lab 网站嵌入版：devices.js、wedge.js 复制进来；/embed/ 改从复制件打，= 线上 lab-0c39d390cc.js（HQ 定）。

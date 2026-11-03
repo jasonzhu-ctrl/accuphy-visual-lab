@@ -3,7 +3,7 @@
 // container-query units of the display, so it scales with the phone frame.
 // The app's buttons are display-only here: dimmed like a disabled iOS control (values stay bright) and a tap
 // opens the sign-up gate (onLocked) — Jason 2026-09-24. The depth axis runs on AUTO.
-import { FT } from '../2026-09-23-sonar-beam/devices'
+import { FT } from './devices'
 
 const num = 'font-brand-body tabular-nums'
 

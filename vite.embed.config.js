@@ -8,5 +8,5 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   base: './',
   define: { 'process.env.NODE_ENV': JSON.stringify('production'), 'import.meta.env.VITE_NO_GATE': JSON.stringify('1'), 'import.meta.env.VITE_DEVICES': JSON.stringify(''), 'import.meta.env.VITE_SCENE': JSON.stringify('') }, // no sign-up gate from the Lab (#139: the Klaviyo chat decides the funnel)
-  build: { lib: { entry: 'share/embed.jsx', formats: ['es'], fileName: 'lab-app', cssFileName: 'lab-app' }, cssCodeSplit: false, chunkSizeWarningLimit: 4000, assetsInlineLimit: 10_000_000 },
+  build: { lib: { entry: process.env.LAB_ENTRY === 'web' ? 'src/experiments/2026-11-03-sonar-lake-web/share/embed.jsx' /* the website-embed version (#233) */ : 'share/embed.jsx', formats: ['es'], fileName: 'lab-app', cssFileName: 'lab-app' }, cssCodeSplit: false, chunkSizeWarningLimit: 4000, assetsInlineLimit: 10_000_000 },
 })

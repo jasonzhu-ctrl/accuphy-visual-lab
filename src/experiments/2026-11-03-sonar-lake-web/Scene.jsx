@@ -9,7 +9,7 @@ import { HALF, SEG, bedY, fbm, depthAt, ROCK_HUMPS, shoreStop, shoreR } from './
 import { SPECIES, makePopulation, fishPose, stepBehaviours, forceRise, forceJig, winterCamp, rnd, drawnLen } from './fish'
 import { seedBeamFish, stepBeamFish, inFan } from './fishBeam'
 import { makeLakeMaterial, setBeamUniforms, LAKE_TIME } from './lakeMaterial'
-import { wedgeGeometry } from '../2026-09-23-beam-shapes-3d/wedge'
+import { wedgeGeometry } from './wedge'
 import { makeTallTree, makeBushTree, makeStump, makeLog, makeWeedTuft, placeAll } from './vegetation'
 import { makeRockGeometry, ROCK_KINDS } from './rocks'
 import { makeBassBoat, makeWaterContact, TRANSDUCER_OFFSET } from './boat'

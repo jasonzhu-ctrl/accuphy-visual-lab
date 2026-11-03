@@ -6,8 +6,8 @@
 // the maximum, nothing is called during a drag. The opening spot gets its minimum before the first frame (seedBeamFish).
 // Only the poses (fish.js visitPose) know about the visit; this file decides who comes and where to.
 import { SPECIES, fishPose, drawnLen, bottomGap, makeVisitPath, makeVisit, startVisitBack, visitInBeamPhase } from './fish'
-import { DEVICES } from '../2026-09-23-sonar-beam/devices'
-import { wedgeSpecs } from '../2026-09-23-beam-shapes-3d/wedge'
+import { DEVICES } from './devices'
+import { wedgeSpecs } from './wedge'
 
 // the minimum per fan (Jason's table). The maxima (Mini 5, PingLive 8, Panoramic 8 / 10) only matter in that nothing is called above the minimum
 const beamMin = (deviceId, mode) => (mode === 'panoramic' ? (deviceId === 'PL' ? 6 : 4) : deviceId === 'PL' ? 4 : 3)
