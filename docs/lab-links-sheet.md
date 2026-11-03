@@ -25,16 +25,17 @@ Jason 11-03：“一定要搞个文档，专门把这些不同的版本啊，那
 | 比荷卢 法语 | https://shop.accuphy.com/fr-benelux/pages/lab | 法 | 法（部分还是英文） | 法 |
 | 比荷卢 德语 | https://shop.accuphy.com/de-benelux/pages/lab | 德 | 英 | **德** |
 | 比荷卢 英文 | https://shop.accuphy.com/en-benelux/pages/lab | 英 | 英 | 英 |
-| **波兰**（只展示、不能网上下单） | https://shop.accuphy.com/en-pl/pages/lab?lang=pl | 店铺只有英文 | 英 | **波兰语**（靠 `?lang=pl`） |
-| **拉脱维亚**（在罗马尼亚市场里） | https://shop.accuphy.com/en-ro/pages/lab?lang=lv | 店铺没有拉脱维亚语 | 英 | **拉脱维亚语**（靠 `?lang=lv`） |
+| **波兰**（只展示、不能网上下单） | 网站加了波兰语以后：波兰市场的波兰语页（地址由网站定，比如 `/pl-pl/pages/lab`）；在那之前：https://shop.accuphy.com/pages/lab?lang=pl（主站） | 网站正在被请求加波兰语（#218） | 英 | **波兰语** |
+| **拉脱维亚**（网站上没有自己的市场） | https://shop.accuphy.com/pages/lab?lang=lv（主站） | 主站英文 | 英 | **拉脱维亚语**（靠 `?lang=lv`） |
 | 罗马尼亚 | https://shop.accuphy.com/ro-ro/pages/lab | 罗马尼亚语 | 英 | 英（这次不做罗马尼亚语） |
 | 巴拉圭 | https://shop.accuphy.com/es-py/pages/lab | 西班牙语 | 英 | 英（这次不做西班牙语） |
 
-**波兰、拉脱维亚为什么这样写：**
-- Jason 11-03 说，没有对应语言的，就用店铺的链接后面加语言。
-- 波兰 10-22 起有了自己的市场 `/en-pl`，有波兰门店页和找代理商的链接；拉脱维亚在罗马尼亚市场 `/en-ro` 里。
-- 所以加语言的地方用这两个市场自己的链接，“去商店”、门店和货币也就都对。只有加拿大店铺 `shop.accuphy.com/pages/lab?lang=pl` 也能出波兰语，但去商店会进加拿大店。
-- Shopify 做不了“/pages/lab/pl”这种斜杠路径，用 `?lang=` 是现成的：店铺框已经会把它传给 Lab（网站 #228）。
+**规矩（Jason 11-03，#218）：** “有网站 market 的就放网站，没有的就放在主站下，不懂问我。”
+- 网站上有这个市场、也有这种语言的，Lab 就放在那个市场自己的店铺页里，语言跟着店铺走。
+- 没有的，就放在主站 shop.accuphy.com/pages/lab 下面，后面加 `?lang=语言`。Shopify 做不了 “/pages/lab/pl” 这种斜杠路径；`?lang=` 店铺框已经会传给 Lab（网站 #228）。
+- **波兰：** Jason 说波兰语交给网站做（给波兰市场加波兰语）。网站做好以前，按规矩先放主站。
+- **拉脱维亚：** 网站上归在罗马尼亚市场里，但没有自己的市场和语言。Jason 选了放主站。主站的“去商店”进主站（加拿大）。
+- 拿不准的，问 Jason。
 
 **注意：** 带 `?lang=` 的链接只是 Lab 换语言，店铺页别的地方还是英文。
 
@@ -69,3 +70,4 @@ Jason 11-03：“一定要搞个文档，专门把这些不同的版本啊，那
 ## 改动记录
 
 - 2026-11-03 HQ：建表（Jason 11-03）。
+- 2026-11-03 HQ：波兰、拉脱维亚改按 #218 的规矩（拉脱维亚放主站；波兰等网站加波兰语）。

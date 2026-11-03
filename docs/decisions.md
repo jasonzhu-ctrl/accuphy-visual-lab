@@ -3938,3 +3938,11 @@ Numbered log. Newest at the bottom.
        so the shop button, retail pages and currency fit; Shopify cannot serve a `/pages/lab/pl` path.
      - Romanian and Spanish store pages stay English in the Lab (not in #212).
      - Sheet: `docs/lab-links-sheet.md` (all store Lab links checked 200 on 11-03, Lab addresses, test links, the two versions).
+
+218. **2026-11-03** — **Rule for where a language's Lab page lives: the market's store page if the website has that market, else the
+     main store; Polish goes to the website** (Jason in Lab HQ: “波兰语可以通知网站做 规则就是有网站market的就放网站 没有的 就放在主站下不懂问我”;
+     card on Latvia, which sits inside the Romania market without its own: “放主站”).
+     - Polish: Lab HQ asks the website to add Polish to the Poland market (handoff 2026-11-03-poland-polish-store.md); the website
+       needs Jason's own word in its HQ before anything goes live. Until then the Polish Lab is on the main store, `?lang=pl`.
+     - Latvian: `shop.accuphy.com/pages/lab?lang=lv`. Its shop button goes to the main (Canadian) store.
+     - Replaces #217's `/en-pl` and `/en-ro` links. Sheet: `docs/lab-links-sheet.md`.
