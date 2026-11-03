@@ -21,7 +21,7 @@ the share popover closes the QR). `no-lock-desktop` (#202: the live base has no 
 ever reaches Klaviyo, whatever list id the build carries) opens Combo and sends one `signup` { source unlock, product, view } with
 no email in it; then `?lab_unlock=sub` (passed through the fake store page as `extra=`) opens Combo with no card and no `signup`.
 The unit tests take the folder too: `LAB_DIR=2026-11-03-sonar-lake-bf node scripts/dev/signup-guard-test.mjs` (also
-`shop-url-test.mjs`, `app-qr-test.mjs`). signup-guard checks the list id comes only from the build's `VITE_BF_LIST_ID` (base: never). They cover #184 / #187 (shop click, receipt), #188 / #192 (share popover) #200 (A8) and #202 (lock off).
+`shop-url-test.mjs`, `app-qr-test.mjs`). signup-guard checks the list id comes only from the build's `VITE_BF_LIST_ID` (base: never). They cover #184 / #187 (shop click, receipt), #188 / #192 (share popover) #200 (A8) and #202 (lock off). `share-de` (#212: on a German store page the copied share link ends with `&lang=de` and the Shop click stays on `/de-de/products/`).
 The fake store page passes `?shop=/de-de` like the real bridge, plus `tour=off`: the entry tour (#199) dims the Shop,
 badge and share buttons while it runs. A wrong-ORIGIN receipt cannot be staged (the parent's origin is what the Lab trusts).
 Software WebGL is slow: allow ~15 s per scenario. Unit tests are separate: `shop-url-test.mjs`, `share-url-test.mjs`,

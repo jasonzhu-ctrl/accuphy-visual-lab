@@ -106,6 +106,21 @@ for (const [name, w, h] of [['share-desktop', 1280, 800], ['share-phone', 390, 8
     return { ok, detail: `${phone ? `pill="${o.pill}" badges=${o.badges} ` : ''}popover=${o.pops} qr=${o.qr}px clearOfShopPill=${o.clearOfPill} copy→"${label}" events=${evs} afterEsc=${after}` }
   }
 }
+// #212: a German store page (shop=/de-de, lang=de) — the copied share link keeps &lang=de at the end, the Shop click stays on
+// /de-de/products/ (no '/de' path), and the panel is not English
+scenarios['share-de'] = async () => {
+  const tab = await openTab(1280, 800)
+  if (!(await tab.open('mode=none&shop=/de-de&lang=de'))) return { ok: false, detail: 'Lab did not start' }
+  await tab.tap('.ac-share'); await sleep(600)
+  const field = await tab.lab("d.querySelector('.ac-share-field') ? d.querySelector('.ac-share-field').value : ''")
+  await tab.esc(); await sleep(300)
+  await tab.lab("(d.querySelector('.ac-shop').click(), true)"); await sleep(150)
+  const log = JSON.parse((await tab.ev('JSON.stringify(window.__log)')) || '[]'); const click = log.find((l) => l.event === 'shop_click')
+  const html = await tab.lab("d.documentElement.lang || ''"); await tab.close()
+  const ok = /^https:\/\/shop\.accuphy\.com\/de-de\/pages\/lab\?.*utm_campaign=bf2026_lab_de&lang=de$/.test(field) && /\/de-de\/products\/pinglive-sonar$/.test(click?.data?.url || '') && click?.data?.lang === 'de'
+  return { ok, detail: `share link=${field} shop_click url=${click?.data?.url} lang=${click?.data?.lang} html lang=${html}` }
+}
+
 // #200 (A8): desktop store badges open that store's QR; app_badge { store } per click; never together with the share popover
 scenarios['app-badges-desktop'] = async () => {
   const tab = await openTab(1280, 800)
