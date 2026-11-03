@@ -3972,3 +3972,13 @@ Numbered log. Newest at the bottom.
      - First use: the English "Down range" stays. It pairs with "Forward range" and with the view name "Down" visitors see; the app's
        Live Down menu shows no range name (`reference/app-study/plm-combo-menu.jpg`), so there is no app word to follow; the
        translations' Garmin "depth range" (#221) means the same thing.
+
+223. **2026-11-03** — **The base ad films are re-thought: told in shots, up to 20 s, with sound, Mini and PingLive both** (Jason in Lab HQ
+     after the first stills: “手机的整个手机跟那个声纳的覆盖的范围，它不能同时出现在那个画面里面 … 可以用分镜的 … 滑动到船的时候 … 把手机再用一个比较好看的一个方式啪再把它给放上来 … 135度啦那些 … 都还挺不错的 … 20秒内然后这个片子是要有声音的 … key message 就是 learn using live sonar under 2 minutes … hard water … open water … 用一个脚本的方式 1、2、3、4、5这样呈现下来”; and on Mini vs PingLive: “都要做”).
+     - Widens #185 to two films (Mini, PingLive), each 9:16 + 16:9, still no language versions.
+     - Shots: lake → drag the boat (3D only) → the phone pops up and takes over → the beam-angle animation (Mini 39°/Combo 78°,
+       PingLive 135°) → ice (Mini) → end card. Lines: "Learn live sonar in under 2 minutes." / "On open water or hard water." /
+       "Try the free Accuphy Lab" (the 2 minutes is the free demo, not the product).
+     - Sound: our own synthesized pings and effects; music only licensed (Jason's pick or Meta's library), slot left empty.
+     - First a numbered storyboard image and script (`docs/2026-11-03-ad-base-script.jpg` / `.md`) by "Lab video creation";
+       no film until Jason nods. Concept: `docs/2026-11-03-ad-base-concept.md`.
