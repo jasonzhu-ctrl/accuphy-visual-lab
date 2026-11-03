@@ -10,7 +10,7 @@ Jason 2026-11-02：“你记住，或者搞一个 sheet 把各种版本做好管
 |---|---|---|---|---|
 | **标准 Base 版（PingLive + PingLive Mini）** | Jason 11-02 定的标准基础版，见下面的清单 | main 6b5a225（4c3fc61 + 关锁 #202） | lab.accuphy.ca `/`（PingLive，可切 Mini）、`/mini/`（只有 Mini）；测试链接同一版 | **11-02 已上线**（Jason：“Lock off, go live”） |
 | 线上版 | 店铺页里嵌的、广告点进来看到的 | **6b5a225（11-02）** = 标准 Base 版 | lab.accuphy.ca、shop.accuphy.com/pages/lab | 已换成标准 Base 版，锁关闭 |
-| 冰钓页 | 冰面，只有 Mini | 和 Base 同一份代码 | 测试链接 `/ice/` | 还是旧的三张步骤卡；入场教程（#203：点冰打洞 → Tap Forward View → Tap Down View）已做好；俯视机位跟随冰洞、边界统一 ±58 米（#204）；测试链接 3af2ead；湖岸（#206–#209，夏天湖和冰钓页同一条，停在约 5 ft 深处，船头对岸处停远一点）已做；等 Jason 看、说“动” |
+| 冰钓页 | 冰面，只有 Mini | 和 Base 同一份代码 | 测试链接 `/ice/` | 还是旧的三张步骤卡；入场教程（#203：点冰打洞 → Tap Forward View → Tap Down View）已做好；俯视机位跟随冰洞、边界统一 ±58 米（#204）；测试链接 86bf80e；湖岸（#206–#211，树按手机快慢自动调，夏天湖和冰钓页同一条，停在约 5 ft 深处，船头对岸处停远一点）已做；等 Jason 看、说“动” |
 | 营销版 | 只有“锁视图”（订阅才能看 Combo 等，#191） | 现在混在 main 里，还没拆出来 | — | Base 版上线后再拆、再做 |
 
 测试链接：https://jasonzhu-ctrl.github.io/accuphy-lab-test/
