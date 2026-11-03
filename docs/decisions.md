@@ -4021,3 +4021,10 @@ Numbered log. Newest at the bottom.
 227. **2026-11-03** — **Latvian: the Lab page has it; email, sign-up forms and ads don't** (Jason in Lab HQ, card on the conflict with
      his 10-28 word in Klaviyo HQ “拉脱维亚语就不要做了”: “Lab 做，邮件广告不做”). #212 keeps lv (`shop.accuphy.com/pages/lab?lang=lv`, #218);
      Klaviyo's five languages (EN FR DE NL PL) stand. Told the BF funnel window.
+
+228. **2026-11-03** — **The marketing (locked) version must never cover the base** (Jason in Lab HQ: “不对 营销版绝对不可以覆盖base你知道吗”).
+     Corrects #213, which put the locked version on lab.accuphy.ca `/` and moved the base to `/base/`; HQ had done the same on the test link.
+     - The base keeps `/` everywhere (lab.accuphy.ca and the test link), plus `/mini/` and `/ice/`. The locked version gets its own path, `/bf/`.
+     - Test link fixed the same day: `/` = base 86bf80e again (md5 = live), `/bf/` = locked (4d41681, test mode), `/base/` removed.
+     - Still to settle with Jason: what the store's Lab page frames during BF (the website would point its frame at `/bf/`, or the store keeps the base).
+     - `scripts/build-bf-site.mjs` must change to this layout ("Lab 营销版").
