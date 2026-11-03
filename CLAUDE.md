@@ -146,7 +146,7 @@ anyone's memory.
     checklist. HQ manages it and does all coordination with the website / Klaviyo.
   - "Lab video creation" (`local_575bc8a6-28cd-4cfb-b367-63a0c78c335d`, Jason 2026-11-03: base 版本还需要参照之前做视频广告的模式做视频) —
     films from the standard base (86bf80e), by the `ad-video` skill; #185 still applies unless Jason widens it.
-  - "Lab 网站嵌入版" (#233, Jason 2026-11-03) — the website-embed version: its own copy `src/experiments/2026-11-03-sonar-lake-web/`
+  - "Lab 网站嵌入版" (`local_43b32a87-3f1b-46f6-badc-4e910964ffb0`, #233, Jason 2026-11-03) — the website-embed version: its own copy `src/experiments/2026-11-03-sonar-lake-web/`
     (from live 96fdc22) that serves lab.accuphy.ca `/`, `/mini/`, `/ice/` inside every store `/pages/lab`; its links, its store bridge
     copy, its go-live checklist. Three versions: Base (source) → 网站嵌入版 / MKT 版 (copies; Base changes move over only on Jason's word).
   - Shared files (`index.jsx`, `SonarChrome.jsx`, `ShareButton.jsx`, `UnlockCard.jsx`, `ShopButton.jsx`, `AppBadges.jsx`): look →
