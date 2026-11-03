@@ -3790,3 +3790,18 @@ Numbered log. Newest at the bottom.
          Panoramic at spots 3 and 4 (its 1.6× reach now meets the north shore); 0 errors.
        - Tours on the lake, Mini and ice pages, desktop and phone: as before; 0 errors. Production builds of all three pages OK.
      - Weight: trees ~0.97 M triangles on a desktop, ~0.56 M on phones; not yet measured on a real phone.
+
+207. **2026-11-02** — **Shoreline, after 界面设计's look check of 6c803dd: a wandering sand band; the bank in view on the ice
+     page's top camera (test version)** (docs/2026-11-02-shoreline-look-check.jpg, items ② and ③; item ①, how far from the
+     shore the boat or hole stops, waits for Jason via HQ).
+     - **② The sand** (`shoreModels.js` `shoreZones`): from above it was one even ribbon round the lake. Now its width wanders
+       0.4–3 m along the shore; in stretches (24 % of the shore) there is no sand and grass, reeds and clusters of rocks run to
+       the water; the wet line wobbles on its own (0.15–0.9 m), never parallel to the grass edge, whose line is ragged too.
+       Winter: the shore-ice rim (0.45–1.75 × its width) and the snowbank's foot wander the same way.
+     - **③ The ice page's top camera near the shore** (`Scene.jsx` Rig): it follows the hole (#204), so a hole at the north
+       shore showed dark ice and no bank. Within 32 m of the shore the point 10 m up the bank, straight out from the hole, is
+       kept inside the frame (clear of the panel; on sideways phones of the small app screen), worked out each frame from where
+       the camera is, so it settles; the hole always stays in frame and clear of the panel (it wins over the bank).
+     - **Checked** on a scratch copy: top camera with the hole at the N, NE (the cove), E, S and W shores on desktop, portrait
+       and sideways phones: the bank and trees in view each time; holes still reach the shore; the ice tour as before; 0
+       errors; production builds OK. The sand on the summer phone view: narrow, wide and no-sand stretches.

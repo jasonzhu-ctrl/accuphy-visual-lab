@@ -5,7 +5,7 @@ import { labEvent } from './embed'
 import { mergeGeometries as _merge } from 'three/addons/utils/BufferGeometryUtils.js'
 // Extrude geometries are non-indexed, primitives are indexed — normalise first.
 const mergeGeometries = (parts) => _merge(parts.map((g) => (g.index ? g.toNonIndexed() : g)))
-import { HALF, SEG, bedY, fbm, depthAt, ROCK_HUMPS, shoreStop } from './terrain'
+import { HALF, SEG, bedY, fbm, depthAt, ROCK_HUMPS, shoreStop, shoreR } from './terrain'
 import { SPECIES, makePopulation, fishPose, stepBehaviours, forceRise, forceJig, winterCamp, rnd, drawnLen } from './fish'
 import { seedBeamFish, stepBeamFish } from './fishBeam'
 import { makeLakeMaterial, setBeamUniforms, LAKE_TIME } from './lakeMaterial'
@@ -782,7 +782,32 @@ function Rig({ state, sonarRect, fogMats, cam = LAKE_CAM }) {
     // only moves when the boat nears the frame's edge (on a desktop: clear of the glass panel on the left).
     const follow = !s.ice, iceFollow = !!s.ice && !!s.holes
     if ((!follow && !iceFollow) || s.camFX == null) { s.camFX = fx; s.camFZ = 0 }
-    if (iceFollow && s.boat) { s.camFX = fx + s.boat.x - ICE_START[0]; s.camFZ = s.boat.z - ICE_START[1] }
+    if (iceFollow && s.boat) {
+      let fX = fx + s.boat.x - ICE_START[0], fZ = s.boat.z - ICE_START[1]
+      // near the shore the bank comes into the frame too (界面设计's look check of 6c803dd: "wherever the hole can stop, the
+      // bank is in view"): the point 10 m up the bank straight out from the hole is kept inside the margins, the hole too.
+      // Worked out each frame from where the camera is now (no adding up), so it settles without overshooting.
+      const ta = Math.atan2(s.boat.z, s.boat.x), Rs = shoreR(ta)
+      if (Rs - Math.hypot(s.boat.x, s.boat.z) < 32 && s.camX != null) {
+        const W = size.width, Hb = bandBottom
+        const at = (x, z) => { tmp.set(x, 1, z).project(camera); return [((tmp.x + 1) / 2) * W, ((1 - tmp.y) / 2) * size.height] }
+        const [bx, by] = at((Rs + 10) * Math.cos(ta), (Rs + 10) * Math.sin(ta))
+        const [hx, hy] = at(s.boat.x, s.boat.z)
+        const ppx = Math.abs(at((Rs + 10) * Math.cos(ta) + 1, (Rs + 10) * Math.sin(ta))[0] - bx) || 1 // pixels per metre there
+        const ppz = Math.abs(at((Rs + 10) * Math.cos(ta), (Rs + 10) * Math.sin(ta) + 1)[1] - by) || 1
+        // where both would sit with the camera at the hole-following focus
+        const dx = (fX - s.camX) * ppx, dz = (fZ - s.camZ) * ppz
+        const sx = bx - dx, sy = by - dz, hx0 = hx - dx, hy0 = hy - dz
+        const pr3 = k > 1 || s.land ? null : s.panelEl?.getBoundingClientRect()
+        const mL = pr3 && pr3.width ? pr3.right + 40 : 0.1 * W, mR = 0.1 * W, mT = 0.1 * Hb, mB = 0.82 * Hb
+        let ex = sx < mL ? sx - mL : sx > W - mR ? sx - (W - mR) : 0, ey = sy < mT ? sy - mT : sy > mB ? sy - mB : 0
+        const lf3 = s.land ? document.querySelector('.ph-lake-back')?.getBoundingClientRect() : null // sideways: the small app screen top-right
+        if (lf3 && lf3.width && Math.max(sx, hx0) > lf3.left - 60 && Math.min(sy, hy0) < lf3.bottom + 50) ey = Math.min(ey, Math.min(sy, hy0) - (lf3.bottom + 50))
+        ex = THREE.MathUtils.clamp(ex, hx0 - (W - mR), hx0 - mL); ey = THREE.MathUtils.clamp(ey, hy0 - mB, hy0 - mT) // the hole itself stays in frame, clear of the panel: it wins over the bank
+        fX += ex / ppx; fZ += ey / ppz
+      }
+      s.camFX = fX; s.camFZ = fZ
+    }
     if (follow && s.boat) {
       tmp.set(s.boat.x, 0.5, s.boat.z).project(camera)
       const bx = ((tmp.x + 1) / 2) * size.width, by = ((1 - tmp.y) / 2) * size.height

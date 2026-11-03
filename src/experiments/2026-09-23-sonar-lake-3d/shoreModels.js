@@ -33,6 +33,17 @@ export function landY(d, t, winter) {
   const land = sm(6, 60, d) * 1.6 + (fbm(t * 9, d * 0.05, 4) - 0.5) * 0.9 * sm(8, 30, d)
   return beach + bank + land + (winter ? 0.22 * sm(0.25, 2.2, d) : 0)
 }
+// The zones along the shore (界面设计's look check of 6c803dd: one even sand ribbon round the lake read as a drawn outline):
+// the sand's width wanders 0.4–3 m; in stretches (~25 % of the shore) there is no sand at all and grass, reeds or rocks run to
+// the water; the wet line has its own, quicker wobble, so it is never parallel to the grass edge. Winter: the shore-ice rim
+// and the snowbank's foot wander the same way.
+export function shoreZones(t) {
+  const none = fbm(t * 7 + 11, 2.3, 3) > 0.6
+  const sand = none ? 0 : 0.4 + 2.6 * Math.pow(Math.min(1, Math.max(0, (fbm(t * 11 + 3, 0.5, 3) - 0.28) / 0.44)), 1.3)
+  const wet = none ? 0.18 + 0.2 * fbm(t * 55 + 2, 4.4, 3) : Math.min(sand * 0.9, 0.15 + 0.85 * fbm(t * 48 + 5, 1.1, 3))
+  const rim = 0.45 + 1.3 * fbm(t * 13 + 7, 3.3, 3), foot = 0.25 + 1.6 * fbm(t * 9 + 1.7, 6.1, 3)
+  return { none, sand, wet, rim, foot }
+}
 const PROF = [-0.6, -0.3, -0.12, 0, 0.12, 0.28, 0.48, 0.72, 1.0, 1.35, 1.75, 2.2, 2.75, 3.4, 4.1, 4.9, 5.8, 6.8, 8, 9.5, 11.5, 14, 17, 21, 26, 32, 40, 50, 62, 78, 98, 125, 160, 200, 260, 340, 440] // out past the fog (ice: far 300 m; lake: 420 m), so no water or ice shows behind the trees
 
 // ---- trees (handover §3): 7–47 m back, small in front, tall behind, in groups with clearings ----
@@ -86,13 +97,15 @@ export function makeGround(trees, winter, R = shoreR, N = 1400) {
       }
       ao = Math.min(0.62, ao)
       let wet = 0
+      const Z = shoreZones(t)
       if (winter) {
-        if (d < 0.5) c.copy(mixc(S.rim, S.rim2, n1))
+        if (d < Z.foot * 0.5) c.copy(mixc(S.rim, S.rim2, n1)) // the shore ice reaching up under the snow's foot
         else c.copy(mixc(S.snow, S.shade, 0.18 + 0.45 * n2 * sm(4, 12, d) + 0.25 * sm(2.2, 4.5, d) * (1 - sm(4.5, 7, d)))) // the bank's face in shadow
         if (d > 12) c.lerp(S.forest, 0.35 * sm(12, 30, d))
       } else {
-        if (d < 0.85) { c.copy(mixc(S.wet, S.sand, sm(0.25, 0.85, d) * 0.85)); wet = 1 - sm(0.2, 0.8, d) }
-        else if (d < 2.6) c.copy(mixc(mixc(S.sand, S.sand2, n1 * 0.6), S.grass, sm(1.9, 2.6, d) * (0.45 + 0.55 * n1)))
+        const sandEnd = Z.sand + 0.35 * (n1 - 0.5) // the grass edge, ragged
+        if (d < Z.wet) { c.copy(Z.none ? mixc(S.wet, S.floor2, 0.5) : mixc(S.wet, S.sand, sm(Z.wet * 0.3, Z.wet, d) * 0.85)); wet = 1 - sm(Z.wet * 0.25, Z.wet, d) }
+        else if (d < sandEnd + 0.7) c.copy(mixc(mixc(S.sand, S.sand2, n1 * 0.6), mixc(S.grass, S.grass2, n2), sm(sandEnd - 0.3, sandEnd + 0.7, d) * (0.55 + 0.45 * n1)))
         else c.copy(mixc(mixc(S.grass, S.grass2, n2), mixc(S.floor, S.floor2, n1), sm(8, 20, d) * (0.55 + 0.45 * n1)))
       }
       c.multiplyScalar(1 - ao * (winter ? 0.55 : 0.75))
@@ -117,9 +130,9 @@ export function makeShoreIce(R = shoreR, N = 1400) {
   for (let i = 0; i <= N; i++) {
     const t = (i / N) * TAU, r0 = R(t)
     for (let j = 0; j < M; j++) {
-      const d = P[j], r = r0 + d, k = (i * M + j) * 3
+      const Z = shoreZones(t), d = P[j] < 0 ? P[j] * Z.rim : P[j] * (0.6 + 0.8 * Z.foot), r = r0 + d, k = (i * M + j) * 3
       const lift = j === 0 ? 0.004 : 0.03 + 0.05 * sm(-1.4, 0, d) + 0.04 * (fbm(t * 90, d * 2, 3) - 0.5) * (j < M - 1 ? 1 : 0)
-      pos[k] = r * Math.cos(t); pos[k + 1] = j === M - 1 ? landY(0.6, t, true) - 0.02 : lift; pos[k + 2] = r * Math.sin(t)
+      pos[k] = r * Math.cos(t); pos[k + 1] = j === M - 1 ? landY(d, t, true) - 0.02 : lift; pos[k + 2] = r * Math.sin(t)
     }
   }
   const idx = []
@@ -257,8 +270,9 @@ export function placeTufts(R = shoreR) {
   for (let i = 0; i < 26000; i++) {
     const t = rnd() * TAU, patch = fbm(t * 40, 2.2, 3), d = -0.2 + Math.pow(rnd(), 1.6) * 14, s = 0.7 + rnd() * 0.7, rot = rnd() * TAU
     const r = R(t) + d, it = { x: r * Math.cos(t), z: r * Math.sin(t), t, d, s, rot }
-    if (d > 0.9 && patch > 0.46) grass.push(it)
-    else if (d < 0.6 && patch > 0.62 && rnd() < 0.9) reed.push(it)
+    const Z = shoreZones(t)
+    if (d > Z.sand + 0.2 && patch > (Z.none ? 0.3 : 0.46)) grass.push(it) // where there is no sand the grass runs to the water
+    else if (d < 0.6 && patch > (Z.none ? 0.42 : 0.62) && rnd() < 0.9) reed.push(it)
   }
   return { grass, reed }
 }
@@ -269,9 +283,9 @@ export const ROCK_GEOS = () => ROCK_KINDS.map((k, i) => makeRockGeometry(k, 3 + 
 export function placeShoreRocks(R = shoreR) {
   seed = 3301
   const out = []
-  for (let i = 0; i < 3200 && out.length < 760; i++) {
+  for (let i = 0; i < 4200 && out.length < 900; i++) {
     const t = rnd() * TAU, d = -1.4 + rnd() * 3.6, s = 0.2 + Math.pow(rnd(), 2.2) * 0.9, k = Math.floor(rnd() * ROCK_KINDS.length), rot = rnd() * TAU, tilt = (rnd() - 0.5) * 0.3
-    if (fbm(t * 26, 9.1, 3) < 0.52) continue
+    if (fbm(t * 26, 9.1, 3) < 0.52 && !(shoreZones(t).none && fbm(t * 70, 2.7, 3) > 0.5)) continue // and clusters where there is no sand
     const r = R(t) + d
     out.push({ x: r * Math.cos(t), z: r * Math.sin(t), t, d, s, k, rot, tilt })
   }
