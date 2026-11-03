@@ -22,12 +22,17 @@ const bx = +(process.env.BX ?? -2), bz = +(process.env.BZ ?? 23), RANGE1 = 120
 const step1 = (u) => { const k = 1 + 0.6 * sstep(u); return { cam: { pos: [bx + 6 + (k - 1) * 3, 11 * k, bz + 26 * k], look: [bx + 13, -7, bz], fov: 42 }, target: [lerp(bx, bx + 4.5, smoother(clamp((u - 0.08) / 0.84))), bz] } }
 // step 2 (cap8.mjs 's3' R1, the angle of the 10-30 still, mirrored to the −z side so the beam opens bottom-left, away from the
 // phone bottom right): the camera ahead of the boat looking back along the beam, following the boat as it is dragged 6 m.
-// v3 (Jason 11-03: step 2 had not been moved to the spot he sent): the step-1 spot (−2, 23), the boat dragged 6 m along +x
-// toward the bank like step 1, Forward 120 ft; the phone shows the same clean rising bottom with standing trees and fish as his
-// screenshot. (v1/v2: x 31 → 37 along the edge at z 8.) DIR2 −1 turns the camera 180° about the boat for a drag the other way,
-// but the boat keeps its heading when dragged astern, so the sonar picture does not change — not used. BX2 / BZ2 override while fitting.
+// v4 (Jason 11-03, "Follow the edge. Keep dragging until the bottom starts to drop"): the west shelf's edge, the nearest drop
+// in the beam's direction to his step-1 spot (−2, 23): the boat at (−30, −2) → (−24, −2), 18–20 ft of water, the Forward beam
+// (120 ft) looking down the edge where the bed falls from 20 ft to 40 ft (terrain.js: the shelf's drop at x −24…−4). The phone
+// shows a clean bottom line falling away with fish above it. v3 sat at the step-1 spot itself (the bottom rose there).
+// (v1/v2: x 31 → 37 along the edge at z 8.) The boat always faces +x, so only eastward lines work (DIR2 −1 drags it astern
+// with the picture unchanged — not used). BX2 / BZ2 override while fitting.
 const S2 = CAM.s2 || { dx: 26, y: 9, dz: -14, lx: -4, ly: -9, lz: 2, fov: 40 }
-const bx2 = +(process.env.BX2 ?? -2), bz2 = +(process.env.BZ2 ?? 23), dir2 = +(process.env.DIR2 ?? 1)
+const bx2 = +(process.env.BX2 ?? -30), bz2 = +(process.env.BZ2 ?? -2), dir2 = +(process.env.DIR2 ?? 1)
+// v4: the phone's depth window is AUTO (the next step above the water under the boat), so a bottom that falls away leaves the
+// screen at once; the dev ?depth= fixes the window (DEPTH2 ft) so the whole drop stays on the phone
+const DEPTH2 = +(process.env.DEPTH2 ?? 50)
 const step2 = (u, x) => ({ cam: { pos: [x + dir2 * S2.dx, S2.y, bz2 + dir2 * S2.dz], look: [x + dir2 * S2.lx, S2.ly, bz2 + dir2 * S2.lz], fov: S2.fov }, target: [lerp(bx2, bx2 + dir2 * 6, smoother(clamp((u - 0.05) / 0.9))), bz2] })
 
 const b = await chromium.launch({ headless: true, args: ['--ignore-gpu-blocklist', '--use-angle=metal', '--enable-gpu-rasterization'] })
@@ -44,7 +49,7 @@ await ctx.addInitScript(() => { // the virtual clock of ../rec.mjs
 const p = await ctx.newPage()
 p.on('pageerror', (e) => console.log('[pageerror]', e.message.slice(0, 200)))
 const boat0 = mode === 'step1' ? `${bx},${bz}` : `${bx2},${bz2}`
-await p.goto(`http://localhost:${port}/?boat=${boat0}&tour=off#2026-09-23-sonar-lake-3d`); await p.waitForTimeout(7000)
+await p.goto(`http://localhost:${port}/?boat=${boat0}&tour=off${mode === 'step2' ? `&depth=${DEPTH2}` : ''}#2026-09-23-sonar-lake-3d`); await p.waitForTimeout(7000)
 const click = (n) => p.getByRole('button', { name: n, exact: true }).first().click({ timeout: 4000 })
 await click('PingLive Mini'); await p.waitForTimeout(600); await click('Forward'); await p.waitForTimeout(2500)
 if (mode !== 'probe2') { await p.locator('input[type=range]').first().evaluate((el, v) => { Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(el, String(v)); el.dispatchEvent(new Event('input', { bubbles: true })) }, RANGE1); await p.waitForTimeout(1500) } // v3: Jason's range, 120 ft, both steps
