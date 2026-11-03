@@ -38,7 +38,27 @@ Jason 11-03：“一定要搞个文档，专门把这些不同的版本啊，那
 - 网站 03 正在用各国 IP 测这些市场前缀（同样适用这批链接），结果出来再更新这一节。
 - 规矩（#218）：“有网站 market 的就放网站，没有的就放在主站下，不懂问我。” 带 `?lang=` 的链接只换 Lab 的语言，店铺页其他地方还是英文。
 
-**店铺原来的 `/pages/lab`**（各市场都有，如 https://shop.accuphy.com/pages/lab、/de-de/pages/lab）：嵌的是 Base，不带锁，**不用来投放**。它照旧留在店里（#228：营销版不覆盖 Base）。
+**店铺原来的 `/pages/lab`**（各市场都有）：嵌的是网站嵌入版（#233），不带锁，**不用来投放**。它照旧留在店里（#228：营销版不覆盖它）。链接见下面第一点五节。
+
+## 一点五、店铺 Lab 页 `/pages/lab`（= 网站嵌入版，#233）
+
+**这一节由 Lab 网站嵌入版维护。** 框里显示 lab.accuphy.ca/（`/mini/`、`/ice/` 从里面点进去），代码是复制件 `src/experiments/2026-11-03-sonar-lake-web/`（复制自 96fdc22）。上线清单：`docs/2026-11-03-web-embed-checklist.md`。
+
+| 市场 | 店铺链接 | Lab 语言 |
+|---|---|---|
+| 加拿大 英 | https://shop.accuphy.com/pages/lab | 英 |
+| 加拿大 法 | https://shop.accuphy.com/fr/pages/lab | 法 |
+| 美国（只出 Mini） | https://shop.accuphy.com/en-us/pages/lab | 英 |
+| 澳洲 | https://shop.accuphy.com/en-au/pages/lab | 英 |
+| 法国 | https://shop.accuphy.com/fr-fr/pages/lab | 法 |
+| 比荷卢 荷兰语 | https://shop.accuphy.com/nl-benelux/pages/lab | 荷 |
+| 比荷卢 法语 | https://shop.accuphy.com/fr-benelux/pages/lab | 法 |
+| 德国 | https://shop.accuphy.com/de-de/pages/lab | 德 |
+| 波兰（#218） | https://shop.accuphy.com/pages/lab?lang=pl | 波兰语 |
+| 拉脱维亚（#218、#227） | https://shop.accuphy.com/pages/lab?lang=lv | 拉脱维亚语 |
+
+- 11-03 核对：8 个市场前缀都 200，框里是 lab.accuphy.ca/。
+- 德、荷、波、拉的文字等译文放进复制件才是那种语言（现在显示英文、用米）。
 
 ## 二、Lab 自己的地址
 
@@ -76,3 +96,4 @@ Jason 11-03：“一定要搞个文档，专门把这些不同的版本啊，那
 - 2026-11-03 HQ：合并第一节和第一点五节：投放链接只有一批，就是 MKT（Jason：“MKT 和投放的是一回事”）。
 - 2026-11-03 HQ：#228 营销版不覆盖 Base：首页留 Base，带锁版放 /mktbf2026/。
 - 2026-11-03 HQ：波兰、拉脱维亚改按 #218 的规矩（拉脱维亚放主站；波兰等网站加波兰语）。
+- 2026-11-03 Lab 网站嵌入版：加第一点五节（店铺 /pages/lab = 网站嵌入版，#233）。

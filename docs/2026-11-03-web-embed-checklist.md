@@ -1,0 +1,89 @@
+# 网站嵌入版 上线清单（Lab 网站嵌入版维护，2026-11-03，#233）
+
+> **硬规则（#232，Jason 定，每次都要记住）：店铺页只是“相框”，Lab 本身放在 lab.accuphy.ca 上。**
+> - 客人、广告、邮件只拿**店铺链接**（`shop.accuphy.com/<市场>/pages/lab`）。lab.accuphy.ca 的地址只在后台用，不给客人。
+> - 各市场的 `/pages/lab` 框里显示的就是网站嵌入版：`lab.accuphy.ca/`（PingLive + Mini）、`/mini/`、`/ice/`，**不带锁**。
+> - 带锁的 MKT 版是另一页 `/pages/sonarlab-mktbf2026` → `lab.accuphy.ca/mktbf2026/`，归 “Lab 营销版”，不在这份清单里。
+> - Lab 的程序不放进 Shopify。
+> - 清单里每一项都写清楚是哪一层：**客人看到的店铺页**，还是**它后面的 lab.accuphy.ca 地址**。
+
+网站嵌入版归 “Lab 网站嵌入版” 窗口。HQ 管它；和网站、Klaviyo 的往来都经 HQ。上线 lab.accuphy.ca 要 Jason 在 **Lab HQ** 说“动”，由 HQ 打包、部署、核对；本窗口不部署，也不推测试链接。
+
+## 现在是什么（11-03）
+
+- **复制件：** `src/experiments/2026-11-03-sonar-lake-web/`，用 `git archive 96fdc22` 从 git 取出（60 个文件，和 96fdc22 的湖文件夹逐个一样），另加自己的入口 `share/`，画廊标题改成 “website embed”。
+- **打包：** `BASE_REF=<版本> node scripts/build-bf-site.mjs <out>`：
+  - `/`、`/mini/`、`/ice/` 从复制件打（`LAB_ENTRY=web`，这个变量不进代码）；
+  - `/mktbf2026/`、`/mktbf2026/ice/` 归营销版，不变；
+  - `BASE_REF` 指向没有复制件的旧版本（如 96fdc22）时，照旧从 Base 文件夹打。
+- **证据（11-03）：** 复制件打出来的三页 md5 和线上 lab.accuphy.ca 一样：`/` afb82b9c、`/mini/` 26abb62f、`/ice/` f22f445a；11 张 App 首页小图也一样。故意把 Base 文件夹弄坏再打，复制件照样打出 afb82b9c，所以确实是从复制件打的。
+- **冰钓格子：** 跳到“当前路径 + ice/”：`/` → `/ice/`，`/mini/` → `/ice/`，`/ice/` → `/ice/`，带上原来的 `?shop=`、`?lang=`，再加 `from=lake`。
+- **客人看到的没变：** 线上还是 96fdc22 打的那一版，内容一样。
+
+## 一、店铺各市场的 Lab 页（客人看到的那一层）
+
+11-03 用 curl 打开，8 个市场前缀都是 200，框里是 lab.accuphy.ca/。
+
+| 市场 | 店铺链接 | Lab 语言 |
+|---|---|---|
+| 加拿大 英 | https://shop.accuphy.com/pages/lab | 英 |
+| 加拿大 法 | https://shop.accuphy.com/fr/pages/lab | 法 |
+| 美国（只出 Mini，#190） | https://shop.accuphy.com/en-us/pages/lab | 英 |
+| 澳洲 | https://shop.accuphy.com/en-au/pages/lab | 英 |
+| 法国 | https://shop.accuphy.com/fr-fr/pages/lab | 法 |
+| 比荷卢 荷兰语 | https://shop.accuphy.com/nl-benelux/pages/lab | 荷 |
+| 比荷卢 法语 | https://shop.accuphy.com/fr-benelux/pages/lab | 法 |
+| 德国 | https://shop.accuphy.com/de-de/pages/lab | 德 |
+| 波兰（#218） | https://shop.accuphy.com/pages/lab?lang=pl | 波兰语 |
+| 拉脱维亚（#218、#227） | https://shop.accuphy.com/pages/lab?lang=lv | 拉脱维亚语 |
+
+- 德、荷、波、拉现在还显示英文、用米：译文还没放进去（见第四节）。
+- 店铺页本身（框、框里的地址）由网站改，要 Jason 在网站 HQ 说“动”。本窗口只管框后面的 lab.accuphy.ca。
+
+## 二、店铺和 Lab 之间的通信（复制件里的 `embed.js`）
+
+店铺的框把市场和语言通过网址告诉 Lab（`?shop=<市场根>&lang=…`）。复制件里的 `embed.js` 用这些：
+
+- **统计事件：** 访客做了什么（看哪个视图、点去商店、分享），发给框外的店铺页，店铺记成 `accuphy:lab` 事件给 Meta。不发个人信息。直接打开 lab.accuphy.ca（不经店铺）时什么都不发。
+- **去商店：** 进访客所在市场的产品页（`<市场根>/products/pinglive-sonar` 或 `pinglive-mini`），店铺里不加 utm。
+- **分享：** 分享出去的是店铺链接 `<市场根>/pages/lab`，带 `lang` 和 lab_share 的 utm，不会把 lab.accuphy.ca 给出去。
+- **美国只出 Mini：** 在店铺里、市场是美国时只给 Mini（#190）。
+- **冰钓页：** 见上面“冰钓格子”。
+
+规矩：`embed.js` 的行为和事件，测试照旧由 “营销和外部系统对接” 做（三个版本都测）；本复制件里的改动由本窗口改，改前告诉 HQ 和对接窗口。
+
+## 三、上线前、上线后的核对
+
+**上线前（每次 lab.accuphy.ca `/`、`/mini/`、`/ice/` 要换版本）：**
+
+- [ ] Jason 在 Lab HQ 说了“动”（别的窗口转述的不算）。
+- [ ] 复制件的改动都写进了 `docs/decisions.md` / 本清单；Base 的改进只在 Jason 说“搬”之后才搬进来。
+- [ ] 打包用干净的 git 版本：`BASE_REF=<版本> node scripts/build-bf-site.mjs <out>`；打出来的 `/`、`/mini/`、`/ice/` 记下 md5。
+- [ ] 先上测试链接试一遍：`/`、`/mini/`、`/ice/`、`/?lang=fr`、`/?lang=de` 都能打开，控制台 0 错误；冰钓格子跳到 `/ice/`；手机和电脑都看。
+- [ ] 对接窗口测过统计事件、去商店、分享（店里框着测）。
+- [ ] `/mktbf2026/` 没被这次打包改掉（营销版的那一页 md5 和它自己记的一样）。
+
+**上线后（HQ 部署之后）：**
+
+- [ ] 线上 `/`、`/mini/`、`/ice/` 的 md5 = 打包时记的 md5。
+- [ ] 第一节 10 个店铺链接都是 200，框里是 lab.accuphy.ca/。
+- [ ] 店铺页里：拖船、换视图、冰钓格子、去商店（进对的市场）、分享（是店铺链接）都正常。
+- [ ] 防嵌（frame-ancestors）和 noindex 还在；`.env.local`、`.vercel` 打不开（404）。
+- [ ] 更新 `docs/lab-links-sheet.md` 的 /pages/lab 部分，并告诉 HQ 更新 `docs/version-sheet.md`、`docs/versions.md`。
+
+## 四、各市场的语言
+
+- 文字由 “Lab 多语言” 窗口整理、网站核过；核好的字经 HQ 交过来。
+- 本窗口把核好的字放进复制件的 `i18n.js`；Base 那份由 Base 窗口放进它自己的 `i18n.js`，留作底本。两份要一样。
+- 放进去以后：测试链接上 `?lang=` 每种语言看一遍（文字不溢出、不缺字），再走第三节上线。
+- 现在：法文有；德、荷、波、拉还没放，显示英文、用米。
+
+## 五、还没定 / 要 HQ 问的
+
+1. **`/embed/`（`scripts/build-embed.mjs`）还从 Base 文件夹打。** 这是“装进店铺页本身、不用框”的那种做法（#142），线上 lab.accuphy.ca/embed/ 有它。店铺现在用的是框，不用它。要不要也改从复制件打，还是以后不再部署它，由 HQ 定。
+2. **复制件还和 Base 共用两个小文件：** `2026-09-23-sonar-beam/devices.js`（设备参数）和 `2026-09-23-beam-shapes-3d/wedge.js`（波束形状）。Base 改了它们，网站嵌入版下次打包也会跟着变（MKT 版也一样）。11-03 这两个文件和 96fdc22 一样。要不要也复制一份进来，由 HQ 定。
+3. 有人直接打开 `lab.accuphy.ca/index.html`（不是 `/`）时，冰钓格子会跳错。店铺框的是 `/`，客人碰不到；先记着。
+
+## 改动记录
+
+- 2026-11-03 Lab 网站嵌入版：建清单；复制件从 96fdc22 取出；打包改成 `/`、`/mini/`、`/ice/` 从复制件打，md5 = 线上。

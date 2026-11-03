@@ -12,7 +12,7 @@ const title = variant === 'tour' ? 'Accuphy Lab · Tour' : variant === 'fish' ? 
 const tmp = path.join(outDir, 'vite')
 await build({ configFile: 'vite.share.config.js', logLevel: 'warn', build: { outDir: tmp, emptyOutDir: true } })
 
-const htmlRel = variant === 'tour' ? 'src/experiments/2026-11-01-tour-proto/share/index.html' : variant === 'bf' ? 'src/experiments/2026-11-03-sonar-lake-bf/share/index.html' : 'share/index.html' // the tour and BF pages have their own entries (vite.share.config.js)
+const htmlRel = process.env.LAB_ENTRY === 'web' ? 'src/experiments/2026-11-03-sonar-lake-web/share/index.html' : variant === 'tour' ? 'src/experiments/2026-11-01-tour-proto/share/index.html' : variant === 'bf' ? 'src/experiments/2026-11-03-sonar-lake-bf/share/index.html' : 'share/index.html' // the tour and BF pages, and the website-embed copy (LAB_ENTRY=web, #233, with VITE_DEVICES / VITE_SCENE as usual), have their own entries (vite.share.config.js)
 const html = fs.readFileSync(path.join(tmp, htmlRel), 'utf8')
 const jsRel = /<script[^>]*src="([^"]+\.js)"/.exec(html)[1], cssRel = /<link[^>]*href="([^"]+\.css)"/.exec(html)[1]
 const fromHtml = (rel) => path.resolve(path.dirname(path.join(tmp, htmlRel)), rel)
