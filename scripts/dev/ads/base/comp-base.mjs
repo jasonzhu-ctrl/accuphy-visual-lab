@@ -7,7 +7,7 @@ import { chromium } from 'playwright-core'
 import fs from 'node:fs'
 import path from 'node:path'
 const [dir, out, fpsArg = '30', mode] = process.argv.slice(2)
-const FPS = +fpsArg, STYLE = process.env.STYLE || 'A', END = [29, 33]
+const FPS = +fpsArg, STYLE = process.env.STYLE || 'A', END = [30, 34]
 fs.mkdirSync(out, { recursive: true })
 const lines = JSON.parse(fs.readFileSync(process.env.AD_LINES_FILE || path.join(path.dirname(new URL(import.meta.url).pathname), 'lines-base.json'), 'utf8'))
 const info = Object.fromEntries((fs.existsSync(`${dir}/info.json`) ? JSON.parse(fs.readFileSync(`${dir}/info.json`, 'utf8')) : []).map((f) => [f.name, f]))

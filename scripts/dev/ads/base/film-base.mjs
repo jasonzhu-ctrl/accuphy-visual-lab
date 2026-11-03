@@ -16,7 +16,8 @@ import { chromium } from 'playwright-core'
 import fs from 'node:fs'
 const [pass, out, port = '5192', fpsArg = '30'] = process.argv.slice(2)
 const FPS = +fpsArg
-const SPAN = { open: [0, 4], drag: [4, 8.5], phone: [8.5, 13.5], angle: [13.5, 18], combo: [18, 21.5], ice: [21.5, 29] }[pass]
+// round 2 (docs/2026-11-03-ad-base-feedback-round2.md): the drag is 1 s longer, so everything after it moves by +1 s
+const SPAN = { open: [0, 4], drag: [4, 9.5], phone: [9.5, 14.5], angle: [14.5, 19], combo: [19, 22.5], ice: [22.5, 30] }[pass]
 if (!SPAN) throw new Error('pass: open | drag | phone | angle | combo | ice')
 fs.mkdirSync(out, { recursive: true })
 const clamp = (u) => Math.min(1, Math.max(0, u)), lerp = (a, b, u) => a + (b - a) * u, lerp3 = (a, b, u) => a.map((x, i) => lerp(x, b[i], u))
@@ -26,27 +27,33 @@ const CAM = JSON.parse(process.env.CAMS || '{}') // per-pass camera overrides wh
 // ---- cameras ----
 const WIDE = CAM.wide || { pos: [-40, 95, 150], look: [10, -10, 0], fov: 48 }        // the whole lake (storyboard shot 1)
 const OPEN1 = CAM.open1 || { pos: [-12, 40, 84], look: [22, -8, 8], fov: 48 }        // the push lands here: the boat and the beam readable
-const F5 = CAM.f5 || { pos: [-2, 26, 60], look: [28, -6, 8], fov: 48 }               // the drag framing (the v3 opening)
-const BACK = CAM.back || { pos: [-4, 82, 92], look: [22, -8, 30], fov: 48 }          // the pull-back as the phone comes up: higher, looking more down; the boat and beam end up at y ~560–720, above the phone (748)
-const LOW1 = CAM.low1 || { pos: [0, 12, 24], look: [28, -6, 8], fov: 52 }            // the angle beat: low beside the boat (el ~29°: lower, the water mirrors the sky), the beam big in the frame
-const LOW2 = CAM.low2 || { pos: [10, 16, 32], look: [26, -5, 10], fov: 50 }          // ...rising a little as Combo opens
-const TOP = CAM.top || { pos: [24, 95, 46], look: [24, -10, 22], fov: 40 }            // the combo phone beat (storyboard shot 4)
+const F5 = CAM.f5 || { pos: [-4, 27, 62], look: [26, -6, 8], fov: 48 }               // the drag framing (the v3 opening, a little back for the longer path)
+const DRAG0 = 11.4, DRAG1 = 25.4                                                      // r2: the boat's path on the drag (bow-first, +x)
+const BACK = CAM.back || { pos: [-4, 120, 112], look: [22, -8, 22], fov: 48 }        // r2: the pull-back as the phone comes up, higher still: the boat and beam sit in y ~600–740, between the caption and the phone (748)
+// r2: the angle beat and the combo phone move to the big wreck (wreck.js BIG_WRECK x 58, z −47; Jason's reference
+// docs/2026-11-03-ad-r2-shot4-reference.webp): the boat at WRECK_BOAT facing +x, Combo with forward 155 ft / down 100 ft, the camera
+// pulled back so the whole coverage block is in the frame (the forward curtain is ~47 m long)
+const WRECK_BOAT = CAM.wreckBoat || [36, -47]
+const LOW1 = CAM.low1 || { pos: [-4, 30, 10], look: [58, -8, -47], fov: 52 }           // low behind/beside the boat, the block big in the frame (fitted on the wreck)
+const LOW2 = CAM.low2 || { pos: [16, 40, 6], look: [58, -8, -47], fov: 50 }            // ...rising a little as Combo opens; the whole 155 ft block in the frame, the wreck under its far end
+const TOP = CAM.top || { pos: [46, 150, -24], look: [46, -10, -30], fov: 40 }           // the combo phone beat over the wreck: the boat in the band above the phone, the wreck on the phone's Down panel
 // the orbit round the hole, left to right, near → far, at the page's own Section elevation. Base's c8ace42 turns the Section
 // cut to face the camera every frame (adIce.cutAz = 'cam'); the shelter is not cut, so it is kept 8 m on the far side of the
 // hole from the camera, a little to the side (adIce.shelter set per frame). az 90 = the +z side the page looks from.
-const ICE = CAM.ice || { r0: 19, r1: 30, el: 17, az0: 30, az1: 150, lookY: -4, shelterR: 8, shelterSide: 3 }
+const ICE = CAM.ice || { r0: 21, r1: 44, el0: 25, el1: 32, az0: 30, az1: 150, lookY: -3, shelterR: 8, shelterSide: -9 } // r2: higher all through (the hole kit sits under the caption band), the second half pulls higher and farther; the shelter to the right, clear of the caption
 const shot = {
   open: (t) => { const u = smoother(span(t, 0, 4)); return { cam: { pos: lerp3(WIDE.pos, OPEN1.pos, u), look: lerp3(WIDE.look, OPEN1.look, u), fov: lerp(WIDE.fov, OPEN1.fov, u) } } },
-  drag: (t) => { const u = smoother(span(t, 4, 8.5)); return { cam: { pos: lerp3(OPEN1.pos, F5.pos, u * 0.9), look: lerp3(OPEN1.look, F5.look, u * 0.9), fov: 48 }, target: [lerp(16, 23, smoother(span(t, 4.4, 7.6))), 11] } },
-  phone: (t) => { const u = easeOut(span(t, 8.6, 9.5)); const A = { pos: lerp3(OPEN1.pos, F5.pos, 0.9), look: lerp3(OPEN1.look, F5.look, 0.9), fov: 48 }
-    return { cam: { pos: lerp3(A.pos, BACK.pos, u), look: lerp3(A.look, BACK.look, u), fov: 48 }, lift: lerp(720, -215, easeOut(span(t, 8.6, 9.3))) + lerp(0, 900, easeIn(span(t, 12.9, 13.5))) } },
-  angle: (t) => { const u = smoother(span(t, 15.0, 18)); return { cam: { pos: lerp3(LOW1.pos, LOW2.pos, u), look: lerp3(LOW1.look, LOW2.look, u), fov: lerp(LOW1.fov, LOW2.fov, u) }, view: t < 15.0 ? 'Forward' : 'Combo', fanOpen: t < 15.0 ? 1 : lerp(0.03, 1, easeOut(span(t, 15.0, 16.3))) } },
-  combo: (t) => { const u = span(t, 18, 21.5); return { cam: { pos: [TOP.pos[0], TOP.pos[1] - 6 * u, TOP.pos[2] + 2 * u], look: TOP.look, fov: TOP.fov }, lift: -215 } },
-  ice: (t, s) => { const u = smoother(span(t, 21.8, 28.5)), az = lerp(ICE.az0, ICE.az1, u) * Math.PI / 180, el = ICE.el * Math.PI / 180, r = lerp(ICE.r0, ICE.r1, u)
+  // r2: the path twice as long (14 m) and moved back 15 ft (4.6 m): x 11.4 → 25.4 over 4.2 s (was 16 → 23 over 3.2 s)
+  drag: (t) => { const u = smoother(span(t, 4, 9.5)); return { cam: { pos: lerp3(OPEN1.pos, F5.pos, u * 0.9), look: lerp3(OPEN1.look, F5.look, u * 0.9), fov: 48 }, target: [lerp(DRAG0, DRAG1, smoother(span(t, 4.4, 8.6))), 11] } },
+  phone: (t) => { const u = easeOut(span(t, 9.6, 10.5)); const A = { pos: lerp3(OPEN1.pos, F5.pos, 0.9), look: lerp3(OPEN1.look, F5.look, 0.9), fov: 48 }
+    return { cam: { pos: lerp3(A.pos, BACK.pos, u), look: lerp3(A.look, BACK.look, u), fov: 48 }, lift: lerp(720, -215, easeOut(span(t, 9.6, 10.3))) + lerp(0, 900, easeIn(span(t, 13.9, 14.5))) } },
+  angle: (t) => { const u = smoother(span(t, 16.0, 19)); return { cam: { pos: lerp3(LOW1.pos, LOW2.pos, u), look: lerp3(LOW1.look, LOW2.look, u), fov: lerp(LOW1.fov, LOW2.fov, u) }, view: t < 16.0 ? 'Forward' : 'Combo', fanOpen: t < 16.0 ? 1 : lerp(0.03, 1, easeOut(span(t, 16.0, 17.3))) } },
+  combo: (t) => { const u = span(t, 19, 22.5); return { cam: { pos: [TOP.pos[0], TOP.pos[1] - 6 * u, TOP.pos[2] + 2 * u], look: TOP.look, fov: TOP.fov }, lift: -215 } },
+  ice: (t, s) => { const u = smoother(span(t, 22.8, 29.5)), az = lerp(ICE.az0, ICE.az1, u) * Math.PI / 180, el = lerp(ICE.el0, ICE.el1, smoother(span(u, 0.35, 1))) * Math.PI / 180, r = lerp(ICE.r0, ICE.r1, smoother(span(u, 0.35, 1)))
     const shelter = [-ICE.shelterR * Math.cos(az) - ICE.shelterSide * Math.sin(az), -ICE.shelterR * Math.sin(az) + ICE.shelterSide * Math.cos(az)]
     return { cam: { pos: [s.hole[0] + r * Math.cos(el) * Math.cos(az), r * Math.sin(el) + 0.5, s.hole[1] + r * Math.cos(el) * Math.sin(az)], look: [s.hole[0], ICE.lookY, s.hole[1]], fov: 46 }, shelter } },
 }[pass]
-const calls = { open: [], drag: [[4.5, 'largemouth'], [6.3, 'largemouth']], phone: [[8.9, 'largemouth'], [10.6, 'largemouth']], angle: [[14.0, 'largemouth'], [16.4, 'largemouth']], combo: [[18.3, 'largemouth']], ice: [] }[pass]
+const calls = { open: [], drag: [[4.5, 'largemouth'], [6.3, 'largemouth'], [7.8, 'largemouth']], phone: [[9.9, 'largemouth'], [11.6, 'largemouth']], angle: [[15.0, 'largemouth'], [17.4, 'largemouth']], combo: [[19.3, 'largemouth']], ice: [] }[pass]
 
 // ---- the page ----
 const phone = pass === 'phone' || pass === 'combo', ice = pass === 'ice'
@@ -63,7 +70,7 @@ await ctx.addInitScript(() => { // the virtual clock of ../rec.mjs
 })
 const p = await ctx.newPage()
 p.on('pageerror', (e) => console.log('[pageerror]', e.message.slice(0, 200)))
-const boat0 = pass === 'drag' ? '16,11' : pass === 'phone' ? '23,11' : '16,11'
+const boat0 = pass === 'drag' ? `${DRAG0},11` : pass === 'phone' ? `${DRAG1},11` : pass === 'angle' || pass === 'combo' ? `${WRECK_BOAT[0]},${WRECK_BOAT[1]}` : '16,11'
 await p.goto(`http://localhost:${port}/?boat=${boat0}&tour=off#${ice ? '2026-10-16-sonar-ice-3d' : '2026-09-23-sonar-lake-3d'}`); await p.waitForTimeout(7000)
 const click = async (n) => { // the Mini's tiles sit in the hidden desktop panel on the phone layout: press through the DOM then
   const l = p.getByRole('button', { name: n, exact: true })
@@ -73,6 +80,8 @@ const click = async (n) => { // the Mini's tiles sit in the hidden desktop panel
 }
 if (!ice) { await click('PingLive Mini'); await p.waitForTimeout(600) }
 await click({ open: 'Forward', drag: 'Forward', phone: 'Live Forward', angle: 'Forward', combo: 'Live Combo', ice: 'Combo' }[pass]); await p.waitForTimeout(2500)
+const setRange = (i, v) => p.locator('input[type=range]').nth(i).evaluate((el, v) => { Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(el, String(v)); el.dispatchEvent(new Event('input', { bubbles: true })) }, v)
+if (pass === 'combo') { await setRange(0, 155); await setRange(1, 100); await p.waitForTimeout(1500) } // the reference's ranges; the angle pass sets them when it switches to Combo
 await p.evaluate(([phone]) => {
   const s = window.__sonarState; s.hasDragged = true; s.adClean = true; s.adBeam = { line: 0.55, face: 0.18 }; if (!phone) s.dragging = true
   if (s.hintEl) s.hintEl.style.visibility = 'hidden'
@@ -94,7 +103,7 @@ if (ice) { // Base's #225 hooks (322f47f + c8ace42, "ad-lake-ice" port 5193): th
 let view = null
 const apply = async (t) => {
   const st = shot(t, { hole })
-  if (st.view && st.view !== view) { view = st.view; await click(view); await p.waitForTimeout(50) }
+  if (st.view && st.view !== view) { view = st.view; await click(view); await p.waitForTimeout(50); if (view === 'Combo') { await setRange(0, 155); await setRange(1, 100) } }
   await p.evaluate(([st]) => {
     const s = window.__sonarState
     s.camOverride = { ...st.cam, noLogo: true }
