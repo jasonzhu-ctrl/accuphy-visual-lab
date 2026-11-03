@@ -103,7 +103,7 @@ const S = {
   not_available: { en: 'Not available in this simulation yet.', fr: 'Pas encore disponible dans cette simulation.' }, // FR reviewed 2026-10-31 (#191); only Live Panoramic on the ice page now
   // {view} is the tile's name (#191, Jason 2026-10-30)
   na_moving: { en: '{view} needs the boat moving slowly, so it isn’t available in this simulation yet.', fr: '{view} exige que le bateau avance lentement : cette vue n’est donc pas encore disponible dans cette simulation.' },
-  // the subscribe card (#191). {view} is the tile's name. unlock_consent, unlock_done: Klaviyo HQ's draft, Jason has not seen it. FR reviewed by the website HQ 2026-10-31 ("la vue {view}", so any view name reads right), except unlock_consent and unlock_done: still drafts
+  // the subscribe card (#191). {view} is the tile's name. unlock_done: Klaviyo HQ's draft, Jason has not seen it; unlock_consent: Jason's own text (2026-11-03). FR reviewed by the website HQ 2026-10-31 ("la vue {view}", so any view name reads right), except unlock_done: still a draft
   unlock_title: { en: 'Unlock {view}', fr: 'Débloquer la vue {view}' },
   unlock_locked: { en: '{view}, locked: subscribe to unlock', fr: 'Vue {view} verrouillée : abonnez-vous pour la débloquer' },
   unlock_text: { en: 'Subscribe with your email first, and {view} opens right away.', fr: 'Abonnez-vous d’abord avec votre courriel : la vue {view} s’ouvre aussitôt.' },
@@ -112,7 +112,7 @@ const S = {
   unlock_email: { en: 'Email', fr: 'Courriel' },
   unlock_cta: { en: 'Subscribe and unlock', fr: 'M’abonner et débloquer' },
   unlock_sending: { en: 'Subscribing…', fr: 'Abonnement en cours…' },
-  unlock_consent: { en: 'By subscribing, you agree to receive marketing emails from Accuphy Trading Ltd. about sonar tips, products and offers. Unsubscribe anytime.', fr: 'En vous abonnant, vous acceptez de recevoir des courriels de marketing d’Accuphy Trading Ltd. sur des conseils sonar, des produits et des offres. Désabonnement possible à tout moment.' },
+  unlock_consent: { en: 'By subscribing, you agree to receive marketing emails from Accuphy. Unsubscribe anytime.', fr: 'En vous abonnant, vous acceptez de recevoir des courriels marketing d’Accuphy. Désabonnement en tout temps.' }, // Jason confirmed EN + FR 2026-11-03 in the BF funnel chat (via Lab HQ)
   unlock_privacy: { en: 'Privacy Policy', fr: 'Politique de confidentialité' },
   unlock_err_email: { en: 'Please enter a valid email address.', fr: 'Veuillez entrer une adresse courriel valide.' },
   unlock_err_send: { en: 'Something went wrong. Please try again.', fr: 'Une erreur est survenue. Veuillez réessayer.' },

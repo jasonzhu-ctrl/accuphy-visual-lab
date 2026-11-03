@@ -67,7 +67,7 @@ export default function UnlockCard({ name, img, product, view, onClose, onDone }
                   </label>
                   {status === 'error' && <div className="mt-2 text-[12.5px] text-[#ffd0d0]" role="alert">{error}</div>}
                   <button type="submit" disabled={status === 'sending'} className="ac-primary mt-3 w-full">{status === 'sending' ? t('unlock_sending') : t('unlock_cta')}</button>
-                  <p className="ac-unlock-fine">
+                  <p className="ac-unlock-fine" style={{ fontSize: 11 }}>{/* one small grey line, like the store's pop-up (HQ 2026-11-03) */}
                     {t('unlock_consent')}{' '}
                     <a href="https://shop.accuphy.com/policies/privacy-policy" target="_blank" rel="noreferrer">{t('unlock_privacy')}</a>
                   </p>
