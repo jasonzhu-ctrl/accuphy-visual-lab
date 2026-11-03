@@ -3747,3 +3747,46 @@ Numbered log. Newest at the bottom.
      every new model (its geometry, materials, lighting, fit in the fog, and the edge where it meets the water or the ice)
      matches or beats the lake, the boat and the camp as they are; no low-poly or cheap-game look. If it gets heavy, cut
      density or samples, never the look (#50). Its self-check images include a close-up of that edge.
+
+206. **2026-11-02** — **One shoreline round the lake on both pages; the boat and the holes stop 1.5 m inside it (test version)**
+     (Jason in Lab HQ: "OK, lock it in" for 界面设计's layout, docs/2026-11-02-shoreline-design-handover.md; then "A, rounded
+     square" for the shape). It replaces #204's invisible ±58 m square.
+     - **The shape** (`terrain.js` `shoreR`): a rounded square, Base's line (the handover's circle put the big wreck on land and
+       the lockup and the deep hole in the shallows). East 65, south 62, west 61 m from the centre; south corners 78–80 m; the
+       north side ~76 m and the wreck's corner a cove (~98 m), so the lockup, the deep hole, the wreck and its debris keep their
+       depth: each is ≥ 15 m inside the shore, past the bottom's rise. A slow wobble of a few metres along the sides.
+     - **The bottom** (`terrain.js` `shoreRise`, in `depthAt`, so the sonar sees it): from depth D it rises over 3 + 0.45 D m
+       (≤ 14 m) to 0.1 m at the waterline — a gentle beach off the shelf, a steep slope where the 24 m floor meets the north
+       shore and in the wreck's cove (Jason: "the deep water runs to the shore as a steep underwater slope"). Under the land it
+       stays at the waterline.
+     - **The land** (`Shore.jsx`, `shoreModels.js`; the same geometry on both pages, the season only in the materials; all on
+       SONAR_HIDE_LAYER): ground from the waterline out past the fog (440 m) with the handover's profile — wet sand (dark,
+       glossy), beach, a ~1.25 m bank, rolling land — and fine detail in the shader (sand grain, a weave of grass blades, sun-
+       dried patches; winter: drift ripples that fade where they get finer than a pixel, a little sparkle); soft contact shade
+       baked under every tree. Conifers: four crown shapes of drooping needle sprays (two crossed cards per branch, a needle
+       atlas drawn in code, see-through gaps, dark inside to lighter tips), the back rows (≥ 24 m) with two-thirds of the
+       whorls; ~1,900 trees on a desktop, 60 % on phones (#50: fewer trees, each as fine); winter snow on the branches' upper
+       faces. ~760 shore rocks (the lake's own boulders, wet at the waterline, snow caps in winter), grass tufts and reeds
+       (winter: a few dry reeds out of the snow), a cracked shore-ice rim in winter.
+     - **The stop** (`terrain.js` `shoreStop`): the drag target (summer) and the aim ring and hop (ice) stop 1.5 m inside the
+       shore along the way. The cue (`Shore.jsx` ShoreCue): one line, "Shoreline — the lake ends here" (`shore_edge`, words
+       from 对接; FR draft for the website's review), in the Lab's dark glass over the stop, kept 16 px inside the screen, in
+       0.2 s / 2.5 s / out 0.4 s; once per drag on the lake; on the ice also a faint dashed ring where the finger was and a
+       dotted line to the stop.
+     - **The view follows the boat on every lake screen** (界面设计 11-02: "wherever the boat can stop, the shore must be in
+       view"): desktop and sideways phones too, not only portrait ones (#201); the home framing is unchanged, the view moves
+       only near the frame's edge — on a desktop clear of the glass panel and the app's phone frame, on a sideways phone clear
+       of the small app screen. The follow is measured from where the camera is now (adding while it eased overshot).
+     - The leader cards at the treetops were dropped (they read as dark spikes).
+     - **Checked** on scratch copies (sheets `docs/2026-11-02-shoreline-build-check.jpg`, `…-sonar-check.jpg`):
+       - Summer lake, desktop / portrait / sideways phone, 8 directions each: all 24 drags end 1.5 m inside the shore, with the
+         bank and trees in view; the line shows and stays on screen.
+       - Ice page, three cameras × desktop / portrait / sideways: holes reach the shore (north −74, east +63 m …); a tap past it
+         stops the ring 1.5 m inside with the ghost ring and the line.
+       - Sonar, the wreck, the lockup and the deep hole at their own spots in six views against a8db17b: the same pictures;
+         new only where the beam now reaches the shore's slope (the wreck's cove wall to the right of the wreck in Down, the
+         north shore in PingLive Panoramic).
+       - sonar-qa grid (lake 6 × 6 on/off + ice 4 on/off) against a8db17b: all tiles within 0.63 luma except PingLive
+         Panoramic at spots 3 and 4 (its 1.6× reach now meets the north shore); 0 errors.
+       - Tours on the lake, Mini and ice pages, desktop and phone: as before; 0 errors. Production builds of all three pages OK.
+     - Weight: trees ~0.97 M triangles on a desktop, ~0.56 M on phones; not yet measured on a real phone.

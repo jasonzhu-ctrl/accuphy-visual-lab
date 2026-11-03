@@ -15,7 +15,7 @@ import { makeSkyDome } from './iceSky'
 import { ICE_T, MINI_DROP, APEX_Y, HOLE_DRAW_R, MAX_HOLES, ICE_CAMP, CUT_R, ISLAND_R, SECTION_CAM, WIND, col, dir, iceParams } from './iceScene'
 import { setBeamUniforms } from './lakeMaterial'
 import { SONAR_HIDE_LAYER } from './SonarScreen'
-import { HALF, EDGE, depthAt } from './terrain'
+import { HALF, depthAt, shoreStop } from './terrain'
 
 const LIFT = ICE_T + MINI_DROP + 0.35 // how far the Mini comes up when it is pulled out of the hole
 const DUR = { lift: 0.55, move: 0.9, drill: 1.5, drop: 0.7 }
@@ -318,12 +318,13 @@ export function IceWalls({ state, iceMat }) {
 // dropped). Now every tap counts: a far tap walks HOP_MAX in that direction, and the aim ring shows where the hole will be.
 const HOP_MAX = 25
 export function IcePick({ state }) {
-  const clampXZ = (p) => ({ x: THREE.MathUtils.clamp(p.x, -EDGE, EDGE), z: THREE.MathUtils.clamp(p.z, -EDGE, EDGE) }) // the lake's edge (#204)
+  // the shore (terrain.js shoreStop): the ring stops 1.5 m inside it on the way there; s.aimPast keeps where the finger was
+  const clampXZ = (s, p) => { const st = shoreStop(s.boat.x, s.boat.z, p.x, p.z); s.aimPast = st ? { x: p.x, z: p.z } : null; return st || p }
   const clampHop = (s, p) => {
     let dx = p.x - s.boat.x, dz = p.z - s.boat.z
     const dd = Math.hypot(dx, dz)
     if (dd > HOP_MAX) { dx *= HOP_MAX / dd; dz *= HOP_MAX / dd }
-    return clampXZ({ x: s.boat.x + dx, z: s.boat.z + dz })
+    return clampXZ(s, { x: s.boat.x + dx, z: s.boat.z + dz })
   }
   // the section view: the ice in front of the wall is cut away, so a tap counts only on the ice behind it (a ray that
   // meets the sheet's plane in front of the wall came through the water column or the empty cut — ignored)
@@ -337,6 +338,7 @@ export function IcePick({ state }) {
     if (!s.aim || s.drill?.phase !== 'idle') return
     if (Math.hypot(s.aim.x - s.boat.x, s.aim.z - s.boat.z) < 1.0) return
     s.target.x = s.aim.x; s.target.z = s.aim.z; s.hasDragged = true
+    if (s.aimPast) s.shoreCue = { x: s.aim.x, z: s.aim.z, gx: s.aimPast.x, gz: s.aimPast.z, t0: performance.now(), ring: true } // a tap past the shore
   }
   // R3F never passes a pointercancel on to the mesh, so a cancelled touch (iOS) left the aim ring up: drop the aim then
   useEffect(() => {

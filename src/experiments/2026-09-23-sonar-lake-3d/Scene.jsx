@@ -5,7 +5,7 @@ import { labEvent } from './embed'
 import { mergeGeometries as _merge } from 'three/addons/utils/BufferGeometryUtils.js'
 // Extrude geometries are non-indexed, primitives are indexed — normalise first.
 const mergeGeometries = (parts) => _merge(parts.map((g) => (g.index ? g.toNonIndexed() : g)))
-import { HALF, SEG, bedY, fbm, depthAt, ROCK_HUMPS, EDGE } from './terrain'
+import { HALF, SEG, bedY, fbm, depthAt, ROCK_HUMPS, shoreStop } from './terrain'
 import { SPECIES, makePopulation, fishPose, stepBehaviours, forceRise, forceJig, winterCamp, rnd, drawnLen } from './fish'
 import { seedBeamFish, stepBeamFish } from './fishBeam'
 import { makeLakeMaterial, setBeamUniforms, LAKE_TIME } from './lakeMaterial'
@@ -21,6 +21,7 @@ import SonarScreen, { SONAR_HIDE_LAYER, LAKEBED_LAYER, FISH_LAYER, LOGO_LAYER } 
 // the ice scene (Jason 2026-10-16): the same lake frozen over — iceScene.js has the story and the presets
 import { IceSky, IceSheet, IceCamp, IceWalls, Snowfall, IcePick, LightShaft, MarineSnow, SectionFaces } from './IceCamp'
 import { makeIceMaterial } from './iceSheet'
+import Shore, { ShoreCue } from './Shore'
 import { bakeTerrain } from './sonarMarks'
 import lakeSkyUrl from './assets/lake-sky.jpg?inline' // the sky mirrored in the summer lake (#162): a CC0 photo, see assets/LICENSES.md
 import { makeLakeFFT, FFT_L } from './lakeFFT' // the waves: a wind-sea spectrum by FFT (#165, after ABYSSAL, MIT, see assets/LICENSES.md)
@@ -776,21 +777,34 @@ function Rig({ state, sonarRect, fogMats, cam = LAKE_CAM }) {
     // The ice page's top camera follows the hole on every screen (Jason 2026-11-02, #204), as its other two cameras do: it
     // stood still, so a hole could only be drilled as far as the screen's edge (26 m up on a desktop) and the lake's edge was
     // out of reach. The hole keeps its place on the screen; the view eases after the walk to a new hole.
-    const follow = k > 1 && !s.ice, iceFollow = !!s.ice && !!s.holes
+    // Since the shore (#206) every screen follows on the lake too (界面设计 11-02: "wherever the boat can stop, the shore must be
+    // in view"): the north shore lies ~76 m out, above the desktop's fixed frame. The home framing is as before; the view
+    // only moves when the boat nears the frame's edge (on a desktop: clear of the glass panel on the left).
+    const follow = !s.ice, iceFollow = !!s.ice && !!s.holes
     if ((!follow && !iceFollow) || s.camFX == null) { s.camFX = fx; s.camFZ = 0 }
     if (iceFollow && s.boat) { s.camFX = fx + s.boat.x - ICE_START[0]; s.camFZ = s.boat.z - ICE_START[1] }
     if (follow && s.boat) {
       tmp.set(s.boat.x, 0.5, s.boat.z).project(camera)
       const bx = ((tmp.x + 1) / 2) * size.width, by = ((1 - tmp.y) / 2) * size.height
       const mx = 0.2 * size.width, top = 0.16 * bandBottom, bot = 0.76 * bandBottom // the boat stays in the middle 60 % across, 16–76 % down the band
-      const ex = bx < mx ? bx - mx : bx > size.width - mx ? bx - (size.width - mx) : 0
-      const ey = by < top ? by - top : by > bot ? by - bot : 0
+      const pr2 = k > 1 || s.land ? null : s.panelEl?.getBoundingClientRect()
+      const mxL = pr2 && pr2.width && by < pr2.bottom + 40 ? Math.max(mx, pr2.right + 70) : mx // desktop: clear of the glass panel on the left
+      const ex = bx < mxL ? bx - mxL : bx > size.width - mx ? bx - (size.width - mx) : 0
+      let ey = by < top ? by - top : by > bot ? by - bot : 0
+      // desktop: never under the app's phone frame in the bottom-right corner
+      const frR = k > 1 || s.land ? null : sonarRect?.current?.frame?.getBoundingClientRect()
+      if (frR && frR.width && bx > frR.left - 60 && by > frR.top - 50) ey = Math.max(ey, by - (frR.top - 50))
+      // sideways phones: never under the app's screen in the top-right corner
+      const lfR = s.land ? document.querySelector('.ph-lake-back')?.getBoundingClientRect() : null // the small app screen over the enlarged lake
+      if (lfR && lfR.width && bx > lfR.left - 60 && by < lfR.bottom + 50) ey = Math.min(ey, by - (lfR.bottom + 50))
       if (ex || ey) {
         // pixels per metre at the boat, across (x) and along the lake (z: up the screen is −z)
         tmp2.set(s.boat.x + 1, 0.5, s.boat.z).project(camera); const ppx = Math.abs(((tmp2.x - tmp.x) / 2) * size.width) || 1
         tmp2.set(s.boat.x, 0.5, s.boat.z + 1).project(camera); const ppz = Math.abs(((tmp.y - tmp2.y) / 2) * size.height) || 1
-        s.camFX = THREE.MathUtils.clamp(s.camFX + ex / ppx, -40, 46)
-        s.camFZ = THREE.MathUtils.clamp(s.camFZ + ey / ppz, -48, 40)
+        // measured from where the camera is now, not added to where it is heading: while the view is still easing over, the
+        // boat stays outside the margin for a few frames, and adding up those frames overshot (#206, desktop drags)
+        s.camFX = THREE.MathUtils.clamp((s.camX ?? s.camFX) + ex / ppx, -80, 100) // up to the shore's farthest reach (the wreck's cove, #206)
+        s.camFZ = THREE.MathUtils.clamp((s.camZ ?? s.camFZ) + ey / ppz, -100, 80)
       }
     }
     // eased, and never faster than 12 m/s, so a quick flick across the screen pans calmly rather than whipping the view
@@ -806,12 +820,15 @@ function Rig({ state, sonarRect, fogMats, cam = LAKE_CAM }) {
   return null
 }
 function PickPlane({ state }) {
-  const onDown = (e) => { e.stopPropagation(); state.current.dragging = true; state.current.hasDragged = true; labEvent('first_drag', {}, { once: true }); e.target.setPointerCapture?.(e.pointerId); move(e) }
+  const onDown = (e) => { e.stopPropagation(); state.current.dragging = true; state.current.hasDragged = true; state.current.shoreCued = false; labEvent('first_drag', {}, { once: true }); e.target.setPointerCapture?.(e.pointerId); move(e) }
   const move = (e) => {
     const s = state.current
     if (!s.dragging) return
-    s.target.x = THREE.MathUtils.clamp(e.point.x, -EDGE, EDGE)
-    s.target.z = THREE.MathUtils.clamp(e.point.z, -EDGE, EDGE)
+    // the boat stops 1.5 m inside the shore (terrain.js shoreStop); the first time in a drag, one quiet line says why
+    const stop = shoreStop(s.boat.x, s.boat.z, e.point.x, e.point.z)
+    s.target.x = stop ? stop.x : e.point.x
+    s.target.z = stop ? stop.z : e.point.z
+    if (stop && !s.shoreCued) { s.shoreCued = true; s.shoreCue = { x: stop.x, z: stop.z, t0: performance.now(), ring: false } }
   }
   const onUp = () => { state.current.dragging = false }
   // R3F never passes a pointercancel on to the mesh (it only clears hover), and iOS cancels touches readily: the drag
@@ -896,6 +913,8 @@ export default function LakeScene({ state, sonarRect, paused = false, scene = 'l
           2026-10-23) lying along the Down plane 2–40 ft to the boat's +x side on the bottom, structure (not steel) tag */}
       {import.meta.env.DEV && /study=wreck/.test(window.location.search) && (() => { const m = /boat=(-?[\d.]+),(-?[\d.]+)/.exec(window.location.search); const bx = m ? +m[1] : 0, bz = m ? +m[2] : 0; return <Wreck mat={mats.wood} at={{ x: bx + 6.4, z: bz, rot: [0, 0, 0], scale: 1.25 }} /> })()}
       <Fish mat={mats.fish} state={state} />
+      <Shore state={state} winter={ice} />
+      <ShoreCue state={state} />
       {ice ? (<>
         <IceSheet mat={iceMat} state={state} />
         <IceCamp state={state} beamMats={beamMats} iceMat={iceMat} T={P.T} />

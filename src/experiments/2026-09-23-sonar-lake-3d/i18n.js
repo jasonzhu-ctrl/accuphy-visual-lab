@@ -35,6 +35,7 @@ const S = {
   // cues and toasts
   hint_boat: { en: 'Drag the boat to move it', fr: 'Faites glisser le bateau pour le déplacer' },
   hint_ice: { en: 'Tap the ice to drill a hole', fr: 'Touchez la glace pour percer un trou' },
+  shore_edge: { en: 'Shoreline — the lake ends here', fr: 'La rive : le lac s’arrête ici' }, // the line when the boat or a tap reaches the shore (#206; words from 对接 11-02). FR draft, for the website's review
   toast_phone: { en: 'These are the app’s own controls — Home, range, gain and pause work.', fr: 'Ce sont les commandes de l’application : Accueil, portée, gain et pause fonctionnent.' },
   toast_desktop: { en: 'These are the app’s own controls — use the panel to change the view.', fr: 'Ce sont les commandes de l’application : changez de vue dans le panneau.' },
   // the entry tour (Tour.jsx, Jason 2026-11-02; replaces the lake's s1–s3 step cards): placeholder English from the prototype,

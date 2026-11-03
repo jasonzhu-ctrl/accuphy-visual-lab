@@ -2,9 +2,38 @@
 // centres + radius of the small rock humps (shared with vegetation.js)
 export const ROCK_HUMPS = [[-8, 22, 6], [42, -6, 7], [-38, -18, 6]]
 export const HALF = 160 // modelled lakebed half-size; detail lives within ±70 m
-// where the boat (summer) and a hole (ice) can go, one number for both pages (#204, Jason 2026-11-02): the terrain's detail
-// (±70 m) and every fish's home (within ±52 m) lie inside it. Was ±58 on the lake and ±56 on the ice.
-export const EDGE = 58
+// The shoreline (Jason 2026-11-02, #206; 界面设计 docs/2026-11-02-shoreline-design-handover.md): metres from the lake's
+// centre at angle t = atan2(z, x). A rounded square (Jason chose it over the spec's circle, which put the big wreck on land
+// and the lockup and the deep hole in the shallows): ~62 m on the east, south and west sides, ~78–80 m at the south
+// corners; the north side lies ~77 m out and the wreck's corner bulges into a cove (~99 m), so the lockup, the deep hole,
+// the wreck and its debris keep their depth (each ≥ 14 m inside the shore, past the bottom's rise). A slow wobble of a few
+// metres keeps the sides from reading as ruled lines.
+const angD = (a, b) => Math.atan2(Math.sin(a - b), Math.cos(a - b)), bump = (t, c, w) => Math.exp(-((angD(t, c) / w) ** 2))
+export function shoreR(t) {
+  const c = Math.abs(Math.cos(t)), s = Math.abs(Math.sin(t)), sq = 62 / Math.pow(c ** 5.9 + s ** 5.9, 1 / 5.9)
+  return sq * (1 + 0.023 * Math.sin(3 * t + 0.7) + 0.012 * Math.sin(7 * t + 2.1) + 0.014 * Math.sin(5 * t + 1.3))
+    + 18 * bump(t, -1.95, 0.75) + 32 * bump(t, -0.6, 0.28) // the north side (the deep water), the wreck's cove
+}
+// the bottom's rise to the shore (handover §2: "build it into the lakebed"): from a depth D it climbs over W = 3 + 0.45 D m
+// (≤ 14 m) to 0.1 m at the waterline — a gentle beach off the shelf, a steep slope where the deep water meets the north
+// shore (Jason: "the deep water runs to the shore as a steep underwater slope"); under the land it stays at the waterline.
+function shoreRise(x, z, d) {
+  const dist = Math.hypot(x, z) - shoreR(Math.atan2(z, x)), W = Math.min(14, 3 + 0.45 * d)
+  if (dist <= -W) return d
+  const k = smooth(-W, 0, dist)
+  return d + (0.1 - d) * k
+}
+// The boat (summer) and a hole (ice) stop 1.5 m inside the shore, on the way from where they are toward where they were
+// sent (handover §1; this replaces the ±58 m square of #204). Returns the stop, or null when the target is on the water.
+export const SHORE_INSET = 1.5
+const inLake = (x, z, inset) => Math.hypot(x, z) <= shoreR(Math.atan2(z, x)) - inset
+export function shoreStop(x0, z0, x1, z1, inset = SHORE_INSET) {
+  if (inLake(x1, z1, inset)) return null
+  if (!inLake(x0, z0, inset)) { const r = Math.hypot(x1, z1) || 1, R = shoreR(Math.atan2(z1, x1)) - inset; return { x: (x1 * R) / r, z: (z1 * R) / r } } // already at the shore: along the radius
+  let lo = 0, hi = 1
+  for (let i = 0; i < 22; i++) { const m = (lo + hi) / 2; if (inLake(x0 + (x1 - x0) * m, z0 + (z1 - z0) * m, inset)) lo = m; else hi = m }
+  return { x: x0 + (x1 - x0) * lo, z: z0 + (z1 - z0) * lo }
+}
 export const SEG = 160  // 2 m spacing
 
 // small deterministic value-noise / fbm
@@ -66,7 +95,7 @@ export function depthAt(x, z) {
   // its outline wanders a little so it reads as a natural hole, its walls ~25°
   const hq = Math.hypot(x - DEEP_HOLE.x, z - DEEP_HOLE.z) + 3 * (fbm(x * 0.08 + 21, z * 0.08 + 5) - 0.5)
   d = d + (DEEP_HOLE.depth - d) * (1 - smooth(DEEP_HOLE.r0, DEEP_HOLE.r1, hq))
-  return humpsAndRim(x, z, d, DEEP_M)
+  return shoreRise(x, z, humpsAndRim(x, z, d, DEEP_M))
 }
 export const DEEP_HOLE = { x: -22, z: -45, r0: 4, r1: 16, depth: 33.5 } // 33.5 m = 110 ft
 // The depth the timber, bushes and rocks were laid out against: the lake before #91 (40 m floor, 17 m middle, 7 m

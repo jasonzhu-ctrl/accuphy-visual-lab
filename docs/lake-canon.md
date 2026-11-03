@@ -21,6 +21,7 @@ Jason, 2026-10-27: the lake scene (boat and lake), its effects, the sonar pictur
 | Drag cue | reticle on the water, ripple every 2.6 s, back once the boat stops | #132, #160, #166 |
 | Water column from above | tints the bottom with depth | #156 |
 | Terrain | deep floor 24 m (79 ft); a 110 ft hole at (−22, −45) | #64, #172, #174 |
+| Shore | one shoreline round the lake on both pages (rounded square: E 65, S 62, W 61, N 76 m, corners 78–91, the wreck's cove 98 m); beach, bank, conifers, rocks, reeds; winter: snow and a shore-ice rim; hidden from the sonar; the bottom rises to it in the terrain; boat and holes stop 1.5 m inside | #206, #205 |
 | Rocks | Shield boulders, six shapes | #131 |
 | Wrecks | small wreck = workboat with three decks and a wheelhouse | #155 |
 | Fish | bodies by species, spread realistically (#173 round 3: between rounds 1 and 2); bass drawn 1.5×; three lake trout at ~92–99 ft in the 110 ft hole; nearby fish swim into a beam below its minimum, in by about 10 s (test version; the yellow perch and one crappie group moved from the west shelf to the empty east flat) | #170, #173, #174, #193, #198 |
