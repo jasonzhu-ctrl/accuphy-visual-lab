@@ -199,7 +199,7 @@ nl、lv 的 App 没有这两种语言，留英文。de、pl 是 App 原字（网
 
 1. ~~range_down 照字面还是照 Garmin~~ → **照 Garmin**（Jason 11-03：“照 Garmin 吧”，#221），写“深度量程”：
    Portée de la profondeur / Tiefenbereich / Dieptebereik / Zakres głębokości / Dziļuma diapazons，已填进第一节。
-   英文 “Down range” 没改（i18n.js 的英文归 Base；要不要改成 “Depth range”，HQ 可以顺带问一句，不改也对得上意思）。
+   英文 “Down range” 不改（Lab 定，#222）：跟 “Forward range” 成对，也跟访客看到的视图名 “Down” 一致；App 的 Live Down 菜单里没有量程名字可照；译文的“深度量程”意思一样。
 2. ~~德语 Panoramablick 还是 Panoramaansicht~~ → **Panoramablick**（Jason 11-03：“你查一查定吧，我也不懂”，Lab 定，#221）。
    理由：手机里 App 的格子就叫 Panoramablick，教程卡就在旁边，访客看到的是同一个字；店铺 PingLive 产品页也这么写。
    Panoramaansicht 只在店铺首页一行和 glossary 里。
@@ -263,3 +263,4 @@ App Store、Google Play、“ACCUPHY | LAB” 标题、AUTO、数字和单位、
   法语 /fr-fr、/fr-benelux 和英文的同类问题记进第七节第 3 条；加了检查用的店铺链接。
 - 2026-11-03 Lab 多语言：Jason 在本窗口定了去商店按钮写“买”（#220），填进 de / nl / pl / lv；拿不准剩 2 条。检查链接照 #218 改成主站。
 - 2026-11-03 Lab 多语言：Jason 定 range_down 照 Garmin；德语 Panoramic 名他让 Lab 定，定 Panoramablick（#221）。拿不准清零。
+- 2026-11-03 Lab 多语言：Jason：“你来定这些翻译 不确定就查一查”（#222）。英文 Down range 不改。

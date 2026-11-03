@@ -3964,3 +3964,11 @@ Numbered log. Newest at the bottom.
      - German Panoramic View outside the phone: "Panoramablick", the app's own tile word and the PingLive product page's (the store home
        and the glossary say Panoramaansicht). Only tour_pano_title uses it; the pill stays "Panorama".
      - With #220 no open points are left in `docs/2026-11-03-lab-strings-5lang.md`; only share_title / share_line wait for English.
+222. **2026-11-03** — **"Lab 多语言" decides the Lab's translations itself and researches when unsure; Jason is not asked about wording**
+     (Jason in "Lab 多语言": “你来定这些翻译 不确定就查一查”).
+     - Method stays #214's: store's live text → glossary → big brands (Polish also Prime Power, Polish and Latvian back-translated);
+       each line keeps its source. Questions go to Jason only when a choice changes something other than wording (what a button does,
+       which page, a fact).
+     - First use: the English "Down range" stays. It pairs with "Forward range" and with the view name "Down" visitors see; the app's
+       Live Down menu shows no range name (`reference/app-study/plm-combo-menu.jpg`), so there is no app word to follow; the
+       translations' Garmin "depth range" (#221) means the same thing.
