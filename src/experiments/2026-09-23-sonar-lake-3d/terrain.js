@@ -2,6 +2,9 @@
 // centres + radius of the small rock humps (shared with vegetation.js)
 export const ROCK_HUMPS = [[-8, 22, 6], [42, -6, 7], [-38, -18, 6]]
 export const HALF = 160 // modelled lakebed half-size; detail lives within ±70 m
+// where the boat (summer) and a hole (ice) can go, one number for both pages (#204, Jason 2026-11-02): the terrain's detail
+// (±70 m) and every fish's home (within ±52 m) lie inside it. Was ±58 on the lake and ±56 on the ice.
+export const EDGE = 58
 export const SEG = 160  // 2 m spacing
 
 // small deterministic value-noise / fbm

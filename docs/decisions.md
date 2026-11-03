@@ -3720,3 +3720,30 @@ Numbered log. Newest at the bottom.
        - sonar-qa grid (lake 6 × 6 on/off + ice 4 on/off) against 6b5a225: ice tiles within 0.43 luma; lake tiles within
          1.16 luma and 0.98 % lit, the largest at spot 5 with the boat still on its way after 1.8 s (the same picture, a
          step along the path); 0 errors. Production build of the ice page OK.
+
+204. **2026-11-02** — **The ice page's top camera follows the hole; one edge, ±58 m, for both pages (test version)** (Jason in Lab HQ,
+     after "After a certain point I can't move up anymore": "do A, unify the boundary, and make the edge visible").
+     - **Why he got stuck** (Base's check, 11-02): the ice page's top camera stood still, so a hole could only be drilled to the
+       screen's edge (about 26 m up on a desktop, 31 m on a sideways phone, 42 m on a portrait one); the section and under
+       cameras followed the hole but stopped at an invisible ±56 m edge with ice drawn on to the horizon.
+     - **A (`Scene.jsx` Rig):** on the ice page the top camera follows the hole on every screen, like its other two cameras and
+       like #201 on the summer lake's portrait phones: the hole keeps its place on the screen, the view eases after the walk
+       (2.2/s, never faster than 12 m/s). Coming back from the under / section camera it starts where the hole is (no long pan).
+       The tour's "tap the ice" cue follows (it reads `s.tapAt` every frame).
+     - **One edge:** `EDGE = 58` in `terrain.js`, used by the summer lake's drag (`Scene.jsx` PickPlane, was ±58) and the ice
+       page's taps (`IceCamp.jsx` IcePick, was ±56). 58 because the terrain's detail reaches ±70 m and every fish's home lies
+       within ±52 m, and the summer lake keeps exactly the reach it had (#201 tested at ±58): only the ice page changes, by 2 m.
+     - B, the visible edge, comes separately: one shoreline for both pages at ±58 m (Jason 11-02, option A: snowbank and
+       conifers in winter, green in summer), from 界面设计's spec once Jason approves the layout.
+     - **Checked** on scratch copies:
+       - Ice page, top camera: up, left and right to the edge on desktop, portrait and sideways phones (desktop up −58 where it
+         stopped at −26; left −57.5; right +58). Section and under cameras: to ±58 as before at ±56.
+       - Summer lake, desktop / portrait / sideways phone, 8 directions: the same reach as before the change, to the decimal
+         (one corner differs by 1 m from the drag path's timing).
+       - Ice tour 1 → 2 → 3 on desktop (section and top) and phone: as before, the cue on the reticle; 0 errors.
+
+205. **2026-11-02** — **Every new model in the base version is built to the premium look** (Jason in Lab HQ: "Every model newly
+     added to the base version must be optimised — more premium, better looking"). A standing rule, from the shoreline on:
+     every new model (its geometry, materials, lighting, fit in the fog, and the edge where it meets the water or the ice)
+     matches or beats the lake, the boat and the camp as they are; no low-poly or cheap-game look. If it gets heavy, cut
+     density or samples, never the look (#50). Its self-check images include a close-up of that edge.

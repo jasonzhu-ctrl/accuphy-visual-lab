@@ -5,7 +5,7 @@ import { labEvent } from './embed'
 import { mergeGeometries as _merge } from 'three/addons/utils/BufferGeometryUtils.js'
 // Extrude geometries are non-indexed, primitives are indexed — normalise first.
 const mergeGeometries = (parts) => _merge(parts.map((g) => (g.index ? g.toNonIndexed() : g)))
-import { HALF, SEG, bedY, fbm, depthAt, ROCK_HUMPS } from './terrain'
+import { HALF, SEG, bedY, fbm, depthAt, ROCK_HUMPS, EDGE } from './terrain'
 import { SPECIES, makePopulation, fishPose, stepBehaviours, forceRise, forceJig, winterCamp, rnd, drawnLen } from './fish'
 import { seedBeamFish, stepBeamFish } from './fishBeam'
 import { makeLakeMaterial, setBeamUniforms, LAKE_TIME } from './lakeMaterial'
@@ -24,7 +24,7 @@ import { makeIceMaterial } from './iceSheet'
 import { bakeTerrain } from './sonarMarks'
 import lakeSkyUrl from './assets/lake-sky.jpg?inline' // the sky mirrored in the summer lake (#162): a CC0 photo, see assets/LICENSES.md
 import { makeLakeFFT, FFT_L } from './lakeFFT' // the waves: a wind-sea spectrum by FFT (#165, after ABYSSAL, MIT, see assets/LICENSES.md)
-import { APEX_Y, iceParams, ICE_CAM_T, ICE_CAM_D, ICE_LAKE_W, ICE_FOG, UNDER_CAM, SECTION_CAM, SECTION_CAM_PHONE, ICE_T, dir } from './iceScene'
+import { APEX_Y, iceParams, ICE_START, ICE_CAM_T, ICE_CAM_D, ICE_LAKE_W, ICE_FOG, UNDER_CAM, SECTION_CAM, SECTION_CAM_PHONE, ICE_T, dir } from './iceScene'
 
 // ---------- lakebed ----------
 function Lakebed({ mat }) {
@@ -763,7 +763,7 @@ function Rig({ state, sonarRect, fogMats, cam = LAKE_CAM }) {
       camera.up.set(0, 1, 0); camera.position.copy(s.camP); camera.lookAt(s.camL)
       return
     }
-    s.camP = null
+    if (s.camP) { s.camP = null; s.camX = s.camZ = null } // back from the ice page's under / section camera: start where the hole is now, no long pan
     if (camera.fov !== 38) { camera.fov = 38; camera.updateProjectionMatrix() }
     // view from the south (desktop exactly as before); phones: pulled back, re-centred on a step preset's boat
     const fx = k > 1 && s.frameX != null ? s.frameX : cam.T.x
@@ -772,9 +772,13 @@ function Rig({ state, sonarRect, fogMats, cam = LAKE_CAM }) {
     // of the ±58 m lake and nothing could reach the rest. Now, when the boat comes within the margins of the band above the
     // phone, the focus moves just enough to keep it inside, and the camera eases after it; a finger held at the edge keeps
     // pushing (every move puts the target under it again). The focus stops where the lake's edge reaches the band's edge.
-    // Desktop, sideways phones (both reach the edges already) and the ice page are unchanged.
-    const follow = k > 1 && !s.ice
-    if (!follow || s.camFX == null) { s.camFX = fx; s.camFZ = 0 }
+    // Desktop, sideways phones (both reach the edges already) are unchanged.
+    // The ice page's top camera follows the hole on every screen (Jason 2026-11-02, #204), as its other two cameras do: it
+    // stood still, so a hole could only be drilled as far as the screen's edge (26 m up on a desktop) and the lake's edge was
+    // out of reach. The hole keeps its place on the screen; the view eases after the walk to a new hole.
+    const follow = k > 1 && !s.ice, iceFollow = !!s.ice && !!s.holes
+    if ((!follow && !iceFollow) || s.camFX == null) { s.camFX = fx; s.camFZ = 0 }
+    if (iceFollow && s.boat) { s.camFX = fx + s.boat.x - ICE_START[0]; s.camFZ = s.boat.z - ICE_START[1] }
     if (follow && s.boat) {
       tmp.set(s.boat.x, 0.5, s.boat.z).project(camera)
       const bx = ((tmp.x + 1) / 2) * size.width, by = ((1 - tmp.y) / 2) * size.height
@@ -790,7 +794,7 @@ function Rig({ state, sonarRect, fogMats, cam = LAKE_CAM }) {
       }
     }
     // eased, and never faster than 12 m/s, so a quick flick across the screen pans calmly rather than whipping the view
-    const ef = Math.min(1, dt * 2.2), vmax = follow ? 12 * Math.min(dt, 0.05) : Infinity
+    const ef = Math.min(1, dt * 2.2), vmax = follow || iceFollow ? 12 * Math.min(dt, 0.05) : Infinity
     const ease = (cur, to) => (cur == null ? to : cur + THREE.MathUtils.clamp((to - cur) * ef, -vmax, vmax))
     s.camX = ease(s.camX, s.camFX)
     s.camZ = ease(s.camZ, s.camFZ)
@@ -806,8 +810,8 @@ function PickPlane({ state }) {
   const move = (e) => {
     const s = state.current
     if (!s.dragging) return
-    s.target.x = THREE.MathUtils.clamp(e.point.x, -58, 58)
-    s.target.z = THREE.MathUtils.clamp(e.point.z, -58, 58)
+    s.target.x = THREE.MathUtils.clamp(e.point.x, -EDGE, EDGE)
+    s.target.z = THREE.MathUtils.clamp(e.point.z, -EDGE, EDGE)
   }
   const onUp = () => { state.current.dragging = false }
   // R3F never passes a pointercancel on to the mesh (it only clears hover), and iOS cancels touches readily: the drag

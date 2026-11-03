@@ -15,7 +15,7 @@ import { makeSkyDome } from './iceSky'
 import { ICE_T, MINI_DROP, APEX_Y, HOLE_DRAW_R, MAX_HOLES, ICE_CAMP, CUT_R, ISLAND_R, SECTION_CAM, WIND, col, dir, iceParams } from './iceScene'
 import { setBeamUniforms } from './lakeMaterial'
 import { SONAR_HIDE_LAYER } from './SonarScreen'
-import { HALF, depthAt } from './terrain'
+import { HALF, EDGE, depthAt } from './terrain'
 
 const LIFT = ICE_T + MINI_DROP + 0.35 // how far the Mini comes up when it is pulled out of the hole
 const DUR = { lift: 0.55, move: 0.9, drill: 1.5, drop: 0.7 }
@@ -318,7 +318,7 @@ export function IceWalls({ state, iceMat }) {
 // dropped). Now every tap counts: a far tap walks HOP_MAX in that direction, and the aim ring shows where the hole will be.
 const HOP_MAX = 25
 export function IcePick({ state }) {
-  const clampXZ = (p) => ({ x: THREE.MathUtils.clamp(p.x, -56, 56), z: THREE.MathUtils.clamp(p.z, -56, 56) })
+  const clampXZ = (p) => ({ x: THREE.MathUtils.clamp(p.x, -EDGE, EDGE), z: THREE.MathUtils.clamp(p.z, -EDGE, EDGE) }) // the lake's edge (#204)
   const clampHop = (s, p) => {
     let dx = p.x - s.boat.x, dz = p.z - s.boat.z
     const dd = Math.hypot(dx, dz)
