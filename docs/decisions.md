@@ -4076,3 +4076,7 @@ Numbered log. Newest at the bottom.
      - lab.accuphy.ca/mktbf2026/ goes live only after #212 is reviewed and in (all languages at once); then the order stays: /mktbf2026/
        live (store links not yet in ads) → website 03 real sign-up → links to ads.
      - The multi-language blocker left: the share box's two English lines (share_title, share_line).
+
+235. **2026-11-03** — **Share box English final: “Show a buddy what’s under the boat” / “Drag the boat. Watch the sonar light up.”**
+     (Jason in Lab HQ, card: “就用这两句”). `share_title` and `share_line` stop being drafts; "Lab 多语言" translates and reviews them,
+     which completes the #212 table.
