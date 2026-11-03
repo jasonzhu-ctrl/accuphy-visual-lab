@@ -9,6 +9,10 @@ with the source commit it was built from, so anyone can tell which version a lin
 sign-up and Combo stays shut for everyone (no fake success). Test links show "Test mode: nothing is sent." The consent wording
 (`unlock_consent` in i18n.js) is Klaviyo HQ's draft and waits for Jason.
 
+## 2026-11-03: test link /ice/ at 65486b0 (#224)
+
+Base 99e15c8 (Jason 动 in Base): ice Forward/Combo frame the forward beam to 120 ft on phone and desktop. Built with `BASE_REF=HEAD node scripts/build-bf-site.mjs`; only `/ice/` copied to the test repo (md5 checked live). `/`, `/base/`, `/mini/` unchanged. Not live.
+
 ## 2026-11-03: test link: / = BF locked version (#213)
 
 Jason said 动 in Lab HQ for the locked version up to the test link. Built with `BASE_REF=86bf80e node scripts/build-bf-site.mjs <out> HEAD` (HEAD ecc15ed; the copy `src/experiments/2026-11-03-sonar-lake-bf/` is 86bf80e with the lock always on). No list id, so the card says "Test mode: nothing is sent". `/base/` md5 = the 86bf80e root build; `/mini/`, `/ice/` unchanged. Test repo c1545c2. HQ checked: Mini → Live Combo opens the "Unlock Live Combo" card. lab.accuphy.ca not touched.

@@ -56,7 +56,8 @@ Jason 11-03：“一定要搞个文档，专门把这些不同的版本啊，那
 |---|---|
 | https://jasonzhu-ctrl.github.io/accuphy-lab-test/ | 黑五带锁版，测试模式，订阅不发出去 |
 | https://jasonzhu-ctrl.github.io/accuphy-lab-test/base/ | Base 86bf80e（= 线上） |
-| https://jasonzhu-ctrl.github.io/accuphy-lab-test/mini/ 、/ice/ | Base 86bf80e |
+| https://jasonzhu-ctrl.github.io/accuphy-lab-test/mini/ | Base 86bf80e |
+| https://jasonzhu-ctrl.github.io/accuphy-lab-test/ice/ | Base 65486b0（11-03：冰钓 Forward / Combo 的前视 120 ft 进画面，#224；还没上线） |
 
 测试链接后面加 `?lang=de`（或 fr、nl、pl、lv）可以看那种语言。只有核好的字放进去以后，才看得出区别。
 
