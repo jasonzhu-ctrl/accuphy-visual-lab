@@ -57,7 +57,9 @@ async function openTab(width, height) {
     for (const type of ['mousePressed', 'mouseReleased']) await send('Input.dispatchMouseEvent', { type, x: r.x, y: r.y, button: 'left', clickCount: 1 })
   }
   const esc = async () => { for (const type of ['keyDown', 'keyUp']) await send('Input.dispatchKeyEvent', { type, key: 'Escape', code: 'Escape', windowsVirtualKeyCode: 27 }) }
-  const open = async (query) => { await send('Page.navigate', { url: `${base}/?${query}` }); return waitFor("!!d.querySelector('.ac-shop')") }
+  // ready = the buttons exist AND the loading cover has gone: since #210 it stays up to ~3 s longer (shore tree budget) and would
+  // catch the trusted mouse clicks below
+  const open = async (query) => { await send('Page.navigate', { url: `${base}/?${query}` }); return waitFor("!!d.querySelector('.ac-shop') && !d.getElementById('lab-cover')") }
   const close = async () => { await send('Target.closeTarget', { targetId: t.id }).catch(() => {}); ws.close() }
   return { ev, lab, waitFor, tap, esc, open, close, navs }
 }
