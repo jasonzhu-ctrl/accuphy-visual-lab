@@ -1,0 +1,58 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<!-- Caption styles for the Base Mini film (2026-11-03, #225: Jason "现在的很 low" — 醒目、高级, never over the beam, inside the Reels
+     lines). Three styles on the same frames; styles-render.mjs opens this at 1080×1920 and calls setStyle(name, bg, head, sub).
+     Eurostile Heavy comes from the Creative Cloud activation (local()); Instrument Sans from the repo (OFL). -->
+<style>
+  @font-face { font-family: 'Eurostile Heavy'; src: local('Eurostile Heavy'), local('Eurostile-Hea'); font-weight: 800; }
+  @font-face { font-family: 'Instrument Sans'; src: url('fonts/InstrumentSans-Variable.ttf') format('truetype'); font-weight: 400 700; }
+  html, body { margin: 0; background: #000; }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: #000; color: #fff; }
+  #bg { position: absolute; left: -12px; top: -12px; width: 1104px; height: 1944px; }
+  .cap { position: absolute; left: 0; width: 1080px; top: 330px; }
+  .hidden { display: none }
+
+  /* A · 标题 + 蓝线：Eurostile 大标题，细蓝线，Instrument Sans 副句；上方一层淡淡的渐变压暗，没有框 */
+  #A .grad { position: absolute; left: 0; top: 0; width: 1080px; height: 900px; background: linear-gradient(180deg, rgba(2,8,14,.55) 0%, rgba(2,8,14,.25) 60%, rgba(2,8,14,0) 100%); }
+  #A .cap { left: 72px; width: 936px; }
+  #A .head { font-family: 'Eurostile Heavy'; font-size: 88px; line-height: 1.02; letter-spacing: .005em; text-shadow: 0 6px 36px rgba(0,0,0,.5); text-wrap: balance; }
+  #A .rule { width: 160px; height: 8px; margin: 26px 0 24px; background: #028CDF; border-radius: 4px; box-shadow: 0 0 24px rgba(2,140,223,.7); }
+  #A .sub { font-family: 'Instrument Sans'; font-weight: 500; font-size: 52px; line-height: 1.22; color: rgba(255,255,255,.92); text-shadow: 0 2px 16px rgba(0,0,0,.6); max-width: 860px; text-wrap: balance; }
+
+  /* B · 玻璃板：和 Lab 面板一样的磨砂玻璃块，细描边，蓝点；字在板里，板不盖波束 */
+  #B .cap { left: 60px; width: auto; max-width: 960px; padding: 40px 52px 44px; border-radius: 28px;
+    background: rgba(8, 18, 30, .42); backdrop-filter: blur(22px) saturate(1.2); -webkit-backdrop-filter: blur(22px) saturate(1.2);
+    border: 1.5px solid rgba(255,255,255,.22); box-shadow: 0 30px 80px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.18); }
+  #B .kick { display: flex; align-items: center; gap: 14px; font-family: 'Instrument Sans'; font-weight: 600; font-size: 26px; letter-spacing: .22em; color: #7CC4F2; margin-bottom: 18px; }
+  #B .kick::before { content: ''; width: 12px; height: 12px; border-radius: 6px; background: #028CDF; box-shadow: 0 0 16px #028CDF; }
+  #B .head { font-family: 'Eurostile Heavy'; font-size: 72px; line-height: 1.06; letter-spacing: .005em; text-wrap: balance; }
+  #B .sub { font-family: 'Instrument Sans'; font-weight: 500; font-size: 46px; line-height: 1.24; color: rgba(255,255,255,.88); margin-top: 16px; text-wrap: balance; }
+
+  /* C · 电影字幕：小字间距很大的蓝色 kicker，大标题，左边一道竖的蓝线；画面四角轻微压暗（vignette） */
+  #C .vig { position: absolute; inset: 0; background: radial-gradient(120% 90% at 50% 45%, rgba(0,0,0,0) 55%, rgba(0,0,0,.55) 100%); }
+  #C .cap { left: 84px; width: 912px; padding-left: 34px; border-left: 6px solid #028CDF; }
+  #C .kick { font-family: 'Instrument Sans'; font-weight: 600; font-size: 28px; letter-spacing: .3em; color: #7CC4F2; text-transform: uppercase; margin-bottom: 22px; text-shadow: 0 2px 12px rgba(0,0,0,.6); }
+  #C .head { font-family: 'Eurostile Heavy'; font-size: 96px; line-height: 1; letter-spacing: -.005em; text-shadow: 0 8px 40px rgba(0,0,0,.55); text-wrap: balance; }
+  #C .sub { font-family: 'Instrument Sans'; font-weight: 400; font-size: 50px; line-height: 1.22; color: rgba(255,255,255,.9); margin-top: 26px; text-shadow: 0 2px 16px rgba(0,0,0,.6); max-width: 820px; text-wrap: balance; }
+</style></head>
+<body>
+<div id="stage">
+  <img id="bg">
+  <div id="A" class="style"><div class="grad"></div><div class="cap"><div class="head"></div><div class="rule"></div><div class="sub"></div></div></div>
+  <div id="B" class="style"><div class="cap"><div class="kick">ACCUPHY LAB</div><div class="head"></div><div class="sub"></div></div></div>
+  <div id="C" class="style"><div class="vig"></div><div class="cap"><div class="kick">Accuphy Lab</div><div class="head"></div><div class="sub"></div></div></div>
+</div>
+<script>
+  const $ = (q) => document.querySelector(q)
+  window.setStyle = async ({ name, bg, head, sub, top }) => {
+    for (const el of document.querySelectorAll('.style')) el.classList.toggle('hidden', el.id !== name)
+    const box = $(`#${name} .cap`); box.style.top = (top || 330) + 'px'
+    $(`#${name} .head`).textContent = head || ''; $(`#${name} .sub`).textContent = sub || ''
+    $(`#${name} .sub`).style.display = sub ? '' : 'none'
+    $('#bg').src = bg
+    await document.fonts.ready
+    await new Promise((r) => { const im = $('#bg'); if (im.complete && im.naturalWidth) r(); else { im.onload = r; im.onerror = r } })
+    return { eurostile: document.fonts.check('80px "Eurostile Heavy"'), bottom: box.getBoundingClientRect().bottom }
+  }
+</script>
+</body></html>
