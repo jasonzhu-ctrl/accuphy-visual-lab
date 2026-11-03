@@ -3907,6 +3907,10 @@ Numbered log. Newest at the bottom.
        as wide as the widest label of the rows on screen (min 56 px, wide rows min 96 px; normal rows capped at 104 px, longer ones would
        wrap), the same for every row, measured again on device / view / camera change and on font load. English is identical to the
        commit before (every label and control rect, lake / Combo / ice). de pl lv: ≥ 16 px between each label and its control.
+     - **Tour titles fit** (界面设计's spec, 11-03; `Tour.jsx` + `tour.css`): desktop on one line, the 46 px title shrinking to no less than
+       38 px (1280: de 40.9–44 px, nl 44.6–45.9, pl 41.7, lv 41.8–43.1; at 1440 none shrinks); phone at most two lines at 30 px with
+       `text-wrap: balance`, else 26 px (only nl "Tik op Panoramische weergave"). Measured after fonts load and on resize. English: the
+       same size and lines as the commit before (1280, 1440, 390).
      Plan: `docs/2026-11-03-multilang-base-plan.md`.
 
 213. **2026-11-03** — **Black Friday locked version: a copy of the base with the #191 lock on, and it takes over the store's Lab**
