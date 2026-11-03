@@ -1,4 +1,4 @@
-# Mini 广告片：Jason 第 1 轮分镜意见和改动单（Lab HQ，2026-11-03）
+# Mini 广告片：Jason 第 1 轮分镜意见和改动单（Lab HQ，2026-11-03，决定 #225）
 
 - 来源：Jason 在反馈页上写的意见，一格一条（https://claude.ai/artifact/WSZb4nFQxdTqwFsaytmLa6，页面数据库 `feedback`，9 条，HQ 用 ArtifactData 读）。
 - 拿不准的三处，HQ 在 Lab HQ 用卡片问过 Jason：

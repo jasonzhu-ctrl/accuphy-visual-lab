@@ -3995,7 +3995,7 @@ Numbered log. Newest at the bottom.
      - **Unchanged:** Live Ice, Down and Ice Fishing; the Top and Under-the-ice cameras; the summer lake (camera identical to 86bf80e,
        desktop and phone). The ice tour walks through on desktop, phone and `?view=top`; 0 errors.
 
-224. **2026-11-03** — **Mini ad, round 1 feedback: new shots and lines; Mini first, PingLive after; no fixed length** (Jason on the
+225. **2026-11-03** — **Mini ad, round 1 feedback: new shots and lines; Mini first, PingLive after; no fixed length** (Jason on the
      storyboard feedback page, nine notes, and three cards in Lab HQ: “加一段只拍手机”; on “No black box. No heavy battery and
      plotter.”: “照写，是对的”; end card “用Try Accuphy Sonar Lab. No fee. No download. Right in your browser”; PingLive end card “片尾只保留Tap the link and try the Accuphy Sonar Lab for free.”).
      - Captions redesigned (eye-catching, premium, never over the beam). Length not fixed (replaces #223's 20 s). Camera moves
