@@ -1,0 +1,27 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<!-- e01 step 1: the finger cue (the Lab tour's boat cue: blue ring + pointing hand) over the recorded 1600×900 frames, at the
+     boat's screen position logged by e01.mjs. No words (the French email shares the picture). e01-comp.mjs drives it. -->
+<style>
+  html, body { margin: 0; background: #000; }
+  #stage { position: relative; width: 1600px; height: 900px; overflow: hidden; }
+  #bg { position: absolute; left: 0; top: 0; width: 1600px; height: 900px; }
+  #cue { position: absolute; left: 0; top: 0; width: 0; height: 0; }
+  #cue .ring { position: absolute; left: -52px; top: -52px; width: 104px; height: 104px; border-radius: 50%; box-sizing: border-box; border: 5px solid #028cdf; background: rgba(2,140,223,.24); box-shadow: 0 0 18px rgba(2,140,223,.6); }
+  #cue .wave { position: absolute; left: -52px; top: -52px; width: 104px; height: 104px; border-radius: 50%; box-sizing: border-box; border: 3px solid rgba(2,140,223,.7); }
+  #cue img { position: absolute; width: 52px; left: -20px; top: -3px; filter: drop-shadow(0 2px 6px rgba(0,0,0,.5)); }
+</style></head>
+<body><div id="stage"><img id="bg"><div id="cue"><div class="wave"></div><div class="ring"></div><img src="finger.svg"></div></div>
+<script>
+  const $ = (q) => document.querySelector(q), clamp = (u) => Math.min(1, Math.max(0, u)), ease = (u) => 1 - (1 - u) ** 3
+  window.setFrame = async ({ bg, u, boat, show }) => {
+    $('#bg').src = bg
+    $('#cue').style.display = show && boat ? '' : 'none'
+    if (show && boat) {
+      const k = (u * 3.5 % 1.2) / 1.2 // the ring beats every 1.2 s of a 3.5 s clip
+      $('#cue').style.transform = `translate(${boat[0]}px, ${boat[1]}px)`; $('#cue').style.opacity = ease(clamp(u / 0.12)) * (1 - ease(clamp((u - 0.9) / 0.1)))
+      $('#cue .wave').style.transform = `scale(${1 + k * 0.9})`; $('#cue .wave').style.opacity = 1 - k
+    }
+    await new Promise((r) => { const im = $('#bg'); if (im.complete && im.naturalWidth && im.src.endsWith(bg)) r(); else { im.onload = r; im.onerror = r } })
+  }
+</script></body></html>
