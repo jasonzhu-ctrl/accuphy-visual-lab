@@ -105,6 +105,9 @@ anyone's memory.
 - **Decision numbers:** re-read the last number in `docs/decisions.md` right before appending, and again
   after `git fetch` just before the commit (renumber if another chat took it meanwhile). Two chats wrote #69
   twice and #102 twice (Jason 2026-10-18: 以后注意避免).
+- **Store page = frame, Lab = lab.accuphy.ca (#232, Jason 2026-11-03, hard rule, repeat it):** customers, ads and emails only get
+  store links (shop.accuphy.com/<market>/pages/…). Each store page frames one lab.accuphy.ca address (`/pages/lab` → `/`, no lock;
+  `/pages/sonarlab-mktbf2026` → `/bf/`, MKT). The Lab's code never goes into Shopify. HQ and "Lab 营销版" keep and restate this.
 - **One lake, one owner (#176, Jason 2026-10-27):** only "Lab 场景和声纳画面Base" (formerly "冰钓版本视觉效果", renamed by Jason 2026-10-31, #195) changes the lake scene and the sonar imaging
   (ice included). Other chats send it what they need. The canon is `docs/lake-canon.md`; every link is built from one commit.
 - **The colleague 孙英杰 (GitHub AJ-nb, #183, Jason 2026-10-28):** works on his own branch and opens a pull request that

@@ -8,6 +8,11 @@ Jason 11-03：“一定要搞个文档，专门把这些不同的版本啊，那
 
 最后核对：2026-11-03。HQ 用 curl 打开下面每个店铺链接，都返回 200，都嵌着 lab.accuphy.ca/。
 
+> **硬规则（#232，Jason 11-03，要反复提醒）：** 店铺页只是一个“相框”，Lab 本身放在 lab.accuphy.ca 上。
+> - 客人和广告、邮件只拿**店铺链接**（shop.accuphy.com/<市场>/pages/…），lab.accuphy.ca 的地址在后台，不给客人。
+> - 每个店铺页里的框只显示一个 lab.accuphy.ca 地址：`/pages/lab` → lab.accuphy.ca/（不带锁）；`/pages/sonarlab-mktbf2026` → lab.accuphy.ca/bf/（MKT 版，带锁）。
+> - Lab 的程序不放进 Shopify。Lab 更新只改 lab.accuphy.ca（Jason 在 Lab HQ 说“动”）；店铺页只改框里的地址（网站，Jason 在网站 HQ 说“动”）。
+
 ## 一、投放链接（= MKT 版，#229，Jason 11-03：“MKT 和投放的是一回事”）
 
 **这一节由 Lab 营销版维护（#231）**，其他几节照旧由 HQ 维护。

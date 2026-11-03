@@ -4049,3 +4049,13 @@ Numbered log. Newest at the bottom.
        lab.accuphy.ca/bf/ and the MKT store page, the geo-test results for the ad links, moving #212/#224 in (#216/#226).
      - HQ: dispatches, checks, and is the only one that talks to the website HQ (and the BF funnel / Klaviyo) about MKT; HQ builds
        and deploys; anything live still needs Jason's 动 in Lab HQ (Lab) or website HQ (Shopify).
+
+232. **2026-11-03** — **Hard rule, to be repeated: a store page is only a frame; the Lab itself lives on lab.accuphy.ca** (Jason in Lab
+     HQ, after HQ explained why the Lab can't sit inside a Shopify page: “明白了 这个事应该是硬规则而且要反复提醒 你和lab营销版窗口都应该记住 并且管理”).
+     - Customers and ads only ever get **store links** (shop.accuphy.com/<market>/pages/…). Each store page holds one frame that
+       shows one lab.accuphy.ca address: `/pages/lab` → lab.accuphy.ca/ (no lock); `/pages/sonarlab-mktbf2026` → lab.accuphy.ca/bf/
+       (MKT, locked). The lab.accuphy.ca addresses are behind the scenes and never go into ads or emails.
+     - The Lab's code is never put into Shopify. Lab updates go to lab.accuphy.ca (Jason's 动 in Lab HQ); store pages only change
+       their frame address (website, Jason's 动 in website HQ).
+     - HQ and "Lab 营销版" keep this rule: in `CLAUDE.md`, at the top of `docs/lab-links-sheet.md` and the MKT go-live checklist,
+       and they restate it whenever links, pages or a release are discussed.
