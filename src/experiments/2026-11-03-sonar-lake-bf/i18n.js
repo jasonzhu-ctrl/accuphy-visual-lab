@@ -103,11 +103,11 @@ const S = {
   not_available: { en: 'Not available in this simulation yet.', fr: 'Pas encore disponible dans cette simulation.' }, // FR reviewed 2026-10-31 (#191); only Live Panoramic on the ice page now
   // {view} is the tile's name (#191, Jason 2026-10-30)
   na_moving: { en: '{view} needs the boat moving slowly, so it isn’t available in this simulation yet.', fr: '{view} exige que le bateau avance lentement : cette vue n’est donc pas encore disponible dans cette simulation.' },
-  // the subscribe card (#191). {view} is the tile's name. unlock_done: Klaviyo HQ's draft, Jason has not seen it; unlock_consent: Jason's own text (2026-11-03). FR reviewed by the website HQ 2026-10-31 ("la vue {view}", so any view name reads right), except unlock_done: still a draft
+  // the subscribe card (#191). {view} is the tile's name. unlock_consent and unlock_done: Jason's own pick (2026-11-03). FR reviewed by the website HQ 2026-10-31 ("la vue {view}", so any view name reads right)
   unlock_title: { en: 'Unlock {view}', fr: 'Débloquer la vue {view}' },
   unlock_locked: { en: '{view}, locked: subscribe to unlock', fr: 'Vue {view} verrouillée : abonnez-vous pour la débloquer' },
   unlock_text: { en: 'Subscribe with your email first, and {view} opens right away.', fr: 'Abonnez-vous d’abord avec votre courriel : la vue {view} s’ouvre aussitôt.' },
-  unlock_done: { en: 'You’re in. {view} is unlocked.', fr: 'C’est fait. {view} est débloquée.' },
+  unlock_done: { en: 'You’re in. {view} is unlocked.', fr: 'C’est fait. La vue {view} est débloquée.' }, // Jason confirmed 2026-11-03 (via Lab HQ): EN unchanged, FR with “La vue”
   back_to_lake: { en: 'Back to the lake', fr: 'Retour au lac' },
   unlock_email: { en: 'Email', fr: 'Courriel' },
   unlock_cta: { en: 'Subscribe and unlock', fr: 'M’abonner et débloquer' },
