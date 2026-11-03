@@ -3952,3 +3952,8 @@ Numbered log. Newest at the bottom.
      beam sit clear of the phone and the captions; stills and previews are checked for it. The 10-28 Mini film's deep-water shot
      broke this (the Down beam ran behind the phone); the base brief `docs/2026-11-03-ad-base-brief.md` reframes it from almost
      straight above.
+220. **2026-11-03** — **The Lab's shop button says "buy" in every language, whether or not that market sells online** (Jason in "Lab 多语言":
+     “不用管能不能下单，你就这么做就可以了”, after the chat found that the Lab pages for German, Dutch, Polish and Latvian (and French on
+     /fr-fr, /fr-benelux, English on /en-de…) land on store pages that only list dealers).
+     - de "{name} kaufen", nl "Koop de {name}", pl "Kup {name}", lv "Pirkt {name}"; French "Achetez le {name}" and English "Shop {name}" unchanged.
+     - No per-market button text. Table: `docs/2026-11-03-lab-strings-5lang.md` (section 7, item 3).

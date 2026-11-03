@@ -4,7 +4,7 @@
 `src/experiments/2026-09-23-sonar-lake-3d/i18n.js` 里的键（来源：i18n.js @ e715574，每个键都在代码里查过用在哪）。
 
 **状态（11-03 核完）：Lab 自己核（#214，Jason 11-03）。** 能核的都标了 “Lab 已核”，每条写了依据。
-拿不准的 3 条单独列在第七节（第 3 条 11-03 #217 后扩到德、荷、波、拉 4 种），**没有硬定**，表里写“拿不准”，给了几个备选。
+拿不准的单独列在第七节，**还剩 2 条**（第 3 条去商店按钮 Jason 11-03 定了写“买”，#220），**没有硬定**，表里写“拿不准”，给了几个备选。
 教程四句说明（`tour_*_text`）的英文 Jason 11-03 定了用现在的（#215），已翻已核；分享框标题和下面那句（`share_title`、`share_line`）的英文还没定，照旧空着。
 下一步：HQ 先给 Jason 看，再交给 Base 放进 `i18n.js`。这份表本身不改任何代码。
 
@@ -60,7 +60,7 @@
 | mode_panoramic | 同上 | Panoramic | Panoramique | Panorama | Panoramisch | Panoramiczny | Panorāma | 翻 | fr 网站已核；de nl pl lv Lab 已核 | 店de 两种写法都以 Panorama 开头；店nl “Panoramisch”；PP “Widok panoramiczny”；lv：Garmin 没有这个视图，用普通词 panorāma |
 | mode_combo | 同上（Mini） | Combo | Combinée | Kombi | Combo | Łączony | Kombinētais | 翻 | fr 网站已核；de nl pl lv Lab 已核 | 店de “Kombi-Ansicht”、App “Live-Kombi”；店nl “Combo”；PP “Widok łączony”；G-LV “kombinētajos ekrānos”（lv 偏长，界面设计看宽度） |
 | desc_lake | 面板下的一句 | {device} · {beam} beam. Drag the boat — whatever the beam touches lights up. | {device} · faisceau de {beam}. Faites glisser le bateau : tout ce que le faisceau touche s’allume. | {device} · {beam}-Kegel. Ziehen Sie das Boot – alles, was der Kegel erfasst, leuchtet auf. | {device} · {beam}-bundel. Versleep de boot – alles wat de bundel raakt, licht op. | {device} · wiązka {beam}. Przeciągnij łódź – wszystko, czego dotknie wiązka, podświetla się. | {device} · {beam} stars. Velciet laivu – viss, ko skar stars, izgaismojas. | 翻 | fr 网站已核；de nl pl lv Lab 已核 | de：GL beam=Kegel、G-DE “Kegel” 13 处（店de 首页规格写 “135°-Strahlwinkel”，是“波束角”，句子里用 Kegel）；店de “Ziehen Sie den Schieberegler”。nl：店nl “135°-bundel”“Versleep de schuifregelaar”。pl：PP “Szeroka wiązka 135°”、G-PL “przeciągnij”。lv：G-LV “stars / staru zona”“velciet”“izgaismojas” |
-| shop | 面板的去商店按钮 | Shop {name} | Achetez le {name} | 拿不准 | 拿不准 | 拿不准 | 拿不准 | 翻（照店铺按钮） | fr 网站已核（/fr 能买；/fr-fr、/fr-benelux 不能买，见第七节第 3 条）；**de nl pl lv 拿不准，见第七节第 3 条** | 这 4 种语言的 Lab 落地的店铺页都不能网上下单 |
+| shop | 面板的去商店按钮 | Shop {name} | Achetez le {name} | {name} kaufen | Koop de {name} | Kup {name} | Pirkt {name} | 翻（照店铺按钮） | fr 网站已核；de nl pl lv Lab 已核（Jason 11-03：“不用管能不能下单”，写“买”，#220） | fr 店fr “Achetez le PingLive Mini”；de 店de 首页 “Jetzt einkaufen” 的 kaufen；nl 店nl 首页 “Shop nu” 的意思，用本地动词 kopen；pl PP “Kup PingLive Mini”；lv garmin.com/lv-LV “Pirkt” |
 | shop_opening | 点了去商店后 1 秒 | Opening the store… | Ouverture de la boutique… | Shop wird geöffnet… | Winkel wordt geopend… | Otwieranie sklepu… | Veikals tiek atvērts… | 翻 | fr 网站已核；de nl pl lv Lab 已核 | 主题de “Lädt…” 的句式；店nl “Winkelwagen / Winkelpunten”；PP “Sklep internetowy”；lv 普通词 veikals |
 
 ## 二、湖上的提示
@@ -154,7 +154,7 @@ nl、lv 的 App 没有这两种语言，留英文。de、pl 是 App 原字（网
 | range_fwd | Forward range | Zasięg do przodu | Range forward | Diapazons uz priekšu | Range forward | = |
 | mode_down / forward / panoramic / combo | Down / Forward / Panoramic / Combo | W dół / Do przodu / Panoramiczny / Łączony | Down / Forward / Panoramic / Combined | Uz leju / Uz priekšu / Panorāma / Kombinētais | Down / Forward / Panorama / Combined | = |
 | desc_lake | {device} · {beam} beam. Drag the boat — whatever the beam touches lights up. | {device} · wiązka {beam}. Przeciągnij łódź – wszystko, czego dotknie wiązka, podświetla się. | {device} · {beam} beam. Drag the boat – everything the beam touches lights up. | {device} · {beam} stars. Velciet laivu – viss, ko skar stars, izgaismojas. | {device} · {beam} beam. Drag the boat – everything the beam touches lights up. | = |
-| shop | Shop {name} | （拿不准：A Kup {name} / B Zobacz {name}） | A Buy {name} / B See {name} | （拿不准：A Pirkt {name} / B Apskatīt {name}） | A Buy {name} / B See {name} | 见第七节第 3 条 |
+| shop | Shop {name} | Kup {name} | Buy {name} | Pirkt {name} | Buy {name} | = |
 | shop_opening | Opening the store… | Otwieranie sklepu… | Opening the store… | Veikals tiek atvērts… | The store is being opened… | = |
 | hint_boat | Drag the boat to move it | Przeciągnij łódź, aby ją przesunąć | Drag the boat to move it | Velciet laivu, lai to pārvietotu | Drag the boat to move it | = |
 | shore_edge | Shoreline — the lake ends here | Linia brzegowa – tu kończy się jezioro | Shoreline – the lake ends here | Krasta līnija – šeit ezers beidzas | Shoreline – the lake ends here | = |
@@ -194,7 +194,7 @@ nl、lv 的 App 没有这两种语言，留英文。de、pl 是 App 原字（网
 - 波兰语只对照了 Prime Power 网店和 Garmin，还没请 Prime Power 的人看过。按网站 #178 的办法，是 Jason 看过这份结果后，再定要不要请 Prime Power 复核。
 - 拉脱维亚语只对照了 Garmin 的手册，没有人工复核，也没有母语者看过。
 
-## 七、拿不准的 3 条（没有硬定，等定了再填进表）
+## 七、拿不准的（没有硬定，等定了再填进表；还剩第 1、2 条）
 
 1. **range_down（Mini Combo 的第二个量程，英文 “Down range”）：照字面翻，还是照 Garmin 写成“深度量程”？**
    - Garmin 的 LiveScope 设置里，“Forward Range” 配的是 “Depth Range”，五种语言手册都这样写：
@@ -207,23 +207,9 @@ nl、lv 的 App 没有这两种语言，留英文。de、pl 是 App 原字（网
    - 线上店铺两种都有：PingLive 产品页写 “Panoramablick”，首页写 “Panoramaansicht”。glossary 写 Panoramaansicht，App 写 Panoramablick。
    - A：Tippen Sie auf „Panoramablick“。B：Tippen Sie auf „Panoramaansicht“。
    - 倾向 A：跟旁边手机里 App 的格子是同一个字，也跟 PingLive 产品页一致。
-3. **去商店按钮 shop（“Shop {name}”）：德、荷、波兰、拉脱维亚 4 种都拿不准。**（11-03 #217 后重查过）
-   - 这 4 种语言的 Lab 都放在不能网上下单的店铺页里（链接见 `docs/lab-links-sheet.md`）。11-03 抓了这些店铺页的 PingLive 产品页，
-     按钮全是找经销商：
-     - /de-de “Verfügbarkeit prüfen →”、/de-benelux “Einzelhandelsstandorte →”；
-     - /nl-benelux “Winkelpunten →”；
-     - /en-pl “WHERE TO BUY”（波兰只展示、不能网上下单）；
-     - /en-ro “Find Retail Locations →”（拉脱维亚在罗马尼亚市场里）。
-   - 首页按钮是 “Jetzt einkaufen” / “Shop nu”。Lab 的按钮点了去的就是产品页。
-   - A 写“买”：{name} kaufen / Koop de {name} / Kup {name} / Pirkt {name}（波兰语照 PP 的 “Kup PingLive Mini”，拉脱维亚语照 garmin.com/lv-LV 的 “Pirkt”）。
-   - B 写“看”：{name} ansehen / Bekijk de {name} / Zobacz {name} / Apskatīt {name}（拉脱维亚语照 garmin.com/lv-LV 的 “Apskatiet…”）。
-   - C 照首页：Jetzt einkaufen / Shop nu（波兰语、拉脱维亚语没有对应的店铺原字）。
-   - 倾向 B：落地的页面不能直接买，写“买”会让人以为能下单。
-   - **同一个问题也在法语和英文里，不只是这次的新语言：**
-     - /fr 能买（“Ajouter au panier”）；但 /fr-fr、/fr-benelux 的法语 Lab 按钮是 “Achetez le {name}”，落地页只有 “Points de vente →”。
-     - 英文 Lab 放在 /en-de、/en-pl、/en-ro 这些不能下单的市场里，按钮也写 “Shop {name}”。
-     - 要彻底解决，按钮的字就得跟着市场走、不跟着语言走。这是代码的事（对接 / Base），不在这张表里，交 HQ 定。
-     - 这张表只给 B 方案的字。
+3. ~~去商店按钮 shop 写“买”还是“看”~~ → **定了：写“买”**（Jason 11-03 在本窗口：“不用管能不能下单，你就这么做就可以了”，#220）。
+   - de {name} kaufen、nl Koop de {name}、pl Kup {name}、lv Pirkt {name}，已填进第一节。
+   - 法语 “Achetez le {name}”、英文 “Shop {name}” 都不改；“按钮跟着市场走”也不做了。
 
 ## 八、永远不翻（原样）
 
@@ -257,9 +243,9 @@ App Store、Google Play、“ACCUPHY | LAB” 标题、AUTO、数字和单位、
   - 法：/fr、/fr-fr、/fr-benelux；
   - 德：/de-de、/de-benelux；
   - 荷：/nl-benelux；
-  - 波兰：/en-pl/pages/lab?lang=pl；
-  - 拉脱维亚：/en-ro/pages/lab?lang=lv。
-- 罗马尼亚 /ro-ro、巴拉圭 /es-py 照旧英文。每页都点一次“去商店”，看落地页和按钮的字对不对得上（第七节第 3 条）。
+  - 波兰：主站 shop.accuphy.com/pages/lab?lang=pl（#218；网站给波兰市场加上波兰语以后，改看波兰市场页）；
+  - 拉脱维亚：主站 shop.accuphy.com/pages/lab?lang=lv（#218）。
+- 罗马尼亚 /ro-ro、巴拉圭 /es-py 照旧英文。每页都点一次“去商店”，看它去对店铺。
 
 ## 记录
 
@@ -280,3 +266,4 @@ App Store、Google Play、“ACCUPHY | LAB” 标题、AUTO、数字和单位、
   依据同上（法语照已核的旧步骤卡句子，德、荷照店铺产品页的视图说明，波兰语照 PP），波兰语、拉脱维亚语翻回英文对过。
 - 2026-11-03 Lab 多语言：#217 后重查去商店按钮：德、荷、波、拉的 Lab 落地店铺页都不能网上下单，shop 一行 pl、lv 也改成拿不准；
   法语 /fr-fr、/fr-benelux 和英文的同类问题记进第七节第 3 条；加了检查用的店铺链接。
+- 2026-11-03 Lab 多语言：Jason 在本窗口定了去商店按钮写“买”（#220），填进 de / nl / pl / lv；拿不准剩 2 条。检查链接照 #218 改成主站。
