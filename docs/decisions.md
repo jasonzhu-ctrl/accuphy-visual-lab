@@ -4070,3 +4070,9 @@ Numbered log. Newest at the bottom.
        framed by `/pages/sonarlab-mktbf2026` (#229). Same name front and back.
      - Base changes reach the two copies only when Jason says so (as #216). Neither copy covers the base (#228). #232 holds.
      - Supersedes #228's "base keeps lab.accuphy.ca /": lab.accuphy.ca `/` now serves the website-embed copy (today identical to 96fdc22).
+
+234. **2026-11-03** — **MKT go-live waits for the multi-language work; unlock_done settled** (Jason in Lab HQ, cards: on unlock_done
+     EN “You’re in. {view} is unlocked.” unchanged, FR “C’est fait. La vue {view} est débloquée.”: “可以”; on “MKT 版上线要不要等多语言做完？”: “等多语言一起上”).
+     - lab.accuphy.ca/mktbf2026/ goes live only after #212 is reviewed and in (all languages at once); then the order stays: /mktbf2026/
+       live (store links not yet in ads) → website 03 real sign-up → links to ads.
+     - The multi-language blocker left: the share box's two English lines (share_title, share_line).
