@@ -3911,6 +3911,8 @@ Numbered log. Newest at the bottom.
        38 px (1280: de 40.9–44 px, nl 44.6–45.9, pl 41.7, lv 41.8–43.1; at 1440 none shrinks); phone at most two lines at 30 px with
        `text-wrap: balance`, else 26 px (only nl "Tik op Panoramische weergave"). Measured after fonts load and on resize. English: the
        same size and lines as the commit before (1280, 1440, 390).
+       Then (界面设计): one desktop size per language for the whole tour — the smallest the page's three titles need, measured in a hidden
+       twin (1280: de 40.9, nl 44.6, pl 41.7, lv 41.8 px; English and French 46). The phone keeps its per-title rule.
      Plan: `docs/2026-11-03-multilang-base-plan.md`.
 
 213. **2026-11-03** — **Black Friday locked version: a copy of the base with the #191 lock on, and it takes over the store's Lab**

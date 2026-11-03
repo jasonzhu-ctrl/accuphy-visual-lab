@@ -49,7 +49,8 @@ export default function Tour({ script, auto, phone, mode, deviceId, state, onSho
   const [armed, setArmed] = useState(false) // past the 0.6 s guard of a new card
   const ring = useRef(null), marks = useRef({}), ptile = useRef(null), titleEl = useRef(null)
   // the title fits (界面设计 11-03, the long de / nl / pl / lv titles): desktop on one line, its size (46 px) shrinking to no less than
-  // 38 px; phone in at most two lines at 30 px, else 26 px. A title that fits keeps its size, so English never changes.
+  // 38 px, one size for the whole tour (the smallest the page's titles need, so the heading does not resize from stop to stop);
+  // phone in at most two lines at 30 px, else 26 px for that title. Titles that fit keep their size, so English never changes.
   useLayoutEffect(() => {
     const el = titleEl.current
     if (!el) return
@@ -63,9 +64,12 @@ export default function Tour({ script, auto, phone, mode, deviceId, state, onSho
       }
       const card = el.parentElement, cs = getComputedStyle(card)
       const room = card.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight)
-      el.style.whiteSpace = 'nowrap'
-      const r = document.createRange(); r.selectNodeContents(el); const w = r.getBoundingClientRect().width
-      el.style.whiteSpace = ''
+      const probe = el.cloneNode(false) // a hidden twin at the CSS size, one line, for every title of this tour
+      probe.removeAttribute('style'); Object.assign(probe.style, { position: 'absolute', left: '0', top: '0', visibility: 'hidden', whiteSpace: 'nowrap' })
+      card.appendChild(probe)
+      let w = 0
+      for (const st of sc.stops) { probe.textContent = t(`tour_${st.key}_title`); const r = document.createRange(); r.selectNodeContents(probe); w = Math.max(w, r.getBoundingClientRect().width) }
+      probe.remove()
       if (w > room) el.style.fontSize = `${Math.max(38, Math.min(base, Math.floor((base * room) / w * 10) / 10))}px` // the width scales with the size (the letter spacing is in em)
     }
     fit()
