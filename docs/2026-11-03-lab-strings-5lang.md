@@ -4,7 +4,7 @@
 `src/experiments/2026-09-23-sonar-lake-3d/i18n.js` 里的键（来源：i18n.js @ e715574，每个键都在代码里查过用在哪）。
 
 **状态（11-03 核完）：Lab 自己核（#214，Jason 11-03）。** 能核的都标了 “Lab 已核”，每条写了依据。
-拿不准的单独列在第七节，**还剩 2 条**（第 3 条去商店按钮 Jason 11-03 定了写“买”，#220），**没有硬定**，表里写“拿不准”，给了几个备选。
+拿不准的 3 条都定了（第七节：#220、#221），表里已经没有空格，只剩分享框两句等英文，**没有硬定**，表里写“拿不准”，给了几个备选。
 教程四句说明（`tour_*_text`）的英文 Jason 11-03 定了用现在的（#215），已翻已核；分享框标题和下面那句（`share_title`、`share_line`）的英文还没定，照旧空着。
 下一步：HQ 先给 Jason 看，再交给 Base 放进 `i18n.js`。这份表本身不改任何代码。
 
@@ -54,7 +54,7 @@
 | range | 面板 | Range | Portée | Reichweite | Bereik | Zasięg | Diapazons | 翻 | fr 网站已核；de nl pl lv Lab 已核 | 店de “Reichweite & Tiefe”“Maximale Reichweite”（G-DE 设置项写 Bereich，照店铺）；店nl “Bereik & diepte”、G-NL “Bereik:”；PP “Maksymalny zasięg”、G-PL “Zasięg:”；G-LV “Diapazons:” |
 | auto_follows | 面板，Down 视图时 | AUTO · follows the water | AUTO · suit la profondeur | AUTO · folgt der Wassertiefe | AUTO · volgt de waterdiepte | AUTO · dopasowuje się do głębokości | AUTO · seko ūdens dziļumam | 翻（AUTO 不翻） | fr 网站已核；de nl pl lv Lab 已核 | 店de “Tiefe”；店nl “diepte”；G-PL “głębokość”；G-LV “dziļums”；G 的 Auto 范围说明是同一个意思（量程跟着水深变） |
 | range_fwd | 面板，Mini 的 Combo | Forward range | Portée avant | Reichweite nach vorne | Voorwaarts bereik | Zasięg do przodu | Diapazons uz priekšu | 翻 | 全部 Lab 已核 | G-DE “Reichweite nach vorne:”；G-NL “Voorwaarts bereik:”；G-PL “Zasięg do przodu:”；G-LV “attāluma uz priekšu diapazons”（设置项叫 Priekšupgaita，太怪不用）；fr 照店fr “Vue avant” 的短写（G-FR “Portée vers l’avant”） |
-| range_down | 面板，Mini 的 Combo | Down range | 拿不准 | 拿不准 | 拿不准 | 拿不准 | 拿不准 | 翻 | **拿不准，见第七节第 1 条** | — |
+| range_down | 面板，Mini 的 Combo | Down range | Portée de la profondeur | Tiefenbereich | Dieptebereik | Zakres głębokości | Dziļuma diapazons | 翻 | 全部 Lab 已核（Jason 11-03：照 Garmin，#221） | Garmin LiveScope 设置里跟 Forward Range 配对的 Depth Range：G-FR “Portée de la profondeur”、G-NL “Dieptebereik”、G-PL “Zakres głębokości”、G-LV “Dziļuma diapazons”；de：G-DE 这一项写 “Mögliche Reichweite”（不通顺），用 GL depth-range 和 G-DE 别处的 “Tiefenbereich”；nl 也跟 GL 一致 |
 | mode_down | 视图胶囊；教程卡上的视图按钮 | Down | Bas | Abwärts | Omlaag | W dół | Uz leju | 翻 | fr 网站已核；de nl pl lv Lab 已核 | 店de “Abwärtsansicht”；店nl “Omlaag”（“3 weergavemodi • Omlaag • Vooruit • Panoramisch”）；PP “Widok w dół”；G-LV “skats uz leju” |
 | mode_forward | 同上 | Forward | Avant | Vorwärts | Vooruit | Do przodu | Uz priekšu | 翻 | fr 网站已核；de nl pl lv Lab 已核 | 店de “Vorwärtsansicht”“Live vorwärts”；店nl “Vooruit”；PP “Widok do przodu”；G-LV “skats uz priekšu” |
 | mode_panoramic | 同上 | Panoramic | Panoramique | Panorama | Panoramisch | Panoramiczny | Panorāma | 翻 | fr 网站已核；de nl pl lv Lab 已核 | 店de 两种写法都以 Panorama 开头；店nl “Panoramisch”；PP “Widok panoramiczny”；lv：Garmin 没有这个视图，用普通词 panorāma |
@@ -85,7 +85,7 @@ PingLive：拖船（Down）→ 点 Forward → 点 Panoramic；Mini：拖船（C
 | tour_drag_text | 第 1 站说明 | Whatever the beam touches shows up live in the Accuphy Sonar app. | Tout ce que le faisceau touche apparaît en direct dans l’application Accuphy Sonar. | Alles, was der Kegel erfasst, erscheint live in der Accuphy Sonar-App. | Alles wat de bundel raakt, zie je live in de Accuphy Sonar-app. | Wszystko, czego dotknie wiązka, widać na żywo w aplikacji Accuphy Sonar. | Viss, ko skar stars, reāllaikā parādās lietotnē Accuphy Sonar. | 翻 | 全部 Lab 已核（英文 Jason 11-03 定，#215） | fr：已核 s2_text “en direct … dans l’application Accuphy Sonar”、desc_lake “tout ce que le faisceau touche”；de：desc_lake 的 Kegel、店de Mini 页 “mit der Accuphy Sonar-App”“Live-Bild”；nl：店nl “met de Accuphy Sonar-app”“live beelden”；pl：PP “Widok na żywo”“aplikacji Accuphy Sonar”；lv：G-LV “reāllaikā skatīt”、garmin.com/lv-LV “Aplūkojiet zemūdens pasauli reāllaikā” |
 | tour_fwd_title | 第 2 站标题 | Tap Forward View | Touchez la vue avant | Tippen Sie auf „Vorwärtsansicht“ | Tik op Voorwaartse weergave | Dotknij widoku do przodu | Pieskarieties skatam uz priekšu | 翻 | 全部 Lab 已核 | 店fr “Vue avant”；店de “Vorwärtsansicht”（GL 写 Sicht nach vorne，照线上）；店nl “Voorwaartse weergave”、G-NL “Tik op”；PP “Widok do przodu”；G-LV “skats uz priekšu”“pieskarieties + 与格” |
 | tour_fwd_text | 第 2 站说明 | The beam turns to look ahead of the boat — where you cast. | Le faisceau se tourne vers l’avant du bateau : là où vous lancez. | Der Kegel dreht sich und blickt vor das Boot – dorthin, wo Sie auswerfen. | De bundel draait naar voren, voor de boot – daar waar je werpt. | Wiązka obraca się i patrzy przed łódź – tam, gdzie zarzucasz. | Stars pagriežas uz priekšu, laivas priekšā – tur, kur metat ēsmu. | 翻 | 全部 Lab 已核（英文 Jason 11-03 定，#215） | fr：已核步骤 3 “la vue avant, pour lancer dessus”、已核步骤 2 “l’oriente devant le bateau”；de：店de “Frontansicht für verschiedene Angelszenarien”，auswerfen = 抛竿；nl：店nl “Kijk in realtime voor uw boot”，werpen = 抛竿；pl：PP “Obserwuj obszar przed łodzią”，zarzucać = 抛竿；lv：G-LV “laivas priekšā vai zem laivas”，抛竿 Garmin 没有，用常用的 mest ēsmu（抛饵） |
-| tour_pano_title | PingLive 第 3 站标题 | Tap Panoramic View | Touchez la vue panoramique | 拿不准 | Tik op Panoramische weergave | Dotknij widoku panoramicznego | Pieskarieties panorāmas skatam | 翻 | fr nl pl lv Lab 已核；**de 拿不准，见第七节第 2 条** | 店fr “Vue panoramique”；店nl “Panoramische weergave”；PP “Widok panoramiczny” |
+| tour_pano_title | PingLive 第 3 站标题 | Tap Panoramic View | Touchez la vue panoramique | Tippen Sie auf „Panoramablick“ | Tik op Panoramische weergave | Dotknij widoku panoramicznego | Pieskarieties panorāmas skatam | 翻 | 全部 Lab 已核（de：Jason 11-03 “你查一查定吧”，Lab 定 Panoramablick，#221） | 店fr “Vue panoramique”；店de PingLive 产品页 “Panoramablick”，App 格子也是 “Panoramablick”（店de 首页和 GL 写 Panoramaansicht，少数，不用）；店nl “Panoramische weergave”；PP “Widok panoramiczny” |
 | tour_pano_text | PingLive 第 3 站说明 | A wide sweep ahead of the boat — to find fish and structure. | Un large balayage devant le bateau : pour repérer poissons et structures. | Ein breiter Scan vor dem Boot – um Fische und Strukturen zu erkennen. | Een brede scan voor de boot – om vissen en structuren te spotten. | Szerokie skanowanie przed łodzią – do odnajdywania ryb i struktur. | Plaša skenēšana laivas priekšā – lai atrastu zivis un struktūras. | 翻 | 全部 Lab 已核（英文 Jason 11-03 定，#215） | fr：已核步骤 3 “scanne de larges zones pour repérer poissons et structures”；de：店de “scannt große Bereiche, um Strukturen und Fische leicht zu erkennen”；nl：店nl “scan grote gebieden om gemakkelijk structuren en vissen te spotten”；pl：PP “skanowanie dużego obszaru i łatwiejsze odnajdywanie ryb”“podwodne struktury”；lv：G-LV “skenēšana”“struktūra un zivis” |
 | tour_down_title | Mini 第 3 站标题 | Tap Down View | Touchez la vue vers le bas | Tippen Sie auf „Abwärtsansicht“ | Tik op Neerwaartse weergave | Dotknij widoku w dół | Pieskarieties skatam uz leju | 翻 | 全部 Lab 已核 | 店fr “Vue vers le bas”；店de “Abwärtsansicht”；店nl “Neerwaartse weergave”；PP “Widok w dół”；G-LV “skats uz leju” |
 | tour_down_text | Mini 第 3 站说明 | The beam points straight under the boat — see what’s right below. | Le faisceau pointe droit sous le bateau : voyez ce qui se trouve juste en dessous. | Der Kegel zeigt direkt unter das Boot – Sie sehen, was genau darunter ist. | De bundel wijst recht onder de boot – zie wat er direct onder je zit. | Wiązka skierowana jest prosto pod łódź – zobacz, co jest tuż pod nią. | Stars vērsts taisni zem laivas – redziet, kas atrodas tieši apakšā. | 翻 | 全部 Lab 已核（英文 Jason 11-03 定，#215） | fr：已核 “pêcher à la verticale”、店fr “Vue vers le bas … sous votre bateau”；de：店de “die Aktivität unter Ihrem Boot … direkt unter einem Eisloch”；nl：店nl “direct onder uw vaartuig”“de activiteit onder je boot”；pl：PP “bezpośrednio pod łodzią”、G-PL “wiązką skierowaną w dół”；lv：G-LV “zem laivas” |
@@ -152,6 +152,7 @@ nl、lv 的 App 没有这两种语言，留英文。de、pl 是 App 原字（网
 | range | Range | Zasięg | Range | Diapazons | Range | = |
 | auto_follows | AUTO · follows the water | AUTO · dopasowuje się do głębokości | AUTO · adjusts to the depth | AUTO · seko ūdens dziļumam | AUTO · follows the water depth | 意思一样（量程跟着水深走），pl 说“调到水深” |
 | range_fwd | Forward range | Zasięg do przodu | Range forward | Diapazons uz priekšu | Range forward | = |
+| range_down | Down range | Zakres głębokości | Depth range | Dziļuma diapazons | Depth range | 故意照 Garmin 写“深度量程”（#221）；Down 视图的量程就是深度 |
 | mode_down / forward / panoramic / combo | Down / Forward / Panoramic / Combo | W dół / Do przodu / Panoramiczny / Łączony | Down / Forward / Panoramic / Combined | Uz leju / Uz priekšu / Panorāma / Kombinētais | Down / Forward / Panorama / Combined | = |
 | desc_lake | {device} · {beam} beam. Drag the boat — whatever the beam touches lights up. | {device} · wiązka {beam}. Przeciągnij łódź – wszystko, czego dotknie wiązka, podświetla się. | {device} · {beam} beam. Drag the boat – everything the beam touches lights up. | {device} · {beam} stars. Velciet laivu – viss, ko skar stars, izgaismojas. | {device} · {beam} beam. Drag the boat – everything the beam touches lights up. | = |
 | shop | Shop {name} | Kup {name} | Buy {name} | Pirkt {name} | Buy {name} | = |
@@ -194,22 +195,16 @@ nl、lv 的 App 没有这两种语言，留英文。de、pl 是 App 原字（网
 - 波兰语只对照了 Prime Power 网店和 Garmin，还没请 Prime Power 的人看过。按网站 #178 的办法，是 Jason 看过这份结果后，再定要不要请 Prime Power 复核。
 - 拉脱维亚语只对照了 Garmin 的手册，没有人工复核，也没有母语者看过。
 
-## 七、拿不准的（没有硬定，等定了再填进表；还剩第 1、2 条）
+## 七、拿不准的（3 条都定了）
 
-1. **range_down（Mini Combo 的第二个量程，英文 “Down range”）：照字面翻，还是照 Garmin 写成“深度量程”？**
-   - Garmin 的 LiveScope 设置里，“Forward Range” 配的是 “Depth Range”，五种语言手册都这样写：
-     fr Portée de la profondeur、de Mögliche Reichweite（GL 是 Tiefenbereich）、nl Dieptebereik、pl Zakres głębokości、lv Dziļuma diapazons。
-   - A 照字面：Portée vers le bas / Reichweite nach unten / Bereik omlaag / Zasięg w dół / Diapazons uz leju。跟英文、跟 range_fwd 成对。
-   - B 照 Garmin：Portée de la profondeur / Tiefenbereich / Dieptebereik / Zakres głębokości / Dziļuma diapazons。
-     用别家声纳的钓友看着熟，glossary 的 depth-range 一行也是这些词。
-   - 倾向 B。但 B 的意思是“深度量程”，跟英文 “Down range” 不完全一样，要不要连英文一起改成 “Depth range”，该 Jason 定。
-2. **德语 Panoramic View 叫 Panoramablick 还是 Panoramaansicht？** 只影响教程第 3 站标题 tour_pano_title；视图胶囊两种都写 “Panorama”。
-   - 线上店铺两种都有：PingLive 产品页写 “Panoramablick”，首页写 “Panoramaansicht”。glossary 写 Panoramaansicht，App 写 Panoramablick。
-   - A：Tippen Sie auf „Panoramablick“。B：Tippen Sie auf „Panoramaansicht“。
-   - 倾向 A：跟旁边手机里 App 的格子是同一个字，也跟 PingLive 产品页一致。
-3. ~~去商店按钮 shop 写“买”还是“看”~~ → **定了：写“买”**（Jason 11-03 在本窗口：“不用管能不能下单，你就这么做就可以了”，#220）。
-   - de {name} kaufen、nl Koop de {name}、pl Kup {name}、lv Pirkt {name}，已填进第一节。
-   - 法语 “Achetez le {name}”、英文 “Shop {name}” 都不改；“按钮跟着市场走”也不做了。
+1. ~~range_down 照字面还是照 Garmin~~ → **照 Garmin**（Jason 11-03：“照 Garmin 吧”，#221），写“深度量程”：
+   Portée de la profondeur / Tiefenbereich / Dieptebereik / Zakres głębokości / Dziļuma diapazons，已填进第一节。
+   英文 “Down range” 没改（i18n.js 的英文归 Base；要不要改成 “Depth range”，HQ 可以顺带问一句，不改也对得上意思）。
+2. ~~德语 Panoramablick 还是 Panoramaansicht~~ → **Panoramablick**（Jason 11-03：“你查一查定吧，我也不懂”，Lab 定，#221）。
+   理由：手机里 App 的格子就叫 Panoramablick，教程卡就在旁边，访客看到的是同一个字；店铺 PingLive 产品页也这么写。
+   Panoramaansicht 只在店铺首页一行和 glossary 里。
+3. ~~去商店按钮写“买”还是“看”~~ → **写“买”**（Jason 11-03：“不用管能不能下单，你就这么做就可以了”，#220）。
+   de {name} kaufen、nl Koop de {name}、pl Kup {name}、lv Pirkt {name}；法语、英文不改。
 
 ## 八、永远不翻（原样）
 
@@ -267,3 +262,4 @@ App Store、Google Play、“ACCUPHY | LAB” 标题、AUTO、数字和单位、
 - 2026-11-03 Lab 多语言：#217 后重查去商店按钮：德、荷、波、拉的 Lab 落地店铺页都不能网上下单，shop 一行 pl、lv 也改成拿不准；
   法语 /fr-fr、/fr-benelux 和英文的同类问题记进第七节第 3 条；加了检查用的店铺链接。
 - 2026-11-03 Lab 多语言：Jason 在本窗口定了去商店按钮写“买”（#220），填进 de / nl / pl / lv；拿不准剩 2 条。检查链接照 #218 改成主站。
+- 2026-11-03 Lab 多语言：Jason 定 range_down 照 Garmin；德语 Panoramic 名他让 Lab 定，定 Panoramablick（#221）。拿不准清零。

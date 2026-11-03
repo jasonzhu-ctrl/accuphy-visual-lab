@@ -3957,3 +3957,10 @@ Numbered log. Newest at the bottom.
      /fr-fr, /fr-benelux, English on /en-de…) land on store pages that only list dealers).
      - de "{name} kaufen", nl "Koop de {name}", pl "Kup {name}", lv "Pirkt {name}"; French "Achetez le {name}" and English "Shop {name}" unchanged.
      - No per-market button text. Table: `docs/2026-11-03-lab-strings-5lang.md` (section 7, item 3).
+221. **2026-11-03** — **The Mini Combo's second range follows Garmin's "Depth range"; German Panoramic is "Panoramablick"** (Jason in
+     "Lab 多语言": “照 Garmin 吧。然后第二个问题，你查一查定吧，我也不懂”).
+     - range_down: fr Portée de la profondeur, de Tiefenbereich, nl Dieptebereik, pl Zakres głębokości, lv Dziļuma diapazons (Garmin's
+       LiveScope pair to Forward Range; de from the glossary, as Garmin DE writes "Mögliche Reichweite" there). English "Down range" unchanged.
+     - German Panoramic View outside the phone: "Panoramablick", the app's own tile word and the PingLive product page's (the store home
+       and the glossary say Panoramaansicht). Only tour_pano_title uses it; the pill stays "Panorama".
+     - With #220 no open points are left in `docs/2026-11-03-lab-strings-5lang.md`; only share_title / share_line wait for English.
