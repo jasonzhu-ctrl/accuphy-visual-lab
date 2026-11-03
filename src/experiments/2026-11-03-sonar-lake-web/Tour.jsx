@@ -6,7 +6,7 @@
 // "Replay tour" afterwards; once seen (finished or skipped) it does not start by
 // itself again on this device. The page (index.jsx) owns the views: the tour only asks for them through `onShow`, and
 // tells the page which tile to light (`onState`). The base version has no lock: Combo shows during the tour.
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { sentEvents } from './embed'
 import { t } from './i18n'
 import ViewIcon from './ViewIcon'
@@ -47,7 +47,7 @@ export default function Tour({ script, auto, phone, mode, deviceId, state, onSho
   const [i, setI] = useState(0)
   const [vis, setVis] = useState('hidden') // hidden | in | check (the hold) | out
   const [armed, setArmed] = useState(false) // past the 0.6 s guard of a new card
-  const ring = useRef(null), marks = useRef({}), ptile = useRef(null)
+  const ring = useRef(null), marks = useRef({}), ptile = useRef(null), titleEl = useRef(null)
   const timers = useRef([])
   const later = (fn, ms) => { const id = setTimeout(fn, ms); timers.current.push(id); return id }
   useEffect(() => () => timers.current.forEach(clearTimeout), [])
@@ -154,6 +154,36 @@ export default function Tour({ script, auto, phone, mode, deviceId, state, onSho
     return () => cancelAnimationFrame(raf)
   }, [phase, vis, i, phone]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // The title in five languages (界面设计 11-03): on a desktop one line, shrunk to fit (at most the CSS size, 46 px at 1280, at least
+  // 38 px; still longer, it wraps, balanced); on a phone at most two lines at 30 px, else 26 px (Dutch "Tik op Panoramische weergave").
+  // English fits as it is, so it keeps its size.
+  useLayoutEffect(() => {
+    const el = titleEl.current
+    if (!el) return
+    const fit = () => {
+      el.style.fontSize = ''; el.style.whiteSpace = ''
+      const base = parseFloat(getComputedStyle(el).fontSize)
+      if (phone) {
+        if (el.getBoundingClientRect().height > base * 1.08 * 2 + 1) el.style.fontSize = Math.min(base, 26) + 'px'
+        return
+      }
+      el.style.whiteSpace = 'nowrap'
+      const min = Math.min(base, 38)
+      let size = base
+      if (el.scrollWidth > el.clientWidth) {
+        size = Math.max(min, Math.floor((base * el.clientWidth / el.scrollWidth) * 2) / 2)
+        el.style.fontSize = size + 'px'
+        while (el.scrollWidth > el.clientWidth && size > min) { size = Math.max(min, size - 0.5); el.style.fontSize = size + 'px' }
+      }
+      el.style.whiteSpace = ''
+    }
+    fit()
+    let on = true
+    document.fonts?.ready?.then(() => { if (on) fit() })
+    window.addEventListener('resize', fit)
+    return () => { on = false; window.removeEventListener('resize', fit) }
+  }, [phase, i, phone, script])
+
   if (phase === 'idle') return null
   const k = stop.key
   return (
@@ -169,7 +199,7 @@ export default function Tour({ script, auto, phone, mode, deviceId, state, onSho
           </div>
         )}
         <div className={`ac-tour-card is-${vis}`}>
-          <div className="ac-tour-title">{t(`tour_${k}_title`)}</div>
+          <div ref={titleEl} className="ac-tour-title">{t(`tour_${k}_title`)}</div>
           <div className="ac-tour-text">{t(stop.text || `tour_${k}_text`)}</div>
           <div className="ac-tour-dots">{sc.stops.map((_, n) => <i key={n} className={n < i || (n === i && (vis === 'check' || (vis === 'out' && phase === 'running' && doneRef.current))) ? 'is-done' : n === i ? 'is-on' : ''} />)}</div>
           {phone && stop.action === 'tile' && (
