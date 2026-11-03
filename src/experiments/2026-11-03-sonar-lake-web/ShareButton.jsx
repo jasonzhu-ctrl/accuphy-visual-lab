@@ -7,7 +7,7 @@
 // own address. Each send reports `share` { channel, market }. No reward wording anywhere (Meta forbids it).
 // Copy inside the store's iframe: clipboard.writeText needs allow="clipboard-write"; else execCommand('copy') on the
 // selected field; else the text stays selected with a "Press ⌘C" hint. Never window.prompt.
-import { useEffect, useId, useRef, useState } from 'react'
+import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import qrcode from 'qrcode-generator'
@@ -58,6 +58,29 @@ export default function ShareButton({ compact = false, thumb, className = '', st
 
   const onClick = (e) => { e.stopPropagation(); if (open) close(); else show('qr_shown') }
 
+  // Desktop (界面设计 11-03, via HQ): the box opens beside the panel, 14 px right of it, its bottom on the button's, at least 16 px
+  // inside the window top and bottom (above the button it ran 46–75 px off the top at 1280×800). It stays a child of the button's
+  // wrap (absolute, from the measured rects, against whatever box contains it): inside the panel's glass and motion `fixed` would be the panel's anyway, and it keeps
+  // the same inherited look. The arrow (buttons.css .is-side) points at the button and moves with the clamp.
+  const [side, setSide] = useState(false)
+  useLayoutEffect(() => { setSide(!phone && !!wrap.current?.closest('.ac-panel')) }, [phone])
+  useLayoutEffect(() => {
+    if (!open || !side) return
+    const place = () => {
+      const p = pop.current, panel = wrap.current?.closest('.ac-panel')
+      if (!p || !panel) return
+      const cb = p.offsetParent || panel, cr = cb.getBoundingClientRect() // the box's own containing block (its padding box)
+      const ox = cr.left + cb.clientLeft, oy = cr.top + cb.clientTop, br = opener.current.getBoundingClientRect(), h = p.offsetHeight
+      const top = Math.max(16, Math.min(br.bottom - h, window.innerHeight - 16 - h))
+      p.style.left = `${panel.getBoundingClientRect().right + 14 - ox}px`
+      p.style.top = `${top - oy}px`
+      p.style.setProperty('--ac-arrow-y', `${Math.max(16, Math.min(h - 16, br.top + br.height / 2 - top))}px`)
+    }
+    place()
+    window.addEventListener('resize', place)
+    return () => window.removeEventListener('resize', place)
+  }, [open, side, copied, pressHint])
+
   const copy = async () => {
     const url = shareUrl('copy')
     const done = () => { setCopied(true); setPressHint(false); clearTimeout(timer.current); timer.current = setTimeout(() => setCopied(false), 1500); labEvent('share', { channel: 'copy', market }) }
@@ -78,7 +101,7 @@ export default function ShareButton({ compact = false, thumb, className = '', st
       {/* the phone popover goes to <body>: inside the phone dock (a transformed element) position: fixed would be relative to the dock */}
       {(phone ? (n) => createPortal(n, document.body) : (n) => n)(<AnimatePresence>
         {open && (
-          <motion.div ref={pop} key="pop" id={id} role="dialog" aria-modal="false" aria-labelledby={`${id}-t`} className={`ac-share-pop ${phone ? 'is-phone' : ''}`}
+          <motion.div ref={pop} key="pop" id={id} role="dialog" aria-modal="false" aria-labelledby={`${id}-t`} className={`ac-share-pop ${phone ? 'is-phone' : side ? 'is-side' : ''}`}
             initial={phone ? { opacity: 0 } : { opacity: 0, y: 6, scale: 0.98 }} animate={phone ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }} exit={phone ? { opacity: 0 } : { opacity: 0, y: 4, scale: 0.98 }} transition={{ duration: 0.18, ease: 'easeOut' }}
             onPointerDown={(e) => e.stopPropagation()}> {/* phones: opacity only — the centring transform is the CSS's (.is-phone) */}
             <h3 id={`${id}-t`}>{t('share_title')}</h3>

@@ -239,6 +239,8 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
     rigCam: import.meta.env.DEV && /rigcam/.test(window.location.search), // ice: the hole kit up close
   })
   usePanelLabels(state) // the panel's label column, one width per language (界面设计 11-03)
+  const viewsEl = useRef(null)
+  useViewNames(viewsEl, modes.join())
   state.current.specs = liveSpecs
   state.current.ice = ICE
   state.current.specKey = specKey
@@ -372,7 +374,7 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
         </Row>
         <div>
           <span className="ac-label">{t('view')}</span>
-          <div className={`ac-views is-${modes.length}`}>{modes.map((m) => {
+          <div ref={viewsEl} className={`ac-views ac-views-fit is-${modes.length}`}>{modes.map((m) => {
             const locked = isLocked(deviceId, m) && !unlocked && !tour.on, active = mode === m
             return (
               <button key={m} type="button" className={`ac-view ${active ? 'is-active' : ''} ${locked ? 'is-locked' : ''} ${tour.tile === m ? 'is-tour-target' : ''}`} aria-pressed={active} aria-label={locked ? t('unlock_locked', { view: t(LOCKED_NAME[m]) }) : undefined} onClick={() => pickView(deviceId, m, 'panel')}>
@@ -573,6 +575,24 @@ function usePanelLabels(state) {
     document.fonts?.ready?.then(() => { if (on) fit() })
     return () => { on = false }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
+}
+// The view tiles' names (界面设计 11-03): they break between words only (buttons.css); if a word is still wider than its tile, the
+// whole row's names shrink together, 0.5 px a step, down to 10 px. English fits, so it keeps the CSS size (12 px, 11 px in a row of five).
+function useViewNames(ref, key) {
+  useLayoutEffect(() => {
+    const fit = () => {
+      const names = [...(ref.current?.querySelectorAll('.ac-view-name') || [])]
+      if (!names.length) return
+      for (const n of names) n.style.fontSize = ''
+      let size = parseFloat(getComputedStyle(names[0]).fontSize)
+      const over = () => names.some((n) => n.scrollWidth > n.clientWidth + 0.5)
+      while (over() && size > 10) { size = Math.max(10, size - 0.5); for (const n of names) n.style.fontSize = size + 'px' }
+    }
+    fit()
+    let on = true
+    document.fonts?.ready?.then(() => { if (on) fit() })
+    return () => { on = false }
+  }, [key]) // eslint-disable-line react-hooks/exhaustive-deps
 }
 function Row({ label, children, wide = false }) {
   return (

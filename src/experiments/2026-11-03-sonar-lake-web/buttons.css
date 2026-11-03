@@ -69,3 +69,17 @@ body .ac-share-pop.is-phone { top: 40%; } /* body: wins over src/index.css whate
 .ac-panel .ac-lab-rule { flex: none; width: 1px; height: 15px; margin-top: 0.43px; background: rgba(255, 255, 255, 0.3); }
 .ac-panel .ac-lab-title { margin-top: 4.66px; margin-right: -0.3em; font: 600 12.46px/1 'Instrument Sans', system-ui, sans-serif; letter-spacing: 0.3em;
   text-transform: uppercase; color: rgba(255, 255, 255, 0.72); }
+
+/* Five languages (界面设计 11-03, via HQ). Scoped to classes only this copy sets (ac-views-fit, is-side), so the base and MKT
+   copies are untouched even where the dev gallery loads every copy's CSS at once.
+   View tiles: names break between words only (src/index.css has overflow-wrap: anywhere: "Panoramiczn|y", "Kombinētai|s");
+   a word that still doesn't fit shrinks the whole row's names together (index.jsx, down to 10 px). The ice page's row of five:
+   3 px side padding instead of 5. */
+.ac-views-fit .ac-view-name { overflow-wrap: normal; }
+.ac-views-fit.is-5 .ac-view { padding-left: 3px; padding-right: 3px; }
+/* Desktop share box beside the panel, not above its button (it ran 46–75 px off the top at 1280×800): 14 px right of the panel,
+   its bottom on the button's, kept 16 px inside the window; ShareButton.jsx places it. The arrow on the left points at the
+   button and moves with it (--ac-arrow-y). */
+.ac-share-pop.is-side { bottom: auto; }
+.ac-share-pop.is-side::before { content: ''; position: absolute; left: -7px; top: var(--ac-arrow-y, 50%); width: 12px; height: 12px; margin-top: -6px;
+  background: rgba(14, 28, 36, 0.96); border-left: 1px solid rgba(255, 255, 255, 0.14); border-bottom: 1px solid rgba(255, 255, 255, 0.14); transform: rotate(45deg); }
