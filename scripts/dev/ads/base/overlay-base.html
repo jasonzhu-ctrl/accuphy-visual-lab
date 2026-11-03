@@ -85,15 +85,18 @@
       const o = ease(span(t, a + (key === 'open' ? 0.4 : 0.15), a + (key === 'open' ? 1.0 : 0.65))) * (1 - ease(span(t, b - 0.35, b)))
       cap.style.opacity = o; cap.style.transform = `translateY(${(1 - o) * 22}px)`
       const big = S.querySelector('.big'); big.classList.toggle('hidden', key !== 'angle')
-      if (key === 'angle') { // 39° while Forward, then counting with the fan to 78° as Combo opens (16.0–17.3 s)
-        const n = t < 16 ? 39 : Math.round(39 + 39 * clamp(info?.fan ?? 1)); big.innerHTML = `${n}°<small>${t < 16 ? 'FORWARD' : 'COMBO'}</small>` }
+      if (key === 'angle') { // r3: Combo from the first frame; the number counts with the fan as it opens (14.8–16.1 s) to 78°
+        const n = Math.round(78 * clamp(info?.fan ?? 1)); big.innerHTML = `${n}°<small>COMBO</small>` }
     } else cap.style.opacity = 0
     // the finger cue on the boat while it is dragged (shot 2): ring beats every 1.2 s like the tour; hand slides in from the right
     const drag = t >= 4.3 && t < 9.2 && info?.boat
     $('#cue').classList.toggle('hidden', !drag)
     if (drag) {
       const [x, y] = info.boat, k = ((t - 4.3) % 1.2) / 1.2, o = ease(span(t, 4.3, 4.8)) * (1 - ease(span(t, 8.8, 9.2)))
-      $('#cue .arc').setAttribute('stroke-dasharray', `${100 * span(t, 4.4, 8.6)} 100`) // the hold's progress, full when the drag ends
+      // r3 (Jason): the arc and the boat move together — the arc is the boat's own progress along the path (bx logged by
+      // film-base.mjs, 4.4 → 18.4), full when the boat has all but arrived; time-based only when bx is missing
+      const prog = info.bx != null ? clamp((info.bx - 4.4) / 14 / 0.985) : span(t, 4.4, 8.6)
+      $('#cue .arc').setAttribute('stroke-dasharray', `${100 * prog} 100`)
       $('#cue').style.transform = `translate(${x}px, ${y}px)`; $('#cue').style.opacity = o
       $('#cue .wave').style.transform = `scale(${1 + k * 0.9})`; $('#cue .wave').style.opacity = 1 - k
       $('#cue img').style.transform = `translate(${(1 - ease(span(t, 4.3, 5.0))) * 60}px, 0)`
