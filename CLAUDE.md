@@ -139,6 +139,8 @@ anyone's memory.
     the strings table, the website's review, follow-up. Writes no code; Base puts the reviewed text into `i18n.js`.
   - "Lab 营销版" (`local_5d3f1b7f-3e66-4a16-b3f1-2729d56f75f0`, #213, Jason 2026-11-03) — the Black Friday locked version: a copy of
     the base at `src/experiments/2026-11-03-sonar-lake-bf/` with the #191 lock always on. Changes only that copy; never the base folder.
+    Owner of the whole MKT version (#231): the copy, `build-bf-site.mjs`, the ad links (`docs/lab-links-sheet.md` §1), the MKT go-live
+    checklist. HQ manages it and does all coordination with the website / Klaviyo.
   - "Lab video creation" (`local_575bc8a6-28cd-4cfb-b367-63a0c78c335d`, Jason 2026-11-03: base 版本还需要参照之前做视频广告的模式做视频) —
     films from the standard base (86bf80e), by the `ad-video` skill; #185 still applies unless Jason widens it.
   - Shared files (`index.jsx`, `SonarChrome.jsx`, `ShareButton.jsx`, `UnlockCard.jsx`, `ShopButton.jsx`, `AppBadges.jsx`): look →

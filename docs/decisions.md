@@ -4041,3 +4041,11 @@ Numbered log. Newest at the bottom.
      The Australia market (/en-au, live since 10-12, English, AUD) was missing from HQ's list. Ad link by #229:
      https://shop.accuphy.com/en-au/pages/sonarlab-mktbf2026 (English); the base page /en-au/pages/lab exists (200). Told the website (page,
      geo test) and the BF funnel (ads, email). Which products Australia sells in the ads is for the BF funnel to confirm with Jason.
+
+231. **2026-11-03** — **"Lab 营销版" owns the whole MKT version; HQ manages it and coordinates with the website** (Jason in Lab HQ:
+     “这些都让Lab营销版窗口去做去管理 他是负责人 你这里管他和website那边的协调”).
+     - "Lab 营销版" owns and keeps: the locked copy, `scripts/build-bf-site.mjs`, the MKT / ad links (`docs/lab-links-sheet.md` §1),
+       `docs/2026-11-03-bf-locked-version-plan.md` and `docs/2026-11-03-mkt-link-rule-proposal.md`, the go-live checklist for
+       lab.accuphy.ca/bf/ and the MKT store page, the geo-test results for the ad links, moving #212/#224 in (#216/#226).
+     - HQ: dispatches, checks, and is the only one that talks to the website HQ (and the BF funnel / Klaviyo) about MKT; HQ builds
+       and deploys; anything live still needs Jason's 动 in Lab HQ (Lab) or website HQ (Shopify).
