@@ -5,7 +5,7 @@
 # Creative Cloud running (Eurostile Heavy). Runs: grade → merge info → comp (type) → sfx → encode → contact sheet.
 set -e
 PASSES=$1; WORK=$2; FPS=$3; OUT=$4
-HERE=${0:a:h}; REPO=${HERE:h:h:h:h}; TOOLS=${TOOLS:-$HERE}; STYLE=${STYLE:-A}
+HERE=${0:a:h}; REPO=${REPO:-${HERE:h:h:h:h}}; TOOLS=${TOOLS:-$HERE}; STYLE=${STYLE:-A}  # run a copy from a folder whose parent links node_modules (playwright-core); then pass REPO=<repo root>
 mkdir -p $WORK/comp/bg $WORK/comp/fonts $WORK/final
 for d in $PASSES/*(/); do python3 -I $REPO/scripts/dev/ads/v3/grade.py $d $WORK/comp/bg; done
 node -e "const fs=require('fs');let all=[];for(const d of fs.readdirSync('$PASSES')){const f='$PASSES/'+d+'/frames.json';if(fs.existsSync(f))all=all.concat(JSON.parse(fs.readFileSync(f,'utf8')))}fs.writeFileSync('$WORK/comp/info.json',JSON.stringify(all));console.log(all.length,'frames of info')"

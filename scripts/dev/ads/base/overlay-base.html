@@ -12,12 +12,13 @@
   #bg { position: absolute; left: -12px; top: -12px; width: 1104px; height: 1944px; }
   .cap { position: absolute; left: 0; width: 1080px; top: 330px; will-change: opacity, transform; }
   .hidden { display: none }
-  /* A · 标题 + 蓝线 */
-  #A .grad { position: absolute; left: 0; top: 0; width: 1080px; height: 900px; background: linear-gradient(180deg, rgba(2,8,14,.55) 0%, rgba(2,8,14,.25) 60%, rgba(2,8,14,0) 100%); }
+  /* A · 标题 + 蓝线 — Jason's pick (11-03, #225). HQ: over bright water the contrast was weak, so the top is darkened more and
+     the type gets a soft shadow; still no box */
+  #A .grad { position: absolute; left: 0; top: 0; width: 1080px; height: 980px; background: linear-gradient(180deg, rgba(2,8,14,.74) 0%, rgba(2,8,14,.52) 45%, rgba(2,8,14,.22) 75%, rgba(2,8,14,0) 100%); }
   #A .cap { left: 72px; width: 936px; }
-  #A .head { font-family: 'Eurostile Heavy'; font-size: 88px; line-height: 1.02; letter-spacing: .005em; text-shadow: 0 6px 36px rgba(0,0,0,.5); text-wrap: balance; }
+  #A .head { font-family: 'Eurostile Heavy'; font-size: 88px; line-height: 1.02; letter-spacing: .005em; text-shadow: 0 2px 6px rgba(0,12,20,.7), 0 10px 40px rgba(0,0,0,.6); text-wrap: balance; }
   #A .rule { width: 160px; height: 8px; margin: 26px 0 24px; background: #028CDF; border-radius: 4px; box-shadow: 0 0 24px rgba(2,140,223,.7); transform-origin: left; }
-  #A .sub { font-family: 'Instrument Sans'; font-weight: 500; font-size: 52px; line-height: 1.22; color: rgba(255,255,255,.92); text-shadow: 0 2px 16px rgba(0,0,0,.6); max-width: 860px; text-wrap: balance; }
+  #A .sub { font-family: 'Instrument Sans'; font-weight: 500; font-size: 52px; line-height: 1.22; color: rgba(255,255,255,.94); text-shadow: 0 2px 5px rgba(0,12,20,.7), 0 6px 24px rgba(0,0,0,.6); max-width: 860px; text-wrap: balance; }
   /* B · 玻璃板 */
   #B .cap { left: 60px; width: auto; max-width: 960px; padding: 40px 52px 44px; border-radius: 28px; background: rgba(8, 18, 30, .42); backdrop-filter: blur(22px) saturate(1.2); -webkit-backdrop-filter: blur(22px) saturate(1.2); border: 1.5px solid rgba(255,255,255,.22); box-shadow: 0 30px 80px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.18); }
   #B .kick { display: flex; align-items: center; gap: 14px; font-family: 'Instrument Sans'; font-weight: 600; font-size: 26px; letter-spacing: .22em; color: #7CC4F2; margin-bottom: 18px; }

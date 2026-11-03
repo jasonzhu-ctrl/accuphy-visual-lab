@@ -83,6 +83,12 @@ await p.evaluate(([phone]) => {
   }
 }, [phone])
 const hole = ice ? await p.evaluate(() => [window.__sonarState.boat?.x ?? 0, window.__sonarState.boat?.z ?? 0]) : null
+if (ice) { // Base's #225 hooks (322f47f, "ad-lake-ice" port 5193): the shelter and sled on the far side of the hole, 2 + 3 fish held
+  // in the Combo beam; the fish need ~15 s to swim in before rolling (Base's measurement)
+  await p.evaluate((a) => { window.__sonarState.adIce = a }, JSON.parse(process.env.ADICE || '{"shelter":[-3,-9],"sled":[1.5,-11,20],"fish":[2,3]}'))
+  await p.waitForTimeout(+(process.env.ICE_WAIT || 15000))
+  console.log('beam fish', JSON.stringify(await p.evaluate(() => (window.__beamFish ? window.__beamFish() : null))))
+}
 let view = null
 const apply = async (t) => {
   const st = shot(t, { hole })
