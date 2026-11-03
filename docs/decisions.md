@@ -4028,3 +4028,11 @@ Numbered log. Newest at the bottom.
      - Test link fixed the same day: `/` = base 86bf80e again (md5 = live), `/bf/` = locked (4d41681, test mode), `/base/` removed.
      - Still to settle with Jason: what the store's Lab page frames during BF (the website would point its frame at `/bf/`, or the store keeps the base).
      - `scripts/build-bf-site.mjs` must change to this layout ("Lab 营销版").
+
+229. **2026-11-03** — **The MKT (locked) version's store link: each market's home URL + `/pages/sonarlab-mktbf2026`, framing
+     lab.accuphy.ca/bf/; the base stays on lab.accuphy.ca `/`, `/mini/`, `/ice/`** (Jason in Lab HQ: “带锁版本也就是MKT版本应该按照现有shopify市场的主页网址后面定一个规则 你提议”;
+     on HQ's proposal `/pages/sonar-lab`: “规则不变，只是页面名换成别的，/pages/sonarlab-mktbf2026”; on the base list: “很好 记住”).
+     - The store's `/pages/lab` keeps framing the base. A second Shopify page `sonarlab-mktbf2026` (same embed section, frame
+       src lab.accuphy.ca/bf/) is made by the website on Jason's 动 there. Poland and Latvia: main store + `?lang=` (#218).
+     - The Lab path stays `/bf/` (HQ's call; no rename). Klaviyo's 20 s box goes off only on the MKT page.
+     - Sheet: `docs/lab-links-sheet.md` §1.5; proposal `docs/2026-11-03-mkt-link-rule-proposal.md`.

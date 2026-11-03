@@ -39,6 +39,23 @@ Jason 11-03：“一定要搞个文档，专门把这些不同的版本啊，那
 
 **注意：** 带 `?lang=` 的链接只是 Lab 换语言，店铺页别的地方还是英文。
 
+## 一点五、营销版（MKT，带锁版）的店铺链接（#229，还没建）
+
+规则：**每个市场主页网址 + `/pages/sonarlab-mktbf2026`**，页面里嵌 lab.accuphy.ca/bf/。Base 的 `/pages/lab` 不动。波兰、拉脱维亚照 #218 用主站 + `?lang=`。
+
+| 市场 | MKT 链接 |
+|---|---|
+| 加拿大 英 | https://shop.accuphy.com/pages/sonarlab-mktbf2026 |
+| 加拿大 法 | https://shop.accuphy.com/fr/pages/sonarlab-mktbf2026 |
+| 美国（只出 Mini） | https://shop.accuphy.com/en-us/pages/sonarlab-mktbf2026 |
+| 法国 | https://shop.accuphy.com/fr-fr/pages/sonarlab-mktbf2026 |
+| 比荷卢 荷 / 法 | https://shop.accuphy.com/nl-benelux/pages/sonarlab-mktbf2026 、https://shop.accuphy.com/fr-benelux/pages/sonarlab-mktbf2026 |
+| 德国 | https://shop.accuphy.com/de-de/pages/sonarlab-mktbf2026 |
+| 波兰 | https://shop.accuphy.com/pages/sonarlab-mktbf2026?lang=pl |
+| 拉脱维亚 | https://shop.accuphy.com/pages/sonarlab-mktbf2026?lang=lv |
+
+页面要网站在 Shopify 建（Jason 在网站 HQ 说“动”），lab.accuphy.ca/bf/ 要 Jason 在 Lab HQ 说“动”。
+
 ## 二、Lab 自己的地址
 
 | 地址 | 现在是什么 | 黑五带锁版上线后（#213） |

@@ -1,4 +1,6 @@
-# 营销版（MKT，带锁版）的链接规则：HQ 提议（2026-11-03，等 Jason 定）
+# 营销版（MKT，带锁版）的链接规则（2026-11-03，Jason 定了，#229）
+
+> **定了（Jason 11-03）：** 规则照下面，只是页面名换成 **`/pages/sonarlab-mktbf2026`**（不用 sonar-lab）。Lab 这边的地址保留 **lab.accuphy.ca/bf/**（HQ 定：页面名已经带 bf2026，不再改名 /mkt/）。下文里的 sonar-lab 都读作 sonarlab-mktbf2026、/mkt/ 都读作 /bf/。
 
 Jason 11-03：“带锁版本也就是 MKT 版本应该按照现有 shopify 市场的主页网址后面定一个规则，你提议。”
 
