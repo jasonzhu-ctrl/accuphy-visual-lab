@@ -3982,3 +3982,15 @@ Numbered log. Newest at the bottom.
      - Sound: our own synthesized pings and effects; music only licensed (Jason's pick or Meta's library), slot left empty.
      - First a numbered storyboard image and script (`docs/2026-11-03-ad-base-script.jpg` / `.md`) by "Lab video creation";
        no film until Jason nods. Concept: `docs/2026-11-03-ad-base-concept.md`.
+
+224. **2026-11-03** — **Ice page, Forward and Combo: the forward beam out to 120 ft is always in the picture** (Jason in Base: “冰钓的手机版本是不是看不到完整的声纳照射区域?”, then “动 距离以120feet的forward range对应的声纳照射范围能进入画面为标准”; asked again with phone stills of 120 ft against a closer 80 ft fit: “120ft”).
+     - **Before:** the section camera framed only the ice and the bottom under the hole. On a 390 px phone ~6 m of the forward fan showed
+       (80 ft = 24 m range); on desktop 23–27 m, the rest under the app badges and the phone, then off the right edge.
+     - **Now** (`Scene.jsx` Rig, ice section only, Forward and Combo): the camera pans along the fan and backs off until the fan to
+       120 ft (36.6 m) — its top edge along the ice, its lower edge 39° down to the lit bed — and the hole kit fit. Phones: inside the
+       band above the app frame (camera ~85–100 m out; everything is small, Jason accepted that). Desktop: right of the glass panel,
+       clear of the app badges and the phone (1280 / 1440 / 1920: zoom 1.2–1.5). Combo's 150 ft default runs ~9 m past.
+       Turning the camera to look along the fan was tried and dropped (the cut wall and ground ran diagonally across the screen).
+     - Phones in this framing: the tour's "Tap the ice" reticle sits 8 m east of the hole (it fell off the left edge).
+     - **Unchanged:** Live Ice, Down and Ice Fishing; the Top and Under-the-ice cameras; the summer lake (camera identical to 86bf80e,
+       desktop and phone). The ice tour walks through on desktop, phone and `?view=top`; 0 errors.
