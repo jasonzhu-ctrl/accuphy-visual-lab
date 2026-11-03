@@ -3910,3 +3910,12 @@ Numbered log. Newest at the bottom.
      - Not live until: W24Qdc in the copy's `signup.js`, Jason has read the consent and "unlocked" lines, Klaviyo's VpD3CV is off
        on the store Lab page, and the website has checked a real sign-up. Building waits for Jason's 动.
      Plan: `docs/2026-11-03-bf-locked-version-plan.md`.
+
+214. **2026-11-03** — **The Lab reviews its own five languages** (website HQ: under its #238 it does not review Lab text; Jason in Lab
+     HQ, card on fr/de/nl/pl: “Lab 自己核”; card on Latvian, which nobody at the website can review: “你来做”).
+     - "Lab 多语言" reviews in the website's order: the store's live text (/fr, /de-de, /nl-benelux), then the glossary, then big
+       brands. Polish: against Prime Power's Polish shop, plus a back-translation (website #178's method). Latvian: big brands'
+       Latvian pages, plus a back-translation; no distributor is asked.
+     - Address: German Sie, Dutch je (measured on the live product pages). Inside the phone: the app's own de/pl words (website
+       table in `accuphy-website/handoffs/2026-11-03-lab-multilang-questions.md`); nl and lv stay English; Map is never translated.
+     - HQ shows Jason the reviewed table before Base puts it in; live still needs his 动.
