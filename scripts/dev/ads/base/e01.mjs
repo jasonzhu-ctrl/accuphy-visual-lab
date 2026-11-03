@@ -13,9 +13,13 @@ fs.mkdirSync(out, { recursive: true })
 const FPS = 10, N = +(nArg || (mode === 'step1' ? 36 : 40))
 const clamp = (u) => Math.min(1, Math.max(0, u)), lerp = (a, b, u) => a + (b - a) * u, sstep = (u) => u * u * (3 - 2 * u), smoother = (u) => u * u * u * (u * (u * 6 - 15) + 10)
 const CAM = JSON.parse(process.env.CAMS || '{}')
-// step 1 (cap8.mjs 'rec', the move Jason likes): bx 8, bz 5; pos [bx+6+(k−1)·3, 11k, bz+26k], look [bx+13, −7, bz], fov 42, k 1 → 1.6
-const bx = 8, bz = 5
-const step1 = (u) => { const k = 1 + 0.6 * sstep(u); return { cam: { pos: [bx + 6 + (k - 1) * 3, 11 * k, bz + 26 * k], look: [bx + 13, -7, bz], fov: 42 }, target: [lerp(8, 12.5, smoother(clamp((u - 0.08) / 0.84))), 5] } } // r2 (Jason 11-03): the boat stops before the shallows, 12.5 not 15
+// step 1 (cap8.mjs 'rec', the move Jason likes): pos [bx+6+(k−1)·3, 11k, bz+26k], look [bx+13, −7, bz], fov 42, k 1 → 1.6; the boat
+// dragged 4.5 m along +x from (bx, bz). v3 (Jason 11-03, his screenshot 参考-第1步位置-Jason-11-03.webp): the whole shot moved to
+// open water at (−2, 23) with the Forward beam (120 ft) reaching the timber and rocks of the bank at x 27–37, z 20–35 — the phone
+// shows a clean bottom rising with standing trees and fish; the camera, its move, the finger and the boat's motion unchanged.
+// (v1/v2 sat at (8, 5), the boat into the timber shallows, x 8 → 12.5.) BX/BZ override while fitting.
+const bx = +(process.env.BX ?? -2), bz = +(process.env.BZ ?? 23), RANGE1 = 120
+const step1 = (u) => { const k = 1 + 0.6 * sstep(u); return { cam: { pos: [bx + 6 + (k - 1) * 3, 11 * k, bz + 26 * k], look: [bx + 13, -7, bz], fov: 42 }, target: [lerp(bx, bx + 4.5, smoother(clamp((u - 0.08) / 0.84))), bz] } }
 // step 2 (cap8.mjs 's3' R1, the angle of the 10-30 still, mirrored to the −z side so the beam opens bottom-left, away from the
 // phone bottom right): the boat on the edge at x 31 → 37, the camera following
 const S2 = CAM.s2 || { dx: 26, y: 9, dz: -14, lx: -4, ly: -9, lz: 2, fov: 40 }
@@ -34,10 +38,11 @@ await ctx.addInitScript(() => { // the virtual clock of ../rec.mjs
 })
 const p = await ctx.newPage()
 p.on('pageerror', (e) => console.log('[pageerror]', e.message.slice(0, 200)))
-const boat0 = mode === 'step1' ? '8,5' : '31,8'
+const boat0 = mode === 'step1' ? `${bx},${bz}` : '31,8'
 await p.goto(`http://localhost:${port}/?boat=${boat0}&tour=off#2026-09-23-sonar-lake-3d`); await p.waitForTimeout(7000)
 const click = (n) => p.getByRole('button', { name: n, exact: true }).first().click({ timeout: 4000 })
 await click('PingLive Mini'); await p.waitForTimeout(600); await click('Forward'); await p.waitForTimeout(2500)
+if (mode === 'step1') { await p.locator('input[type=range]').first().evaluate((el, v) => { Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(el, String(v)); el.dispatchEvent(new Event('input', { bubbles: true })) }, RANGE1); await p.waitForTimeout(1500) } // v3: Jason's range, 120 ft
 await p.evaluate(() => { // only the lake and the phone: the panel, the badges, the back link, the replay link and the hint hidden
   const s = window.__sonarState; s.hasDragged = true; s.dragging = true; s.adClean = true; s.adBeam = { line: 0.6, face: 0.22 }; s.fanOpen = 1
   if (s.hintEl) s.hintEl.style.visibility = 'hidden'
