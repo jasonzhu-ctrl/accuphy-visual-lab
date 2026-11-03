@@ -11,7 +11,7 @@ Jason 2026-11-02：“你记住，或者搞一个 sheet 把各种版本做好管
 | **标准 Base 版（PingLive + PingLive Mini）** | Jason 11-02 定的标准基础版，见下面的清单 | main 86bf80e（6b5a225 + 冰钓教程、去厚度、湖岸、树自动调） | lab.accuphy.ca `/`（PingLive，可切 Mini）、`/mini/`（只有 Mini）、`/ice/`；测试链接同一版 | **11-03 已上线**（Jason：“动”） |
 | 线上版 | 店铺页里嵌的、广告点进来看到的 | **86bf80e（11-03）** = 标准 Base 版 | lab.accuphy.ca、shop.accuphy.com/pages/lab | 标准 Base 版，锁关闭 |
 | 冰钓页 | 冰面，只有 Mini | 和 Base 同一份代码 | lab.accuphy.ca/ice/ | **11-03 已上线**：入场教程（点冰打洞 → Tap Forward View → Tap Down View）、俯视跟随冰洞、和夏天湖同一条湖岸 |
-| 营销版 | 只有“锁视图”（订阅才能看 Combo 等，#191） | 现在混在 main 里，还没拆出来 | — | Base 版上线后再拆、再做 |
+| 营销版（黑五带锁版） | Base 复制一份，锁视图打开（订阅才能看 Combo 等，#191 / #213） | `src/experiments/2026-11-03-sonar-lake-bf/`，复制自 86bf80e；“Lab 营销版”窗口管 | 测试链接首页 `/`（测试模式，不发订阅）；干净 Base 在测试链接 `/base/` | 11-03 上测试链接；上线要 Jason 说“动”；多语言做完再搬进来（#216） |
 
 测试链接：https://jasonzhu-ctrl.github.io/accuphy-lab-test/
 

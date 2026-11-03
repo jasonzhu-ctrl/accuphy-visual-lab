@@ -9,6 +9,10 @@ with the source commit it was built from, so anyone can tell which version a lin
 sign-up and Combo stays shut for everyone (no fake success). Test links show "Test mode: nothing is sent." The consent wording
 (`unlock_consent` in i18n.js) is Klaviyo HQ's draft and waits for Jason.
 
+## 2026-11-03: test link: / = BF locked version (#213)
+
+Jason said 动 in Lab HQ for the locked version up to the test link. Built with `BASE_REF=86bf80e node scripts/build-bf-site.mjs <out> HEAD` (HEAD ecc15ed; the copy `src/experiments/2026-11-03-sonar-lake-bf/` is 86bf80e with the lock always on). No list id, so the card says "Test mode: nothing is sent". `/base/` md5 = the 86bf80e root build; `/mini/`, `/ice/` unchanged. Test repo c1545c2. HQ checked: Mini → Live Combo opens the "Unlock Live Combo" card. lab.accuphy.ca not touched.
+
 ## 2026-11-03: LIVE lab.accuphy.ca at 86bf80e
 
 Jason said 动 in Lab HQ. Adds to 6b5a225: ice page entry tour (#203), beam text width only (#197 latest), ice Top camera follows the hole and one edge (#204), shared shoreline for lake and ice (#206–#209: rounded square, stop at ~5 ft, bow-to-shore stops further out), adaptive tree density after the cover (#210/#211), premium-model rule (#205). Vercel inspect https://vercel.com/accuphy/accuphy-lab/7aMxVJ9s5c4W4FRP8PX3tBsYssfn, embed `lab-1242b2515b.js`. Checked: live md5 = build = test links for `/`, `/mini/`, `/ice/`; thumbnails and /embed/ 200; CSP and noindex present; .env/.vercel 404. 对接 store-frame 8/8 and unit tests passed on 86bf80e; 界面设计: cover pass and far-row tree fade pass (14 ice-horizon frames, no popping, 0 errors). Website 03 store-page check passed (accuphy-website f3d0b073: /pages/lab and /fr/pages/lab, desktop 1440 and phone 390; tour past stop 1, /mini/, /ice/, US IP and a real iPhone not checked). Real phone not tried. Replaces 6b5a225.
