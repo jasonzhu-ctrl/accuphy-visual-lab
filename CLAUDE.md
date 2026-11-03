@@ -135,6 +135,8 @@ anyone's memory.
   - "营销和外部系统对接" (`local_e14cb86c-9b2f-4431-a4c5-78c2d8d323c7`, #196) — what takes visitors to the store and records
     data: the store bridge (`embed.js`), Klaviyo (`signup.js`), all visitor text (`i18n.js`) and its French review, share,
     shop links by market, badges, tracking. Note `docs/handover/chats/marketing-integration.md`.
+  - "Lab 多语言" (`local_acdc8fc8-45fe-4009-9b82-503697a24c3f`, #212, Jason 2026-11-03) — the base page `/` in fr / de / nl / pl / lv:
+    the strings table, the website's review, follow-up. Writes no code; Base puts the reviewed text into `i18n.js`.
   - Shared files (`index.jsx`, `SonarChrome.jsx`, `ShareButton.jsx`, `UnlockCard.jsx`, `ShopButton.jsx`, `AppBadges.jsx`): look →
     界面设计, behaviour/events/locks → 对接, scene/range/depth → Base. Tell the others and HQ before editing; say "freed" after.
   - Opened on request, then archived after a handover note: ad films (paused, #183/#185, `ad-video` skill and

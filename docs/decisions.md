@@ -3875,3 +3875,20 @@ Numbered log. Newest at the bottom.
        all; simulated slow (+25 ms a frame, 37 fps) desktop and phone → 35 %; +60 ms (16 fps) → 35 %; +80 ms (12 fps) → 20 %;
        warming after 9 s → one tier down at 21 fps. The far rows filling in on the ice horizon and the summer phone are hard to
        see. Tours on the lake, Mini and ice pages as before; production builds; 0 errors.
+
+212. **2026-11-03** — **The base page gets French, German, Dutch, Polish and Latvian; a new "Lab 多语言" chat runs it** (Jason in Lab
+     HQ: “先基于 base 做 base 的法语、德语、波兰语、波罗的海说的最多的语言、荷兰语的版本 … 可以问网站怎么翻译”; Baltic card:
+     Latvian, recommended because the distributor Slanpo is in Latvia and the store's frame already passes `lv`; on the plan:
+     “可以的 这个制作多开一个多语言专门制作的窗口 但是我们明确下来 base画面都是lab管 对了 多语言只做pinglive和pinglive Mini一起都有的base版本 mini的不用单做”).
+     - Scope: only `/` (PingLive with the Mini switch, the page the store embeds). `/mini/` and `/ice/` are not done or checked
+       on their own; ice-only strings are not translated. The lock strings (unlock_*) wait for the marketing version; no ad films (#185).
+     - What is translated: our own words outside the phone, in the store's wording. Inside the phone: the app's own words if the
+       app has that language, else English. Never: PingLive, PingLive Mini, Accuphy Sonar App, Down Scan, CHIRP, store names, the
+       "ACCUPHY | LAB" title, numbers and units.
+     - Who: "Lab 多语言" makes the strings table, asks the website how it translates and who reviews, and tracks it; it writes no
+       code. Base alone puts the text into `i18n.js` and does the code (new `?lang=` values, Latin Extended-A font subsets, metres
+       by default for the European languages, the share link keeps the language). 界面设计 checks long German and the new letters.
+       Machine translation is a draft only. Live needs Jason's 动 in Lab HQ; going live also changes the store's /de-de and
+       /nl-benelux Lab automatically, so review comes first.
+     - Still to settle with Jason: who reviews Polish and Latvian; the final English of the tour's three lines.
+     Plan: `docs/2026-11-03-multilang-base-plan.md`.
