@@ -1,42 +1,34 @@
-# 营销版（MKT，带锁版）的链接规则（2026-11-03，Jason 定了，#229）
+# MKT 版（带锁版 = 投放版）的链接规则：已定（Lab 营销版维护，最后整理 2026-11-03）
 
-> **定了（Jason 11-03）：** 规则照下面，只是页面名换成 **`/pages/sonarlab-mktbf2026`**（不用 sonar-lab）。Lab 这边的地址保留 **lab.accuphy.ca/bf/**（HQ 定：页面名已经带 bf2026，不再改名 /mkt/）。下文里的 sonar-lab 都读作 sonarlab-mktbf2026、/mkt/ 都读作 /bf/。
+决定：#228（不覆盖 Base）、#229（规则和页面名）、#230（加上澳洲）、#218（店铺没有的语言放主站下）、#231（营销版维护）。
+每个市场的完整链接只记在 `docs/lab-links-sheet.md` 第一节，这里只写规则。
 
-Jason 11-03：“带锁版本也就是 MKT 版本应该按照现有 shopify 市场的主页网址后面定一个规则，你提议。”
+## 规则
 
-## 已经定的
+- **Base（不带锁）：**
+  - lab.accuphy.ca `/`（PingLive，能切 Mini）、`/mini/`、`/ice/`（Jason：“很好 记住”）；
+  - 店铺各市场的 `<市场主页>/pages/lab` 嵌 Base；
+  - 不用来投放。
+- **MKT 版（带锁、投放用）：**
+  - 店铺页面：`<市场主页网址>/pages/sonarlab-mktbf2026`；
+  - 页面里嵌：lab.accuphy.ca/bf/。
+- **店铺没有这种语言的市场（波兰、拉脱维亚，#218）：** 主站加语言，`https://shop.accuphy.com/pages/sonarlab-mktbf2026?lang=pl` / `?lang=lv`。
+  - 网站给波兰加了波兰语页以后，波兰换成那一页。
+  - `?lang=` 只换 Lab 的语言，店铺页其他地方还是英文。
+- **10 个市场：** 加拿大英、加拿大法、美国（只出 Mini）、澳洲、法国、比荷卢荷、比荷卢法、德国、波兰、拉脱维亚。
+  - 奥地利、瑞士用哪个链接，等网站 03 的各国 IP 测试结果。
 
-- **Base（不带锁）**只用 lab.accuphy.ca：`/`（PingLive，能切 Mini）、`/mini/`、`/ice/`（Jason：“很好 记住”）。
-- 店铺各市场的 `/pages/lab` 嵌的是 Base，营销版绝对不覆盖 Base（#228）。
+## 为什么这样定
 
-## 提议：MKT 版 = 每个市场主页网址 + `/pages/sonar-lab`
+- 规则只有一条，跟着店铺现有的市场前缀走。页面是全店共用的，建一次，每个市场前缀都自动有。
+- Base 的 `/pages/lab` 一点不动，两个版本同时在。广告投 MKT 链接；视频、素材、别的页面用 Base。
+- MKT 页也在店铺里，所以去商店按市场走、统计事件（Meta、GA4、Klaviyo）照常，和 Base 页一样。
+- Lab 的地址用 `/bf/`，不改名 `/mkt/`：店铺页面名里已经带 bf2026（HQ 定）。
 
-| 部分 | Base（不变） | MKT 版（新） |
-|---|---|---|
-| 店铺里的页面 | `<市场主页>/pages/lab` | `<市场主页>/pages/sonar-lab` |
-| 页面里嵌的 Lab | lab.accuphy.ca/ | lab.accuphy.ca/mkt/（现在测试里叫 /bf/，建议改名，因为不只黑五用） |
+## 谁做（都经 HQ）
 
-**每个市场的 MKT 链接：**
+- **网站：** 建 `sonarlab-mktbf2026` 页面，用和 `/pages/lab` 同一个嵌入区块，地址改成 lab.accuphy.ca/bf/，不放菜单。要 Jason 在网站 HQ 说“动”。
+- **Lab 营销版：** 打包 `/bf/`（`scripts/build-bf-site.mjs`）。lab.accuphy.ca/bf/ 上线要 Jason 在 Lab HQ 说“动”。
+- **Klaviyo：** 只在 `/pages/sonarlab-mktbf2026` 上关掉 20 秒弹窗 VpD3CV，`/pages/lab` 照旧。
 
-| 市场 | MKT 链接 |
-|---|---|
-| 加拿大 英 | https://shop.accuphy.com/pages/sonar-lab |
-| 加拿大 法 | https://shop.accuphy.com/fr/pages/sonar-lab |
-| 美国（只出 Mini） | https://shop.accuphy.com/en-us/pages/sonar-lab |
-| 法国 | https://shop.accuphy.com/fr-fr/pages/sonar-lab |
-| 比荷卢 荷 / 法 | https://shop.accuphy.com/nl-benelux/pages/sonar-lab 、/fr-benelux/pages/sonar-lab |
-| 德国 | https://shop.accuphy.com/de-de/pages/sonar-lab |
-| 波兰、拉脱维亚 | 照 #218：主站 + 语言，https://shop.accuphy.com/pages/sonar-lab?lang=pl 、?lang=lv |
-
-**为什么这样定：**
-- 规则只有一条，跟着店铺现有的市场前缀走，Shopify 会自动给每个市场生成这个地址，不用一个个建。
-- Base 的 `/pages/lab` 一点不动，两个版本同时都在。广告投 MKT 链接，视频、素材、别的页面用 Base。
-- MKT 页面也在店铺里，所以去商店按市场走、统计事件（Meta、GA4、Klaviyo）照常，和 Base 页一样。
-- “sonar-lab” 跟广告里的名字 “Accuphy Sonar Lab” 一致，客人看到的网址好懂。
-
-**要谁做：**
-- 网站：在 Shopify 建一个新页面 `sonar-lab`，用跟 `/pages/lab` 同一个嵌入区块，只把框的地址改成 lab.accuphy.ca/mkt/。要 Jason 在网站 HQ 说“动”。
-- Lab：营销版改名 /bf/ → /mkt/（打包脚本），上线 lab.accuphy.ca/mkt/ 要 Jason 在 Lab HQ 说“动”。
-- Klaviyo：只在 `/pages/sonar-lab` 上关掉 20 秒弹窗；`/pages/lab` 照旧。
-
-**上线前要齐的**照旧（#213）：名单号、同意文字（已定）、订阅成功那句、网站核一次真实订阅。
+上线前要齐的全部东西：`docs/2026-11-03-mkt-go-live-checklist.md`。
