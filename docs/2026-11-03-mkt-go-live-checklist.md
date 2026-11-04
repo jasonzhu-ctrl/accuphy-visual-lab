@@ -63,7 +63,7 @@ MKT 版归 “Lab 营销版” 窗口负责（#231）。HQ 管它，和网站、
 
 ## 五、网站 03 的检查（经 HQ）
 
-- [ ] **真实订阅测一次：** 在店铺 MKT 页上用一个测试邮箱。只提交一次，要 Jason 同意。要看到：
+- [x] **真实订阅测一次：**（11-04 两次通过：网站 #245 224f413b + 全新邮箱一次，Klaviyo HQ 读回：新档案进 W24Qdc、单次确认、6 个属性齐、没发欢迎邮件；档案国家为空，看市场用 signup_market） 在店铺 MKT 页上用一个测试邮箱。只提交一次，要 Jason 同意。要看到：
   - 邮箱进了 W24Qdc，档案上带 `signup_page=accuphy-lab`、`signup_channel=lab_unlock`、`signup_language`、`signup_market`、`lab_scene`、`lab_product`；
   - Combo 打开了；
   - 店铺这边算一次 Meta Lead / GA4 generate_lead（form = lab_unlock），事件里不带邮箱；
@@ -152,3 +152,4 @@ MKT 版归 “Lab 营销版” 窗口负责（#231）。HQ 管它，和网站、
 | 2026-11-04 | 客人看到的店铺页上线（第一节） | 网站 #244，00 446dbfb6（Jason 在网站 HQ 说“动”）；HQ curl 各前缀 200，框指向 lab.accuphy.ca/mktbf2026/；03 在查全部前缀、拉脱维亚 /en-ro、无店铺弹窗；真实订阅测试等 Jason 点头；核完前链接不进广告 |
 | 2026-11-04 | 网站 03 核 MKT 页（第五节） | fe7d485a 通过；剩测试订阅（等 Jason 在网站 HQ 点头），过了北美澳链接才进广告 |
 | 2026-11-04 | 真实测试订阅（第五节，网站 #245） | 一次，测试邮箱，加拿大英文 MKT 页、加拿大 IP；网站 224f413b 通过：Combo 打开、重开仍解锁、无店铺弹窗、Meta Lead 1 次、GA4 generate_lead form=lab_unlock 1 次、请求里无邮箱。剩 Klaviyo HQ 读回 W24Qdc + 6 个属性，并把测试地址排除；读回通过才给广告 |
+| 2026-11-04 | **北美澳可以进广告** | 店铺页 + Lab 都上线，网站 03 核过（fe7d485a），两次测试订阅通过（224f413b + Klaviyo 读回新邮箱）。欧洲名单、按国家分名单的后续、欧洲锁卡翻译：Jason 11-04 经 Klaviyo HQ “lab的先暂停 不重要的”，先停 |
