@@ -1,4 +1,4 @@
-// MKT locked copy only (checklist §6.5, Jason 11-04: “欧洲需要做两步的”): which Klaviyo list the lock card sends to, by market.
+// MKT locked copy only (#244: Canada / US / Australia each their own list by signup_market; checklist §6.5, Jason 11-04: “欧洲需要做两步的”): which Klaviyo list the lock card sends to, by market.
 // node scripts/dev/mkt-list-route-test.mjs
 // Canada (/, /fr), US (/en-us), Australia (/en-au) → VITE_BF_LIST_ID (W24Qdc, single opt-in); Europe and anything unknown →
 // VITE_BF_LIST_ID_EU (double opt-in). A European visitor must never reach W24Qdc; with the EU id empty, Europe behaves like an
@@ -17,12 +17,14 @@ globalThis.__LAB_ENV = {}
 const loadSignup = () => { const f = path.join(TMP, `signup-${++k}.mjs`); fs.writeFileSync(f, signupSrc); return import(f) }
 const routes = [
   // North America + Australia
-  { q: '?shop=/', want: 'na', note: 'Canada EN' },
-  { q: '?shop=/fr&lang=fr', want: 'na', note: 'Canada FR' },
-  { q: '?shop=/en-us&market=us', want: 'na', note: 'US' },
-  { q: '?shop=/en-au&market=au', want: 'na', note: 'Australia' },
-  { q: '?shop=/&market=ca', want: 'na', note: 'Canada with market' },
-  { q: '?market=us', want: 'na', note: 'market only' },
+  { q: '?shop=/', want: 'na', mk: 'ca', note: 'Canada EN' },
+  { q: '?shop=/fr&lang=fr', want: 'na', mk: 'ca', note: 'Canada FR' },
+  { q: '?shop=/en-us&market=us', want: 'na', mk: 'us', note: 'US' },
+  { q: '?shop=/en-au&market=au', want: 'na', mk: 'au', note: 'Australia' },
+  { q: '?shop=/&market=ca', want: 'na', mk: 'ca', note: 'Canada with market' },
+  { q: '?market=us', want: 'na', mk: 'us', note: 'market only' },
+  { q: '?shop=/&market=us', want: 'na', mk: 'us', note: 'US visitor on the main-store root, bridge says us → US list' },
+  { q: '?shop=/en-au', want: 'na', mk: 'au', note: 'Australia root, no market' },
   // Europe
   { q: '?shop=/fr-fr&lang=fr&market=fr', want: 'eu', note: 'France' },
   { q: '?shop=/nl-benelux&lang=nl&market=nl', want: 'eu', note: 'Benelux NL' },
@@ -51,13 +53,15 @@ for (const c of routes) {
   const e = await import(`../../src/experiments/${DIR}/embed.js?case=${++n}`)
   const lang = (new URLSearchParams(c.q).get('lang') || 'en')
   const got = sig.listRegion({ market: e.passedMarket(), shop: e.shopRoot(), lang: ['en', 'fr', 'de', 'nl', 'pl', 'lv'].includes(lang) ? lang : 'en' })
-  check(got === c.want, `${(c.q || '(nothing)').padEnd(44)} → ${got}   · ${c.note}`)
+  const sm = e.shareMarket() // signup_market = the country list (#244)
+  check(got === c.want && (!c.mk || sm === c.mk), `${(c.q || '(nothing)').padEnd(44)} → ${got}${got === 'na' ? ' ' + sm : ''}   · ${c.note}`)
 }
 
 // 2. which list is sent, with the go-live ids filled or not (fetch stubbed: nothing leaves this script)
 const store = {}
 globalThis.localStorage = { getItem: (x) => store[x] ?? null, setItem: (x, v) => { store[x] = v }, removeItem: (x) => { delete store[x] } }
 const bodies = []; globalThis.fetch = async (u, o) => { bodies.push(JSON.parse(o.body)); return { ok: true } }
+const ALL = { VITE_BF_LIST_ID: 'W24Qdc', VITE_BF_LIST_ID_US: 'SPeeP6', VITE_BF_LIST_ID_AU: 'Scdcct' }
 const sends = [
   { host: 'lab.accuphy.ca', env: { VITE_BF_LIST_ID: 'W24Qdc' }, region: 'na', want: 'W24Qdc' },
   { host: 'lab.accuphy.ca', env: { VITE_BF_LIST_ID: 'W24Qdc' }, region: 'eu', want: 'refused', note: 'EU id empty: never W24Qdc' },
@@ -66,6 +70,15 @@ const sends = [
   { host: 'lab.accuphy.ca', env: { VITE_BF_LIST_ID_EU: 'EUtst1' }, region: 'na', want: 'refused', note: 'NA id empty: never the EU list' },
   { host: 'lab.accuphy.ca', env: { VITE_BF_LIST_ID: 'W24Qdc', VITE_BF_LIST_ID_EU: 'not an id' }, region: 'eu', want: 'refused', note: 'bad EU id ignored' },
   { host: 'lab.accuphy.ca', env: { VITE_BF_LIST_ID: 'W24Qdc' }, region: undefined, want: 'refused', note: 'no region given → Europe' },
+  // one list per country (#244): the market decides; a missing country id is refused, never another country's list
+  { host: 'lab.accuphy.ca', env: ALL, region: 'na', market: 'ca', want: 'W24Qdc' },
+  { host: 'lab.accuphy.ca', env: ALL, region: 'na', market: 'us', want: 'SPeeP6' },
+  { host: 'lab.accuphy.ca', env: ALL, region: 'na', market: 'au', want: 'Scdcct' },
+  { host: 'lab.accuphy.ca', env: ALL, region: 'na', market: 'gb', want: 'refused', note: 'not ca/us/au' },
+  { host: 'lab.accuphy.ca', env: ALL, region: 'na', market: null, want: 'refused', note: 'no market' },
+  { host: 'lab.accuphy.ca', env: { VITE_BF_LIST_ID: 'W24Qdc' }, region: 'na', market: 'us', want: 'refused', note: 'US id empty: never Canada' },
+  { host: 'lab.accuphy.ca', env: { VITE_BF_LIST_ID: 'W24Qdc' }, region: 'na', market: 'au', want: 'refused', note: 'AU id empty: never Canada' },
+  { host: 'lab.accuphy.ca', env: ALL, region: 'eu', market: 'us', want: 'refused', note: 'EU id empty: never a NA list' },
   { host: 'jasonzhu-ctrl.github.io', env: {}, region: 'na', want: 'test' },
   { host: 'jasonzhu-ctrl.github.io', env: {}, region: 'eu', want: 'test' },
   { host: 'localhost', env: {}, region: 'eu', want: 'test' },
@@ -74,14 +87,15 @@ for (const c of sends) {
   for (const x in store) delete store[x]; bodies.length = 0
   globalThis.__LAB_ENV = c.env; globalThis.window = { location: { hostname: c.host, search: '' } }
   const m = await loadSignup()
-  let got
+  let got, mk
   try {
-    await m.submitSignup({ email: 'a@example.com', language: 'de', market: 'de', view: 'combo', product: 'pinglive-mini', ...(c.region ? { region: c.region } : {}) })
-    got = bodies.length ? bodies[0].data.relationships.list.data.id : (m.signupTestMode(c.region) ? 'test' : 'unlocked, nothing sent')
+    mk = 'market' in c ? c.market : (c.region === 'na' ? 'ca' : 'de')
+    await m.submitSignup({ email: 'a@example.com', language: 'de', market: mk, view: 'combo', product: 'pinglive-mini', ...(c.region ? { region: c.region } : {}) })
+    got = bodies.length ? bodies[0].data.relationships.list.data.id : (m.signupTestMode(c.region, mk) ? 'test' : 'unlocked, nothing sent')
   } catch (e) { got = e.message === 'not_ready' ? 'refused' : 'error ' + e.message }
   const props = bodies[0]?.data.attributes.profile.data.attributes.properties
-  const propsOk = !props || (props.signup_page === 'accuphy-lab' && props.signup_channel === 'lab_unlock' && props.signup_market === 'de' && props.signup_language === 'de')
-  check(got === c.want && propsOk && !(c.region !== 'na' && got === 'W24Qdc'), `${c.host.padEnd(24)} ${JSON.stringify(c.env).padEnd(56)} ${String(c.region).padEnd(9)} → ${got}${c.note ? '   · ' + c.note : ''}`)
+  const propsOk = !props || (props.signup_page === 'accuphy-lab' && props.signup_channel === 'lab_unlock' && props.signup_market === mk && props.signup_language === 'de')
+  check(got === c.want && propsOk && !(c.region !== 'na' && got === 'W24Qdc'), `${c.host.padEnd(24)} ${JSON.stringify(c.env).padEnd(56)} ${String(c.region).padEnd(9)} ${String(mk).padEnd(4)} → ${got}${c.note ? '   · ' + c.note : ''}`)
 }
 fs.rmSync(TMP, { recursive: true, force: true })
 console.log(fail ? `${fail} FAILED` : 'all passed'); process.exit(fail ? 1 : 0)
