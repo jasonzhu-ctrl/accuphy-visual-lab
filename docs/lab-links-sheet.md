@@ -33,7 +33,7 @@ Jason 11-03：“一定要搞个文档，专门把这些不同的版本啊，那
 | 波兰 | https://shop.accuphy.com/pages/sonarlab-mktbf2026?lang=pl（波兰客人会被 302 转到 /en-pl/…?lang=pl，店铺那层是英文，Lab 还是波兰语，能用；网站给波兰市场加了波兰语以后，换成波兰页） | 波兰语 |
 | 拉脱维亚（#238，Jason 11-04：“用英语”；第二批欧洲） | https://shop.accuphy.com/en-ro/pages/sonarlab-mktbf2026?lang=lv（拉脱维亚属于罗马尼亚市场，用它的英语页；店铺那层英文，Lab 拉脱维亚语；网站 03 还要实测一次） | 拉脱维亚语 |
 
-- 状态：【客人看到的店铺页】Jason 已在网站 HQ 说“动”（网站 #241），网站 00 在建。【后面那一层】lab.accuphy.ca/mktbf2026/ 等多语言一起上（#234），要 Jason 在 Lab HQ 说“动”。在那之前店铺页的框是空的（404），**这批链接不要给广告**。
+- 状态（11-04）：【后面那一层】lab.accuphy.ca/mktbf2026/ **已上线**（0117d52，Jason 在 Lab HQ 说“动，上线”）。【客人看到的店铺页】网站 11-03 做好但被权限挡住没发布，等 Jason 在网站 HQ（本 app）说“动”。分两批（#239）：北美澳先，欧洲等两步确认名单。在那之前店铺页的框是空的（404），**这批链接不要给广告**。
 - 德、荷、波、拉的 Lab 文字要等译文放进去才是那种语言（现在显示英文、用米）。
 - **各国 IP 测试（网站 03，11-03，194a98c0；测的是 `/pages/lab`，市场前缀一样，所以结果也适用于这批链接）：**
   - 加拿大英、加拿大法、美国、法国、比荷卢荷、比荷卢法、德国、澳洲：都不跳转，框里 lang、shop、market 都对；加上 utm 和 fbclid 也能传到框里。
@@ -74,8 +74,8 @@ Jason 11-03：“一定要搞个文档，专门把这些不同的版本啊，那
 | https://lab.accuphy.ca/ | 网站嵌入版（无锁） | 96fdc22（11-03 晚上线） | 各市场 `/pages/lab` |
 | https://lab.accuphy.ca/mini/ | 网站嵌入版，只有 Mini | 96fdc22 | — |
 | https://lab.accuphy.ca/ice/ | 网站嵌入版，冰钓页 | 96fdc22 | — |
-| https://lab.accuphy.ca/mktbf2026/ | MKT 版（带锁） | 还没上线 | 各市场 `/pages/sonarlab-mktbf2026`（还没建） |
-| https://lab.accuphy.ca/mktbf2026/ice/ | MKT 版里冰钓格子去的页，是网站嵌入版冰钓页的拷贝 | 还没上线 | — |
+| https://lab.accuphy.ca/mktbf2026/ | MKT 版（带锁） | **0117d52（11-04 上线，北美澳名单 W24Qdc；欧洲名单未填）** | 各市场 `/pages/sonarlab-mktbf2026`（还没建） |
+| https://lab.accuphy.ca/mktbf2026/ice/ | MKT 版里冰钓格子去的页，是网站嵌入版冰钓页的拷贝 | 96fdc22 的 /ice/（11-04 上线） | — |
 
 直接打开 lab.accuphy.ca（不经过店铺）时，Lab 不发统计事件，“去商店”进加拿大店。广告请用第一节的投放链接。
 

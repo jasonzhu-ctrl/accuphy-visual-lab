@@ -28,7 +28,7 @@ MKT 版归 “Lab 营销版” 窗口负责（#231）。HQ 管它，和网站、
 
 ## 一、Jason 要说的两个“动”
 
-- [ ] **后面那一层 lab.accuphy.ca/mktbf2026/ 上线：** Jason 在 **Lab HQ** 说“动”。
+- [x] **后面那一层 lab.accuphy.ca/mktbf2026/ 上线：** Jason 11-04 在 **Lab HQ** 说“动，上线”，HQ 部署了 0117d52（北美澳名单 W24Qdc，欧洲名单未填），证据见记录表。
   - HQ 用上线包部署。上线包是填了名单号的那份，见第二节。
   - `/`、`/mini/`、`/ice/` 仍是网站嵌入版，部署前用 md5 证明和当时的线上一样（#228：营销版不覆盖不带锁的那一份）。
 - [x] **客人看到的那一层，店铺 MKT 页 /pages/sonarlab-mktbf2026：** Jason 11-03 在 **网站 HQ** 说了“动”（网站 #241），网站 00 正在建，框指向 `https://lab.accuphy.ca/mktbf2026/`。
@@ -39,7 +39,7 @@ MKT 版归 “Lab 营销版” 窗口负责（#231）。HQ 管它，和网站、
 
 ## 二、名单号
 
-- [ ] **W24Qdc 只在上线包里填：** `VITE_BF_LIST_ID=W24Qdc node scripts/build-bf-site.mjs <out> [版本]`。
+- [x] **W24Qdc 只在上线包里填：**（11-04：线上 `/mktbf2026/` 有 W24Qdc，`/` 没有） `VITE_BF_LIST_ID=W24Qdc node scripts/build-bf-site.mjs <out> [版本]`。
   - 测试链接不填，所以测试访客进不了真名单。
   - 没填时：真实域名上订阅卡说 “Subscribing isn’t open yet”、Combo 不开；测试链接上是 “Test mode: nothing is sent”。
   - 部署后核一次：线上 `/mktbf2026/` 的页面里能找到 `W24Qdc`，`/` 里找不到。
@@ -148,3 +148,4 @@ MKT 版归 “Lab 营销版” 窗口负责（#231）。HQ 管它，和网站、
 | 2026-11-04 | 第六点五节 Lab：订阅卡按市场送名单（北美澳 → W24Qdc，欧洲和不明 → `VITE_BF_LIST_ID_EU`），欧洲成功卡“Check your inbox” | 本次提交；mkt-list-route-test 33/33；假店铺页德国 9/9、加拿大 lock PASS；假名单号草稿包：德 → 欧洲号，加拿大 / 美国 → 北美号；手机卡都放得下。等名单号和译文 |
 | 2026-11-04 | 第六节搬完（新的 Lab 营销版，本 app） | 本次提交；单元测试四套全过（share-url 22/22）；假店铺页带锁 9/9 含 share-de；`/mktbf2026/` md5 c4c8bce9；`BASE_REF=537adc2` 时 `/`、`/mini/`、`/ice/` md5 = 线上；六种语言 × 电脑/手机 0 报错；`docs/2026-11-04-mkt-lock-card-6lang.png`。锁卡 13 条德荷波拉没有，报 HQ |
 | 2026-11-04 | 第六节：Jason 在 Lab HQ 说“搬”（五种语言 #212 + 冰钓 #224 搬进带锁版） | 旧营销版窗口在停用的另一个账户里找不到；HQ 在本 app 建了新的“Lab 营销版”任务卡（lab-mkt），按第六节做，只改复制件，不上线 |
+| 2026-11-04 | 后面那一层上线（第一、二、七节） | 0117d52 + BASE_REF 96fdc22，Vercel FaE6Y1UjSaYBVW3o7FCtL5gX1DhP；`/`、`/mini/`、`/ice/`、`/embed/lab.js` md5 = 上线前；`/mktbf2026/`、`/mktbf2026/ice/` 200；W24Qdc 只在 /mktbf2026/；浏览器加拿大参数 → Live Combo 出订阅卡，0 报错，没提交 |
