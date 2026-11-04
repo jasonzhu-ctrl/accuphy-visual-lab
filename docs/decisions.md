@@ -4116,4 +4116,4 @@ Numbered log. Newest at the bottom.
    - 交接包放在 Google Drive：`My Drive/Accuphy Mini Ad handover 2026-11/`，先读 `00-HANDOVER-READ-FIRST.md`。里面有 r11b 成片、Adam 一口气读的 4 条和切好的 9 句、Space Brunch 正式下载、片尾和 logo、各轮记录、Lab 五种语言字表。
    - 从此广告片的剪辑、响度、横版、语言版本归那个新窗口；“Lab video creation”停手。30 fps 干净画面只能从 Lab 的 3D 湖录，到时由 Lab HQ 安排录好交过去。
    - **#185 放宽**：广告片可以做语言版本（Jason 11-04 交接时提出）。做哪几种由新窗口先问 Jason，交接包里的建议是法、德、荷、波，拉脱维亚照 #227 不做。
-   - **同日更正：接手的是 Jason 另一个账号里原有的 “Lab video creation” 窗口**（Jason：“我都可以 … 我在那里是另一个叫lab video creation的窗口做的”）。它照 Drive 交接文件 “Resume here” 一节继续，不另开新窗口。Drive 文件夹是两个账号之间唯一的共享状态，每轮存 `rNN/` 并在文件末尾记一行。
+   - **同日再定：在 Lab HQ 所在的这个应用里新开窗口 “Lab 广告片”（lab-ad-film）接手**，挂在 Lab HQ 下面（Jason：“这里开新窗口”）；另一个账号的 “Lab video creation” 停手。新窗口照 Drive 交接文件 “Resume here” 一节继续，每轮存 `rNN/` 并在文件末尾记一行，做完报告给 Lab HQ。
