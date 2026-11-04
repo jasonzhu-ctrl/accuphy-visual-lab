@@ -55,9 +55,10 @@ MKT 版归 “Lab 营销版” 窗口负责（#231）。HQ 管它，和网站、
 
 ## 四、Klaviyo（经 HQ，Klaviyo HQ 做）
 
-- [ ] **20 秒弹窗 VpD3CV 只在 MKT 页上关掉**（`/pages/sonarlab-mktbf2026`，所有市场前缀）。`/pages/lab` 和店里其他页照旧。
+- [x] **20 秒弹窗 VpD3CV 只在 MKT 页上关掉**（Klaviyo HQ 11-04 只读核过：不用改。VpD3CV 只在 `shop.accuphy.com/pages/lab` 和 `/en-us/pages/lab` 出，TpVDh9 只在 `/fr/pages/lab` 出，MKT 页不在里面；MKT 页上线后它再读一次）。原文：（`/pages/sonarlab-mktbf2026`，所有市场前缀）。`/pages/lab` 和店里其他页照旧。
   - 不关的话，Lab 的订阅卡和 Klaviyo 的弹窗会一起出来。
   - 要 Jason 在 Klaviyo HQ 说“动”。
+- [ ] **商店弹窗不进 Lab 页和 MKT 页**（K4b，Klaviyo HQ e8f7de4 清单 + 预览）：CA RUd8QJ、DE W8UPFL、BNL RwEkZj、FR TeNugm、RO WgcWSj 加 `*/pages/lab*` 和 `*/pages/sonarlab-mktbf2026*`；美国 SRSX6U、TWCLKy 只加 MKT 那条；澳洲弹窗没发布。顺带去掉挡 Skip tour 的小圆标。等 Jason 在 Klaviyo HQ 说“动”。
 - [ ] 发给老订阅者的邮件链接带 `lab_unlock=sub`：直接解锁，不出卡，不算新 Lead。由漏斗和 Klaviyo 定。
 
 ## 五、网站 03 的检查（经 HQ）
@@ -109,3 +110,4 @@ MKT 版归 “Lab 营销版” 窗口负责（#231）。HQ 管它，和网站、
 | 2026-11-03 | 复制件自带 devices.js、wedge.js（9e96e0d，取自 86bf80e） | /mktbf2026/ md5 还是 475bf95f；假店铺页带锁场景 PASS |
 | 2026-11-03 | unlock_done 法文（bab47fc） | 打包页里有 “C’est fait. La vue {view} est débloquée.”；`/`、`/mini/`、`/ice/` md5 = 线上；单元测试和假店铺页带锁场景通过，只剩多语言用例（预料中） |
 | 2026-11-04 | 第四节 Klaviyo：HQ 把三件事转给本 app 的 Klaviyo HQ（local_c57e9aed，另一个账户的窗口停用，不写交接）：MKT 页关 VpD3CV；所有商店弹窗排除 */pages/lab* 和 */pages/sonarlab-mktbf2026*（K4b，左下角小圆标挡 Skip tour）；老订阅者邮件带 lab_unlock=sub。先出预览，Jason 在 Klaviyo HQ 说“动”才改 | Jason 11-04：“你和klaviyo窗口说一下弹窗要解决的事” |
+| 2026-11-04 | 第四节 Klaviyo HQ 回（e8f7de4） | VpD3CV 不用改；商店弹窗排除清单 + 预览已出，Klaviyo 未改；lab_unlock=sub 由 Klaviyo HQ 问 Jason（BF 漏斗窗口已停用） |
