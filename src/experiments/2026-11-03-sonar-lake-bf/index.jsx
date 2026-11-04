@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import * as THREE from 'three'
 import LakeScene from './Scene'
@@ -15,7 +15,7 @@ import ViewIcon from './ViewIcon'
 import { isSignedUp } from './signup'
 import { iceUrl, labEvent, miniOnly, PRODUCT, sentEvents } from './embed'
 import ShopButton from './ShopButton' // the one link to the store (X-6L, 2026-10-25; placement B, Jason)
-import { t } from './i18n' // every visitor-visible string, English or French (?lang=fr; X-6L-fr)
+import { t, METRIC_FIRST } from './i18n' // every visitor-visible string by ?lang= (en · fr X-6L-fr · de nl pl lv #212)
 import ShareButton from './ShareButton'
 import AppBadges from './AppBadges'
 import Tour, { TOUR_SCRIPTS, tourForced, tourOff, tourSeen } from './Tour'
@@ -134,7 +134,7 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
   const [home, setHome] = useState(homeFirst && !tourAuto)      // the app's Home page is open inside the phone display
   const [started, setStarted] = useState(!homeFirst || tourAuto) // a view has been picked (always true on desktop and on the ice page; the tour picks its own)
   const toastT = useRef(0)
-  const [imperial, setImperial] = useState(true)
+  const [imperial, setImperial] = useState(!METRIC_FIRST) // feet for en / fr, metres for de nl pl lv (#212); tapping a value switches
   const [colormap, setColormap] = useState('accuphy_mid') // halfway between the app 2.0.0 'orange' map measured on its own recording and the LiveScope amber (Jason 2026-10-23: 折中); 'garmin_amber' was the LiveScope-measured amber (§7.7)
   const [gain, setGain] = useState(Number.isFinite(devNum('gain')) ? devNum('gain') : 0.40) // 40 %: the app's own recordings run at 40–50; the look is the one the old 57 % gave (sonarShader toneIdx)
   const [contrast, setContrast] = useState(Number.isFinite(devNum('contrast')) ? devNum('contrast') : 0.4)    // demo look (sonar-style.md §6.5): floor mostly gone, a trace of noise stays
@@ -219,6 +219,41 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
   const live = started || !phone
   const liveSpecs = live ? specs : []
   const specKey = `${deviceId}-${mode}-${effRangeFt}-${live ? 1 : 0}`
+  // the panel's label column (界面设计 11-03, for de / pl / lv): as wide as the widest label in this language, the same for every
+  // row so the chips and sliders start on one line; never narrower than the old 56 / 96 px (English unchanged); past 104 px the
+  // long label goes to two lines instead of squeezing its control. Measured again when the rows change (Combo, ice) and on font load.
+  useLayoutEffect(() => {
+    const el = state.current.panelEl
+    if (!el) return
+    const fit = () => {
+      const labels = [...el.querySelectorAll('.ac-row-label')]
+      for (const n of labels) { n.style.whiteSpace = 'nowrap'; n.style.lineHeight = '' } // measure on one line
+      const widest = (sel) => Math.max(0, ...[...el.querySelectorAll(sel)].map((n) => { const r = document.createRange(); r.selectNodeContents(n); return Math.ceil(r.getBoundingClientRect().width) }))
+      const w = widest('.ac-row-label:not([data-wide])') + 4, wide = widest('.ac-row-label[data-wide]') + 4
+      el.style.setProperty('--ac-label-w', `${Math.min(104, Math.max(56, w))}px`)
+      el.style.setProperty('--ac-label-wide', `${Math.max(96, wide)}px`)
+      if (w > 104) for (const n of labels) if (!n.hasAttribute('data-wide')) { n.style.whiteSpace = 'normal'; n.style.lineHeight = '1.15' }
+      // the view tiles' names break only between words (buttons.css); when a row's longest word is wider than its tile, the whole
+      // row's names shrink together, 0.5 px at a time, to no less than 10 px (HQ / 界面设计 11-03)
+      for (const row of el.querySelectorAll('.ac-views')) {
+        const names = [...row.querySelectorAll('.ac-view-name')]
+        if (!names.length) continue
+        for (const n of names) n.style.fontSize = ''
+        const base = parseFloat(getComputedStyle(names[0]).fontSize)
+        let k = 1
+        for (const n of names) { // each word's own width, a Range over it in the name's text
+          const tile = n.closest('.ac-view'), ts = getComputedStyle(tile), room = tile.clientWidth - parseFloat(ts.paddingLeft) - parseFloat(ts.paddingRight)
+          const tn = n.firstChild, txt = tn?.textContent || ''
+          for (const m of txt.matchAll(/\S+/g)) { const r = document.createRange(); r.setStart(tn, m.index); r.setEnd(tn, m.index + m[0].length); k = Math.min(k, room / r.getBoundingClientRect().width) }
+        }
+        if (k < 1) { const size = Math.max(10, Math.floor(base * k * 2) / 2); for (const n of names) n.style.fontSize = `${size}px` }
+      }
+    }
+    fit()
+    let live = true
+    document.fonts?.ready?.then(() => { if (live) fit() })
+    return () => { live = false }
+  }, [deviceId, mode, view, land])
   const layout = useMemo(() => screenLayout(deviceId, mode, effRangeFt * FT, dispAspect, specs, (combo ? comboDown : depthFt) * FT, depthFt * FT), [deviceId, mode, effRangeFt, depthFt, combo, comboDown, specs, dispAspect]) // display aspect = phone frame aspect (sideways: the screen's)
 
   const b0 = (/boat=(-?[\d.]+),(-?[\d.]+)/.exec(window.location.search) || []).slice(1).map(Number) // dev: ?boat=x,z
@@ -544,7 +579,7 @@ function ring(pad) {
 function Row({ label, children, wide = false }) {
   return (
     <div className="flex flex-wrap items-center gap-3">
-      <span className={`ac-label ${wide ? 'w-24' : 'w-14'}`}>{label}</span>
+      <span className="ac-label ac-row-label" data-wide={wide ? '' : undefined} style={{ width: wide ? 'var(--ac-label-wide, 96px)' : 'var(--ac-label-w, 56px)', flex: 'none', whiteSpace: 'nowrap' }}>{label}</span>
       {children}
     </div>
   )

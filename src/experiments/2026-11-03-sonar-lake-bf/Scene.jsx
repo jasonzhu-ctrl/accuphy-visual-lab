@@ -613,7 +613,8 @@ function Rig({ state, sonarRect, fogMats, cam = LAKE_CAM }) {
       // placement, with a plain caption under it — no glass pill, no glowing dot (Jason: 看着太 AI 了)
       if (iceSec) {
         s.hintAnchor = s.hintAnchor || { x: 0, z: 0 }
-        s.hintAnchor.x = s.boat.x - (k > 1 ? 1.5 : 2.6); s.hintAnchor.z = s.boat.z + (k > 1 ? 3.8 : 2.2)
+        // phones in Forward / Combo (the framing pans along the fan, the hole at the left edge): 8 m east of the hole instead
+        s.hintAnchor.x = s.boat.x + (k > 1 ? ((s.secDx || 0) > 0.5 ? 8 : -1.5) : -2.6); s.hintAnchor.z = s.boat.z + (k > 1 ? 3.8 : 2.2)
         tmp.set(s.hintAnchor.x, 0, s.hintAnchor.z).project(camera)
       } else { s.hintAnchor = null; tmp.set(s.boat.x, 0.05, s.boat.z - 5.3).project(camera) } // the lake: just above the far edge of the water reticle (#132)
       s.tapAt = [((tmp.x + 1) / 2) * size.width, ((1 - tmp.y) / 2) * size.height] // where the ice page's tour asks for a tap (Tour.jsx drill stop): the reticle
@@ -727,36 +728,82 @@ function Rig({ state, sonarRect, fogMats, cam = LAKE_CAM }) {
         // controller converged slowly, jumped on the first (long) frames and settled at different zooms per browser.
         const D = depthAt(s.boat.x, s.boat.z)
         const iceWant = k > 1 ? 0.26 : 0.45, bottomMax = k > 1 ? 0.8 : 0.9 // phones: the band is short, keep room under the lit bottom
-        const key = [s.boat.x.toFixed(2), s.boat.z.toFixed(2), D.toFixed(2), size.width, size.height, Math.round(bandBottom), camera.fov, k > 1].join('|')
+        // Forward and Combo (#224, Jason 11-03: “距离以120feet的forward range对应的声纳照射范围能进入画面为标准”, then “120ft” over a
+        // closer 80 ft fit): the forward fan out to 120 ft — its top edge along the ice, its lower edge 39° down to the lit bed —
+        // fits on screen as well. The camera pans along the fan and backs off until it does; Combo's 150 ft default runs a little
+        // past. Phones: inside the band above the app frame. Desktop: right of the glass panel, clear of the app badges and the phone.
+        const fwdFit = s.mode === 'forward' || s.mode === 'combo'
+        let box = null // where the fan may go, in fractions of the width and of the band
+        if (fwdFit && k > 1) box = { l: 0.05, r: 0.95, t: 0.1, b: bottomMax, obs: [], cx: 0.5, cy: 0.45 }
+        else if (fwdFit) {
+          const W = size.width, H = size.height, pan = document.querySelector('.ac-panel')?.getBoundingClientRect()
+          const obs = [sonarRect?.current?.frame, document.querySelector('.ac-badges-wrap')].map((el) => el?.getBoundingClientRect()).filter((r) => r && r.width > 0)
+            .map((r) => ({ l: (r.left - 16) / W, r: (r.right + 16) / W, t: (r.top - 16) / H, b: (r.bottom + 16) / H }))
+          const l = pan && pan.width ? (pan.right + 24) / W : 0.04, t = 64 / H
+          box = { l, r: 1 - 24 / W, t, b: 1 - 24 / H, obs, cx: (l + 1) / 2, cy: (t + Math.min(1, ...obs.map((o) => o.t))) / 2 }
+        }
+        const key = [s.boat.x.toFixed(2), s.boat.z.toFixed(2), D.toFixed(2), size.width, size.height, Math.round(bandBottom), camera.fov, k > 1, box && JSON.stringify(box, (_, v) => (typeof v === 'number' ? Math.round(v * 200) / 200 : v))].join('|')
         if (s.secKey !== key) {
           s.secKey = key
           const probe = camera.clone() // same fov and view offset as the live camera
           const lookT = new THREE.Vector3(), posT = new THREE.Vector3(), pt = new THREE.Vector3()
-          const place = (dy, zoom) => {
-            lookT.set(s.boat.x + C.look[0], C.look[1] + dy, s.boat.z + C.look[2])
-            posT.set(s.boat.x + C.pos[0], C.pos[1], s.boat.z + C.pos[2]).sub(lookT).multiplyScalar(zoom).add(lookT)
+          const place = (dy, zoom, dx = 0) => {
+            lookT.set(s.boat.x + C.look[0] + dx, C.look[1] + dy, s.boat.z + C.look[2])
+            posT.set(s.boat.x + C.pos[0] + dx, C.pos[1], s.boat.z + C.pos[2]).sub(lookT).multiplyScalar(zoom).add(lookT)
             probe.position.copy(posT); probe.up.set(0, 1, 0); probe.lookAt(lookT); probe.updateMatrixWorld(true)
           }
           const frac = (y) => ((1 - pt.set(s.boat.x, y, s.boat.z).project(probe).y) / 2) * size.height / bandBottom // 0 = band top, 1 = band bottom
-          const solveDy = (zoom) => { // frac(0) grows with dy (look higher → the scene slides down)
+          const solveDy = (zoom, dx = 0) => { // frac(0) grows with dy (look higher → the scene slides down)
             let lo = -14, hi = 16
-            for (let i = 0; i < 16; i++) { const mid = (lo + hi) / 2; place(mid, zoom); if (frac(0) < iceWant) lo = mid; else hi = mid }
+            for (let i = 0; i < 16; i++) { const mid = (lo + hi) / 2; place(mid, zoom, dx); if (frac(0) < iceWant) lo = mid; else hi = mid }
             return (lo + hi) / 2
           }
-          let zoom = 1, dy = solveDy(1)
+          let zoom = 1, dy = solveDy(1), dx = 0
           place(dy, 1)
           if (frac(-D) > bottomMax) { // too deep for the band: back off along the line of sight until the bottom fits
             let lo = 1, hi = 3.2
             for (let i = 0; i < 14; i++) { const mid = (lo + hi) / 2; place(solveDy(mid), mid); if (frac(-D) > bottomMax) lo = mid; else hi = mid }
             zoom = hi; dy = solveDy(zoom)
           }
-          s.secZoom = zoom; s.secDy = dy
+          if (box) {
+            const R = 120 * 0.3048, tanF = Math.tan((39 * Math.PI) / 180), pts = [[s.boat.x, -D], [s.boat.x - 3, 1.8]] // the hole kit stands ~3 m west, ~1.8 m tall
+            for (let i = 0; i <= 8; i++) { const x = s.boat.x + (R * i) / 8; pts.push([x, 0], [x, -Math.min(depthAt(x, s.boat.z), (R * i) / 8 * tanF)]) }
+            const ext = () => { // the points on screen (x of the width, y of the band): their box, and whether all are where they may be
+              let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9, ok = true
+              for (const [x, y] of pts) {
+                pt.set(x, y, s.boat.z).project(probe); const fx = (pt.x + 1) / 2, fy = ((1 - pt.y) / 2) * size.height / bandBottom
+                x0 = Math.min(x0, fx); x1 = Math.max(x1, fx); y0 = Math.min(y0, fy); y1 = Math.max(y1, fy)
+                if (fx < box.l || fx > box.r || fy < box.t || fy > box.b || box.obs.some((o) => fx > o.l && fx < o.r && fy > o.t && fy < o.b)) ok = false
+              }
+              return { x0, x1, y0, y1, ok }
+            }
+            const midY = (z, dx) => { // the fan's middle at box.cy (the ice line no longer pinned: more sky, less cut ground)
+              let lo = -30, hi = 30
+              for (let i = 0; i < 16; i++) { const mid = (lo + hi) / 2; place(mid, z, dx); const e = ext(); if ((e.y0 + e.y1) / 2 < box.cy) lo = mid; else hi = mid }
+              return (lo + hi) / 2
+            }
+            const fitAt = (z) => { // pan so the fan is centred across its room
+              let lo = -R, hi = R, dyz = dy
+              for (let i = 0; i < 13; i++) { const mid = (lo + hi) / 2; dyz = midY(z, mid); place(dyz, z, mid); const e = ext(); if ((e.x0 + e.x1) / 2 > box.cx) lo = mid; else hi = mid }
+              const dxz = (lo + hi) / 2; dyz = midY(z, dxz); place(dyz, z, dxz)
+              return { dx: dxz, dy: dyz, ok: ext().ok }
+            }
+            let f = fitAt(zoom)
+            if (!f.ok) {
+              let lo = zoom, hi = 7
+              for (let i = 0; i < 14; i++) { const mid = (lo + hi) / 2; if (fitAt(mid).ok) hi = mid; else lo = mid }
+              zoom = hi; f = fitAt(zoom)
+            }
+            dx = f.dx; dy = f.dy
+          }
+          s.secZoom = zoom; s.secDy = dy; s.secDx = dx
         }
         zoom = s.secZoom
       } else if (s.offX > 0) { if (!camera.view?.enabled || camera.view.offsetX !== -s.offX || camera.view.offsetY !== 0) camera.setViewOffset(size.width, size.height, -s.offX, 0, size.width, size.height) }
       else if (camera.view?.enabled) camera.clearViewOffset()
-      const lk = new THREE.Vector3(s.boat.x + C.look[0], C.look[1] + (s.view === 'section' ? s.secDy : 0), s.boat.z + C.look[2])
-      tmp.set(s.boat.x + C.pos[0], C.pos[1], s.boat.z + C.pos[2]).sub(lk).multiplyScalar(zoom).add(lk)
+      const sdx = s.view === 'section' ? s.secDx || 0 : 0 // the pan along the forward fan (#224, above)
+      const lk = new THREE.Vector3(s.boat.x + C.look[0] + sdx, C.look[1] + (s.view === 'section' ? s.secDy : 0), s.boat.z + C.look[2])
+      tmp.set(s.boat.x + C.pos[0] + sdx, C.pos[1], s.boat.z + C.pos[2]).sub(lk).multiplyScalar(zoom).add(lk)
       tmp.x += px * 1.2; tmp.y += py * 0.6
       if (!s.camP) { s.camP = tmp.clone(); s.camL = lk.clone() }
       s.camP.lerp(tmp, e)

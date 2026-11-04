@@ -81,7 +81,21 @@ MKT 版归 “Lab 营销版” 窗口负责（#231）。HQ 管它，和网站、
 
 ## 六、Base 的改动搬进复制件（#216、#226）
 
-- [ ] **多语言 #212 和冰钓 #224 一起搬（#234：这一项做完，MKT 版才上线）：** 等多语言核完、放进 Base，HQ 通知后，营销版一次搬这两样。
+- [x] **多语言 #212 和冰钓 #224 一起搬（#234：这一项做完，MKT 版才上线）：** 2026-11-04 搬完（Jason 11-04 在 Lab HQ：“搬”），证据见下面“11-04 搬完”和记录表。
+  - **11-04 搬完：** 把 Base 这几次提交按顺序搬进复制件（只改 `2026-11-03-sonar-lake-bf/`）：066623a、3db81b2、99e15c8（#224，Scene.jsx）、3df49de（五种语言的表）、
+    12f5918、43c2d45、ac71a78、40eca0f、348d3d2（面板标签、导览标题、视图名排版，和网站嵌入版 29c90af / 96a37dd / 5a00dc8 / d8cd16c / ee7b8d0 同一套）。
+    **没搬：** 322f47f、c8ace42（#225 广告用的开发开关，打包里没有）。复制件自己的锁（#191）、同意文字（4d41681）、unlock_done（bab47fc）都留着。
+    搬完和 Base 比：只差复制件自己的这几处 + #225 开关。
+  - **单元测试**（`LAB_DIR=2026-11-03-sonar-lake-bf`）：app-qr 4/4、share-url 22/22（原来那 4 条德荷波拉现在通过）、shop-url 26/26、signup-guard 全过。
+  - **假店铺页**（`LAB_LOCKED=1`）：9/9 PASS，含 share-de（分享链接带 `&lang=de`，去商店进 `/de-de/products/`，`<html lang=de>`）和 lock-desktop。
+  - **打包：** `/mktbf2026/` md5 c4c8bce9；`/mktbf2026/ice/` = `/ice/`。`/`、`/mini/`、`/ice/` 用 `BASE_REF=537adc2` 打，md5 = 线上（afb82b9c、26abb62f、f22f445a）。
+    **注意（给 HQ）：** 用 HEAD 打，`/`、`/mini/`、`/ice/` 是网站嵌入版已经放进五种语言、但还没上线的那份（58ed5de8 / 6bd00616 / 14e6cc38），所以和线上不一样。这是网站嵌入版自己的改动，营销版没碰。上线那天用哪个 `BASE_REF`，由 HQ 和网站嵌入版定。
+  - **看过：** 带锁湖页 en fr de nl pl lv，电脑 1440×900 和手机 390×844 各一次，都能打开，0 报错，`<html lang>` 对，德荷波拉用米；锁卡和同意文字都放得下（同意文字 11 px，英 2 行，法 3 行）。冰钓页（`/mktbf2026/ice/?lang=de`）看了一次，0 报错。
+    锁卡六种语言的图：`docs/2026-11-04-mkt-lock-card-6lang.png`。
+- [ ] **锁卡这 13 条还没有德、荷、波、拉（不自己编，报 HQ）：** unlock_title、unlock_locked、unlock_text、unlock_done、unlock_email、unlock_cta、unlock_sending、
+  unlock_consent、unlock_privacy、unlock_err_email、unlock_err_send、unlock_err_closed、back_to_lake。
+  五种语言的表（`docs/2026-11-03-lab-strings-5lang.md` 第九节）专门写了“锁（营销版）不在这张表里”。现在德、荷、波、拉的访客看到的锁卡是英文，只有视图名是那种语言（“Unlock Live-Kombi”）。
+  卡上的 “Test mode: nothing is sent.” 和隐私链接 `shop.accuphy.com/policies/privacy-policy` 也只有一种写法。要 Lab 多语言出译文、网站核过，再放进复制件。
   - #212：`embed.js`、`i18n.js` 等文件，066623a 及以后。
   - #224：99e15c8，冰钓页前视 120 ft 进画面。要搬的只是复制件里湖页那部分代码（#226）。
   - 搬完要做的：
@@ -117,4 +131,5 @@ MKT 版归 “Lab 营销版” 窗口负责（#231）。HQ 管它，和网站、
 | 2026-11-03 | unlock_done 法文（bab47fc） | 打包页里有 “C’est fait. La vue {view} est débloquée.”；`/`、`/mini/`、`/ice/` md5 = 线上；单元测试和假店铺页带锁场景通过，只剩多语言用例（预料中） |
 | 2026-11-04 | 第四节 Klaviyo：HQ 把三件事转给本 app 的 Klaviyo HQ（local_c57e9aed，另一个账户的窗口停用，不写交接）：MKT 页关 VpD3CV；所有商店弹窗排除 */pages/lab* 和 */pages/sonarlab-mktbf2026*（K4b，左下角小圆标挡 Skip tour）；老订阅者邮件带 lab_unlock=sub。先出预览，Jason 在 Klaviyo HQ 说“动”才改 | Jason 11-04：“你和klaviyo窗口说一下弹窗要解决的事” |
 | 2026-11-04 | 第四节 Klaviyo HQ 回（e8f7de4） | VpD3CV 不用改；商店弹窗排除清单 + 预览已出，Klaviyo 未改；lab_unlock=sub 由 Klaviyo HQ 问 Jason（BF 漏斗窗口已停用） |
+| 2026-11-04 | 第六节搬完（新的 Lab 营销版，本 app） | 本次提交；单元测试四套全过（share-url 22/22）；假店铺页带锁 9/9 含 share-de；`/mktbf2026/` md5 c4c8bce9；`BASE_REF=537adc2` 时 `/`、`/mini/`、`/ice/` md5 = 线上；六种语言 × 电脑/手机 0 报错；`docs/2026-11-04-mkt-lock-card-6lang.png`。锁卡 13 条德荷波拉没有，报 HQ |
 | 2026-11-04 | 第六节：Jason 在 Lab HQ 说“搬”（五种语言 #212 + 冰钓 #224 搬进带锁版） | 旧营销版窗口在停用的另一个账户里找不到；HQ 在本 app 建了新的“Lab 营销版”任务卡（lab-mkt），按第六节做，只改复制件，不上线 |

@@ -134,7 +134,7 @@ main.is-touring .ac-shop, main.is-touring .ac-badges-wrap, main.is-touring .ac-s
 
 /* phones: no panel and, since A8, no badges: the card under the safe area + 64 px, Skip and Replay top right (design handover §4) */
 .ac-tour-layer.is-phone .ac-tour-card { left: 0; right: 0; top: calc(env(safe-area-inset-top) + 64px); padding: 0 20px; }
-.ac-tour-layer.is-phone .ac-tour-title { font-size: 30px; }
+.ac-tour-layer.is-phone .ac-tour-title { font-size: 30px; text-wrap: balance; } /* two lines at most (Tour.jsx fits it: 26 px past that) */
 .ac-tour-layer.is-phone .ac-tour-text { font-size: 14.5px; max-width: 320px; }
 .ac-tour-layer.is-phone .ac-tour-corner { left: auto; right: 16px; bottom: auto; top: calc(env(safe-area-inset-top) + 14px); }
 
