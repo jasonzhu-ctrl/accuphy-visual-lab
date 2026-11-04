@@ -22,8 +22,26 @@ while i < n:
         i = j
     else: i += 1
 need = len(keys) - 1
-big = sorted(sorted(gaps, key=lambda g: g[1] - g[0])[-need:])
-assert len(big) == need and min(g[1] - g[0] for g in big) >= 30, f'need {need} pauses ≥ 0.3 s between the lines, found {[(g[0]/100, (g[1]-g[0])/100) for g in big]}'
+# which pauses are BETWEEN lines: the longest pauses are not enough (a full stop inside a line can be longer than a line break,
+# take 2 on 11-04), so pick the set of `need` pauses (≥ 0.12 s) whose pieces best match each line's share of the words
+# (template lines carry "text"), by dynamic programming over the pauses ≥ 0.3 s in order
+cand = [g for g in gaps if g[1] - g[0] >= 30]   # only pauses ≥ 0.3 s can be line breaks
+t0, t1 = int(np.argmax(act)), n - int(np.argmax(act[::-1]))
+words = np.array([len(L['text'].split()) + 1 for L in P['lines']], float); share = words / words.sum()
+bounds = [t0] + [(g[0] + g[1]) / 2 for g in cand] + [t1]          # piece edges: start, every pause middle, end
+INF = 1e18; m = len(bounds); best = {(0, 0): (0.0, None)}
+for k in range(1, len(keys) + 1):                                  # k pieces ending at edge j
+    for j in range(1, m):
+        if k == len(keys) and j != m - 1: continue
+        opts = [(best[(k - 1, i)][0] + np.log(max(bounds[j] - bounds[i], 1) / ((t1 - t0) * share[k - 1])) ** 2, i)
+                for i in range(j) if (k - 1, i) in best]
+        if opts: best[(k, j)] = min(opts)
+assert (len(keys), m - 1) in best, 'could not split the take into the lines'
+path = []; k, j = len(keys), m - 1
+while k > 0: i = best[(k, j)][1]; path.append(j); k, j = k - 1, i
+edges = sorted(path)[:-1]                                          # the need inner edges, as indexes into bounds
+big = [cand[e - 1] for e in edges]
+assert len(big) == need, f'bad split: {[(g[0]/100, (g[1]-g[0])/100) for g in big]}'
 on = [int(np.argmax(act))] + [g[1] for g in big]; off = [g[0] for g in big] + [n - int(np.argmax(act[::-1]))]
 rows = []
 for k, s, e, L in zip(keys, on, off, P['lines']):
