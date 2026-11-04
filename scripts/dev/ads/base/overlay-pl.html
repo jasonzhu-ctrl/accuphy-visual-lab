@@ -102,7 +102,7 @@
     // the Lab's own drag hint (r17): its small caption above the boat for the first 2.2 s of the drag
     const d0 = beats.drag[0], hint = type && t >= d0 && t < d0 + 2.2 && info?.boat
     $('#labhint').classList.toggle('hidden', !hint)
-    if (hint) { const e = $('#labhint'); e.textContent = lines.hint || 'Drag the boat to move it'; const o = ease(span(t, d0, d0 + 0.5)) * (1 - ease(span(t, d0 + 1.6, d0 + 2.2))); e.style.opacity = o; e.style.transform = `translate(${Math.max(72, info.boat[0] - e.offsetWidth / 2)}px, ${info.boat[1] - 150}px)` }
+    if (hint) { const e = $('#labhint'); e.textContent = lines.hint || 'Drag the boat to move it'; const o = ease(span(t, d0, d0 + 0.5)) * (1 - ease(span(t, d0 + 1.6, d0 + 2.2))); e.style.opacity = o; e.style.transform = `translate(${Math.min(1008 - e.offsetWidth, Math.max(72, info.boat[0] - e.offsetWidth / 2))}px, ${info.boat[1] - 150}px)` } // inside x 72–1008 (as overlay-base.html bf62de5)
     $('#cue').classList.add('hidden')
     const end = t >= END
     $('#end').classList.toggle('hidden', !end)
