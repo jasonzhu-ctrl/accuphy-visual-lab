@@ -158,7 +158,8 @@ if (!LOCKED) scenarios['no-lock-desktop'] = async () => {
 // #213 (BF locked version, LAB_LOCKED=1): Combo is locked until the visitor subscribes. The frame's fetch is stubbed first, so a
 // test never sends a real sign-up to Klaviyo even when the build carries the list id. Then: an email link (?lab_unlock=sub)
 // opens it with no card and no `signup`. The sign-up mark is cleared before and after, so other scenarios start locked.
-if (LOCKED) scenarios['lock-desktop'] = async () => {
+const US = SHOP_DEFAULT === '/en-us'
+if (LOCKED && !US) scenarios['lock-desktop'] = async () => {
   const tab = await openTab(1280, 800)
   if (!(await tab.open('mode=none'))) return { ok: false, detail: 'Lab did not start' }
   await tab.lab("(w.localStorage.removeItem('accuphy_sonar_signup_v1'), true)")
@@ -187,6 +188,26 @@ if (LOCKED) scenarios['lock-desktop'] = async () => {
     && b.posts.every((x) => /a\.klaviyo\.com\/client\/subscriptions/.test(x.u))
     && c.locks === 0 && c.card === 0 && c.active === 'Combo' && !c.evs.some((x) => x.e === 'signup')
   return { ok, detail: `before: locks=${a.locks} card=${a.card} active=${a.active} | after subscribe: card=${b.card} active=${b.active} signup=${JSON.stringify(sign.map((x) => x.d))} done="${doneTitle}" klaviyoPosts=${b.posts.length}${list ? ` list=${list}` : ' (test mode, nothing sent)'} (stubbed) | email link: locks=${c.locks} card=${c.card} active=${c.active} signup=${c.evs.filter((x) => x.e === 'signup').length}` }
+}
+
+// #241 (MKT copy, `LAB_SHOP=/en-us LAB_LOCKED=1`): the US store page is Mini only (#190) and its Live Combo is free — no padlock, no card,
+// a `view` event and no `signup`; its Panoramic still opens the subscribe card (#240/#191). Runs instead of lock-desktop there.
+if (LOCKED && US) scenarios['lock-us'] = async () => {
+  const tab = await openTab(1280, 800)
+  if (!(await tab.open('mode=none&extra=market%3Dus'))) return { ok: false, detail: 'Lab did not start' }
+  await tab.lab("(w.localStorage.removeItem('accuphy_sonar_signup_v1'), true)")
+  if (!(await tab.open('mode=none&extra=market%3Dus'))) return { ok: false, detail: 'Lab did not restart' }
+  await tab.lab("(w.__evs = [], w.addEventListener('accuphy-lab', e => { if (e.detail.event === 'view' || e.detail.event === 'signup') w.__evs.push(e.detail.event + ':' + (e.detail.data.view || '')) }), true)")
+  const devs = await tab.lab("[...d.querySelectorAll('.ac-btn')].map(b => b.textContent.trim()).join()")
+  const locked = await tab.lab("[...d.querySelectorAll('.ac-view.is-locked .ac-view-name')].map(e => e.textContent.trim()).join()")
+  const pick = (name) => `([...d.querySelectorAll('.ac-view')].find(b => b.querySelector('.ac-view-name').textContent.trim() === '${name}').click(), true)`
+  await tab.lab(pick('Combo')); await sleep(800)
+  const a = JSON.parse(await tab.lab("JSON.stringify({ card: d.querySelectorAll('.ac-unlock').length, active: [...d.querySelectorAll('.ac-view.is-active .ac-view-name')].map(e => e.textContent.trim()).join(), evs: w.__evs })"))
+  await tab.lab(pick('Panoramic')); await sleep(800)
+  const b = JSON.parse(await tab.lab("JSON.stringify({ card: d.querySelectorAll('.ac-unlock').length, title: d.querySelector('.ac-unlock-title')?.textContent, active: [...d.querySelectorAll('.ac-view.is-active .ac-view-name')].map(e => e.textContent.trim()).join() })"))
+  await tab.close()
+  const ok = devs === 'PingLive Mini' && locked === 'Panoramic' && a.card === 0 && a.active === 'Combo' && a.evs.includes('view:combo') && !a.evs.some((e) => e.startsWith('signup')) && b.card === 1 && b.title === 'Unlock Live Panoramic' && b.active === 'Combo'
+  return { ok, detail: `devices=${devs} locked=${locked} | Combo: card=${a.card} active=${a.active} events=${JSON.stringify(a.evs)} | Panoramic: card=${b.card} "${b.title}" active=${b.active}` }
 }
 
 let failed = 0

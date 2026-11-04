@@ -31,6 +31,8 @@ The unit tests take the folder too: `LAB_DIR=2026-11-03-sonar-lake-bf node scrip
 **MKT list by market (§6.5, 2026-11-04):** `LAB_SHOP=/` (or `/en-us`, `/en-au`) makes the fake store page North American; the
 default `/de-de` is European. lock-desktop prints the success line (`done=`) and, in a build with list ids, the list it sent to. Routing unit test:
 `node scripts/dev/mkt-list-route-test.mjs`.
+`LAB_SHOP=/en-us` runs `lock-us` instead of `lock-desktop` (#241: the US page's Live Combo is free, Panoramic still locked); the
+lock rule by market: `node scripts/dev/mkt-lock-rule-test.mjs`.
 
 **(Resolved 2026-11-04, c442045: #212 is in the copy and these pass.)** Expected failures on the copy, until #212 moves in (#216, Jason 2026-11-03: the languages move into the locked version once they are done):** the BF copy stays at 86bf80e (#213) and does not have #212's
 languages. So on `LAB_DIR=2026-11-03-sonar-lake-bf`, `share-url-test.mjs` fails its 4 de/nl/pl/lv cases, and in a locked run

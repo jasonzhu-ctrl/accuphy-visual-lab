@@ -9,6 +9,7 @@
 // and a tap only shows a short notice (#191: Live Combo unlocks by subscribing; Down Scan and Chirp explain themselves). Sizes are in cqh of the display, like SonarChrome.
 import { useEffect, useRef, useState } from 'react'
 import { LockIcon } from '../UnlockCard'
+import { isLocked } from '../locks'
 import { t } from '../i18n' // English / French (?lang=fr); the French is the real app's own (website review 2026-10-26)
 // the thumbnails are files beside the page, not inlined (load plan B, 2026-10-27): fetched only when the Home page is shown — never on desktop
 import plPanoramic from './pl-panoramic.jpg'
@@ -48,9 +49,7 @@ const OFF = 'rgba(255,255,255,0.32)' // Setting and Map: greyed, nothing happens
 // the desktop panel's view tiles use the same pictures (Jason 2026-10-30)
 export const viewThumb = (d, m) => (d === 'PL' ? { down: plDown, forward: plForward, panoramic: plPanoramic } : { down: plmDown, forward: plmForward, combo: plmCombo, panoramic: plmPanoramic, ice: plmIceFishing, liveice: plmLiveIce })[m]
 export const VIEW_IMG = { combo: plmCombo, panoramic: plmPanoramic, ice: plmIceFishing, liveice: plmLiveIce } // the subscribe card's picture of what it opens (#191)
-// the views behind the subscribe card (#191); PingLive's Panoramic too in this locked copy (#240, Jason 11-04: “锁全景 Panoramic”) — its
-// Down and Forward stay free
-export const isLocked = (d, m) => m === 'combo' || m === 'ice' || m === 'panoramic'
+export { isLocked } // the rule lives in ../locks.js (node tests read it there)
 const unlockLabel = (view) => t('unlock_locked', { view })
 const movingText = (view) => t('na_moving', { view })
 function Icon({ name, active }) {
