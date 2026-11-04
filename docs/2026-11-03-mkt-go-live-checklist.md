@@ -149,3 +149,4 @@ MKT 版归 “Lab 营销版” 窗口负责（#231）。HQ 管它，和网站、
 | 2026-11-04 | 第六节搬完（新的 Lab 营销版，本 app） | 本次提交；单元测试四套全过（share-url 22/22）；假店铺页带锁 9/9 含 share-de；`/mktbf2026/` md5 c4c8bce9；`BASE_REF=537adc2` 时 `/`、`/mini/`、`/ice/` md5 = 线上；六种语言 × 电脑/手机 0 报错；`docs/2026-11-04-mkt-lock-card-6lang.png`。锁卡 13 条德荷波拉没有，报 HQ |
 | 2026-11-04 | 第六节：Jason 在 Lab HQ 说“搬”（五种语言 #212 + 冰钓 #224 搬进带锁版） | 旧营销版窗口在停用的另一个账户里找不到；HQ 在本 app 建了新的“Lab 营销版”任务卡（lab-mkt），按第六节做，只改复制件，不上线 |
 | 2026-11-04 | 后面那一层上线（第一、二、七节） | 0117d52 + BASE_REF 96fdc22，Vercel FaE6Y1UjSaYBVW3o7FCtL5gX1DhP；`/`、`/mini/`、`/ice/`、`/embed/lab.js` md5 = 上线前；`/mktbf2026/`、`/mktbf2026/ice/` 200；W24Qdc 只在 /mktbf2026/；浏览器加拿大参数 → Live Combo 出订阅卡，0 报错，没提交 |
+| 2026-11-04 | 客人看到的店铺页上线（第一节） | 网站 #244，00 446dbfb6（Jason 在网站 HQ 说“动”）；HQ curl 各前缀 200，框指向 lab.accuphy.ca/mktbf2026/；03 在查全部前缀、拉脱维亚 /en-ro、无店铺弹窗；真实订阅测试等 Jason 点头；核完前链接不进广告 |
