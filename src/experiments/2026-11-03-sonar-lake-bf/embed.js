@@ -69,9 +69,14 @@ export function storeOrigin() {
 // the names; website HQ 2026-10-29: GA4 files unknown mediums as "Unassigned"): utm_source=lab_share (no ref=share: nothing reads it, and the QR stays lean — HQ 2026-10-29),
 // utm_medium=referral, utm_content = qr | copy (native / whatsapp / sms were dropped 2026-10-29: QR and copy only, Jason), utm_campaign=bf2026_lab_<market> — the market is the
 // country code the bridge uses (ca for /fr too: Quebec is Canada).
-export function shareMarket() {
+// the `market` the store's bridge passed (2 letters, lower case), or null — no fallback (the sign-up list, §6.5, must know "none")
+export function passedMarket() {
   const m = (embedOpts.market ?? (() => { try { return new URLSearchParams(window.location.search).get('market') } catch { return null } })())
-  if (typeof m === 'string' && /^[a-z]{2}$/i.test(m.trim())) return m.trim().toLowerCase()
+  return typeof m === 'string' && /^[a-z]{2}$/i.test(m.trim()) ? m.trim().toLowerCase() : null
+}
+export function shareMarket() {
+  const m = passedMarket()
+  if (m) return m
   const root = shopRoot()
   if (root === null || root === '' || root === '/fr') return 'ca'
   const region = root.split('-')[1] || ''

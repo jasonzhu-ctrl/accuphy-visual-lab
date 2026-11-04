@@ -109,7 +109,21 @@ MKT 版归 “Lab 营销版” 窗口负责（#231）。HQ 管它，和网站、
 ## 六点五、欧洲两步确认名单（Jason 11-04 在 Klaviyo HQ：“欧洲需要做两步的”）
 
 - [ ] **Klaviyo：** 新建欧洲 Lab 名单，两步确认（double opt-in），确认邮件出各语言。Klaviyo HQ 先出预览，Jason 在 Klaviyo HQ 说“动”才建；名单号建好后给 Lab HQ。
-- [ ] **Lab（带锁版复制件）：** 订阅卡按市场送名单：加拿大、美国、澳洲 → W24Qdc（单次确认）；欧洲各市场（fr-fr、nl-benelux、fr-benelux、de-de、波兰、拉脱维亚）→ 欧洲新名单。欧洲成功页写“去邮箱点确认”（五种语言，要网站 / Lab 多语言核过，不自己编）。要 Jason 说“动”才做。
+- [x] **Lab（带锁版复制件）：** 订阅卡按市场送名单：加拿大、美国、澳洲 → W24Qdc（单次确认）；欧洲各市场（fr-fr、nl-benelux、fr-benelux、de-de、波兰、拉脱维亚）→ 欧洲新名单。欧洲成功页写“去邮箱点确认”（五种语言，要网站 / Lab 多语言核过，不自己编）。
+  **11-04 做好了，等名单号和译文**（HQ 转 Jason 11-04：“现在做”；更正：“不用再单独做订阅还没开放的显示了”）：
+  - **怎么分：** 只有店铺页给的信息全都指向北美澳，才送 W24Qdc：`market` 是 ca / us / au（有传的话），而且 `shop` 是 `/`、`/fr`、`/en-us`、`/en-au`（有传的话），两样至少有一样，语言也不是 de / nl / pl / lv。
+    其他情况一律送欧洲名单，包括什么都没传（直接打开 lab.accuphy.ca）、只有 `?lang=fr`、市场和网址对不上。欧洲访客永远进不了 W24Qdc。
+  - **名单号：** 欧洲的放 `VITE_BF_LIST_ID_EU`，只在上线包里填：`VITE_BF_LIST_ID=W24Qdc VITE_BF_LIST_ID_EU=<Klaviyo 给的号> node scripts/build-bf-site.mjs <out>`。
+    欧洲名单号没填时，照没填名单号的老规矩：真实域名上欧洲访客订不了（“Subscribing isn’t open yet”，不解锁），没有新界面；测试链接上两边都是测试模式。
+  - **欧洲成功卡：** 标题 “Check your inbox”，下一行 “Click the link in our email to confirm your subscription. {view} is unlocked now.”，停 4.5 秒，然后视图马上打开（Lab 看不到确认那一下）。北美澳照旧 “You’re in. {view} is unlocked.”，停 1.5 秒。
+    这两句英文是草稿，放进了 `docs/2026-11-03-lab-strings-5lang.md` 第十一节，等 HQ 送核；法、德、荷、波、拉没写（欧洲的法国、比荷卢法语访客现在也看到英文）。
+  - **不变：** 档案属性（signup_market 等）、事件都照旧，事件里没有邮箱。
+  - **测试：** `node scripts/dev/mkt-list-route-test.mjs` 33/33（23 种店铺网址 / 市场 / 语言 → 哪个名单；10 种名单号填没填 → 送哪个、拒绝还是测试模式）；四套单元测试照旧全过（Base 的 signup-guard 也过）。
+    假店铺页（`LAB_LOCKED=1`，新加 `LAB_SHOP=` 选店铺网址）：测试包 9/9（德国页，成功卡 “Check your inbox”）+ 加拿大页 lock-desktop PASS（“You’re in…”）；
+    再用临时假名单号打一份草稿包（只在本机，不上线，fetch 被拦住什么都不发）：德国页送到欧洲那个号，加拿大 `/` 和美国 `/en-us` 送到北美那个号。
+    `/`、`/mini/`、`/ice/` 用 `BASE_REF=537adc2` 打，md5 = 线上；名单号只出现在 `/mktbf2026/`。
+    手机 390×844：欧洲卡（德、法、波）和北美卡（英、法）都放得下，没有溢出，0 报错。图：`docs/2026-11-04-mkt-success-card-phone.png`。
+  - **还差：** Klaviyo 的欧洲名单号；两句新英文定稿和五种语言译文；锁卡那 13 条的德荷波拉（第六节）。
 - [x] **上线顺序：** Jason 11-04 在 Lab HQ 选“北美澳先上”：加拿大、美国、澳洲照原计划先上线投广告；欧洲 6 个市场的链接先不给广告，等欧洲名单建好、Lab 按市场送名单、“去邮箱点确认”文字核好再上。
 
 ## 七、上线当天（HQ 做，营销版核）
@@ -131,5 +145,6 @@ MKT 版归 “Lab 营销版” 窗口负责（#231）。HQ 管它，和网站、
 | 2026-11-03 | unlock_done 法文（bab47fc） | 打包页里有 “C’est fait. La vue {view} est débloquée.”；`/`、`/mini/`、`/ice/` md5 = 线上；单元测试和假店铺页带锁场景通过，只剩多语言用例（预料中） |
 | 2026-11-04 | 第四节 Klaviyo：HQ 把三件事转给本 app 的 Klaviyo HQ（local_c57e9aed，另一个账户的窗口停用，不写交接）：MKT 页关 VpD3CV；所有商店弹窗排除 */pages/lab* 和 */pages/sonarlab-mktbf2026*（K4b，左下角小圆标挡 Skip tour）；老订阅者邮件带 lab_unlock=sub。先出预览，Jason 在 Klaviyo HQ 说“动”才改 | Jason 11-04：“你和klaviyo窗口说一下弹窗要解决的事” |
 | 2026-11-04 | 第四节 Klaviyo HQ 回（e8f7de4） | VpD3CV 不用改；商店弹窗排除清单 + 预览已出，Klaviyo 未改；lab_unlock=sub 由 Klaviyo HQ 问 Jason（BF 漏斗窗口已停用） |
+| 2026-11-04 | 第六点五节 Lab：订阅卡按市场送名单（北美澳 → W24Qdc，欧洲和不明 → `VITE_BF_LIST_ID_EU`），欧洲成功卡“Check your inbox” | 本次提交；mkt-list-route-test 33/33；假店铺页德国 9/9、加拿大 lock PASS；假名单号草稿包：德 → 欧洲号，加拿大 / 美国 → 北美号；手机卡都放得下。等名单号和译文 |
 | 2026-11-04 | 第六节搬完（新的 Lab 营销版，本 app） | 本次提交；单元测试四套全过（share-url 22/22）；假店铺页带锁 9/9 含 share-de；`/mktbf2026/` md5 c4c8bce9；`BASE_REF=537adc2` 时 `/`、`/mini/`、`/ice/` md5 = 线上；六种语言 × 电脑/手机 0 报错；`docs/2026-11-04-mkt-lock-card-6lang.png`。锁卡 13 条德荷波拉没有，报 HQ |
 | 2026-11-04 | 第六节：Jason 在 Lab HQ 说“搬”（五种语言 #212 + 冰钓 #224 搬进带锁版） | 旧营销版窗口在停用的另一个账户里找不到；HQ 在本 app 建了新的“Lab 营销版”任务卡（lab-mkt），按第六节做，只改复制件，不上线 |

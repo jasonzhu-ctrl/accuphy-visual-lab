@@ -3,8 +3,8 @@
 // lake keeps running behind it. Success says so for a moment, then opens the view; this device remembers it (signup.js).
 import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion, MotionConfig } from 'framer-motion'
-import { submitSignup, isEmail, signupTestMode } from './signup'
-import { labEvent, shareMarket } from './embed'
+import { submitSignup, isEmail, signupTestMode, listRegion } from './signup'
+import { labEvent, shareMarket, passedMarket, shopRoot } from './embed'
 import { t, LANG } from './i18n'
 
 // small and fine on purpose: a lock on a tile or a pill, not a paywall sign. `open` lifts the shackle (the unlock moment)
@@ -18,12 +18,16 @@ export function LockIcon({ size = 11, open = false, style }) {
 }
 
 const DONE_MS = 1500 // the frost clears, one sonar sweep, then the view opens
+// Europe (§6.5, double opt-in): the view opens right away too (the Lab cannot see the confirmation click), but the card first says to
+// confirm from the inbox — two lines to read, so it stays longer
+const DONE_MS_EU = 4500
 
 export default function UnlockCard({ name, img, product, view, onClose, onDone }) {
   const [email, setEmail] = useState('')
   const [status, setStatus] = useState('idle') // idle | sending | error | done
   const [error, setError] = useState('')
   const input = useRef(null)
+  const region = listRegion({ market: passedMarket(), shop: shopRoot(), lang: LANG }) // which Klaviyo list (§6.5); fixed for the card's life
   useEffect(() => {
     const opener = document.activeElement
     if (window.matchMedia?.('(pointer: fine)').matches) input.current?.focus() // not on touch: the keyboard would hide the card before it is read
@@ -36,7 +40,7 @@ export default function UnlockCard({ name, img, product, view, onClose, onDone }
     e.preventDefault()
     if (!isEmail(email)) { setStatus('error'); setError(t('unlock_err_email')); return }
     setStatus('sending'); setError('')
-    try { await submitSignup({ email, language: LANG, market: shareMarket(), view, product }); labEvent('signup', { source: 'unlock', product, view }, { once: true }) /* never the email: the iframe message goes to '*' */; setStatus('done'); setTimeout(onDone, DONE_MS) } catch (err) { setStatus('error'); setError(t(err.message === 'not_ready' ? 'unlock_err_closed' : 'unlock_err_send')) }
+    try { await submitSignup({ email, language: LANG, market: shareMarket(), view, product, region }); labEvent('signup', { source: 'unlock', product, view }, { once: true }) /* never the email: the iframe message goes to '*' */; setStatus('done'); setTimeout(onDone, region === 'eu' ? DONE_MS_EU : DONE_MS) } catch (err) { setStatus('error'); setError(t(err.message === 'not_ready' ? 'unlock_err_closed' : 'unlock_err_send')) }
   }
 
   const done = status === 'done'
@@ -55,7 +59,8 @@ export default function UnlockCard({ name, img, product, view, onClose, onDone }
           </div>
           {!done && <button type="button" className="ac-unlock-x" aria-label={t('share_close')} onClick={onClose}><svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true"><path d="M1.5 1.5l9 9M10.5 1.5l-9 9" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" /></svg></button>}
           <div className="ac-unlock-body">
-            <h2 id="unlock-title" className="ac-unlock-title">{done ? t('unlock_done', { view: name }) : t('unlock_title', { view: name })}</h2>
+            <h2 id="unlock-title" className="ac-unlock-title">{done ? t(region === 'eu' ? 'unlock_done_eu' : 'unlock_done', { view: name }) : t('unlock_title', { view: name })}</h2>
+            {done && region === 'eu' && <p className="ac-unlock-text">{t('unlock_done_eu_text', { view: name })}</p>}
             <AnimatePresence initial={false}>
               {!done && (
                 <motion.div key="form" exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }} style={{ overflow: 'hidden' }}>
@@ -71,7 +76,7 @@ export default function UnlockCard({ name, img, product, view, onClose, onDone }
                     {t('unlock_consent')}{' '}
                     <a href="https://shop.accuphy.com/policies/privacy-policy" target="_blank" rel="noreferrer">{t('unlock_privacy')}</a>
                   </p>
-                  {signupTestMode() && <p className="mt-1.5 text-[11px] font-semibold text-[#ffd98a]">Test mode: nothing is sent.</p>}
+                  {signupTestMode(region) && <p className="mt-1.5 text-[11px] font-semibold text-[#ffd98a]">Test mode: nothing is sent.</p>}
                 </motion.div>
               )}
             </AnimatePresence>

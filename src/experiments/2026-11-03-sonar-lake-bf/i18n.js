@@ -118,6 +118,10 @@ const S = {
   unlock_locked: { en: '{view}, locked: subscribe to unlock', fr: 'Vue {view} verrouillée : abonnez-vous pour la débloquer' },
   unlock_text: { en: 'Subscribe with your email first, and {view} opens right away.', fr: 'Abonnez-vous d’abord avec votre courriel : la vue {view} s’ouvre aussitôt.' },
   unlock_done: { en: 'You’re in. {view} is unlocked.', fr: 'C’est fait. La vue {view} est débloquée.' }, // Jason confirmed 2026-11-03 (via Lab HQ): EN unchanged, FR with “La vue”
+  // Europe's double opt-in (§6.5): the success title and line instead of unlock_done. English draft by Lab 营销版 11-04, in the strings table
+  // for review; no other language until it is reviewed (falls back to English)
+  unlock_done_eu: { en: 'Check your inbox' },
+  unlock_done_eu_text: { en: 'Click the link in our email to confirm your subscription. {view} is unlocked now.' },
   back_to_lake: { en: 'Back to the lake', fr: 'Retour au lac' },
   unlock_email: { en: 'Email', fr: 'Courriel' },
   unlock_cta: { en: 'Subscribe and unlock', fr: 'M’abonner et débloquer' },

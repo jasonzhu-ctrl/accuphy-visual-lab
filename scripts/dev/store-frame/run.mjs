@@ -5,6 +5,9 @@ const dist = path.resolve(process.argv[2] && !NAME.test(process.argv[2]) ? proce
 const wanted = process.argv.slice(2).filter((a) => NAME.test(a))
 // LAB_LOCKED=1: the page under test is the BF locked version (#213): run lock-desktop instead of no-lock-desktop
 const LOCKED = process.env.LAB_LOCKED === '1'
+// LAB_SHOP=/en-us (etc.): the store root the fake page passes when a scenario gives none (default /de-de). For the MKT copy's list by
+// market (§6.5): `LAB_SHOP=/ LAB_LOCKED=1 node run.mjs <dist> lock-desktop` is a North American store page; the default is European
+const SHOP_DEFAULT = process.env.LAB_SHOP || '/de-de'
 const CHROME = process.env.CHROME || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
 const PORT_DBG = 9333
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
@@ -25,7 +28,7 @@ window.addEventListener('message', (e) => {
   if (mode === 'badtype') lab.postMessage({ type: 'something_else' }, e.origin)
   if (mode === 'wrong') document.getElementById('sib').contentWindow.postMessage({ cmd: 'ack-the-lab', origin: e.origin }, '*') // a sibling frame answers: wrong source
 })
-document.write('<iframe id="lab" src="/lab/?tour=off&shop=' + (q.get('shop') || '/de-de') + (q.get('lang') ? '&lang=' + q.get('lang') : '') + (q.get('extra') ? '&' + q.get('extra') : '') + '"' + (q.get('allow') ? ' allow="clipboard-write; web-share"' : '') + '></iframe><iframe id="sib" src="sibling.html" style="width:1px;height:1px;position:absolute"></iframe>')
+document.write('<iframe id="lab" src="/lab/?tour=off&shop=' + (q.get('shop') || ${JSON.stringify(SHOP_DEFAULT)}) + (q.get('lang') ? '&lang=' + q.get('lang') : '') + (q.get('extra') ? '&' + q.get('extra') : '') + '"' + (q.get('allow') ? ' allow="clipboard-write; web-share"' : '') + '></iframe><iframe id="sib" src="sibling.html" style="width:1px;height:1px;position:absolute"></iframe>')
 </script>`)
 fs.writeFileSync(path.join(tmp, 'sibling.html'), `<!doctype html><script>window.addEventListener('message', (e) => { if (e.data && e.data.cmd === 'ack-the-lab') parent.frames[0].postMessage({ type: 'shop_click_ack' }, e.data.origin) })</script>`)
 fs.symlinkSync(dist, path.join(tmp, 'lab'))
@@ -167,7 +170,9 @@ if (LOCKED) scenarios['lock-desktop'] = async () => {
   await tab.lab(listen); await tab.lab(mini); await sleep(600); await tab.lab(combo); await sleep(800)
   const a = JSON.parse(await tab.lab(state))
   await tab.lab("(() => { const i = d.querySelector('.ac-unlock input[type=email]'); Object.getOwnPropertyDescriptor(w.HTMLInputElement.prototype, 'value').set.call(i, 'lab-test@example.com'); i.dispatchEvent(new w.Event('input', { bubbles: true })); d.querySelector('.ac-unlock button[type=submit]').click(); return true })()")
-  await sleep(2600)
+  await sleep(700)
+  const doneTitle = await tab.lab("(d.querySelector('.ac-unlock-title') || {}).textContent || ''") // the success line (Europe: check your inbox, §6.5)
+  await sleep(4900) // Europe's success card stays 4.5 s (North America 1.5 s)
   const b = JSON.parse(await tab.lab(state))
   const sign = b.evs.filter((x) => x.e === 'signup'), post = b.posts[0]
   const list = post ? (() => { try { return JSON.parse(post.body).data.relationships.list.data.id } catch { return '?' } })() : null
@@ -181,7 +186,7 @@ if (LOCKED) scenarios['lock-desktop'] = async () => {
     && b.card === 0 && b.active === 'Combo' && sign.length === 1 && sign[0].d.source === 'unlock' && sign[0].d.view === 'combo' && sign[0].d.product === 'pinglive-mini' && !JSON.stringify(sign[0].d).includes('@')
     && b.posts.every((x) => /a\.klaviyo\.com\/client\/subscriptions/.test(x.u))
     && c.locks === 0 && c.card === 0 && c.active === 'Combo' && !c.evs.some((x) => x.e === 'signup')
-  return { ok, detail: `before: locks=${a.locks} card=${a.card} active=${a.active} | after subscribe: card=${b.card} active=${b.active} signup=${JSON.stringify(sign.map((x) => x.d))} klaviyoPosts=${b.posts.length}${list ? ` list=${list}` : ' (test mode, nothing sent)'} (stubbed) | email link: locks=${c.locks} card=${c.card} active=${c.active} signup=${c.evs.filter((x) => x.e === 'signup').length}` }
+  return { ok, detail: `before: locks=${a.locks} card=${a.card} active=${a.active} | after subscribe: card=${b.card} active=${b.active} signup=${JSON.stringify(sign.map((x) => x.d))} done="${doneTitle}" klaviyoPosts=${b.posts.length}${list ? ` list=${list}` : ' (test mode, nothing sent)'} (stubbed) | email link: locks=${c.locks} card=${c.card} active=${c.active} signup=${c.evs.filter((x) => x.e === 'signup').length}` }
 }
 
 let failed = 0

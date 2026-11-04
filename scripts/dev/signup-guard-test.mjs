@@ -28,7 +28,7 @@ for (const c of cases) {
   const m = await load()
   m.KLAVIYO.listId = c.list
   let refused = false
-  try { await m.submitSignup({ email: 'a@example.com' }) } catch (e) { refused = e.message === 'not_ready' }
+  try { await m.submitSignup({ email: 'a@example.com', region: 'na' }) } catch (e) { refused = e.message === 'not_ready' }
   const ok = refused === c.refuses && m.isSignedUp() === !c.refuses && m.signupTestMode() === !!c.test && posts.length === (c.sends ? 1 : 0)
   if (!ok) fail++
   console.log(`${ok ? 'OK  ' : 'FAIL'} ${c.host} list=${c.list} → ${refused ? 'refused' : 'unlocked'}${m.signupTestMode() ? ' (test mode)' : ''}${posts.length ? ' (sent)' : ''}`)
@@ -38,7 +38,7 @@ for (const c of cases) {
   globalThis.window = { location: { hostname: 'lab.accuphy.ca', search: '' } }; bodies.length = 0
   const m = await load()
   m.KLAVIYO.listId = 'W24Qdc'
-  await m.submitSignup({ email: 'a@example.com', language: 'fr', market: 'us', view: 'combo', product: 'pinglive-mini' })
+  await m.submitSignup({ email: 'a@example.com', language: 'fr', market: 'us', view: 'combo', product: 'pinglive-mini', region: 'na' })
   const a = bodies[0].data.attributes, pr = a.profile.data.attributes.properties
   const ok = a.custom_source === 'Accuphy Lab' && pr.signup_channel === 'lab_unlock' && pr.signup_language === 'fr' && pr.signup_market === 'us' && pr.lab_scene === 'combo' && pr.lab_product === 'pinglive-mini' && bodies[0].data.relationships.list.data.id === 'W24Qdc'
   if (!ok) fail++

@@ -239,6 +239,21 @@ App Store、Google Play、“ACCUPHY | LAB” 标题、AUTO、数字和单位、
 - 字体：波兰语（ą ć ę ł ń ó ś ź ż）、拉脱维亚语（ā č ē ģ ī ķ ļ ņ š ū ž）的字母要补进品牌字体（规划第二节第 2 条）。
   上表 pl、lv 列用到的字母都在这两组里。
 
+## 十一、营销版（MKT 带锁版）待译待核的字（Lab 营销版 11-04 加，经 HQ 送核）
+
+只用在 `src/experiments/2026-11-03-sonar-lake-bf/`。英文是营销版写的草稿，**要 Jason / HQ 定英文**；其他语言没写（不自己编），在核好以前显示英文。
+
+**A. 欧洲订阅成功（新，§6.5 两步确认名单）：** 欧洲访客订阅后，卡片上显示这两句，代替 unlock_done；4.5 秒后视图打开。
+
+| 键 | 英文草稿 | fr | de | nl | pl | lv |
+|---|---|---|---|---|---|---|
+| unlock_done_eu（标题） | Check your inbox | | | | | |
+| unlock_done_eu_text（标题下一行，{view} = 视图名） | Click the link in our email to confirm your subscription. {view} is unlocked now. | | | | | |
+
+**B. 锁卡原有的 13 条（第九节里的“锁（营销版）”）：** 英文、法文已定，de / nl / pl / lv 都没有：
+unlock_title、unlock_locked、unlock_text、unlock_done、unlock_email、unlock_cta、unlock_sending、unlock_consent、unlock_privacy、
+unlock_err_email、unlock_err_send、unlock_err_closed、back_to_lake（英文、法文原文见复制件的 `i18n.js`）。
+
 ## 核完以后怎么检查（#217）
 
 - 多语言是各市场店铺里各自的 Lab 页，不是在 Lab 里手动切语言。检查用 `docs/lab-links-sheet.md` 里的店铺链接，不只看 `?lang=`：

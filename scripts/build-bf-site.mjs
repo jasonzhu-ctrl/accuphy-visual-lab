@@ -7,7 +7,9 @@
 // Usage: node scripts/build-bf-site.mjs <outDir> [ref]      (ref of the locked version, default HEAD)
 //   BASE_REF=<ref>      the commit for /, /mini/, /ice/ (default: the same ref). A ref without the web copy (before #233) builds the base
 //                       folder there, as before (e.g. BASE_REF=96fdc22 rebuilds today's live site)
-//   VITE_BF_LIST_ID=W24Qdc   only for HQ's go-live build: the Klaviyo list of the lock (#191). Unset (test links): nothing is sent.
+//   VITE_BF_LIST_ID=W24Qdc   only for HQ's go-live build: the Klaviyo list of the lock (#191) for Canada, US, Australia. Unset (test links): nothing is sent.
+//   VITE_BF_LIST_ID_EU=<id>  only for the go-live build: Europe's double opt-in list (checklist §6.5). Unset: European visitors cannot
+//                            subscribe on the real hosts (never W24Qdc); test links stay in test mode.
 // /embed/ (scripts/build-embed.mjs) is not built here.
 import { execSync } from 'node:child_process'
 import fs from 'node:fs'
@@ -44,13 +46,13 @@ const bfDir = checkout(ref)
 if (!fs.existsSync(path.join(bfDir, 'src/experiments/2026-11-03-sonar-lake-bf'))) throw new Error(`no locked version at ${ref}`)
 const baseDir = checkout(baseRef) // its own checkout even at the same ref, so the root pages are built as on their own
 const web = fs.existsSync(path.join(baseDir, 'src/experiments/2026-11-03-sonar-lake-web')) ? { LAB_ENTRY: 'web' } : {} // the website-embed copy (#233)
-const list = process.env.VITE_BF_LIST_ID
-delete process.env.VITE_BF_LIST_ID
+const list = process.env.VITE_BF_LIST_ID, listEu = process.env.VITE_BF_LIST_ID_EU
+delete process.env.VITE_BF_LIST_ID; delete process.env.VITE_BF_LIST_ID_EU
 buildPage(baseDir, { ...web }, '') // root: its robots.txt, .nojekyll and vercel.json serve the whole site
 buildPage(baseDir, { ...web, VITE_DEVICES: 'PLM' }, 'mini')
 buildPage(baseDir, { ...web, VITE_SCENE: 'ice' }, 'ice')
-buildPage(bfDir, { VITE_LAB: 'bf', ...(list ? { VITE_BF_LIST_ID: list } : {}) }, 'mktbf2026')
+buildPage(bfDir, { VITE_LAB: 'bf', ...(list ? { VITE_BF_LIST_ID: list } : {}), ...(listEu ? { VITE_BF_LIST_ID_EU: listEu } : {}) }, 'mktbf2026')
 fs.cpSync(path.join(outDir, 'ice'), path.join(outDir, 'mktbf2026/ice'), { recursive: true })
 for (const sub of ['mini', 'ice', 'mktbf2026', 'mktbf2026/ice']) for (const f of ['vercel.json', 'robots.txt', '.nojekyll']) fs.rmSync(path.join(outDir, sub, f), { force: true })
 for (const d of [bfDir, baseDir]) fs.rmSync(d, { recursive: true, force: true })
-console.log(`${outDir}: /, /mini/, /ice/, /mktbf2026/ice/ = ${web.LAB_ENTRY ? 'website-embed copy' : 'base folder'} ${commit(baseRef)}; /mktbf2026/ = locked ${commit(ref)}${list ? ' (list ' + list + ')' : ' (no list: test mode / not open)'}`)
+console.log(`${outDir}: /, /mini/, /ice/, /mktbf2026/ice/ = ${web.LAB_ENTRY ? 'website-embed copy' : 'base folder'} ${commit(baseRef)}; /mktbf2026/ = locked ${commit(ref)}${list ? ' (NA list ' + list + ')' : ' (no NA list: test mode / not open)'}${listEu ? ' (EU list ' + listEu + ')' : ' (no EU list: test mode / not open)'}`)
