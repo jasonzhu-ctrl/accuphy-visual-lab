@@ -4111,3 +4111,8 @@ Numbered log. Newest at the bottom.
    - 旁白逐句用 Jason 在反馈页定的词（r9 定稿表，`docs/2026-11-03-ad-base-r7-sound.md`），原生语速，不提速；**字幕不跟旁白改**（Jason：“不要”）。
    - 声音和音乐：**Adam（Dark and Tough）+ Space Brunch — Guy Mar**（Jason：“Space Brunch — Guy Mar音乐配Adam（Dark and Tough）”），音乐在 Artlist 正式下载，留下载记录作许可证明。
    - **片尾只留 ACCUPHY 标志和 “Sonar Lab”，其他字全部去掉，重新排版**（Jason：“最后一个页面只保留logo 加上Sonar Lab 其他全部去掉 你重新排版设计下”）；旁白 “Try it free, right in your browser.” 照读。先出两张静帧给 Jason 选，再合成 r10。
+
+237. **2026-11-04** — **Mini 广告片的剪辑和多语言版本交给另一个 Claude 窗口（Jason 在 Lab HQ：“这个剪视频的项目和多语言版本我想给另一个更合适的ai做”；“你只要帮我管理好交接的事情”）**：
+   - 交接包放在 Google Drive：`My Drive/Accuphy Mini Ad handover 2026-11/`，先读 `00-HANDOVER-READ-FIRST.md`。里面有 r11b 成片、Adam 一口气读的 4 条和切好的 9 句、Space Brunch 正式下载、片尾和 logo、各轮记录、Lab 五种语言字表。
+   - 从此广告片的剪辑、响度、横版、语言版本归那个新窗口；“Lab video creation”停手。30 fps 干净画面只能从 Lab 的 3D 湖录，到时由 Lab HQ 安排录好交过去。
+   - **#185 放宽**：广告片可以做语言版本（Jason 11-04 交接时提出）。做哪几种由新窗口先问 Jason，交接包里的建议是法、德、荷、波，拉脱维亚照 #227 不做。
