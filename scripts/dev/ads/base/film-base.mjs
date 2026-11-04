@@ -96,8 +96,8 @@ if (!ice) { await click('PingLive Mini'); await p.waitForTimeout(600) }
 await click({ open: 'Forward', drag: 'Forward', phone: 'Live Forward', angle: 'Combo', combo: 'Live Combo', ice: 'Combo' }[pass]); await p.waitForTimeout(2500)
 const setRange = (i, v) => p.locator('input[type=range]').nth(i).evaluate((el, v) => { Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(el, String(v)); el.dispatchEvent(new Event('input', { bubbles: true })) }, v)
 if (pass === 'combo' || pass === 'angle') { await setRange(0, 155); await setRange(1, 100); await p.waitForTimeout(1500) } // the reference's ranges
-await p.evaluate(([phone]) => {
-  const s = window.__sonarState; s.hasDragged = true; s.adClean = true; s.adBeam = { line: 0.55, face: 0.18 }; if (!phone) s.dragging = true
+await p.evaluate(([phone, cueKeep]) => {
+  const s = window.__sonarState; s.hasDragged = true; s.adClean = true; if (cueKeep) { s.adClean = false; s.adCueKeep = true }; s.adBeam = { line: 0.55, face: 0.18 }; if (!phone) s.dragging = true // r17 (Jason: the ad's ring was too heavy): the web's own thin reticle rides with the boat on the drag
   if (s.hintEl) s.hintEl.style.visibility = 'hidden'
   if (phone) { // only the lake and the phone (as v3/film3.mjs); the phone frame is moved per frame through #__lift
     const fr = document.querySelector('[data-hint-avoid][style*="aspect-ratio"]')
@@ -106,7 +106,7 @@ await p.evaluate(([phone]) => {
     for (const el of document.querySelectorAll('a,button')) { const t = (el.textContent || '').trim(); if (/^←?\s*Lab$|Replay tour|Learn More|Share to a|Back to the lake/.test(t)) el.style.visibility = 'hidden' }
     const st = document.createElement('style'); st.id = '__lift'; document.head.appendChild(st)
   }
-}, [phone])
+}, [phone, pass === 'drag' && process.env.CUE !== 'ring'])
 const hole = ice ? await p.evaluate(() => [window.__sonarState.boat?.x ?? 0, window.__sonarState.boat?.z ?? 0]) : null
 if (ice) { // Base's #225 hooks (322f47f + c8ace42, "ad-lake-ice" port 5193): the shelter and sled on the far side of the hole, 2 + 3 fish held
   // in the Combo beam; the fish need ~15 s to swim in before rolling (Base's measurement)

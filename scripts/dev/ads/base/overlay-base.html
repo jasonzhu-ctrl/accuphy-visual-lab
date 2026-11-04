@@ -71,6 +71,10 @@
   <div id="A" class="style"><div class="grad"></div><div class="cap"><div class="title hidden"><img src="logo.png"><i></i><span>Sonar Lab</span></div><div class="head"></div><div class="rule"></div><div class="sub"></div><div class="big hidden"></div></div></div>
   <div id="B" class="style"><div class="cap"><div class="kick">ACCUPHY LAB</div><div class="head"></div><div class="sub"></div><div class="big hidden"></div></div></div>
   <div id="C" class="style"><div class="vig"></div><div class="cap"><div class="kick">Accuphy Lab</div><div class="head"></div><div class="sub"></div><div class="big hidden"></div></div></div>
+  <!-- r17 (Jason on r16: 这里这个特效相比原版实在太粗了 一点不高级): the web's own drag cue instead of the ring + finger: its thin reticle is
+       recorded on the water (film-base.mjs keeps it on), and its small caption "Drag the boat to move it" is drawn here as the web draws it
+       (13 px at the 360 px phone width = 39 px, white 92 %, soft shadow), above the boat until the drag gets going -->
+  <div id="labhint" class="hidden" style="position:absolute;left:0;top:0;white-space:nowrap;font-family:'Instrument Sans';font-weight:500;font-size:39px;letter-spacing:.01em;color:rgba(255,255,255,.92);text-shadow:0 3px 6px rgba(0,0,0,.55),0 0 36px rgba(0,0,0,.45)">Drag the boat to move it</div>
   <div id="cue" class="hidden"><div class="wave"></div><div class="ring"></div><svg viewBox="0 0 100 100"><circle class="track" cx="50" cy="50" r="46"/><circle class="arc" cx="50" cy="50" r="46" pathLength="100" stroke-dasharray="0 100"/></svg><img src="finger.svg"></div>
   <div id="end" class="hidden stack"><div class="lock"><img src="logo.png"><i></i><span>Sonar Lab</span></div></div>
 </div>
@@ -79,7 +83,7 @@
   const clamp = (u) => Math.min(1, Math.max(0, u)), span = (t, a, b) => clamp((t - a) / (b - a)), ease = (u) => 1 - (1 - u) ** 3
   // the beats: [t0, t1, key, captionTop]; a caption fades/slides in over 0.5 s and out over 0.35 s
   const BEATS = [[0, 4, 'open', 300], [4, 9.5, 'drag', 330], [9.5, 14.5, 'phone', 300], [14.5, 19, 'angle', 300], [19, 22.5, 'combo', 330], [22.5, 25.3, 'ice1', 330], [25.3, 27.6, 'ice2', 330], [27.6, 30, 'ice3', 330]] // r2: +1 s from the drag on
-  window.setFrame = async ({ bg, t, info, lines, style = 'A', type = true, endLayout = 'stack' }) => {
+  window.setFrame = async ({ bg, t, info, lines, style = 'A', type = true, endLayout = 'stack', cue = 'lab' }) => {
     for (const el of document.querySelectorAll('.style')) el.classList.toggle('hidden', !type || el.id !== style || t >= 30)
     $('#bg').src = bg || ''; $('#bg').style.display = bg ? '' : 'none'
     const beat = BEATS.find(([a, b]) => t >= a && t < b)
@@ -97,7 +101,10 @@
         const n = Math.round(78 * clamp(info?.fan ?? 1)); big.innerHTML = `${n}°<small>COMBO</small>` }
     } else cap.style.opacity = 0
     // the finger cue on the boat while it is dragged (shot 2): ring beats every 1.2 s like the tour; hand slides in from the right
-    const drag = t >= 4.3 && t < 9.2 && info?.boat
+    const hint = cue === 'lab' && type && t >= 4.0 && t < 6.2 && info?.boat
+    $('#labhint').classList.toggle('hidden', !hint)
+    if (hint) { const e = $('#labhint'), o = ease(span(t, 4.0, 4.5)) * (1 - ease(span(t, 5.6, 6.2))); e.style.opacity = o; e.style.transform = `translate(${Math.max(72, info.boat[0] - e.offsetWidth / 2)}px, ${info.boat[1] - 150}px)` } // kept on the caption's left margin
+    const drag = cue !== 'lab' && t >= 4.3 && t < 9.2 && info?.boat
     $('#cue').classList.toggle('hidden', !drag)
     if (drag) {
       const [x, y] = info.boat, k = ((t - 4.3) % 1.2) / 1.2, o = ease(span(t, 4.3, 4.8)) * (1 - ease(span(t, 8.8, 9.2)))

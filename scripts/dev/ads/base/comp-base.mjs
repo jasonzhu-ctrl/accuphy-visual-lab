@@ -19,7 +19,7 @@ await p.evaluate(() => Promise.all([document.fonts.load("800 100px 'Eurostile He
 if (!(await p.evaluate(() => document.fonts.check("800 100px 'Eurostile Heavy'")))) throw new Error('Eurostile Heavy did not load: is Creative Cloud running?')
 for (const f of frames) {
   const name = f.replace('.jpg', ''), t = +name.slice(1) / 30
-  await p.evaluate((a) => window.setFrame(a), { bg: `bg/${f}`, t, info: info[name] || null, lines, style: STYLE, type: mode !== 'clean' })
+  await p.evaluate((a) => window.setFrame(a), { bg: `bg/${f}`, t, info: info[name] || null, lines, style: STYLE, type: mode !== 'clean', cue: process.env.CUE || 'lab' }) // r17: CUE=ring for the old ring + finger
   await p.screenshot({ path: `${out}/${f}`, type: 'jpeg', quality: 94 })
 }
 for (let i = 0; i < Math.round((END[1] - END[0]) * FPS); i++) { // the end card over black
