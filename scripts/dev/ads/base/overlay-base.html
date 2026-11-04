@@ -98,12 +98,13 @@
       cap.style.opacity = o; cap.style.transform = `translateY(${(1 - o) * 22}px)`
       const big = S.querySelector('.big'); big.classList.toggle('hidden', key !== 'angle')
       if (key === 'angle') { // r3: Combo from the first frame; the number counts with the fan as it opens (14.8–16.1 s) to 78°
-        const n = Math.round(78 * clamp(info?.fan ?? 1)); big.innerHTML = `${n}°<small>COMBO</small>` }
+        const n = Math.round(78 * clamp(info?.fan ?? 1)); big.innerHTML = `${n}°<small>${L.label || 'COMBO'}</small>` } // language versions: lines.angle.label (COMBINÉE, KOMBI …)
     } else cap.style.opacity = 0
     // the finger cue on the boat while it is dragged (shot 2): ring beats every 1.2 s like the tour; hand slides in from the right
     const hint = cue === 'lab' && type && t >= 4.0 && t < 6.2 && info?.boat
     $('#labhint').classList.toggle('hidden', !hint)
-    if (hint) { const e = $('#labhint'), o = ease(span(t, 4.0, 4.5)) * (1 - ease(span(t, 5.6, 6.2))); e.style.opacity = o; e.style.transform = `translate(${Math.max(72, info.boat[0] - e.offsetWidth / 2)}px, ${info.boat[1] - 150}px)` } // kept on the caption's left margin
+    if (hint) { const e = $('#labhint'); if (lines.hint && e.textContent !== lines.hint) e.textContent = lines.hint // language versions: the Lab's own hint_boat
+      const o = ease(span(t, 4.0, 4.5)) * (1 - ease(span(t, 5.6, 6.2))); e.style.opacity = o; e.style.transform = `translate(${Math.min(1008 - e.offsetWidth, Math.max(72, info.boat[0] - e.offsetWidth / 2))}px, ${info.boat[1] - 150}px)` } // kept on the caption's left margin
     const drag = cue !== 'lab' && t >= 4.3 && t < 9.2 && info?.boat
     $('#cue').classList.toggle('hidden', !drag)
     if (drag) {
