@@ -84,10 +84,11 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
   const TOUR = ICE ? 'ice' : ONLY === 'PLM' ? 'mini' : 'pl'
   const [tourAuto] = useState(() => !!TOUR && !tourOff && (tourForced || !tourSeen(TOUR)))
   const [tour, setTour] = useState({ on: false, tile: null }) // the tour is running; the view whose tile it lights
-  // while the tour runs, only the view it shows by itself (stop 1: the Mini's Combo) is open without subscribing; a tile stop on a
-  // locked view (PingLive's Panoramic, #240) asks for the subscription instead (Tour.jsx)
-  const TOUR_FREE = TOUR ? TOUR_SCRIPTS[TOUR].stops.filter((s) => s.action !== 'tile').map((s) => s.view) : []
-  const tourFree = (m) => tour.on && TOUR_FREE.includes(m)
+  // while the tour runs, every view it uses is open without subscribing (#242, Jason 11-04: “在卡片的时候应该大家是可以用的”): the
+  // Mini's Combo (stop 1), PingLive's Panoramic (stop 3). Only those views, on the tour's own device; the rest keep their lock.
+  // When it ends (finished or skipped) a locked view goes back to Forward on the same device (the effect below).
+  const TOUR_DEVICE = TOUR ? TOUR_SCRIPTS[TOUR].device : null, TOUR_VIEWS = TOUR ? TOUR_SCRIPTS[TOUR].stops.map((s) => s.view) : []
+  const tourFree = (d, m) => tour.on && d === TOUR_DEVICE && TOUR_VIEWS.includes(m)
   const [deviceId, setDeviceId] = useState(ONLY || 'PL')
   const [mode, setMode] = useState(tourAuto ? TOUR_SCRIPTS[TOUR].stops[0].view : ICE ? (/[?&]view=ice\b/.test(window.location.search) && (!COMBO_LOCK || isSignedUp()) ? 'ice' : 'liveice') : 'forward') // ?view=ice: the Ice Fishing tile from the lake (#191)
   const [view, setView] = useState(ICE ? iceParams().view : 'top') // ice page cameras: top / under the ice / section (docs/ice-relationship-study.md)
@@ -324,7 +325,7 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
   // every pick passes here, so nothing reaches Combo before subscribing (#191): the card opens and the view stays as it was
   // The entry tour belongs to the base version, which has no lock: while it runs every view opens (Jason 2026-11-02)
   const pickView = (d, m, source, name) => {
-    if (isLocked(d, m) && !unlocked && !tourFree(m)) { setUnlock({ d, m, source, name: (d === 'PL' && m === 'panoramic') || !name ? lockedName(d, m) : name }); return false }
+    if (isLocked(d, m) && !unlocked && !tourFree(d, m)) { setUnlock({ d, m, source, name: (d === 'PL' && m === 'panoramic') || !name ? lockedName(d, m) : name }); return false }
     showView(d, m, source); return true
   }
   const goIce = (view) => { window.location.href = iceUrl(view) }
@@ -339,6 +340,15 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
 
   // the tour shows a stop's view: by itself (stop 1, no `view` event: not a visitor's pick, #139) or for the visitor's tap
   // (stops 2–3, source 'tour'). On phones that also leaves the app's Home.
+  // #242: the tour is over (finished, skipped, or a replay ended) and the page still shows a view this visitor has not unlocked → Forward
+  // on the same device, with its padlock back on the tile; no `view` event (not the visitor's pick, #139). US page: Combo is free (#241)
+  const tourWasOn = useRef(false)
+  useEffect(() => {
+    if (tour.on) { tourWasOn.current = true; return }
+    if (!tourWasOn.current) return
+    tourWasOn.current = false
+    if (isLocked(deviceId, mode) && !unlocked) setMode('forward')
+  }, [tour.on]) // eslint-disable-line react-hooks/exhaustive-deps
   const tourShow = (d, m, byVisitor) => {
     if (byVisitor) { if (!pickView(d, m, 'tour')) return } else { setDeviceId(d); setMode(m) } // a locked stop's tap opens the subscribe card
     if (phone) { setHome(false); setStarted(true) }
@@ -414,7 +424,7 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
         <div>
           <span className="ac-label">{t('view')}</span>
           <div className={`ac-views is-${modes.length}`}>{modes.map((m) => {
-            const locked = isLocked(deviceId, m) && !unlocked && !tourFree(m), active = mode === m
+            const locked = isLocked(deviceId, m) && !unlocked && !tourFree(deviceId, m), active = mode === m
             return (
               <button key={m} type="button" className={`ac-view ${active ? 'is-active' : ''} ${locked ? 'is-locked' : ''} ${tour.tile === m ? 'is-tour-target' : ''}`} aria-pressed={active} aria-label={locked ? t('unlock_locked', { view: lockedName(deviceId, m) }) : undefined} onClick={() => pickView(deviceId, m, 'panel')}>
                 {locked && <span className="ac-view-lock"><LockIcon size={10} /></span>}
@@ -569,7 +579,7 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
         <pre ref={(el) => { state.current.debugEl = el }} className="pointer-events-none absolute left-2 top-1/2 rounded bg-black/60 p-1 text-[10px] text-lime-300" />
       )}
     </main>
-    {TOUR && <Tour script={TOUR} auto={tourAuto} phone={phone} mode={mode} deviceId={deviceId} state={state} onShow={tourShow} onState={setTour} lockedName={(d, m) => (isLocked(d, m) && !unlocked && !TOUR_FREE.includes(m) ? lockedName(d, m) : null)} />}
+    {TOUR && <Tour script={TOUR} auto={tourAuto} phone={phone} mode={mode} deviceId={deviceId} state={state} onShow={tourShow} onState={setTour} />}
     <AnimatePresence>{unlock && <UnlockCard key="unlock" name={unlock.name} img={VIEW_IMG[unlock.m]} product={PRODUCT[unlock.d] || PRODUCT.PLM} view={unlock.m} onClose={() => setUnlock(null)} onDone={onUnlocked} />}</AnimatePresence>
     </>
   )
