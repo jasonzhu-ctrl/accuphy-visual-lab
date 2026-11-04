@@ -158,3 +158,4 @@ MKT 版归 “Lab 营销版” 窗口负责（#231）。HQ 管它，和网站、
 | 2026-11-04 | **北美澳可以进广告** | 店铺页 + Lab 都上线，网站 03 核过（fe7d485a），两次测试订阅通过（224f413b + Klaviyo 读回新邮箱）。欧洲名单、按国家分名单的后续、欧洲锁卡翻译：Jason 11-04 经 Klaviyo HQ “lab的先暂停 不重要的”，先停 |
 | 2026-11-04 | #240 + #241 上线 | c743dfe，Vercel 9gzQuK8CM4gzNUYFLgVr226avow4；/、/mini/、/ice/、/embed/ md5 = 上线前；/mktbf2026/ = 打包；直接打开（加拿大参数、未订阅）PingLive 全景和 Mini 全景都锁；美国页待网站 03 用美国 IP 核 |
 | 2026-11-04 | #240/#241 线上核（Lab HQ 自测；网站 HQ：锁哪些是 Lab 的内容，网站不核，#238） | 全新无头浏览器、真店铺页 /pages/sonarlab-mktbf2026，把框的 market 换成 ca / us：加拿大 = PingLive 全景锁、Mini Combo 和全景锁；美国 = 只有 Mini、Combo 不锁、全景锁；Lab 没有报错（只有店铺自己的两条 Shopify/Goaffpro 脚本提示） |
+| 2026-11-04 | #242 上线（导览中导览的视图都能用，结束回 Forward） | 00ff0d9，Jason 在 Lab HQ 说“动, go live”；Vercel 6BTnuoHcTnRYCrrMCvoEJVn4ebs2；/、/mini/、/ice/、/embed/ md5 = 上线前；/mktbf2026/ b3d64b9d = 打包。同一份文件跑导览测试：加拿大电脑完整导览 + 重播、第 3 站跳过、加拿大手机、美国 Mini 导览和第 1 站跳过，都对、0 报错；真店铺页全新浏览器：加拿大锁 PingLive 全景、Mini Combo 和全景，美国只有 Mini、Combo 不锁、全景锁 |
