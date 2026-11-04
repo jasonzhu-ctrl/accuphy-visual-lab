@@ -4117,3 +4117,6 @@ Numbered log. Newest at the bottom.
    - 从此广告片的剪辑、响度、横版、语言版本归那个新窗口；“Lab video creation”停手。30 fps 干净画面只能从 Lab 的 3D 湖录，到时由 Lab HQ 安排录好交过去。
    - **#185 放宽**：广告片可以做语言版本（Jason 11-04 交接时提出）。做哪几种由新窗口先问 Jason，交接包里的建议是法、德、荷、波，拉脱维亚照 #227 不做。
    - **同日再定：在 Lab HQ 所在的这个应用里新开窗口 “Lab 广告片”（lab-ad-film）接手**，挂在 Lab HQ 下面（Jason：“这里开新窗口”）；另一个账号的 “Lab video creation” 停手。新窗口照 Drive 交接文件 “Resume here” 一节继续，每轮存 `rNN/` 并在文件末尾记一行，做完报告给 Lab HQ。
+   - **英文版定稿 = r17**（Jason 11-04 在 Lab 广告片：“定稿”）：成片 Drive `01-current-cut/FINAL-EN-r17/plm-base-30fps-r17.mp4`（投放用）和 `-small.mp4`。画面由 Lab HQ 从冻结的湖 96fdc22 按 r6 镜头脚本重录 30 fps；第 2 段改用网页自己的细圈和小字 “Drag the boat to move it”（Jason：“这里这个特效相比原版实在太粗了 一点不高级”，看样片后“细圈 + 小字，照样片”）。音乐改为 Hype Me Up – Instrumental version（IamDayLight），旁白 Adam take 4，−13.9 LUFS。
+   - **投放前：** Jason 在 Artlist 账号的 License 页保存 Hype Me Up 的许可证书（Space Brunch 不再用）。
+   - **语言版本不用重录湖：** 背景帧和镜头记录留在 `reference/ads/2026-11-bf/base/r17-comp/`（本机，git 忽略，约 415 MB）；每种语言只换字幕层重新合成（`comp-base.mjs` + 该语言的 lines 文件），鱼和镜头与英文版逐帧相同。
