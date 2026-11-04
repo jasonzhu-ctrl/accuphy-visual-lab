@@ -7,6 +7,7 @@
 > 11-05 给 Jason：① 看 PingLive 英语样片 r1（Drive `Accuphy PingLive Ad 2026-11/r1/pl-30fps-r1-small.mp4`，先看 `pl-r1-positions.jpg` 船位；README 列了要他看/听的 5 点；HQ 已核：34 s、−14.0 LUFS，帧率读 29.94 下一轮修）；② 看/听 Mini 四语正式版 r1（Drive Mini handover `07-language-versions/<lang>/plm-<lang>-30fps-r1-small.mp4`，五语字幕总览图；法、荷声音是 Lab 广告片按音高选的）；③ 定欧洲版手机读数用米还是英尺。经验总结：docs/2026-11-04-ad-lessons.md
 > 广告片：英文版定稿 r17（Drive FINAL-EN-r17）；投放前 Jason 在 Artlist License 页存 Hype Me Up 证书；四语版本由 Lab 广告片写稿，Jason 批稿后 HQ 换字幕重合成 · 11-04
 > 上线后要做：#191 解锁弹窗上线当天告诉网站 HQ（local_2f48043d-43bf-440c-ba78-2f53beaa0a5a），网站 03 再测真实弹窗（#233 桥已核 9a182111，真实流程没走过）。
+> 等欧洲恢复（Jason 11-04：“先不搞这个”）：网站嵌入版整套上线（免费版 /pages/lab 的五种语言 + 长单词排版 + 电脑分享框挪到面板旁；/pl-pl/pages/lab 里现在是英文）。跟北美澳广告无关。
 > 卡住：无。同事 PR #30、#31 只作参考，不合并（Jason 10-30：不要拉进主线）；测试页 pr30/、pr31/ 等 Jason 看完删。待补：#228 第 4 条德/荷/波兰/拉脱维亚界面（不急）
 > 本周做完：#190 美国只出 Mini · 线上 5c2e69a，网站 03 复查 310dedd1 · 已核（别的聊天）；#187/#188/#189 线上复查 · 网站 03 3dbfbec5（accuphy-website/docs/verification/2026-10-30-lab-a1fd3ee/result.md）· 已核（别的聊天）；#189 Mini Combo 前后 range + #188 分享改版 · lab.accuphy.ca a1fd3ee（docs/versions.md 10-30 行）· HQ 核过（md5 同测试链接、线上 Combo 两条滑杆、二维码弹框、0 报错）；#173 鱼群第 3 轮、#175 圆形水纹船迹、#178 新全景并进湖面 · 已在线上 8c15c20（/jig/、/pano/ 已下线）· 冰钓窗口核过；#182/#184/#186/#187 去商店按市场、GA4、分享徽章、商店页跳转 · lab.accuphy.ca 8c15c20 · HQ 核过；#185 Mini 测试片 · docs/2026-10-28-ad-mini-test-*-sheet.jpg · HQ 核过；#189 · docs/2026-10-29-plm-combo-two-ranges.jpg · HQ 核过
 
