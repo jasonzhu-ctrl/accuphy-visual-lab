@@ -1,7 +1,7 @@
 // The Base Mini film (#225, Jason's round-1 feedback): records one pass on the virtual clock of ../rec.mjs, from the clean
 // checkout served by "ad-lake-base" (port 5192; rounds 1–4 86bf80e, round 5 on the latest base 96fdc22 — HQ 11-03, Jason: 都用最新版本;
 // no VITE_DEVICES: the Mini is picked with the device switch).
-//   node film-base.mjs <pass> <outDir> [port=5192] [fps=30]
+//   node film-base.mjs <pass> <outDir> [port=5192] [fps=30]      UNITS=m: the phone reads metres (dev ?units=m in the frozen lake; Jason 11-04 for the European versions)
 // Passes (film seconds), 9:16 only for now:
 //   open   0–4      the whole lake, a slow cinematic push toward the boat (lake context 1080×1920, __lakeSnap frames)
 //   drag   4–9.5    the boat dragged bow-first along Jason's route toward the island's timber; the finger cue is drawn by the
@@ -85,7 +85,7 @@ await ctx.addInitScript(() => { // the virtual clock of ../rec.mjs
 const p = await ctx.newPage()
 p.on('pageerror', (e) => console.log('[pageerror]', e.message.slice(0, 200)))
 const boat0 = pass === 'open' || pass === 'drag' ? `${DRAG0[0]},${DRAG0[1]}` : pass === 'phone' ? `${DRAG1[0]},${DRAG1[1]}` : pass === 'angle' || pass === 'combo' ? `${WRECK_BOAT[0]},${WRECK_BOAT[1]}` : '16,11' // r3: the open lands on the drag's start
-await p.goto(`http://localhost:${port}/?boat=${boat0}&tour=off#${ice ? '2026-10-16-sonar-ice-3d' : '2026-09-23-sonar-lake-3d'}`); await p.waitForTimeout(7000)
+await p.goto(`http://localhost:${port}/?boat=${boat0}&tour=off${process.env.UNITS === 'm' ? '&units=m' : ''}#${ice ? '2026-10-16-sonar-ice-3d' : '2026-09-23-sonar-lake-3d'}`); await p.waitForTimeout(7000)
 const click = async (n) => { // the Mini's tiles sit in the hidden desktop panel on the phone layout: press through the DOM then
   const l = p.getByRole('button', { name: n, exact: true })
   if ((await l.count()) && (await l.first().isVisible())) return l.first().click({ timeout: 4000 })
