@@ -32,7 +32,7 @@ Jason 11-03：“一定要搞个文档，专门把这些不同的版本啊，那
 | 比荷卢 荷兰语 | https://shop.accuphy.com/nl-benelux/pages/sonarlab-mktbf2026 | 荷 |
 | 比荷卢 法语 | https://shop.accuphy.com/fr-benelux/pages/sonarlab-mktbf2026 | 法 |
 | 德国（含奥地利、瑞士：网站 03 测过，打开不跳转，看到德国市场、欧元） | https://shop.accuphy.com/de-de/pages/sonarlab-mktbf2026 | 德 |
-| 波兰 | https://shop.accuphy.com/pages/sonarlab-mktbf2026?lang=pl（波兰客人会被 302 转到 /en-pl/…?lang=pl，店铺那层是英文，Lab 还是波兰语，能用；网站给波兰市场加了波兰语以后，换成波兰页） | 波兰语 |
+| 波兰 | https://shop.accuphy.com/pl-pl/pages/sonarlab-mktbf2026（11-04 换：网站 #249 开了波兰语站，店铺那层也是波兰语，框带 lang=pl、shop=/pl-pl、market=pl，去商店到 /pl-pl 商品页；旧链接 /pages/sonarlab-mktbf2026?lang=pl → /en-pl 照样能用） | 波兰语 |
 | 拉脱维亚（#238，Jason 11-04：“用英语”；第二批欧洲） | https://shop.accuphy.com/en-ro/pages/sonarlab-mktbf2026?lang=lv（拉脱维亚属于罗马尼亚市场，用它的英语页；店铺那层英文，Lab 拉脱维亚语；网站 03 还要实测一次） | 拉脱维亚语 |
 
 - 状态（11-04）：【后面那一层】lab.accuphy.ca/mktbf2026/ **已上线**（0117d52，Jason 在 Lab HQ 说“动，上线”）。【客人看到的店铺页】11-04 已上线（网站 #244，446dbfb6）；网站 03 核过、两次测试订阅通过：**加拿大、美国、澳洲 11-04 起可以进广告**；欧洲仍停（Jason 11-04：“lab的先暂停 不重要的”）。分两批（#239）：北美澳先，欧洲等两步确认名单。在那之前店铺页的框是空的（404），**这批链接不要给广告**。
@@ -63,7 +63,7 @@ Jason 11-03：“一定要搞个文档，专门把这些不同的版本啊，那
 | 比荷卢 荷兰语 | https://shop.accuphy.com/nl-benelux/pages/lab | 荷 |
 | 比荷卢 法语 | https://shop.accuphy.com/fr-benelux/pages/lab | 法 |
 | 德国 | https://shop.accuphy.com/de-de/pages/lab | 德 |
-| 波兰（#218） | https://shop.accuphy.com/pages/lab?lang=pl | 波兰语 |
+| 波兰（#218） | https://shop.accuphy.com/pl-pl/pages/lab（11-04 起；Lab 里面暂时还是英文：网站嵌入版 96fdc22 没有波兰语，搬不搬等 Jason） | 波兰语 |
 | 拉脱维亚（#218、#227） | https://shop.accuphy.com/pages/lab?lang=lv | 拉脱维亚语 |
 
 - 11-03 核对：8 个市场前缀都 200，框里是 lab.accuphy.ca/。
