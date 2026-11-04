@@ -205,7 +205,7 @@ https://artlist.io/royalty-free-music/song/walking-the-universe/58141
 | 2 `adam-take2-steady` | 同上，声音稳定度调到 0.75 | 99 99 97 103 89 80 121 83 88 | 最平，接近念稿 |
 | **3 `adam-take3-lift`（用这条）** | 同上，但 “Be part of the action” 前加 confident、片尾前加 warmly | 129 122 97 127 109 85 95 118 99 | 起伏最自然，“Be part of the action” 往上提，有力量 |
 
-本轮新生成 3 条，共 196 点，套餐内。余额 69,091 → 68,895，11-08 续满。
+本轮新生成 3 条，共 196 点，套餐内。加上 HQ 那条（62 点），余额 69,091 → 68,833，11-08 续满。
 
 切分方法：
 - 程序只在 ≥0.3 s 的停顿里找断句，再按每句的词数挑出 8 处，确保不会切在句子里面。
