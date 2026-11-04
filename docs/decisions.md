@@ -4124,3 +4124,5 @@ Numbered log. Newest at the bottom.
 238. **拉脱维亚的投放链接用罗马尼亚市场的英语页**（Jason 2026-11-04 在 Lab HQ：“用英语”）。拉脱维亚在店里属于罗马尼亚市场（网站 03 11-03 用拉脱维亚 IP 实测：主站链接 302 到 /ro-ro，罗马尼亚语）。MKT 链接改为 `https://shop.accuphy.com/en-ro/pages/sonarlab-mktbf2026?lang=lv`：店铺那层英文，Lab 拉脱维亚语。这个地址网站 03 还没测，店铺页建好后测。
 
 239. **带锁版（MKT）分两批上线**（Jason 2026-11-04 在 Lab HQ 选“北美澳先上”）。起因：Jason 在 Klaviyo HQ 定“欧洲需要做两步的”，欧洲访客不进 W24Qdc（单次确认），进新建的欧洲两步确认名单。第一批：加拿大、美国、澳洲，进 W24Qdc。第二批：欧洲 6 个市场，等欧洲名单建好、Lab 按市场送名单、“去邮箱点确认”五种语言核好再给广告。Lab 营销版做按市场送名单（Jason：“现在做”）；不另做欧洲“订阅还没开放”的显示（Jason：“不用再单独做 … 同步进行的 很快的”）。清单第 6.5 节。
+
+240. **2026-11-04** — **带锁版（MKT）里 PingLive 的全景（Panoramic）也要订阅才开**（Jason 在 Lab HQ 发现“只有 mini 有锁 pinglive 没有锁”，选“锁全景 Panoramic”）。只改带锁版复制件 `2026-11-03-sonar-lake-bf/` 的 `isLocked`：PingLive 的 Down、Forward 照旧免费；Base 和网站嵌入版不动。入场教程第 3 站（PingLive 的全景）照 Mini 第 3 站的做法：没订阅时停在 Forward、说订阅可开。上线要 Jason 在 Lab HQ 另说“动”。美国页本来就只有 Mini（#190，网站 03 11-04 核过），不受影响。
