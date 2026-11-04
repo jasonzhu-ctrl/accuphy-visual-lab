@@ -178,3 +178,9 @@ https://artlist.io/royalty-free-music/song/walking-the-universe/58141
 - 入场：30.2–30.75 s 淡入，同时从 96.5% 轻微放大到 100%。旁白 “Try it free, right in your browser.” 照读（31.16–33.19 s）。
 - 代码在 `overlay-base.html`，合成时用 `END_LAYOUT=stack|inline` 选。静帧用 `endcard-stills.mjs` 出。
 - Jason 选好以后再合成 r10 的片尾。
+
+**r10 定稿片尾：A 竖排**（Jason 在本会话直接选的：“A 竖排”）。
+- 成片 `plm-base-preview-10fps-r10.mp4`（40 MB）和 `-small.mp4`（22 MB）已重出，覆盖掉旧片尾的那版。
+- 0–30 s 用第 6 轮原来的成品帧，逐秒核过和之前交付的画面一致。只换了 30–34 s 的片尾帧（黑底，只有 logo 和 Sonar Lab）。
+- 声音是 r10 那版混音，没动。
+- 注意：临时目录里 `w6/comp/bg` 的背景帧后来被别的测试改过，所以不能用它整片重合成；这次是拼的帧。
