@@ -4130,3 +4130,5 @@ Numbered log. Newest at the bottom.
 241. **2026-11-04** — **带锁版（MKT）的美国页：Live Combo 免费，全景照锁**（Jason 在 Lab HQ：“美国的把combo打开吧 保留panoramic 然后美国没有pinglive的access吧”）。美国页（店铺市场 us，#190）只有 Mini：Live Combo 不用订阅；Mini 全景照锁；冰钓格子照锁（Jason 没提，按原样）。美国没有 PingLive：`miniOnly()` 在店铺里、市场是 us 时只给 Mini，没有网址参数能切到 PingLive。加拿大、澳洲、欧洲不变（Combo 照锁）。和 #240 一起上线，要 Jason 在 Lab HQ 说“动”。
 
 242. **2026-11-04** — **带锁版的入场教程里所有画面都能用，教程结束才上锁**（Jason 手机上试了线上版，指出第 3 站点 PingLive 全景就弹订阅框“这个不合理……在卡片的时候应该大家是可以用的”；对 HQ 的建议说“好的”）。改 #240 里 HQ 交代错的那一步：教程进行中，教程要用到的画面（Mini 第 1 站 Combo、PingLive 第 3 站全景）都不锁，第 3 站和第 2 站一样，点了直接打开、停 5 秒、可以拖船；教程结束（走完或 Skip）时，如果正停在上锁的画面上，回到 Forward，格子显示锁，之后再点才出订阅卡。核对过的计时不变（Jason 11-02 第 4 轮）：第 1 站拖满 4 秒（累计）直接进下一站；第 2、3 站点完停 5 秒。只改带锁版复制件；上线要 Jason 在 Lab HQ 说“动”。
+
+243. **2026-11-04** — **加拿大法语广告用英尺版 Mini 片子（r1）**（Jason 在 Lab HQ 被问“英尺版 r1 还是米版 r2”时说“你决定”）。HQ 选 r1 `plm-fr-30fps-r1.mp4`：加拿大法语店铺页 `/fr/pages/sonarlab-mktbf2026` 里的 Lab 法语默认显示英尺（`METRIC_FIRST` 只含 de/nl/pl/lv），广告和落地页单位一致；加拿大钓鱼人看水深也习惯用英尺。团队英文文档（Ad landing links by market）视频一栏和改动记录已改。欧洲法语（法国、比荷卢）仍是米版 r2，等 Jason 看；但那边的 Lab 法语页也默认英尺，欧洲恢复时要先定：法语页按市场改成米，还是片子改英尺。
