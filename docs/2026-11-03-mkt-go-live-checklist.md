@@ -151,3 +151,4 @@ MKT 版归 “Lab 营销版” 窗口负责（#231）。HQ 管它，和网站、
 | 2026-11-04 | 后面那一层上线（第一、二、七节） | 0117d52 + BASE_REF 96fdc22，Vercel FaE6Y1UjSaYBVW3o7FCtL5gX1DhP；`/`、`/mini/`、`/ice/`、`/embed/lab.js` md5 = 上线前；`/mktbf2026/`、`/mktbf2026/ice/` 200；W24Qdc 只在 /mktbf2026/；浏览器加拿大参数 → Live Combo 出订阅卡，0 报错，没提交 |
 | 2026-11-04 | 客人看到的店铺页上线（第一节） | 网站 #244，00 446dbfb6（Jason 在网站 HQ 说“动”）；HQ curl 各前缀 200，框指向 lab.accuphy.ca/mktbf2026/；03 在查全部前缀、拉脱维亚 /en-ro、无店铺弹窗；真实订阅测试等 Jason 点头；核完前链接不进广告 |
 | 2026-11-04 | 网站 03 核 MKT 页（第五节） | fe7d485a 通过；剩测试订阅（等 Jason 在网站 HQ 点头），过了北美澳链接才进广告 |
+| 2026-11-04 | 真实测试订阅（第五节，网站 #245） | 一次，测试邮箱，加拿大英文 MKT 页、加拿大 IP；网站 224f413b 通过：Combo 打开、重开仍解锁、无店铺弹窗、Meta Lead 1 次、GA4 generate_lead form=lab_unlock 1 次、请求里无邮箱。剩 Klaviyo HQ 读回 W24Qdc + 6 个属性，并把测试地址排除；读回通过才给广告 |
