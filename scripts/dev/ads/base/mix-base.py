@@ -21,11 +21,16 @@ for L in plan['lines']:
     s = int(L['at'] * SR); e = min(N, s + len(x)); voice[s:e] += x[:e - s]
     rows.append((L['key'], L['at'] + t0, L['at'] + t1))
 # the music bed: a window of the track, faded in and out, ducked under the voice (envelope follower on the voice)
-m = rd(plan['music']); s = int(plan['musicIn'] * SR); bed = m[s:s + N]
+m = rd(plan['music']); s = int(plan['musicIn'] * SR)
+if s < 0: m = np.concatenate([np.zeros(-s, np.float32), m]); s = 0   # negative musicIn: the track starts that late (r10)
+bed = m[s:s + N]
 if len(bed) < N: bed = np.concatenate([bed, np.zeros(N - len(bed), np.float32)])
 rms = np.sqrt((bed ** 2).mean()); bed = bed / (rms + 1e-9) * 10 ** (plan['musicGainDb'] / 20)
 fi, fo = int(plan['fadeIn'] * SR), int(plan['fadeOut'] * SR)
 bed[:fi] *= np.linspace(0, 1, fi); bed[N - fo:] *= np.linspace(1, 0, fo) ** 1.5
+for t, db in plan.get('bedSteps', []):   # optional [[t, dB], ...]: bed gain change from t on, 0.2 s ramp (r10: the 808 drop)
+    i = int(t * SR); g = np.ones(N, np.float32); r = int(0.2 * SR); tgt = 10 ** (db / 20)
+    g[i:i + r] = np.linspace(1, tgt, min(r, N - i)); g[i + r:] = tgt; bed *= g
 env = np.zeros(N, np.float32); a_att, a_rel = np.exp(-1 / (0.05 * SR)), np.exp(-1 / (0.35 * SR))
 lvl = 0.0; av = np.abs(voice)
 # block-wise follower (fast enough in numpy): 5 ms blocks

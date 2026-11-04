@@ -1,0 +1,4 @@
+{ "voDir": "reference/ads/2026-11-bf/base/sound-r10", "music": "reference/ads/2026-11-bf/base/sound-r10/space-brunch-mono48.wav", "musicIn": -1.15, "musicGainDb": -19, "duckDb": -13, "bedSteps": [[27.6, -5]], "fadeIn": 0.3, "fadeOut": 0.8, "length": 34, "voPeakDb": -3,
+  "lines": [ {"key":"open","file":"open-b.wav","at":0.5}, {"key":"drag","file":"drag-b.wav","at":4.3}, {"key":"phone","file":"phone-b.wav","at":9.75},
+             {"key":"angle","file":"angle-a.wav","at":14.75}, {"key":"combo","file":"combo-b.wav","at":19.2}, {"key":"ice1","file":"ice1-a.wav","at":22.6},
+             {"key":"ice2","file":"ice2-a.wav","at":25.25}, {"key":"ice3","file":"ice3-a.wav","at":27.65}, {"key":"end","file":"end-a.wav","at":31.01} ] }

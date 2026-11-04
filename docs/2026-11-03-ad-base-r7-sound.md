@@ -106,3 +106,60 @@ https://artlist.io/royalty-free-music/song/walking-the-universe/58141
 
 电平：整片 RMS −15.4 dBFS，峰值 −1.2 dBFS；片尾前 29.1–30.9 s 只有音乐 −32 dBFS，最后 0.3 s 静音。
 核对靠数值（本会话无放音）：每句发声起止如上表，都在各自字幕时间内，无重叠，间隔都 ≥0.72 s。take 是按时长、停顿、音高起伏和尾音挑的，不是听出来的，请 Jason 实听；每句另一个 take 都在 `sound-r9/`，要换随时换。
+
+---
+
+# r10：换音乐和旁白声音（Jason 在 Lab HQ 原话：“Space Brunch — Guy Mar音乐配Adam（Dark and Tough）”）
+
+画面、字幕 = r9，一个没动：视频轨和 r9 逐帧同一份，340 帧，哈希一致。台词照 r9 定稿表，一个词没改。
+规则同 r8/r9：原生语速，不提速、不压停顿；每句落在它那段字幕时间里；句间 ≥0.5 s。
+
+成品（git 不收）：在 `reference/ads/2026-11-bf/base/`。
+- `plm-base-preview-10fps-r10.mp4`（40 MB）
+- `plm-base-preview-10fps-r10-small.mp4`（22 MB）
+- 整段混音 `plm-base-r10-mix.wav`（34 s，48 kHz）
+
+素材在 `sound-r10/`：18 个 take 的 mp3/wav、音乐原文件、混音。参数是 `scripts/dev/ads/base/plan-r10.json`。
+
+## 音乐：Space Brunch — Guy Mar（trap 器乐）
+
+- 链接：https://artlist.io/royalty-free-music/song/space-brunch/77373
+- 标 75 bpm（听感是 150 的 trap 节拍），全曲 3:03。
+- **已在 Artlist 正式下载**，2026-11-03，WAV（44.1 kHz / 24 bit，无水印）。走的是 Max Pro 订阅里的曲库下载，不另收钱。文件存为 `sound-r10/space-brunch.wav`。
+- **这条下载记录就是许可证明。** 它在 Artlist 账号的下载历史里；投 Meta 前请 HQ 在账号 License 页把这首的证书存一份。
+- 用的段：曲子 **0:00–0:32.85**。曲子开头本来有 1.0 s 静音。
+- **对齐 808**：整段往后挪了 1.15 s，让曲子第 26.62 s 的 808 第一下落在片子第 27.77 s，就是 “Be part of the action” 开口那一刻（发声从 27.81 s 起）。片尾那句从 808 的另一拍 31.15 s 开口。
+- **代价**：片头前 2.15 s 只有人声，没有音乐（冷开场），音乐从拖船那段才进来。
+- 不挪的话，808 会落在 26.62 s，正好压在 “Drill a hole in the ice” 句尾（那句要读到 27.03 s），两句都会被盖。
+
+## 旁白：Adam – American, Dark and Tough
+
+所有句子都用 “relaxed” 语气提示，只有 “Be part of the action.” 用 “confident”。
+新生成 16 条，加上上一轮挑声音时 Adam 已读的两条，每句 2 个 take。共 133 点，套餐内，余额 69,224 → 69,091（11-08 续满）。
+挑法：按音高起伏（太平的像念稿，排除）、停顿位置、长度。不是听出来的。
+
+| 段 | 字幕时间 | 旁白 | 发声起止 | 与下一句间隔 | 人声比音乐高 | 选哪条、为什么 |
+|---|---|---|---|---|---|---|
+| 1 开场 | 0.0–4.0 | Learn Forward-Facing Sonar in 2 minutes. | 0.64–3.32 | 1.06 s | 28.5 dB | b：音高 117 Hz、起伏大。a 的 136 Hz 偏高，不像 Adam 平时的声音 |
+| 2 拖船 | 4.0–9.5 | Drag the boat. See what the beam finds for you in the timber. | 4.38–7.84 | 2.02 s | 21.1 dB | b：两句之间自然停 0.59 s，有起伏。a 太平 |
+| 3 手机 | 9.5–14.5 | Here’s how it looks on your phone. | 9.86–11.15 | 3.69 s | 21.6 dB | b：有起伏。a 几乎一个调 |
+| 4 角度 | 14.5–19.0 | Switch to Combo View. | 14.84–16.28 | 3.03 s | 16.1 dB | a：起伏正常。b 很平、音量也偏小 |
+| 4b 手机 Combo | 19.0–22.5 | Ahead and straight down, at the same time. | 19.31–21.78 | 0.95 s | 17.9 dB | b：逗号处有小停顿，起伏比 a 大 |
+| 5 冰上 1 | 22.5–25.3 | Combo View on Ice. | 22.73–24.60 | 0.76 s | 15.9 dB | a：“Combo View” 和 “on Ice” 之间自然停 0.2 s。b 句尾带一口气 |
+| 5 冰上 2 | 25.3–27.6 | Drill a hole in the ice. | 25.36–27.03 | 0.78 s | 18.6 dB | a：起伏最大。b 很平 |
+| 5 冰上 3 | 27.6–30.0 | Be part of the action. | 27.81–28.81 | 2.35 s | 11.9 dB | a（上一轮挑声音时那条）：1.0 s 一口气说完，短促有力，开口在 808 第一下后 0.04 s。b 长 0.2 s、更平 |
+| 6 片尾 | 30.0–34.0 | Try it free, right in your browser. | 31.16–33.19 | 片尾，后面 0.8 s 音乐收 | 12.9 dB | a（上一轮挑声音时那条）：“free” 后停 0.15 s，起伏比 b 大。开口在 808 的一拍上 |
+
+## 混音
+
+- 音乐整体 −19 dBFS，人声出现时压低 13 dB（r9 是 9 dB）。
+- 从 27.6 s（808 进来）起，音乐再整体低 5 dB。否则 808 和人声只差 3–4 dB，最后两句会被盖住。
+- 现在每句人声都比音乐高至少 11.9 dB。
+- 808 进来后句与句之间的音乐是 −17 dBFS，比前面 −24 dBFS 高 7 dB，起落还在。
+- 最后 0.8 s 淡出，最后 0.3 s 是 −41 dBFS。
+- 整片 RMS −16.1 dBFS，峰值 −1.5 dBFS。
+
+这次 `mix-base.py` 加了两样：`musicIn` 可以是负数（音乐晚进），`bedSteps` 可以从某一刻起改音乐的音量。
+
+旁白和字幕不同的段落跟 r9 一样，共 6 段：3 手机、4 角度、5 冰上三句、6 片尾（表在 r9 一节）。字幕没改，等 Jason 定。
+核对靠数值，这里不能放音：每句起止、间隔、人声比音乐高多少都在上表。请 Jason 实听；每句另一个 take 都在 `sound-r10/`，要换随时换。
