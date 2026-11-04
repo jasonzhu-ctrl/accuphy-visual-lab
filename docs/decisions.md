@@ -4106,3 +4106,8 @@ Numbered log. Newest at the bottom.
 235. **2026-11-03** — **Share box English final: “Show a buddy what’s under the boat” / “Drag the boat. Watch the sonar light up.”**
      (Jason in Lab HQ, card: “就用这两句”). `share_title` and `share_line` stop being drafts; "Lab 多语言" translates and reviews them,
      which completes the #212 table.
+
+236. **2026-11-03** — **Mini 广告片的声音和片尾（Jason 在 Lab HQ）**：
+   - 旁白逐句用 Jason 在反馈页定的词（r9 定稿表，`docs/2026-11-03-ad-base-r7-sound.md`），原生语速，不提速；**字幕不跟旁白改**（Jason：“不要”）。
+   - 声音和音乐：**Adam（Dark and Tough）+ Space Brunch — Guy Mar**（Jason：“Space Brunch — Guy Mar音乐配Adam（Dark and Tough）”），音乐在 Artlist 正式下载，留下载记录作许可证明。
+   - **片尾只留 ACCUPHY 标志和 “Sonar Lab”，其他字全部去掉，重新排版**（Jason：“最后一个页面只保留logo 加上Sonar Lab 其他全部去掉 你重新排版设计下”）；旁白 “Try it free, right in your browser.” 照读。先出两张静帧给 Jason 选，再合成 r10。
