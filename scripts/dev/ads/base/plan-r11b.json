@@ -1,0 +1,83 @@
+{
+ "voDir": "reference/ads/2026-11-bf/base/sound-r11",
+ "music": "reference/ads/2026-11-bf/base/sound-r10/space-brunch-mono48.wav",
+ "musicIn": -1.15,
+ "musicGainDb": -15,
+ "duckDb": -10,
+ "bedSteps": [
+  [
+   27.6,
+   -7
+  ]
+ ],
+ "fadeIn": 0.3,
+ "fadeOut": 0.8,
+ "length": 34,
+ "voPeakDb": -3,
+ "lines": [
+  {
+   "key": "open",
+   "speech": 0.64,
+   "text": "Learn Forward-Facing Sonar in 2 minutes.",
+   "file": "open.wav",
+   "at": 0.52
+  },
+  {
+   "key": "drag",
+   "speech": 4.38,
+   "text": "Drag the boat. See what the beam finds for you in the timber.",
+   "file": "drag.wav",
+   "at": 4.26
+  },
+  {
+   "key": "phone",
+   "speech": 9.86,
+   "text": "Here's how it looks on your phone.",
+   "file": "phone.wav",
+   "at": 9.74
+  },
+  {
+   "key": "angle",
+   "speech": 14.84,
+   "text": "Switch to Combo View.",
+   "file": "angle.wav",
+   "at": 14.72
+  },
+  {
+   "key": "combo",
+   "speech": 19.31,
+   "text": "Ahead and straight down, at the same time.",
+   "file": "combo.wav",
+   "at": 19.19
+  },
+  {
+   "key": "ice1",
+   "speech": 22.73,
+   "text": "Combo View on Ice.",
+   "file": "ice1.wav",
+   "at": 22.61
+  },
+  {
+   "key": "ice2",
+   "speech": 25.36,
+   "text": "Drill a hole in the ice.",
+   "file": "ice2.wav",
+   "at": 25.24
+  },
+  {
+   "key": "ice3",
+   "speech": 27.81,
+   "text": "Be part of the action.",
+   "file": "ice3.wav",
+   "at": 27.69
+  },
+  {
+   "key": "end",
+   "speech": 31.16,
+   "text": "Try it free, right in your browser.",
+   "file": "end.wav",
+   "at": 31.04
+  }
+ ],
+ "_note": "r11b (Jason 11-04: \u73b0\u5728\u7684\u97f3\u4e50\u592a\u8f7b\u4e86 \u4eba\u58f0\u592a\u54cd\u4e86): music +4 dB, duck 10 dB, -7 dB after the 808; voice still >= 8 dB over the music"
+}
