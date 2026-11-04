@@ -13,6 +13,8 @@ Jason 11-03：“一定要搞个文档，专门把这些不同的版本啊，那
 > - 每个店铺页里的框只显示一个 lab.accuphy.ca 地址：`/pages/lab` → lab.accuphy.ca/（不带锁）；`/pages/sonarlab-mktbf2026` → lab.accuphy.ca/mktbf2026/（MKT 版，带锁；#233 起由 /mktbf2026/ 改名）。
 > - Lab 的程序不放进 Shopify。Lab 更新只改 lab.accuphy.ca（Jason 在 Lab HQ 说“动”）；店铺页只改框里的地址（网站，Jason 在网站 HQ 说“动”）。
 
+> **给团队的英文版（Jason 11-04）：** Google Doc “Black Friday 2026 – Ad landing links by market (Accuphy Sonar Lab)”，在共享盘 Accuphy Public Drive → Marketing → Black Friday 2026 → Test Phase → placement link（https://docs.google.com/document/d/19WvaK6xObQdkHbsidrnkPEPUbR16KzBAnaeKGCe70RM/edit）。这一节一变，HQ 同时改那份文档：03 核完 + 测试订阅通过 → 第 1 节写 READY FOR ADS（北美澳）；欧洲名单好了 → 写欧洲 ready；视频定稿 → 改视频一栏；加改动记录。
+
 ## 一、投放链接（= MKT 版，#229，Jason 11-03：“MKT 和投放的是一回事”）
 
 **这一节由 Lab 营销版维护（#231）**，其他几节照旧由 HQ 维护。
