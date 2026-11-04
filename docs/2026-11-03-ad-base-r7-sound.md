@@ -163,3 +163,7 @@ https://artlist.io/royalty-free-music/song/walking-the-universe/58141
 
 旁白和字幕不同的段落跟 r9 一样，共 6 段：3 手机、4 角度、5 冰上三句、6 片尾（表在 r9 一节）。字幕没改，等 Jason 定。
 核对靠数值，这里不能放音：每句起止、间隔、人声比音乐高多少都在上表。请 Jason 实听；每句另一个 take 都在 `sound-r10/`，要换随时换。
+
+**r10 之后的决定（Lab HQ 转 Jason，2026-11-03）：**
+- 字幕不跟旁白改（Jason：“不要”），字幕照旧，上面那 6 段旁白和字幕不同的地方保持现状。
+- 片尾最后一个页面要去掉，具体怎么去等 HQ 回话。片尾 30–34 s 那段（含 “Try it free, right in your browser.” 的位置）先不定稿。其余的音乐和旁白照 r10。
