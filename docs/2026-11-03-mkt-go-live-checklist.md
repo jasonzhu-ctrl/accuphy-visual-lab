@@ -156,3 +156,4 @@ MKT 版归 “Lab 营销版” 窗口负责（#231）。HQ 管它，和网站、
 | 2026-11-04 | 真实测试订阅（第五节，网站 #245） | 一次，测试邮箱，加拿大英文 MKT 页、加拿大 IP；网站 224f413b 通过：Combo 打开、重开仍解锁、无店铺弹窗、Meta Lead 1 次、GA4 generate_lead form=lab_unlock 1 次、请求里无邮箱。剩 Klaviyo HQ 读回 W24Qdc + 6 个属性，并把测试地址排除；读回通过才给广告 |
 | 2026-11-04 | **北美澳可以进广告** | 店铺页 + Lab 都上线，网站 03 核过（fe7d485a），两次测试订阅通过（224f413b + Klaviyo 读回新邮箱）。欧洲名单、按国家分名单的后续、欧洲锁卡翻译：Jason 11-04 经 Klaviyo HQ “lab的先暂停 不重要的”，先停 |
 | 2026-11-04 | #240 + #241 上线 | c743dfe，Vercel 9gzQuK8CM4gzNUYFLgVr226avow4；/、/mini/、/ice/、/embed/ md5 = 上线前；/mktbf2026/ = 打包；直接打开（加拿大参数、未订阅）PingLive 全景和 Mini 全景都锁；美国页待网站 03 用美国 IP 核 |
+| 2026-11-04 | #240/#241 线上核（Lab HQ 自测；网站 HQ：锁哪些是 Lab 的内容，网站不核，#238） | 全新无头浏览器、真店铺页 /pages/sonarlab-mktbf2026，把框的 market 换成 ca / us：加拿大 = PingLive 全景锁、Mini Combo 和全景锁；美国 = 只有 Mini、Combo 不锁、全景锁；Lab 没有报错（只有店铺自己的两条 Shopify/Goaffpro 脚本提示） |
