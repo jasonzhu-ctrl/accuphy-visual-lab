@@ -31,7 +31,7 @@ Jason 11-03：“一定要搞个文档，专门把这些不同的版本啊，那
 | 比荷卢 法语 | https://shop.accuphy.com/fr-benelux/pages/sonarlab-mktbf2026 | 法 |
 | 德国（含奥地利、瑞士：网站 03 测过，打开不跳转，看到德国市场、欧元） | https://shop.accuphy.com/de-de/pages/sonarlab-mktbf2026 | 德 |
 | 波兰 | https://shop.accuphy.com/pages/sonarlab-mktbf2026?lang=pl（波兰客人会被 302 转到 /en-pl/…?lang=pl，店铺那层是英文，Lab 还是波兰语，能用；网站给波兰市场加了波兰语以后，换成波兰页） | 波兰语 |
-| 拉脱维亚 | **待定**（HQ 在问 Jason）。现在的 https://shop.accuphy.com/pages/sonarlab-mktbf2026?lang=lv 会被 302 转到 /ro-ro/…?lang=lv，店铺那层是罗马尼亚语，Lab 还是拉脱维亚语；网站给的另一个选择是 /en-ro/pages/sonarlab-mktbf2026?lang=lv，店铺那层是英文（没测过） | 拉脱维亚语 |
+| 拉脱维亚（#238，Jason 11-04：“用英语”；第二批欧洲） | https://shop.accuphy.com/en-ro/pages/sonarlab-mktbf2026?lang=lv（拉脱维亚属于罗马尼亚市场，用它的英语页；店铺那层英文，Lab 拉脱维亚语；网站 03 还要实测一次） | 拉脱维亚语 |
 
 - 状态：【客人看到的店铺页】Jason 已在网站 HQ 说“动”（网站 #241），网站 00 在建。【后面那一层】lab.accuphy.ca/mktbf2026/ 等多语言一起上（#234），要 Jason 在 Lab HQ 说“动”。在那之前店铺页的框是空的（404），**这批链接不要给广告**。
 - 德、荷、波、拉的 Lab 文字要等译文放进去才是那种语言（现在显示英文、用米）。
@@ -108,3 +108,4 @@ Base 的改进要不要搬进两份复制件，HQ 问 Jason，他说了才搬（
 - 2026-11-03 HQ：#228 营销版不覆盖 Base：首页留 Base，带锁版放 /mktbf2026/。
 - 2026-11-03 HQ：波兰、拉脱维亚改按 #218 的规矩（拉脱维亚放主站；波兰等网站加波兰语）。
 - 2026-11-03 Lab 网站嵌入版：加第一点五节（店铺 /pages/lab = 网站嵌入版，#233）。
+- 2026-11-04 HQ：#238 拉脱维亚 MKT 链接用 /en-ro（英语）；#239 带锁版分两批：北美澳先上，欧洲等两步确认名单。

@@ -4120,3 +4120,7 @@ Numbered log. Newest at the bottom.
    - **英文版定稿 = r17**（Jason 11-04 在 Lab 广告片：“定稿”）：成片 Drive `01-current-cut/FINAL-EN-r17/plm-base-30fps-r17.mp4`（投放用）和 `-small.mp4`。画面由 Lab HQ 从冻结的湖 96fdc22 按 r6 镜头脚本重录 30 fps；第 2 段改用网页自己的细圈和小字 “Drag the boat to move it”（Jason：“这里这个特效相比原版实在太粗了 一点不高级”，看样片后“细圈 + 小字，照样片”）。音乐改为 Hype Me Up – Instrumental version（IamDayLight），旁白 Adam take 4，−13.9 LUFS。
    - **投放前：** Jason 在 Artlist 账号的 License 页保存 Hype Me Up 的许可证书（Space Brunch 不再用）。
    - **语言版本不用重录湖：** 背景帧和镜头记录留在 `reference/ads/2026-11-bf/base/r17-comp/`（本机，git 忽略，约 415 MB）；每种语言只换字幕层重新合成（`comp-base.mjs` + 该语言的 lines 文件），鱼和镜头与英文版逐帧相同。
+
+238. **拉脱维亚的投放链接用罗马尼亚市场的英语页**（Jason 2026-11-04 在 Lab HQ：“用英语”）。拉脱维亚在店里属于罗马尼亚市场（网站 03 11-03 用拉脱维亚 IP 实测：主站链接 302 到 /ro-ro，罗马尼亚语）。MKT 链接改为 `https://shop.accuphy.com/en-ro/pages/sonarlab-mktbf2026?lang=lv`：店铺那层英文，Lab 拉脱维亚语。这个地址网站 03 还没测，店铺页建好后测。
+
+239. **带锁版（MKT）分两批上线**（Jason 2026-11-04 在 Lab HQ 选“北美澳先上”）。起因：Jason 在 Klaviyo HQ 定“欧洲需要做两步的”，欧洲访客不进 W24Qdc（单次确认），进新建的欧洲两步确认名单。第一批：加拿大、美国、澳洲，进 W24Qdc。第二批：欧洲 6 个市场，等欧洲名单建好、Lab 按市场送名单、“去邮箱点确认”五种语言核好再给广告。Lab 营销版做按市场送名单（Jason：“现在做”）；不另做欧洲“订阅还没开放”的显示（Jason：“不用再单独做 … 同步进行的 很快的”）。清单第 6.5 节。
