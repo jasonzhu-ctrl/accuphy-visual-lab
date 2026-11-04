@@ -48,7 +48,9 @@ const OFF = 'rgba(255,255,255,0.32)' // Setting and Map: greyed, nothing happens
 // the desktop panel's view tiles use the same pictures (Jason 2026-10-30)
 export const viewThumb = (d, m) => (d === 'PL' ? { down: plDown, forward: plForward, panoramic: plPanoramic } : { down: plmDown, forward: plmForward, combo: plmCombo, panoramic: plmPanoramic, ice: plmIceFishing, liveice: plmLiveIce })[m]
 export const VIEW_IMG = { combo: plmCombo, panoramic: plmPanoramic, ice: plmIceFishing, liveice: plmLiveIce } // the subscribe card's picture of what it opens (#191)
-export const isLocked = (d, m) => m === 'combo' || m === 'ice' || (d === 'PLM' && m === 'panoramic') // the views behind the subscribe card (#191)
+// the views behind the subscribe card (#191); PingLive's Panoramic too in this locked copy (#240, Jason 11-04: “锁全景 Panoramic”) — its
+// Down and Forward stay free
+export const isLocked = (d, m) => m === 'combo' || m === 'ice' || m === 'panoramic'
 const unlockLabel = (view) => t('unlock_locked', { view })
 const movingText = (view) => t('na_moving', { view })
 function Icon({ name, active }) {

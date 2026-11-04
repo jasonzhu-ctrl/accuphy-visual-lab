@@ -10,6 +10,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { sentEvents } from './embed'
 import { t } from './i18n'
 import ViewIcon from './ViewIcon'
+import { LockIcon } from './UnlockCard'
 import finger from './assets/tour/finger.svg'
 import arrow from './assets/tour/arrow.svg'
 import './tour.css'
@@ -40,8 +41,12 @@ const SLOW = import.meta.env.DEV ? +((/[?&]tourslow(?:=(\d+))?\b/.exec(q) || [, 
 // card (after the last, the tour ends). The ice page's drill stop is done at the tap and goes straight on like the drag stop
 // (HQ 11-02, Jason's timing: no pause); the hole is still drilling while stop 2 fades in.
 const START_MS = 700, IN_DELAY = 80, OUT_MS = 400 * SLOW, HOLD_DRAG_MS = 0, HOLD_TILE_MS = 5000 * SLOW, DRAG_S = 4 * SLOW, GUARD_MS = 600
+// a tile stop on a locked view (the locked copy, #240: PingLive's Panoramic before subscribing): the page stays on the view before it
+// (Forward), the card says the view opens by subscribing (the subscribe card's own words), a tap on the tile opens that card. With no
+// tap the tour ends after this long, so it never sits over the page; subscribing opens the view and the stop ends as usual
+const LOCKED_STOP_MS = 8000 * SLOW
 
-export default function Tour({ script, auto, phone, mode, deviceId, state, onShow, onState }) {
+export default function Tour({ script, auto, phone, mode, deviceId, state, onShow, onState, lockedName = () => null }) {
   const sc = TOUR_SCRIPTS[script]
   const [phase, setPhase] = useState('idle') // idle | running | done
   const [i, setI] = useState(0)
@@ -89,6 +94,7 @@ export default function Tour({ script, auto, phone, mode, deviceId, state, onSho
     if (st.action !== 'tile') onShow(sc.device, st.view, false) // the stop's own view is on before its title appears
     onState({ on: true, tile: st.action === 'tile' ? st.view : null })
     later(() => setVis('in'), IN_DELAY)
+    if (st.action === 'tile' && lockedName(sc.device, st.view)) later(() => { if (!doneRef.current) skip() }, IN_DELAY + LOCKED_STOP_MS)
     later(() => setArmed(true), IN_DELAY + GUARD_MS)
   }
   const start = () => { timers.current.forEach(clearTimeout); timers.current = []; setPhase('running'); enter(0) }
@@ -186,6 +192,7 @@ export default function Tour({ script, auto, phone, mode, deviceId, state, onSho
 
   if (phase === 'idle') return null
   const k = stop.key
+  const lockName = stop.action === 'tile' ? lockedName(sc.device, stop.view) : null // this stop's view is behind the subscribe card (#240)
   return (
     <div className={`ac-tour-layer ${phone ? 'is-phone' : ''}`} style={SLOW > 1 ? { '--tour-k': SLOW } : undefined} aria-live="polite">
       {phase === 'running' && (<>
@@ -199,11 +206,12 @@ export default function Tour({ script, auto, phone, mode, deviceId, state, onSho
           </div>
         )}
         <div className={`ac-tour-card is-${vis}`}>
-          <div ref={titleEl} className="ac-tour-title">{t(`tour_${k}_title`)}</div>
-          <div className="ac-tour-text">{t(stop.text || `tour_${k}_text`)}</div>
+          <div ref={titleEl} className="ac-tour-title">{lockName ? t('unlock_title', { view: lockName }) : t(`tour_${k}_title`)}</div>
+          <div className="ac-tour-text">{lockName ? t('unlock_text', { view: lockName }) : t(stop.text || `tour_${k}_text`)}</div>
           <div className="ac-tour-dots">{sc.stops.map((_, n) => <i key={n} className={n < i || (n === i && (vis === 'check' || (vis === 'out' && phase === 'running' && doneRef.current))) ? 'is-done' : n === i ? 'is-on' : ''} />)}</div>
           {phone && stop.action === 'tile' && (
-            <button ref={ptile} type="button" className={`ac-view ac-tour-ptile is-tour-target ${mode === stop.view ? 'is-active' : ''}`} onClick={() => onShow(sc.device, stop.view, true)}>
+            <button ref={ptile} type="button" className={`ac-view ac-tour-ptile is-tour-target ${mode === stop.view ? 'is-active' : ''} ${lockName ? 'is-locked' : ''}`} aria-label={lockName ? t('unlock_locked', { view: lockName }) : undefined} onClick={() => onShow(sc.device, stop.view, true)}>
+              {lockName && <span className="ac-view-lock"><LockIcon size={10} /></span>}
               <ViewIcon view={stop.view} deg={sc.device === 'PLM' ? 39 : 135} active={mode === stop.view} />
               <span className="ac-view-name">{t('mode_' + stop.view)}</span>
             </button>

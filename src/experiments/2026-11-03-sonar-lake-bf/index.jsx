@@ -27,6 +27,9 @@ const BIG_PHONE = import.meta.env.DEV && window.location.search.includes('bigpho
 // Build variant (Jason 2026-10-16): VITE_DEVICES='PLM' makes a PingLive Mini-only page — no device switch, the
 // Mini is the device, the step presets use its views. Unset: both devices (the default Lab).
 const LOCKED_NAME = { combo: 'tile_live_combo', panoramic: 'tile_live_panoramic', ice: 'tile_ice' }
+// the subscribe card's name for the view. PingLive's Panoramic (#240) uses the same "Live Panoramic" as the Mini, also when its Home
+// tile (“Panoramic View”) is tapped: the French card reads “Débloquer la vue {view}”, and “Vue panoramique” would say vue twice
+const lockedName = (d, m) => t(LOCKED_NAME[m])
 // Black Friday locked version (#213): this folder is a copy of the base lake at 86bf80e, changed only by the "Lab 营销版" chat.
 // The subscribe lock (#191) is always on here; VITE_COMBO_LOCK is not read. The base (2026-09-23-sonar-lake-3d) stays lock-free.
 const COMBO_LOCK = true
@@ -81,6 +84,10 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
   const TOUR = ICE ? 'ice' : ONLY === 'PLM' ? 'mini' : 'pl'
   const [tourAuto] = useState(() => !!TOUR && !tourOff && (tourForced || !tourSeen(TOUR)))
   const [tour, setTour] = useState({ on: false, tile: null }) // the tour is running; the view whose tile it lights
+  // while the tour runs, only the view it shows by itself (stop 1: the Mini's Combo) is open without subscribing; a tile stop on a
+  // locked view (PingLive's Panoramic, #240) asks for the subscription instead (Tour.jsx)
+  const TOUR_FREE = TOUR ? TOUR_SCRIPTS[TOUR].stops.filter((s) => s.action !== 'tile').map((s) => s.view) : []
+  const tourFree = (m) => tour.on && TOUR_FREE.includes(m)
   const [deviceId, setDeviceId] = useState(ONLY || 'PL')
   const [mode, setMode] = useState(tourAuto ? TOUR_SCRIPTS[TOUR].stops[0].view : ICE ? (/[?&]view=ice\b/.test(window.location.search) && (!COMBO_LOCK || isSignedUp()) ? 'ice' : 'liveice') : 'forward') // ?view=ice: the Ice Fishing tile from the lake (#191)
   const [view, setView] = useState(ICE ? iceParams().view : 'top') // ice page cameras: top / under the ice / section (docs/ice-relationship-study.md)
@@ -317,7 +324,7 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
   // every pick passes here, so nothing reaches Combo before subscribing (#191): the card opens and the view stays as it was
   // The entry tour belongs to the base version, which has no lock: while it runs every view opens (Jason 2026-11-02)
   const pickView = (d, m, source, name) => {
-    if (isLocked(d, m) && !unlocked && !tour.on) { setUnlock({ d, m, source, name: name || t(LOCKED_NAME[m]) }); return false }
+    if (isLocked(d, m) && !unlocked && !tourFree(m)) { setUnlock({ d, m, source, name: (d === 'PL' && m === 'panoramic') || !name ? lockedName(d, m) : name }); return false }
     showView(d, m, source); return true
   }
   const goIce = (view) => { window.location.href = iceUrl(view) }
@@ -333,7 +340,7 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
   // the tour shows a stop's view: by itself (stop 1, no `view` event: not a visitor's pick, #139) or for the visitor's tap
   // (stops 2–3, source 'tour'). On phones that also leaves the app's Home.
   const tourShow = (d, m, byVisitor) => {
-    if (byVisitor) showView(d, m, 'tour'); else { setDeviceId(d); setMode(m) }
+    if (byVisitor) { if (!pickView(d, m, 'tour')) return } else { setDeviceId(d); setMode(m) } // a locked stop's tap opens the subscribe card
     if (phone) { setHome(false); setStarted(true) }
   }
 
@@ -407,9 +414,9 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
         <div>
           <span className="ac-label">{t('view')}</span>
           <div className={`ac-views is-${modes.length}`}>{modes.map((m) => {
-            const locked = isLocked(deviceId, m) && !unlocked && !tour.on, active = mode === m
+            const locked = isLocked(deviceId, m) && !unlocked && !tourFree(m), active = mode === m
             return (
-              <button key={m} type="button" className={`ac-view ${active ? 'is-active' : ''} ${locked ? 'is-locked' : ''} ${tour.tile === m ? 'is-tour-target' : ''}`} aria-pressed={active} aria-label={locked ? t('unlock_locked', { view: t(LOCKED_NAME[m]) }) : undefined} onClick={() => pickView(deviceId, m, 'panel')}>
+              <button key={m} type="button" className={`ac-view ${active ? 'is-active' : ''} ${locked ? 'is-locked' : ''} ${tour.tile === m ? 'is-tour-target' : ''}`} aria-pressed={active} aria-label={locked ? t('unlock_locked', { view: lockedName(deviceId, m) }) : undefined} onClick={() => pickView(deviceId, m, 'panel')}>
                 {locked && <span className="ac-view-lock"><LockIcon size={10} /></span>}
                 <ViewIcon view={m} deg={device.beamDeg} active={active} live={!phone} />
                 <span className="ac-view-name">{t('mode_' + m)}</span>
@@ -562,7 +569,7 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
         <pre ref={(el) => { state.current.debugEl = el }} className="pointer-events-none absolute left-2 top-1/2 rounded bg-black/60 p-1 text-[10px] text-lime-300" />
       )}
     </main>
-    {TOUR && <Tour script={TOUR} auto={tourAuto} phone={phone} mode={mode} deviceId={deviceId} state={state} onShow={tourShow} onState={setTour} />}
+    {TOUR && <Tour script={TOUR} auto={tourAuto} phone={phone} mode={mode} deviceId={deviceId} state={state} onShow={tourShow} onState={setTour} lockedName={(d, m) => (isLocked(d, m) && !unlocked && !TOUR_FREE.includes(m) ? lockedName(d, m) : null)} />}
     <AnimatePresence>{unlock && <UnlockCard key="unlock" name={unlock.name} img={VIEW_IMG[unlock.m]} product={PRODUCT[unlock.d] || PRODUCT.PLM} view={unlock.m} onClose={() => setUnlock(null)} onDone={onUnlocked} />}</AnimatePresence>
     </>
   )
