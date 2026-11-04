@@ -67,3 +67,42 @@ https://artlist.io/royalty-free-music/song/walking-the-universe/58141
 
 电平：整片 RMS −15.5 dBFS，峰值 −1.0 dBFS；句间只有音乐时 −16～−29 dBFS，片尾 30–31 s −36 dBFS，最后 0.3 s 静音。
 核对仍靠数值（本会话无放音）：每句发声起止如上表，无重叠，间隔都 ≥0.5 s。请 Jason 实听。
+
+---
+
+# r9：按 Jason 逐句定稿换旁白（Jason：“修改的comment写完了 你再继续做一个版本吧”，HQ 转来定稿表）
+
+画面、字幕、音乐 = r8，一个没动（视频轨与 r8 逐帧同一份：340 帧，哈希一致；音乐参数同 r8）。只按定稿换旁白。
+规则同 r8：一律原生语速，不提速、不压停顿；每句落在它那段字幕时间里；句间 ≥0.5 s。
+
+成品：`reference/ads/2026-11-bf/base/plm-base-preview-10fps-r9.mp4`（40 MB）、`plm-base-preview-10fps-r9-small.mp4`（22 MB），整段混音单独一份 `plm-base-r9-mix.wav`（34 s，48 kHz；本机不能直接编 mp3，所以给 wav）。
+新 take 在 `sound-r9/`（10 个 take 的 mp3/wav、`phone-half.wav`、`mix-r9.wav`），参数 `scripts/dev/ads/base/plan-r9.json`。
+新生成 10 个 take（5 句新词 × 2），共 47 点，套餐内（余额 69,340 → 69,293，11-08 续满）。
+
+| 段 | 字幕时间 | 旁白读 | 发声起止 | 与下一句的间隔 | take 怎么选 |
+|---|---|---|---|---|---|
+| 1 开场 | 0.0–4.0 | Learn Forward-Facing Sonar in 2 minutes. | 0.60–3.47 | 0.83 s | r7 原 take，不动 |
+| 2 拖船 | 4.0–9.5 | Drag the boat. See what the beam finds for you in the timber. | 4.30–7.86 | 1.89 s | r7 原 take，不动 |
+| 3 手机 | 9.5–14.5 | Here’s how it looks on your phone. | 9.75–11.16 | 3.60 s | 不另生成：r7 原 take 在两句之间有 0.45 s 自然停顿，从停顿处剪下前半句（尾部 80 ms 淡出），语气、语速都是原来的 |
+| 4 角度 | 14.5–19.0 | **Switch to Combo View.**（新） | 14.76–16.11 | 3.09 s | take b：音高起伏更大（读起来不平），1.35 s；a 更平、1.29 s |
+| 4b 手机 Combo | 19.0–22.5 | Ahead and straight down, at the same time. | 19.20–22.03 | 0.82 s | r7 原 take，不动 |
+| 5 冰上 1 | 22.5–25.3 | **Combo View on Ice.**（新） | 22.85–24.77 | 0.72 s | take b：起伏更大、更从容（1.7 s 加尾部一口很轻的气 −49 dB）；a 1.6 s 较平 |
+| 5 冰上 2 | 25.3–27.6 | **Drill a hole in the ice.**（新） | 25.49–26.85 | 0.99 s | take b：干净无尾音、起伏更大；a 句尾多一段 0.2 s 的气声 |
+| 5 冰上 3 | 27.6–30.0 | **Be part of the action.**（新，品牌口号） | 27.84–29.00 | 1.98 s | take b（生成时加了 “confident” 语气提示，不会读出来）：音高中位 134 Hz，比 a 的 150 Hz 低，有力但不喊、不像念口号；a 更高更亮，像宣传腔。两条时长一样 1.17 s |
+| 6 片尾 | 30.0–34.0 | **Try it free, right in your browser.**（新，CTA） | 30.98–33.00 | 片尾，之后 1 s 只有音乐收尾 | take b（加了 “warmly” 提示，free 大写强调）：“free” 后有一个 0.12 s 的逗号停顿、整体语调更亮，像朋友在邀请；a 一口气读完，free 没有突出 |
+
+**旁白和字幕不一样的几段（字幕先不改，等 HQ 问过 Jason）：**
+
+| 段 | 字幕（画面上现在的字） | 旁白（r9） |
+|---|---|---|
+| 3 手机 | Here’s how it looks on your phone. Spot the fish among the trees. | Here’s how it looks on your phone.（只读前半句） |
+| 4 角度 | One beam ahead. Two with Combo. | Switch to Combo View. |
+| 5 冰上 1 | No black box. No heavy battery and plotter. | Combo View on Ice. |
+| 5 冰上 2 | Wireless image to your phone. | Drill a hole in the ice. |
+| 5 冰上 3 | Hop holes faster with PingLive Mini on hard water. | Be part of the action. |
+| 6 片尾 | Try Accuphy Sonar Lab. No fee. No download. Right in your browser. | Try it free, right in your browser. |
+
+1 开场、2 拖船、4b 手机 Combo 三段旁白和字幕一致。
+
+电平：整片 RMS −15.4 dBFS，峰值 −1.2 dBFS；片尾前 29.1–30.9 s 只有音乐 −32 dBFS，最后 0.3 s 静音。
+核对靠数值（本会话无放音）：每句发声起止如上表，都在各自字幕时间内，无重叠，间隔都 ≥0.72 s。take 是按时长、停顿、音高起伏和尾音挑的，不是听出来的，请 Jason 实听；每句另一个 take 都在 `sound-r9/`，要换随时换。
