@@ -92,6 +92,12 @@ MKT 版归 “Lab 营销版” 窗口负责（#231）。HQ 管它，和网站、
   - `/ice/`、`/mktbf2026/ice/` 是网站嵌入版的冰钓页，已经有 120 ft：它的复制件取自 96fdc22，96fdc22 包含 99e15c8。
   - 没搬之前：德、荷、波、拉的访客在 MKT 页上看到英文，分享出去的链接也不带语言。
 
+## 六点五、欧洲两步确认名单（Jason 11-04 在 Klaviyo HQ：“欧洲需要做两步的”）
+
+- [ ] **Klaviyo：** 新建欧洲 Lab 名单，两步确认（double opt-in），确认邮件出各语言。Klaviyo HQ 先出预览，Jason 在 Klaviyo HQ 说“动”才建；名单号建好后给 Lab HQ。
+- [ ] **Lab（带锁版复制件）：** 订阅卡按市场送名单：加拿大、美国、澳洲 → W24Qdc（单次确认）；欧洲各市场（fr-fr、nl-benelux、fr-benelux、de-de、波兰、拉脱维亚）→ 欧洲新名单。欧洲成功页写“去邮箱点确认”（五种语言，要网站 / Lab 多语言核过，不自己编）。要 Jason 说“动”才做。
+- [ ] **上线顺序：** 欧洲要不要等新名单建好再上锁，HQ 问 Jason。
+
 ## 七、上线当天（HQ 做，营销版核）
 
 - [ ] 上线包和测试链接用同一个提交打包，写进 `docs/versions.md`、`docs/version-sheet.md`、`docs/lab-links-sheet.md`。
