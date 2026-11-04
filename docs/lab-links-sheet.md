@@ -76,7 +76,7 @@ Jason 11-03：“一定要搞个文档，专门把这些不同的版本啊，那
 | https://lab.accuphy.ca/ | 网站嵌入版（无锁） | 96fdc22（11-03 晚上线） | 各市场 `/pages/lab` |
 | https://lab.accuphy.ca/mini/ | 网站嵌入版，只有 Mini | 96fdc22 | — |
 | https://lab.accuphy.ca/ice/ | 网站嵌入版，冰钓页 | 96fdc22 | — |
-| https://lab.accuphy.ca/mktbf2026/ | MKT 版（带锁） | **00ff0d9（11-04 上线，北美澳名单 W24Qdc；欧洲名单未填；#240 PingLive 全景锁、#241 美国 Combo 免费、#242 导览中视图都能用）** | 各市场 `/pages/sonarlab-mktbf2026`（还没建） |
+| https://lab.accuphy.ca/mktbf2026/ | MKT 版（带锁） | **b572dde（11-04 上线，名单按国家：加拿大 W24Qdc、美国 SPeeP6、澳洲 Scdcct（#244）；欧洲名单未填；#240 PingLive 全景锁、#241 美国 Combo 免费、#242 导览中视图都能用）** | 各市场 `/pages/sonarlab-mktbf2026`（还没建） |
 | https://lab.accuphy.ca/mktbf2026/ice/ | MKT 版里冰钓格子去的页，是网站嵌入版冰钓页的拷贝 | 96fdc22 的 /ice/（11-04 上线） | — |
 
 直接打开 lab.accuphy.ca（不经过店铺）时，Lab 不发统计事件，“去商店”进加拿大店。广告请用第一节的投放链接。
