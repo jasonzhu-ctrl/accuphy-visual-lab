@@ -1,0 +1,10 @@
+{
+  "_status": "DRAFT 2026-11-05, PingLive ad r1 (HQ script v1, docs/2026-11-04-pinglive-ad-script.md). Changed from the script: shot 4 'Live Down.' → 'Down View.' and shot 5 'Panoramic.' → 'Panoramic View.' (the app's PingLive tile names; 'Live …' are the Mini's). English finals go to Klaviyo HQ later.",
+  "hook": { "head": "135° of live sonar.", "sub": "PingLive" },
+  "drag": { "head": "Drag the boat.", "sub": "The wide beam sweeps the timber." },
+  "phone": { "head": "Your phone is the screen.", "sub": "Trees and fish, as they move." },
+  "down": { "head": "Down View.", "sub": "What’s right under the boat." },
+  "pano": { "head": "Panoramic View.", "sub": "See what’s around the boat." },
+  "reveal": { "head": "Built for open water.", "sub": "PingLive on your boat." },
+  "hint": "Drag the boat to move it"
+}

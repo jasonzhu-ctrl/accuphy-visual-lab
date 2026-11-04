@@ -1,0 +1,10 @@
+{
+  "_what": "PingLive ad r1 (2026-11-04/05): the film's beats in seconds, shared by film-pl.mjs (the passes) and comp-pl.mjs / overlay-pl.html (captions, cue, end card). Fitted to Adam's one take of the 7 lines (line 1 reads 4.55 s, so the hook is 4.9 s, not the script's 3.5).",
+  "hook": [0, 4.9],
+  "drag": [4.9, 9.7],
+  "phone": [9.7, 13.9],
+  "down": [13.9, 18.7],
+  "pano": [18.7, 24.0],
+  "reveal": [24.0, 30.0],
+  "end": [30.0, 34.0]
+}

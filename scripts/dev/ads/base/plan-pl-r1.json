@@ -1,0 +1,69 @@
+{
+ "_note": "PingLive ad r1 (2026-11-05): Adam - American, Dark and Tough (Artlist, Eleven v3, stability 50 %, [relaxed] / [confident] / [warmly] as the Mini's take 4), ONE take of the 7 lines (Artlist project 'Accuphy PingLive Ad 2026-11' \u2192 folder 'PingLive r1 voice', 63 credits), cut in the pauses between lines by split-take.py. Music: Hype Me Up \u2013 Instrumental version (IamDayLight, Artlist, licensed for the Mini) from 3.6 s, so the track's steady bass at 29.6 s lands on the slogan (film 26.0 s). Levels as the Mini r14 (music \u221214 dBFS, duck 8 dB). r1 mix: duck 9 dB (the Mini 8) and the music \u22124 dB from the cut to the end card (30.0 s), so the slogan and the end line stay over the drop.",
+ "voDir": "reference/ads/2026-11-pl/r1/sound/lines",
+ "music": "reference/ads/2026-11-pl/hype-inst-mono48.wav",
+ "musicIn": 3.6,
+ "musicGainDb": -14,
+ "duckDb": -9,
+ "fadeIn": 0.3,
+ "fadeOut": 0.8,
+ "length": 34,
+ "voPeakDb": -3,
+ "lines": [
+  {
+   "key": "hook",
+   "speech": 0.3,
+   "text": "This is PingLive. One hundred thirty-five degrees of live sonar.",
+   "file": "hook.wav",
+   "at": 0.18
+  },
+  {
+   "key": "drag",
+   "speech": 5.2,
+   "text": "Drag the boat. Sweep the timber.",
+   "file": "drag.wav",
+   "at": 5.08
+  },
+  {
+   "key": "phone",
+   "speech": 10.0,
+   "text": "Watch it live, right on your phone.",
+   "file": "phone.wav",
+   "at": 9.88
+  },
+  {
+   "key": "down",
+   "speech": 14.2,
+   "text": "Switch to Down View. The wreck, right under you.",
+   "file": "down.wav",
+   "at": 14.08
+  },
+  {
+   "key": "pano",
+   "speech": 19.0,
+   "text": "Go Panoramic. See what's around you.",
+   "file": "pano.wav",
+   "at": 18.88
+  },
+  {
+   "key": "reveal",
+   "speech": 26.0,
+   "text": "Be part of the action.",
+   "file": "reveal.wav",
+   "at": 25.88
+  },
+  {
+   "key": "end",
+   "speech": 30.9,
+   "text": "Try it free, right in your browser.",
+   "file": "end.wav",
+   "at": 30.78
+  }
+ ],
+ "bedSteps": [
+  [
+   30.0,
+   -4
+  ]
+ ]
+}

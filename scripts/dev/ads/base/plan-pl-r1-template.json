@@ -1,0 +1,21 @@
+{
+ "_note": "PingLive ad r1 (2026-11-05): Adam - American, Dark and Tough (Artlist, Eleven v3, stability 50 %, [relaxed] / [confident] / [warmly] as the Mini's take 4), ONE take of the 7 lines (Artlist project 'Accuphy PingLive Ad 2026-11' → folder 'PingLive r1 voice', 63 credits), cut in the pauses between lines by split-take.py. Music: Hype Me Up – Instrumental version (IamDayLight, Artlist, licensed for the Mini) from 3.6 s, so the track's steady bass at 29.6 s lands on the slogan (film 26.0 s). Levels as the Mini r14 (music −14 dBFS, duck 8 dB).",
+ "voDir": "",
+ "music": "",
+ "musicIn": 3.6,
+ "musicGainDb": -14,
+ "duckDb": -8,
+ "fadeIn": 0.3,
+ "fadeOut": 0.8,
+ "length": 34,
+ "voPeakDb": -3,
+ "lines": [
+  { "key": "hook", "speech": 0.30, "text": "This is PingLive. One hundred thirty-five degrees of live sonar." },
+  { "key": "drag", "speech": 5.20, "text": "Drag the boat. Sweep the timber." },
+  { "key": "phone", "speech": 10.00, "text": "Watch it live, right on your phone." },
+  { "key": "down", "speech": 14.20, "text": "Switch to Down View. The wreck, right under you." },
+  { "key": "pano", "speech": 19.00, "text": "Go Panoramic. See what's around you." },
+  { "key": "reveal", "speech": 26.00, "text": "Be part of the action." },
+  { "key": "end", "speech": 30.90, "text": "Try it free, right in your browser." }
+ ]
+}
