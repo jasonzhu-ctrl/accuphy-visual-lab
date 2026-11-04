@@ -11,7 +11,7 @@ Jason 2026-11-02：“你记住，或者搞一个 sheet 把各种版本做好管
 | **标准 Base 版（PingLive + PingLive Mini）** | Jason 11-02 定的标准基础版，见下面的清单 | main 86bf80e（6b5a225 + 冰钓教程、去厚度、湖岸、树自动调） | lab.accuphy.ca `/`（PingLive，可切 Mini）、`/mini/`（只有 Mini）、`/ice/`；测试链接同一版 | **11-03 已上线**（Jason：“动”） |
 | 网站嵌入版（线上） | 店铺各市场 /pages/lab 的框里显示的 | **96fdc22（11-03 晚）**；#233 起有自己的复制件 `2026-11-03-sonar-lake-web/`，“Lab 网站嵌入版”管 | lab.accuphy.ca、shop.accuphy.com/pages/lab | 标准 Base 版，锁关闭；比 86bf80e 多：冰钓前视 120 ft 进画面、多语言代码（译文还没放，德荷波拉先显示英文、用米） |
 | 冰钓页 | 冰面，只有 Mini | 和 Base 同一份代码 | lab.accuphy.ca/ice/ | **11-03 已上线**：入场教程（点冰打洞 → Tap Forward View → Tap Down View）、俯视跟随冰洞、和夏天湖同一条湖岸 |
-| 营销版（黑五带锁版 = MKT 版） | Base 复制一份，锁视图打开（订阅才能看 Combo 等，#191 / #213）；五种语言已搬进；按市场送名单（北美澳 → W24Qdc，欧洲 → 欧洲两步确认名单，名单号未填） | `src/experiments/2026-11-03-sonar-lake-bf/`，**0117d52**；“Lab 营销版”窗口管 | **lab.accuphy.ca/mktbf2026/**（后台，不给客人）；客人从店铺 `/pages/sonarlab-mktbf2026` 进（店铺页还没建好） | **11-04 已上线（Jason 在 Lab HQ 说“动，上线”）**：北美澳名单 W24Qdc 已填；欧洲名单号未填（欧洲订阅暂不开，#239 欧洲第二批） |
+| 营销版（黑五带锁版 = MKT 版） | Base 复制一份，锁视图打开（订阅才能看 Combo 等，#191 / #213）；五种语言已搬进；按市场送名单（北美澳 → W24Qdc，欧洲 → 欧洲两步确认名单，名单号未填） | `src/experiments/2026-11-03-sonar-lake-bf/`，**c743dfe**（#240 PingLive 全景锁、#241 美国 Combo 免费）；“Lab 营销版”窗口管 | **lab.accuphy.ca/mktbf2026/**（后台，不给客人）；客人从店铺 `/pages/sonarlab-mktbf2026` 进（店铺页还没建好） | **11-04 已上线（Jason 在 Lab HQ 说“动，上线”）**：北美澳名单 W24Qdc 已填；欧洲名单号未填（欧洲订阅暂不开，#239 欧洲第二批） |
 
 测试链接：https://jasonzhu-ctrl.github.io/accuphy-lab-test/
 
