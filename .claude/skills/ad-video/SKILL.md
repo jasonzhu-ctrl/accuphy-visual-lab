@@ -5,6 +5,10 @@ description: Make Accuphy Lab ad videos (stills, 15 s films, 9:16 / 4:5, EN / FR
 
 # Ad videos from the Lab
 
+**Read `docs/2026-11-04-ad-lessons.md` first** (what the Mini film r1–r17 taught: 30 fps from the start, boat route and following
+camera, the Lab's own cues, one-take voice, safe band on full-size frames, keep the frames for language versions). The PingLive film's
+script is `docs/2026-11-04-pinglive-ad-script.md`. Some rules below predate 11-04 (#237 allows language versions now).
+
 Owner: the chat **"广告视频制作"** (decision #179, Jason 2026-10-27: "做广告视频……单独制作视频……视频制作专门让他做"). It reports to
 Lab HQ (`local_1022478a-b63a-4fff-8403-7c58646dab95`).
 
