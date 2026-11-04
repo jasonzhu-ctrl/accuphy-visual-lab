@@ -1,0 +1,4 @@
+{ "voDir": "reference/ads/2026-11-bf/base/sound-r7", "music": "reference/ads/2026-11-bf/base/sound-r7/walking-the-universe-mono48.wav", "musicIn": 144.5, "musicGainDb": -19, "duckDb": -9, "fadeIn": 1.2, "fadeOut": 1.0, "length": 34, "voPeakDb": -3,
+  "lines": [ {"key":"open","file":"open-fit.wav","at":0.6}, {"key":"drag","file":"drag-fit.wav","at":4.3}, {"key":"phone","file":"phone-fit.wav","at":9.75},
+             {"key":"angle","file":"angle-fit.wav","at":14.75}, {"key":"combo","file":"combo-fit.wav","at":19.2}, {"key":"ice1","file":"../sound-r8/ice1-a.wav","at":22.75},
+             {"key":"ice2","file":"ice2-fit.wav","at":25.5}, {"key":"ice3","file":"../sound-r8/ice3L-a.wav","at":27.8}, {"key":"end","file":"../sound-r8/endS.wav","at":31.0} ] }
