@@ -34,8 +34,12 @@ const WIDE = CAM.wide || { pos: [-40, 95, 150], look: [10, -10, 0], fov: 48 }   
 // 15 ft (4.6 m) back along the route on his word ("再往回一点", 11-03): (−25.6, 16.3) → (3.4, 14.3). This replaces the round 2/3
 // rule (2× round 2's distance, 15 ft back: 4.4 → 18.4). The cameras sit farther back for the longer path and moved with it.
 const DRAG0 = CAM.drag0 || [-25.6, 16.3], DRAG1 = CAM.drag1 || [3.4, 14.3]             // the boat's path on the drag (bow-first, +x)
-const OPEN1 = CAM.open1 || { pos: [-40.6, 40, 86.3], look: [-12.6, -8, 16.3], fov: 48 } // the push lands here: the boat at the start and its beam readable
-const F5 = CAM.f5 || { pos: [-34.6, 36, 88.3], look: [-4.6, -6, 15.3], fov: 48 }     // the drag framing: the whole 29 m path in the band under the caption
+const OPEN1 = CAM.open1 || { pos: [-40.6, 40, 86.3], look: [-12.6, -8, 16.3], fov: 48 } // the push lands here: the boat at the start and its beam readable (look = boat + AHEAD)
+// r6 (Jason on r5: 镜头最后没有跟着船, the beam ran out of frame): the drag camera follows the boat — its look point rides 13 m ahead
+// of the boat (the boat left of centre, the 80 ft beam to the right) and the camera keeps OPEN1's offset, easing to a slightly
+// lower, closer one (F5_OFF) as the boat goes; the phone beat starts from the same camera (dragCam at the end point)
+const AHEAD = [13, 0, 0], F5_OFF = CAM.f5off || [-30, 42, 73]
+const dragCam = (boat, u) => { const look = [boat[0] + AHEAD[0], lerp(-8, -6, u), boat[1] + AHEAD[2]]; const off = lerp3([OPEN1.pos[0] - OPEN1.look[0], OPEN1.pos[1] - OPEN1.look[1], OPEN1.pos[2] - OPEN1.look[2]], F5_OFF, u * 0.9); return { pos: [look[0] + off[0], look[1] + off[1], look[2] + off[2]], look, fov: 48 } }
 const BACK = CAM.back || { pos: [-26, 130, 124.3], look: [0, -8, 36.3], fov: 48 }    // r2: the pull-back as the phone comes up, higher still: the boat and beam sit in y ~600–740, between the caption and the phone (748); r5: moved with the end point
 // r3 (Jason): the angle beat and the combo phone sit at the SMALL wreck of the reference (wreck.js SMALL_WRECK x 16, z −26, the
 // 10 m workboat; docs/2026-11-03-ad-r2-shot4-reference.webp): the boat at WRECK_BOAT facing +x with the wreck ~30 m ahead inside the
@@ -53,8 +57,8 @@ const shot = {
   open: (t) => { const u = smoother(span(t, 0, 4)); return { cam: { pos: lerp3(WIDE.pos, OPEN1.pos, u), look: lerp3(WIDE.look, OPEN1.look, u), fov: lerp(WIDE.fov, OPEN1.fov, u) } } },
   // r3 (Jason): the boat must move the moment the hold's arc starts, so the target leaves at once (sine ease-out from 4.4 s; the
   // boat closes on it at 4/s, Scene.jsx) instead of the slow smoother start; the comp's arc follows the boat's own x (bx)
-  drag: (t) => { const u = smoother(span(t, 4, 9.5)); return { cam: { pos: lerp3(OPEN1.pos, F5.pos, u * 0.9), look: lerp3(OPEN1.look, F5.look, u * 0.9), fov: 48 }, target: lerp3(DRAG0, DRAG1, Math.sin(span(t, 4.4, 8.7) * Math.PI / 2)) } },
-  phone: (t) => { const u = easeOut(span(t, 9.6, 10.5)); const A = { pos: lerp3(OPEN1.pos, F5.pos, 0.9), look: lerp3(OPEN1.look, F5.look, 0.9), fov: 48 }
+  drag: (t, s) => { const u = smoother(span(t, 4, 9.5)); return { cam: dragCam(s.boat || DRAG0, u), target: lerp3(DRAG0, DRAG1, Math.sin(span(t, 4.4, 8.7) * Math.PI / 2)) } },
+  phone: (t) => { const u = easeOut(span(t, 9.6, 10.5)); const A = dragCam(DRAG1, 1)
     return { cam: { pos: lerp3(A.pos, BACK.pos, u), look: lerp3(A.look, BACK.look, u), fov: 48 }, lift: lerp(720, -215, easeOut(span(t, 9.6, 10.3))) + lerp(0, 900, easeIn(span(t, 13.9, 14.5))) } },
   // r3: no Forward opening; Combo from the first frame, its fans a slit that opens over 14.8–16.1 s while the camera rises
   angle: (t) => { const u = smoother(span(t, 14.5, 19)); return { cam: { pos: lerp3(LOW1.pos, LOW2.pos, u), look: lerp3(LOW1.look, LOW2.look, u), fov: lerp(LOW1.fov, LOW2.fov, u) }, fanOpen: lerp(0.03, 1, easeOut(span(t, 14.8, 16.1))) } },
@@ -112,7 +116,8 @@ if (ice) { // Base's #225 hooks (322f47f + c8ace42, "ad-lake-ice" port 5193): th
 }
 let view = null
 const apply = async (t) => {
-  const st = shot(t, { hole })
+  const boat = pass === 'drag' ? await p.evaluate(() => [window.__sonarState.boat.x, window.__sonarState.boat.z]) : null // the drag camera follows the boat
+  const st = shot(t, { hole, boat })
   if (st.view && st.view !== view) { view = st.view; await click(view); await p.waitForTimeout(50); if (view === 'Combo') { await setRange(0, 155); await setRange(1, 100) } }
   await p.evaluate(([st]) => {
     const s = window.__sonarState
@@ -139,7 +144,10 @@ for (let i = 0; i < N; i++) {
     const s = window.__sonarState, cam = window.__camera
     let boat = null
     if (cam && s.boat) { const v = new cam.position.constructor(s.boat.x, 0.2, s.boat.z).project(cam); boat = [+((v.x + 1) / 2 * W).toFixed(1), +((1 - v.y) / 2 * H).toFixed(1)] }
-    return { depth: s.depthEl?.textContent || null, boat, bx: s.boat ? +s.boat.x.toFixed(2) : null, prog: s.boat ? +((s.boat.x - D0) / (D1 - D0)).toFixed(4) : null, fan: s.fanOpen ?? null } // prog: the boat's progress along the drag path, for the comp's arc
+    // beam: the Forward beam's far corners (80 ft = 24.4 m ahead, ±19.5°, surface and ~9 m down) on screen, to check the beam stays in frame
+    let beam = null
+    if (cam && s.boat) { const R = 24.4, w = R * Math.tan(19.5 * Math.PI / 180); beam = [[R, 0, w], [R, 0, -w], [R, -9, w], [R, -9, -w]].map(([dx, dy, dz]) => { const v = new cam.position.constructor(s.boat.x + dx, dy, s.boat.z + dz).project(cam); return [+((v.x + 1) / 2 * W).toFixed(0), +((1 - v.y) / 2 * H).toFixed(0)] }) }
+    return { depth: s.depthEl?.textContent || null, boat, beam, bx: s.boat ? +s.boat.x.toFixed(2) : null, prog: s.boat ? +((s.boat.x - D0) / (D1 - D0)).toFixed(4) : null, fan: s.fanOpen ?? null } // prog: the boat's progress along the drag path, for the comp's arc
   }, [1080, 1920, DRAG0[0], DRAG1[0]])
   log.push({ name, t: +t.toFixed(4), lift: st.lift ?? null, view, ...info })
   if (i % 30 === 0) console.log(pass, name, t.toFixed(2), info.depth || '', info.boat ? `boat ${info.boat}` : '')
