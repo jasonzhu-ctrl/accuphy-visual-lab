@@ -184,3 +184,4 @@ https://artlist.io/royalty-free-music/song/walking-the-universe/58141
 - 0–30 s 用第 6 轮原来的成品帧，逐秒核过和之前交付的画面一致。只换了 30–34 s 的片尾帧（黑底，只有 logo 和 Sonar Lab）。
 - 声音是 r10 那版混音，没动。
 - 注意：临时目录里 `w6/comp/bg` 的背景帧后来被别的测试改过，所以不能用它整片重合成；这次是拼的帧。
+- 待 Jason 听后决定（HQ 提醒，这次不改）：音乐往后挪了 1.15 s，片头前约 2 s 只有人声。要是 Jason 觉得开头空，备选是在前 2 s 垫一点 Space Brunch 的前奏或低音，808 照样对在 “Be part of the action” 上。
