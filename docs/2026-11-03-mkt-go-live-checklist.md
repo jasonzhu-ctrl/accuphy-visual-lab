@@ -108,3 +108,4 @@ MKT 版归 “Lab 营销版” 窗口负责（#231）。HQ 管它，和网站、
 | 2026-11-03 | 网站嵌入版接手 /、/mini/、/ice/（5171be3） | 从 5171be3 打包：`/`、`/mini/`、`/ice/` md5 = 线上；/mktbf2026/ 还是 475bf95f；/mktbf2026/ice/ = /ice/；假店铺页带锁场景 PASS，只剩 share-de（多语言，预料中） |
 | 2026-11-03 | 复制件自带 devices.js、wedge.js（9e96e0d，取自 86bf80e） | /mktbf2026/ md5 还是 475bf95f；假店铺页带锁场景 PASS |
 | 2026-11-03 | unlock_done 法文（bab47fc） | 打包页里有 “C’est fait. La vue {view} est débloquée.”；`/`、`/mini/`、`/ice/` md5 = 线上；单元测试和假店铺页带锁场景通过，只剩多语言用例（预料中） |
+| 2026-11-04 | 第四节 Klaviyo：HQ 把三件事转给本 app 的 Klaviyo HQ（local_c57e9aed，另一个账户的窗口停用，不写交接）：MKT 页关 VpD3CV；所有商店弹窗排除 */pages/lab* 和 */pages/sonarlab-mktbf2026*（K4b，左下角小圆标挡 Skip tour）；老订阅者邮件带 lab_unlock=sub。先出预览，Jason 在 Klaviyo HQ 说“动”才改 | Jason 11-04：“你和klaviyo窗口说一下弹窗要解决的事” |
