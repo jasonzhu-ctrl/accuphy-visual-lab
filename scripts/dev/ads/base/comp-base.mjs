@@ -24,7 +24,7 @@ for (const f of frames) {
 }
 for (let i = 0; i < Math.round((END[1] - END[0]) * FPS); i++) { // the end card over black
   const t = END[0] + i / FPS, name = `f${String(Math.round(t * 30)).padStart(5, '0')}`
-  await p.evaluate((a) => window.setFrame(a), { bg: null, t, info: null, lines, style: STYLE, type: mode !== 'clean' })
+  await p.evaluate((a) => window.setFrame(a), { bg: null, t, info: null, lines, style: STYLE, type: mode !== 'clean', endLayout: process.env.END_LAYOUT || 'stack' }) // r10: END_LAYOUT=stack|inline
   await p.screenshot({ path: `${out}/${name}.jpg`, type: 'jpeg', quality: 94 })
 }
 console.log(frames.length, 'frames + end card →', out)

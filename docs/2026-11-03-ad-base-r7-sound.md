@@ -167,3 +167,14 @@ https://artlist.io/royalty-free-music/song/walking-the-universe/58141
 **r10 之后的决定（Lab HQ 转 Jason，2026-11-03）：**
 - 字幕不跟旁白改（Jason：“不要”），字幕照旧，上面那 6 段旁白和字幕不同的地方保持现状。
 - 片尾最后一个页面要去掉，具体怎么去等 HQ 回话。片尾 30–34 s 那段（含 “Try it free, right in your browser.” 的位置）先不定稿。其余的音乐和旁白照 r10。
+
+**r10 片尾重排（Jason：“最后一个页面只保留logo 加上Sonar Lab 其他全部去掉 你重新排版设计下”）：** 两张静帧给 Jason 选，见 `docs/2026-11-03-ad-base-r10-endcard.jpg`（红线是 Reels 安全区 269–1248）。
+单张 PNG 在 `reference/ads/2026-11-bf/base/endcard-r10/`。
+- 画面上只留白色 logo 原文件（`public/brand/logo/White Accuphy Logo.png`，没有重新描字）和 “Sonar Lab”。“Try Accuphy Sonar Lab.”、“No fee…” 和蓝线都去掉了。
+- “Sonar Lab” 和开场标题一样，用 Eurostile Heavy 大写加字距。
+- A 竖排：logo 宽 600 px，下面是 50 px 的 SONAR LAB，字距更开，整组 y 623–857。
+- B 横排：开场的 “ACCUPHY | SONAR LAB” 组合放大，logo 高 84 px，中间一根细白竖线，整组 y 698–782。
+- 两种排法的中心都在 y 740，比安全区正中（758）略高。四周全是黑底。
+- 入场：30.2–30.75 s 淡入，同时从 96.5% 轻微放大到 100%。旁白 “Try it free, right in your browser.” 照读（31.16–33.19 s）。
+- 代码在 `overlay-base.html`，合成时用 `END_LAYOUT=stack|inline` 选。静帧用 `endcard-stills.mjs` 出。
+- Jason 选好以后再合成 r10 的片尾。
