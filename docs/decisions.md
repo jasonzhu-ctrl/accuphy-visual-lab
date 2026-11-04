@@ -4126,3 +4126,5 @@ Numbered log. Newest at the bottom.
 239. **带锁版（MKT）分两批上线**（Jason 2026-11-04 在 Lab HQ 选“北美澳先上”）。起因：Jason 在 Klaviyo HQ 定“欧洲需要做两步的”，欧洲访客不进 W24Qdc（单次确认），进新建的欧洲两步确认名单。第一批：加拿大、美国、澳洲，进 W24Qdc。第二批：欧洲 6 个市场，等欧洲名单建好、Lab 按市场送名单、“去邮箱点确认”五种语言核好再给广告。Lab 营销版做按市场送名单（Jason：“现在做”）；不另做欧洲“订阅还没开放”的显示（Jason：“不用再单独做 … 同步进行的 很快的”）。清单第 6.5 节。
 
 240. **2026-11-04** — **带锁版（MKT）里 PingLive 的全景（Panoramic）也要订阅才开**（Jason 在 Lab HQ 发现“只有 mini 有锁 pinglive 没有锁”，选“锁全景 Panoramic”）。只改带锁版复制件 `2026-11-03-sonar-lake-bf/` 的 `isLocked`：PingLive 的 Down、Forward 照旧免费；Base 和网站嵌入版不动。入场教程第 3 站（PingLive 的全景）照 Mini 第 3 站的做法：没订阅时停在 Forward、说订阅可开。上线要 Jason 在 Lab HQ 另说“动”。美国页本来就只有 Mini（#190，网站 03 11-04 核过），不受影响。
+
+241. **2026-11-04** — **带锁版（MKT）的美国页：Live Combo 免费，全景照锁**（Jason 在 Lab HQ：“美国的把combo打开吧 保留panoramic 然后美国没有pinglive的access吧”）。美国页（店铺市场 us，#190）只有 Mini：Live Combo 不用订阅；Mini 全景照锁；冰钓格子照锁（Jason 没提，按原样）。美国没有 PingLive：`miniOnly()` 在店铺里、市场是 us 时只给 Mini，没有网址参数能切到 PingLive。加拿大、澳洲、欧洲不变（Combo 照锁）。和 #240 一起上线，要 Jason 在 Lab HQ 说“动”。
