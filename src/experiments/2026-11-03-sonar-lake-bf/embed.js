@@ -89,7 +89,9 @@ export function shareMarket() {
   return region === 'benelux' ? 'be' : region.slice(0, 2) || 'ca'
 }
 export function shareUrl(medium) {
-  const root = shopRoot(); const path = (root !== null ? root : LANG_PATH) + '/pages/lab'
+  // MKT copy (BF HQ 11-05, Jason: “好的”): the friend lands on the locked store page, so the lock card shows there too; the free
+  // version's /pages/lab is never a share target from here. Market root, lang and utm rules unchanged.
+  const root = shopRoot(); const path = (root !== null ? root : LANG_PATH) + '/pages/sonarlab-mktbf2026'
   const u = new URL(path, STORE)
   u.searchParams.set('utm_source', 'lab_share'); u.searchParams.set('utm_medium', 'referral'); u.searchParams.set('utm_content', medium); u.searchParams.set('utm_campaign', 'bf2026_lab_' + shareMarket())
   // the friend sees the same language (#212): the store's bridge passes the page's ?lang= into the Lab (website #228). en and fr
