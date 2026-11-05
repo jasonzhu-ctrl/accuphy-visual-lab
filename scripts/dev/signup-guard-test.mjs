@@ -28,7 +28,7 @@ for (const c of cases) {
   const m = await load()
   m.KLAVIYO.listId = c.list
   let refused = false
-  try { await m.submitSignup({ email: 'a@example.com', region: 'na' }) } catch (e) { refused = e.message === 'not_ready' }
+  try { await m.submitSignup({ email: 'a@example.com', market: 'ca', region: 'na' }) } catch (e) { refused = e.message === 'not_ready' } // a Canadian visitor (W24Qdc is Canada's list, #244)
   const ok = refused === c.refuses && m.isSignedUp() === !c.refuses && m.signupTestMode() === !!c.test && posts.length === (c.sends ? 1 : 0)
   if (!ok) fail++
   console.log(`${ok ? 'OK  ' : 'FAIL'} ${c.host} list=${c.list} → ${refused ? 'refused' : 'unlocked'}${m.signupTestMode() ? ' (test mode)' : ''}${posts.length ? ' (sent)' : ''}`)
@@ -38,9 +38,11 @@ for (const c of cases) {
   globalThis.window = { location: { hostname: 'lab.accuphy.ca', search: '' } }; bodies.length = 0
   const m = await load()
   m.KLAVIYO.listId = 'W24Qdc'
+  // a copy that sends each country to its own list (#244: the BF copy) sends a US visitor to the US list, never Canada's
+  const want = typeof m.listFor === 'function' ? (m.KLAVIYO.listIdUs = 'SPeeP6') : 'W24Qdc'
   await m.submitSignup({ email: 'a@example.com', language: 'fr', market: 'us', view: 'combo', product: 'pinglive-mini', region: 'na' })
   const a = bodies[0].data.attributes, pr = a.profile.data.attributes.properties
-  const ok = a.custom_source === 'Accuphy Lab' && pr.signup_channel === 'lab_unlock' && pr.signup_language === 'fr' && pr.signup_market === 'us' && pr.lab_scene === 'combo' && pr.lab_product === 'pinglive-mini' && bodies[0].data.relationships.list.data.id === 'W24Qdc'
+  const ok = a.custom_source === 'Accuphy Lab' && pr.signup_channel === 'lab_unlock' && pr.signup_language === 'fr' && pr.signup_market === 'us' && pr.lab_scene === 'combo' && pr.lab_product === 'pinglive-mini' && bodies[0].data.relationships.list.data.id === want
   if (!ok) fail++
   console.log(`${ok ? 'OK  ' : 'FAIL'} Klaviyo body ${JSON.stringify(pr)}`)
 }
@@ -66,6 +68,52 @@ for (const c of [{ q: '?lab_unlock=sub', want: true }, { q: '?market=us&lab_unlo
     const got = (await load()).KLAVIYO.listId
     const ok = got === want; if (!ok) fail++
     console.log(`${ok ? 'OK  ' : 'FAIL'} ${DIR}/signup.js built with ${JSON.stringify(env)} → listId=${JSON.stringify(got)}${ok ? '' : '   expected ' + JSON.stringify(want)}`)
+  }
+  globalThis.__LAB_ENV = {}
+}
+// one list per country (#244 Canada / US / Australia, #247 Europe by VITE_BF_LISTS_EU; Klaviyo handoff 2026-11-05): only in copies that
+// route by country (the BF copy). Region and market as UnlockCard passes them: listRegion({ market, shop, lang }) and shareMarket().
+// The ids below stand in for the go-live build's environment; the build string itself belongs to "Lab 营销版".
+if (SRC.includes('export const listFor')) {
+  const EU = 'de:VGcbFE,at:VGcbFE,ch:VGcbFE,fr:Usa6sq,ch-fr:Usa6sq,nl:XpYNQK,be-nl:XpYNQK,lu-nl:XpYNQK,be:XpYNQK,be-fr:TzfgMB,lu-fr:TzfgMB,lu:TzfgMB,be-de:TzfgMB,lu-de:TzfgMB,pl:R9NkEv,ro:RGc8VJ,lv:RGc8VJ,ee:RGc8VJ'
+  const FULL = { VITE_BF_LIST_ID: 'W24Qdc', VITE_BF_LIST_ID_US: 'SPeeP6', VITE_BF_LIST_ID_AU: 'Scdcct', VITE_BF_LISTS_EU: EU }
+  const route = [
+    // [what, env, { market, shop, lang } as the store page gives them, list it must go to (null = refused, nothing sent, Combo stays shut)]
+    ['Canada', FULL, { market: 'ca', shop: '' }, 'W24Qdc'],
+    ['Canada, French', FULL, { market: 'ca', shop: '/fr', lang: 'fr' }, 'W24Qdc'],
+    ['US', FULL, { market: 'us', shop: '/en-us' }, 'SPeeP6'],
+    ['Australia', FULL, { market: 'au', shop: '/en-au' }, 'Scdcct'],
+    ['Germany', FULL, { market: 'de', shop: '/de-de', lang: 'de' }, 'VGcbFE'],
+    ['Austria', FULL, { market: 'at', lang: 'de' }, 'VGcbFE'],
+    ['Switzerland, French', FULL, { market: 'ch', lang: 'fr' }, 'Usa6sq'],
+    ['France', FULL, { market: 'fr', lang: 'fr' }, 'Usa6sq'],
+    ['Belgium, French', FULL, { market: 'be', lang: 'fr' }, 'TzfgMB'],
+    ['Belgium, Dutch', FULL, { market: 'be', lang: 'nl' }, 'XpYNQK'],
+    ['Belgium, English', FULL, { market: 'be' }, 'XpYNQK'],
+    ['Netherlands', FULL, { market: 'nl', lang: 'nl' }, 'XpYNQK'],
+    ['Poland', FULL, { market: 'pl', lang: 'pl' }, 'R9NkEv'],
+    ['Latvia', FULL, { market: 'lv', lang: 'lv' }, 'RGc8VJ'],
+    ['Romania', FULL, { market: 'ro' }, 'RGc8VJ'],
+    ['no market at all', FULL, {}, null],
+    ['no market, "/" root', FULL, { shop: '' }, null],
+    ['European country with no list (Italy)', FULL, { market: 'it' }, null],
+    ['German text on the Canadian market', FULL, { market: 'ca', shop: '', lang: 'de' }, null],
+    ['US with the US list missing', { ...FULL, VITE_BF_LIST_ID_US: '' }, { market: 'us', shop: '/en-us' }, null],
+    ['Germany with the European lists missing', { ...FULL, VITE_BF_LISTS_EU: '' }, { market: 'de', lang: 'de' }, null],
+    ['bad entries in VITE_BF_LISTS_EU are dropped', { ...FULL, VITE_BF_LISTS_EU: 'DE:VGcbFE,de:not-an-id,pl' }, { market: 'de', lang: 'de' }, null],
+  ]
+  for (const [what, env, given, want] of route) {
+    for (const k in store) delete store[k]; posts.length = 0; bodies.length = 0
+    globalThis.__LAB_ENV = env
+    globalThis.window = { location: { hostname: 'lab.accuphy.ca', search: '' } }
+    const m = await load()
+    const lang = given.lang || 'en', region = m.listRegion({ market: given.market ?? null, shop: given.shop ?? null, lang })
+    let refused = false
+    try { await m.submitSignup({ email: 'a@example.com', language: lang, market: given.market, region }) } catch (e) { refused = e.message === 'not_ready' }
+    const got = bodies[0]?.data.relationships.list.data.id ?? null
+    const ok = got === want && refused === !want && posts.length === (want ? 1 : 0) && m.isSignedUp() === !!want
+    if (!ok) fail++
+    console.log(`${ok ? 'OK  ' : 'FAIL'} list for ${what} (${region}) → ${got ?? 'refused'}${ok ? '' : '   expected ' + (want ?? 'refused')}`)
   }
   globalThis.__LAB_ENV = {}
 }
