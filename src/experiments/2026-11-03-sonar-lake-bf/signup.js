@@ -74,13 +74,18 @@ export const isEmail = (s) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(s).tri
 // Still failing: 'send_failed' — the card says so, nothing unlocks, no `signup` event. The same request body every time.
 export const SEND_TRIES = 3
 const RETRY_WAIT_MS = [600, 1500]
+// Success only when Klaviyo itself answered 2xx (HQ 11-05: a 503 once showed success): a real response object, status 200–299,
+// not opaque (status 0), not redirected (an anti-bot or captcha page answering 200 after a redirect is not Klaviyo). Klaviyo's
+// client subscription answers 202 with an empty body, so an empty body is fine.
+const sent = (res) => !!res && typeof res.status === 'number' && res.status >= 200 && res.status < 300 && res.ok !== false && !res.redirected && res.type !== 'opaque' && res.type !== 'opaqueredirect'
 async function sendWithRetry(args) {
   for (let i = 0; i < SEND_TRIES; i++) {
     if (i) await new Promise((r) => setTimeout(r, RETRY_WAIT_MS[i - 1] ?? 1500))
     let res
     try { res = await fetch(...args) } catch { continue } // network error: try again
-    if (res.ok) return
-    if (res.status < 500) break // 4xx: no retry
+    if (sent(res)) return
+    if (res && res.status >= 400 && res.status < 500) break // 4xx: a refusal, no retry
+    // anything else (5xx, status 0, an opaque or redirected answer, no answer object) is tried again
   }
   throw new Error('send_failed')
 }

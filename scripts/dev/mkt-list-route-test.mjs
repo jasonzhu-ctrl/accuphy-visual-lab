@@ -60,7 +60,7 @@ for (const c of routes) {
 // 2. which list is sent, with the go-live ids filled or not (fetch stubbed: nothing leaves this script)
 const store = {}
 globalThis.localStorage = { getItem: (x) => store[x] ?? null, setItem: (x, v) => { store[x] = v }, removeItem: (x) => { delete store[x] } }
-const bodies = []; globalThis.fetch = async (u, o) => { bodies.push(JSON.parse(o.body)); return { ok: true } }
+const bodies = []; globalThis.fetch = async (u, o) => { bodies.push(JSON.parse(o.body)); return { ok: true, status: 202 } } // as Klaviyo answers: 202, empty body
 const EU = 'de:DEtst1,fr:FRtst1,be-nl:BEnl01,be-fr:BEfr01,ee:ROtst1,lv:ROtst1,ro:ROtst1'
 const ALL = { VITE_BF_LIST_ID: 'W24Qdc', VITE_BF_LIST_ID_US: 'SPeeP6', VITE_BF_LIST_ID_AU: 'Scdcct' }
 const sends = [
