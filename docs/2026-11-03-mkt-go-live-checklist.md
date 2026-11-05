@@ -147,7 +147,7 @@ MKT 版归 “Lab 营销版” 窗口负责（#231）。HQ 管它，和网站、
 - [x] 上线包和测试链接用同一个提交打包，写进 `docs/versions.md`、`docs/version-sheet.md`、`docs/lab-links-sheet.md`。（11-04 北美澳每次都做了）
 - [x] 线上 `/`、`/mini/`、`/ice/` 的 md5 = 部署前的线上（不带锁的那份没被覆盖）；`/mktbf2026/` 和 `/mktbf2026/ice/` 打开返回 200，0 报错。（11-04 北美澳每次都核了）
 - [x] 网站 03 复测 MKT 页的真实订阅。（11-04 北美澳：网站 224f413b，加上 Klaviyo 读回）
-- [ ] **欧洲那一批：** 上面三项再做一遍，再加上前面“欧洲这一批”那段要核的。
+- [x] **欧洲那一批：** 11-05 上线（e6efaf3），见记录表。还差 Klaviyo HQ 在手机上走一遍“订阅 → 确认信 → 跳回解锁”并用 API 读回。
 
 ## 记录
 
@@ -184,3 +184,4 @@ MKT 版归 “Lab 营销版” 窗口负责（#231）。HQ 管它，和网站、
 | 2026-11-04 | Klaviyo 欧洲名单对照（Jason 在 Klaviyo HQ 定：Benelux 按语言分，罗马尼亚+波罗的海一个、英文确认信） | de/at/ch→DE；fr→FR；nl/nl-nl/be-nl/lu-nl/be→BENELUX NL；be-fr/lu-fr/lu→BENELUX FR；pl→PL；ro/lv/ee→RO-LV。HQ 用占位号走真链路全对；回 Klaviyo 两个边角（瑞士法语在 /fr-fr 会进 DE；/de-benelux 的德语进荷/法名单），加键即可。同意那句不用改。Klaviyo 定边角：ch-fr→FR，be-de/lu-de→BENELUX FR。等名单建好给号（含这三个键） |
 | 2026-11-05 | 换号后营销版接回（SW-1104），整理清单 | 线上 /mktbf2026/ md5 6cfc3363 = b572dde 加三个名单号重新打包；三个店铺 MKT 页 200；线上没有欧洲名单对照 |
 | 2026-11-05 | 欧洲这一批上线包备好（没部署：营销版这个窗口没有部署权限） | 从 e6efaf3（复制件和打包脚本到现在没再改过）打包，BASE_REF=96fdc22，三个北美澳名单号 + VITE_BF_LISTS_EU（Klaviyo HQ 给的 6 个号，19 个市场键），不设 VITE_BF_LIST_ID_EU。`/`、`/mini/`、`/ice/`、`/embed/lab.js`、`/embed/lab-0c39d390cc.js` md5 = 线上；/mktbf2026/ 7d1ba67d。9 个名单号只在 /mktbf2026/。用 lab.accuphy.ca 的假主机、拦下请求（没发到 Klaviyo），11 个场景全对、0 报错：加拿大英/法 → W24Qdc（法语“C’est fait. La vue … est débloquée.”）、澳洲 → Scdcct、德国/奥地利 → VGcbFE、法国 → Usa6sq、比荷卢荷 → XpYNQK、比荷卢法 → TzfgMB、波兰 → R9NkEv、拉脱维亚（ee / ro）→ RGc8VJ；欧洲都显示本国语言的“请查收邮箱”。假店铺页：德国 9/9、加拿大 lock-desktop、美国 lock-us 通过。单元测试全过（signup-guard 用对接 a9f0195 的新版）、mkt-list-route / lock-rule / units 全过。拉脱维亚卡片是拉脱维亚语、确认信是英语，这是 #227 定的。 |
+| 2026-11-05 | **欧洲这一批上线**（Jason 在 Lab HQ 卡片上点“动，HQ 部署”；也在营销版窗口点了“允许在这里部署”） | e6efaf3 + BASE_REF=96fdc22 + 9 个名单号（VITE_BF_LISTS_EU 19 个键）。同一个包部署了三次：HQ 两次（dpl_6btnPxkzAj4dVSB5TeVt46PxEUYX，https://vercel.com/accuphy/accuphy-lab/6btnPxkzAj4dVSB5TeVt46PxEUYX），营销版一次 dpl_9MPtmHsQw3f1bdS7o9G73zRDntC2（最后一次，现在 lab.accuphy.ca 指向它）。营销版线上核：`/` afb82b9c、`/mini/`、`/ice/`、`/embed/lab.js`、`lab-0c39d390cc.js` 和上线前一样；`/mktbf2026/` 7d1ba67d = 包；`/mktbf2026/ice/` = `/ice/`；9 个名单号只在 /mktbf2026/；noindex 和 frame-ancestors 在；.env、.env.local、.vercel 404；9 个店铺 MKT 页 200。真 lab.accuphy.ca 上 11 个场景（拦下请求，没发到 Klaviyo）全对、0 报错。等 Klaviyo HQ 手机实测和读回 |
