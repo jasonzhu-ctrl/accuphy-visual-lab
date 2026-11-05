@@ -2,7 +2,10 @@
 const DIR = process.env.LAB_DIR || '2026-09-23-sonar-lake-3d' // the lake folder under test; the BF locked copy: LAB_DIR=2026-11-03-sonar-lake-bf (#213)
 import jsQR from 'jsqr'
 import qrcode from 'qrcode-generator'
-const cases = [
+// the store page a share points to: the free page /pages/lab, except the MKT locked copy, whose shares go to the locked store page
+// (BF HQ handoff 2026-11-05 bf-share-link-to-mkt, Jason “好的”, 5a47ccb). Everything else in the link is the same for all versions.
+const PAGE = DIR === '2026-11-03-sonar-lake-bf' ? '/pages/sonarlab-mktbf2026' : '/pages/lab'
+const CASES = [
   { shop: '/', expect: 'https://shop.accuphy.com/pages/lab?utm_source=lab_share&utm_medium=referral&utm_content=qr&utm_campaign=bf2026_lab_ca' },
   { shop: '/fr', expect: 'https://shop.accuphy.com/fr/pages/lab?utm_source=lab_share&utm_medium=referral&utm_content=qr&utm_campaign=bf2026_lab_ca' },
   { shop: '/en-us', expect: 'https://shop.accuphy.com/en-us/pages/lab?utm_source=lab_share&utm_medium=referral&utm_content=qr&utm_campaign=bf2026_lab_us' },
@@ -26,6 +29,7 @@ const cases = [
   { shop: '/fr', lang: 'fr', expect: 'https://shop.accuphy.com/fr/pages/lab?utm_source=lab_share&utm_medium=referral&utm_content=qr&utm_campaign=bf2026_lab_ca', note: 'fr unchanged' },
   { shop: '/de-de', lang: 'es', expect: 'https://shop.accuphy.com/de-de/pages/lab?utm_source=lab_share&utm_medium=referral&utm_content=qr&utm_campaign=bf2026_lab_de', note: 'unknown language → English, no lang' },
 ]
+const cases = CASES.map((c) => ({ ...c, expect: c.expect.replace('/pages/lab?', PAGE + '?') }))
 const decode = (text, s = 4) => { // the same encoder as the page, rendered to pixels with a 4-module quiet zone, read back with jsQR
   const qr = qrcode(0, 'M'); qr.addData(text); qr.make(); const n = qr.getModuleCount(), q = 4 * s, w = n * s + 2 * q
   const px = new Uint8ClampedArray(w * w * 4).fill(255)
@@ -48,7 +52,8 @@ for (const c of cases) {
   const w = { location: { search: '?shop=/en-us&market=us&lab_unlock=sub', origin: 'https://shop.accuphy.com' }, addEventListener() {}, dispatchEvent() {} }; w.self = w; w.top = w; w.parent = w
   globalThis.window = w
   const m = await import(`../../src/experiments/${DIR}/embed.js?share=${++n}`)
-  const ok = !m.shareUrl('copy').includes('lab_unlock'); if (!ok) fail++
-  console.log(`${ok ? 'OK  ' : 'FAIL'} lab_unlock stays out of the share link`)
+  const link = m.shareUrl('copy')
+  const ok = !link.includes('lab_unlock') && new URL(link).pathname === '/en-us' + PAGE; if (!ok) fail++
+  console.log(`${ok ? 'OK  ' : 'FAIL'} lab_unlock stays out of the share link, which points to ${PAGE}${ok ? '' : '   got ' + link}`)
 }
 console.log(fail ? `${fail} FAILED` : `all ${cases.length + 1} passed`); process.exit(fail ? 1 : 0)

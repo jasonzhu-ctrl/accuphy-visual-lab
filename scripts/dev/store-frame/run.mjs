@@ -105,7 +105,7 @@ for (const [name, w, h] of [['share-desktop', 1280, 800], ['share-phone', 390, 8
     await tab.esc(); await sleep(400); const after = await tab.lab("d.querySelectorAll('.ac-share-pop').length")
     await tab.close()
     const phoneOk = !phone || (o.pill === 'Learn More' && o.badges === 0) // #200: phones show Learn More and no store badges
-    const ok = phoneOk && o.pops === 1 && o.qr >= 160 && o.clearOfPill && /\/de-de\/pages\/lab\?utm_source=lab_share&utm_medium=referral&utm_content=copy/.test(o.field || '') && label === 'Copied ✓' && after === 0 && /qr_shown/.test(evs) && /copy/.test(evs)
+    const ok = phoneOk && o.pops === 1 && o.qr >= 160 && o.clearOfPill && new RegExp(`/de-de/pages/${LOCKED ? 'sonarlab-mktbf2026' : 'lab'}\\?utm_source=lab_share&utm_medium=referral&utm_content=copy`).test(o.field || '') && label === 'Copied ✓' && after === 0 && /qr_shown/.test(evs) && /copy/.test(evs)
     return { ok, detail: `${phone ? `pill="${o.pill}" badges=${o.badges} ` : ''}popover=${o.pops} qr=${o.qr}px clearOfShopPill=${o.clearOfPill} copy→"${label}" events=${evs} afterEsc=${after}` }
   }
 }
@@ -120,7 +120,8 @@ scenarios['share-de'] = async () => {
   await tab.lab("(d.querySelector('.ac-shop').click(), true)"); await sleep(150)
   const log = JSON.parse((await tab.ev('JSON.stringify(window.__log)')) || '[]'); const click = log.find((l) => l.event === 'shop_click')
   const html = await tab.lab("d.documentElement.lang || ''"); await tab.close()
-  const ok = /^https:\/\/shop\.accuphy\.com\/de-de\/pages\/lab\?.*utm_campaign=bf2026_lab_de&lang=de$/.test(field) && /\/de-de\/products\/pinglive-sonar$/.test(click?.data?.url || '') && click?.data?.lang === 'de'
+  // the MKT copy shares the locked store page (BF HQ 11-05, 5a47ccb); the free versions share /pages/lab
+  const ok = new RegExp(`^https://shop\\.accuphy\\.com/de-de/pages/${LOCKED ? 'sonarlab-mktbf2026' : 'lab'}\\?.*utm_campaign=bf2026_lab_de&lang=de$`).test(field) && /\/de-de\/products\/pinglive-sonar$/.test(click?.data?.url || '') && click?.data?.lang === 'de'
   return { ok, detail: `share link=${field} shop_click url=${click?.data?.url} lang=${click?.data?.lang} html lang=${html}` }
 }
 
