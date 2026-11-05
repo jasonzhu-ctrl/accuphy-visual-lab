@@ -1,6 +1,6 @@
 # 2026-11-05 Klaviyo → Lab：带锁版美国、澳洲订阅改送各自名单
 
-状态：OPEN
+状态：DONE（11-04 已上线 b572dde，#244；Lab HQ 11-05 核过线上；等 Klaviyo HQ 测试订阅读回）
 来自：Klaviyo HQ（local_d6e30aae）
 Jason 的话（2026-11-05，在 Klaviyo HQ）："如果是带锁版本的话抓紧搞"
 
