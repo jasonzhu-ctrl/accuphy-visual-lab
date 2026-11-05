@@ -167,7 +167,7 @@ if (LOCKED && !US) scenarios['lock-desktop'] = async () => {
   if (!(await tab.open('mode=none'))) return { ok: false, detail: 'Lab did not start' }
   await tab.lab("(w.localStorage.removeItem('accuphy_sonar_signup_v1'), true)")
   if (!(await tab.open('mode=none'))) return { ok: false, detail: 'Lab did not restart' }
-  const listen = "(w.__evs = [], w.__posts = [], w.fetch = (u, o) => { w.__posts.push({ u: String(u), body: o && o.body }); return Promise.resolve({ ok: true }) }, w.addEventListener('accuphy-lab', e => { if (['view', 'signup', 'lock_shown'].includes(e.detail.event)) w.__evs.push({ e: e.detail.event, d: e.detail.data }) }), true)"
+  const listen = "(w.__evs = [], w.__posts = [], w.fetch = (u, o) => { w.__posts.push({ u: String(u), body: o && o.body }); return Promise.resolve({ ok: true, status: 202 }) }, w.addEventListener('accuphy-lab', e => { if (['view', 'signup', 'lock_shown'].includes(e.detail.event)) w.__evs.push({ e: e.detail.event, d: e.detail.data }) }), true)"
   const mini = "([...d.querySelectorAll('.ac-btn')].find(b => b.textContent.trim() === 'PingLive Mini').click(), true)"
   const combo = "([...d.querySelectorAll('.ac-view')].find(b => b.querySelector('.ac-view-name').textContent.trim() === 'Combo').click(), true)"
   const state = "JSON.stringify({ locks: d.querySelectorAll('.ac-view.is-locked').length, card: d.querySelectorAll('.ac-unlock').length, active: [...d.querySelectorAll('.ac-view.is-active .ac-view-name')].map(e => e.textContent.trim()).join(), evs: w.__evs, posts: w.__posts })"

@@ -11,7 +11,7 @@ globalThis.__LAB_ENV = {}
 const load = () => { const f = path.join(TMP, `signup-${++k}.mjs`); fs.writeFileSync(f, SRC); return import(f) }
 const store = {}
 globalThis.localStorage = { getItem: (k) => store[k] ?? null, setItem: (k, v) => { store[k] = v } }
-const posts = [], bodies = []; globalThis.fetch = async (u, o) => { posts.push(u); bodies.push(JSON.parse(o.body)); return { ok: true } }
+const posts = [], bodies = []; globalThis.fetch = async (u, o) => { posts.push(u); bodies.push(JSON.parse(o.body)); return { ok: true, status: 202 } }
 const cases = [
   { host: 'lab.accuphy.ca', list: null, refuses: true },
   { host: 'accuphy-lab.vercel.app', list: null, refuses: true },
@@ -150,7 +150,7 @@ if (/export const SEND_TRIES\b/.test(SRC)) {
     console.log(`${ok ? 'OK  ' : 'FAIL'} retry: ${what} → ${posts.length} tries, ${err ? 'failed (' + err + ')' : 'unlocked'}${ok ? '' : `   expected ${tries} tries, ${unlocked ? 'unlocked' : 'failed (send_failed), still locked'}`}`)
   }
   globalThis.setTimeout = realTimeout
-  globalThis.fetch = async (u, o) => { posts.push(u); bodies.push(JSON.parse(o.body)); return { ok: true } }
+  globalThis.fetch = async (u, o) => { posts.push(u); bodies.push(JSON.parse(o.body)); return { ok: true, status: 202 } }
   globalThis.__LAB_ENV = {}
 }
 fs.rmSync(TMP, { recursive: true, force: true })
