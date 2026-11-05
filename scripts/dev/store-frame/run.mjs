@@ -28,7 +28,7 @@ window.addEventListener('message', (e) => {
   if (mode === 'badtype') lab.postMessage({ type: 'something_else' }, e.origin)
   if (mode === 'wrong') document.getElementById('sib').contentWindow.postMessage({ cmd: 'ack-the-lab', origin: e.origin }, '*') // a sibling frame answers: wrong source
 })
-document.write('<iframe id="lab" src="/lab/?tour=off&shop=' + (q.get('shop') || ${JSON.stringify(SHOP_DEFAULT)}) + (q.get('lang') ? '&lang=' + q.get('lang') : '') + (q.get('extra') ? '&' + q.get('extra') : '') + '"' + (q.get('allow') ? ' allow="clipboard-write; web-share"' : '') + '></iframe><iframe id="sib" src="sibling.html" style="width:1px;height:1px;position:absolute"></iframe>')
+document.write('<iframe id="lab" src="/lab/?' + (q.get('tour') === 'on' ? '' : 'tour=off&') + 'shop=' + (q.get('shop') || ${JSON.stringify(SHOP_DEFAULT)}) + (q.get('lang') ? '&lang=' + q.get('lang') : '') + (q.get('extra') ? '&' + q.get('extra') : '') + '"' + (q.get('allow') ? ' allow="clipboard-write; web-share"' : '') + '></iframe><iframe id="sib" src="sibling.html" style="width:1px;height:1px;position:absolute"></iframe>')
 </script>`)
 fs.writeFileSync(path.join(tmp, 'sibling.html'), `<!doctype html><script>window.addEventListener('message', (e) => { if (e.data && e.data.cmd === 'ack-the-lab') parent.frames[0].postMessage({ type: 'shop_click_ack' }, e.data.origin) })</script>`)
 fs.symlinkSync(dist, path.join(tmp, 'lab'))
@@ -158,13 +158,16 @@ if (!LOCKED) scenarios['no-lock-desktop'] = async () => {
 // #213 (BF locked version, LAB_LOCKED=1): Combo is locked until the visitor subscribes. The frame's fetch is stubbed first, so a
 // test never sends a real sign-up to Klaviyo even when the build carries the list id. Then: an email link (?lab_unlock=sub)
 // opens it with no card and no `signup`. The sign-up mark is cleared before and after, so other scenarios start locked.
+// lock_shown (MKT, BF HQ handoff 2026-11-05): checked only once the build under test sends it (the name survives minifying)
+const builtJs = (dir) => fs.readdirSync(dir, { withFileTypes: true }).flatMap((e) => e.isDirectory() ? builtJs(path.join(dir, e.name)) : /\.(js|html)$/.test(e.name) ? [path.join(dir, e.name)] : [])
+const LOCK_SHOWN = LOCKED && builtJs(dist).some((f) => fs.readFileSync(f, 'utf8').includes('lock_shown'))
 const US = SHOP_DEFAULT === '/en-us'
 if (LOCKED && !US) scenarios['lock-desktop'] = async () => {
   const tab = await openTab(1280, 800)
   if (!(await tab.open('mode=none'))) return { ok: false, detail: 'Lab did not start' }
   await tab.lab("(w.localStorage.removeItem('accuphy_sonar_signup_v1'), true)")
   if (!(await tab.open('mode=none'))) return { ok: false, detail: 'Lab did not restart' }
-  const listen = "(w.__evs = [], w.__posts = [], w.fetch = (u, o) => { w.__posts.push({ u: String(u), body: o && o.body }); return Promise.resolve({ ok: true }) }, w.addEventListener('accuphy-lab', e => { if (e.detail.event === 'view' || e.detail.event === 'signup') w.__evs.push({ e: e.detail.event, d: e.detail.data }) }), true)"
+  const listen = "(w.__evs = [], w.__posts = [], w.fetch = (u, o) => { w.__posts.push({ u: String(u), body: o && o.body }); return Promise.resolve({ ok: true }) }, w.addEventListener('accuphy-lab', e => { if (['view', 'signup', 'lock_shown'].includes(e.detail.event)) w.__evs.push({ e: e.detail.event, d: e.detail.data }) }), true)"
   const mini = "([...d.querySelectorAll('.ac-btn')].find(b => b.textContent.trim() === 'PingLive Mini').click(), true)"
   const combo = "([...d.querySelectorAll('.ac-view')].find(b => b.querySelector('.ac-view-name').textContent.trim() === 'Combo').click(), true)"
   const state = "JSON.stringify({ locks: d.querySelectorAll('.ac-view.is-locked').length, card: d.querySelectorAll('.ac-unlock').length, active: [...d.querySelectorAll('.ac-view.is-active .ac-view-name')].map(e => e.textContent.trim()).join(), evs: w.__evs, posts: w.__posts })"
@@ -187,7 +190,10 @@ if (LOCKED && !US) scenarios['lock-desktop'] = async () => {
     && b.card === 0 && b.active === 'Combo' && sign.length === 1 && sign[0].d.source === 'unlock' && sign[0].d.view === 'combo' && sign[0].d.product === 'pinglive-mini' && !JSON.stringify(sign[0].d).includes('@')
     && b.posts.every((x) => /a\.klaviyo\.com\/client\/subscriptions/.test(x.u))
     && c.locks === 0 && c.card === 0 && c.active === 'Combo' && !c.evs.some((x) => x.e === 'signup')
-  return { ok, detail: `before: locks=${a.locks} card=${a.card} active=${a.active} | after subscribe: card=${b.card} active=${b.active} signup=${JSON.stringify(sign.map((x) => x.d))} done="${doneTitle}" klaviyoPosts=${b.posts.length}${list ? ` list=${list}` : ' (test mode, nothing sent)'} (stubbed) | email link: locks=${c.locks} card=${c.card} active=${c.active} signup=${c.evs.filter((x) => x.e === 'signup').length}` }
+  // lock_shown: once when the card opened, with product and view, never the email; none on the email link (no card)
+  const shown = b.evs.filter((x) => x.e === 'lock_shown')
+  const shownOk = !LOCK_SHOWN || (a.evs.filter((x) => x.e === 'lock_shown').length === 1 && shown.length === 1 && shown[0].d.product === 'pinglive-mini' && shown[0].d.view === 'combo' && !JSON.stringify(b.evs).includes('@') && !c.evs.some((x) => x.e === 'lock_shown'))
+  return { ok: ok && shownOk, detail: `${LOCK_SHOWN ? `lock_shown=${JSON.stringify(shown.map((x) => x.d))} email link lock_shown=${c.evs.filter((x) => x.e === 'lock_shown').length} | ` : '(no lock_shown in this build) | '}before: locks=${a.locks} card=${a.card} active=${a.active} | after subscribe: card=${b.card} active=${b.active} signup=${JSON.stringify(sign.map((x) => x.d))} done="${doneTitle}" klaviyoPosts=${b.posts.length}${list ? ` list=${list}` : ' (test mode, nothing sent)'} (stubbed) | email link: locks=${c.locks} card=${c.card} active=${c.active} signup=${c.evs.filter((x) => x.e === 'signup').length}` }
 }
 
 // #241 (MKT copy, `LAB_SHOP=/en-us LAB_LOCKED=1`): the US store page is Mini only (#190) and its Live Combo is free — no padlock, no card,
@@ -208,6 +214,50 @@ if (LOCKED && US) scenarios['lock-us'] = async () => {
   await tab.close()
   const ok = devs === 'PingLive Mini' && locked === 'Panoramic' && a.card === 0 && a.active === 'Combo' && a.evs.includes('view:combo') && !a.evs.some((e) => e.startsWith('signup')) && b.card === 1 && b.title === 'Unlock Live Panoramic' && b.active === 'Combo'
   return { ok, detail: `devices=${devs} locked=${locked} | Combo: card=${a.card} active=${a.active} events=${JSON.stringify(a.evs)} | Panoramic: card=${b.card} "${b.title}" active=${b.active}` }
+}
+
+// Klaviyo answers 503 (Jason 11-05 via HQ): the card retries in the background; when every try fails it shows the error line,
+// Combo stays shut, nothing is remembered and no `signup` goes out. 503 then OK: unlocked with one `signup`. The tries counted
+// here say whether this build retries at all (signup-guard-test.mjs checks the retry rules themselves).
+if (LOCKED && !US) scenarios['lock-retry-desktop'] = async () => {
+  const tab = await openTab(1280, 800)
+  const run = async (answers) => {
+    if (!(await tab.open('mode=none'))) return null
+    await tab.lab("(w.localStorage.removeItem('accuphy_sonar_signup_v1'), true)")
+    if (!(await tab.open('mode=none'))) return null
+    await tab.lab(`(w.__evs = [], w.__posts = 0, w.__answers = ${JSON.stringify(answers)}, w.fetch = () => { w.__posts++; const a = w.__answers.shift() ?? 503; return Promise.resolve({ ok: a < 400, status: a }) }, w.addEventListener('accuphy-lab', e => { if (e.detail.event === 'signup') w.__evs.push(e.detail.data) }), true)`)
+    await tab.lab("([...d.querySelectorAll('.ac-btn')].find(b => b.textContent.trim() === 'PingLive Mini').click(), true)"); await sleep(600)
+    await tab.lab("([...d.querySelectorAll('.ac-view')].find(b => b.querySelector('.ac-view-name').textContent.trim() === 'Combo').click(), true)"); await sleep(800)
+    await tab.lab("(() => { const i = d.querySelector('.ac-unlock input[type=email]'); Object.getOwnPropertyDescriptor(w.HTMLInputElement.prototype, 'value').set.call(i, 'lab-test@example.com'); i.dispatchEvent(new w.Event('input', { bubbles: true })); d.querySelector('.ac-unlock button[type=submit]').click(); return true })()")
+    await sleep(9000) // two waits between tries, then Europe's success card (4.5 s)
+    const r = JSON.parse(await tab.lab("JSON.stringify({ posts: w.__posts, card: d.querySelectorAll('.ac-unlock').length, alert: (d.querySelector('.ac-unlock [role=alert]') || {}).textContent || '', active: [...d.querySelectorAll('.ac-view.is-active .ac-view-name')].map(e => e.textContent.trim()).join(), signups: w.__evs.length, remembered: w.localStorage.getItem('accuphy_sonar_signup_v1') === '1' })"))
+    await tab.lab("(w.localStorage.removeItem('accuphy_sonar_signup_v1'), true)")
+    return r
+  }
+  const a = await run([503, 503, 503]), b = await run([503, 202])
+  await tab.close()
+  if (!a || !b) return { ok: false, detail: 'Lab did not start' }
+  const retries = b.posts > 1
+  const ok = a.card === 1 && a.alert === 'Something went wrong. Please try again.' && a.active !== 'Combo' && a.signups === 0 && !a.remembered && a.posts === (retries ? 3 : 1)
+    && (retries ? b.card === 0 && b.active === 'Combo' && b.signups === 1 && b.remembered && b.posts === 2 : true)
+  return { ok, detail: `${a.posts === 0 ? "(nothing sent: a test-mode build — build it with the list ids) " : ""}${retries ? "" : "(this build does not retry yet) "}503×3: tries=${a.posts} card=${a.card} "${a.alert}" active=${a.active} signup=${a.signups} remembered=${a.remembered} | 503→OK: tries=${b.posts} card=${b.card} active=${b.active} signup=${b.signups}` }
+}
+
+// lock_shown is not sent during the entry tour (#242: the tour's own views are open then). PingLive's tour: its Panoramic is free
+// while the tour runs — a tap opens it with no card and no lock_shown. Only once the build sends lock_shown.
+if (LOCK_SHOWN && !US) scenarios['lock-tour-desktop'] = async () => {
+  const tab = await openTab(1280, 800)
+  if (!(await tab.open('mode=none&tour=on'))) return { ok: false, detail: 'Lab did not start' }
+  await tab.lab("(w.localStorage.removeItem('accuphy_sonar_signup_v1'), w.localStorage.removeItem('accuphy_lab_tour_v1'), true)")
+  if (!(await tab.open('mode=none&tour=on'))) return { ok: false, detail: 'Lab did not restart' }
+  await tab.lab("(w.__shown = 0, w.addEventListener('accuphy-lab', e => { if (e.detail.event === 'lock_shown') w.__shown++ }), true)")
+  await sleep(1500)
+  const touring = await tab.lab("!!d.querySelector('main.is-touring')")
+  await tab.lab("([...d.querySelectorAll('.ac-view')].find(b => b.querySelector('.ac-view-name').textContent.trim() === 'Panoramic').click(), true)"); await sleep(800)
+  const r = JSON.parse(await tab.lab("JSON.stringify({ card: d.querySelectorAll('.ac-unlock').length, active: [...d.querySelectorAll('.ac-view.is-active .ac-view-name')].map(e => e.textContent.trim()).join(), shown: w.__shown })"))
+  await tab.lab("(w.localStorage.removeItem('accuphy_lab_tour_v1'), true)"); await tab.close()
+  const ok = touring && r.card === 0 && r.active === 'Panoramic' && r.shown === 0
+  return { ok, detail: `touring=${touring} | Panoramic during the tour: card=${r.card} active=${r.active} lock_shown=${r.shown}` }
 }
 
 let failed = 0

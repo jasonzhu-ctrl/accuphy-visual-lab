@@ -34,6 +34,15 @@ default `/de-de` is European. lock-desktop prints the success line (`done=`) and
 `LAB_SHOP=/en-us` runs `lock-us` instead of `lock-desktop` (#241: the US page's Live Combo is free, Panoramic still locked); the
 lock rule by market: `node scripts/dev/mkt-lock-rule-test.mjs`.
 
+**Retry and lock_shown (MKT, 2026-11-05, BF HQ handoff `handoffs/2026-11-05-bf-lock-shown-event.md`):** build the MKT page with the
+list ids (e.g. `VITE_BF_LIST_ID=… VITE_BF_LISTS_EU='de:…' node scripts/build-bf-site.mjs <out> <ref>`, then `LAB_LOCKED=1 node run.mjs <out>/mktbf2026`;
+a test-mode build sends nothing, so the retry cannot be seen). `lock-retry-desktop`: Klaviyo stubbed to answer 503 three times →
+three tries, the card shows "Something went wrong. Please try again.", Combo stays shut, nothing remembered, no `signup`; 503 then OK →
+two tries, Combo opens, one `signup`. In a build that sends `lock_shown`, `lock-desktop` also checks one `lock_shown` { product, view }
+when the card opens (once per visit, no email) and none on the email link, and `lock-tour-desktop` (fake page `tour=on`) taps PingLive's
+Panoramic during the entry tour: it opens, no card, no `lock_shown` (#242). The store's bridge drops event names it does not know:
+`lock_shown` reaches Meta / GA4 / Klaviyo only after the website adds its line to `sections/lab-embed.liquid`'s MAP.
+
 **(Resolved 2026-11-04, c442045: #212 is in the copy and these pass.)** Expected failures on the copy, until #212 moves in (#216, Jason 2026-11-03: the languages move into the locked version once they are done):** the BF copy stays at 86bf80e (#213) and does not have #212's
 languages. So on `LAB_DIR=2026-11-03-sonar-lake-bf`, `share-url-test.mjs` fails its 4 de/nl/pl/lv cases, and in a locked run
 `share-de` fails. Do not change the tests or sync the copy before then; once #212 is moved in, these must pass. They cover #184 / #187 (shop click, receipt), #188 / #192 (share popover) #200 (A8) and #202 (lock off). `share-de` (#212: on a German store page the copied share link ends with `&lang=de` and the Shop click stays on `/de-de/products/`).
