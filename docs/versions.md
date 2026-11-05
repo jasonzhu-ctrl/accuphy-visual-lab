@@ -9,6 +9,16 @@ with the source commit it was built from, so anyone can tell which version a lin
 sign-up and Combo stays shut for everyone (no fake success). Test links show "Test mode: nothing is sent." The consent wording
 (`unlock_consent` in i18n.js) is Klaviyo HQ's draft and waits for Jason.
 
+## 2026-11-05: LIVE lab.accuphy.ca/mktbf2026/ at e6efaf3 (Europe batch: #245 metres, #246 EU card wording, #247 six EU double opt-in lists)
+
+Jason in Lab HQ: “抓紧上线啊”, then on the card “营销版部署被权限挡住，要我在 HQ 部署吗？” picked “动，HQ 部署”. Package built by Lab 营销版 from e6efaf3:
+`BASE_REF=96fdc22 VITE_BF_LIST_ID=W24Qdc VITE_BF_LIST_ID_US=SPeeP6 VITE_BF_LIST_ID_AU=Scdcct VITE_BF_LISTS_EU=<19 market keys → VGcbFE / Usa6sq /
+XpYNQK / TzfgMB / R9NkEv / RGc8VJ>` (no `VITE_BF_LIST_ID_EU`), /embed/ rebuilt from 96fdc22. Deployed by HQ (dpl_6btnPxkzAj4dVSB5TeVt46PxEUYX,
+the same package twice because the first output was cut), then once more by 营销版 after Jason allowed it there (dpl_9MPtmHsQw3f1bdS7o9G73zRDntC2,
+the one lab.accuphy.ca points to); all three identical. Checked live: /mktbf2026/ md5 7d1ba67d; free pages unchanged (/ afb82b9c, /mini/ 26abb62f,
+/ice/ f22f445a, /embed/); the 9 list IDs only in /mktbf2026/; noindex; .env / .env.local / .vercel 404; 11 market cases on the real host route to the
+right list (Klaviyo calls stopped); 9 store MKT pages 200. Klaviyo HQ runs the double opt-in test next; EU ad links wait for it.
+
 ## 2026-11-04: LIVE lab.accuphy.ca/mktbf2026/ at b572dde (#244 one Klaviyo list per country)
 
 Jason in Lab HQ picked “动，改好直接上线” (on Klaviyo HQ's request; prices differ by country). Built with `BASE_REF=96fdc22 VITE_BF_LIST_ID=W24Qdc VITE_BF_LIST_ID_US=SPeeP6 VITE_BF_LIST_ID_AU=Scdcct node scripts/build-bf-site.mjs <out> b572dde` + the same /embed/. Vercel inspect https://vercel.com/accuphy/accuphy-lab/3hZdxnHtUJH1vuJuuX1etH7HQDCZ. Checked live: `/` afb82b9c, `/mini/` 26abb62f, `/ice/` f22f445a, `/mktbf2026/ice/` f22f445a, `/embed/lab.js` f159340c = before; `/mktbf2026/` 6cfc3363 = build. Real store pages in a fresh browser, card submitted with the Klaviyo request intercepted (nothing reached Klaviyo): Canada → W24Qdc (signup_market ca), US `/en-us` → SPeeP6 (us), Australia `/en-au` → Scdcct (au). Local copy of the build: Canada French → W24Qdc, Germany → nothing sent. Includes #242. Replaces 00ff0d9. Klaviyo HQ reads back with a test address.
