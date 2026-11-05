@@ -58,7 +58,7 @@ MKT 版归 “Lab 营销版” 窗口负责（#231）。HQ 管它，和网站、
 - [x] **20 秒弹窗 VpD3CV 只在 MKT 页上关掉**（Klaviyo HQ 11-04 只读核过：不用改。VpD3CV 只在 `shop.accuphy.com/pages/lab` 和 `/en-us/pages/lab` 出，TpVDh9 只在 `/fr/pages/lab` 出，MKT 页不在里面；MKT 页上线后它再读一次）。原文：（`/pages/sonarlab-mktbf2026`，所有市场前缀）。`/pages/lab` 和店里其他页照旧。
   - 不关的话，Lab 的订阅卡和 Klaviyo 的弹窗会一起出来。
   - 要 Jason 在 Klaviyo HQ 说“动”。
-- [ ] **商店弹窗不进 Lab 页和 MKT 页**（K4b，Klaviyo HQ e8f7de4 清单 + 预览）：CA RUd8QJ、DE W8UPFL、BNL RwEkZj、FR TeNugm、RO WgcWSj 加 `*/pages/lab*` 和 `*/pages/sonarlab-mktbf2026*`；美国 SRSX6U、TWCLKy 只加 MKT 那条；澳洲弹窗没发布。顺带去掉挡 Skip tour 的小圆标。等 Jason 在 Klaviyo HQ 说“动”。
+- [x] **商店弹窗不进 Lab 页和 MKT 页**（11-04 已做：Jason 在 Klaviyo HQ 说“动”，11:50 读回核过，记录在 Klaviyo `Maintenance and Fix/Forms/2026-11-04 Lab 页和 MKT 页弹窗 改动记录.md`；网站 03 测订阅时也没见店铺弹窗）（K4b，Klaviyo HQ e8f7de4 清单 + 预览）：CA RUd8QJ、DE W8UPFL、BNL RwEkZj、FR TeNugm、RO WgcWSj 加 `*/pages/lab*` 和 `*/pages/sonarlab-mktbf2026*`；美国 SRSX6U、TWCLKy 只加 MKT 那条；澳洲弹窗没发布。顺带去掉挡 Skip tour 的小圆标。等 Jason 在 Klaviyo HQ 说“动”。
 - [ ] 发给老订阅者的邮件链接带 `lab_unlock=sub`：直接解锁，不出卡，不算新 Lead。由漏斗和 Klaviyo 定。
 
 ## 五、网站 03 的检查（经 HQ）

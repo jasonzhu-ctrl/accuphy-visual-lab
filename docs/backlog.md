@@ -1,5 +1,10 @@
 # Backlog — Sonar Beam Visualizer (kept current every round)
 
+> **现在（2026-11-04 晚，Lab HQ）：** 北美澳 BF 广告在投（Carl 开的），落地 = 店铺 `/pages/sonarlab-mktbf2026`（带锁版 lab.accuphy.ca/mktbf2026/ b572dde：PingLive 全景锁、Mini Combo/全景锁、美国只 Mini 且 Combo 免费、导览中不锁、名单按国家 W24Qdc/SPeeP6/Scdcct，Klaviyo 读回过）。
+> 等 Jason：① PingLive 英语样片 r1 看/听（只投加拿大，没定稿不投）② Carl 广告用的链接对一下（应是 MKT 页）③ Klaviyo HQ：订阅后第一封邮件、邮件里 Lab 链接去哪（带 lab_unlock=sub）。
+> 等别人：Carl 查 Mini 四语 r2 外语用词（U 盘）；欧洲整批暂停（名单、锁卡 13 条德荷波拉、拉脱维亚片子、欧洲法语页单位、免费版五语）。
+> 免费版 lab.accuphy.ca / 还是 96fdc22（网站嵌入版复制件已备好五语，等欧洲）。
+
 > 状态（2026-10-31，Lab HQ；10-27～10-29 的长版原文在下面“明细”里）
 > 阶段：X-6L Lab 上线后收尾，11-02 广告开投（加拿大 + 美国）；lab.accuphy.ca 现在是 5c2e69a（10-30 Jason 动）
 > 进行中：#192 电脑版面板改版 + 分享改版 · d8b411c（视图格只留图标，选中格是动态小声纳图）、测试链接 ba71f8a、HQ 看过对比图 · 等 Jason 看；#191 模糊视图订阅后打开 · 测试版已看待定；上线前：填 W24Qdc、核法文、Klaviyo 文字、真机、Klaviyo 关 20 秒表单。注意：#191 若先于 #192 上线，要从 c91bf7e 构建
