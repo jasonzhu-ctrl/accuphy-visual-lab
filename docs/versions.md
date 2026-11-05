@@ -9,6 +9,13 @@ with the source commit it was built from, so anyone can tell which version a lin
 sign-up and Combo stays shut for everyone (no fake success). Test links show "Test mode: nothing is sent." The consent wording
 (`unlock_consent` in i18n.js) is Klaviyo HQ's draft and waits for Jason.
 
+## 2026-11-05: LIVE lab.accuphy.ca/mktbf2026/ at 5a47ccb (share link → /pages/sonarlab-mktbf2026)
+
+Jason in Lab HQ picked “动，营销版部署” (on “带锁版的分享链接改成指向带锁版店铺页，测试全过，免费版不动，现在上线吗？”; Jason agreed the change in
+Black Friday HQ: “好的”). Package rel-4 by Lab 营销版 from 5a47ccb (tests 297bbbb), deployed once by 营销版 after Jason allowed it in its window
+(https://vercel.com/accuphy/accuphy-lab/Guth1iwoSYgwaR8SwrqaitKmicu9). Live: /mktbf2026/ md5 4d384927; free pages unchanged (/ afb82b9c); 20 share links
+(QR + copy, 10 markets) all point to <market>/pages/sonarlab-mktbf2026, none to /pages/lab, no lab_unlock.
+
 ## 2026-11-05: LIVE lab.accuphy.ca/mktbf2026/ at 529b533 (sign-up retry, only a real 2xx counts, lock_shown event)
 
 Jason in Lab HQ picked “动，上线” (on “带锁版这次的包三处改动全部测过，免费版不动，现在上线吗？”), then “HQ 部署” after 营销版's deploy was blocked by its
