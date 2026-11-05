@@ -74,6 +74,12 @@ export function passedMarket() {
   const m = (embedOpts.market ?? (() => { try { return new URLSearchParams(window.location.search).get('market') } catch { return null } })())
   return typeof m === 'string' && /^[a-z]{2}$/i.test(m.trim()) ? m.trim().toLowerCase() : null
 }
+// French in Europe (#245): metres first, like de / nl / pl / lv. Canada's French (root '/fr', market ca) stays in feet.
+const EU_FR_MARKETS = ['fr', 'be', 'lu', 'ch', 'mc']
+export function euFrench() {
+  const root = shopRoot(), m = passedMarket()
+  return (root != null && root.startsWith('/fr-')) || (m != null && EU_FR_MARKETS.includes(m))
+}
 export function shareMarket() {
   const m = passedMarket()
   if (m) return m

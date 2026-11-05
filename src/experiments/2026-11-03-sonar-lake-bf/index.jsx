@@ -13,7 +13,7 @@ import UnlockCard, { LockIcon } from './UnlockCard'
 import AppHome, { isLocked, viewThumb, VIEW_IMG } from './home/AppHome'
 import ViewIcon from './ViewIcon'
 import { isSignedUp } from './signup'
-import { iceUrl, labEvent, miniOnly, PRODUCT, sentEvents } from './embed'
+import { iceUrl, labEvent, miniOnly, PRODUCT, sentEvents, euFrench } from './embed'
 import ShopButton from './ShopButton' // the one link to the store (X-6L, 2026-10-25; placement B, Jason)
 import { t, METRIC_FIRST } from './i18n' // every visitor-visible string by ?lang= (en · fr X-6L-fr · de nl pl lv #212)
 import ShareButton from './ShareButton'
@@ -142,7 +142,9 @@ export default function SonarLake3D({ scene: sceneProp, lab }) {
   const [home, setHome] = useState(homeFirst && !tourAuto)      // the app's Home page is open inside the phone display
   const [started, setStarted] = useState(!homeFirst || tourAuto) // a view has been picked (always true on desktop and on the ice page; the tour picks its own)
   const toastT = useRef(0)
-  const [imperial, setImperial] = useState(!METRIC_FIRST) // feet for en / fr, metres for de nl pl lv (#212); tapping a value switches
+  // feet for en and Canada's fr, metres for de nl pl lv (#212) and for French in Europe (#245, Jason 11-04: the France / Benelux Mini
+  // films are in metres): the store root /fr-fr, /fr-benelux… or a European market from the bridge. Tapping a value switches.
+  const [imperial, setImperial] = useState(() => !(METRIC_FIRST || euFrench()))
   const [colormap, setColormap] = useState('accuphy_mid') // halfway between the app 2.0.0 'orange' map measured on its own recording and the LiveScope amber (Jason 2026-10-23: 折中); 'garmin_amber' was the LiveScope-measured amber (§7.7)
   const [gain, setGain] = useState(Number.isFinite(devNum('gain')) ? devNum('gain') : 0.40) // 40 %: the app's own recordings run at 40–50; the look is the one the old 57 % gave (sonarShader toneIdx)
   const [contrast, setContrast] = useState(Number.isFinite(devNum('contrast')) ? devNum('contrast') : 0.4)    // demo look (sonar-style.md §6.5): floor mostly gone, a trace of noise stays
