@@ -69,12 +69,28 @@ function rememberSignedUp() {
 
 export const isEmail = (s) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(s).trim())
 
+// Klaviyo sometimes answers 5xx (HQ 11-05, Jason in Lab HQ: retry automatically). A 5xx or a network error is tried again,
+// SEND_TRIES in all, after a short, growing wait the visitor does not notice; a 4xx (a wrong list, a refusal, 429) is not retried.
+// Still failing: 'send_failed' — the card says so, nothing unlocks, no `signup` event. The same request body every time.
+export const SEND_TRIES = 3
+const RETRY_WAIT_MS = [600, 1500]
+async function sendWithRetry(args) {
+  for (let i = 0; i < SEND_TRIES; i++) {
+    if (i) await new Promise((r) => setTimeout(r, RETRY_WAIT_MS[i - 1] ?? 1500))
+    let res
+    try { res = await fetch(...args) } catch { continue } // network error: try again
+    if (res.ok) return
+    if (res.status < 500) break // 4xx: no retry
+  }
+  throw new Error('send_failed')
+}
+
 export async function submitSignup({ email, language = 'en', market, view, product, region = 'eu', source = 'Accuphy Lab' }) {
   const addr = String(email).trim()
   if (!isEmail(addr)) throw new Error('bad_email')
   if (!signupReady(region, market, language) && onLiveHost()) throw new Error('not_ready')
   if (signupReady(region, market, language)) {
-    const res = await fetch(`https://a.klaviyo.com/client/subscriptions?company_id=${encodeURIComponent(KLAVIYO.publicKey)}`, {
+    const args = [`https://a.klaviyo.com/client/subscriptions?company_id=${encodeURIComponent(KLAVIYO.publicKey)}`, {
       method: 'POST',
       headers: { 'content-type': 'application/vnd.api+json', revision: KLAVIYO.revision },
       body: JSON.stringify({
@@ -91,8 +107,8 @@ export async function submitSignup({ email, language = 'en', market, view, produ
           relationships: { list: { data: { type: 'list', id: listFor(region, market, language) } } },
         },
       }),
-    })
-    if (!res.ok) throw new Error('send_failed')
+    }]
+    await sendWithRetry(args)
   }
   rememberSignedUp()
   return true

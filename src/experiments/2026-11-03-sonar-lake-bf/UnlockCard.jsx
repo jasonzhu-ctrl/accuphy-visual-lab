@@ -35,6 +35,9 @@ export default function UnlockCard({ name, img, product, view, onClose, onDone }
     window.addEventListener('keydown', k, true)
     return () => { window.removeEventListener('keydown', k, true); opener?.focus?.() }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  // the card came up (BF HQ 11-05, handoffs/2026-11-05-bf-lock-shown-event.md): once per opening, so the funnel sees who reached the lock.
+  // No email, nothing personal. The tour never shows the card (#242), so it never sends this either.
+  useEffect(() => { labEvent('lock_shown', { product, view, market: shareMarket() }) }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const submit = async (e) => {
     e.preventDefault()
