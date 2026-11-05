@@ -239,3 +239,7 @@ https://artlist.io/royalty-free-music/song/walking-the-universe/58141
 | 人声比音乐高（9 句依次，dB） | 27 23 20 19 16 17 20 16 13 | 20 17 14 12 9 10 13 11 8 |
 
 最小差距 8 dB，最后两句仍然清楚。
+
+---
+
+**这份文档停在 r11b。英文定稿是 r17**（Jason 11-04 “定稿”，#237）：音乐 Hype Me Up – Instrumental version（IamDayLight），不再用 Space Brunch；旁白 Adam take 4，一口气读、只在句间切开；30 fps，−13.9 LUFS。成片在 Drive `Accuphy Mini Ad handover 2026-11/01-current-cut/FINAL-EN-r17/`；经验总结看 `docs/2026-11-04-ad-lessons.md`。
