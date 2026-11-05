@@ -114,23 +114,23 @@ const S = {
   // {view} is the tile's name (#191, Jason 2026-10-30)
   na_moving: { en: '{view} needs the boat moving slowly, so it isn’t available in this simulation yet.', fr: '{view} exige que le bateau avance lentement : cette vue n’est donc pas encore disponible dans cette simulation.', de: '{view} braucht ein langsam fahrendes Boot und ist in dieser Simulation deshalb noch nicht verfügbar.', nl: '{view} vraagt om een langzaam varende boot en is daarom nog niet beschikbaar in deze simulatie.', pl: 'Tryb {view} wymaga powoli płynącej łodzi, dlatego nie jest jeszcze dostępny w tej symulacji.', lv: 'Skatam {view} vajadzīga lēni braucoša laiva, tāpēc šajā simulācijā tas vēl nav pieejams.' },
   // the subscribe card (#191). {view} is the tile's name. unlock_consent and unlock_done: Jason's own pick (2026-11-03). FR reviewed by the website HQ 2026-10-31 ("la vue {view}", so any view name reads right)
-  unlock_title: { en: 'Unlock {view}', fr: 'Débloquer la vue {view}' },
-  unlock_locked: { en: '{view}, locked: subscribe to unlock', fr: 'Vue {view} verrouillée : abonnez-vous pour la débloquer' },
-  unlock_text: { en: 'Subscribe with your email first, and {view} opens right away.', fr: 'Abonnez-vous d’abord avec votre courriel : la vue {view} s’ouvre aussitôt.' },
-  unlock_done: { en: 'You’re in. {view} is unlocked.', fr: 'C’est fait. La vue {view} est débloquée.' }, // Jason confirmed 2026-11-03 (via Lab HQ): EN unchanged, FR with “La vue”
-  // Europe's double opt-in (§6.5): the success title and line instead of unlock_done. English draft by Lab 营销版 11-04, in the strings table
-  // for review; no other language until it is reviewed (falls back to English)
-  unlock_done_eu: { en: 'Check your inbox' },
-  unlock_done_eu_text: { en: 'Click the link in our email to confirm your subscription. {view} is unlocked now.' },
-  back_to_lake: { en: 'Back to the lake', fr: 'Retour au lac' },
-  unlock_email: { en: 'Email', fr: 'Courriel' },
-  unlock_cta: { en: 'Subscribe and unlock', fr: 'M’abonner et débloquer' },
-  unlock_sending: { en: 'Subscribing…', fr: 'Abonnement en cours…' },
-  unlock_consent: { en: 'By subscribing, you agree to receive marketing emails from Accuphy. Unsubscribe anytime.', fr: 'En vous abonnant, vous acceptez de recevoir des courriels marketing d’Accuphy. Désabonnement en tout temps.' }, // Jason confirmed EN + FR 2026-11-03 in the BF funnel chat (via Lab HQ)
-  unlock_privacy: { en: 'Privacy Policy', fr: 'Politique de confidentialité' },
-  unlock_err_email: { en: 'Please enter a valid email address.', fr: 'Veuillez entrer une adresse courriel valide.' },
-  unlock_err_send: { en: 'Something went wrong. Please try again.', fr: 'Une erreur est survenue. Veuillez réessayer.' },
-  unlock_err_closed: { en: 'Subscribing isn’t open yet. Please try again later.', fr: 'L’abonnement n’est pas encore ouvert. Veuillez réessayer plus tard.' },
+  unlock_title: { en: 'Unlock {view}', fr: 'Débloquer la vue {view}', de: '{view} freischalten', nl: '{view} ontgrendelen', pl: 'Odblokuj widok {view}', lv: 'Atbloķēt skatu {view}' },
+  unlock_locked: { en: '{view}, locked: subscribe to unlock', fr: 'Vue {view} verrouillée : abonnez-vous pour la débloquer', de: '{view}, gesperrt: zum Freischalten abonnieren', nl: '{view}, vergrendeld: schrijf je in om te ontgrendelen', pl: 'Widok {view} zablokowany: zapisz się, aby odblokować', lv: 'Skats {view} bloķēts: abonējiet, lai atbloķētu' },
+  unlock_text: { en: 'Subscribe with your email first, and {view} opens right away.', fr: 'Abonnez-vous d’abord avec votre courriel : la vue {view} s’ouvre aussitôt.', de: 'Abonnieren Sie zuerst mit Ihrer E-Mail-Adresse – dann öffnet sich {view} sofort.', nl: 'Schrijf je eerst in met je e-mailadres, dan opent {view} meteen.', pl: 'Najpierw zapisz się, podając swój e-mail, a widok {view} od razu się otworzy.', lv: 'Vispirms abonējiet ar savu e-pasta adresi, un skats {view} uzreiz atvērsies.' },
+  unlock_done: { en: 'You’re in. {view} is unlocked.', fr: 'C’est fait. La vue {view} est débloquée.', de: 'Geschafft. {view} ist freigeschaltet.', nl: 'Gelukt. {view} is ontgrendeld.', pl: 'Gotowe. Widok {view} jest odblokowany.', lv: 'Gatavs! Skats {view} ir atbloķēts.' }, // Jason confirmed 2026-11-03 (via Lab HQ): EN unchanged, FR with “La vue”
+  // Europe's double opt-in (§6.5): the success title and line instead of unlock_done. English: Lab 营销版 11-04, approved by Lab HQ 11-04.
+  // The card in fr de nl pl lv (#246, Jason 11-04 “带锁版的欧洲的事情都可以开始搞了”): Lab HQ, checked as #214 / #222 (store wording, back-translated); website review requested
+  unlock_done_eu: { en: 'Check your inbox', fr: 'Vérifiez votre boîte de réception', de: 'Bitte prüfen Sie Ihr Postfach', nl: 'Check je inbox', pl: 'Sprawdź swoją skrzynkę', lv: 'Pārbaudiet savu e-pastu' },
+  unlock_done_eu_text: { en: 'Click the link in our email to confirm your subscription. {view} is unlocked now.', fr: 'Cliquez sur le lien de notre e-mail pour confirmer votre abonnement. La vue {view} est débloquée.', de: 'Klicken Sie auf den Link in unserer E-Mail, um Ihr Abonnement zu bestätigen. {view} ist jetzt freigeschaltet.', nl: 'Klik op de link in onze e-mail om je inschrijving te bevestigen. {view} is nu ontgrendeld.', pl: 'Kliknij link w naszym e-mailu, aby potwierdzić subskrypcję. Widok {view} jest już odblokowany.', lv: 'Noklikšķiniet uz saites mūsu e-pastā, lai apstiprinātu abonementu. Skats {view} jau ir atbloķēts.' },
+  back_to_lake: { en: 'Back to the lake', fr: 'Retour au lac', de: 'Zurück zum See', nl: 'Terug naar het meer', pl: 'Wróć nad jezioro', lv: 'Atpakaļ pie ezera' },
+  unlock_email: { en: 'Email', fr: 'Courriel', de: 'E-Mail', nl: 'E-mail', pl: 'E-mail', lv: 'E-pasts' },
+  unlock_cta: { en: 'Subscribe and unlock', fr: 'M’abonner et débloquer', de: 'Abonnieren und freischalten', nl: 'Inschrijven en ontgrendelen', pl: 'Zapisz się i odblokuj', lv: 'Abonēt un atbloķēt' },
+  unlock_sending: { en: 'Subscribing…', fr: 'Abonnement en cours…', de: 'Wird abonniert…', nl: 'Bezig met inschrijven…', pl: 'Zapisywanie…', lv: 'Notiek abonēšana…' },
+  unlock_consent: { en: 'By subscribing, you agree to receive marketing emails from Accuphy. Unsubscribe anytime.', fr: 'En vous abonnant, vous acceptez de recevoir des courriels marketing d’Accuphy. Désabonnement en tout temps.', de: 'Mit dem Abonnieren stimmen Sie zu, Marketing-E-Mails von Accuphy zu erhalten. Abmeldung jederzeit möglich.', nl: 'Door je in te schrijven ga je akkoord met marketingmails van Accuphy. Je kunt je altijd afmelden.', pl: 'Zapisując się, zgadzasz się na otrzymywanie e-maili marketingowych od Accuphy. Możesz zrezygnować w każdej chwili.', lv: 'Abonējot jūs piekrītat saņemt mārketinga e-pastus no Accuphy. No abonementa var atteikties jebkurā laikā.' }, // Jason confirmed EN + FR 2026-11-03 in the BF funnel chat (via Lab HQ)
+  unlock_privacy: { en: 'Privacy Policy', fr: 'Politique de confidentialité', de: 'Datenschutzerklärung', nl: 'Privacybeleid', pl: 'Polityka prywatności', lv: 'Privātuma politika' },
+  unlock_err_email: { en: 'Please enter a valid email address.', fr: 'Veuillez entrer une adresse courriel valide.', de: 'Bitte geben Sie eine gültige E-Mail-Adresse ein.', nl: 'Vul een geldig e-mailadres in.', pl: 'Podaj prawidłowy adres e-mail.', lv: 'Lūdzu, ievadiet derīgu e-pasta adresi.' },
+  unlock_err_send: { en: 'Something went wrong. Please try again.', fr: 'Une erreur est survenue. Veuillez réessayer.', de: 'Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.', nl: 'Er ging iets mis. Probeer het opnieuw.', pl: 'Coś poszło nie tak. Spróbuj ponownie.', lv: 'Kaut kas nogāja greizi. Lūdzu, mēģiniet vēlreiz.' },
+  unlock_err_closed: { en: 'Subscribing isn’t open yet. Please try again later.', fr: 'L’abonnement n’est pas encore ouvert. Veuillez réessayer plus tard.', de: 'Das Abonnieren ist noch nicht möglich. Bitte versuchen Sie es später erneut.', nl: 'Inschrijven is nog niet mogelijk. Probeer het later opnieuw.', pl: 'Zapisy nie są jeszcze otwarte. Spróbuj ponownie później.', lv: 'Abonēšana vēl nav atvērta. Lūdzu, mēģiniet vēlāk.' },
 }
 
 export function t(key, vars) {
