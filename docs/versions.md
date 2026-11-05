@@ -9,6 +9,14 @@ with the source commit it was built from, so anyone can tell which version a lin
 sign-up and Combo stays shut for everyone (no fake success). Test links show "Test mode: nothing is sent." The consent wording
 (`unlock_consent` in i18n.js) is Klaviyo HQ's draft and waits for Jason.
 
+## 2026-11-05: LIVE lab.accuphy.ca/mktbf2026/ at 529b533 (sign-up retry, only a real 2xx counts, lock_shown event)
+
+Jason in Lab HQ picked “动，上线” (on “带锁版这次的包三处改动全部测过，免费版不动，现在上线吗？”), then “HQ 部署” after 营销版's deploy was blocked by its
+own permission. Package by Lab 营销版 from 529b533 (tests 8b5077e), same env as the Europe batch, /embed/ from 96fdc22. Deployed by HQ
+(https://vercel.com/accuphy/accuphy-lab/5x9AMaCMkc1i4RaCoakuuJGCmrsh). Checked live: /mktbf2026/ md5 9638344b; /, /mini/, /ice/ unchanged; 9 list IDs only
+in /mktbf2026/; noindex and frame-ancestors present; .env / .env.local / .vercel 404. lock_shown reaches Meta / GA4 / Klaviyo only after the website adds it to the
+store bridge MAP (accuphy-website/handoffs/2026-11-05-lab-lock-shown-bridge.md).
+
 ## 2026-11-05: LIVE lab.accuphy.ca/mktbf2026/ at e6efaf3 (Europe batch: #245 metres, #246 EU card wording, #247 six EU double opt-in lists)
 
 Jason in Lab HQ: “抓紧上线啊”, then on the card “营销版部署被权限挡住，要我在 HQ 部署吗？” picked “动，HQ 部署”. Package built by Lab 营销版 from e6efaf3:
