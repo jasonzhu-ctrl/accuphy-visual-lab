@@ -21,7 +21,7 @@ Jason 不想窗口没显示就被忘掉（CHIEF SW-1104 补，2026-11-05）。�
 |---|---|---|
 | Lab HQ（`local_47bc36c3`） | accuphy-visual-lab HQ | 已接上（SW-1104） |
 | Lab 营销版（`local_9524f8a3`） | Lab 营销版 | 已接上 |
-| Lab 广告片：Mini 广告剪辑与多语言（`local_374e9bc2`） | **Lab video creation** | 已合并：Mini 英文 r17 定稿和四语 r1/r2 已核 |
+| Lab 广告片：Mini 广告剪辑与多语言（`local_374e9bc2`） | **Lab video creation** | 已合并。**Mini 广告片全部做完**（Jason 11-05：“早做完了都”）：英文 r17 定稿、四语版都好了，没有剩下的活 |
 | Lab PingLive 广告片：英语样片（`local_63d2f9b6`） | **Lab video creation** | 已合并：PingLive r1 等 Jason 看；Drive 里的 r1 文件还是 29.94 fps，下一轮重出 |
 | 广告视频制作（`local_4a14ee51`，10-29） | **Lab video creation** | 停用：早期的广告片窗口，活都已经在 video creation 里 |
 | 冰钓版本视觉效果（`local_2b04f455`，10-31） | **Lab 场景和声纳画面Base**（#195 改名，同一个角色） | 停用：它最后那个测试包 5764b06（鱼进波束）后来由 Base 接着做 |
