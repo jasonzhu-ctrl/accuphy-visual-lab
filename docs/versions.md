@@ -13,7 +13,7 @@ sign-up and Combo stays shut for everyone (no fake success). Test links show "Te
 
 Jason in Lab HQ picked “动，上线” (on “带锁版这次的包三处改动全部测过，免费版不动，现在上线吗？”), then “HQ 部署” after 营销版's deploy was blocked by its
 own permission. Package by Lab 营销版 from 529b533 (tests 8b5077e), same env as the Europe batch, /embed/ from 96fdc22. Deployed by HQ
-(https://vercel.com/accuphy/accuphy-lab/5x9AMaCMkc1i4RaCoakuuJGCmrsh). Checked live: /mktbf2026/ md5 9638344b; /, /mini/, /ice/ unchanged; 9 list IDs only
+(https://vercel.com/accuphy/accuphy-lab/5x9AMaCMkc1i4RaCoakuuJGCmrsh). Lab 营销版 then deployed the same package once more after Jason allowed it in its window (dpl_EVpBUxsKAXej9vMQ7YeZmCMxDk8c, the one lab.accuphy.ca points to); identical content, and 营销版 re-ran the 11 markets and the retry / lock_shown cases on the real host. Checked live: /mktbf2026/ md5 9638344b; /, /mini/, /ice/ unchanged; 9 list IDs only
 in /mktbf2026/; noindex and frame-ancestors present; .env / .env.local / .vercel 404. lock_shown reaches Meta / GA4 / Klaviyo only after the website adds it to the
 store bridge MAP (accuphy-website/handoffs/2026-11-05-lab-lock-shown-bridge.md).
 
