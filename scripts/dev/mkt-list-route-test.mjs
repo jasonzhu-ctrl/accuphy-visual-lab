@@ -61,6 +61,7 @@ for (const c of routes) {
 const store = {}
 globalThis.localStorage = { getItem: (x) => store[x] ?? null, setItem: (x, v) => { store[x] = v }, removeItem: (x) => { delete store[x] } }
 const bodies = []; globalThis.fetch = async (u, o) => { bodies.push(JSON.parse(o.body)); return { ok: true } }
+const EU = 'de:DEtst1,fr:FRtst1,be-nl:BEnl01,be-fr:BEfr01,ee:ROtst1,lv:ROtst1,ro:ROtst1'
 const ALL = { VITE_BF_LIST_ID: 'W24Qdc', VITE_BF_LIST_ID_US: 'SPeeP6', VITE_BF_LIST_ID_AU: 'Scdcct' }
 const sends = [
   { host: 'lab.accuphy.ca', env: { VITE_BF_LIST_ID: 'W24Qdc' }, region: 'na', want: 'W24Qdc' },
@@ -79,6 +80,16 @@ const sends = [
   { host: 'lab.accuphy.ca', env: { VITE_BF_LIST_ID: 'W24Qdc' }, region: 'na', market: 'us', want: 'refused', note: 'US id empty: never Canada' },
   { host: 'lab.accuphy.ca', env: { VITE_BF_LIST_ID: 'W24Qdc' }, region: 'na', market: 'au', want: 'refused', note: 'AU id empty: never Canada' },
   { host: 'lab.accuphy.ca', env: ALL, region: 'eu', market: 'us', want: 'refused', note: 'EU id empty: never a NA list' },
+  // Europe: one list per country (#247); country-language first (Benelux), then the country; no list → refused, never another country's
+  { host: 'lab.accuphy.ca', env: { ...ALL, VITE_BF_LISTS_EU: EU }, region: 'eu', market: 'de', lang: 'de', want: 'DEtst1' },
+  { host: 'lab.accuphy.ca', env: { ...ALL, VITE_BF_LISTS_EU: EU }, region: 'eu', market: 'at', lang: 'de', want: 'refused', note: 'Austria has no list in this map' },
+  { host: 'lab.accuphy.ca', env: { ...ALL, VITE_BF_LISTS_EU: EU }, region: 'eu', market: 'be', lang: 'nl', want: 'BEnl01' },
+  { host: 'lab.accuphy.ca', env: { ...ALL, VITE_BF_LISTS_EU: EU }, region: 'eu', market: 'be', lang: 'fr', want: 'BEfr01' },
+  { host: 'lab.accuphy.ca', env: { ...ALL, VITE_BF_LISTS_EU: EU }, region: 'eu', market: 'fr', lang: 'fr', want: 'FRtst1' },
+  { host: 'lab.accuphy.ca', env: { ...ALL, VITE_BF_LISTS_EU: EU }, region: 'eu', market: 'ee', lang: 'lv', want: 'ROtst1', note: 'Latvian IP read as ee by Shopify' },
+  { host: 'lab.accuphy.ca', env: { ...ALL, VITE_BF_LISTS_EU: EU }, region: 'eu', market: 'pl', lang: 'pl', want: 'refused', note: 'Poland not in this map' },
+  { host: 'lab.accuphy.ca', env: { ...ALL, VITE_BF_LISTS_EU: EU }, region: 'eu', market: 'us', lang: 'de', want: 'refused', note: 'never a NA list' },
+  { host: 'lab.accuphy.ca', env: { ...ALL, VITE_BF_LISTS_EU: 'de:bad,xx' }, region: 'eu', market: 'de', lang: 'de', want: 'refused', note: 'bad entries ignored' },
   { host: 'jasonzhu-ctrl.github.io', env: {}, region: 'na', want: 'test' },
   { host: 'jasonzhu-ctrl.github.io', env: {}, region: 'eu', want: 'test' },
   { host: 'localhost', env: {}, region: 'eu', want: 'test' },
@@ -90,11 +101,11 @@ for (const c of sends) {
   let got, mk
   try {
     mk = 'market' in c ? c.market : (c.region === 'na' ? 'ca' : 'de')
-    await m.submitSignup({ email: 'a@example.com', language: 'de', market: mk, view: 'combo', product: 'pinglive-mini', ...(c.region ? { region: c.region } : {}) })
-    got = bodies.length ? bodies[0].data.relationships.list.data.id : (m.signupTestMode(c.region, mk) ? 'test' : 'unlocked, nothing sent')
+    await m.submitSignup({ email: 'a@example.com', language: c.lang || 'de', market: mk, view: 'combo', product: 'pinglive-mini', ...(c.region ? { region: c.region } : {}) })
+    got = bodies.length ? bodies[0].data.relationships.list.data.id : (m.signupTestMode(c.region, mk, c.lang || 'de') ? 'test' : 'unlocked, nothing sent')
   } catch (e) { got = e.message === 'not_ready' ? 'refused' : 'error ' + e.message }
   const props = bodies[0]?.data.attributes.profile.data.attributes.properties
-  const propsOk = !props || (props.signup_page === 'accuphy-lab' && props.signup_channel === 'lab_unlock' && props.signup_market === mk && props.signup_language === 'de')
+  const propsOk = !props || (props.signup_page === 'accuphy-lab' && props.signup_channel === 'lab_unlock' && props.signup_market === mk && props.signup_language === (c.lang || 'de'))
   check(got === c.want && propsOk && !(c.region !== 'na' && got === 'W24Qdc'), `${c.host.padEnd(24)} ${JSON.stringify(c.env).padEnd(56)} ${String(c.region).padEnd(9)} ${String(mk).padEnd(4)} → ${got}${c.note ? '   · ' + c.note : ''}`)
 }
 fs.rmSync(TMP, { recursive: true, force: true })

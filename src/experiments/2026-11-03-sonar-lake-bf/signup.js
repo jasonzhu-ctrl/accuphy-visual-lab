@@ -16,6 +16,12 @@ export const KLAVIYO = {
   // the real hosts — never another country's list.
   listIdUs: /^[A-Za-z0-9]{6}$/.test(import.meta.env.VITE_BF_LIST_ID_US || '') ? import.meta.env.VITE_BF_LIST_ID_US : null,
   listIdAu: /^[A-Za-z0-9]{6}$/.test(import.meta.env.VITE_BF_LIST_ID_AU || '') ? import.meta.env.VITE_BF_LIST_ID_AU : null,
+  // One double opt-in list per European country (#247, Jason 11-04 in Klaviyo HQ: per country, like CA/US/AU). The go-live build
+  // fills VITE_BF_LISTS_EU = "key:ListID,key:ListID" — key = the country (signup_market: fr de at ch nl be lu pl lv ro…), or
+  // country-language when one country has a list per language (be-nl, be-fr). Lookup: country-language first, then country.
+  // A European country with no list is refused on the real hosts — never another country's list. listIdEu (one list for all of
+  // Europe) is only the fallback if a build still sets it.
+  listsEu: Object.fromEntries(String(import.meta.env.VITE_BF_LISTS_EU || '').split(',').map((x) => x.trim().split(':')).filter(([k, v]) => /^[a-z]{2}(-[a-z]{2})?$/.test(k || '') && /^[A-Za-z0-9]{6}$/.test(v || ''))),
   revision: '2026-07-15', // Klaviyo API revision (each is supported ~2 years; bump when Klaviyo retires it)
 }
 
@@ -41,10 +47,11 @@ export function listRegion({ market = null, shop = null, lang = 'en' } = {}) {
 // 'na' → the country's own list by signup_market (shareMarket(): ca for / and /fr, us for /en-us, au for /en-au, or the bridge's market);
 // a market outside ca / us / au gets no list (refused), never Canada's.
 const NA_LISTS = () => ({ ca: KLAVIYO.listId, us: KLAVIYO.listIdUs, au: KLAVIYO.listIdAu })
-export const listFor = (region, market) => (region === 'na' ? NA_LISTS()[market] || null : KLAVIYO.listIdEu)
-const signupReady = (region, market) => !!(KLAVIYO.publicKey && listFor(region, market))
+const euList = (market, lang) => (market && (KLAVIYO.listsEu[`${market}-${lang}`] || KLAVIYO.listsEu[market])) || KLAVIYO.listIdEu || null
+export const listFor = (region, market, lang = 'en') => (region === 'na' ? NA_LISTS()[market] || null : euList(market, lang))
+const signupReady = (region, market, lang) => !!(KLAVIYO.publicKey && listFor(region, market, lang))
 const onLiveHost = () => { try { return LIVE_HOST.test(window.location.hostname) } catch { return true } }
-export const signupTestMode = (region = 'eu', market = null) => !signupReady(region, market) && !onLiveHost()
+export const signupTestMode = (region = 'eu', market = null, lang = 'en') => !signupReady(region, market, lang) && !onLiveHost()
 
 const FLAG = 'accuphy_sonar_signup_v1'
 
@@ -65,8 +72,8 @@ export const isEmail = (s) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(s).tri
 export async function submitSignup({ email, language = 'en', market, view, product, region = 'eu', source = 'Accuphy Lab' }) {
   const addr = String(email).trim()
   if (!isEmail(addr)) throw new Error('bad_email')
-  if (!signupReady(region, market) && onLiveHost()) throw new Error('not_ready')
-  if (signupReady(region, market)) {
+  if (!signupReady(region, market, language) && onLiveHost()) throw new Error('not_ready')
+  if (signupReady(region, market, language)) {
     const res = await fetch(`https://a.klaviyo.com/client/subscriptions?company_id=${encodeURIComponent(KLAVIYO.publicKey)}`, {
       method: 'POST',
       headers: { 'content-type': 'application/vnd.api+json', revision: KLAVIYO.revision },
@@ -81,7 +88,7 @@ export async function submitSignup({ email, language = 'en', market, view, produ
               subscriptions: { email: { marketing: { consent: CONSENT } } }, // the list's single/double opt-in setting still applies
             } } },
           },
-          relationships: { list: { data: { type: 'list', id: listFor(region, market) } } },
+          relationships: { list: { data: { type: 'list', id: listFor(region, market, language) } } },
         },
       }),
     })

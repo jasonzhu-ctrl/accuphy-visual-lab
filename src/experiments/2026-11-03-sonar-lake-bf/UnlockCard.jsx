@@ -76,7 +76,7 @@ export default function UnlockCard({ name, img, product, view, onClose, onDone }
                     {t('unlock_consent')}{' '}
                     <a href="https://shop.accuphy.com/policies/privacy-policy" target="_blank" rel="noreferrer">{t('unlock_privacy')}</a>
                   </p>
-                  {signupTestMode(region, shareMarket()) && <p className="mt-1.5 text-[11px] font-semibold text-[#ffd98a]">Test mode: nothing is sent.</p>}
+                  {signupTestMode(region, shareMarket(), LANG) && <p className="mt-1.5 text-[11px] font-semibold text-[#ffd98a]">Test mode: nothing is sent.</p>}
                 </motion.div>
               )}
             </AnimatePresence>
