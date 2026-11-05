@@ -117,5 +117,41 @@ if (SRC.includes('export const listFor')) {
   }
   globalThis.__LAB_ENV = {}
 }
+// retries (Jason 11-05 via HQ): a Klaviyo 5xx or a network error is retried twice in the background; if all three tries fail, no
+// success, no unlock (and the card sends no `signup`, it only fires after submitSignup resolves). A 4xx is not retried. Only in a
+// copy that declares `export const SEND_TRIES` (the BF copy, written by "Lab 营销版"); the waits between tries are skipped here.
+if (/export const SEND_TRIES\b/.test(SRC)) {
+  const realTimeout = globalThis.setTimeout
+  globalThis.setTimeout = (fn) => { fn(); return 0 }
+  const answer = (r) => r === 'net' ? Promise.reject(new TypeError('Failed to fetch')) : Promise.resolve({ ok: r < 400, status: r })
+  const retry = [
+    // [what, Klaviyo's answers in order, tries it must make, unlocked]
+    ['503 then OK', [503, 202], 2, true],
+    ['network error then OK', ['net', 202], 2, true],
+    ['503, 503, then OK', [503, 503, 202], 3, true],
+    ['503 three times', [503, 503, 503], 3, false],
+    ['network error three times', ['net', 'net', 'net'], 3, false],
+    ['500, network error, 502', [500, 'net', 502], 3, false],
+    ['400: not retried', [400, 202], 1, false],
+    ['429: not retried', [429, 202], 1, false],
+  ]
+  globalThis.__LAB_ENV = { VITE_BF_LIST_ID: 'W24Qdc' }
+  for (const [what, answers, tries, unlocked] of retry) {
+    for (const k in store) delete store[k]; posts.length = 0; bodies.length = 0
+    globalThis.window = { location: { hostname: 'lab.accuphy.ca', search: '' } }
+    const m = await load()
+    const queue = [...answers]
+    globalThis.fetch = async (u, o) => { posts.push(u); bodies.push(JSON.parse(o.body)); return answer(queue.shift()) }
+    let err = null
+    try { await m.submitSignup({ email: 'a@example.com', market: 'ca', region: 'na' }) } catch (e) { err = e.message }
+    const same = bodies.every((b) => JSON.stringify(b) === JSON.stringify(bodies[0])) // each try sends the same sign-up
+    const ok = posts.length === tries && same && (unlocked ? err === null : err === 'send_failed') && m.isSignedUp() === unlocked
+    if (!ok) fail++
+    console.log(`${ok ? 'OK  ' : 'FAIL'} retry: ${what} → ${posts.length} tries, ${err ? 'failed (' + err + ')' : 'unlocked'}${ok ? '' : `   expected ${tries} tries, ${unlocked ? 'unlocked' : 'failed (send_failed), still locked'}`}`)
+  }
+  globalThis.setTimeout = realTimeout
+  globalThis.fetch = async (u, o) => { posts.push(u); bodies.push(JSON.parse(o.body)); return { ok: true } }
+  globalThis.__LAB_ENV = {}
+}
 fs.rmSync(TMP, { recursive: true, force: true })
 console.log(fail ? `${fail} FAILED` : 'all passed'); process.exit(fail ? 1 : 0)
