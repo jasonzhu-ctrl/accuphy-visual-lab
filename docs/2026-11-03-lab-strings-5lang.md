@@ -289,3 +289,4 @@ unlock_err_email、unlock_err_send、unlock_err_closed、back_to_lake（英文�
 - 2026-11-03 Lab 多语言：照 #233 改了交付去处（HQ 放进网站嵌入版，Base 留一份，MKT 版之后）。
 - 2026-11-03 Lab 多语言：#235 分享框两句翻成 5 种并核过（pl、lv 反译对过）。整张表齐了，没有拿不准的。
 - 2026-11-03 Lab 多语言：lv mode_combo Kombinētais → Kombo（放不下冰钓五格一行；拉脱维亚语 kombo 的用法 + 跟 App 的 Live Combo 对上）。
+- 2026-11-04 Lab HQ：第十一节填好（#246，Jason “带锁版的欧洲的事情都可以开始搞了”）：A 两句英文 HQ 定、法德荷波拉已译；B 13 条德荷波拉已译。字在 `src/experiments/2026-11-03-sonar-lake-bf/i18n.js`（Lab HQ 提交 #246），照 #214 / #222 自核（店铺页脚原字、称呼照已有、波拉反译）；已请网站 HQ 再核。

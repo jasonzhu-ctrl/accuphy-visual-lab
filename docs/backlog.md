@@ -2,7 +2,8 @@
 
 > **现在（2026-11-04 晚，Lab HQ）：** 北美澳 BF 广告在投（Carl 开的），落地 = 店铺 `/pages/sonarlab-mktbf2026`（带锁版 lab.accuphy.ca/mktbf2026/ b572dde：PingLive 全景锁、Mini Combo/全景锁、美国只 Mini 且 Combo 免费、导览中不锁、名单按国家 W24Qdc/SPeeP6/Scdcct，Klaviyo 读回过）。
 > 等 Jason：① PingLive 英语样片 r1 看/听（只投加拿大，没定稿不投）② Carl 广告用的链接对一下（应是 MKT 页）③ Klaviyo HQ：订阅后第一封邮件、邮件里 Lab 链接去哪（带 lab_unlock=sub）。
-> 等别人：Carl 查 Mini 四语 r2 外语用词（U 盘）。欧洲整批暂停，每件都写明版本（Jason 11-04：版本多，要说清是哪个）：【带锁版 MKT】欧洲订阅名单（VITE_BF_LIST_ID_EU 空）、订阅卡 13 句德荷波拉、欧洲法语页单位（页英尺 / 片子米）；【广告片】拉脱维亚语 Mini 片；【免费版 网站嵌入版】五种语言上线。
+> 欧洲带锁版重启（Jason 11-04 晚）：#245 欧洲法语页用米、#246 订阅卡欧洲语言 已做未上线；等 Klaviyo 欧洲名单（Jason 在 Klaviyo HQ 定一个还是按国家、说“动”）、网站 03 波兰/拉脱维亚 IP 复查 + 译文再核；上线要 Jason 在 Lab HQ 说“动”。
+> 等别人：Carl 查 Mini 四语 r2 外语用词（U 盘）。原欧洲暂停清单（已重启的见上一行），每件都写明版本（Jason 11-04：版本多，要说清是哪个）：【带锁版 MKT】欧洲订阅名单（VITE_BF_LIST_ID_EU 空）、订阅卡 13 句德荷波拉、欧洲法语页单位（页英尺 / 片子米）；【广告片】拉脱维亚语 Mini 片；【免费版 网站嵌入版】五种语言上线。
 > 免费版 lab.accuphy.ca / 还是 96fdc22（网站嵌入版复制件已备好五语，等欧洲）。
 
 > 状态（2026-10-31，Lab HQ；10-27～10-29 的长版原文在下面“明细”里）

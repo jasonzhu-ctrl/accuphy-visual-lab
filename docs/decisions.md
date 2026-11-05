@@ -4134,3 +4134,7 @@ Numbered log. Newest at the bottom.
 243. **2026-11-04** — **加拿大法语广告用英尺版 Mini 片子（r1）**（Jason 在 Lab HQ 被问“英尺版 r1 还是米版 r2”时说“你决定”）。HQ 选 r1 `plm-fr-30fps-r1.mp4`：加拿大法语店铺页 `/fr/pages/sonarlab-mktbf2026` 里的 Lab 法语默认显示英尺（`METRIC_FIRST` 只含 de/nl/pl/lv），广告和落地页单位一致；加拿大钓鱼人看水深也习惯用英尺。团队英文文档（Ad landing links by market）视频一栏和改动记录已改。欧洲法语（法国、比荷卢）仍是米版 r2，等 Jason 看；但那边的 Lab 法语页也默认英尺，欧洲恢复时要先定：法语页按市场改成米，还是片子改英尺。
 
 244. **2026-11-04** — **带锁版订阅按国家进各自名单**（Jason 在 Klaviyo HQ：“不应该分开吗?”“继续做 抓紧”，原因是三国价格不同；Lab HQ 卡片上 Jason 选“动，改好直接上线”）。加拿大 → `W24Qdc`（CA - Sonar Lab），美国 → `SPeeP6`（US - Sonar Lab），澳洲 → `Scdcct`（AU - Sonar Lab），三个都是单次确认，Klaviyo HQ 建的。按 `signup_market`（/ 和 /fr = ca，/en-us = us，/en-au = au，或店铺传来的 market）选名单；哪国的名单号没打包进去、或市场不是这三国，在正式网址上拒绝，绝不进别国名单。欧洲照旧没有名单（暂停）。卡片文字不变。代码 b572dde（Lab HQ 改的，“Lab 营销版”这时不在这个 app 里），上线见 docs/versions.md。
+
+245. **2026-11-04** — **带锁版：欧洲的法语页默认用米**（Jason 在 Lab HQ 选“欧洲法语页改成米”；原因：法国、比荷卢的 Mini 法语片子是米，页面原来是英尺）。店铺前缀 /fr-fr、/fr-benelux… 或店铺传来的市场是 fr / be / lu / ch / mc → 开页就是米（和德荷波拉一样）；加拿大法语 /fr 和英文照旧英尺；点数字照样能换。只改带锁版复制件（330dba5，`embed.js` euFrench）；免费版不动。没上线，和欧洲名单一起上。
+
+246. **2026-11-04** — **带锁版欧洲的订阅卡有了本国语言**（Jason 在 Lab HQ：“带锁版的欧洲的事情都可以开始搞了”）。订阅卡 13 条加德、荷、波、拉；欧洲订阅成功的两句（“Check your inbox”和下一行）加法、德、荷、波、拉，英文由 HQ 定。照 #214 / #222 的办法 Lab 自己核：隐私链接用店铺页脚原字（Datenschutzerklärung、Privacybeleid、Polityka prywatności），称呼照已有译文（德 Sie、荷 je），波兰语、拉脱维亚语反译对过；只在欧洲出现的法语句子用 “e-mail”（加拿大法语照旧 courriel）。电脑、手机五种语言截图核过不溢出（docs/2026-11-04-mkt-eu-card-4lang.jpg）。另请网站 HQ 核一遍。只改带锁版复制件 i18n.js；没上线，和欧洲名单一起上。

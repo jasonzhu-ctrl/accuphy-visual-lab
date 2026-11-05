@@ -92,7 +92,7 @@ MKT 版归 “Lab 营销版” 窗口负责（#231）。HQ 管它，和网站、
     **注意（给 HQ）：** 用 HEAD 打，`/`、`/mini/`、`/ice/` 是网站嵌入版已经放进五种语言、但还没上线的那份（58ed5de8 / 6bd00616 / 14e6cc38），所以和线上不一样。这是网站嵌入版自己的改动，营销版没碰。上线那天用哪个 `BASE_REF`，由 HQ 和网站嵌入版定。
   - **看过：** 带锁湖页 en fr de nl pl lv，电脑 1440×900 和手机 390×844 各一次，都能打开，0 报错，`<html lang>` 对，德荷波拉用米；锁卡和同意文字都放得下（同意文字 11 px，英 2 行，法 3 行）。冰钓页（`/mktbf2026/ice/?lang=de`）看了一次，0 报错。
     锁卡六种语言的图：`docs/2026-11-04-mkt-lock-card-6lang.png`。
-- [ ] **锁卡这 13 条还没有德、荷、波、拉（不自己编，报 HQ）：** unlock_title、unlock_locked、unlock_text、unlock_done、unlock_email、unlock_cta、unlock_sending、
+- [x] **（11-04 已译，#246：13 条德荷波拉 + 欧洲成功两句五种语言，Lab HQ 自核，网站再核中）锁卡这 13 条还没有德、荷、波、拉（不自己编，报 HQ）：** unlock_title、unlock_locked、unlock_text、unlock_done、unlock_email、unlock_cta、unlock_sending、
   unlock_consent、unlock_privacy、unlock_err_email、unlock_err_send、unlock_err_closed、back_to_lake。
   五种语言的表（`docs/2026-11-03-lab-strings-5lang.md` 第九节）专门写了“锁（营销版）不在这张表里”。现在德、荷、波、拉的访客看到的锁卡是英文，只有视图名是那种语言（“Unlock Live-Kombi”）。
   卡上的 “Test mode: nothing is sent.” 和隐私链接 `shop.accuphy.com/policies/privacy-policy` 也只有一种写法。要 Lab 多语言出译文、网站核过，再放进复制件。
@@ -161,3 +161,4 @@ MKT 版归 “Lab 营销版” 窗口负责（#231）。HQ 管它，和网站、
 | 2026-11-04 | #242 上线（导览中导览的视图都能用，结束回 Forward） | 00ff0d9，Jason 在 Lab HQ 说“动, go live”；Vercel 6BTnuoHcTnRYCrrMCvoEJVn4ebs2；/、/mini/、/ice/、/embed/ md5 = 上线前；/mktbf2026/ b3d64b9d = 打包。同一份文件跑导览测试：加拿大电脑完整导览 + 重播、第 3 站跳过、加拿大手机、美国 Mini 导览和第 1 站跳过，都对、0 报错；真店铺页全新浏览器：加拿大锁 PingLive 全景、Mini Combo 和全景，美国只有 Mini、Combo 不锁、全景锁 |
 | 2026-11-04 | #244 上线（订阅按国家进名单） | b572dde，Jason 在 Lab HQ 选“动，改好直接上线”；Vercel 3hZdxnHtUJH1vuJuuX1etH7HQDCZ；/、/mini/、/ice/、/embed/ md5 = 上线前；/mktbf2026/ 6cfc3363 = 打包。真店铺页全新浏览器提交（拦下请求，没发到 Klaviyo）：加拿大 → W24Qdc、美国 → SPeeP6、澳洲 → Scdcct，signup_market 对。等 Klaviyo HQ 用测试邮箱读回 |
 | 2026-11-04 | #244 Klaviyo 读回通过 | Klaviyo HQ 23:15 UTC，Jason 同意提交 3 次（直接开 lab.accuphy.ca/mktbf2026/ 带 shop/market）：us → SPeeP6（没进 W24Qdc）、au → Scdcct、ca → W24Qdc，属性对，signup_market = us/au/ca；测试地址已进排除清单。US 档案 lab_product=pinglive-sonar 是因为直接开 Lab、不在店铺框里（miniOnly 只在店铺里生效），真店铺美国页只有 Mini（HQ 全新浏览器核过）。Klaviyo 那个浏览器里店铺框全景没锁 = 那个浏览器存过订阅记号（和 11-04 之前一样），全新浏览器里有锁 |
+| 2026-11-04 | 欧洲重启（Jason 在 Lab HQ：“带锁版的欧洲的事情都可以开始搞了”） | #245 欧洲法语页默认米（330dba5）；#246 订阅卡欧洲四语 + 成功两句五语（截图 docs/2026-11-04-mkt-eu-card-4lang.jpg）；都没上线。已请 Klaviyo HQ：欧洲两步名单（一个还是按国家，等 Jason 在 Klaviyo HQ 定）+ 确认邮件各语言 + 同意那句够不够；已请网站 HQ：03 用波兰、拉脱维亚 IP 复查 /pl-pl、/en-ro 两页，再核卡片译文。上线要名单号到 + Jason 在 Lab HQ 说“动” |
