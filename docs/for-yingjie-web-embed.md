@@ -38,4 +38,4 @@ Lab 有三份代码，互不覆盖（决定 #233）：
 GitHub 上 accuphy-marketing/accuphy-visual-lab 的 `main` 加了规则 “protect main”：
 - 改 main 必须开 pull request，要 1 个批准；不能删 main，也不能强推。
 - 组织管理员（Jason）可以直接推，所以 Lab 各窗口用 Jason 的账号推照常。
-- ChatGPT Codex Connector 只装在这一个仓库上（英杰 11-06 申请，Jason 批准）。
+- ChatGPT Codex Connector：英杰申请了，要装就只装在这一个仓库上；11-06 还在等 Jason 点批准。
