@@ -32,3 +32,10 @@ Lab 有三份代码，互不覆盖（决定 #233）：
 - 湖的场景可以优化，也可以挑场景和声纳画面拍视频；**声纳成像引擎和它的逻辑不能动**（`sonarShader.js`、`SonarScreen.jsx`、range/depth 那部分）。
 - 店铺页（shop.accuphy.com）不归这个仓库，Lab 代码也不放进 Shopify。客人和广告只拿店铺链接，不给 lab.accuphy.ca 的地址（#232）。
 - 上线 lab.accuphy.ca 要 Jason 在 Lab HQ 说“动”。
+
+## 主线保护（2026-11-06，Jason 同意）
+
+GitHub 上 accuphy-marketing/accuphy-visual-lab 的 `main` 加了规则 “protect main”：
+- 改 main 必须开 pull request，要 1 个批准；不能删 main，也不能强推。
+- 组织管理员（Jason）可以直接推，所以 Lab 各窗口用 Jason 的账号推照常。
+- ChatGPT Codex Connector 只装在这一个仓库上（英杰 11-06 申请，Jason 批准）。
