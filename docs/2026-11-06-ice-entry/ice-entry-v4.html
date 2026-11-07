@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ice entry v4</title>
+<!-- 界面设计 2026-11-07, v4 (Jason: no shatter; a simple entry in the current style). One frosted "On ice" pill for phone and
+     desktop (on-ice-v4.css). Click it: the ice page with "Back to the lake" in the same corner and the same shape; click
+     that to come back. The locked (MKT) pill shows where the subscribe card would open. Mock only, over screenshots of
+     the Base pages (phone 390 × 844, desktop 1280 × 800).
+     Options: ?d=phone | desk  ·  &pos=panel | corner | top (desktop)  ·  &lock  ·  &press (pressed / hovered look)  ·  &ice -->
+<link rel="stylesheet" href="on-ice-v4.css">
+<style>
+  @font-face { font-family: 'Instrument Sans'; src: url('../../public/brand/fonts/InstrumentSans-Variable.woff2') format('woff2'); font-weight: 400 700; }
+  html, body { margin: 0; min-height: 100%; background: #0b1820; font-family: 'Instrument Sans', system-ui, sans-serif; color: #cfe3ee; }
+  .wrap { display: flex; gap: 24px; align-items: flex-start; padding: 16px; }
+  .stage { position: relative; flex: none; overflow: hidden; background: center / cover no-repeat; }
+  .stage.phone { width: 390px; height: 844px; border-radius: 28px; }
+  .stage.desk { width: 1280px; height: 800px; border-radius: 6px; }
+  .pick { display: flex; flex-direction: column; gap: 8px; font-size: 13px; min-width: 200px; }
+  .pick b { color: #fff; font-size: 14px; margin-top: 6px; }
+  .pick a { color: #9ad8ff; text-decoration: none; } .pick a.on { color: #fff; font-weight: 600; }
+  .note { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); padding: 14px 18px; border-radius: 14px; font-size: 13px; color: #fff;
+    background: rgba(3,18,26,0.82); box-shadow: 0 0 0 1px rgba(255,255,255,0.2); opacity: 0; transition: opacity .25s; pointer-events: none; text-align: center; }
+  .note.on { opacity: 1; }
+  body.shot .pick { display: none; } body.shot .wrap { padding: 0; } body.shot .stage { border-radius: 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="stage" id="stage"><div class="note" id="note">The subscribe card opens here<br><span style="opacity:.7">(mock: same card as the locked views)</span></div></div>
+  <div class="pick" id="pick"></div>
+</div>
+<script>
+  const q = new URLSearchParams(location.search)
+  const d = q.get('d') === 'desk' ? 'desk' : 'phone', pos = q.get('pos') || 'panel', lock = q.has('lock')
+  if (q.has('shot')) document.body.classList.add('shot')
+  const stage = document.getElementById('stage'), note = document.getElementById('note')
+  stage.classList.add(d)
+  // desktop places, measured on the Base page at 1280 × 800: panel 16,56 400 × 402 (bottom 458); Replay tour 20,755; Back 12,12
+  const DESK = { panel: 'left:16px;top:470px', corner: 'left:20px;top:716px', top: 'left:16px;top:14px' }
+  const FLAKE = '<svg class="ac-onice-flake" viewBox="0 0 14 14" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.15" stroke-linecap="round"><path d="M7 1v12M1.8 4l10.4 6M1.8 10l10.4-6"/><path d="M5.6 1.9 7 3.2l1.4-1.3M5.6 12.1 7 10.8l1.4 1.3M2.1 5.7l1.8.4-.5 1.8M11.9 8.3l-1.8-.4.5-1.8M2.1 8.3l1.8-.4-.5-1.8M11.9 5.7l-1.8.4.5 1.8"/></g></svg>'
+  const LOCK = '<svg class="ac-lock" viewBox="0 0 12 14" width="11" height="11" aria-hidden="true"><path d="M3.4 6.4V4.1a2.6 2.6 0 0 1 5.2 0v2.3" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/><rect x="1.6" y="6.2" width="8.8" height="6.6" rx="1.4" fill="currentColor"/></svg>'
+  let ice = q.has('ice')
+  function render () {
+    stage.style.backgroundImage = `url('v4-${ice ? 'ice' : 'lake'}-${d}.jpg')`
+    stage.querySelectorAll('.ac-onice').forEach((e) => e.remove())
+    const b = document.createElement('button'); b.type = 'button'
+    if (!ice) {
+      b.className = `ac-onice${lock ? ' is-locked' : ''}${q.has('press') ? ' is-pressed' : ''}${d === 'phone' ? ' at-phone' : ''}`
+      b.innerHTML = `${FLAKE}<span>On ice</span><span class="ac-onice-end">${lock ? LOCK : '→'}</span>`
+      b.setAttribute('aria-label', lock ? 'On ice (locked): subscribe to open the ice-fishing page' : 'On ice: open the ice-fishing page')
+      b.onclick = () => { if (lock) { note.classList.add('on'); setTimeout(() => note.classList.remove('on'), 1800) } else { ice = true; render() } }
+    } else {
+      b.className = `ac-onice is-back${d === 'phone' ? ' at-phone' : ''}`
+      b.innerHTML = '<span class="ac-onice-end">←</span><span>Back to the lake</span>'
+      b.onclick = () => { ice = false; render() }
+    }
+    if (d === 'desk') b.style.cssText = ice ? 'left:12px;top:12px' : DESK[pos]
+    stage.appendChild(b)
+  }
+  render()
+  const link = (label, params) => { const u = new URLSearchParams(params).toString(); return `<a href="?${u}" class="${'?' + u === location.search ? 'on' : ''}">${label}</a>` }
+  document.getElementById('pick').innerHTML = `<b>On ice · v4 mock</b>
+    <b>Phone 390 × 844</b>${link('Free version', { d: 'phone' })}${link('Locked (MKT)', { d: 'phone', lock: '' })}
+    <b>Desktop 1280 × 800</b>${link('Under the panel (recommended)', { d: 'desk', pos: 'panel' })}${link('Bottom left, above Replay tour', { d: 'desk', pos: 'corner' })}${link('Top left, where Back to the lake is', { d: 'desk', pos: 'top' })}${link('Under the panel, locked (MKT)', { d: 'desk', pos: 'panel', lock: '' })}
+    <span style="opacity:.7;margin-top:8px">Click the pill to go on the ice; click Back to come back.</span>`
+</script>
+</body>
+</html>
