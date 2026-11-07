@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ice entry v2</title>
+<!-- 界面设计 2026-11-06, v2 (Jason: v1 "太呆了"; reference: 21st.dev "Frosted Window Background"). A small frosted window
+     whose frost is simulated on the GPU (frost-v2.js). Hover wipes the frost, which grows back; a click spreads frost over the
+     whole screen and the ice page fades in under it. Mock only, over a screenshot of the Base desktop page (1280 × 800). -->
+<style>
+  @font-face { font-family: 'Eurostile Heavy'; src: url('../../public/brand/fonts/Eurostile-Heavy.woff2') format('woff2'); font-weight: 800; }
+  @font-face { font-family: 'Instrument Sans'; src: url('../../public/brand/fonts/InstrumentSans-Variable.woff2') format('woff2'); font-weight: 400 700; }
+  html, body { margin: 0; height: 100%; background: #0f3b44; overflow: hidden; }
+  .stage { position: relative; width: 1280px; height: 800px; background: url('lake-1280x800.jpg') center / 1280px 800px no-repeat; }
+</style>
+</head>
+<body>
+<div class="stage" id="stage"></div>
+<script src="frost-v2.js"></script>
+<script>
+  const manual = /[?&]manual\b/.test(location.search)
+  window.entry = IceFrost.mount({ parent: document.getElementById('stage'), backdrop: 'ice-window.jpg', fullBackdrop: 'ice-page-1280x800.jpg', manual,
+    onEnter: () => { if (!manual) setTimeout(() => location.reload(), 2600) } }) // the demo starts over after the jump
+</script>
+</body>
+</html>
