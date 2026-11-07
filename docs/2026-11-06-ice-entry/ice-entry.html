@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ice entry mock</title>
+<!-- 界面设计 2026-11-06: the desktop ice-fishing entry (Jason picked the "ice hole" icon). Mock only, over a screenshot of the
+     Base desktop page (1280 × 800); no version's code changed. Open this file in a browser: hover the hole, click it.
+     Rules: #50 premium/tech first; effects are CSS transform/opacity + static SVG filters, so the 3D frame rate is untouched;
+     no images besides the background screenshot; brand fonts. -->
+<style>
+  @font-face { font-family: 'Eurostile Heavy'; src: url('../../public/brand/fonts/Eurostile-Heavy.woff2') format('woff2'); font-weight: 800; }
+  @font-face { font-family: 'Instrument Sans'; src: url('../../public/brand/fonts/InstrumentSans-Variable.woff2') format('woff2'); font-weight: 400 700; }
+  :root { --blue: #028cdf; }
+  html, body { margin: 0; height: 100%; background: #0f3b44; overflow: hidden; }
+  .stage { position: relative; width: 1280px; height: 800px; background: url('lake-1280x800.jpg') center / 1280px 800px no-repeat; }
+
+  /* ---- the entry: an ice hole + one line, bottom-left of the lake, above "Replay tour", clear of the panel (which ends at y 458) ---- */
+  .ice-entry { position: absolute; z-index: 2; left: 22px; bottom: 62px; display: flex; align-items: center; gap: 14px; padding: 8px 18px 8px 8px;
+    border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.14); background: rgba(10, 24, 32, 0.42);
+    backdrop-filter: blur(10px) saturate(1.2); -webkit-backdrop-filter: blur(10px) saturate(1.2);
+    box-shadow: 0 10px 28px rgba(2, 20, 30, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    color: #fff; cursor: pointer; text-decoration: none; transition: transform 0.25s ease, background 0.25s ease, border-color 0.25s ease; }
+  .ice-entry:hover, .ice-entry.is-hover { background: rgba(12, 30, 40, 0.55); border-color: rgba(190, 228, 255, 0.34); transform: translateY(-2px); }
+  .ice-entry:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
+
+  /* the hole, 68 px: a matte snow-and-ice rim with a slightly uneven edge; inside, the blue wall of the ice (its thickness)
+     going down to dark water; sonar rings expand from the transducer at the centre */
+  .hole { position: relative; width: 68px; height: 68px; flex: none; }
+  .rim { position: absolute; inset: 0; border-radius: 48% 52% 50% 50% / 52% 47% 53% 48%; filter: url(#rough);
+    background: radial-gradient(circle at 40% 32%, #f3f8fc 0%, #dfeaf3 45%, #b9cfdf 80%, #9ab7cc 100%);
+    box-shadow: 0 2px 10px rgba(0, 20, 30, 0.45); }
+  .wall { position: absolute; inset: 10px; border-radius: 50% 48% 52% 50% / 49% 52% 48% 51%; overflow: hidden;
+    background: radial-gradient(circle at 52% 56%, #021520 0%, #052638 34%, #0b4560 50%, #2f82ad 66%, #7cc4e8 82%, #c2e7f8 93%, #eef8fd 100%);
+    box-shadow: inset 0 3px 6px rgba(0, 12, 20, 0.6); }
+  .ring { position: absolute; left: 50%; top: 50%; width: 44px; height: 44px; margin: -22px 0 0 -22px; border-radius: 50%;
+    border: 1.5px solid #5cc8ff; box-shadow: 0 0 6px rgba(2, 140, 223, 0.8); opacity: 0; transform: scale(0.12);
+    animation: ping 2.4s cubic-bezier(0.2, 0.6, 0.3, 1) infinite; }
+  .ring.r2 { animation-delay: 0.8s; } .ring.r3 { animation-delay: 1.6s; }
+  @keyframes ping { 0% { transform: scale(0.12); opacity: 0; } 10% { opacity: 1; } 70% { opacity: 0.55; } 100% { transform: scale(0.95); opacity: 0; } }
+  .dot { position: absolute; left: 50%; top: 50%; width: 5px; height: 5px; margin: -2.5px 0 0 -2.5px; border-radius: 50%; background: #d4f0ff;
+    box-shadow: 0 0 8px 2px rgba(2, 140, 223, 1); animation: dot 2.4s ease-in-out infinite; }
+  @keyframes dot { 0%, 100% { opacity: 0.75; } 8% { opacity: 1; } }
+  .ice-entry:hover .ring, .ice-entry.is-hover .ring { animation-duration: 1.6s; }
+
+  /* frost: fine crystal needles round the rim (a ring of thin rays). Faint at rest; on hover they grow outward and brighten */
+  .frost { position: absolute; inset: -16px; pointer-events: none; opacity: 0.28; transform: scale(0.86) rotate(0deg);
+    background: repeating-conic-gradient(from 3deg, rgba(236, 247, 255, 0.95) 0deg 0.9deg, transparent 0.9deg 6.5deg),
+                repeating-conic-gradient(from 0deg, rgba(210, 236, 255, 0.6) 0deg 0.5deg, transparent 0.5deg 4.1deg);
+    -webkit-mask: radial-gradient(circle, transparent 0 46%, #000 49%, rgba(0,0,0,0.6) 60%, transparent 71%);
+            mask: radial-gradient(circle, transparent 0 46%, #000 49%, rgba(0,0,0,0.6) 60%, transparent 71%);
+    filter: url(#crystal) drop-shadow(0 0 2px rgba(180, 225, 255, 0.6));
+    transition: transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.5s ease; will-change: transform, opacity; }
+  .ice-entry:hover .frost, .ice-entry.is-hover .frost { opacity: 0.95; transform: scale(1.12) rotate(4deg); }
+
+  /* snow: flakes lift out of the hole and drift on hover */
+  .snow { position: absolute; inset: 0; pointer-events: none; }
+  .snow i { position: absolute; left: 50%; top: 50%; width: 4px; height: 4px; border-radius: 50%; background: #fff; opacity: 0;
+    box-shadow: 0 0 6px 1px rgba(220, 240, 255, 0.9); }
+  .ice-entry:hover .snow i, .ice-entry.is-hover .snow i { animation: flake 2.4s ease-out infinite; }
+  .snow i:nth-child(1) { --x: -30px; --y: -52px; animation-delay: 0s !important; }
+  .snow i:nth-child(2) { --x: 22px; --y: -60px; animation-delay: 0.3s !important; width: 3px; height: 3px; }
+  .snow i:nth-child(3) { --x: -6px; --y: -70px; animation-delay: 0.6s !important; }
+  .snow i:nth-child(4) { --x: 36px; --y: -38px; animation-delay: 0.9s !important; width: 3px; height: 3px; }
+  .snow i:nth-child(5) { --x: -40px; --y: -26px; animation-delay: 1.2s !important; }
+  .snow i:nth-child(6) { --x: 8px; --y: -48px; animation-delay: 1.5s !important; width: 3px; height: 3px; }
+  .snow i:nth-child(7) { --x: -18px; --y: -64px; animation-delay: 1.8s !important; width: 3px; height: 3px; }
+  .snow i:nth-child(8) { --x: 28px; --y: -24px; animation-delay: 2.1s !important; }
+  @keyframes flake { 0% { transform: translate(-50%, -50%) scale(0.3); opacity: 0; } 15% { opacity: 1; } 100% { transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) scale(1); opacity: 0; } }
+
+  /* the words */
+  .words { display: flex; flex-direction: column; gap: 4px; }
+  .title { font: 800 15px/1 'Eurostile Heavy', 'Instrument Sans', sans-serif; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; }
+  .title b { display: inline-block; margin-left: 6px; color: #8fd3ff; transition: transform 0.25s ease; }
+  .ice-entry:hover .title b, .ice-entry.is-hover .title b { transform: translateX(4px); }
+  .sub { font: 500 12px/1.2 'Instrument Sans', system-ui, sans-serif; color: rgba(255, 255, 255, 0.68); white-space: nowrap; }
+
+  /* the click: hairline cracks run out across the lake from the hole (behind the pill, so the words stay clean), then a frost
+     flash covers the screen — the jump to the ice page */
+  .cracks { position: absolute; z-index: 1; left: 65px; top: 695px; width: 520px; height: 520px; margin: -260px 0 0 -260px; pointer-events: none; overflow: visible; }
+  .cracks path { fill: none; stroke: rgba(236, 247, 255, 0.95); stroke-width: 1.1; stroke-linecap: round; stroke-linejoin: round;
+    filter: drop-shadow(0 0 2px rgba(120, 200, 255, 0.9)); stroke-dasharray: 300; stroke-dashoffset: 300; opacity: 0; }
+  .cracks path.thin { stroke-width: 0.7; stroke: rgba(220, 240, 255, 0.8); }
+  .stage.is-crack .cracks path { animation: crack 0.5s cubic-bezier(0.1, 0.8, 0.2, 1) forwards; }
+  .stage.is-crack .cracks path.thin { animation-delay: 0.12s; }
+  @keyframes crack { 0% { stroke-dashoffset: 300; opacity: 1; } 100% { stroke-dashoffset: 0; opacity: 1; } }
+  .stage.is-crack .hole { animation: knock 0.2s ease-out; }
+  @keyframes knock { 0% { transform: scale(1); } 40% { transform: scale(0.9); } 100% { transform: scale(1); } }
+  .stage.is-crack .frost { opacity: 1; transform: scale(1.3) rotate(8deg); }
+  .flash { position: absolute; z-index: 3; inset: 0; pointer-events: none; opacity: 0;
+    background: radial-gradient(circle at 65px 695px, rgba(240, 248, 255, 0.96) 0%, rgba(206, 230, 248, 0.85) 32%, rgba(24, 44, 66, 0.92) 100%); }
+  .stage.is-crack .flash { animation: flash 0.8s ease-in 0.55s forwards; }
+  @keyframes flash { 0% { opacity: 0; } 100% { opacity: 1; } }
+
+  @media (prefers-reduced-motion: reduce) { .ring, .dot, .snow i { animation: none !important; } .ring.r1 { opacity: 0.6; transform: scale(0.6); } }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <filter id="rough" x="-10%" y="-10%" width="120%" height="120%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.6" numOctaves="2" seed="3" result="n" />
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="3" xChannelSelector="R" yChannelSelector="G" />
+  </filter>
+  <filter id="crystal" x="-20%" y="-20%" width="140%" height="140%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.35" numOctaves="1" seed="11" result="n" />
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="2.5" xChannelSelector="R" yChannelSelector="G" />
+  </filter>
+</svg>
+<div class="stage" id="stage">
+  <!-- the cracks are drawn first so the pill sits on top of them -->
+  <svg class="cracks" viewBox="-260 -260 520 520" aria-hidden="true">
+    <path d="M24 -24 L58 -62 L66 -104 L104 -150 L112 -214" /><path d="M58 -62 L96 -70" class="thin" /><path d="M66 -104 L40 -132" class="thin" />
+    <path d="M30 -14 L92 -36 L150 -30 L208 -64 L250 -60" /><path d="M150 -30 L170 0" class="thin" /><path d="M92 -36 L118 -78" class="thin" />
+    <path d="M-4 -34 L-10 -88 L8 -136 L-6 -200" /><path d="M-10 -88 L-40 -110" class="thin" />
+    <path d="M34 4 L120 18" class="thin" /><path d="M-26 -22 L-62 -58 L-70 -96" class="thin" />
+  </svg>
+  <a class="ice-entry" id="entry" href="#" aria-label="Try ice fishing: open the ice-fishing page">
+    <span class="hole">
+      <span class="frost"></span>
+      <span class="rim"></span>
+      <span class="wall"><i class="ring r1"></i><i class="ring r2"></i><i class="ring r3"></i><i class="dot"></i></span>
+      <span class="snow"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+    </span>
+    <span class="words">
+      <span class="title">Try ice fishing<b>→</b></span>
+      <span class="sub">PingLive Mini, through the ice</span>
+    </span>
+  </a>
+  <div class="flash"></div>
+</div>
+<script>
+  // the demo: a click shows the crack and the frost flash, then resets after 2.4 s
+  const st = document.getElementById('stage')
+  document.getElementById('entry').addEventListener('click', (e) => { e.preventDefault(); st.classList.remove('is-crack'); void st.offsetWidth; st.classList.add('is-crack'); setTimeout(() => st.classList.remove('is-crack'), 2400) })
+</script>
+</body>
+</html>
