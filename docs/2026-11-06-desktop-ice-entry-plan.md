@@ -37,3 +37,12 @@ Jason：“要做的高级一点 … 一个图标带特效 … 单独做一个�
 3. **雪花徽章**：面板右边贴一个小冰牌，雪花慢慢转，边缘一闪一闪的冷光。
 
 规矩：#50 高级感、科技感优先；特效不能拖慢 3D 帧率（只用 CSS / 小动画，不加大图）；带锁版的锁照手机规则。
+
+## Jason 11-06：第一版样稿“太呆”，找网上牛的特效
+
+界面设计的 CSS 样稿（docs/2026-11-06-ice-entry/，a3a39a0）Jason 看了说“太呆了”。HQ 网上找到的参考：
+
+1. **真结霜（推荐）**：21st.dev “Frosted Window Background”（hoarfrost-pane，Kedhareswer Naidu，MIT 可商用，React + WebGL2，不用图片）。用 GPU 真的模拟冰晶生长，六角枝晶从边上往里长，手指划过会擦出一道，霜再慢慢长回来。用法：入口做成一小块结霜的玻璃窗，鼠标移上去擦开霜，露出冰钓页的画面；点了以后霜从这块窗长满整个屏幕，再转到冰钓页。只在小窗里模拟，点击时才铺满全屏，帧率可控。要量一下对 3D 湖帧率的影响（#50：不拿画面换速度，但也不能卡）。
+   https://21st.dev/@kedhareswer/components/hoarfrost-pane
+2. **水晶冰块**：shaders.com 的 Crystal / Frost / Shatter（可以套自定义 SVG 形状，比如雪花或冰洞，点击时碎裂）。效果很强，但用的是 WebGPU，导出代码要买 Pro，价格和商用条款页面上没写清，而且 Lab 已经有一个 3D 画布，再加一个 WebGPU 画布风险大。
+   https://shaders.com/docs/components/crystal
