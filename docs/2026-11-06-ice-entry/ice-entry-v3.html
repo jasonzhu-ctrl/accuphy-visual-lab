@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ice entry v3</title>
+<!-- 界面设计 2026-11-06, v3 (Jason on v2: no frost; the whole screen should crack bit by bit and fall away). A clean ice slab
+     with the ice camp inside; hover creeps a few fine cracks; a click cracks the whole screen from the click point and the
+     shards tumble down, showing the ice page. Mock only, over a screenshot of the Base desktop page (1280 × 800). -->
+<style>
+  @font-face { font-family: 'Eurostile Heavy'; src: url('../../public/brand/fonts/Eurostile-Heavy.woff2') format('woff2'); font-weight: 800; }
+  @font-face { font-family: 'Instrument Sans'; src: url('../../public/brand/fonts/InstrumentSans-Variable.woff2') format('woff2'); font-weight: 400 700; }
+  html, body { margin: 0; height: 100%; background: #0f3b44; overflow: hidden; }
+  .stage { position: relative; width: 1280px; height: 800px; background: url('lake-1280x800.jpg') center / 1280px 800px no-repeat; }
+</style>
+</head>
+<body>
+<div class="stage" id="stage"></div>
+<script src="shatter-v3-snapshot.js"></script>
+<script src="shatter-v3.js"></script>
+<script>
+  const manual = /[?&]manual\b/.test(location.search)
+  window.entry = IceShatter.mount({ parent: document.getElementById('stage'), backdrop: IC3_SNAP.slab, snapshot: IC3_SNAP.lake,
+    fullBackdrop: 'ice-page-1280x800.jpg', manual,
+    onEnter: () => { if (!manual) setTimeout(() => location.reload(), 2200) } }) // the demo starts over after the jump
+</script>
+</body>
+</html>
