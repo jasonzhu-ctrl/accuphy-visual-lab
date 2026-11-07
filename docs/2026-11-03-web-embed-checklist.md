@@ -89,9 +89,14 @@
 1. ~~`/embed/` 从哪打~~：HQ 11-03 定，从复制件打，照旧部署（见上面“现在是什么”）。
 2. ~~和 Base 共用的两个小文件~~：HQ 11-03 定，各复制一份进复制件，已做。
 3. 有人直接打开 `lab.accuphy.ca/index.html`（不是 `/`）时，冰钓格子会跳错。店铺框的是 `/`，客人碰不到；先记着。
+4. **合作方网站放嵌入版（Jason 11-06 问，待定）：** 德国经销商 Echolotzentrum（www.echolotzentrum.de，WordPress + WooCommerce），有 PingLive、PingLive Mini、两个套装的产品页，还有一篇 App 2.0 文章。
+   - 他们那边：产品页和文章页没有防嵌设置，已经在放 YouTube 框，技术上放得进。
+   - 我们这边三处要改（要 Jason 定了、在 Lab HQ 说“动”才做）：① lab.accuphy.ca 现在只许 shop.accuphy.com 和 Shopify 来框（frame-ancestors），要加他们的网址；② “去商店”按钮会跳到框外网站自己的 `/products/pinglive-sonar`，在他们网站上是 404，要改成去他们自己的产品页或我们的店；③ 分享链接同理，会变成他们网站上不存在的 `/pages/lab`。
+   - 和 #232（客人只拿店铺链接）是新情况，要 Jason 定；联系合作方经 HQ，不由本窗口去。
 
 ## 改动记录
 
 - 2026-11-03 Lab 网站嵌入版：建清单；复制件从 96fdc22 取出；打包改成 `/`、`/mini/`、`/ice/` 从复制件打，md5 = 线上。
 - 2026-11-03 Lab 网站嵌入版：devices.js、wedge.js 复制进来；/embed/ 改从复制件打，= 线上 lab-0c39d390cc.js（HQ 定）。
 - 2026-11-03 Lab 网站嵌入版：五种语言的字放进复制件 i18n.js（对照表 aa64746，Jason “动，放进去”）。
+- 2026-11-06 Lab 网站嵌入版：查了合作方 Echolotzentrum 网站能不能放嵌入版（只看，没改），记进第五节第 4 条。
